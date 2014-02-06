@@ -7,8 +7,7 @@
 #include "EventBase.h"
 
 #include "strbitset.h"
-
-//#include "CommonTools/Utils/interface/TFileDirectory.h"
+#include "TFileDirectory.h"
 
 //ROOT includes
 #include "TTree.h"

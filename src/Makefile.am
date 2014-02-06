@@ -8,12 +8,17 @@ lib_LTLIBRARIES = libRootAnalysis.la
 # Build information for each library
 
 # Sources for libRootAnalysis
-libRootAnalysis_la_SOURCES = libRootAnalysis.c
+libRootAnalysis_la_SOURCES = libRootAnalysis.c strbitset.cc TH1AddDirectorySentry.cc TFileDirectory.cc
 
 # Linker options libTestProgram
-libRootAnalysis_la_LDFLAGS = 
+libRootAnalysis_la_LDFLAGS = -version-info 1:0 -R @ROOTLIBDIR@ -L@ROOTLIBDIR@
+#LDADD = -lCore -lCint @ROOTAUXLIBS@
 
 # Compiler options. Here we are adding the include directory
 # to be searched for headers included in the source code.
-libRootAnalysis_la_CPPFLAGS = -I$(top_srcdir)/include
+libRootAnalysis_la_CPPFLAGS = -I$(top_srcdir)/include -I@ROOTINCDIR@
 
+#AM_CPPFLAGS             = -I@ROOTINCDIR@
+#AM_LDFLAGS              = -L@ROOTLIBDIR@
+#CLEANFILES              = *Cint.cxx *Cint.h *~ core
+            

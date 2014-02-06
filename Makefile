@@ -84,7 +84,8 @@ DIST_COMMON = INSTALL NEWS README AUTHORS ChangeLog \
 	$(top_srcdir)/configure $(am__configure_deps) COPYING compile \
 	config.guess config.sub depcomp install-sh missing ltmain.sh
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
-am__aclocal_m4_deps = $(top_srcdir)/configure.ac
+am__aclocal_m4_deps = $(top_srcdir)/acinclude.m4 \
+	$(top_srcdir)/configure.ac
 am__configure_deps = $(am__aclocal_m4_deps) $(CONFIGURE_DEPENDENCIES) \
 	$(ACLOCAL_M4)
 am__CONFIG_DISTCLEAN_FILES = config.status config.cache config.log \
@@ -203,6 +204,10 @@ CCDEPMODE = depmode=gcc3
 CFLAGS = -g -O2
 CPP = gcc -E
 CPPFLAGS = 
+CXX = g++
+CXXCPP = g++ -E
+CXXDEPMODE = depmode=gcc3
+CXXFLAGS = -g -O2
 CYGPATH_W = echo
 DEFS = -DPACKAGE_NAME=\"RootAnalysis\" -DPACKAGE_TARNAME=\"rootanalysis\" -DPACKAGE_VERSION=\"1.0\" -DPACKAGE_STRING=\"RootAnalysis\ 1.0\" -DPACKAGE_BUGREPORT=\"\" -DPACKAGE_URL=\"\" -DPACKAGE=\"rootanalysis\" -DVERSION=\"1.0\" -DSTDC_HEADERS=1 -DHAVE_SYS_TYPES_H=1 -DHAVE_SYS_STAT_H=1 -DHAVE_STDLIB_H=1 -DHAVE_STRING_H=1 -DHAVE_MEMORY_H=1 -DHAVE_STRINGS_H=1 -DHAVE_INTTYPES_H=1 -DHAVE_STDINT_H=1 -DHAVE_UNISTD_H=1 -DHAVE_DLFCN_H=1 -DLT_OBJDIR=\".libs/\"
 DEPDIR = .deps
@@ -247,6 +252,20 @@ PACKAGE_URL =
 PACKAGE_VERSION = 1.0
 PATH_SEPARATOR = :
 RANLIB = ranlib
+ROOTAUXCFLAGS = -pthread -m64
+ROOTAUXLIBS = -pthread -lm -ldl -rdynamic
+ROOTCFLAGS = -I/usr/include/root
+ROOTCINT = /usr/bin/rootcint
+ROOTCONF = /usr/bin/root-config
+ROOTETCDIR = /usr/share/root
+ROOTEXEC = /usr/bin/root
+ROOTGLIBS = -lGui -lCore -lCint -lRIO -lNet -lHist -lGraf -lGraf3d -lGpad -lTree -lRint -lPostscript -lMatrix -lPhysics -lMathCore -lThread
+ROOTINCDIR = /usr/include/root
+ROOTLIBDIR = /usr/lib64/root
+ROOTLIBS = -lCore -lCint -lRIO -lNet -lHist -lGraf -lGraf3d -lGpad -lTree -lRint -lPostscript -lMatrix -lPhysics -lMathCore -lThread
+ROOTRPATH = /usr/lib64/root
+ROOTSOVERSION = 5.34
+ROOTVERSION = 5.34/14
 SED = /usr/bin/sed
 SET_MAKE = 
 SHELL = /bin/sh
@@ -258,6 +277,7 @@ abs_top_builddir = /home/akalinow/scratch/EclipseWorkspace/RootAnalysis
 abs_top_srcdir = /home/akalinow/scratch/EclipseWorkspace/RootAnalysis
 ac_ct_AR = ar
 ac_ct_CC = gcc
+ac_ct_CXX = g++
 ac_ct_DUMPBIN = 
 am__include = include
 am__leading_dot = .

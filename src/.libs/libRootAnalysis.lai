@@ -5,10 +5,10 @@
 # It is necessary for linking the library.
 
 # The name that we can dlopen(3).
-dlname='libRootAnalysis.so.0'
+dlname='libRootAnalysis.so.1'
 
 # Names of this library.
-library_names='libRootAnalysis.so.0.0.0 libRootAnalysis.so.0 libRootAnalysis.so'
+library_names='libRootAnalysis.so.1.0.0 libRootAnalysis.so.1 libRootAnalysis.so'
 
 # The name of the static archive.
 old_library='libRootAnalysis.a'
@@ -17,13 +17,13 @@ old_library='libRootAnalysis.a'
 inherited_linker_flags=''
 
 # Libraries that this one depends upon.
-dependency_libs=''
+dependency_libs=' -R/usr/lib64/root -L/usr/lib64/root'
 
 # Names of additional weak libraries provided by this library
 weak_library_names=''
 
 # Version information for libRootAnalysis.
-current=0
+current=1
 age=0
 revision=0
 
