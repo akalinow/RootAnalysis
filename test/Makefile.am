@@ -16,10 +16,12 @@ noinst_PROGRAMS=exampleProgram
 # '_SOURCES' for example.
 
 # Sources for the a.out 
-exampleProgram_SOURCES= exampleProgram.c
+exampleProgram_SOURCES= exampleProgram.cc
 
 # Linker options for a.out
-exampleProgram_LDFLAGS = $(top_srcdir)/src/libRootAnalysis.la
+exampleProgram_LDFLAGS = $(top_srcdir)/src/libRootAnalysis.la -R @ROOTLIBDIR@ -L@ROOTLIBDIR@
+exampleProgram_LDADD   = @ROOTLIBS@ -lProof @ROOTAUXLIBS@ -lboost_regex
+
 
 # Compiler options for a.out
-exampleProgram_CPPFLAGS = -I$(top_srcdir)/include
+exampleProgram_CPPFLAGS = -I$(top_srcdir)/include -I@ROOTINCDIR@

@@ -120,19 +120,19 @@ am__uninstall_files_from_dir = { \
 am__installdirs = "$(DESTDIR)$(libdir)"
 LTLIBRARIES = $(lib_LTLIBRARIES)
 libRootAnalysis_la_LIBADD =
-am_libRootAnalysis_la_OBJECTS = libRootAnalysis_la-libRootAnalysis.lo \
+am_libRootAnalysis_la_OBJECTS = libRootAnalysis_la-Analyzer.lo \
+	libRootAnalysis_la-EventBase.lo \
+	libRootAnalysis_la-ObjectMessenger.lo \
 	libRootAnalysis_la-strbitset.lo \
+	libRootAnalysis_la-TFileDirectory.lo \
+	libRootAnalysis_la-TFileService.lo \
 	libRootAnalysis_la-TH1AddDirectorySentry.lo \
-	libRootAnalysis_la-TFileDirectory.lo
+	libRootAnalysis_la-TreeAnalyzer.lo
 libRootAnalysis_la_OBJECTS = $(am_libRootAnalysis_la_OBJECTS)
 AM_V_lt = $(am__v_lt_$(V))
 am__v_lt_ = $(am__v_lt_$(AM_DEFAULT_VERBOSITY))
 am__v_lt_0 = --silent
 am__v_lt_1 = 
-libRootAnalysis_la_LINK = $(LIBTOOL) $(AM_V_lt) --tag=CXX \
-	$(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=link $(CXXLD) \
-	$(AM_CXXFLAGS) $(CXXFLAGS) $(libRootAnalysis_la_LDFLAGS) \
-	$(LDFLAGS) -o $@
 AM_V_P = $(am__v_P_$(V))
 am__v_P_ = $(am__v_P_$(AM_DEFAULT_VERBOSITY))
 am__v_P_0 = false
@@ -149,24 +149,6 @@ DEFAULT_INCLUDES = -I.
 depcomp = $(SHELL) $(top_srcdir)/depcomp
 am__depfiles_maybe = depfiles
 am__mv = mv -f
-COMPILE = $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) \
-	$(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS)
-LTCOMPILE = $(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) \
-	$(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) \
-	$(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) \
-	$(AM_CFLAGS) $(CFLAGS)
-AM_V_CC = $(am__v_CC_$(V))
-am__v_CC_ = $(am__v_CC_$(AM_DEFAULT_VERBOSITY))
-am__v_CC_0 = @echo "  CC      " $@;
-am__v_CC_1 = 
-CCLD = $(CC)
-LINK = $(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) \
-	$(LIBTOOLFLAGS) --mode=link $(CCLD) $(AM_CFLAGS) $(CFLAGS) \
-	$(AM_LDFLAGS) $(LDFLAGS) -o $@
-AM_V_CCLD = $(am__v_CCLD_$(V))
-am__v_CCLD_ = $(am__v_CCLD_$(AM_DEFAULT_VERBOSITY))
-am__v_CCLD_0 = @echo "  CCLD    " $@;
-am__v_CCLD_1 = 
 CXXCOMPILE = $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) \
 	$(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS)
 LTCXXCOMPILE = $(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) \
@@ -230,7 +212,7 @@ CXXCPP = g++ -E
 CXXDEPMODE = depmode=gcc3
 CXXFLAGS = -g -O2
 CYGPATH_W = echo
-DEFS = -DPACKAGE_NAME=\"RootAnalysis\" -DPACKAGE_TARNAME=\"rootanalysis\" -DPACKAGE_VERSION=\"1.0\" -DPACKAGE_STRING=\"RootAnalysis\ 1.0\" -DPACKAGE_BUGREPORT=\"\" -DPACKAGE_URL=\"\" -DPACKAGE=\"rootanalysis\" -DVERSION=\"1.0\" -DSTDC_HEADERS=1 -DHAVE_SYS_TYPES_H=1 -DHAVE_SYS_STAT_H=1 -DHAVE_STDLIB_H=1 -DHAVE_STRING_H=1 -DHAVE_MEMORY_H=1 -DHAVE_STRINGS_H=1 -DHAVE_INTTYPES_H=1 -DHAVE_STDINT_H=1 -DHAVE_UNISTD_H=1 -DHAVE_DLFCN_H=1 -DLT_OBJDIR=\".libs/\"
+DEFS = -DPACKAGE_NAME=\"RootAnalysis\" -DPACKAGE_TARNAME=\"rootanalysis\" -DPACKAGE_VERSION=\"1.0\" -DPACKAGE_STRING=\"RootAnalysis\ 1.0\" -DPACKAGE_BUGREPORT=\"\" -DPACKAGE_URL=\"\" -DHAVE_MKDIR=1 -DSTDC_HEADERS=1 -DHAVE_SYS_TYPES_H=1 -DHAVE_SYS_STAT_H=1 -DHAVE_STDLIB_H=1 -DHAVE_STRING_H=1 -DHAVE_MEMORY_H=1 -DHAVE_STRINGS_H=1 -DHAVE_INTTYPES_H=1 -DHAVE_STDINT_H=1 -DHAVE_UNISTD_H=1 -DHAVE__BOOL=1 -DPACKAGE=\"rootanalysis\" -DVERSION=\"1.0\" -DHAVE_DLFCN_H=1 -DLT_OBJDIR=\".libs/\"
 DEPDIR = .deps
 DLLTOOL = false
 DSYMUTIL = 
@@ -360,10 +342,10 @@ lib_LTLIBRARIES = libRootAnalysis.la
 # Build information for each library
 
 # Sources for libRootAnalysis
-libRootAnalysis_la_SOURCES = libRootAnalysis.c strbitset.cc TH1AddDirectorySentry.cc TFileDirectory.cc
+libRootAnalysis_la_SOURCES = Analyzer.cc EventBase.cc ObjectMessenger.cc strbitset.cc TFileDirectory.cc TFileService.cc TH1AddDirectorySentry.cc TreeAnalyzer.cc
 
 # Linker options libTestProgram
-libRootAnalysis_la_LDFLAGS = -version-info 1:0 -R /usr/lib64/root -L/usr/lib64/root
+#libRootAnalysis_la_LDFLAGS = -version-info 1:0 -R /usr/lib64/root -L/usr/lib64/root
 #LDADD = -lCore -lCint -pthread -lm -ldl -rdynamic
 
 # Compiler options. Here we are adding the include directory
@@ -372,7 +354,7 @@ libRootAnalysis_la_CPPFLAGS = -I$(top_srcdir)/include -I/usr/include/root
 all: all-am
 
 .SUFFIXES:
-.SUFFIXES: .c .cc .lo .o .obj
+.SUFFIXES: .cc .lo .o .obj
 $(srcdir)/Makefile.in:  $(srcdir)/Makefile.am  $(am__configure_deps)
 	@for dep in $?; do \
 	  case '$(am__configure_deps)' in \
@@ -440,7 +422,7 @@ clean-libLTLIBRARIES:
 	}
 
 libRootAnalysis.la: $(libRootAnalysis_la_OBJECTS) $(libRootAnalysis_la_DEPENDENCIES) $(EXTRA_libRootAnalysis_la_DEPENDENCIES) 
-	$(AM_V_CXXLD)$(libRootAnalysis_la_LINK) -rpath $(libdir) $(libRootAnalysis_la_OBJECTS) $(libRootAnalysis_la_LIBADD) $(LIBS)
+	$(AM_V_CXXLD)$(CXXLINK) -rpath $(libdir) $(libRootAnalysis_la_OBJECTS) $(libRootAnalysis_la_LIBADD) $(LIBS)
 
 mostlyclean-compile:
 	-rm -f *.$(OBJEXT)
@@ -448,38 +430,14 @@ mostlyclean-compile:
 distclean-compile:
 	-rm -f *.tab.c
 
+include ./$(DEPDIR)/libRootAnalysis_la-Analyzer.Plo
+include ./$(DEPDIR)/libRootAnalysis_la-EventBase.Plo
+include ./$(DEPDIR)/libRootAnalysis_la-ObjectMessenger.Plo
 include ./$(DEPDIR)/libRootAnalysis_la-TFileDirectory.Plo
+include ./$(DEPDIR)/libRootAnalysis_la-TFileService.Plo
 include ./$(DEPDIR)/libRootAnalysis_la-TH1AddDirectorySentry.Plo
-include ./$(DEPDIR)/libRootAnalysis_la-libRootAnalysis.Plo
+include ./$(DEPDIR)/libRootAnalysis_la-TreeAnalyzer.Plo
 include ./$(DEPDIR)/libRootAnalysis_la-strbitset.Plo
-
-.c.o:
-	$(AM_V_CC)$(COMPILE) -MT $@ -MD -MP -MF $(DEPDIR)/$*.Tpo -c -o $@ $<
-	$(AM_V_at)$(am__mv) $(DEPDIR)/$*.Tpo $(DEPDIR)/$*.Po
-#	$(AM_V_CC)source='$<' object='$@' libtool=no \
-#	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) \
-#	$(AM_V_CC_no)$(COMPILE) -c $<
-
-.c.obj:
-	$(AM_V_CC)$(COMPILE) -MT $@ -MD -MP -MF $(DEPDIR)/$*.Tpo -c -o $@ `$(CYGPATH_W) '$<'`
-	$(AM_V_at)$(am__mv) $(DEPDIR)/$*.Tpo $(DEPDIR)/$*.Po
-#	$(AM_V_CC)source='$<' object='$@' libtool=no \
-#	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) \
-#	$(AM_V_CC_no)$(COMPILE) -c `$(CYGPATH_W) '$<'`
-
-.c.lo:
-	$(AM_V_CC)$(LTCOMPILE) -MT $@ -MD -MP -MF $(DEPDIR)/$*.Tpo -c -o $@ $<
-	$(AM_V_at)$(am__mv) $(DEPDIR)/$*.Tpo $(DEPDIR)/$*.Plo
-#	$(AM_V_CC)source='$<' object='$@' libtool=yes \
-#	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) \
-#	$(AM_V_CC_no)$(LTCOMPILE) -c -o $@ $<
-
-libRootAnalysis_la-libRootAnalysis.lo: libRootAnalysis.c
-	$(AM_V_CC)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libRootAnalysis_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT libRootAnalysis_la-libRootAnalysis.lo -MD -MP -MF $(DEPDIR)/libRootAnalysis_la-libRootAnalysis.Tpo -c -o libRootAnalysis_la-libRootAnalysis.lo `test -f 'libRootAnalysis.c' || echo '$(srcdir)/'`libRootAnalysis.c
-	$(AM_V_at)$(am__mv) $(DEPDIR)/libRootAnalysis_la-libRootAnalysis.Tpo $(DEPDIR)/libRootAnalysis_la-libRootAnalysis.Plo
-#	$(AM_V_CC)source='libRootAnalysis.c' object='libRootAnalysis_la-libRootAnalysis.lo' libtool=yes \
-#	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) \
-#	$(AM_V_CC_no)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libRootAnalysis_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o libRootAnalysis_la-libRootAnalysis.lo `test -f 'libRootAnalysis.c' || echo '$(srcdir)/'`libRootAnalysis.c
 
 .cc.o:
 	$(AM_V_CXX)$(CXXCOMPILE) -MT $@ -MD -MP -MF $(DEPDIR)/$*.Tpo -c -o $@ $<
@@ -502,12 +460,47 @@ libRootAnalysis_la-libRootAnalysis.lo: libRootAnalysis.c
 #	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) \
 #	$(AM_V_CXX_no)$(LTCXXCOMPILE) -c -o $@ $<
 
+libRootAnalysis_la-Analyzer.lo: Analyzer.cc
+	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libRootAnalysis_la_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT libRootAnalysis_la-Analyzer.lo -MD -MP -MF $(DEPDIR)/libRootAnalysis_la-Analyzer.Tpo -c -o libRootAnalysis_la-Analyzer.lo `test -f 'Analyzer.cc' || echo '$(srcdir)/'`Analyzer.cc
+	$(AM_V_at)$(am__mv) $(DEPDIR)/libRootAnalysis_la-Analyzer.Tpo $(DEPDIR)/libRootAnalysis_la-Analyzer.Plo
+#	$(AM_V_CXX)source='Analyzer.cc' object='libRootAnalysis_la-Analyzer.lo' libtool=yes \
+#	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) \
+#	$(AM_V_CXX_no)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libRootAnalysis_la_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o libRootAnalysis_la-Analyzer.lo `test -f 'Analyzer.cc' || echo '$(srcdir)/'`Analyzer.cc
+
+libRootAnalysis_la-EventBase.lo: EventBase.cc
+	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libRootAnalysis_la_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT libRootAnalysis_la-EventBase.lo -MD -MP -MF $(DEPDIR)/libRootAnalysis_la-EventBase.Tpo -c -o libRootAnalysis_la-EventBase.lo `test -f 'EventBase.cc' || echo '$(srcdir)/'`EventBase.cc
+	$(AM_V_at)$(am__mv) $(DEPDIR)/libRootAnalysis_la-EventBase.Tpo $(DEPDIR)/libRootAnalysis_la-EventBase.Plo
+#	$(AM_V_CXX)source='EventBase.cc' object='libRootAnalysis_la-EventBase.lo' libtool=yes \
+#	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) \
+#	$(AM_V_CXX_no)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libRootAnalysis_la_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o libRootAnalysis_la-EventBase.lo `test -f 'EventBase.cc' || echo '$(srcdir)/'`EventBase.cc
+
+libRootAnalysis_la-ObjectMessenger.lo: ObjectMessenger.cc
+	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libRootAnalysis_la_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT libRootAnalysis_la-ObjectMessenger.lo -MD -MP -MF $(DEPDIR)/libRootAnalysis_la-ObjectMessenger.Tpo -c -o libRootAnalysis_la-ObjectMessenger.lo `test -f 'ObjectMessenger.cc' || echo '$(srcdir)/'`ObjectMessenger.cc
+	$(AM_V_at)$(am__mv) $(DEPDIR)/libRootAnalysis_la-ObjectMessenger.Tpo $(DEPDIR)/libRootAnalysis_la-ObjectMessenger.Plo
+#	$(AM_V_CXX)source='ObjectMessenger.cc' object='libRootAnalysis_la-ObjectMessenger.lo' libtool=yes \
+#	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) \
+#	$(AM_V_CXX_no)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libRootAnalysis_la_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o libRootAnalysis_la-ObjectMessenger.lo `test -f 'ObjectMessenger.cc' || echo '$(srcdir)/'`ObjectMessenger.cc
+
 libRootAnalysis_la-strbitset.lo: strbitset.cc
 	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libRootAnalysis_la_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT libRootAnalysis_la-strbitset.lo -MD -MP -MF $(DEPDIR)/libRootAnalysis_la-strbitset.Tpo -c -o libRootAnalysis_la-strbitset.lo `test -f 'strbitset.cc' || echo '$(srcdir)/'`strbitset.cc
 	$(AM_V_at)$(am__mv) $(DEPDIR)/libRootAnalysis_la-strbitset.Tpo $(DEPDIR)/libRootAnalysis_la-strbitset.Plo
 #	$(AM_V_CXX)source='strbitset.cc' object='libRootAnalysis_la-strbitset.lo' libtool=yes \
 #	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) \
 #	$(AM_V_CXX_no)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libRootAnalysis_la_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o libRootAnalysis_la-strbitset.lo `test -f 'strbitset.cc' || echo '$(srcdir)/'`strbitset.cc
+
+libRootAnalysis_la-TFileDirectory.lo: TFileDirectory.cc
+	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libRootAnalysis_la_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT libRootAnalysis_la-TFileDirectory.lo -MD -MP -MF $(DEPDIR)/libRootAnalysis_la-TFileDirectory.Tpo -c -o libRootAnalysis_la-TFileDirectory.lo `test -f 'TFileDirectory.cc' || echo '$(srcdir)/'`TFileDirectory.cc
+	$(AM_V_at)$(am__mv) $(DEPDIR)/libRootAnalysis_la-TFileDirectory.Tpo $(DEPDIR)/libRootAnalysis_la-TFileDirectory.Plo
+#	$(AM_V_CXX)source='TFileDirectory.cc' object='libRootAnalysis_la-TFileDirectory.lo' libtool=yes \
+#	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) \
+#	$(AM_V_CXX_no)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libRootAnalysis_la_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o libRootAnalysis_la-TFileDirectory.lo `test -f 'TFileDirectory.cc' || echo '$(srcdir)/'`TFileDirectory.cc
+
+libRootAnalysis_la-TFileService.lo: TFileService.cc
+	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libRootAnalysis_la_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT libRootAnalysis_la-TFileService.lo -MD -MP -MF $(DEPDIR)/libRootAnalysis_la-TFileService.Tpo -c -o libRootAnalysis_la-TFileService.lo `test -f 'TFileService.cc' || echo '$(srcdir)/'`TFileService.cc
+	$(AM_V_at)$(am__mv) $(DEPDIR)/libRootAnalysis_la-TFileService.Tpo $(DEPDIR)/libRootAnalysis_la-TFileService.Plo
+#	$(AM_V_CXX)source='TFileService.cc' object='libRootAnalysis_la-TFileService.lo' libtool=yes \
+#	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) \
+#	$(AM_V_CXX_no)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libRootAnalysis_la_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o libRootAnalysis_la-TFileService.lo `test -f 'TFileService.cc' || echo '$(srcdir)/'`TFileService.cc
 
 libRootAnalysis_la-TH1AddDirectorySentry.lo: TH1AddDirectorySentry.cc
 	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libRootAnalysis_la_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT libRootAnalysis_la-TH1AddDirectorySentry.lo -MD -MP -MF $(DEPDIR)/libRootAnalysis_la-TH1AddDirectorySentry.Tpo -c -o libRootAnalysis_la-TH1AddDirectorySentry.lo `test -f 'TH1AddDirectorySentry.cc' || echo '$(srcdir)/'`TH1AddDirectorySentry.cc
@@ -516,12 +509,12 @@ libRootAnalysis_la-TH1AddDirectorySentry.lo: TH1AddDirectorySentry.cc
 #	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) \
 #	$(AM_V_CXX_no)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libRootAnalysis_la_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o libRootAnalysis_la-TH1AddDirectorySentry.lo `test -f 'TH1AddDirectorySentry.cc' || echo '$(srcdir)/'`TH1AddDirectorySentry.cc
 
-libRootAnalysis_la-TFileDirectory.lo: TFileDirectory.cc
-	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libRootAnalysis_la_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT libRootAnalysis_la-TFileDirectory.lo -MD -MP -MF $(DEPDIR)/libRootAnalysis_la-TFileDirectory.Tpo -c -o libRootAnalysis_la-TFileDirectory.lo `test -f 'TFileDirectory.cc' || echo '$(srcdir)/'`TFileDirectory.cc
-	$(AM_V_at)$(am__mv) $(DEPDIR)/libRootAnalysis_la-TFileDirectory.Tpo $(DEPDIR)/libRootAnalysis_la-TFileDirectory.Plo
-#	$(AM_V_CXX)source='TFileDirectory.cc' object='libRootAnalysis_la-TFileDirectory.lo' libtool=yes \
+libRootAnalysis_la-TreeAnalyzer.lo: TreeAnalyzer.cc
+	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libRootAnalysis_la_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT libRootAnalysis_la-TreeAnalyzer.lo -MD -MP -MF $(DEPDIR)/libRootAnalysis_la-TreeAnalyzer.Tpo -c -o libRootAnalysis_la-TreeAnalyzer.lo `test -f 'TreeAnalyzer.cc' || echo '$(srcdir)/'`TreeAnalyzer.cc
+	$(AM_V_at)$(am__mv) $(DEPDIR)/libRootAnalysis_la-TreeAnalyzer.Tpo $(DEPDIR)/libRootAnalysis_la-TreeAnalyzer.Plo
+#	$(AM_V_CXX)source='TreeAnalyzer.cc' object='libRootAnalysis_la-TreeAnalyzer.lo' libtool=yes \
 #	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) \
-#	$(AM_V_CXX_no)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libRootAnalysis_la_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o libRootAnalysis_la-TFileDirectory.lo `test -f 'TFileDirectory.cc' || echo '$(srcdir)/'`TFileDirectory.cc
+#	$(AM_V_CXX_no)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libRootAnalysis_la_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o libRootAnalysis_la-TreeAnalyzer.lo `test -f 'TreeAnalyzer.cc' || echo '$(srcdir)/'`TreeAnalyzer.cc
 
 mostlyclean-libtool:
 	-rm -f *.lo
@@ -735,10 +728,6 @@ uninstall-am: uninstall-libLTLIBRARIES
 	mostlyclean-generic mostlyclean-libtool pdf pdf-am ps ps-am \
 	tags tags-am uninstall uninstall-am uninstall-libLTLIBRARIES
 
-
-#AM_CPPFLAGS             = -I/usr/include/root
-#AM_LDFLAGS              = -L/usr/lib64/root
-#CLEANFILES              = *Cint.cxx *Cint.h *~ core
 
 # Tell versions [3.59,3.63) of GNU make to not export all variables.
 # Otherwise a system limit (for SysV at least) may be exceeded.

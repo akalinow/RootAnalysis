@@ -23,30 +23,17 @@ class Analyzer{
   virtual ~Analyzer(){;}
   
   ///Initialize the analyzer
-  virtual void initialize(const edm::ParameterSet& aPset, 
-			  TFileDirectory& aDir,
+  virtual void initialize(TFileDirectory& aDir,
 			  pat::strbitset *aSelections){
 
     //default is to do whatever the analzer does
-    filterEvent_ = aPset.getUntrackedParameter<bool>("filter",true);
-    initialize(aPset,(const TFileDirectory &)aDir,aSelections);
-
+    filterEvent_ = false;
 };
   
-  ///Initialize the analyzer. 
-  ///Method for assuring the backward compatibility.
-  ///To be removed at some time
-  virtual void initialize(const edm::ParameterSet& aPset, 
-			  const TFileDirectory& aDir,
-			  pat::strbitset *aSelections){};
-
-  virtual void processRunInfo(const edm::RunBase& aRun){;};
   
-  virtual bool analyze(const edm::EventBase& iEvent) = 0;
+  virtual bool analyze(const EventBase& iEvent) = 0;
 
-  virtual bool analyze(const edm::EventBase& iEvent, ObjectMessenger *aMessenger){
-    return analyze(iEvent);
-  }
+  virtual bool analyze(const EventBase& iEvent, ObjectMessenger *aMessenger){return analyze(iEvent); }
 
   virtual void finalize(){;};
 

@@ -13,11 +13,13 @@
  ============================================================================
  */
 
-//#include "libRootAnalysis.h"
+#include <iostream>
 
 #include "TreeAnalyzer.h"
 
 int main(void) {
-  //print_hello();
+
+  std::cout<<"Test"<<std::endl;
+
   return 0;
 }

@@ -15,10 +15,10 @@ class ObjectMessenger{
   const std::string & name(){return myName_;};
 
   ///Method for putting a object into messenger
-  template<class T> void putObject(const T* obj, const std::string & flavour)= 0;
+  template<class T> void putObject(const T* obj, const std::string & flavour){};
 
   ///Method for accessing object from the messenger
-  template<class T> const T* getObject(const std::string & flavour) = 0;
+  template<class T> const T* getObject(const std::string & flavour){};
 
   ///Method cleaning the messenger contents
   void clear();

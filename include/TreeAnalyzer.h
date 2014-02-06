@@ -8,16 +8,13 @@
 
 #include "boost/unordered_map.hpp"
 
-#include "TCollection.h"
-
 #include "Analyzer.h"
 #include "ObjectMessenger.h"
-
-//#include "PhysicsTools/FWLite/interface/TFileService.h"
+#include "TFileService.h"
 
 class TH1D;
 class TProofOutputFile;
-class FWLiteSummaryAnalyzer;
+//class FWLiteSummaryAnalyzer;
 class ObjectMessenger;
 
 class TreeAnalyzer: public Analyzer{
@@ -44,14 +41,8 @@ public :
   ///Loop method, starting loop over the events.
   int loop();
 
-  //Process the run info for the file
-  virtual void processRunInfo(const edm::RunBase& aRun);
-
   ///Implementation of the abstract method
-  virtual bool analyze(const edm::EventBase& iEvent) {return true;};
-
-  virtual bool analyze(const edm::EventBase& iEvent,
-		       const edm::RunBase& aRun);
+  virtual bool analyze(const EventBase& iEvent);
 
   ///Method return the event weight for analyzed dataset.
   float getEventWeight() const {return eventWeight_;};
@@ -66,9 +57,9 @@ public :
   TFile *getHistoFile() const { return &store_->file();};
 
   ///Method returning the ROOT file whre the analysis histograms are stored. 
-  fwlite::TFileService *getTFileService() const { return store_;};
+  TFileService *getTFileService() const { return store_;};
 
-  ///Method to acces the selections word
+  ///Method to access the selections word
   const pat::strbitset & getSelections() const {return *myStrSelections_;};
 
   ///Method normalising the histograms at the end of processing.
@@ -83,9 +74,6 @@ public :
    ///Method reseting the state of analyzer for the new event.
    void clear();
 
-   ///Parameter set for the analysis
-   boost::shared_ptr<edm::ParameterSet> parameterSet_;
-
    ///Vector with list of analyzers.
    std::vector<Analyzer*> myAnalyzers_;
 
@@ -97,13 +85,13 @@ public :
 
 
    ///Summary analyzer is a special one
-   FWLiteSummaryAnalyzer *mySummary_;
+   //FWLiteSummaryAnalyzer *mySummary_;
 
    ///Path to the output file.
    std::string filePath_;
 
    ///Pointer to the ROOT file holding the histograms.
-   fwlite::TFileService *store_;
+   TFileService *store_;
 
    ///Histogram counting the number of event analyzed.
    ///Necessary for event counting when running on PROOF.
@@ -121,6 +109,9 @@ public :
 
    ///Number of events to be analyzed.
    int nEventsToAnalyze_;   
+
+   ///Weight of single event.
+   float eventWeight_;
 
    ///Number of initial and final events in the
    ///processing of RECO/AOD with possible filtering, that
