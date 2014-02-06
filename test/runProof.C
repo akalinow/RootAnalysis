@@ -3,11 +3,7 @@
 TProof::AddEnvVar("PATH1",gSystem->Getenv("PATH"));
 
 TProof * p = TProof::Open("workers=7"); 
-
-gSystem->Load("libFWCoreFWLite");
-AutoLibraryLoader::enable();
-
-gSystem->Load("libPFAnalysesVBFHTauTau");
+gSystem->Load("libRootAnalysis");
 
 //This makes sure the TSelector library and dictionary are properly
 // installed in the remote PROOF servers
@@ -17,7 +13,6 @@ p->Exec( ".x proof_remote.C" );
 // NOTE: the files given must be accessible by the remote systems
 TDSet c( "TTree", "Events");
 
-loadFWLite();
 TPython::LoadMacro("tmpConfig.py");
 int size = TPython::Eval("len(process.source.fileNames)");
 int nEventsToRead = TPython::Eval("process.maxEvents.input.value()");

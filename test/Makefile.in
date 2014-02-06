@@ -85,7 +85,7 @@ POST_UNINSTALL = :
 build_triplet = @build@
 host_triplet = @host@
 target_triplet = @target@
-noinst_PROGRAMS = exampleProgram$(EXEEXT)
+noinst_PROGRAMS = test$(EXEEXT)
 subdir = test
 DIST_COMMON = $(srcdir)/Makefile.in $(srcdir)/Makefile.am \
 	$(top_srcdir)/depcomp
@@ -98,17 +98,16 @@ mkinstalldirs = $(install_sh) -d
 CONFIG_CLEAN_FILES =
 CONFIG_CLEAN_VPATH_FILES =
 PROGRAMS = $(noinst_PROGRAMS)
-am_exampleProgram_OBJECTS = exampleProgram-exampleProgram.$(OBJEXT)
-exampleProgram_OBJECTS = $(am_exampleProgram_OBJECTS)
-exampleProgram_DEPENDENCIES =
+am_test_OBJECTS = test-test.$(OBJEXT)
+test_OBJECTS = $(am_test_OBJECTS)
+test_DEPENDENCIES =
 AM_V_lt = $(am__v_lt_@AM_V@)
 am__v_lt_ = $(am__v_lt_@AM_DEFAULT_V@)
 am__v_lt_0 = --silent
 am__v_lt_1 = 
-exampleProgram_LINK = $(LIBTOOL) $(AM_V_lt) --tag=CXX \
-	$(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=link $(CXXLD) \
-	$(AM_CXXFLAGS) $(CXXFLAGS) $(exampleProgram_LDFLAGS) \
-	$(LDFLAGS) -o $@
+test_LINK = $(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) \
+	$(LIBTOOLFLAGS) --mode=link $(CXXLD) $(AM_CXXFLAGS) \
+	$(CXXFLAGS) $(test_LDFLAGS) $(LDFLAGS) -o $@
 AM_V_P = $(am__v_P_@AM_V@)
 am__v_P_ = $(am__v_P_@AM_DEFAULT_V@)
 am__v_P_0 = false
@@ -143,8 +142,8 @@ AM_V_CXXLD = $(am__v_CXXLD_@AM_V@)
 am__v_CXXLD_ = $(am__v_CXXLD_@AM_DEFAULT_V@)
 am__v_CXXLD_0 = @echo "  CXXLD   " $@;
 am__v_CXXLD_1 = 
-SOURCES = $(exampleProgram_SOURCES)
-DIST_SOURCES = $(exampleProgram_SOURCES)
+SOURCES = $(test_SOURCES)
+DIST_SOURCES = $(test_SOURCES)
 am__can_run_installinfo = \
   case $$AM_UPDATE_INFO_DIR in \
     n|no|NO) false;; \
@@ -315,14 +314,14 @@ top_srcdir = @top_srcdir@
 # '_SOURCES' for example.
 
 # Sources for the a.out 
-exampleProgram_SOURCES = exampleProgram.cc
+test_SOURCES = test.cc
 
 # Linker options for a.out
-exampleProgram_LDFLAGS = $(top_srcdir)/src/libRootAnalysis.la -R @ROOTLIBDIR@ -L@ROOTLIBDIR@
-exampleProgram_LDADD = @ROOTLIBS@ -lProof @ROOTAUXLIBS@ -lboost_regex
+test_LDFLAGS = $(top_srcdir)/src/libRootAnalysis.la -R @ROOTLIBDIR@ -L@ROOTLIBDIR@
+test_LDADD = @ROOTLIBS@ -lProof @ROOTAUXLIBS@ -lboost_regex
 
 # Compiler options for a.out
-exampleProgram_CPPFLAGS = -I$(top_srcdir)/include -I@ROOTINCDIR@
+test_CPPFLAGS = -I$(top_srcdir)/include -I@ROOTINCDIR@
 all: all-am
 
 .SUFFIXES:
@@ -367,9 +366,9 @@ clean-noinstPROGRAMS:
 	echo " rm -f" $$list; \
 	rm -f $$list
 
-exampleProgram$(EXEEXT): $(exampleProgram_OBJECTS) $(exampleProgram_DEPENDENCIES) $(EXTRA_exampleProgram_DEPENDENCIES) 
-	@rm -f exampleProgram$(EXEEXT)
-	$(AM_V_CXXLD)$(exampleProgram_LINK) $(exampleProgram_OBJECTS) $(exampleProgram_LDADD) $(LIBS)
+test$(EXEEXT): $(test_OBJECTS) $(test_DEPENDENCIES) $(EXTRA_test_DEPENDENCIES) 
+	@rm -f test$(EXEEXT)
+	$(AM_V_CXXLD)$(test_LINK) $(test_OBJECTS) $(test_LDADD) $(LIBS)
 
 mostlyclean-compile:
 	-rm -f *.$(OBJEXT)
@@ -377,7 +376,7 @@ mostlyclean-compile:
 distclean-compile:
 	-rm -f *.tab.c
 
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/exampleProgram-exampleProgram.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/test-test.Po@am__quote@
 
 .cc.o:
 @am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXXCOMPILE) -MT $@ -MD -MP -MF $(DEPDIR)/$*.Tpo -c -o $@ $<
@@ -400,19 +399,19 @@ distclean-compile:
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LTCXXCOMPILE) -c -o $@ $<
 
-exampleProgram-exampleProgram.o: exampleProgram.cc
-@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(exampleProgram_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT exampleProgram-exampleProgram.o -MD -MP -MF $(DEPDIR)/exampleProgram-exampleProgram.Tpo -c -o exampleProgram-exampleProgram.o `test -f 'exampleProgram.cc' || echo '$(srcdir)/'`exampleProgram.cc
-@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/exampleProgram-exampleProgram.Tpo $(DEPDIR)/exampleProgram-exampleProgram.Po
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='exampleProgram.cc' object='exampleProgram-exampleProgram.o' libtool=no @AMDEPBACKSLASH@
+test-test.o: test.cc
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(test_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT test-test.o -MD -MP -MF $(DEPDIR)/test-test.Tpo -c -o test-test.o `test -f 'test.cc' || echo '$(srcdir)/'`test.cc
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/test-test.Tpo $(DEPDIR)/test-test.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='test.cc' object='test-test.o' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(exampleProgram_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o exampleProgram-exampleProgram.o `test -f 'exampleProgram.cc' || echo '$(srcdir)/'`exampleProgram.cc
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(test_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o test-test.o `test -f 'test.cc' || echo '$(srcdir)/'`test.cc
 
-exampleProgram-exampleProgram.obj: exampleProgram.cc
-@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(exampleProgram_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT exampleProgram-exampleProgram.obj -MD -MP -MF $(DEPDIR)/exampleProgram-exampleProgram.Tpo -c -o exampleProgram-exampleProgram.obj `if test -f 'exampleProgram.cc'; then $(CYGPATH_W) 'exampleProgram.cc'; else $(CYGPATH_W) '$(srcdir)/exampleProgram.cc'; fi`
-@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/exampleProgram-exampleProgram.Tpo $(DEPDIR)/exampleProgram-exampleProgram.Po
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='exampleProgram.cc' object='exampleProgram-exampleProgram.obj' libtool=no @AMDEPBACKSLASH@
+test-test.obj: test.cc
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(test_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT test-test.obj -MD -MP -MF $(DEPDIR)/test-test.Tpo -c -o test-test.obj `if test -f 'test.cc'; then $(CYGPATH_W) 'test.cc'; else $(CYGPATH_W) '$(srcdir)/test.cc'; fi`
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/test-test.Tpo $(DEPDIR)/test-test.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='test.cc' object='test-test.obj' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(exampleProgram_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o exampleProgram-exampleProgram.obj `if test -f 'exampleProgram.cc'; then $(CYGPATH_W) 'exampleProgram.cc'; else $(CYGPATH_W) '$(srcdir)/exampleProgram.cc'; fi`
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(test_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o test-test.obj `if test -f 'test.cc'; then $(CYGPATH_W) 'test.cc'; else $(CYGPATH_W) '$(srcdir)/test.cc'; fi`
 
 mostlyclean-libtool:
 	-rm -f *.lo

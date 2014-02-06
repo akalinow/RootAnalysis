@@ -7,7 +7,7 @@
 # Because a.out is only a sample program we don't want it to be installed.
 # The 'noinst_' prefix indicates that the following targets are not to be
 # installed.
-noinst_PROGRAMS=exampleProgram
+noinst_PROGRAMS=test
 
 #######################################
 # Build information for each executable. The variable name is derived
@@ -16,12 +16,12 @@ noinst_PROGRAMS=exampleProgram
 # '_SOURCES' for example.
 
 # Sources for the a.out 
-exampleProgram_SOURCES= exampleProgram.cc
+test_SOURCES= test.cc
 
 # Linker options for a.out
-exampleProgram_LDFLAGS = $(top_srcdir)/src/libRootAnalysis.la -R @ROOTLIBDIR@ -L@ROOTLIBDIR@
-exampleProgram_LDADD   = @ROOTLIBS@ -lProof @ROOTAUXLIBS@ -lboost_regex
+test_LDFLAGS = $(top_srcdir)/src/libRootAnalysis.la -R @ROOTLIBDIR@ -L@ROOTLIBDIR@
+test_LDADD   = @ROOTLIBS@ -lProof @ROOTAUXLIBS@ -lboost_regex
 
 
 # Compiler options for a.out
-exampleProgram_CPPFLAGS = -I$(top_srcdir)/include -I@ROOTINCDIR@
+test_CPPFLAGS = -I$(top_srcdir)/include -I@ROOTINCDIR@

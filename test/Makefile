@@ -85,7 +85,7 @@ POST_UNINSTALL = :
 build_triplet = x86_64-unknown-linux-gnu
 host_triplet = x86_64-unknown-linux-gnu
 target_triplet = x86_64-unknown-linux-gnu
-noinst_PROGRAMS = exampleProgram$(EXEEXT)
+noinst_PROGRAMS = test$(EXEEXT)
 subdir = test
 DIST_COMMON = $(srcdir)/Makefile.in $(srcdir)/Makefile.am \
 	$(top_srcdir)/depcomp
@@ -98,17 +98,16 @@ mkinstalldirs = $(install_sh) -d
 CONFIG_CLEAN_FILES =
 CONFIG_CLEAN_VPATH_FILES =
 PROGRAMS = $(noinst_PROGRAMS)
-am_exampleProgram_OBJECTS = exampleProgram-exampleProgram.$(OBJEXT)
-exampleProgram_OBJECTS = $(am_exampleProgram_OBJECTS)
-exampleProgram_DEPENDENCIES =
+am_test_OBJECTS = test-test.$(OBJEXT)
+test_OBJECTS = $(am_test_OBJECTS)
+test_DEPENDENCIES =
 AM_V_lt = $(am__v_lt_$(V))
 am__v_lt_ = $(am__v_lt_$(AM_DEFAULT_VERBOSITY))
 am__v_lt_0 = --silent
 am__v_lt_1 = 
-exampleProgram_LINK = $(LIBTOOL) $(AM_V_lt) --tag=CXX \
-	$(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=link $(CXXLD) \
-	$(AM_CXXFLAGS) $(CXXFLAGS) $(exampleProgram_LDFLAGS) \
-	$(LDFLAGS) -o $@
+test_LINK = $(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) \
+	$(LIBTOOLFLAGS) --mode=link $(CXXLD) $(AM_CXXFLAGS) \
+	$(CXXFLAGS) $(test_LDFLAGS) $(LDFLAGS) -o $@
 AM_V_P = $(am__v_P_$(V))
 am__v_P_ = $(am__v_P_$(AM_DEFAULT_VERBOSITY))
 am__v_P_0 = false
@@ -143,8 +142,8 @@ AM_V_CXXLD = $(am__v_CXXLD_$(V))
 am__v_CXXLD_ = $(am__v_CXXLD_$(AM_DEFAULT_VERBOSITY))
 am__v_CXXLD_0 = @echo "  CXXLD   " $@;
 am__v_CXXLD_1 = 
-SOURCES = $(exampleProgram_SOURCES)
-DIST_SOURCES = $(exampleProgram_SOURCES)
+SOURCES = $(test_SOURCES)
+DIST_SOURCES = $(test_SOURCES)
 am__can_run_installinfo = \
   case $$AM_UPDATE_INFO_DIR in \
     n|no|NO) false;; \
@@ -315,14 +314,14 @@ top_srcdir = ..
 # '_SOURCES' for example.
 
 # Sources for the a.out 
-exampleProgram_SOURCES = exampleProgram.cc
+test_SOURCES = test.cc
 
 # Linker options for a.out
-exampleProgram_LDFLAGS = $(top_srcdir)/src/libRootAnalysis.la -R /usr/lib64/root -L/usr/lib64/root
-exampleProgram_LDADD = -lCore -lCint -lRIO -lNet -lHist -lGraf -lGraf3d -lGpad -lTree -lRint -lPostscript -lMatrix -lPhysics -lMathCore -lThread -lProof -pthread -lm -ldl -rdynamic -lboost_regex
+test_LDFLAGS = $(top_srcdir)/src/libRootAnalysis.la -R /usr/lib64/root -L/usr/lib64/root
+test_LDADD = -lCore -lCint -lRIO -lNet -lHist -lGraf -lGraf3d -lGpad -lTree -lRint -lPostscript -lMatrix -lPhysics -lMathCore -lThread -lProof -pthread -lm -ldl -rdynamic -lboost_regex
 
 # Compiler options for a.out
-exampleProgram_CPPFLAGS = -I$(top_srcdir)/include -I/usr/include/root
+test_CPPFLAGS = -I$(top_srcdir)/include -I/usr/include/root
 all: all-am
 
 .SUFFIXES:
@@ -367,9 +366,9 @@ clean-noinstPROGRAMS:
 	echo " rm -f" $$list; \
 	rm -f $$list
 
-exampleProgram$(EXEEXT): $(exampleProgram_OBJECTS) $(exampleProgram_DEPENDENCIES) $(EXTRA_exampleProgram_DEPENDENCIES) 
-	@rm -f exampleProgram$(EXEEXT)
-	$(AM_V_CXXLD)$(exampleProgram_LINK) $(exampleProgram_OBJECTS) $(exampleProgram_LDADD) $(LIBS)
+test$(EXEEXT): $(test_OBJECTS) $(test_DEPENDENCIES) $(EXTRA_test_DEPENDENCIES) 
+	@rm -f test$(EXEEXT)
+	$(AM_V_CXXLD)$(test_LINK) $(test_OBJECTS) $(test_LDADD) $(LIBS)
 
 mostlyclean-compile:
 	-rm -f *.$(OBJEXT)
@@ -377,7 +376,7 @@ mostlyclean-compile:
 distclean-compile:
 	-rm -f *.tab.c
 
-include ./$(DEPDIR)/exampleProgram-exampleProgram.Po
+include ./$(DEPDIR)/test-test.Po
 
 .cc.o:
 	$(AM_V_CXX)$(CXXCOMPILE) -MT $@ -MD -MP -MF $(DEPDIR)/$*.Tpo -c -o $@ $<
@@ -400,19 +399,19 @@ include ./$(DEPDIR)/exampleProgram-exampleProgram.Po
 #	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) \
 #	$(AM_V_CXX_no)$(LTCXXCOMPILE) -c -o $@ $<
 
-exampleProgram-exampleProgram.o: exampleProgram.cc
-	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(exampleProgram_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT exampleProgram-exampleProgram.o -MD -MP -MF $(DEPDIR)/exampleProgram-exampleProgram.Tpo -c -o exampleProgram-exampleProgram.o `test -f 'exampleProgram.cc' || echo '$(srcdir)/'`exampleProgram.cc
-	$(AM_V_at)$(am__mv) $(DEPDIR)/exampleProgram-exampleProgram.Tpo $(DEPDIR)/exampleProgram-exampleProgram.Po
-#	$(AM_V_CXX)source='exampleProgram.cc' object='exampleProgram-exampleProgram.o' libtool=no \
+test-test.o: test.cc
+	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(test_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT test-test.o -MD -MP -MF $(DEPDIR)/test-test.Tpo -c -o test-test.o `test -f 'test.cc' || echo '$(srcdir)/'`test.cc
+	$(AM_V_at)$(am__mv) $(DEPDIR)/test-test.Tpo $(DEPDIR)/test-test.Po
+#	$(AM_V_CXX)source='test.cc' object='test-test.o' libtool=no \
 #	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) \
-#	$(AM_V_CXX_no)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(exampleProgram_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o exampleProgram-exampleProgram.o `test -f 'exampleProgram.cc' || echo '$(srcdir)/'`exampleProgram.cc
+#	$(AM_V_CXX_no)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(test_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o test-test.o `test -f 'test.cc' || echo '$(srcdir)/'`test.cc
 
-exampleProgram-exampleProgram.obj: exampleProgram.cc
-	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(exampleProgram_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT exampleProgram-exampleProgram.obj -MD -MP -MF $(DEPDIR)/exampleProgram-exampleProgram.Tpo -c -o exampleProgram-exampleProgram.obj `if test -f 'exampleProgram.cc'; then $(CYGPATH_W) 'exampleProgram.cc'; else $(CYGPATH_W) '$(srcdir)/exampleProgram.cc'; fi`
-	$(AM_V_at)$(am__mv) $(DEPDIR)/exampleProgram-exampleProgram.Tpo $(DEPDIR)/exampleProgram-exampleProgram.Po
-#	$(AM_V_CXX)source='exampleProgram.cc' object='exampleProgram-exampleProgram.obj' libtool=no \
+test-test.obj: test.cc
+	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(test_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT test-test.obj -MD -MP -MF $(DEPDIR)/test-test.Tpo -c -o test-test.obj `if test -f 'test.cc'; then $(CYGPATH_W) 'test.cc'; else $(CYGPATH_W) '$(srcdir)/test.cc'; fi`
+	$(AM_V_at)$(am__mv) $(DEPDIR)/test-test.Tpo $(DEPDIR)/test-test.Po
+#	$(AM_V_CXX)source='test.cc' object='test-test.obj' libtool=no \
 #	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) \
-#	$(AM_V_CXX_no)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(exampleProgram_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o exampleProgram-exampleProgram.obj `if test -f 'exampleProgram.cc'; then $(CYGPATH_W) 'exampleProgram.cc'; else $(CYGPATH_W) '$(srcdir)/exampleProgram.cc'; fi`
+#	$(AM_V_CXX_no)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(test_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o test-test.obj `if test -f 'test.cc'; then $(CYGPATH_W) 'test.cc'; else $(CYGPATH_W) '$(srcdir)/test.cc'; fi`
 
 mostlyclean-libtool:
 	-rm -f *.lo

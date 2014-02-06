@@ -120,8 +120,9 @@ am__uninstall_files_from_dir = { \
 am__installdirs = "$(DESTDIR)$(libdir)"
 LTLIBRARIES = $(lib_LTLIBRARIES)
 libRootAnalysis_la_LIBADD =
-am_libRootAnalysis_la_OBJECTS = libRootAnalysis_la-Analyzer.lo \
-	libRootAnalysis_la-EventBase.lo \
+am_libRootAnalysis_la_OBJECTS = libRootAnalysis_la-TestAnalyser.lo \
+	libRootAnalysis_la-AnalysisHistograms.lo \
+	libRootAnalysis_la-Analyzer.lo libRootAnalysis_la-EventBase.lo \
 	libRootAnalysis_la-ObjectMessenger.lo \
 	libRootAnalysis_la-strbitset.lo \
 	libRootAnalysis_la-TFileDirectory.lo \
@@ -342,7 +343,7 @@ lib_LTLIBRARIES = libRootAnalysis.la
 # Build information for each library
 
 # Sources for libRootAnalysis
-libRootAnalysis_la_SOURCES = Analyzer.cc EventBase.cc ObjectMessenger.cc strbitset.cc TFileDirectory.cc TFileService.cc TH1AddDirectorySentry.cc TreeAnalyzer.cc
+libRootAnalysis_la_SOURCES = TestAnalyser.cc AnalysisHistograms.cc Analyzer.cc EventBase.cc ObjectMessenger.cc strbitset.cc TFileDirectory.cc TFileService.cc TH1AddDirectorySentry.cc TreeAnalyzer.cc
 
 # Linker options libTestProgram
 #libRootAnalysis_la_LDFLAGS = -version-info 1:0 -R @ROOTLIBDIR@ -L@ROOTLIBDIR@
@@ -430,12 +431,14 @@ mostlyclean-compile:
 distclean-compile:
 	-rm -f *.tab.c
 
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libRootAnalysis_la-AnalysisHistograms.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libRootAnalysis_la-Analyzer.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libRootAnalysis_la-EventBase.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libRootAnalysis_la-ObjectMessenger.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libRootAnalysis_la-TFileDirectory.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libRootAnalysis_la-TFileService.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libRootAnalysis_la-TH1AddDirectorySentry.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libRootAnalysis_la-TestAnalyser.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libRootAnalysis_la-TreeAnalyzer.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libRootAnalysis_la-strbitset.Plo@am__quote@
 
@@ -459,6 +462,20 @@ distclean-compile:
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='$<' object='$@' libtool=yes @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LTCXXCOMPILE) -c -o $@ $<
+
+libRootAnalysis_la-TestAnalyser.lo: TestAnalyser.cc
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libRootAnalysis_la_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT libRootAnalysis_la-TestAnalyser.lo -MD -MP -MF $(DEPDIR)/libRootAnalysis_la-TestAnalyser.Tpo -c -o libRootAnalysis_la-TestAnalyser.lo `test -f 'TestAnalyser.cc' || echo '$(srcdir)/'`TestAnalyser.cc
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/libRootAnalysis_la-TestAnalyser.Tpo $(DEPDIR)/libRootAnalysis_la-TestAnalyser.Plo
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='TestAnalyser.cc' object='libRootAnalysis_la-TestAnalyser.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libRootAnalysis_la_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o libRootAnalysis_la-TestAnalyser.lo `test -f 'TestAnalyser.cc' || echo '$(srcdir)/'`TestAnalyser.cc
+
+libRootAnalysis_la-AnalysisHistograms.lo: AnalysisHistograms.cc
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libRootAnalysis_la_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT libRootAnalysis_la-AnalysisHistograms.lo -MD -MP -MF $(DEPDIR)/libRootAnalysis_la-AnalysisHistograms.Tpo -c -o libRootAnalysis_la-AnalysisHistograms.lo `test -f 'AnalysisHistograms.cc' || echo '$(srcdir)/'`AnalysisHistograms.cc
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/libRootAnalysis_la-AnalysisHistograms.Tpo $(DEPDIR)/libRootAnalysis_la-AnalysisHistograms.Plo
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='AnalysisHistograms.cc' object='libRootAnalysis_la-AnalysisHistograms.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libRootAnalysis_la_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o libRootAnalysis_la-AnalysisHistograms.lo `test -f 'AnalysisHistograms.cc' || echo '$(srcdir)/'`AnalysisHistograms.cc
 
 libRootAnalysis_la-Analyzer.lo: Analyzer.cc
 @am__fastdepCXX_TRUE@	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libRootAnalysis_la_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT libRootAnalysis_la-Analyzer.lo -MD -MP -MF $(DEPDIR)/libRootAnalysis_la-Analyzer.Tpo -c -o libRootAnalysis_la-Analyzer.lo `test -f 'Analyzer.cc' || echo '$(srcdir)/'`Analyzer.cc

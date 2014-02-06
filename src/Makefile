@@ -120,8 +120,9 @@ am__uninstall_files_from_dir = { \
 am__installdirs = "$(DESTDIR)$(libdir)"
 LTLIBRARIES = $(lib_LTLIBRARIES)
 libRootAnalysis_la_LIBADD =
-am_libRootAnalysis_la_OBJECTS = libRootAnalysis_la-Analyzer.lo \
-	libRootAnalysis_la-EventBase.lo \
+am_libRootAnalysis_la_OBJECTS = libRootAnalysis_la-TestAnalyser.lo \
+	libRootAnalysis_la-AnalysisHistograms.lo \
+	libRootAnalysis_la-Analyzer.lo libRootAnalysis_la-EventBase.lo \
 	libRootAnalysis_la-ObjectMessenger.lo \
 	libRootAnalysis_la-strbitset.lo \
 	libRootAnalysis_la-TFileDirectory.lo \
@@ -342,7 +343,7 @@ lib_LTLIBRARIES = libRootAnalysis.la
 # Build information for each library
 
 # Sources for libRootAnalysis
-libRootAnalysis_la_SOURCES = Analyzer.cc EventBase.cc ObjectMessenger.cc strbitset.cc TFileDirectory.cc TFileService.cc TH1AddDirectorySentry.cc TreeAnalyzer.cc
+libRootAnalysis_la_SOURCES = TestAnalyser.cc AnalysisHistograms.cc Analyzer.cc EventBase.cc ObjectMessenger.cc strbitset.cc TFileDirectory.cc TFileService.cc TH1AddDirectorySentry.cc TreeAnalyzer.cc
 
 # Linker options libTestProgram
 #libRootAnalysis_la_LDFLAGS = -version-info 1:0 -R /usr/lib64/root -L/usr/lib64/root
@@ -430,12 +431,14 @@ mostlyclean-compile:
 distclean-compile:
 	-rm -f *.tab.c
 
+include ./$(DEPDIR)/libRootAnalysis_la-AnalysisHistograms.Plo
 include ./$(DEPDIR)/libRootAnalysis_la-Analyzer.Plo
 include ./$(DEPDIR)/libRootAnalysis_la-EventBase.Plo
 include ./$(DEPDIR)/libRootAnalysis_la-ObjectMessenger.Plo
 include ./$(DEPDIR)/libRootAnalysis_la-TFileDirectory.Plo
 include ./$(DEPDIR)/libRootAnalysis_la-TFileService.Plo
 include ./$(DEPDIR)/libRootAnalysis_la-TH1AddDirectorySentry.Plo
+include ./$(DEPDIR)/libRootAnalysis_la-TestAnalyser.Plo
 include ./$(DEPDIR)/libRootAnalysis_la-TreeAnalyzer.Plo
 include ./$(DEPDIR)/libRootAnalysis_la-strbitset.Plo
 
@@ -459,6 +462,20 @@ include ./$(DEPDIR)/libRootAnalysis_la-strbitset.Plo
 #	$(AM_V_CXX)source='$<' object='$@' libtool=yes \
 #	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) \
 #	$(AM_V_CXX_no)$(LTCXXCOMPILE) -c -o $@ $<
+
+libRootAnalysis_la-TestAnalyser.lo: TestAnalyser.cc
+	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libRootAnalysis_la_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT libRootAnalysis_la-TestAnalyser.lo -MD -MP -MF $(DEPDIR)/libRootAnalysis_la-TestAnalyser.Tpo -c -o libRootAnalysis_la-TestAnalyser.lo `test -f 'TestAnalyser.cc' || echo '$(srcdir)/'`TestAnalyser.cc
+	$(AM_V_at)$(am__mv) $(DEPDIR)/libRootAnalysis_la-TestAnalyser.Tpo $(DEPDIR)/libRootAnalysis_la-TestAnalyser.Plo
+#	$(AM_V_CXX)source='TestAnalyser.cc' object='libRootAnalysis_la-TestAnalyser.lo' libtool=yes \
+#	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) \
+#	$(AM_V_CXX_no)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libRootAnalysis_la_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o libRootAnalysis_la-TestAnalyser.lo `test -f 'TestAnalyser.cc' || echo '$(srcdir)/'`TestAnalyser.cc
+
+libRootAnalysis_la-AnalysisHistograms.lo: AnalysisHistograms.cc
+	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libRootAnalysis_la_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT libRootAnalysis_la-AnalysisHistograms.lo -MD -MP -MF $(DEPDIR)/libRootAnalysis_la-AnalysisHistograms.Tpo -c -o libRootAnalysis_la-AnalysisHistograms.lo `test -f 'AnalysisHistograms.cc' || echo '$(srcdir)/'`AnalysisHistograms.cc
+	$(AM_V_at)$(am__mv) $(DEPDIR)/libRootAnalysis_la-AnalysisHistograms.Tpo $(DEPDIR)/libRootAnalysis_la-AnalysisHistograms.Plo
+#	$(AM_V_CXX)source='AnalysisHistograms.cc' object='libRootAnalysis_la-AnalysisHistograms.lo' libtool=yes \
+#	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) \
+#	$(AM_V_CXX_no)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libRootAnalysis_la_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o libRootAnalysis_la-AnalysisHistograms.lo `test -f 'AnalysisHistograms.cc' || echo '$(srcdir)/'`AnalysisHistograms.cc
 
 libRootAnalysis_la-Analyzer.lo: Analyzer.cc
 	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libRootAnalysis_la_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT libRootAnalysis_la-Analyzer.lo -MD -MP -MF $(DEPDIR)/libRootAnalysis_la-Analyzer.Tpo -c -o libRootAnalysis_la-Analyzer.lo `test -f 'Analyzer.cc' || echo '$(srcdir)/'`Analyzer.cc

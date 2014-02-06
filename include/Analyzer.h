@@ -50,6 +50,9 @@ class Analyzer{
 
   pat::strbitset *mySelections_;
 
+  ///Types of the selection flow
+  std::vector<std::string> selectionFlavours_;
+
  private:
 
   std::string myName_;
