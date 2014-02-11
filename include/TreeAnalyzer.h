@@ -42,7 +42,7 @@ public :
   int loop();
 
   ///Implementation of the abstract method
-  virtual bool analyze(const EventBase& iEvent);
+  virtual bool analyze(const EventProxyBase& iEvent);
 
   ///Method return the event weight for analyzed dataset.
   float getEventWeight() const {return eventWeight_;};
@@ -106,6 +106,12 @@ public :
 
    ///Name of the input cfg.py file.
    std::string cfgFileName_;
+
+   ///Number of events analyzed so far.
+   int nEventsAnalyzed_;
+
+   ///Number of events skipped so far.
+   int nEventsSkipped_;
 
    ///Number of events to be analyzed.
    int nEventsToAnalyze_;   

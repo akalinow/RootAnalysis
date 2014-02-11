@@ -8,7 +8,7 @@ lib_LTLIBRARIES = libRootAnalysis.la
 # Build information for each library
 
 # Sources for libRootAnalysis
-libRootAnalysis_la_SOURCES = TestAnalyser.cc AnalysisHistograms.cc Analyzer.cc EventBase.cc ObjectMessenger.cc strbitset.cc TFileDirectory.cc TFileService.cc TH1AddDirectorySentry.cc TreeAnalyzer.cc
+libRootAnalysis_la_SOURCES = EventProxyBase.cc TestAnalyzer.cc AnalysisHistograms.cc Analyzer.cc ObjectMessenger.cc strbitset.cc TFileDirectory.cc TFileService.cc TH1AddDirectorySentry.cc TreeAnalyzer.cc
 
 # Linker options libTestProgram
 #libRootAnalysis_la_LDFLAGS = -version-info 1:0 -R @ROOTLIBDIR@ -L@ROOTLIBDIR@
@@ -16,6 +16,6 @@ libRootAnalysis_la_SOURCES = TestAnalyser.cc AnalysisHistograms.cc Analyzer.cc E
 
 # Compiler options. Here we are adding the include directory
 # to be searched for headers included in the source code.
-libRootAnalysis_la_CPPFLAGS = -I$(top_srcdir)/include -I@ROOTINCDIR@
+libRootAnalysis_la_CPPFLAGS = -I$(top_srcdir)/include -I@ROOTINCDIR@ -std=c++11
 
           

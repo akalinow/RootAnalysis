@@ -13,6 +13,7 @@
 #include "TH1D.h"
 #include "TProofOutputFile.h"
 #include "TTree.h"
+#include "TChain.h"
 
 //////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////
@@ -29,12 +30,12 @@ TreeAnalyzer::TreeAnalyzer(const std::string & aName,
   parseCfg(cfgFileName_);
 
   if(proofFile){   
-    proofFile->SetOutputFileName((filePath_+"/PFAnalysis_"+sampleName_+".root").c_str());
+    proofFile->SetOutputFileName((filePath_+"/RootAnalysis_"+sampleName_+".root").c_str());
     store_ = new TFileService(proofFile->OpenFile("RECREATE"));
   }
   else{ 
     // Create histogram store
-    store_ = new TFileService((filePath_+"/PFAnalysis_"+sampleName_+".root").c_str());
+    store_ = new TFileService((filePath_+"/RootAnalysis_"+sampleName_+".root").c_str());
   }
 
   ///Histogram with processing statistics. Necessary for the PROOF based analysis
@@ -108,91 +109,63 @@ void TreeAnalyzer::scaleHistograms(){
 void TreeAnalyzer::parseCfg(const std::string & cfgFileName){
 
   eventWeight_ = 1.0;
+  filePath_ = "./";
+  fileNames_.push_back("/scratch_local/akalinow/CMS/Data/PostMoriond/NTUPLES_Summer13_TES/nTupleRun2012D-*.root");
   
-  boost::hash<std::string> string_hash;
-  std::ifstream in((filePath_+"/PFAnalysis_"+sampleName_+"_SelEvents.dat").c_str());
-  std::string separator;
-  int counter = 0;
-  unsigned int run,ls,event;
-  char text[500];
-  while (in.good() && !in.eof()){
-    std::string tmpString;
-    in>>run>>ls>>event;
-    sprintf(text,"%d:%d:%d",run,ls,event);
-    tmpString.append(text);
-    eventsToProcessHash_[tmpString] = true;    
-  }
-  in.close();
-
-  std::cout<<"Event tag file name: "<<filePath_+"PFAnalysis_"+sampleName_+"_SelEvents.dat"<<std::endl;
-  std::cout<<"Number of events to process with event list: "<<eventsToProcessHash_.size()<<std::endl
-	   <<"If 0, all events will be processed."<<std::endl;
-
 }
 //////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////
 void  TreeAnalyzer::init(std::vector<Analyzer*> myAnalyzers){
-/*
+
   myAnalyzers_ = myAnalyzers;
-  mySummary_ = new SummaryAnalyzer("Summary");
-  myAnalyzers_.push_back(mySummary_);
+  //mySummary_ = new SummaryAnalyzer("Summary");
+  //myAnalyzers_.push_back(mySummary_);
 
   for(unsigned int i=0;i<myAnalyzers_.size();++i){ 
     myDirectories_.push_back(store_->mkdir(myAnalyzers_[i]->name()));
-    myAnalyzers_[i]->initialize(parameterSet_->getParameter<edm::ParameterSet>(myAnalyzers_[i]->name()), 
-			        myDirectories_[myDirectories_.size()-1],
+    myAnalyzers_[i]->initialize(myDirectories_[myDirectories_.size()-1],
 				myStrSelections_);
   }
-
+/*
  for(unsigned int i=0;i<myAnalyzers_.size();++i){
    myAnalyzers_[i]->addBranch(mySummary_->getTree());  
    myAnalyzers_[i]->addCutHistos(mySummary_->getHistoList());  
  }
-
- myDirectories_.push_back(store_->mkdir("RunInfoAccounting"));
- runInfoAccounting_ = new RunInfoAccounting( myDirectories_.back() ,
-					    "RunInfoAccounting" );
-*/
+ */
 }
 //////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////
 void  TreeAnalyzer::finalize(){
-
   for(unsigned int i=0;i<myAnalyzers_.size();++i) myAnalyzers_[i]->finalize();
 }
 //////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////
 int TreeAnalyzer::loop(){
-/*
-  fwlite::ChainEvent ev(fileNames_);
+
+  EventProxyBase ev(fileNames_);
   std::cout<<"Events total: "<<ev.size()<<std::endl;
 
   nEventsAnalyzed_ = 0;
   nEventsSkipped_ = 0;
+  nEventsToAnalyze_ = 79310;
   int eventPreviouslyPrinted=-1;
-  TFile* currentFile = 0;
   ///////
    for(ev.toBegin();
        !ev.atEnd() && (nEventsToAnalyze_<0 || (nEventsAnalyzed_+nEventsSkipped_)<nEventsToAnalyze_); ++ev){
      
-     //std::cout<<ev.id()<<std::endl;
      if((( nEventsAnalyzed_ < 10) ||
 	 nEventsAnalyzed_%10000==0) &&  nEventsAnalyzed_ != eventPreviouslyPrinted ) {
        eventPreviouslyPrinted = nEventsAnalyzed_;
      }
-     //analyze the Run data for every new run, and also a new file
-     if(ev.id().run()!= currentRun_) ++nRunsAnalyzed_;
-     analyze(ev,ev.getRun());
+     analyze(ev);
    }
    
    std::cout << "Events skipped: " << nEventsSkipped_ << std::endl ;
    return nEventsAnalyzed_;
-   */
-	return 0;
 }
 //////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////
-bool TreeAnalyzer::analyze(const EventBase& iEvent){
+bool TreeAnalyzer::analyze(const EventProxyBase& iEvent){
 
   clear();
     ///////
@@ -205,15 +178,12 @@ bool TreeAnalyzer::analyze(const EventBase& iEvent){
     for(unsigned int i=0;i<myAnalyzers_.size();++i) myAnalyzers_[i]->clear(); 
         
     myObjMessenger_->clear();
+    ++nEventsAnalyzed_;
   
   return 1;
 }
 //////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////
-void TreeAnalyzer::clear(){
-
-  myStrSelections_->set(false);
-  
-}
+void TreeAnalyzer::clear(){ myStrSelections_->set(false); }
 //////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////

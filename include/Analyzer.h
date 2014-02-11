@@ -4,7 +4,7 @@
 #include <string>
 
 #include "ObjectMessenger.h"
-#include "EventBase.h"
+#include "EventProxyBase.h"
 
 #include "strbitset.h"
 #include "TFileDirectory.h"
@@ -31,9 +31,9 @@ class Analyzer{
 };
   
   
-  virtual bool analyze(const EventBase& iEvent) = 0;
+  virtual bool analyze(const EventProxyBase& iEvent) = 0;
 
-  virtual bool analyze(const EventBase& iEvent, ObjectMessenger *aMessenger){return analyze(iEvent); }
+  virtual bool analyze(const EventProxyBase& iEvent, ObjectMessenger *aMessenger){return analyze(iEvent); }
 
   virtual void finalize(){;};
 

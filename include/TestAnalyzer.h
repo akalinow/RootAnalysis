@@ -1,5 +1,5 @@
-#ifndef FWLiteTriggerAnalyzer_H
-#define FWLiteTriggerAnalyzer_H
+#ifndef TestAnalyzer_H
+#define TestAnalyzer_H
 
 // -*- C++ -*-
 //
@@ -22,12 +22,12 @@ class TestAnalyzer:public Analyzer{
 
   TestAnalyzer(const std::string & aName);
 
-  virtual ~FWLiteTriggerAnalyzer();
+  virtual ~TestAnalyzer();
 
   virtual void initialize(const TFileDirectory&,
 			  pat::strbitset *aSelections);
   
-  virtual bool analyze(const EventBase& iEvent);
+  virtual bool analyze(const EventProxyBase& iEvent);
 
   virtual void finalize();
 
