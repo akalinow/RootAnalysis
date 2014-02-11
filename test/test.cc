@@ -17,6 +17,7 @@
 
 #include "TreeAnalyzer.h"
 #include "TestAnalyzer.h"
+#include "OTFAnalyzer.h"
 
 #include "TFile.h"
 #include "TStopwatch.h"
@@ -39,6 +40,7 @@ int main(int argc, char ** argv) {
 	 std::vector<Analyzer*> myAnalyzers;
 
 	  myAnalyzers.push_back(new TestAnalyzer("TestAnalyzer"));
+	  myAnalyzers.push_back(new OTFAnalyzer("OTFAnalyzer"));
 
 	  TreeAnalyzer *tree = new TreeAnalyzer("TreeAnalyzer",cfgFileName);
 	  tree->init(myAnalyzers);

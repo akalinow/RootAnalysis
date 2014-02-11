@@ -26,11 +26,13 @@ class Analyzer{
   virtual void initialize(TFileDirectory& aDir,
 			  pat::strbitset *aSelections){
 
-    //default is to do whatever the analzer does
+    //default is to do whatever the analyzer does
     filterEvent_ = false;
+
+    std::cout<<"Analyzer "<<__func__<<std::endl;
 };
   
-  
+
   virtual bool analyze(const EventProxyBase& iEvent) = 0;
 
   virtual bool analyze(const EventProxyBase& iEvent, ObjectMessenger *aMessenger){return analyze(iEvent); }

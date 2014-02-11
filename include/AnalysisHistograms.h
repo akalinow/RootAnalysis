@@ -29,11 +29,11 @@ class AnalysisHistograms {
   
   AnalysisHistograms():file_(0), histosInitialized_(false){};
 
-  /*
+
   AnalysisHistograms(TFileDirectory *myDir,
-		     const std::string & name=""):
+		     const std::string & name=""): file_(0),
     histosInitialized_(false), name_(name){};
-  */
+
 
   virtual ~AnalysisHistograms();
 
@@ -55,11 +55,7 @@ class AnalysisHistograms {
   
   void write();
 
-  virtual void init(TFileDirectory *myDir, const std::string & name=""); 
-
-  ///Method for backward compatibility. 
-  ///Will be removed at some time
-  virtual void init(const TFileDirectory *myDir); 
+  virtual void init(TFileDirectory *myDir, const std::string & name="");
 
   virtual void init(const std::string & name=""){}; 
 

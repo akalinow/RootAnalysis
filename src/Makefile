@@ -120,7 +120,9 @@ am__uninstall_files_from_dir = { \
 am__installdirs = "$(DESTDIR)$(libdir)"
 LTLIBRARIES = $(lib_LTLIBRARIES)
 libRootAnalysis_la_LIBADD =
-am_libRootAnalysis_la_OBJECTS = libRootAnalysis_la-EventProxyBase.lo \
+am_libRootAnalysis_la_OBJECTS = libRootAnalysis_la-OTFHistograms.lo \
+	libRootAnalysis_la-OTFAnalyzer.lo \
+	libRootAnalysis_la-EventProxyBase.lo \
 	libRootAnalysis_la-TestAnalyzer.lo \
 	libRootAnalysis_la-AnalysisHistograms.lo \
 	libRootAnalysis_la-Analyzer.lo \
@@ -196,13 +198,13 @@ am__define_uniq_tagged_files = \
 ETAGS = etags
 CTAGS = ctags
 DISTFILES = $(DIST_COMMON) $(DIST_SOURCES) $(TEXINFOS) $(EXTRA_DIST)
-ACLOCAL = ${SHELL} /home/akalinow/scratch/EclipseWorkspace/RootAnalysis/missing aclocal-1.13
+ACLOCAL = ${SHELL} /scratch_local/akalinow/EclipseWorkspace/RootAnalysis/missing aclocal-1.13
 AMTAR = $${TAR-tar}
 AM_DEFAULT_VERBOSITY = 1
 AR = ar
-AUTOCONF = ${SHELL} /home/akalinow/scratch/EclipseWorkspace/RootAnalysis/missing autoconf
-AUTOHEADER = ${SHELL} /home/akalinow/scratch/EclipseWorkspace/RootAnalysis/missing autoheader
-AUTOMAKE = ${SHELL} /home/akalinow/scratch/EclipseWorkspace/RootAnalysis/missing automake-1.13
+AUTOCONF = ${SHELL} /scratch_local/akalinow/EclipseWorkspace/RootAnalysis/missing autoconf
+AUTOHEADER = ${SHELL} /scratch_local/akalinow/EclipseWorkspace/RootAnalysis/missing autoheader
+AUTOMAKE = ${SHELL} /scratch_local/akalinow/EclipseWorkspace/RootAnalysis/missing automake-1.13
 AWK = gawk
 CC = gcc
 CCDEPMODE = depmode=gcc3
@@ -239,7 +241,7 @@ LIBTOOL = $(SHELL) $(top_builddir)/libtool
 LIPO = 
 LN_S = ln -s
 LTLIBOBJS = 
-MAKEINFO = ${SHELL} /home/akalinow/scratch/EclipseWorkspace/RootAnalysis/missing makeinfo
+MAKEINFO = ${SHELL} /scratch_local/akalinow/EclipseWorkspace/RootAnalysis/missing makeinfo
 MANIFEST_TOOL = :
 MKDIR_P = /usr/bin/mkdir -p
 NM = /usr/bin/nm -B
@@ -276,10 +278,10 @@ SET_MAKE =
 SHELL = /bin/sh
 STRIP = strip
 VERSION = 1.0
-abs_builddir = /home/akalinow/scratch/EclipseWorkspace/RootAnalysis/src
-abs_srcdir = /home/akalinow/scratch/EclipseWorkspace/RootAnalysis/src
-abs_top_builddir = /home/akalinow/scratch/EclipseWorkspace/RootAnalysis
-abs_top_srcdir = /home/akalinow/scratch/EclipseWorkspace/RootAnalysis
+abs_builddir = /scratch_local/akalinow/EclipseWorkspace/RootAnalysis/src
+abs_srcdir = /scratch_local/akalinow/EclipseWorkspace/RootAnalysis/src
+abs_top_builddir = /scratch_local/akalinow/EclipseWorkspace/RootAnalysis
+abs_top_srcdir = /scratch_local/akalinow/EclipseWorkspace/RootAnalysis
 ac_ct_AR = ar
 ac_ct_CC = gcc
 ac_ct_CXX = g++
@@ -309,7 +311,7 @@ host_vendor = unknown
 htmldir = ${docdir}
 includedir = ${prefix}/include
 infodir = ${datarootdir}/info
-install_sh = ${SHELL} /home/akalinow/scratch/EclipseWorkspace/RootAnalysis/install-sh
+install_sh = ${SHELL} /scratch_local/akalinow/EclipseWorkspace/RootAnalysis/install-sh
 libdir = ${exec_prefix}/lib
 libexecdir = ${exec_prefix}/libexec
 localedir = ${datarootdir}/locale
@@ -344,7 +346,7 @@ lib_LTLIBRARIES = libRootAnalysis.la
 # Build information for each library
 
 # Sources for libRootAnalysis
-libRootAnalysis_la_SOURCES = EventProxyBase.cc TestAnalyzer.cc AnalysisHistograms.cc Analyzer.cc ObjectMessenger.cc strbitset.cc TFileDirectory.cc TFileService.cc TH1AddDirectorySentry.cc TreeAnalyzer.cc
+libRootAnalysis_la_SOURCES = OTFHistograms.cc OTFAnalyzer.cc EventProxyBase.cc TestAnalyzer.cc AnalysisHistograms.cc Analyzer.cc ObjectMessenger.cc strbitset.cc TFileDirectory.cc TFileService.cc TH1AddDirectorySentry.cc TreeAnalyzer.cc
 
 # Linker options libTestProgram
 #libRootAnalysis_la_LDFLAGS = -version-info 1:0 -R /usr/lib64/root -L/usr/lib64/root
@@ -435,6 +437,8 @@ distclean-compile:
 include ./$(DEPDIR)/libRootAnalysis_la-AnalysisHistograms.Plo
 include ./$(DEPDIR)/libRootAnalysis_la-Analyzer.Plo
 include ./$(DEPDIR)/libRootAnalysis_la-EventProxyBase.Plo
+include ./$(DEPDIR)/libRootAnalysis_la-OTFAnalyzer.Plo
+include ./$(DEPDIR)/libRootAnalysis_la-OTFHistograms.Plo
 include ./$(DEPDIR)/libRootAnalysis_la-ObjectMessenger.Plo
 include ./$(DEPDIR)/libRootAnalysis_la-TFileDirectory.Plo
 include ./$(DEPDIR)/libRootAnalysis_la-TFileService.Plo
@@ -463,6 +467,20 @@ include ./$(DEPDIR)/libRootAnalysis_la-strbitset.Plo
 #	$(AM_V_CXX)source='$<' object='$@' libtool=yes \
 #	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) \
 #	$(AM_V_CXX_no)$(LTCXXCOMPILE) -c -o $@ $<
+
+libRootAnalysis_la-OTFHistograms.lo: OTFHistograms.cc
+	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libRootAnalysis_la_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT libRootAnalysis_la-OTFHistograms.lo -MD -MP -MF $(DEPDIR)/libRootAnalysis_la-OTFHistograms.Tpo -c -o libRootAnalysis_la-OTFHistograms.lo `test -f 'OTFHistograms.cc' || echo '$(srcdir)/'`OTFHistograms.cc
+	$(AM_V_at)$(am__mv) $(DEPDIR)/libRootAnalysis_la-OTFHistograms.Tpo $(DEPDIR)/libRootAnalysis_la-OTFHistograms.Plo
+#	$(AM_V_CXX)source='OTFHistograms.cc' object='libRootAnalysis_la-OTFHistograms.lo' libtool=yes \
+#	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) \
+#	$(AM_V_CXX_no)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libRootAnalysis_la_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o libRootAnalysis_la-OTFHistograms.lo `test -f 'OTFHistograms.cc' || echo '$(srcdir)/'`OTFHistograms.cc
+
+libRootAnalysis_la-OTFAnalyzer.lo: OTFAnalyzer.cc
+	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libRootAnalysis_la_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT libRootAnalysis_la-OTFAnalyzer.lo -MD -MP -MF $(DEPDIR)/libRootAnalysis_la-OTFAnalyzer.Tpo -c -o libRootAnalysis_la-OTFAnalyzer.lo `test -f 'OTFAnalyzer.cc' || echo '$(srcdir)/'`OTFAnalyzer.cc
+	$(AM_V_at)$(am__mv) $(DEPDIR)/libRootAnalysis_la-OTFAnalyzer.Tpo $(DEPDIR)/libRootAnalysis_la-OTFAnalyzer.Plo
+#	$(AM_V_CXX)source='OTFAnalyzer.cc' object='libRootAnalysis_la-OTFAnalyzer.lo' libtool=yes \
+#	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) \
+#	$(AM_V_CXX_no)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libRootAnalysis_la_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o libRootAnalysis_la-OTFAnalyzer.lo `test -f 'OTFAnalyzer.cc' || echo '$(srcdir)/'`OTFAnalyzer.cc
 
 libRootAnalysis_la-EventProxyBase.lo: EventProxyBase.cc
 	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libRootAnalysis_la_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT libRootAnalysis_la-EventProxyBase.lo -MD -MP -MF $(DEPDIR)/libRootAnalysis_la-EventProxyBase.Tpo -c -o libRootAnalysis_la-EventProxyBase.lo `test -f 'EventProxyBase.cc' || echo '$(srcdir)/'`EventProxyBase.cc
