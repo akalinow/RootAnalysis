@@ -120,7 +120,8 @@ am__uninstall_files_from_dir = { \
 am__installdirs = "$(DESTDIR)$(libdir)"
 LTLIBRARIES = $(lib_LTLIBRARIES)
 libRootAnalysis_la_LIBADD =
-am_libRootAnalysis_la_OBJECTS = libRootAnalysis_la-OTFHistograms.lo \
+am_libRootAnalysis_la_OBJECTS = libRootAnalysis_la-EventProxyOTF.lo \
+	libRootAnalysis_la-OTFHistograms.lo \
 	libRootAnalysis_la-OTFAnalyzer.lo \
 	libRootAnalysis_la-EventProxyBase.lo \
 	libRootAnalysis_la-TestAnalyzer.lo \
@@ -346,7 +347,7 @@ lib_LTLIBRARIES = libRootAnalysis.la
 # Build information for each library
 
 # Sources for libRootAnalysis
-libRootAnalysis_la_SOURCES = OTFHistograms.cc OTFAnalyzer.cc EventProxyBase.cc TestAnalyzer.cc AnalysisHistograms.cc Analyzer.cc ObjectMessenger.cc strbitset.cc TFileDirectory.cc TFileService.cc TH1AddDirectorySentry.cc TreeAnalyzer.cc
+libRootAnalysis_la_SOURCES = EventProxyOTF.cc OTFHistograms.cc OTFAnalyzer.cc EventProxyBase.cc TestAnalyzer.cc AnalysisHistograms.cc Analyzer.cc ObjectMessenger.cc strbitset.cc TFileDirectory.cc TFileService.cc TH1AddDirectorySentry.cc TreeAnalyzer.cc
 
 # Linker options libTestProgram
 #libRootAnalysis_la_LDFLAGS = -version-info 1:0 -R /usr/lib64/root -L/usr/lib64/root
@@ -437,6 +438,7 @@ distclean-compile:
 include ./$(DEPDIR)/libRootAnalysis_la-AnalysisHistograms.Plo
 include ./$(DEPDIR)/libRootAnalysis_la-Analyzer.Plo
 include ./$(DEPDIR)/libRootAnalysis_la-EventProxyBase.Plo
+include ./$(DEPDIR)/libRootAnalysis_la-EventProxyOTF.Plo
 include ./$(DEPDIR)/libRootAnalysis_la-OTFAnalyzer.Plo
 include ./$(DEPDIR)/libRootAnalysis_la-OTFHistograms.Plo
 include ./$(DEPDIR)/libRootAnalysis_la-ObjectMessenger.Plo
@@ -467,6 +469,13 @@ include ./$(DEPDIR)/libRootAnalysis_la-strbitset.Plo
 #	$(AM_V_CXX)source='$<' object='$@' libtool=yes \
 #	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) \
 #	$(AM_V_CXX_no)$(LTCXXCOMPILE) -c -o $@ $<
+
+libRootAnalysis_la-EventProxyOTF.lo: EventProxyOTF.cc
+	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libRootAnalysis_la_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT libRootAnalysis_la-EventProxyOTF.lo -MD -MP -MF $(DEPDIR)/libRootAnalysis_la-EventProxyOTF.Tpo -c -o libRootAnalysis_la-EventProxyOTF.lo `test -f 'EventProxyOTF.cc' || echo '$(srcdir)/'`EventProxyOTF.cc
+	$(AM_V_at)$(am__mv) $(DEPDIR)/libRootAnalysis_la-EventProxyOTF.Tpo $(DEPDIR)/libRootAnalysis_la-EventProxyOTF.Plo
+#	$(AM_V_CXX)source='EventProxyOTF.cc' object='libRootAnalysis_la-EventProxyOTF.lo' libtool=yes \
+#	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) \
+#	$(AM_V_CXX_no)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libRootAnalysis_la_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o libRootAnalysis_la-EventProxyOTF.lo `test -f 'EventProxyOTF.cc' || echo '$(srcdir)/'`EventProxyOTF.cc
 
 libRootAnalysis_la-OTFHistograms.lo: OTFHistograms.cc
 	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libRootAnalysis_la_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT libRootAnalysis_la-OTFHistograms.lo -MD -MP -MF $(DEPDIR)/libRootAnalysis_la-OTFHistograms.Tpo -c -o libRootAnalysis_la-OTFHistograms.lo `test -f 'OTFHistograms.cc' || echo '$(srcdir)/'`OTFHistograms.cc

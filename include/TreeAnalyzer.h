@@ -16,6 +16,7 @@ class TH1D;
 class TProofOutputFile;
 //class FWLiteSummaryAnalyzer;
 class ObjectMessenger;
+class EventProxyBase;
 
 class TreeAnalyzer: public Analyzer{
 
@@ -26,7 +27,8 @@ public :
   ///Default conctructor takes the configuration cfg.py file name
   ///optional: pointer to the PROOF outputfile
   TreeAnalyzer(const std::string & name, 
-		     const std::string & cfgFileName, 
+		     const std::string & cfgFileName,
+		     EventProxyBase *aProxy,
 		     TProofOutputFile * proofFile=0);
 
   ///Default destructor
@@ -137,6 +139,8 @@ public :
    ///Object holding information passed between analyzers
    ObjectMessenger* myObjMessenger_;
 
+   ///Concrete event proxy
+   EventProxyBase *myProxy_;
 };
 
 #endif

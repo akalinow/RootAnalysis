@@ -1,23 +1,32 @@
 #include "EventProxyBase.h"
 
 
-EventProxyBase::EventProxyBase(std::vector<std::string> const& iFileNames):
-  fileNames_(), chain_(0), treeName_("outTreePtOrd"), eventIndex_(0){
+EventProxyBase::EventProxyBase():
+  fileNames_(), fChain(0), treeName_(""), eventIndex_(0), accumulatedSize_(0){
 
-  chain_ = boost::shared_ptr<TChain>(new TChain(treeName_.c_str()));
+	std::cout<<__func__<<std::endl;
+
+}
+
+void EventProxyBase::init(std::vector<std::string> const& iFileNames){
+
+	std::cout<<"EventProxyBase "<<__func__<<std::endl;
+
+
+  fChain = boost::shared_ptr<TChain>(new TChain(treeName_.c_str()));
 
   for (auto it= iFileNames.begin(), itEnd = iFileNames.end();it!=itEnd; ++it) {
-	  chain_->Add(it->c_str(),-1);
+	  fChain->Add(it->c_str(),-1);
   }
 
-  //chain_->Print();
-  accumulatedSize_ = chain_->GetEntries();
+  //fChain->Print();
+  accumulatedSize_ = fChain->GetEntries();
   Int_t cachesize = 10000000; //10 MBytes
-  chain_->SetCacheSize(cachesize);
-  chain_->AddBranchToCache("*",kTRUE);
-  //chain_->SetParallelUnzip(kTRUE);
+  fChain->SetCacheSize(cachesize);
+  fChain->AddBranchToCache("*",kTRUE);
+  //fChain->SetParallelUnzip(kTRUE);
 
-  chain_->SetBranchStatus("*",0);
+  fChain->SetBranchStatus("*",0);
 
 }
 
@@ -30,7 +39,7 @@ EventProxyBase::~EventProxyBase(){}
 EventProxyBase const&
 EventProxyBase::operator++(){
 
-	chain_->GetEntry(eventIndex_++);
+	fChain->GetEntry(eventIndex_++);
 
    return *this;
 }
@@ -41,7 +50,7 @@ EventProxyBase const&
 EventProxyBase::toBegin()
 {
 
-	chain_->GetEntry(0);
+	fChain->GetEntry(0);
 	eventIndex_ = 0;
     return *this;
 }

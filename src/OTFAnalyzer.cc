@@ -2,6 +2,7 @@
 
 #include "TreeAnalyzer.h"
 #include "OTFAnalyzer.h"
+#include "EventProxyOTF.h"
 
 //////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////
@@ -55,6 +56,10 @@ bool OTFAnalyzer::analyze(const EventProxyBase& iEvent){
 
   eventWeight_ = 1.0;
   /////////////////
+  //const EventProxyOTF & myEvent = iEvent;
+  const EventProxyOTF & myEvent = static_cast<const EventProxyOTF&>(iEvent);
+
+  std::cout<<myEvent.pt<<std::endl;
 
   return true;
 }

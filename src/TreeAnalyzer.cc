@@ -6,6 +6,7 @@
 #include "TreeAnalyzer.h"
 //#include "SummaryAnalyzer.h"
 #include "ObjectMessenger.h"
+#include "EventProxyBase.h"
 
 #include "boost/functional/hash.hpp"
 
@@ -18,7 +19,8 @@
 //////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////
 TreeAnalyzer::TreeAnalyzer(const std::string & aName,
-				       const std::string & cfgFileName, 
+				       const std::string & cfgFileName,
+				       EventProxyBase *aProxy,
 				       TProofOutputFile * proofFile)
   :Analyzer(aName){
 
@@ -54,6 +56,8 @@ TreeAnalyzer::TreeAnalyzer(const std::string & aName,
   myStrSelections_ = new pat::strbitset(); 
 
   myObjMessenger_ = new ObjectMessenger("ObjMessenger");
+
+  myProxy_ = aProxy;
 
 }
 //////////////////////////////////////////////////////////////////////////////
@@ -110,12 +114,15 @@ void TreeAnalyzer::parseCfg(const std::string & cfgFileName){
 
   eventWeight_ = 1.0;
   filePath_ = "./";
-  fileNames_.push_back("/scratch_local/akalinow/CMS/Data/PostMoriond/NTUPLES_Summer13_TES/nTupleRun2012D-*.root");
+  //fileNames_.push_back("/scratch_local/akalinow/CMS/Data/PostMoriond/NTUPLES_Summer13_TES/nTupleRun2012D-*.root");
+  fileNames_.push_back("/scratch_local/akalinow/CMS/test/EfficiencyTree.root");
   
 }
 //////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////
 void  TreeAnalyzer::init(std::vector<Analyzer*> myAnalyzers){
+
+  myProxy_->init(fileNames_);
 
   myAnalyzers_ = myAnalyzers;
   //mySummary_ = new SummaryAnalyzer("Summary");
@@ -142,22 +149,21 @@ void  TreeAnalyzer::finalize(){
 //////////////////////////////////////////////////////////////////////////////
 int TreeAnalyzer::loop(){
 
-  EventProxyBase ev(fileNames_);
-  std::cout<<"Events total: "<<ev.size()<<std::endl;
+  std::cout<<"Events total: "<<myProxy_->size()<<std::endl;
 
   nEventsAnalyzed_ = 0;
   nEventsSkipped_ = 0;
-  nEventsToAnalyze_ = 79310;
+  nEventsToAnalyze_ = 1455902;
   int eventPreviouslyPrinted=-1;
   ///////
-   for(ev.toBegin();
-       !ev.atEnd() && (nEventsToAnalyze_<0 || (nEventsAnalyzed_+nEventsSkipped_)<nEventsToAnalyze_); ++ev){
+   for(myProxy_->toBegin();
+       !myProxy_->atEnd() && (nEventsToAnalyze_<0 || (nEventsAnalyzed_+nEventsSkipped_)<nEventsToAnalyze_); ++(*myProxy_)){
      
      if((( nEventsAnalyzed_ < 10) ||
 	 nEventsAnalyzed_%10000==0) &&  nEventsAnalyzed_ != eventPreviouslyPrinted ) {
        eventPreviouslyPrinted = nEventsAnalyzed_;
      }
-     analyze(ev);
+     analyze(*myProxy_);
    }
    
    std::cout << "Events skipped: " << nEventsSkipped_ << std::endl ;

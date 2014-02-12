@@ -15,7 +15,8 @@
 
    public:
 
-      EventProxyBase(std::vector<std::string> const& iFileNames);
+	  EventProxyBase();
+
       virtual ~EventProxyBase();
 
       EventProxyBase const& operator++();
@@ -27,20 +28,24 @@
       bool isValid() const;
       operator bool() const;
 
-      TFile* getTFile() const { return chain_->GetFile();}
+      TFile* getTFile() const { return fChain->GetFile();}
+
+      virtual void init(std::vector<std::string> const& iFileNames);
 
       //Event *getEvent() const { return Event(chain_);}
 
       Long64_t size() const{ return accumulatedSize_; }
 
-   private:
+   protected:
 
       std::vector<std::string> fileNames_;
-      boost::shared_ptr<TChain> chain_;
+      boost::shared_ptr<TChain> fChain;
       std::string treeName_;
 
       Long64_t eventIndex_;
       Long64_t accumulatedSize_;
+
+
 
 };
 #endif
