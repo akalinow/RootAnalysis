@@ -32,7 +32,7 @@
 
       virtual void init(std::vector<std::string> const& iFileNames);
 
-      //Event *getEvent() const { return Event(chain_);}
+      //
 
       Long64_t size() const{ return accumulatedSize_; }
 

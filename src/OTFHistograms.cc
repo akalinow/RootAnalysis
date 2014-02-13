@@ -47,7 +47,9 @@ void OTFHistograms::defineHistograms(){
 
  if(!histosInitialized_){
 
-    add2DHistogram("h2DPt","",100,0,100,2,-0.5,1.5,file_);
+    add2DHistogram("h2DPtGmt","",100,0,100,2,-0.5,1.5,file_);
+    add2DHistogram("h2DPtOtf","",100,0,100,2,-0.5,1.5,file_);
+
 
 
    histosInitialized_ = true;

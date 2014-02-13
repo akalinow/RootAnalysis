@@ -132,7 +132,8 @@ am_libRootAnalysis_la_OBJECTS = libRootAnalysis_la-EventProxyOTF.lo \
 	libRootAnalysis_la-TFileDirectory.lo \
 	libRootAnalysis_la-TFileService.lo \
 	libRootAnalysis_la-TH1AddDirectorySentry.lo \
-	libRootAnalysis_la-TreeAnalyzer.lo
+	libRootAnalysis_la-TreeAnalyzer.lo libRootAnalysis_la-L1Obj.lo \
+	libRootAnalysis_la-EventData.lo libRootAnalysis_la-DictCint.lo
 libRootAnalysis_la_OBJECTS = $(am_libRootAnalysis_la_OBJECTS)
 AM_V_lt = $(am__v_lt_$(V))
 am__v_lt_ = $(am__v_lt_$(AM_DEFAULT_VERBOSITY))
@@ -215,7 +216,7 @@ CPPFLAGS =
 CXX = g++
 CXXCPP = g++ -E
 CXXDEPMODE = depmode=gcc3
-CXXFLAGS = -g -O2
+CXXFLAGS = -Werror -O3
 CYGPATH_W = echo
 DEFS = -DPACKAGE_NAME=\"RootAnalysis\" -DPACKAGE_TARNAME=\"rootanalysis\" -DPACKAGE_VERSION=\"1.0\" -DPACKAGE_STRING=\"RootAnalysis\ 1.0\" -DPACKAGE_BUGREPORT=\"\" -DPACKAGE_URL=\"\" -DHAVE_MKDIR=1 -DSTDC_HEADERS=1 -DHAVE_SYS_TYPES_H=1 -DHAVE_SYS_STAT_H=1 -DHAVE_STDLIB_H=1 -DHAVE_STRING_H=1 -DHAVE_MEMORY_H=1 -DHAVE_STRINGS_H=1 -DHAVE_INTTYPES_H=1 -DHAVE_STDINT_H=1 -DHAVE_UNISTD_H=1 -DHAVE__BOOL=1 -DPACKAGE=\"rootanalysis\" -DVERSION=\"1.0\" -DHAVE_DLFCN_H=1 -DLT_OBJDIR=\".libs/\"
 DEPDIR = .deps
@@ -347,7 +348,12 @@ lib_LTLIBRARIES = libRootAnalysis.la
 # Build information for each library
 
 # Sources for libRootAnalysis
-libRootAnalysis_la_SOURCES = EventProxyOTF.cc OTFHistograms.cc OTFAnalyzer.cc EventProxyBase.cc TestAnalyzer.cc AnalysisHistograms.cc Analyzer.cc ObjectMessenger.cc strbitset.cc TFileDirectory.cc TFileService.cc TH1AddDirectorySentry.cc TreeAnalyzer.cc
+libRootAnalysis_la_SOURCES = EventProxyOTF.cc OTFHistograms.cc OTFAnalyzer.cc \
+	                         EventProxyBase.cc TestAnalyzer.cc AnalysisHistograms.cc Analyzer.cc \
+	                         ObjectMessenger.cc strbitset.cc TFileDirectory.cc TFileService.cc \
+	                         TH1AddDirectorySentry.cc TreeAnalyzer.cc L1Obj.cc EventData.cc \
+	                         DictCint.cxx
+
 
 # Linker options libTestProgram
 #libRootAnalysis_la_LDFLAGS = -version-info 1:0 -R /usr/lib64/root -L/usr/lib64/root
@@ -356,10 +362,13 @@ libRootAnalysis_la_SOURCES = EventProxyOTF.cc OTFHistograms.cc OTFAnalyzer.cc Ev
 # Compiler options. Here we are adding the include directory
 # to be searched for headers included in the source code.
 libRootAnalysis_la_CPPFLAGS = -I$(top_srcdir)/include -I/usr/include/root -std=c++11
-all: all-am
+BUILT_SOURCES = DictCint.cxx DictCint.h
+CLEANFILES = *Cint.cxx *Cint.h *~ core
+all: $(BUILT_SOURCES)
+	$(MAKE) $(AM_MAKEFLAGS) all-am
 
 .SUFFIXES:
-.SUFFIXES: .cc .lo .o .obj
+.SUFFIXES: .cc .cxx .lo .o .obj
 $(srcdir)/Makefile.in:  $(srcdir)/Makefile.am  $(am__configure_deps)
 	@for dep in $?; do \
 	  case '$(am__configure_deps)' in \
@@ -437,8 +446,11 @@ distclean-compile:
 
 include ./$(DEPDIR)/libRootAnalysis_la-AnalysisHistograms.Plo
 include ./$(DEPDIR)/libRootAnalysis_la-Analyzer.Plo
+include ./$(DEPDIR)/libRootAnalysis_la-DictCint.Plo
+include ./$(DEPDIR)/libRootAnalysis_la-EventData.Plo
 include ./$(DEPDIR)/libRootAnalysis_la-EventProxyBase.Plo
 include ./$(DEPDIR)/libRootAnalysis_la-EventProxyOTF.Plo
+include ./$(DEPDIR)/libRootAnalysis_la-L1Obj.Plo
 include ./$(DEPDIR)/libRootAnalysis_la-OTFAnalyzer.Plo
 include ./$(DEPDIR)/libRootAnalysis_la-OTFHistograms.Plo
 include ./$(DEPDIR)/libRootAnalysis_la-ObjectMessenger.Plo
@@ -561,6 +573,48 @@ libRootAnalysis_la-TreeAnalyzer.lo: TreeAnalyzer.cc
 #	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) \
 #	$(AM_V_CXX_no)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libRootAnalysis_la_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o libRootAnalysis_la-TreeAnalyzer.lo `test -f 'TreeAnalyzer.cc' || echo '$(srcdir)/'`TreeAnalyzer.cc
 
+libRootAnalysis_la-L1Obj.lo: L1Obj.cc
+	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libRootAnalysis_la_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT libRootAnalysis_la-L1Obj.lo -MD -MP -MF $(DEPDIR)/libRootAnalysis_la-L1Obj.Tpo -c -o libRootAnalysis_la-L1Obj.lo `test -f 'L1Obj.cc' || echo '$(srcdir)/'`L1Obj.cc
+	$(AM_V_at)$(am__mv) $(DEPDIR)/libRootAnalysis_la-L1Obj.Tpo $(DEPDIR)/libRootAnalysis_la-L1Obj.Plo
+#	$(AM_V_CXX)source='L1Obj.cc' object='libRootAnalysis_la-L1Obj.lo' libtool=yes \
+#	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) \
+#	$(AM_V_CXX_no)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libRootAnalysis_la_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o libRootAnalysis_la-L1Obj.lo `test -f 'L1Obj.cc' || echo '$(srcdir)/'`L1Obj.cc
+
+libRootAnalysis_la-EventData.lo: EventData.cc
+	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libRootAnalysis_la_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT libRootAnalysis_la-EventData.lo -MD -MP -MF $(DEPDIR)/libRootAnalysis_la-EventData.Tpo -c -o libRootAnalysis_la-EventData.lo `test -f 'EventData.cc' || echo '$(srcdir)/'`EventData.cc
+	$(AM_V_at)$(am__mv) $(DEPDIR)/libRootAnalysis_la-EventData.Tpo $(DEPDIR)/libRootAnalysis_la-EventData.Plo
+#	$(AM_V_CXX)source='EventData.cc' object='libRootAnalysis_la-EventData.lo' libtool=yes \
+#	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) \
+#	$(AM_V_CXX_no)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libRootAnalysis_la_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o libRootAnalysis_la-EventData.lo `test -f 'EventData.cc' || echo '$(srcdir)/'`EventData.cc
+
+libRootAnalysis_la-DictCint.lo: DictCint.cxx
+	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libRootAnalysis_la_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT libRootAnalysis_la-DictCint.lo -MD -MP -MF $(DEPDIR)/libRootAnalysis_la-DictCint.Tpo -c -o libRootAnalysis_la-DictCint.lo `test -f 'DictCint.cxx' || echo '$(srcdir)/'`DictCint.cxx
+	$(AM_V_at)$(am__mv) $(DEPDIR)/libRootAnalysis_la-DictCint.Tpo $(DEPDIR)/libRootAnalysis_la-DictCint.Plo
+#	$(AM_V_CXX)source='DictCint.cxx' object='libRootAnalysis_la-DictCint.lo' libtool=yes \
+#	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) \
+#	$(AM_V_CXX_no)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libRootAnalysis_la_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o libRootAnalysis_la-DictCint.lo `test -f 'DictCint.cxx' || echo '$(srcdir)/'`DictCint.cxx
+
+.cxx.o:
+	$(AM_V_CXX)$(CXXCOMPILE) -MT $@ -MD -MP -MF $(DEPDIR)/$*.Tpo -c -o $@ $<
+	$(AM_V_at)$(am__mv) $(DEPDIR)/$*.Tpo $(DEPDIR)/$*.Po
+#	$(AM_V_CXX)source='$<' object='$@' libtool=no \
+#	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) \
+#	$(AM_V_CXX_no)$(CXXCOMPILE) -c -o $@ $<
+
+.cxx.obj:
+	$(AM_V_CXX)$(CXXCOMPILE) -MT $@ -MD -MP -MF $(DEPDIR)/$*.Tpo -c -o $@ `$(CYGPATH_W) '$<'`
+	$(AM_V_at)$(am__mv) $(DEPDIR)/$*.Tpo $(DEPDIR)/$*.Po
+#	$(AM_V_CXX)source='$<' object='$@' libtool=no \
+#	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) \
+#	$(AM_V_CXX_no)$(CXXCOMPILE) -c -o $@ `$(CYGPATH_W) '$<'`
+
+.cxx.lo:
+	$(AM_V_CXX)$(LTCXXCOMPILE) -MT $@ -MD -MP -MF $(DEPDIR)/$*.Tpo -c -o $@ $<
+	$(AM_V_at)$(am__mv) $(DEPDIR)/$*.Tpo $(DEPDIR)/$*.Plo
+#	$(AM_V_CXX)source='$<' object='$@' libtool=yes \
+#	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) \
+#	$(AM_V_CXX_no)$(LTCXXCOMPILE) -c -o $@ $<
+
 mostlyclean-libtool:
 	-rm -f *.lo
 
@@ -650,13 +704,15 @@ distdir: $(DISTFILES)
 	  fi; \
 	done
 check-am: all-am
-check: check-am
+check: $(BUILT_SOURCES)
+	$(MAKE) $(AM_MAKEFLAGS) check-am
 all-am: Makefile $(LTLIBRARIES)
 installdirs:
 	for dir in "$(DESTDIR)$(libdir)"; do \
 	  test -z "$$dir" || $(MKDIR_P) "$$dir"; \
 	done
-install: install-am
+install: $(BUILT_SOURCES)
+	$(MAKE) $(AM_MAKEFLAGS) install-am
 install-exec: install-exec-am
 install-data: install-data-am
 uninstall: uninstall-am
@@ -678,6 +734,7 @@ install-strip:
 mostlyclean-generic:
 
 clean-generic:
+	-test -z "$(CLEANFILES)" || rm -f $(CLEANFILES)
 
 distclean-generic:
 	-test -z "$(CONFIG_CLEAN_FILES)" || rm -f $(CONFIG_CLEAN_FILES)
@@ -686,6 +743,7 @@ distclean-generic:
 maintainer-clean-generic:
 	@echo "This command is intended for maintainers to use"
 	@echo "it deletes files that may require special tools to rebuild."
+	-test -z "$(BUILT_SOURCES)" || rm -f $(BUILT_SOURCES)
 clean: clean-am
 
 clean-am: clean-generic clean-libLTLIBRARIES clean-libtool \
@@ -757,7 +815,7 @@ ps-am:
 
 uninstall-am: uninstall-libLTLIBRARIES
 
-.MAKE: install-am install-strip
+.MAKE: all check install install-am install-strip
 
 .PHONY: CTAGS GTAGS TAGS all all-am check check-am clean clean-generic \
 	clean-libLTLIBRARIES clean-libtool cscopelist-am ctags \
@@ -773,6 +831,9 @@ uninstall-am: uninstall-libLTLIBRARIES
 	mostlyclean-generic mostlyclean-libtool pdf pdf-am ps ps-am \
 	tags tags-am uninstall uninstall-am uninstall-libLTLIBRARIES
 
+
+%Cint.cxx %Cint.h :$(top_srcdir)/include/L1Obj.h $(top_srcdir)/include/EventData.h $(top_srcdir)/include/LinkDef.h
+		/usr/bin/rootcint -f $*Cint.cxx -c $(INCLUDES) $(AM_CPPFLAGS) $^
 
 # Tell versions [3.59,3.63) of GNU make to not export all variables.
 # Otherwise a system limit (for SysV at least) may be exceeded.

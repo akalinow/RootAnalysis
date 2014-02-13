@@ -50,16 +50,49 @@ void OTFAnalyzer::registerCuts(){
 }
 //////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////
+void OTFAnalyzer::fillTurnOnCurve(float & ptCut, const std::string & sysType){
+
+	bool qualityCut = true;
+
+std::vector<L1Obj> & myL1Coll = theEvent->l1ObjectsGmt;
+std::string hName = "h2DPtGmt";
+
+//if(sysType=="Rpc") myL1Coll = theEvent->l1ObjectsRpc;
+if(sysType=="Otf") {
+	myL1Coll = theEvent->l1ObjectsOtf;
+	qualityCut = myL1Coll.size() && myL1Coll[0].q!=103 &&
+		         myL1Coll[0].q!=104 && myL1Coll[0].q!=105 &&
+		         myL1Coll[0].q%100>3;
+	hName = "h2DPtOtf";
+	}
+
+   bool pass = (myL1Coll.size() && myL1Coll[0].pt>=ptCut && qualityCut) || !myL1Coll.size();
+
+   myHistos_->fill2DHistogram(hName,pass,theEvent->pt);
+   myHistos_->fill2DHistogram(hName,pass,theEvent->etaHit);
+   myHistos_->fill2DHistogram(hName,pass,theEvent->phiHit);
+
+}
+
+
 bool OTFAnalyzer::analyze(const EventProxyBase& iEvent){
 
   clear();
 
   eventWeight_ = 1.0;
   /////////////////
-  //const EventProxyOTF & myEvent = iEvent;
   const EventProxyOTF & myEvent = static_cast<const EventProxyOTF&>(iEvent);
+  theEvent = myEvent.events;
 
-  std::cout<<myEvent.pt<<std::endl;
+  std::string sysType = "Gmt";
+  float ptCut = 20;
+
+  sysType = "Gmt";
+  fillTurnOnCurve(ptCut,sysType);
+  sysType = "Otf";
+  fillTurnOnCurve(ptCut,sysType);
+
+
 
   return true;
 }

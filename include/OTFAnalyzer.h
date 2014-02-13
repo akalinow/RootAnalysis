@@ -6,6 +6,7 @@
 
 #include "OTFHistograms.h"
 #include "Analyzer.h"
+#include "EventData.h"
 
 class TriggerHistograms;
 
@@ -28,9 +29,14 @@ class OTFAnalyzer:public Analyzer{
 
  private:
 
+  void fillTurnOnCurve(float & ptCut, const std::string & sysType);
+
   void registerCuts();
   bool checkSelections(const std::string & type);
   void clear();
+
+  //Class stored in the TTree
+  EventData       *theEvent;
 
   ///Histograms for this analysis
   OTFHistograms *myHistos_;
