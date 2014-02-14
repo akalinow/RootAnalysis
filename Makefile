@@ -328,7 +328,7 @@ target_vendor = unknown
 top_build_prefix = 
 top_builddir = .
 top_srcdir = .
-SUBDIRS = src include test
+SUBDIRS = src include test OTFAnalysis
 all: all-recursive
 
 .SUFFIXES:

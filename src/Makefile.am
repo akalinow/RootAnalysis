@@ -8,11 +8,9 @@ lib_LTLIBRARIES = libRootAnalysis.la
 # Build information for each library
 
 # Sources for libRootAnalysis
-libRootAnalysis_la_SOURCES = EventProxyOTF.cc OTFHistograms.cc OTFAnalyzer.cc \
-	                         EventProxyBase.cc TestAnalyzer.cc AnalysisHistograms.cc Analyzer.cc \
+libRootAnalysis_la_SOURCES = EventProxyBase.cc TestAnalyzer.cc AnalysisHistograms.cc Analyzer.cc \
 	                         ObjectMessenger.cc strbitset.cc TFileDirectory.cc TFileService.cc \
-	                         TH1AddDirectorySentry.cc TreeAnalyzer.cc L1Obj.cc EventData.cc \
-	                         DictCint.cxx
+	                         TH1AddDirectorySentry.cc TreeAnalyzer.cc 
 
 # Linker options libTestProgram
 #libRootAnalysis_la_LDFLAGS = -version-info 1:0 -R @ROOTLIBDIR@ -L@ROOTLIBDIR@
@@ -21,11 +19,4 @@ libRootAnalysis_la_SOURCES = EventProxyOTF.cc OTFHistograms.cc OTFAnalyzer.cc \
 # Compiler options. Here we are adding the include directory
 # to be searched for headers included in the source code.
 libRootAnalysis_la_CPPFLAGS = -I$(top_srcdir)/include -I@ROOTINCDIR@ -std=c++11
-
-BUILT_SOURCES = DictCint.cxx DictCint.h
-
-CLEANFILES = *Cint.cxx *Cint.h *~ core
-
-%Cint.cxx %Cint.h :$(top_srcdir)/include/L1Obj.h $(top_srcdir)/include/EventData.h $(top_srcdir)/include/LinkDef.h
-		@ROOTCINT@ -f $*Cint.cxx -c $(INCLUDES) $(AM_CPPFLAGS) $^
           

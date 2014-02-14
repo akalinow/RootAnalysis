@@ -321,7 +321,7 @@ test_LDFLAGS = $(top_srcdir)/src/libRootAnalysis.la -R /usr/lib64/root -L/usr/li
 test_LDADD = -lCore -lCint -lRIO -lNet -lHist -lGraf -lGraf3d -lGpad -lTree -lRint -lPostscript -lMatrix -lPhysics -lMathCore -lThread -lProof -pthread -lm -ldl -rdynamic -lboost_regex
 
 # Compiler options for a.out
-test_CPPFLAGS = -I$(top_srcdir)/include -I/usr/include/root
+test_CPPFLAGS = -I$(top_srcdir)/include -I$(top_srcdir)/OTFAnalysis -I/usr/include/root
 all: all-am
 
 .SUFFIXES:

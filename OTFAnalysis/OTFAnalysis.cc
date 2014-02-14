@@ -16,7 +16,7 @@
 #include <iostream>
 
 #include "TreeAnalyzer.h"
-#include "TestAnalyzer.h"
+#include "OTFAnalyzer.h"
 #include "EventProxyOTF.h"
 
 #include "TFile.h"
@@ -37,11 +37,10 @@ int main(int argc, char ** argv) {
 	TStopwatch timer;
 	timer.Start();
 	  //----------------------------------------------------------
-	/*
 	 std::vector<Analyzer*> myAnalyzers;
-	 EventProxyTest *myEvent = new EventProxyTest();
+	 EventProxyOTF *myEvent = new EventProxyOTF();
 
-	  myAnalyzers.push_back(new TestAnalyzer("TestAnalyzer"));
+	  myAnalyzers.push_back(new OTFAnalyzer("OTFAnalyzer"));
 
 	  TreeAnalyzer *tree = new TreeAnalyzer("TreeAnalyzer",cfgFileName, myEvent);
 	  tree->init(myAnalyzers);
@@ -60,7 +59,7 @@ int main(int argc, char ** argv) {
 	  for(unsigned int i=0;i<myAnalyzers.size();++i) delete myAnalyzers[i];
 	  delete tree;
 	  delete myEvent;
-*/
+
 	  std::cout<<"Done"<<std::endl;
 	  return 0;
 

@@ -16,7 +16,8 @@ noinst_PROGRAMS=test
 # '_SOURCES' for example.
 
 # Sources for the a.out 
-test_SOURCES= test.cc
+test_SOURCES= OTFAnalysis.cc EventProxyOTF.cc OTFHistograms.cc OTFAnalyzer.cc \
+	          L1Obj.cc EventData.cc DictCint.cxx
 
 # Linker options for a.out
 test_LDFLAGS = $(top_srcdir)/src/libRootAnalysis.la -R @ROOTLIBDIR@ -L@ROOTLIBDIR@
@@ -24,4 +25,15 @@ test_LDADD   = @ROOTLIBS@ -lProof @ROOTAUXLIBS@ -lboost_regex
 
 
 # Compiler options for a.out
-test_CPPFLAGS = -I$(top_srcdir)/include -I$(top_srcdir)/OTFAnalysis -I@ROOTINCDIR@
+test_CPPFLAGS = -I./ -I$(top_srcdir)/include -I@ROOTINCDIR@ -std=c++11
+
+BUILT_SOURCES = DictCint.cxx DictCint.h
+
+CLEANFILES = *Cint.cxx *Cint.h *~ core
+
+%Cint.cxx %Cint.h :L1Obj.h EventData.h LinkDef.h
+		@ROOTCINT@ -f $*Cint.cxx -c $(INCLUDES) $(AM_CPPFLAGS) $^
+		
+
+
+

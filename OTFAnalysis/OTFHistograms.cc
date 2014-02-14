@@ -46,11 +46,18 @@ void OTFHistograms::defineHistograms(){
  using namespace std;
 
  if(!histosInitialized_){
-
-    add2DHistogram("h2DPtGmt","",100,0,100,2,-0.5,1.5,file_);
-    add2DHistogram("h2DPtOtf","",100,0,100,2,-0.5,1.5,file_);
-
-
+    //Gmt
+    add2DHistogram("h2DGmtPt","",150,0,150,2,-0.5,1.5,file_);
+    add2DHistogram("h2DGmtEtaHit","",230,0.0,2.3,2,-0.5,1.5,file_);
+    add2DHistogram("h2DGmtPhiHit","",64,-3.2,3.2,2,-0.5,1.5,file_);
+    add2DHistogram("h2DGmtEtaVx","",230,0,2.3,2,-0.5,1.5,file_);
+    add2DHistogram("h2DGmtPhiVx","",64,-3.2,3.2,2,-0.5,1.5,file_);
+    //Otf
+    add2DHistogram("h2DOtfPt","",150,0,150,2,-0.5,1.5,file_);
+    add2DHistogram("h2DOtfEtaHit","",230,0.0,2.3,2,-0.5,1.5,file_);
+    add2DHistogram("h2DOtfPhiHit","",64,-3.2,3.2,2,-0.5,1.5,file_);
+    add2DHistogram("h2DOtfEtaVx","",230,0,2.3,2,-0.5,1.5,file_);
+    add2DHistogram("h2DOtfPhiVx","",64,-3.2,3.2,2,-0.5,1.5,file_);
 
    histosInitialized_ = true;
  }

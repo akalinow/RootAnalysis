@@ -30,5 +30,6 @@ AC_PROG_LIBTOOL
 AC_CONFIG_FILES(Makefile
                 test/Makefile
                 src/Makefile
-                include/Makefile)
+                include/Makefile
+                OTFAnalysis/Makefile)
 AC_OUTPUT
