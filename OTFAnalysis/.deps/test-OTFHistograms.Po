@@ -91,13 +91,13 @@ test-OTFHistograms.o: OTFHistograms.cc /usr/include/stdc-predef.h \
  /usr/include/c++/4.8.2/bits/locale_facets.tcc \
  /usr/include/c++/4.8.2/bits/basic_ios.tcc \
  /usr/include/c++/4.8.2/bits/ostream.tcc /usr/include/c++/4.8.2/istream \
- /usr/include/c++/4.8.2/bits/istream.tcc OTFHistograms.h \
- ../include/AnalysisHistograms.h /usr/include/c++/4.8.2/cmath \
+ /usr/include/c++/4.8.2/bits/istream.tcc /usr/include/c++/4.8.2/cmath \
  /usr/include/math.h /usr/include/bits/huge_val.h \
  /usr/include/bits/huge_valf.h /usr/include/bits/huge_vall.h \
  /usr/include/bits/inf.h /usr/include/bits/nan.h \
  /usr/include/bits/mathdef.h /usr/include/bits/mathcalls.h \
- /usr/include/bits/mathinline.h /usr/include/c++/4.8.2/map \
+ /usr/include/bits/mathinline.h OTFHistograms.h \
+ ../include/AnalysisHistograms.h /usr/include/c++/4.8.2/map \
  /usr/include/c++/4.8.2/bits/stl_tree.h \
  /usr/include/c++/4.8.2/bits/alloc_traits.h \
  /usr/include/c++/4.8.2/bits/ptr_traits.h \
@@ -160,7 +160,14 @@ test-OTFHistograms.o: OTFHistograms.cc /usr/include/stdc-predef.h \
  /usr/include/root/TFitResultPtr.h /usr/include/root/TH2.h \
  /usr/include/root/TMatrixFBasefwd.h /usr/include/root/TMatrixDBasefwd.h \
  /usr/include/root/TH3.h /usr/include/root/TAtt3D.h \
- /usr/include/root/TProfile.h
+ /usr/include/root/TProfile.h /usr/include/root/TCanvas.h \
+ /usr/include/root/TPad.h /usr/include/root/TVirtualPad.h \
+ /usr/include/root/TAttPad.h /usr/include/root/TVirtualX.h \
+ /usr/include/root/TAttText.h /usr/include/root/GuiTypes.h \
+ /usr/include/root/Buttons.h /usr/include/root/TQObject.h \
+ /usr/include/root/TAttCanvas.h /usr/include/root/TCanvasImp.h \
+ /usr/include/root/TLegend.h /usr/include/root/TPave.h \
+ /usr/include/root/TBox.h /usr/include/root/TString.h
 
 /usr/include/stdc-predef.h:
 
@@ -418,10 +425,6 @@ test-OTFHistograms.o: OTFHistograms.cc /usr/include/stdc-predef.h \
 
 /usr/include/c++/4.8.2/bits/istream.tcc:
 
-OTFHistograms.h:
-
-../include/AnalysisHistograms.h:
-
 /usr/include/c++/4.8.2/cmath:
 
 /usr/include/math.h:
@@ -441,6 +444,10 @@ OTFHistograms.h:
 /usr/include/bits/mathcalls.h:
 
 /usr/include/bits/mathinline.h:
+
+OTFHistograms.h:
+
+../include/AnalysisHistograms.h:
 
 /usr/include/c++/4.8.2/map:
 
@@ -645,3 +652,33 @@ OTFHistograms.h:
 /usr/include/root/TAtt3D.h:
 
 /usr/include/root/TProfile.h:
+
+/usr/include/root/TCanvas.h:
+
+/usr/include/root/TPad.h:
+
+/usr/include/root/TVirtualPad.h:
+
+/usr/include/root/TAttPad.h:
+
+/usr/include/root/TVirtualX.h:
+
+/usr/include/root/TAttText.h:
+
+/usr/include/root/GuiTypes.h:
+
+/usr/include/root/Buttons.h:
+
+/usr/include/root/TQObject.h:
+
+/usr/include/root/TAttCanvas.h:
+
+/usr/include/root/TCanvasImp.h:
+
+/usr/include/root/TLegend.h:
+
+/usr/include/root/TPave.h:
+
+/usr/include/root/TBox.h:
+
+/usr/include/root/TString.h:

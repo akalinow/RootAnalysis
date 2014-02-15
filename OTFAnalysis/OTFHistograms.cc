@@ -1,6 +1,10 @@
 #include <iostream>
+#include <cmath>
 
 #include "OTFHistograms.h"
+#include "TCanvas.h"
+#include "TLegend.h"
+#include "TString.h"
 
 
 int nPtBins = 32;
@@ -9,6 +13,10 @@ float ptBinsTmp[33]={0., 0.1,
   		 10., 12., 14., 16., 18., 20., 25., 30., 35., 40., 45.,
   		 50., 60., 70., 80., 90., 100., 120., 140.,
   		 160. };
+
+const int OTFHistograms::color[6] = {kBlack, kRed, kGreen, kBlue, kMagenta, kTeal};
+const float OTFHistograms::ptCutsGmt[4] = {0.1, 16, 20, 30};
+const float OTFHistograms::ptCutsOtf[4] = {0.1, 14, 18, 25};
 
 
 OTFHistograms::OTFHistograms(std::string fileName, int opt){
@@ -46,27 +54,166 @@ void OTFHistograms::defineHistograms(){
  using namespace std;
 
  if(!histosInitialized_){
+	 for(int iCut=0;iCut<4;++iCut){
     //Gmt
-    add2DHistogram("h2DGmtPt","",150,0,150,2,-0.5,1.5,file_);
-    add2DHistogram("h2DGmtEtaHit","",230,0.0,2.3,2,-0.5,1.5,file_);
-    add2DHistogram("h2DGmtPhiHit","",64,-3.2,3.2,2,-0.5,1.5,file_);
-    add2DHistogram("h2DGmtEtaVx","",230,0,2.3,2,-0.5,1.5,file_);
-    add2DHistogram("h2DGmtPhiVx","",64,-3.2,3.2,2,-0.5,1.5,file_);
+    int ptCut = OTFHistograms::ptCutsGmt[iCut];
+    add2DHistogram("h2DGmtPt"+std::to_string(ptCut),"",15,0,150,2,-0.5,1.5,file_);
+    add2DHistogram("h2DGmtEtaHit"+std::to_string(ptCut),"",23,0.0,2.3,2,-0.5,1.5,file_);
+    add2DHistogram("h2DGmtPhiHit"+std::to_string(ptCut),"",64,-3.2,3.2,2,-0.5,1.5,file_);
+    add2DHistogram("h2DGmtEtaVx"+std::to_string(ptCut),"",23,0,2.3,2,-0.5,1.5,file_);
+    add2DHistogram("h2DGmtPhiVx"+std::to_string(ptCut),"",64,-3.2,3.2,2,-0.5,1.5,file_);
     //Otf
-    add2DHistogram("h2DOtfPt","",150,0,150,2,-0.5,1.5,file_);
-    add2DHistogram("h2DOtfEtaHit","",230,0.0,2.3,2,-0.5,1.5,file_);
-    add2DHistogram("h2DOtfPhiHit","",64,-3.2,3.2,2,-0.5,1.5,file_);
-    add2DHistogram("h2DOtfEtaVx","",230,0,2.3,2,-0.5,1.5,file_);
-    add2DHistogram("h2DOtfPhiVx","",64,-3.2,3.2,2,-0.5,1.5,file_);
+    add2DHistogram("h2DOtfPt"+std::to_string(ptCut),"",15,0,150,2,-0.5,1.5,file_);
+    add2DHistogram("h2DOtfEtaHit"+std::to_string(ptCut),"",23,0.0,2.3,2,-0.5,1.5,file_);
+    add2DHistogram("h2DOtfPhiHit"+std::to_string(ptCut),"",64,-3.2,3.2,2,-0.5,1.5,file_);
+    add2DHistogram("h2DOtfEtaVx"+std::to_string(ptCut),"",23,0,2.3,2,-0.5,1.5,file_);
+    add2DHistogram("h2DOtfPhiVx"+std::to_string(ptCut),"",64,-3.2,3.2,2,-0.5,1.5,file_);
+
+    if(iCut==0) continue;
+    ptCut = OTFHistograms::ptCutsOtf[iCut];
+    add2DHistogram("h2DGmtPt"+std::to_string(ptCut),"",15,0,150,2,-0.5,1.5,file_);
+    add2DHistogram("h2DGmtEtaHit"+std::to_string(ptCut),"",23,0.0,2.3,2,-0.5,1.5,file_);
+    add2DHistogram("h2DGmtPhiHit"+std::to_string(ptCut),"",64,-3.2,3.2,2,-0.5,1.5,file_);
+    add2DHistogram("h2DGmtEtaVx"+std::to_string(ptCut),"",23,0,2.3,2,-0.5,1.5,file_);
+    add2DHistogram("h2DGmtPhiVx"+std::to_string(ptCut),"",64,-3.2,3.2,2,-0.5,1.5,file_);
+    //Otf
+    add2DHistogram("h2DOtfPt"+std::to_string(ptCut),"",15,0,150,2,-0.5,1.5,file_);
+    add2DHistogram("h2DOtfEtaHit"+std::to_string(ptCut),"",23,0.0,2.3,2,-0.5,1.5,file_);
+    add2DHistogram("h2DOtfPhiHit"+std::to_string(ptCut),"",64,-3.2,3.2,2,-0.5,1.5,file_);
+    add2DHistogram("h2DOtfEtaVx"+std::to_string(ptCut),"",23,0,2.3,2,-0.5,1.5,file_);
+    add2DHistogram("h2DOtfPhiVx"+std::to_string(ptCut),"",64,-3.2,3.2,2,-0.5,1.5,file_);
 
    histosInitialized_ = true;
+	 }
  }
 }
 /////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////
 void OTFHistograms::finalizeHistograms(int nRuns, float weight){
 
+	plotEffPanel("Gmt");
+	plotEffPanel("Otf");
 
 }
 /////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////
+TH1F* OTFHistograms::Integrate(TH1F * histoD) {
+
+  TH1F* histoI = (TH1F*)histoD->Clone("hIntegrated");
+
+  Double_t * cont = new Double_t [histoD->GetNbinsX()+2];  //with under+overflow
+  Double_t * errs = new Double_t [histoD->GetNbinsX()+2];  //with under+overflow
+  histoI->Reset();
+
+  // bin=0 underf
+  // bin 1-GetNbinsX() -conten
+  // bin GetNbinsX()+1 overflow
+
+  for (Int_t i = 0; i <= histoD->GetNbinsX()+1; i++) {
+    cont[i] = (Double_t)(histoD->GetBinContent(i));
+    errs[i] = (Double_t)(histoD->GetBinError(i));
+  }
+  Double_t sum=0.;
+  Double_t sume2=0.;
+  for (Int_t i = histoD->GetNbinsX()+1; i >= 0; i--) {
+    sum+=cont[i];
+    sume2+=errs[i]*errs[i];
+    histoI->SetBinContent(i,sum);
+    histoI->SetBinError(i,sqrt(sume2));
+   }
+  delete [] cont;
+  delete [] errs;
+  return histoI;
+}
+
+
+TH1D * OTFHistograms::DivideErr(TH1D * h1,
+                 TH1D * h2,
+                 const char * name,
+                 const char * optErr)
+{
+//
+// return h1/h2 with recalculated errors for "B"
+//
+  if (!h1) std::cout <<"DivideErr called, but histogram (h1) pointer is:"<<h1<<std::endl;
+  if (!h2) std::cout <<"DivideErr called, but histogram (h2) pointer is:"<<h1<<std::endl;
+  if (!h1 || !h2) return 0;
+  TH1D * hout = new TH1D( *h1);
+  hout->Reset();
+  hout->SetName(name);
+//  hout->SetTitleOffset(gStyle->GetTitleXOffset(),"x");
+//  hout->SetTitleOffset(gStyle->GetTitleYOffset(),"y");
+  hout->Divide(h1,h2,1.,1.,optErr);
+
+  if (strcmp(optErr,"B")==0  || strcmp(optErr,"b")==0) {
+    for (int i = 0; i<=hout->GetNbinsX()+1;i++) {
+      Float_t tot   = h2->GetBinContent(i) ;
+      Float_t tot_e = h2->GetBinError(i);
+      Float_t eff = hout->GetBinContent(i) ;
+      Float_t Err = 0.;
+      if (tot > 0) {
+        if (eff == 1.) eff = (tot-1)/tot; //modify efficiency as one even in numerator not fired
+        Err = tot_e / tot * sqrt( eff* (1-eff) );
+      }
+      hout->SetBinError(i, Err);
+    }
+  } else {
+    std::cout << "** Fig--DivideErr ** unknown option ---"<<optErr<<"---"<<std::endl;
+  }
+
+  return hout;
+}
+
+
+
+
+
+void OTFHistograms::plotEffPanel(const std::string & sysType){
+
+  TCanvas* c = new TCanvas(TString::Format("EffVsPt_%s",sysType.c_str()),
+			   TString::Format("EffVsPt_%s",sysType.c_str()),
+			   460,500);
+
+  TLegend l(0.6513158,0.1673729,0.8903509,0.470339,NULL,"brNDC");
+  l.SetTextSize(0.05);
+  l.SetFillStyle(4000);
+  l.SetBorderSize(0);
+  l.SetFillColor(10);
+  c->SetLogx(1);
+  c->SetGrid(0,1);
+
+  TString hName("");
+  const float *ptCuts = ptCutsOtf;
+  if(sysType=="Gmt") ptCuts = ptCutsGmt;
+
+  for (int icut=0; icut <=3;++icut){
+
+	hName = "h2D"+sysType+"Pt"+std::to_string((int)ptCuts[icut]);
+    TH2F* h2D = this->get2DHistogram(hName.Data());
+    std::cout<<hName<<" "<<h2D<<std::endl;
+    TH1D *hNum = h2D->ProjectionX("hNum",2,2);
+    TH1D *hDenom = h2D->ProjectionX("hDenom",1,1);
+    hDenom->Add(hNum);
+    TH1D* hEff =DivideErr(hNum,hDenom,"Pt_Int","B");
+    hEff->SetStats(kFALSE);
+    hEff->SetMinimum(0.0001);
+    hEff->SetMaximum(1.04);
+    hEff->GetXaxis()->SetRange(4,100);
+    hEff->SetMarkerStyle(21+icut);
+    hEff->SetMarkerColor(color[icut]);
+    hEff->SetXTitle("muon p_{T} [GeV/c]");
+    hEff->SetYTitle("Efficiency");
+    if (icut==0)hEff->DrawCopy();
+    else hEff->DrawCopy("same");
+    TString nameCut = TString::Format("%d",(int)ptCuts[icut])+" GeV/c";
+    if (icut==0) nameCut = "no p_{T} cut";
+    l.AddEntry(hEff,nameCut.Data());
+  }
+  l.DrawClone();
+  c->Print(TString::Format("fig_eps/PanelVsPt_%s.eps",sysType.c_str()).Data());
+  c->Print(TString::Format("fig_png/PanelVsPt_%s.png",sysType.c_str()).Data());
+}
+
+
+
+

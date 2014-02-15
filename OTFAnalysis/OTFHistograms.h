@@ -24,13 +24,25 @@ class OTFHistograms: public AnalysisHistograms {
 
   void finalizeHistograms(int nRuns, float weight=1.0);
 
+  static const int color[6];
+  static const float ptCutsGmt[4];
+  static const float ptCutsOtf[4];
+
    private:
 
   virtual void defineHistograms();
 
+
+  TH1F* Integrate(TH1F * histoD);
+
+  TH1D * DivideErr(TH1D * h1, TH1D * h2,
+                   const char * name="DivideErr",
+                   const char * optErr ="");
+
+  void plotEffPanel(const std::string & sysType);
+
   ///Types of the selection flow
   std::vector<std::string> selectionFlavours_;
-
 
   static const unsigned int nPtBins;
   static const float ptBins[33];

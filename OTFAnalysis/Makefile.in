@@ -323,10 +323,10 @@ test_SOURCES = OTFAnalysis.cc EventProxyOTF.cc OTFHistograms.cc OTFAnalyzer.cc \
 
 # Linker options for a.out
 test_LDFLAGS = $(top_srcdir)/src/libRootAnalysis.la -R @ROOTLIBDIR@ -L@ROOTLIBDIR@
-test_LDADD = @ROOTLIBS@ -lProof @ROOTAUXLIBS@ -lboost_regex
+test_LDADD = @ROOTLIBS@ -lProof @ROOTAUXLIBS@ -lboost_regex -lgomp
 
 # Compiler options for a.out
-test_CPPFLAGS = -I./ -I$(top_srcdir)/include -I@ROOTINCDIR@ -std=c++11
+test_CPPFLAGS = -I./ -I$(top_srcdir)/include -I@ROOTINCDIR@ -std=c++11 -fopenmp
 BUILT_SOURCES = DictCint.cxx DictCint.h
 CLEANFILES = *Cint.cxx *Cint.h *~ core
 all: $(BUILT_SOURCES)

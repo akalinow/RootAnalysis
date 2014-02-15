@@ -29,19 +29,11 @@ class OTFAnalyzer:public Analyzer{
 
  private:
 
-  void fillTurnOnCurve(float & ptCut, const std::string & sysType);
-
-  TH1F* Integrate(TH1F * histoD);
-
-  void plotEffPanel(const std::string & sysType);
+  void fillTurnOnCurve(int & ptCut, const std::string & sysType);
 
   void registerCuts();
   bool checkSelections(const std::string & type);
   void clear();
-
-  static const int color[6];
-  static const float ptCutsGmt[4];
-  static const float ptCutsOtf[4];
 
   //Class stored in the TTree
   EventData       *theEvent;

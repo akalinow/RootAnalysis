@@ -154,6 +154,7 @@ int TreeAnalyzer::loop(){
   nEventsAnalyzed_ = 0;
   nEventsSkipped_ = 0;
   nEventsToAnalyze_ = 1455902;
+  nEventsToAnalyze_ = 10;
   int eventPreviouslyPrinted=-1;
   ///////
    for(myProxy_->toBegin();
