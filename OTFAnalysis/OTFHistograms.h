@@ -41,6 +41,8 @@ class OTFHistograms: public AnalysisHistograms {
 
   void plotEffPanel(const std::string & sysType);
 
+  void plotEffVsEta(const std::string & sysType);
+
   ///Types of the selection flow
   std::vector<std::string> selectionFlavours_;
 

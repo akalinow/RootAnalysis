@@ -10,9 +10,6 @@ EventProxyBase::EventProxyBase():
 
 void EventProxyBase::init(std::vector<std::string> const& iFileNames){
 
-	std::cout<<"EventProxyBase "<<__func__<<std::endl;
-
-
   fChain = boost::shared_ptr<TChain>(new TChain(treeName_.c_str()));
 
   for (auto it= iFileNames.begin(), itEnd = iFileNames.end();it!=itEnd; ++it) {

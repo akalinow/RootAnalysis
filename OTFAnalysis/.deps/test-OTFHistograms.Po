@@ -167,7 +167,8 @@ test-OTFHistograms.o: OTFHistograms.cc /usr/include/stdc-predef.h \
  /usr/include/root/Buttons.h /usr/include/root/TQObject.h \
  /usr/include/root/TAttCanvas.h /usr/include/root/TCanvasImp.h \
  /usr/include/root/TLegend.h /usr/include/root/TPave.h \
- /usr/include/root/TBox.h /usr/include/root/TString.h
+ /usr/include/root/TBox.h /usr/include/root/TString.h \
+ /usr/include/root/TLine.h
 
 /usr/include/stdc-predef.h:
 
@@ -682,3 +683,5 @@ OTFHistograms.h:
 /usr/include/root/TBox.h:
 
 /usr/include/root/TString.h:
+
+/usr/include/root/TLine.h:

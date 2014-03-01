@@ -28,7 +28,7 @@ struct EventData: public TObject{
   std::vector<L1Obj> l1ObjectsOtf;
   std::vector<L1Obj> l1ObjectsGmt;
 
-  ClassDef(EventData,1)
+  ClassDef(EventData,2)
 };
 ///////////////////////////////////////
 #endif

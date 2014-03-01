@@ -115,7 +115,8 @@ void TreeAnalyzer::parseCfg(const std::string & cfgFileName){
   eventWeight_ = 1.0;
   filePath_ = "./";
   //fileNames_.push_back("/scratch_local/akalinow/CMS/Data/PostMoriond/NTUPLES_Summer13_TES/nTupleRun2012D-*.root");
-  fileNames_.push_back("/scratch_local/akalinow/CMS/test/EfficiencyTree.root");
+  fileNames_.push_back("/home/akalinow/scratch/CMS/test/EfficiencyTree.root");
+  //fileNames_.push_back("/scratch_local/akalinow/Presentations/Warsaw_05_03_2014/SingleEta_01RPC/EfficiencyTree.root");
   
 }
 //////////////////////////////////////////////////////////////////////////////
@@ -153,16 +154,16 @@ int TreeAnalyzer::loop(){
 
   nEventsAnalyzed_ = 0;
   nEventsSkipped_ = 0;
-  nEventsToAnalyze_ = 1455902;
-  nEventsToAnalyze_ = 10;
+  nEventsToAnalyze_ = myProxy_->size();
   int eventPreviouslyPrinted=-1;
   ///////
    for(myProxy_->toBegin();
        !myProxy_->atEnd() && (nEventsToAnalyze_<0 || (nEventsAnalyzed_+nEventsSkipped_)<nEventsToAnalyze_); ++(*myProxy_)){
      
      if((( nEventsAnalyzed_ < 10) ||
-	 nEventsAnalyzed_%10000==0) &&  nEventsAnalyzed_ != eventPreviouslyPrinted ) {
+	 nEventsAnalyzed_%100000==0) &&  nEventsAnalyzed_ != eventPreviouslyPrinted ) {
        eventPreviouslyPrinted = nEventsAnalyzed_;
+       std::cout<<"Events analyzed: "<<nEventsAnalyzed_<<std::endl;
      }
      analyze(*myProxy_);
    }

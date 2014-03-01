@@ -9,7 +9,6 @@ EventProxyOTF::~EventProxyOTF(){}
 
 void EventProxyOTF::init(std::vector<std::string> const& iFileNames){
 
-	std::cout<<"EventProxyOTF "<<__func__<<std::endl;
 	treeName_ = "efficiencyTree";
 
 	EventProxyBase::init(iFileNames);
