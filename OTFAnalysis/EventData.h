@@ -27,6 +27,8 @@ struct EventData: public TObject{
 
   std::vector<L1Obj> l1ObjectsOtf;
   std::vector<L1Obj> l1ObjectsGmt;
+  std::vector<L1Obj> l1ObjectsRpc;
+  std::vector<L1Obj> l1ObjectsOther;
 
   ClassDef(EventData,2)
 };

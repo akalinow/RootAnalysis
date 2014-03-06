@@ -24,6 +24,8 @@ class OTFHistograms: public AnalysisHistograms {
 
   void finalizeHistograms(int nRuns, float weight=1.0);
 
+  virtual bool fill2DHistogram(const std::string &name, float val1, float val2, float weight=1.0);
+
   static const int color[6];
   static const float ptCutsGmt[4];
   static const float ptCutsOtf[4];
@@ -42,6 +44,10 @@ class OTFHistograms: public AnalysisHistograms {
   void plotEffPanel(const std::string & sysType);
 
   void plotEffVsEta(const std::string & sysType);
+
+  void plotEffVsVar(const std::string & sysType,
+		  	  	  	const std::string & varName);
+
 
   ///Types of the selection flow
   std::vector<std::string> selectionFlavours_;

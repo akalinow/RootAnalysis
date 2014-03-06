@@ -73,7 +73,6 @@ if(sysType=="Otf") {
 
    bool pass = myL1Coll.size() && myL1Coll[0].pt>=ptCut && qualityCut;
 
-
    std::string tmpName = hName+"Pt"+std::to_string(ptCut);
    myHistos_->fill2DHistogram(tmpName,theEvent->pt, pass);
 
@@ -105,8 +104,9 @@ bool OTFAnalyzer::analyze(const EventProxyBase& iEvent){
 
   std::string selType = "";
 
-  omp_set_num_threads(2);
-#pragma omp parallel for
+  //omp_set_num_threads(2);
+  //#pragma omp parallel for
+
   for(int iCut=0;iCut<4;++iCut){
 
 	  //std::cout<<"thread number: "<<omp_get_thread_num()<<std::endl;
@@ -123,15 +123,15 @@ bool OTFAnalyzer::analyze(const EventProxyBase& iEvent){
 	  fillTurnOnCurve(ptCut,sysType,selType);
   }
   ////////////////
-  int iCut = 1;
-  std::string selection = "";
+  int iCut = 2;
+  bool pass = false;
   for(int iType=0;iType<3;++iType){
-	  if(iType==0) selection = std::string(TString::Format("(pt>(%d + 20))",OTFHistograms::ptCutsGmt[iCut]).Data());
-	  if(iType==1) selection = std::string(TString::Format("(pt>%d && pt<(%d+5))",OTFHistograms::ptCutsGmt[iCut],
-			                               OTFHistograms::ptCutsGmt[iCut]).Data());
-	  if(iType==2) selection = std::string(TString::Format("(pt<10)"));
-	  selType = std::string(TString::Format("Type%d",iType));
+	  if(iType==0) pass = theEvent->pt>(OTFHistograms::ptCutsGmt[iCut] + 20);
+	  if(iType==1) pass = theEvent->pt>OTFHistograms::ptCutsGmt[iCut] && theEvent->pt<(OTFHistograms::ptCutsGmt[iCut]+5);
+	  if(iType==2) pass = theEvent->pt<10;
+	  if(!pass) continue;
 
+	  selType = std::string(TString::Format("Type%d",iType));
 	  int ptCut = OTFHistograms::ptCutsGmt[iCut];
 	  std::string sysType = "Gmt";
 	  fillTurnOnCurve(ptCut,sysType,selType);

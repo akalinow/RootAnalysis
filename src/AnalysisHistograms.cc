@@ -156,29 +156,41 @@ void AnalysisHistograms::fillProfile(const std::string& name, float x, float val
 //////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////
-void  AnalysisHistograms::fill1DHistogram(const std::string& name, float val, float weight){
+bool  AnalysisHistograms::fill1DHistogram(const std::string& name, float val, float weight){
 
  using namespace std;
 
   if(my1Dhistograms_.find(name)!=my1Dhistograms_.end()) my1Dhistograms_[name]->Fill(val,weight);
-  else cout<<"ERROR: Histogram: "<<name<<" not found!"<<endl;
+  else{
+	  cout<<"ERROR: Histogram: "<<name<<" not found!"<<endl;
+	  return false;
+  }
+  return true;
 }
 //////////////////////////////////////////////////////////////////////////////
-void  AnalysisHistograms::fill2DHistogram(const std::string& name, float val1, float val2, float weight){
+bool AnalysisHistograms::fill2DHistogram(const std::string& name, float val1, float val2, float weight){
 
  using namespace std;
 
   if(my2Dhistograms_.find(name)!=my2Dhistograms_.end()) my2Dhistograms_[name]->Fill(val1,val2,weight);
-  else cout<<"ERROR: Histogram: "<<name<<" not found!"<<endl;
+  else{
+	  cout<<"ERROR: Histogram: "<<name<<" not found!"<<endl;
+	  return false;
+  }
+  return true;
 }
 //////////////////////////////////////////////////////////////////////////////
-void  AnalysisHistograms::fill3DHistogram(const std::string& name, float val1, float val2, float val3,
+bool  AnalysisHistograms::fill3DHistogram(const std::string& name, float val1, float val2, float val3,
 					  float weight){
 
  using namespace std;
 
  if(my3Dhistograms_.find(name)!=my3Dhistograms_.end()) my3Dhistograms_[name]->Fill(val1,val2,val3,weight);
-  else cout<<"ERROR: Histogram: "<<name<<" not found!"<<endl;
+  else{
+	  cout<<"ERROR: Histogram: "<<name<<" not found!"<<endl;
+	  return false;
+  }
+ return true;
 }
 //////////////////////////////////////////////////////////////////////////////
 

@@ -49,42 +49,43 @@ OTFHistograms::~OTFHistograms(){
 }
 /////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////
+bool OTFHistograms::fill2DHistogram(const std::string& name, float val1, float val2, float weight){
+
+	std::string hTemplateName = "";
+	if(!AnalysisHistograms::fill2DHistogram(name,val1,val2,weight)){
+		if(name.find("Pt")!=std::string::npos) hTemplateName = "h2DPt";
+		if(name.find("EtaHit")!=std::string::npos) hTemplateName = "h2DEtaHit";
+		if(name.find("PhiHit")!=std::string::npos) hTemplateName = "h2DPhiHit";
+		if(name.find("EtaVx")!=std::string::npos) hTemplateName = "h2DEtaVx";
+		if(name.find("PhiVx")!=std::string::npos) hTemplateName = "h2DPhiVx";
+		std::cout<<"Adding histogram: "<<name<<std::endl;
+		this->add2DHistogram(name,"",
+				this->get2DHistogram(hTemplateName)->GetNbinsX(),
+				this->get2DHistogram(hTemplateName)->GetXaxis()->GetXmin(),
+				this->get2DHistogram(hTemplateName)->GetXaxis()->GetXmax(),
+				this->get2DHistogram(hTemplateName)->GetNbinsY(),
+				this->get2DHistogram(hTemplateName)->GetYaxis()->GetXmin(),
+				this->get2DHistogram(hTemplateName)->GetYaxis()->GetXmax(),
+				file_);
+		return AnalysisHistograms::fill2DHistogram(name,val1,val2,weight);
+	}
+	return true;
+}
+
+
+
 void OTFHistograms::defineHistograms(){
 
  using namespace std;
 
  if(!histosInitialized_){
-	 for(int iCut=0;iCut<4;++iCut){
-    //Gmt
-    int ptCut = OTFHistograms::ptCutsGmt[iCut];
-    add2DHistogram("h2DGmtPt"+std::to_string(ptCut),"",150,0,150,2,-0.5,1.5,file_);
-    add2DHistogram("h2DGmtEtaHit"+std::to_string(ptCut),"",23,0.0,2.3,2,-0.5,1.5,file_);
-    add2DHistogram("h2DGmtPhiHit"+std::to_string(ptCut),"",64,-3.2,3.2,2,-0.5,1.5,file_);
-    add2DHistogram("h2DGmtEtaVx"+std::to_string(ptCut),"",23,0,2.3,2,-0.5,1.5,file_);
-    add2DHistogram("h2DGmtPhiVx"+std::to_string(ptCut),"",64,-3.2,3.2,2,-0.5,1.5,file_);
-    //Otf
-    add2DHistogram("h2DOtfPt"+std::to_string(ptCut),"",150,0,150,2,-0.5,1.5,file_);
-    add2DHistogram("h2DOtfEtaHit"+std::to_string(ptCut),"",23,0.0,2.3,2,-0.5,1.5,file_);
-    add2DHistogram("h2DOtfPhiHit"+std::to_string(ptCut),"",64,-3.2,3.2,2,-0.5,1.5,file_);
-    add2DHistogram("h2DOtfEtaVx"+std::to_string(ptCut),"",23,0,2.3,2,-0.5,1.5,file_);
-    add2DHistogram("h2DOtfPhiVx"+std::to_string(ptCut),"",64,-3.2,3.2,2,-0.5,1.5,file_);
-
-    if(iCut==0) continue;
-    ptCut = OTFHistograms::ptCutsOtf[iCut];
-    add2DHistogram("h2DGmtPt"+std::to_string(ptCut),"",150,0,150,2,-0.5,1.5,file_);
-    add2DHistogram("h2DGmtEtaHit"+std::to_string(ptCut),"",23,0.0,2.3,2,-0.5,1.5,file_);
-    add2DHistogram("h2DGmtPhiHit"+std::to_string(ptCut),"",64,-3.2,3.2,2,-0.5,1.5,file_);
-    add2DHistogram("h2DGmtEtaVx"+std::to_string(ptCut),"",23,0,2.3,2,-0.5,1.5,file_);
-    add2DHistogram("h2DGmtPhiVx"+std::to_string(ptCut),"",64,-3.2,3.2,2,-0.5,1.5,file_);
-    //Otf
-    add2DHistogram("h2DOtfPt"+std::to_string(ptCut),"",150,0,150,2,-0.5,1.5,file_);
-    add2DHistogram("h2DOtfEtaHit"+std::to_string(ptCut),"",23,0.0,2.3,2,-0.5,1.5,file_);
-    add2DHistogram("h2DOtfPhiHit"+std::to_string(ptCut),"",64,-3.2,3.2,2,-0.5,1.5,file_);
-    add2DHistogram("h2DOtfEtaVx"+std::to_string(ptCut),"",23,0,2.3,2,-0.5,1.5,file_);
-    add2DHistogram("h2DOtfPhiVx"+std::to_string(ptCut),"",64,-3.2,3.2,2,-0.5,1.5,file_);
-
+ //Make template histos
+ add2DHistogram("h2DPt","",150,0,150,2,-0.5,1.5,file_);
+ add2DHistogram("h2DEtaHit","",8*26,0.8,1.25,2,-0.5,1.5,file_);
+ add2DHistogram("h2DPhiHit","",5*32,-M_PI,M_PI,2,-0.5,1.5,file_);
+ add2DHistogram("h2DEtaVx","",8*26,0.8,1.25,2,-0.5,1.5,file_);
+ add2DHistogram("h2DPhiVx","",5*32,-M_PI,M_PI,2,-0.5,1.5,file_);
    histosInitialized_ = true;
-	 }
  }
 }
 /////////////////////////////////////////////////////////
@@ -93,9 +94,17 @@ void OTFHistograms::finalizeHistograms(int nRuns, float weight){
 
 	plotEffPanel("Gmt");
 	plotEffVsEta("Gmt");
+	plotEffVsVar("Gmt","EtaVx");
+	plotEffVsVar("Gmt","EtaHit");
+	plotEffVsVar("Gmt","PhiVx");
+    plotEffVsVar("Gmt","PhiHit");
 
 	plotEffPanel("Otf");
 	plotEffVsEta("Otf");
+	plotEffVsVar("Otf","EtaVx");
+	plotEffVsVar("Otf","EtaHit");
+	plotEffVsVar("Otf","PhiVx");
+	plotEffVsVar("Otf","PhiHit");
 
 
 }
@@ -218,6 +227,50 @@ void OTFHistograms::plotEffPanel(const std::string & sysType){
 }
 
 
+void OTFHistograms::plotEffVsVar(const std::string & sysType,
+		const std::string & varName){
+
+  TCanvas* c = new TCanvas(TString::Format("EffVs%s_%s",varName.c_str(),sysType.c_str()),
+			   TString::Format("EffVs%s_%s",varName.c_str(),sysType.c_str()),
+			   460,500);
+
+  TLegend l(0.6513158,0.1673729,0.8903509,0.470339,NULL,"brNDC");
+  l.SetTextSize(0.05);
+  l.SetFillStyle(4000);
+  l.SetBorderSize(0);
+  l.SetFillColor(10);
+  c->SetGrid(0,1);
+
+  TString hName("");
+    const float *ptCuts = ptCutsOtf;
+    if(sysType=="Gmt") ptCuts = ptCutsGmt;
+
+    for (int icut=0; icut <=3;++icut){
+    	hName = "h2D"+sysType+varName+std::to_string((int)ptCuts[icut]);
+    	TH2F* h2D = this->get2DHistogram(hName.Data());
+    	TH1D *hNum = h2D->ProjectionX("hNum",2,2);
+    	TH1D *hDenom = h2D->ProjectionX("hDenom",1,1);
+    	hDenom->Add(hNum);
+    	TH1D* hEff =DivideErr(hNum,hDenom,"Pt_Int","B");
+    	hEff->SetStats(kFALSE);
+    	hEff->SetMinimum(0.8);
+    	hEff->SetMaximum(1.04);
+    	hEff->SetMarkerStyle(21+icut);
+    	hEff->SetMarkerColor(color[icut]);
+    	hEff->SetXTitle(varName.c_str());
+    	hEff->SetYTitle("Efficiency");
+    	if (icut==0)hEff->DrawCopy("E0");
+    	else hEff->DrawCopy("same E0");
+    	std::string nameCut = std::to_string((int)ptCuts[icut])+" GeV/c";
+    	if (icut==0) nameCut = "no p_{T} cut";
+    	l.AddEntry(hEff,nameCut.c_str());
+  }
+  l.DrawClone();
+  c->Print(TString::Format("fig_eps/EffVs%s_%s.eps",varName.c_str(), sysType.c_str()).Data());
+  c->Print(TString::Format("fig_png/EffVs%s_%s.png",varName.c_str(), sysType.c_str()).Data());
+}
+///////////////////////////////////////////////////////
+///////////////////////////////////////////////////////
 void OTFHistograms::plotEffVsEta(const std::string & sysType){
 
   TCanvas* c = new TCanvas(TString::Format("EffVsEta_%s",sysType.c_str()),
@@ -239,7 +292,7 @@ void OTFHistograms::plotEffVsEta(const std::string & sysType){
   int iCut = 2;
  std::string hName = "";
   for (int iType=0; iType<3;++iType){
-    hName = "h2D"+sysType+"Type" + std::to_string((int)ptCuts[iType]) + "Pt"+std::to_string((int)ptCuts[iCut]);
+    hName = "h2D"+sysType+"Type" + std::to_string(iType) + "EtaVx"+std::to_string((int)ptCuts[iCut]);
     TH2F* h2D = this->get2DHistogram(hName);
     TH1D *hNum = h2D->ProjectionX("hNum",2,2);
     TH1D *hDenom = h2D->ProjectionX("hDenom",1,1);
@@ -261,7 +314,7 @@ void OTFHistograms::plotEffVsEta(const std::string & sysType){
     if (iType==2) nameCut = "p_{T}^{#mu}<10 GeV/c";
     l.AddEntry(hEff,nameCut.c_str());
   }
-  l.SetHeader(TString::Format("p_{T}^{cut} = %d  GeV/c",ptCuts[iCut]).Data());
+  l.SetHeader(TString::Format("p_{T}^{cut} = %d  GeV/c",(int)ptCuts[iCut]).Data());
   l.DrawClone();
 
    ///OTF eta range used for generating patterns.
@@ -275,3 +328,89 @@ void OTFHistograms::plotEffVsEta(const std::string & sysType){
   c->Print(TString::Format("fig_png/EffVsEta_%s.png",sysType.c_str()).Data());
 }
 
+/*
+void void OTFHistograms::plotOtfVsGmt(float ptCut){
+
+  TCanvas* c = new TCanvas(TString::Format("OtfVsGmt_%d",(int)ptCut).Data(),
+			   TString::Format("OtfVsGmt_%d",(int)ptCut).Data(),
+			   460,500);
+
+  TLegend l(0.1995614,0.7139831,0.4385965,0.8665254,NULL,"brNDC");
+  l.SetTextSize(0.05);
+  l.SetFillStyle(4000);
+  l.SetBorderSize(0);
+  l.SetFillColor(10);
+  c->SetLogx(1);
+  c->SetGrid(0,1);
+
+  //////Histogram for plotting
+  TH2F *h2D = new TH2F("h2D","",nPtBins,ptBins,2,-0.5,1.5);
+
+  std::string hName = "h2DGmtTypePt"+std::to_string((int)ptCut);
+  TH2F* h2D = this->get2DHistogram(hName);
+  TH1D *hNum = h2D->ProjectionX("hNum",2,2);
+  TH1D *hDenom = h2D->ProjectionX("hDenom",1,1);
+  hDenom->Add(hNum);
+  TH1D* hEffGmt =DivideErr(hNum,hDenom,"Pt_Int","B");
+
+  //////Histogram for total eff above ptCut
+  TH2F *h2DTmp = new TH2F("h2D","",11,ptCut,9999,2,-0.5,1.5);
+  TH1D* hEffGmtTmp = getTurnOncurve(tree,ptCut,h2DTmp,"pt","Gmt",selection);
+  float effGmt = hEffGmtTmp->GetBinContent(1);
+  float effOtfMatch = 0.0;
+  int match = -1;
+  float delta = 999.0;
+
+  for (int icut=13; icut <=31;++icut){
+  //for (int icut=18; icut <=18;++icut){
+    if(ptBins[icut]>ptCut+20) continue;
+    TH1D* hEffOtf = getTurnOncurve(tree,ptBins[icut],h2DTmp,"pt","Otf",selection);
+    float effOtf = hEffOtf->GetBinContent(1);
+    std::cout<<ptBins[icut]<<" "<<effOtf<<" "<<fabs(effGmt-effOtf)<<std::endl;
+    if(fabs(effGmt-effOtf)<delta){
+      match = icut;
+      delta = fabs(effGmt-effOtf);
+      effOtfMatch = effOtf;
+    }
+  }
+  std::cout<<"Gmt eff: "<<effGmt<<std::endl;
+  std::cout<<"Otf eff: "<<effOtfMatch<<std::endl;
+
+  int icut = 3;
+  h2D = new TH2F("h2D","",nPtBins,ptBins,2,-0.5,1.5);
+  TH1D* hEffOtf = getTurnOncurve(tree,ptBins[match],h2D,"pt","Otf",selection);
+  hEffGmt->SetMarkerStyle(21+icut);
+  hEffGmt->SetMarkerColor(color[icut]+10);
+
+  hEffOtf->SetXTitle("muon p_{T} [GeV/c]");
+  hEffOtf->SetYTitle("Efficiency");
+  hEffOtf->SetMinimum(0.0001);
+  hEffOtf->SetMaximum(1.04);
+  hEffOtf->GetXaxis()->SetRange(4,100);
+  hEffOtf->SetMarkerStyle(8);
+  hEffOtf->SetMarkerColor(color[icut]);
+  hEffOtf->DrawCopy();
+
+  hEffGmt->DrawCopy("same");
+  std::string nameCut(TString::Format("%1.0f GeV/c",ptBins[match]).Data());
+  if (icut==0) nameCut = "no p_{T} cut";
+  l.AddEntry(hEffOtf,("Otf, "+nameCut).c_str());
+  string tmp = "Gmt, %1.0f GeV/c";
+  if( int(ptBins[match]*10)%10==5)  tmp = "Gmt, %1.1f GeV/c";
+  l.AddEntry(hEffGmt,TString::Format(tmp.c_str(),ptCut).Data());
+  l.DrawClone();
+
+  TLine aLine(0,0,0,0);
+  aLine.SetLineColor(2);
+  aLine.SetLineWidth(3);
+  aLine.DrawLine(ptCut,0,ptCut,1.04);
+
+  c->Print(TString::Format("fig_eps/OtfVsGmt_%d.eps",(int)ptCut).Data());
+  c->Print(TString::Format("fig_png/OtfVsGmt_%d.png",(int)ptCut).Data());
+
+  c->SetLogy();
+  c->Print(TString::Format("fig_eps/OtfVsGmt_%d_log.eps",(int)ptCut).Data());
+  c->Print(TString::Format("fig_png/OtfVsGmt_%d_log.png",(int)ptCut).Data());
+
+}
+*/
