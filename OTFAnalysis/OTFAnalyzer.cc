@@ -52,29 +52,39 @@ void OTFAnalyzer::registerCuts(){
 }
 //////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////
-void OTFAnalyzer::fillTurnOnCurve(int & ptCut,
+void OTFAnalyzer::fillTurnOnCurve(const int & iPtCut,
 			                      const std::string & sysType,
 			                      const std::string & selType){
 
-	bool qualityCut = true;
+bool qualityCut = true;
+int ptCut = OTFHistograms::ptBins[iPtCut];
 
-std::vector<L1Obj> & myL1Coll = theEvent->l1ObjectsGmt;
+std::vector<L1Obj> * myL1Coll = &(theEvent->l1ObjectsGmt);
 std::string hName = "h2DGmt"+selType;
 
-//if(sysType=="Rpc") myL1Coll = theEvent->l1ObjectsRpc;
-//if(sysType=="Other") myL1Coll = theEvent->l1ObjectsOther;
+if(sysType=="Rpc"){
+		myL1Coll = &(theEvent->l1ObjectsRpc);
+		hName = "h2DRpc"+selType;
+}
+if(sysType=="Other"){
+		myL1Coll = &(theEvent->l1ObjectsOther);
+		hName = "h2DOther"+selType;
+}
 if(sysType=="Otf") {
-	myL1Coll = theEvent->l1ObjectsOtf;
-	qualityCut = myL1Coll.size() && myL1Coll[0].q!=103 &&
-		         myL1Coll[0].q!=104 && myL1Coll[0].q!=105 &&
-		         myL1Coll[0].q%100>3;
+	myL1Coll = &(theEvent->l1ObjectsOtf);
+	qualityCut = myL1Coll->size() && myL1Coll->operator[](0).q!=103 &&
+		         myL1Coll->operator[](0).q!=104 && myL1Coll->operator[](0).q!=105 &&
+		         myL1Coll->operator[](0).q%100>3;
 	hName = "h2DOtf"+selType;
 	}
 
-   bool pass = myL1Coll.size() && myL1Coll[0].pt>=ptCut && qualityCut;
+   bool pass = myL1Coll->size() && myL1Coll->operator[](0).pt>=ptCut && qualityCut;
 
    std::string tmpName = hName+"Pt"+std::to_string(ptCut);
    myHistos_->fill2DHistogram(tmpName,theEvent->pt, pass);
+
+   ///Fill histos for eff vs eta/phi only for events at the plateau.
+   if(theEvent->pt<(ptCut + 20)) return;
 
    tmpName = hName+"EtaHit"+std::to_string(ptCut);
    myHistos_->fill2DHistogram(tmpName,theEvent->etaHit, pass);
@@ -103,29 +113,22 @@ bool OTFAnalyzer::analyze(const EventProxyBase& iEvent){
   //int ptCut = 0;
 
   std::string selType = "";
+  std::string sysTypeGmt="Gmt";
+  std::string sysTypeOtf="Otf";
 
   //omp_set_num_threads(2);
   //#pragma omp parallel for
 
-  for(int iCut=0;iCut<4;++iCut){
-
+  for(int iCut=0;iCut<22;++iCut){
+	  if(iCut>0 && iCut<14) continue;
 	  //std::cout<<"thread number: "<<omp_get_thread_num()<<std::endl;
-
-	  int ptCut = OTFHistograms::ptCutsGmt[iCut];
-	  std::string sysType = "Gmt";
-	  fillTurnOnCurve(ptCut,sysType,selType);
-	  sysType = "Otf";
-	  fillTurnOnCurve(ptCut,sysType,selType);
-	  ptCut = OTFHistograms::ptCutsOtf[iCut];
-	  sysType = "Gmt";
-	  fillTurnOnCurve(ptCut,sysType,selType);
-	  sysType = "Otf";
-	  fillTurnOnCurve(ptCut,sysType,selType);
+	  fillTurnOnCurve(iCut,sysTypeGmt,selType);
+	  fillTurnOnCurve(iCut,sysTypeOtf,selType);
   }
   ////////////////
   int iCut = 2;
   bool pass = false;
-  for(int iType=0;iType<3;++iType){
+  for(int iType=0;iType<=3;++iType){
 	  if(iType==0) pass = theEvent->pt>(OTFHistograms::ptCutsGmt[iCut] + 20);
 	  if(iType==1) pass = theEvent->pt>OTFHistograms::ptCutsGmt[iCut] && theEvent->pt<(OTFHistograms::ptCutsGmt[iCut]+5);
 	  if(iType==2) pass = theEvent->pt<10;
@@ -133,11 +136,9 @@ bool OTFAnalyzer::analyze(const EventProxyBase& iEvent){
 
 	  selType = std::string(TString::Format("Type%d",iType));
 	  int ptCut = OTFHistograms::ptCutsGmt[iCut];
-	  std::string sysType = "Gmt";
-	  fillTurnOnCurve(ptCut,sysType,selType);
+	  fillTurnOnCurve(ptCut,sysTypeGmt,selType);
 	  ptCut = OTFHistograms::ptCutsOtf[iCut];
-	  sysType = "Otf";
-	  fillTurnOnCurve(ptCut,sysType,selType);
+	  fillTurnOnCurve(ptCut,sysTypeOtf,selType);
   }
 
 

@@ -29,6 +29,9 @@ class OTFHistograms: public AnalysisHistograms {
   static const int color[6];
   static const float ptCutsGmt[4];
   static const float ptCutsOtf[4];
+  static const unsigned int nPtBins;
+  static const float ptBins[33];
+
 
    private:
 
@@ -48,12 +51,10 @@ class OTFHistograms: public AnalysisHistograms {
   void plotEffVsVar(const std::string & sysType,
 		  	  	  	const std::string & varName);
 
+  void plotOtfVsGmt(int iPt);
 
   ///Types of the selection flow
   std::vector<std::string> selectionFlavours_;
-
-  static const unsigned int nPtBins;
-  static const float ptBins[33];
 
 };
 

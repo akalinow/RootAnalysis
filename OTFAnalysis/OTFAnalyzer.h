@@ -29,7 +29,7 @@ class OTFAnalyzer:public Analyzer{
 
  private:
 
-  void fillTurnOnCurve(int & ptCut, const std::string & sysType,
+  void fillTurnOnCurve(const int & ptCut, const std::string & sysType,
 		               const std::string & selType);
 
   void registerCuts();
