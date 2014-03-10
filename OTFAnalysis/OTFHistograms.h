@@ -27,8 +27,8 @@ class OTFHistograms: public AnalysisHistograms {
   virtual bool fill2DHistogram(const std::string &name, float val1, float val2, float weight=1.0);
 
   static const int color[6];
-  static const float ptCutsGmt[4];
-  static const float ptCutsOtf[4];
+  static const int ptCutsGmt[4];
+  static const int ptCutsOtf[4];
   static const unsigned int nPtBins;
   static const float ptBins[33];
 
@@ -52,6 +52,8 @@ class OTFHistograms: public AnalysisHistograms {
 		  	  	  	const std::string & varName);
 
   void plotOtfVsGmt(int iPt);
+
+  TH1F* makeRateWeights(TH1 *hPtOrig);
 
   ///Types of the selection flow
   std::vector<std::string> selectionFlavours_;

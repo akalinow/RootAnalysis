@@ -6,6 +6,7 @@
 #include "TLegend.h"
 #include "TString.h"
 #include "TLine.h"
+#include "TF1.h"
 
 int nPtBins = 32;
 const float OTFHistograms::ptBins[33]={0., 0.1,
@@ -15,8 +16,8 @@ const float OTFHistograms::ptBins[33]={0., 0.1,
   		 160. };
 
 const int OTFHistograms::color[6] = {kBlack, kRed, kGreen, kBlue, kMagenta, kTeal};
-const float OTFHistograms::ptCutsGmt[4] = {0.1, 16, 20, 25};
-const float OTFHistograms::ptCutsOtf[4] = {0.1, 14, 18, 20};
+const int OTFHistograms::ptCutsGmt[4] = {0, 16, 18, 19};
+const int OTFHistograms::ptCutsOtf[4] = {0, 15, 17, 18};
 
 
 OTFHistograms::OTFHistograms(std::string fileName, int opt){
@@ -58,6 +59,7 @@ bool OTFHistograms::fill2DHistogram(const std::string& name, float val1, float v
 		if(name.find("PhiHit")!=std::string::npos) hTemplateName = "h2DPhiHit";
 		if(name.find("EtaVx")!=std::string::npos) hTemplateName = "h2DEtaVx";
 		if(name.find("PhiVx")!=std::string::npos) hTemplateName = "h2DPhiVx";
+		if(name.find("Rate")!=std::string::npos) hTemplateName = "h2DRate";
 		std::cout<<"Adding histogram: "<<name<<std::endl;
 		this->add2DHistogram(name,"",
 				this->get2DHistogram(hTemplateName)->GetNbinsX(),
@@ -85,6 +87,9 @@ void OTFHistograms::defineHistograms(){
  add2DHistogram("h2DPhiHit","",5*32,-M_PI,M_PI,2,-0.5,1.5,file_);
  add2DHistogram("h2DEtaVx","",8*26,0.8,1.25,2,-0.5,1.5,file_);
  add2DHistogram("h2DPhiVx","",5*32,-M_PI,M_PI,2,-0.5,1.5,file_);
+ //Rate histos
+ add2DHistogram("h2DRate","",400,0,200,140,0,140,file_);
+
    histosInitialized_ = true;
  }
 }
@@ -108,9 +113,11 @@ void OTFHistograms::finalizeHistograms(int nRuns, float weight){
 	plotEffVsVar("Otf","PhiVx");
 	plotEffVsVar("Otf","PhiHit");
 
-	plotOtfVsGmt(16);
-	plotOtfVsGmt(18);
-	plotOtfVsGmt(19);
+	//plotOtfVsGmt(16);
+	//plotOtfVsGmt(18);
+	//plotOtfVsGmt(19);
+
+	plotRate("Gmt");
 
 
 }
@@ -199,11 +206,12 @@ void OTFHistograms::plotEffPanel(const std::string & sysType){
   c->SetGrid(0,1);
 
   TString hName("");
-  const float *ptCuts = ptCutsOtf;
+  const int *ptCuts = ptCutsOtf;
   if(sysType=="Gmt") ptCuts = ptCutsGmt;
 
   for (int icut=0; icut <=3;++icut){
-	hName = "h2D"+sysType+"Pt"+std::to_string((int)ptCuts[icut]);
+	float ptCut = OTFHistograms::ptBins[ptCuts[icut]];
+	hName = "h2D"+sysType+"Pt"+std::to_string((int)ptCut);
     TH2F* h2D = this->get2DHistogram(hName.Data());
     std::cout<<ptCuts[icut]<<" "<<hName<<" "<<h2D<<std::endl;
     TH1D *hNum = h2D->ProjectionX("hNum",2,2);
@@ -245,11 +253,12 @@ void OTFHistograms::plotEffVsVar(const std::string & sysType,
   c->SetGrid(0,1);
 
   TString hName("");
-    const float *ptCuts = ptCutsOtf;
+    const int *ptCuts = ptCutsOtf;
     if(sysType=="Gmt") ptCuts = ptCutsGmt;
 
     for (int icut=0; icut <=1;++icut){
-    	hName = "h2D"+sysType+varName+std::to_string((int)ptCuts[icut]);
+    	float ptCut = OTFHistograms::ptBins[ptCuts[icut]];
+    	hName = "h2D"+sysType+varName+std::to_string((int)ptCut);
     	TH2F* h2D = this->get2DHistogram(hName.Data());
     	TH1D *hNum = h2D->ProjectionX("hNum",2,2);
     	TH1D *hDenom = h2D->ProjectionX("hDenom",1,1);
@@ -292,13 +301,14 @@ void OTFHistograms::plotEffVsEta(const std::string & sysType){
 
   TH2F *h2D = new TH2F("h2D","",8*26,0.8,1.25,2,-0.5,1.5);
 
-  const float *ptCuts = ptCutsOtf;
+  const int *ptCuts = ptCutsOtf;
   if(sysType=="Gmt" || sysType=="Rpc") ptCuts = ptCutsGmt;
 
   int iCut = 2;
  std::string hName = "";
   for (int iType=0; iType<3;++iType){
-    hName = "h2D"+sysType+"Type" + std::to_string(iType) + "EtaVx"+std::to_string((int)ptCuts[iCut]);
+	float ptCut = OTFHistograms::ptBins[ptCuts[iCut]];
+    hName = "h2D"+sysType+"Type" + std::to_string(iType) + "EtaVx"+std::to_string((int)ptCut);
     TH2F* h2D = this->get2DHistogram(hName);
     TH1D *hNum = h2D->ProjectionX("hNum",2,2);
     TH1D *hDenom = h2D->ProjectionX("hDenom",1,1);
@@ -424,3 +434,41 @@ void OTFHistograms::plotOtfVsGmt(int iPtCut){
   c->Print(TString::Format("fig_png/OtfVsGmt_%d_log.png",(int)ptCut).Data());
 
 }
+
+TH1F* OTFHistograms::makeRateWeights(TH1 *hPtOrig){
+
+  TF1 *fIntVxMuRate = new TF1("fIntVxMuRate","TMath::Power(x,[0]*TMath::Log(x))*TMath::Power(x,[1])*TMath::Exp([2])",1,1000);
+  fIntVxMuRate->SetParameters(-0.235801, -2.82346, 17.162);
+
+  TH1F *hWeights = (TH1F*)hPtOrig->Clone("hWeights");
+
+  int iBin, nEvInBin;
+  float ptLow, ptHigh, weight;
+
+  for (int iBin = 1; iBin < hPtOrig->GetNbinsX(); ++iBin){
+    ptLow = hPtOrig->GetXaxis()->GetBinLowEdge(iBin);
+    ptHigh = hPtOrig->GetXaxis()->GetBinUpEdge(iBin);
+    nEvInBin = hPtOrig->GetBinContent(iBin);
+    if(nEvInBin<1) nEvInBin = 1;
+    weight = (fIntVxMuRate->Eval(ptLow) - fIntVxMuRate->Eval(ptHigh))/nEvInBin;
+    hWeights->SetBinContent(iBin,weight);
+  }
+return hWeights;
+}
+
+TH1F* OTFHistograms::getRateHisto(std::string sysType = "Vx"){
+
+	std::string hName = "h2DRate"+sysType;
+	TH2F* h2D = this->get2DHistogram(hName);
+
+
+
+  hRate->SetXTitle("p_{T}^{cut} [GeV/c]");
+  hRate->SetYTitle("Arbitrary units");
+
+  hRate->SetLineWidth(3);
+
+  tree->Draw(var.c_str(),selection.c_str(),"goff");
+
+  return Integrate(hRate)
+
