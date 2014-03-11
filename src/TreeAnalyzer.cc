@@ -116,7 +116,7 @@ void TreeAnalyzer::parseCfg(const std::string & cfgFileName){
   filePath_ = "./";
   //fileNames_.push_back("/scratch_local/akalinow/CMS/Data/PostMoriond/NTUPLES_Summer13_TES/nTupleRun2012D-*.root");
   //fileNames_.push_back("/home/akalinow/scratch/CMS/test/EfficiencyTree.root");
-  fileNames_.push_back("/scratch_local/akalinow/Presentations/Warsaw_05_03_2014/Likelihood/EfficiencyTree.root");
+  fileNames_.push_back("/home/akalinow/scratch0/CMS/OverlapTrackFinder/Dev3/job_4_ana/11_03_2014/Likelihood/EfficiencyTree.root");
   
 }
 //////////////////////////////////////////////////////////////////////////////

@@ -56,47 +56,47 @@ void OTFAnalyzer::fillTurnOnCurve(const int & iPtCut,
 			                      const std::string & sysType,
 			                      const std::string & selType){
 
-bool qualityCut = true;
-int ptCut = OTFHistograms::ptBins[iPtCut];
-
-std::vector<L1Obj> * myL1Coll = &(theEvent->l1ObjectsGmt);
-std::string hName = "h2DGmt"+selType;
-
-if(sysType=="Rpc"){
-		myL1Coll = &(theEvent->l1ObjectsRpc);
-		hName = "h2DRpc"+selType;
-}
-if(sysType=="Other"){
-		myL1Coll = &(theEvent->l1ObjectsOther);
-		hName = "h2DOther"+selType;
-}
-if(sysType=="Otf") {
-	myL1Coll = &(theEvent->l1ObjectsOtf);
-	qualityCut = myL1Coll->size() && myL1Coll->operator[](0).q!=103 &&
-		         myL1Coll->operator[](0).q!=104 && myL1Coll->operator[](0).q!=105 &&
-		         myL1Coll->operator[](0).q%100>3;
-	hName = "h2DOtf"+selType;
-	}
-
-   bool pass = myL1Coll->size() && myL1Coll->operator[](0).pt>=ptCut && qualityCut;
-
-   std::string tmpName = hName+"Pt"+std::to_string(ptCut);
-   myHistos_->fill2DHistogram(tmpName,theEvent->pt, pass);
-
-   ///Fill histos for eff vs eta/phi only for events at the plateau.
-   if(selType.size()==0 && theEvent->pt<(ptCut + 20)) return;
-
-   tmpName = hName+"EtaHit"+std::to_string(ptCut);
-   myHistos_->fill2DHistogram(tmpName,theEvent->etaHit, pass);
-
-   tmpName = hName+"PhiHit"+std::to_string(ptCut);
-   myHistos_->fill2DHistogram(tmpName,theEvent->phiHit, pass);
-
-   tmpName = hName+"EtaVx"+std::to_string(ptCut);
-   myHistos_->fill2DHistogram(tmpName,theEvent->eta, pass);
-
-   tmpName = hName+"PhiVx"+std::to_string(ptCut);
-   myHistos_->fill2DHistogram(tmpName,theEvent->phi, pass);
+  bool qualityCut = true;
+  int ptCut = OTFHistograms::ptBins[iPtCut];
+  
+  std::vector<L1Obj> * myL1Coll = &(theEvent->l1ObjectsGmt);
+  std::string hName = "h2DGmt"+selType;
+  
+  if(sysType=="Rpc"){
+    myL1Coll = &(theEvent->l1ObjectsRpc);
+    hName = "h2DRpc"+selType;
+  }
+  if(sysType=="Other"){
+    myL1Coll = &(theEvent->l1ObjectsOther);
+    hName = "h2DOther"+selType;
+  }
+  if(sysType=="Otf") {
+    myL1Coll = &(theEvent->l1ObjectsOtf);
+    qualityCut = myL1Coll->size() && myL1Coll->operator[](0).q!=103 &&
+      myL1Coll->operator[](0).q!=104 && myL1Coll->operator[](0).q!=105 &&
+      myL1Coll->operator[](0).q%100>3;
+    hName = "h2DOtf"+selType;
+  }
+  
+  bool pass = myL1Coll->size() && myL1Coll->operator[](0).pt>=ptCut && qualityCut;
+  
+  std::string tmpName = hName+"Pt"+std::to_string(ptCut);
+  myHistos_->fill2DHistogram(tmpName,theEvent->pt, pass);
+  
+  ///Fill histos for eff vs eta/phi only for events at the plateau.
+  if(selType.size()==0 && theEvent->pt<(ptCut + 20)) return;
+  
+  tmpName = hName+"EtaHit"+std::to_string(ptCut);
+  myHistos_->fill2DHistogram(tmpName,theEvent->etaHit, pass);
+  
+  tmpName = hName+"PhiHit"+std::to_string(ptCut);
+  myHistos_->fill2DHistogram(tmpName,theEvent->phiHit, pass);
+  
+  tmpName = hName+"EtaVx"+std::to_string(ptCut);
+  myHistos_->fill2DHistogram(tmpName,theEvent->eta, pass);
+  
+  tmpName = hName+"PhiVx"+std::to_string(ptCut);
+  myHistos_->fill2DHistogram(tmpName,theEvent->phi, pass);
 }
 
 
@@ -106,26 +106,28 @@ void OTFAnalyzer::fillRateHisto(const std::string & sysType,
 	bool qualityCut = true;
 
 	std::vector<L1Obj> * myL1Coll = &(theEvent->l1ObjectsGmt);
-	std::string hName = "h2DRateGmt"+selType;
+	std::string hName = "h2DRate"+selType+"Gmt";
 
 	if(sysType=="Rpc"){
 			myL1Coll = &(theEvent->l1ObjectsRpc);
-			hName = "h2DRateRpc"+selType;
+			hName = "h2DRate"+selType+"Rpc";
 	}
 	if(sysType=="Other"){
 			myL1Coll = &(theEvent->l1ObjectsOther);
-			hName = "h2DRateOther"+selType;
+			hName = "h2DRate"+selType+"Other";
 	}
 	if(sysType=="Otf") {
-		myL1Coll = &(theEvent->l1ObjectsOtf);
-		qualityCut = myL1Coll->size() && myL1Coll->operator[](0).q!=103 &&
-			         myL1Coll->operator[](0).q!=104 && myL1Coll->operator[](0).q!=105 &&
-			         myL1Coll->operator[](0).q%100>3;
-		hName = "h2DRateOtf"+selType;
-		}
-
-	   bool pass = myL1Coll->size() && qualityCut;
-	   myHistos_->fill2DHistogram(hName,theEvent->pt,(myL1Coll->size()>0)*myL1Coll->operator[](0).pt);
+	  myL1Coll = &(theEvent->l1ObjectsOtf);
+	  qualityCut = myL1Coll->size() && myL1Coll->operator[](0).q!=103 &&
+	    myL1Coll->operator[](0).q!=104 && myL1Coll->operator[](0).q!=105 &&
+	    myL1Coll->operator[](0).q%100>3;
+	  hName = "h2DRate"+selType+"Otf";
+	}
+	
+	bool pass = myL1Coll->size() && qualityCut;
+        if(selType=="Tot") myHistos_->fill2DHistogram(hName,theEvent->pt,(pass)*myL1Coll->operator[](0).pt);
+	if(selType=="VsEta") myHistos_->fill2DHistogram(hName,theEvent->pt,(pass)*(myL1Coll->operator[](0).pt>20)*theEvent->eta);
+	
 
 }
 
@@ -142,15 +144,19 @@ bool OTFAnalyzer::analyze(const EventProxyBase& iEvent){
   std::string selType = "";
   std::string sysTypeGmt="Gmt";
   std::string sysTypeOtf="Otf";
+  std::string sysTypeRpc="Rpc";
+  std::string sysTypeOther="Other";
 
   //omp_set_num_threads(2);
   //#pragma omp parallel for
-
+  /*  
   for(int iCut=0;iCut<22;++iCut){
 	  if(iCut>0 && iCut<14) continue;
 	  //std::cout<<"thread number: "<<omp_get_thread_num()<<std::endl;
 	  fillTurnOnCurve(iCut,sysTypeGmt,selType);
 	  fillTurnOnCurve(iCut,sysTypeOtf,selType);
+	  fillTurnOnCurve(iCut,sysTypeRpc,selType);
+	  fillTurnOnCurve(iCut,sysTypeOther,selType);
   }
   ////////////////
   int iCut = 2;
@@ -167,7 +173,12 @@ bool OTFAnalyzer::analyze(const EventProxyBase& iEvent){
 	  fillTurnOnCurve(OTFHistograms::ptCutsOtf[iCut],sysTypeOtf,selType);
   }
   /////////////////
-  fillRateHisto("Gmt","");
+  */
+  fillRateHisto("Gmt","Tot");
+  fillRateHisto("Otf","Tot");
+
+  fillRateHisto("Gmt","VsEta");
+  fillRateHisto("Otf","VsEta");
 
 
   return true;

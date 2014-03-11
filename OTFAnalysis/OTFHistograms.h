@@ -38,7 +38,7 @@ class OTFHistograms: public AnalysisHistograms {
   virtual void defineHistograms();
 
 
-  TH1F* Integrate(TH1F * histoD);
+  TH1* Integrate(TH1 * histoD);
 
   TH1D * DivideErr(TH1D * h1, TH1D * h2,
                    const char * name="DivideErr",
@@ -53,7 +53,12 @@ class OTFHistograms: public AnalysisHistograms {
 
   void plotOtfVsGmt(int iPt);
 
-  TH1F* makeRateWeights(TH1 *hPtOrig);
+  TH2F* makeRateWeights(TH2 *hOrig);
+  TH1* getRateHisto(std::string sysType = "Vx",
+		    std::string type = "Tot");
+  void plotRate(std::string type);
+  void plotEffVsRate(int iPtCut);
+  float getEfficiency(TH2F *h2D, float ptCut);
 
   ///Types of the selection flow
   std::vector<std::string> selectionFlavours_;
