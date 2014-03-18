@@ -18,6 +18,7 @@
      Float_t pt;
      Float_t eta;
      Float_t phi;
+     Float_t disc;
      Int_t bx;
      Int_t q;
      Int_t charge;

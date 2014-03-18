@@ -21,7 +21,7 @@ const float OTFHistograms::ptBins[33]={0., 0.1,
 
 const int OTFHistograms::color[6] = {kBlack, kRed, kGreen, kBlue, kMagenta, kTeal};
 const int OTFHistograms::ptCutsGmt[4] = {0, 16, 18, 19};
-const int OTFHistograms::ptCutsOtf[4] = {0, 15, 17, 18};
+const int OTFHistograms::ptCutsOtf[4] = {0, 15, 16, 18};
 
 
 OTFHistograms::OTFHistograms(std::string fileName, int opt){
@@ -90,11 +90,11 @@ void OTFHistograms::defineHistograms(){
  add2DHistogram("h2DPt","",150,0,150,2,-0.5,1.5,file_);
  add2DHistogram("h2DEtaHit","",8*26,0.8,1.25,2,-0.5,1.5,file_);
  add2DHistogram("h2DPhiHit","",5*32,-M_PI,M_PI,2,-0.5,1.5,file_);
- add2DHistogram("h2DEtaVx","",8*26,0.8,1.25,2,-0.5,1.5,file_);
+ add2DHistogram("h2DEtaVx","",8*25,-0.1,2.4,2,-0.5,1.5,file_);
  add2DHistogram("h2DPhiVx","",5*32,-M_PI,M_PI,2,-0.5,1.5,file_);
  //Rate histos
- add2DHistogram("h2DRateTot","",400,1,200,142,0,142,file_);
- add2DHistogram("h2DRateVsEta","",400,1,200,2*26,0.8,1.25,file_);
+ add2DHistogram("h2DRateTot","",400,1,201,142,0,142,file_);
+ add2DHistogram("h2DRateVsEta","",400,1,201,2*25,-0.1,2.4,file_);
 
    histosInitialized_ = true;
  }
@@ -137,9 +137,9 @@ void OTFHistograms::finalizeHistograms(int nRuns, float weight){
   plotOtfVsGmt(18);
   plotOtfVsGmt(19);
 
-  //plotRate("Tot");
+  plotRate("Tot");
   plotRate("VsEta");
-  //plotEffVsRate(18);
+  plotEffVsRate(18);
 }
 /////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////
@@ -334,6 +334,7 @@ void OTFHistograms::plotEffVsEta(const std::string & sysType){
     if(!h2D) return;
     TH1D *hNum = h2D->ProjectionX("hNum",2,2);
     TH1D *hDenom = h2D->ProjectionX("hDenom",1,1);
+    if(iType==2) hNum->Scale(10.0);
     hDenom->Add(hNum);
     TH1D* hEff =DivideErr(hNum,hDenom,"Pt_Int","B");
     hEff->Print();
@@ -349,7 +350,7 @@ void OTFHistograms::plotEffVsEta(const std::string & sysType){
     std::string nameCut = std::to_string((int)OTFHistograms::ptBins[ptCuts[iCut]])+" GeV/c";
     if (iType==0) nameCut = "p_{T}^{#mu}>p_{T}^{cut} + 20 GeV";
     if (iType==1) nameCut = "p_{T}^{cut}<p_{T}^{#mu}<#dot p_{T}^{cut} + 5 GeV/c";
-    if (iType==2) nameCut = "p_{T}^{#mu}<10 GeV/c";
+    if (iType==2) nameCut = "p_{T}^{#mu}<10 GeV/c (#epsilon #times 10)";
     l.AddEntry(hEff,nameCut.c_str());
   }
   l.SetHeader(TString::Format("p_{T}^{cut} = %d  GeV/c",(int)OTFHistograms::ptBins[ptCuts[iCut]]).Data());
@@ -534,7 +535,8 @@ void OTFHistograms::plotRate(std::string type){
     int iBinMin = hRateVx->FindBin(1); 
     int iBinMax = hRateVx->FindBin(100); 
     hRateVx->GetXaxis()->SetRange(iBinMin,iBinMax);
-    hRateVx->SetMinimum(8E6);
+    hRateVx->SetMinimum(1E3);
+    hRateVx->SetMaximum(1E6);
     hRateVx->SetXTitle("p_{T}^{cut} [GeV/c]");
     hRateVx->Draw();
     hRateGmt->Draw("same");
@@ -651,7 +653,7 @@ float  OTFHistograms::getEfficiency(TH2F *h2D, float ptCut){
   hDenom->Add(hNum);
   TH1D* hEffTmp =DivideErr(hNum,hDenom,"hEffTmp","B");
   //Mean eff above pt cut
-  int binLow = hEffTmp->FindBin(ptCut+5);
+  int binLow = hEffTmp->FindBin(ptCut);
   int binHigh = hEffTmp->FindBin(ptCut+20);
   float range = hEffTmp->GetBinLowEdge(binHigh+1) - hEffTmp->GetBinLowEdge(binLow);
   float eff = hEffTmp->Integral(binLow,binHigh,"width")/range;

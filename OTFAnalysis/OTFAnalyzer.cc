@@ -72,8 +72,10 @@ void OTFAnalyzer::fillTurnOnCurve(const int & iPtCut,
   }
   if(sysType=="Otf") {
     myL1Coll = &(theEvent->l1ObjectsOtf);
-    qualityCut = myL1Coll->size() && myL1Coll->operator[](0).q!=103 &&
-      myL1Coll->operator[](0).q!=104 && myL1Coll->operator[](0).q!=105 &&
+    qualityCut = myL1Coll->size() && 
+      myL1Coll->operator[](0).q!=103 &&
+      myL1Coll->operator[](0).q!=203 &&
+      myL1Coll->operator[](0).q!=303 &&
       myL1Coll->operator[](0).q%100>3;
     hName = "h2DOtf"+selType;
   }
@@ -104,6 +106,8 @@ void OTFAnalyzer::fillRateHisto(const std::string & sysType,
 			                    const std::string & selType){
 
 	bool qualityCut = true;
+	int iCut = 2;
+	float ptCut = OTFHistograms::ptBins[OTFHistograms::ptCutsGmt[iCut]];
 
 	std::vector<L1Obj> * myL1Coll = &(theEvent->l1ObjectsGmt);
 	std::string hName = "h2DRate"+selType+"Gmt";
@@ -118,19 +122,23 @@ void OTFAnalyzer::fillRateHisto(const std::string & sysType,
 	}
 	if(sysType=="Otf") {
 	  myL1Coll = &(theEvent->l1ObjectsOtf);
-	  qualityCut = myL1Coll->size() && myL1Coll->operator[](0).q!=103 &&
-	    myL1Coll->operator[](0).q!=104 && myL1Coll->operator[](0).q!=105 &&
+	  qualityCut = myL1Coll->size() && 
+	    myL1Coll->operator[](0).q!=103 &&
+	    myL1Coll->operator[](0).q!=203 && 
+	    myL1Coll->operator[](0).q!=303 &&
 	    myL1Coll->operator[](0).q%100>3;
 	  hName = "h2DRate"+selType+"Otf";
+	  ptCut = OTFHistograms::ptBins[OTFHistograms::ptCutsOtf[iCut]];
+
 	}
 	
 	bool pass = myL1Coll->size() && qualityCut;
-        if(selType=="Tot") myHistos_->fill2DHistogram(hName,theEvent->pt,(pass)*myL1Coll->operator[](0).pt);
-	if(selType=="VsEta") myHistos_->fill2DHistogram(hName,theEvent->pt,(pass)*(myL1Coll->operator[](0).pt>20)*theEvent->eta);
+        if(selType=="Tot") myHistos_->fill2DHistogram(hName,theEvent->pt,pass*myL1Coll->operator[](0).pt);
+	pass = myL1Coll->size() && qualityCut && (myL1Coll->operator[](0).pt>=ptCut);
+	if(selType=="VsEta") myHistos_->fill2DHistogram(hName,theEvent->pt,pass*theEvent->eta+(!pass)*99);
 	
 
 }
-
 
 bool OTFAnalyzer::analyze(const EventProxyBase& iEvent){
 
@@ -141,22 +149,26 @@ bool OTFAnalyzer::analyze(const EventProxyBase& iEvent){
   const EventProxyOTF & myEvent = static_cast<const EventProxyOTF&>(iEvent);
   theEvent = myEvent.events;
 
+  //if( !(theEvent->eta<1.24 && theEvent->eta>0.8) ) return true;
+  if(theEvent->eta>1.6 || theEvent->eta<1.25) return true;
+
+
   std::string selType = "";
   std::string sysTypeGmt="Gmt";
   std::string sysTypeOtf="Otf";
   std::string sysTypeRpc="Rpc";
   std::string sysTypeOther="Other";
 
+  
   //omp_set_num_threads(2);
-  //#pragma omp parallel for
-  /*  
+  //pragma omp parallel for
   for(int iCut=0;iCut<22;++iCut){
 	  if(iCut>0 && iCut<14) continue;
 	  //std::cout<<"thread number: "<<omp_get_thread_num()<<std::endl;
 	  fillTurnOnCurve(iCut,sysTypeGmt,selType);
 	  fillTurnOnCurve(iCut,sysTypeOtf,selType);
-	  fillTurnOnCurve(iCut,sysTypeRpc,selType);
-	  fillTurnOnCurve(iCut,sysTypeOther,selType);
+	  //fillTurnOnCurve(iCut,sysTypeRpc,selType);
+	  //fillTurnOnCurve(iCut,sysTypeOther,selType);
   }
   ////////////////
   int iCut = 2;
@@ -173,7 +185,6 @@ bool OTFAnalyzer::analyze(const EventProxyBase& iEvent){
 	  fillTurnOnCurve(OTFHistograms::ptCutsOtf[iCut],sysTypeOtf,selType);
   }
   /////////////////
-  */
   fillRateHisto("Gmt","Tot");
   fillRateHisto("Otf","Tot");
 
