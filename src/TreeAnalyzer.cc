@@ -114,11 +114,15 @@ void TreeAnalyzer::parseCfg(const std::string & cfgFileName){
 
   eventWeight_ = 1.0;
   filePath_ = "./";
-  //fileNames_.push_back("/scratch_local/akalinow/CMS/Data/PostMoriond/NTUPLES_Summer13_TES/nTupleRun2012D-*.root");
-  //fileNames_.push_back("/home/akalinow/scratch/CMS/test/EfficiencyTree.root");
-  fileNames_.push_back("/home/akalinow/scratch/CMS/OverlapTrackFinder/Dev3/job_4_ana/SingleMu_16_p/EfficiencyTree.root");
-  //fileNames_.push_back("/home/akalinow/scratch0/CMS/OverlapTrackFinder/Dev3/job_4_ana/EfficiencyTree.root");
-  
+
+  //fileNames_.push_back("/home/akalinow/scratch/Presentations/Warsaw_26_03_2014/Overlap_05RPC/EfficiencyTree.root");
+  //fileNames_.push_back("/home/akalinow/scratch/Presentations/Warsaw_26_03_2014/Overlap_05RPC_noDT_CSC/EfficiencyTree.root");
+  //fileNames_.push_back("/home/akalinow/scratch/Presentations/Warsaw_26_03_2014/Overlap_05RPC_noRPC/EfficiencyTree.root");
+  //fileNames_.push_back("/home/akalinow/scratch/Presentations/Warsaw_26_03_2014/FullEta_05RPC/EfficiencyTree.root");
+
+  //fileNames_.push_back("/home/akalinow/scratch/Presentations/Warsaw_26_03_2014/Dev4/05RPC/EfficiencyTree.root");
+  fileNames_.push_back("/home/akalinow/scratch/Presentations/Warsaw_26_03_2014/Dev4/Dynamic/EfficiencyTree.root");
+ 
 }
 //////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////

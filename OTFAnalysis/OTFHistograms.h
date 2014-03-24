@@ -51,7 +51,7 @@ class OTFHistograms: public AnalysisHistograms {
   void plotEffVsVar(const std::string & sysType,
 		  	  	  	const std::string & varName);
 
-  void plotOtfVsGmt(int iPt);
+  void plotOtfVsGmt(int iPt, std::string sysType="Gmt");
 
   TH2F* makeRateWeights(TH2 *hOrig);
   TH1* getRateHisto(std::string sysType = "Vx",

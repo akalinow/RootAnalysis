@@ -137,6 +137,9 @@ void OTFHistograms::finalizeHistograms(int nRuns, float weight){
   plotOtfVsGmt(18);
   plotOtfVsGmt(19);
 
+  plotOtfVsGmt(18,"Rpc");
+  plotOtfVsGmt(18,"Other");
+
   plotRate("Tot");
   plotRate("VsEta");
   plotEffVsRate(18);
@@ -227,7 +230,7 @@ void OTFHistograms::plotEffPanel(const std::string & sysType){
 
   TString hName("");
   const int *ptCuts = ptCutsOtf;
-  if(sysType=="Gmt") ptCuts = ptCutsGmt;
+  if(sysType=="Gmt" || sysType=="Rpc" || sysType=="Other") ptCuts = ptCutsGmt;
 
   for (int icut=0; icut <=3;++icut){
     float ptCut = OTFHistograms::ptBins[ptCuts[icut]];
@@ -367,7 +370,8 @@ void OTFHistograms::plotEffVsEta(const std::string & sysType){
   c->Print(TString::Format("fig_png/EffVsEta_%s.png",sysType.c_str()).Data());
 }
 
-void OTFHistograms::plotOtfVsGmt(int iPtCut){
+void OTFHistograms::plotOtfVsGmt(int iPtCut,
+				 const std::string sysType){
 
   float ptCut = ptBins[iPtCut];
 
@@ -383,7 +387,7 @@ void OTFHistograms::plotOtfVsGmt(int iPtCut){
   c->SetLogx(1);
   c->SetGrid(0,1);
 
-  std::string hName = "h2DGmtPt"+std::to_string((int)ptCut);
+  std::string hName = "h2D"+sysType+"Pt"+std::to_string((int)ptCut);
   TH2F* h2D = this->get2DHistogram(hName);
   if(!h2D) return;
   float  effGmt = getEfficiency(h2D,ptCut);
@@ -433,8 +437,8 @@ void OTFHistograms::plotOtfVsGmt(int iPtCut){
 
   std::string nameCut(TString::Format("%1.0f GeV/c",ptBins[match]).Data());
   l.AddEntry(hEffOtf,("Otf, "+nameCut).c_str());
-  std::string tmp = "Gmt, %1.0f GeV/c";
-  if( int(ptBins[match]*10)%10==5)  tmp = "Gmt, %1.1f GeV/c";
+  std::string tmp = sysType+", %1.0f GeV/c";
+  if( int(ptBins[match]*10)%10==5)  tmp = sysType+", %1.1f GeV/c";
   l.AddEntry(hEffGmt,TString::Format(tmp.c_str(),ptCut).Data());
   l.DrawClone();
 
@@ -443,12 +447,12 @@ void OTFHistograms::plotOtfVsGmt(int iPtCut){
   aLine.SetLineWidth(3);
   aLine.DrawLine(ptCut,0,ptCut,1.04);
 
-  c->Print(TString::Format("fig_eps/OtfVsGmt_%d.eps",(int)ptCut).Data());
-  c->Print(TString::Format("fig_png/OtfVsGmt_%d.png",(int)ptCut).Data());
+  c->Print(TString::Format("fig_eps/OtfVs%s_%d.eps",sysType.c_str(),(int)ptCut).Data());
+  c->Print(TString::Format("fig_png/OtfVs%s_%d.png",sysType.c_str(),(int)ptCut).Data());
 
   c->SetLogy();
-  c->Print(TString::Format("fig_eps/OtfVsGmt_%d_log.eps",(int)ptCut).Data());
-  c->Print(TString::Format("fig_png/OtfVsGmt_%d_log.png",(int)ptCut).Data());
+  c->Print(TString::Format("fig_eps/OtfVs%s_%d_log.eps",sysType.c_str(),(int)ptCut).Data());
+  c->Print(TString::Format("fig_png/OtfVs%s_%d_log.png",sysType.c_str(),(int)ptCut).Data());
 
 }
 
@@ -654,7 +658,7 @@ float  OTFHistograms::getEfficiency(TH2F *h2D, float ptCut){
   TH1D* hEffTmp =DivideErr(hNum,hDenom,"hEffTmp","B");
   //Mean eff above pt cut
   int binLow = hEffTmp->FindBin(ptCut);
-  int binHigh = hEffTmp->FindBin(ptCut+20);
+  int binHigh = hEffTmp->FindBin(ptCut+10);
   float range = hEffTmp->GetBinLowEdge(binHigh+1) - hEffTmp->GetBinLowEdge(binLow);
   float eff = hEffTmp->Integral(binLow,binHigh,"width")/range;
   

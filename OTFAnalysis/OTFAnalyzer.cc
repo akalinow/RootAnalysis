@@ -72,7 +72,7 @@ void OTFAnalyzer::fillTurnOnCurve(const int & iPtCut,
   }
   if(sysType=="Otf") {
     myL1Coll = &(theEvent->l1ObjectsOtf);
-    qualityCut = myL1Coll->size() && 
+    qualityCut = myL1Coll->size() &&
       myL1Coll->operator[](0).q!=103 &&
       myL1Coll->operator[](0).q!=203 &&
       myL1Coll->operator[](0).q!=303 &&
@@ -131,9 +131,11 @@ void OTFAnalyzer::fillRateHisto(const std::string & sysType,
 	  ptCut = OTFHistograms::ptBins[OTFHistograms::ptCutsOtf[iCut]];
 
 	}
-	
+
 	bool pass = myL1Coll->size() && qualityCut;
-        if(selType=="Tot") myHistos_->fill2DHistogram(hName,theEvent->pt,pass*myL1Coll->operator[](0).pt);
+	float val = 0;
+	if(pass) val = myL1Coll->operator[](0).pt;
+        if(selType=="Tot") myHistos_->fill2DHistogram(hName,theEvent->pt,val);
 	pass = myL1Coll->size() && qualityCut && (myL1Coll->operator[](0).pt>=ptCut);
 	if(selType=="VsEta") myHistos_->fill2DHistogram(hName,theEvent->pt,pass*theEvent->eta+(!pass)*99);
 	
@@ -149,9 +151,9 @@ bool OTFAnalyzer::analyze(const EventProxyBase& iEvent){
   const EventProxyOTF & myEvent = static_cast<const EventProxyOTF&>(iEvent);
   theEvent = myEvent.events;
 
-  //if( !(theEvent->eta<1.24 && theEvent->eta>0.8) ) return true;
-  if(theEvent->eta>1.6 || theEvent->eta<1.25) return true;
-
+  if( !(theEvent->eta<1.24 && theEvent->eta>0.8) ) return true;
+  //if(theEvent->eta<1.9) return true;
+  //if(theEvent->eta>0.8) return true;
 
   std::string selType = "";
   std::string sysTypeGmt="Gmt";
@@ -167,8 +169,8 @@ bool OTFAnalyzer::analyze(const EventProxyBase& iEvent){
 	  //std::cout<<"thread number: "<<omp_get_thread_num()<<std::endl;
 	  fillTurnOnCurve(iCut,sysTypeGmt,selType);
 	  fillTurnOnCurve(iCut,sysTypeOtf,selType);
-	  //fillTurnOnCurve(iCut,sysTypeRpc,selType);
-	  //fillTurnOnCurve(iCut,sysTypeOther,selType);
+	  fillTurnOnCurve(iCut,sysTypeRpc,selType);
+	  fillTurnOnCurve(iCut,sysTypeOther,selType);
   }
   ////////////////
   int iCut = 2;
@@ -182,7 +184,10 @@ bool OTFAnalyzer::analyze(const EventProxyBase& iEvent){
 
 	  selType = std::string(TString::Format("Type%d",iType));
 	  fillTurnOnCurve(OTFHistograms::ptCutsGmt[iCut],sysTypeGmt,selType);
+	  fillTurnOnCurve(OTFHistograms::ptCutsGmt[iCut],sysTypeRpc,selType);
+	  fillTurnOnCurve(OTFHistograms::ptCutsGmt[iCut],sysTypeOther,selType);
 	  fillTurnOnCurve(OTFHistograms::ptCutsOtf[iCut],sysTypeOtf,selType);
+
   }
   /////////////////
   fillRateHisto("Gmt","Tot");
