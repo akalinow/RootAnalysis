@@ -244,7 +244,7 @@ void OTFHistograms::plotEffPanel(const std::string & sysType){
     hEff->SetStats(kFALSE);
     hEff->SetMinimum(0.0001);
     hEff->SetMaximum(1.04);
-    hEff->GetXaxis()->SetRange(4,100);
+    hEff->GetXaxis()->SetRange(4,150);
     hEff->SetMarkerStyle(21+icut);
     hEff->SetMarkerColor(color[icut]);
     hEff->SetXTitle("muon p_{T} [GeV/c]");
@@ -258,6 +258,9 @@ void OTFHistograms::plotEffPanel(const std::string & sysType){
   l.DrawClone();
   c->Print(TString::Format("fig_eps/PanelVsPt_%s.eps",sysType.c_str()).Data());
   c->Print(TString::Format("fig_png/PanelVsPt_%s.png",sysType.c_str()).Data());
+  c->SetLogy();
+  c->Print(TString::Format("fig_eps/PanelVsPt_%s_log.eps",sysType.c_str()).Data());
+  c->Print(TString::Format("fig_png/PanelVsPt_%s_log.png",sysType.c_str()).Data());
 }
 
 
@@ -612,7 +615,7 @@ void OTFHistograms::plotEffVsRate(int iPtCut){
     ///
     float rateOtf = hRateOtf->GetBinContent(iBin);
     grOtf->SetPoint(iCut+2,effOtf,rateOtf);
-    std::cout<<ptBins[iPtCut+iCut]<<" effOtf: "<<effOtf<<" rateOtf: "<<rateOtf
+    std::cout<<ptBins[iPtCut+iCut]<<" effOtf: "<<effOtf<<" rateOtf: "<<rateOtf<<" "
 	     <<ptBins[iPtCut+iCut]<<" effGmt: "<<effGmt<<" rateGmt: "<<rateGmt<<std::endl;
   }
 

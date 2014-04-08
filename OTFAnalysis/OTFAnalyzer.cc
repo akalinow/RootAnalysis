@@ -52,13 +52,35 @@ void OTFAnalyzer::registerCuts(){
 }
 //////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////
-void OTFAnalyzer::fillTurnOnCurve(const int & iPtCut,
-			                      const std::string & sysType,
-			                      const std::string & selType){
+bool OTFAnalyzer::passQuality(std::vector<L1Obj> * myL1Coll,
+		 const std::string & sysType, 
+		 int iCand){
 
-  bool qualityCut = true;
+  if(sysType.find("Otf")!=std::string::npos){
+  return myL1Coll->size()>=iCand &&
+    //myL1Coll->operator[](iCand).q!=101 &&
+    //myL1Coll->operator[](iCand).q!=102 &&
+    //myL1Coll->operator[](iCand).q!=103 &&
+    //myL1Coll->operator[](iCand).q!=201 &&
+    //myL1Coll->operator[](iCand).q!=202 &&
+    //myL1Coll->operator[](iCand).q!=203 && 
+    //myL1Coll->operator[](iCand).q!=501 &&
+    //myL1Coll->operator[](iCand).q!=502 &&
+    //myL1Coll->operator[](iCand).q!=503 &&
+    myL1Coll->operator[](iCand).q%100>1;
+  }
+  else return myL1Coll->size();
+ 
+}
+//////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////////
+void OTFAnalyzer::fillTurnOnCurve(const int & iPtCut,
+				  const std::string & sysType,
+				  const std::string & selType){
+
   int ptCut = OTFHistograms::ptBins[iPtCut];
-  
+  int iCand = 0;
+
   std::vector<L1Obj> * myL1Coll = &(theEvent->l1ObjectsGmt);
   std::string hName = "h2DGmt"+selType;
   
@@ -71,16 +93,13 @@ void OTFAnalyzer::fillTurnOnCurve(const int & iPtCut,
     hName = "h2DOther"+selType;
   }
   if(sysType=="Otf") {
+    iCand = 2;
     myL1Coll = &(theEvent->l1ObjectsOtf);
-    qualityCut = myL1Coll->size() &&
-      myL1Coll->operator[](0).q!=103 &&
-      myL1Coll->operator[](0).q!=203 &&
-      myL1Coll->operator[](0).q!=303 &&
-      myL1Coll->operator[](0).q%100>3;
     hName = "h2DOtf"+selType;
   }
   
-  bool pass = myL1Coll->size() && myL1Coll->operator[](0).pt>=ptCut && qualityCut;
+  bool qualityCut = passQuality(myL1Coll,sysType,iCand);
+  bool pass = myL1Coll->size() && myL1Coll->operator[](iCand).pt>=ptCut && qualityCut;
   
   std::string tmpName = hName+"Pt"+std::to_string(ptCut);
   myHistos_->fill2DHistogram(tmpName,theEvent->pt, pass);
@@ -103,11 +122,11 @@ void OTFAnalyzer::fillTurnOnCurve(const int & iPtCut,
 
 
 void OTFAnalyzer::fillRateHisto(const std::string & sysType,
-			                    const std::string & selType){
+				const std::string & selType){
 
-	bool qualityCut = true;
 	int iCut = 2;
 	float ptCut = OTFHistograms::ptBins[OTFHistograms::ptCutsGmt[iCut]];
+	int iCand = 0;
 
 	std::vector<L1Obj> * myL1Coll = &(theEvent->l1ObjectsGmt);
 	std::string hName = "h2DRate"+selType+"Gmt";
@@ -121,22 +140,19 @@ void OTFAnalyzer::fillRateHisto(const std::string & sysType,
 			hName = "h2DRate"+selType+"Other";
 	}
 	if(sysType=="Otf") {
+	  iCand = 1;
 	  myL1Coll = &(theEvent->l1ObjectsOtf);
-	  qualityCut = myL1Coll->size() && 
-	    myL1Coll->operator[](0).q!=103 &&
-	    myL1Coll->operator[](0).q!=203 && 
-	    myL1Coll->operator[](0).q!=303 &&
-	    myL1Coll->operator[](0).q%100>3;
 	  hName = "h2DRate"+selType+"Otf";
 	  ptCut = OTFHistograms::ptBins[OTFHistograms::ptCutsOtf[iCut]];
 
 	}
 
+	bool qualityCut = passQuality(myL1Coll,sysType,iCand);
 	bool pass = myL1Coll->size() && qualityCut;
 	float val = 0;
-	if(pass) val = myL1Coll->operator[](0).pt;
+	if(pass) val = myL1Coll->operator[](iCand).pt;
         if(selType=="Tot") myHistos_->fill2DHistogram(hName,theEvent->pt,val);
-	pass = myL1Coll->size() && qualityCut && (myL1Coll->operator[](0).pt>=ptCut);
+	pass = myL1Coll->size() && qualityCut && (myL1Coll->operator[](iCand).pt>=ptCut);
 	if(selType=="VsEta") myHistos_->fill2DHistogram(hName,theEvent->pt,pass*theEvent->eta+(!pass)*99);
 	
 
@@ -151,8 +167,10 @@ bool OTFAnalyzer::analyze(const EventProxyBase& iEvent){
   const EventProxyOTF & myEvent = static_cast<const EventProxyOTF&>(iEvent);
   theEvent = myEvent.events;
 
-  if( !(theEvent->eta<1.24 && theEvent->eta>0.8) ) return true;
-  //if(theEvent->eta<1.9) return true;
+  if(theEvent->eta<1.4 || theEvent->eta>2.1) return true;
+
+  //if(theEvent->eta<0.8 || theEvent->eta>1.24) return true;
+  //if(theEvent->eta>1.3) return true;
   //if(theEvent->eta>0.8) return true;
 
   std::string selType = "";

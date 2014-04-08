@@ -34,6 +34,10 @@ class OTFAnalyzer:public Analyzer{
 
   void fillRateHisto(const std::string & sysType,
   			         const std::string & selType);
+  
+  bool passQuality(std::vector<L1Obj> * myL1Coll,
+		   const std::string & sysType, 
+		   int iCand);
 
   void registerCuts();
   bool checkSelections(const std::string & type);
