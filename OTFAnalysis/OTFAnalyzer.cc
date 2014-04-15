@@ -58,16 +58,16 @@ bool OTFAnalyzer::passQuality(std::vector<L1Obj> * myL1Coll,
 
   if(sysType.find("Otf")!=std::string::npos){
   return myL1Coll->size()>=iCand &&
-    //myL1Coll->operator[](iCand).q!=101 &&
-    //myL1Coll->operator[](iCand).q!=102 &&
-    //myL1Coll->operator[](iCand).q!=103 &&
-    //myL1Coll->operator[](iCand).q!=201 &&
-    //myL1Coll->operator[](iCand).q!=202 &&
-    //myL1Coll->operator[](iCand).q!=203 && 
-    //myL1Coll->operator[](iCand).q!=501 &&
-    //myL1Coll->operator[](iCand).q!=502 &&
-    //myL1Coll->operator[](iCand).q!=503 &&
-    myL1Coll->operator[](iCand).q%100>1;
+    myL1Coll->operator[](iCand).q!=101 &&
+    myL1Coll->operator[](iCand).q!=102 &&
+    myL1Coll->operator[](iCand).q!=103 &&
+    myL1Coll->operator[](iCand).q!=201 &&
+    myL1Coll->operator[](iCand).q!=202 &&
+    myL1Coll->operator[](iCand).q!=203 && 
+    myL1Coll->operator[](iCand).q!=501 &&
+    myL1Coll->operator[](iCand).q!=502 &&
+    myL1Coll->operator[](iCand).q!=503 &&
+    myL1Coll->operator[](iCand).q%100>3;
   }
   else return myL1Coll->size();
  
@@ -93,7 +93,7 @@ void OTFAnalyzer::fillTurnOnCurve(const int & iPtCut,
     hName = "h2DOther"+selType;
   }
   if(sysType=="Otf") {
-    iCand = 2;
+    iCand = 1;
     myL1Coll = &(theEvent->l1ObjectsOtf);
     hName = "h2DOtf"+selType;
   }
@@ -167,7 +167,7 @@ bool OTFAnalyzer::analyze(const EventProxyBase& iEvent){
   const EventProxyOTF & myEvent = static_cast<const EventProxyOTF&>(iEvent);
   theEvent = myEvent.events;
 
-  if(theEvent->eta<1.4 || theEvent->eta>2.1) return true;
+  if(theEvent->eta<1.4 || theEvent->eta>1.75) return true;
 
   //if(theEvent->eta<0.8 || theEvent->eta>1.24) return true;
   //if(theEvent->eta>1.3) return true;
