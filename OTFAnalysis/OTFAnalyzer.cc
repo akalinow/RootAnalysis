@@ -6,6 +6,8 @@
 #include "OTFAnalyzer.h"
 #include "EventProxyOTF.h"
 
+
+int iCandOTF = 0;
 //////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////
 OTFAnalyzer::OTFAnalyzer(const std::string & aName):Analyzer(aName){
@@ -67,7 +69,8 @@ bool OTFAnalyzer::passQuality(std::vector<L1Obj> * myL1Coll,
     myL1Coll->operator[](iCand).q!=501 &&
     myL1Coll->operator[](iCand).q!=502 &&
     myL1Coll->operator[](iCand).q!=503 &&
-    myL1Coll->operator[](iCand).q%100>3;
+    //myL1Coll->operator[](iCand).charge%1000!=201 &&
+    myL1Coll->operator[](iCand).q%100>2;   
   }
   else return myL1Coll->size();
  
@@ -93,7 +96,7 @@ void OTFAnalyzer::fillTurnOnCurve(const int & iPtCut,
     hName = "h2DOther"+selType;
   }
   if(sysType=="Otf") {
-    iCand = 1;
+    iCand = iCandOTF;
     myL1Coll = &(theEvent->l1ObjectsOtf);
     hName = "h2DOtf"+selType;
   }
@@ -140,7 +143,7 @@ void OTFAnalyzer::fillRateHisto(const std::string & sysType,
 			hName = "h2DRate"+selType+"Other";
 	}
 	if(sysType=="Otf") {
-	  iCand = 1;
+	  iCand = iCandOTF;
 	  myL1Coll = &(theEvent->l1ObjectsOtf);
 	  hName = "h2DRate"+selType+"Otf";
 	  ptCut = OTFHistograms::ptBins[OTFHistograms::ptCutsOtf[iCut]];
@@ -167,11 +170,13 @@ bool OTFAnalyzer::analyze(const EventProxyBase& iEvent){
   const EventProxyOTF & myEvent = static_cast<const EventProxyOTF&>(iEvent);
   theEvent = myEvent.events;
 
-  if(theEvent->eta<1.4 || theEvent->eta>1.75) return true;
+  //if(theEvent->eta>1.6 || theEvent->eta<1.25) return true;
+  //if(theEvent->eta>0.83) return true;
+  //if(theEvent->eta<0.83 || theEvent->eta>1.24) return true;
+  //if(theEvent->eta<1.24 || theEvent->eta>2.1) return true;
+  //if(theEvent->eta<2.1) return true;
 
-  //if(theEvent->eta<0.8 || theEvent->eta>1.24) return true;
-  //if(theEvent->eta>1.3) return true;
-  //if(theEvent->eta>0.8) return true;
+  //if(theEvent->eta<1.73 && theEvent->eta>1.61) return true;
 
   std::string selType = "";
   std::string sysTypeGmt="Gmt";

@@ -130,7 +130,8 @@ void TreeAnalyzer::parseCfg(const std::string & cfgFileName){
   //fileNames_.push_back("/home/akalinow/scratch0/CMS/OverlapTrackFinder/Dev5/job_4_ana/Baseline/EfficiencyTree.root");
   //fileNames_.push_back("/home/akalinow/scratch/CMS/OverlapTrackFinder/Dev3/job_4_ana/EfficiencyTree.root");
 
-  fileNames_.push_back("/scratch/scratch0/akalinow/CMS/OverlapTrackFinder/Dev5/job_4_ana/Baseline/EfficiencyTree.root");
+  //fileNames_.push_back("/home/akalinow/scratch/CMS/OverlapTrackFinder/Dev3/job_4_ana/EfficiencyTree.root");
+  fileNames_.push_back("/scratch/scratch0/akalinow/CMS/OverlapTrackFinder/Dev5/job_4_ana/EfficiencyTree.root");
  
 }
 //////////////////////////////////////////////////////////////////////////////
