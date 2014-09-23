@@ -29,6 +29,7 @@ class OTFHistograms: public AnalysisHistograms {
   static const int color[6];
   static const int ptCutsGmt[4];
   static const int ptCutsOtf[4];
+  static const int ptCutsOtfHigh[4];
   static const unsigned int nPtBins;
   static const float ptBins[33];
 

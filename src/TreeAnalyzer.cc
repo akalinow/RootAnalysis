@@ -130,8 +130,23 @@ void TreeAnalyzer::parseCfg(const std::string & cfgFileName){
   //fileNames_.push_back("/home/akalinow/scratch0/CMS/OverlapTrackFinder/Dev5/job_4_ana/Baseline/EfficiencyTree.root");
   //fileNames_.push_back("/home/akalinow/scratch/CMS/OverlapTrackFinder/Dev3/job_4_ana/EfficiencyTree.root");
 
-  //fileNames_.push_back("/home/akalinow/scratch/CMS/OverlapTrackFinder/Dev3/job_4_ana/EfficiencyTree.root");
-  fileNames_.push_back("/scratch/scratch0/akalinow/CMS/OverlapTrackFinder/Dev5/job_4_ana/EfficiencyTree.root");
+
+
+  fileNames_.push_back("/home/akalinow/scratch/CMS/OverlapTrackFinder/Dev3/job_4_ana/EfficiencyTree.root");
+
+  //fileNames_.push_back("/home/akalinow/scratch/CMS/OverlapTrackFinder/Reference/EfficiencyTree.root");
+
+  //fileNames_.push_back("/scratch/scratch0/akalinow/CMS/OverlapTrackFinder/Dev5/job_4_ana/EfficiencyTree.root");
+
+
+
+  //fileNames_.push_back("/scratch_local/akalinow/Presentations/Warsaw_02_04_2014/Overlap_05RPC/EfficiencyTree.root");
+  //fileNames_.push_back("/scratch_local/akalinow/Presentations/TriggerWorkshop_18_02_2014/job_4_ana/SingleMu_7_p/EfficiencyTree.root");
+
+
+
+
+
  
 }
 //////////////////////////////////////////////////////////////////////////////

@@ -59,7 +59,8 @@ bool OTFAnalyzer::passQuality(std::vector<L1Obj> * myL1Coll,
 		 int iCand){
 
   if(sysType.find("Otf")!=std::string::npos){
-  return myL1Coll->size()>=iCand &&
+  return myL1Coll->size()>iCand &&
+    /*
     myL1Coll->operator[](iCand).q!=101 &&
     myL1Coll->operator[](iCand).q!=102 &&
     myL1Coll->operator[](iCand).q!=103 &&
@@ -69,8 +70,10 @@ bool OTFAnalyzer::passQuality(std::vector<L1Obj> * myL1Coll,
     myL1Coll->operator[](iCand).q!=501 &&
     myL1Coll->operator[](iCand).q!=502 &&
     myL1Coll->operator[](iCand).q!=503 &&
-    //myL1Coll->operator[](iCand).charge%1000!=201 &&
-    myL1Coll->operator[](iCand).q%100>2;   
+    */
+    //myL1Coll->operator[](iCand).disc>-2 &&
+    myL1Coll->operator[](iCand).q%100>3;   
+    true;
   }
   else return myL1Coll->size();
  
@@ -128,8 +131,8 @@ void OTFAnalyzer::fillRateHisto(const std::string & sysType,
 				const std::string & selType){
 
 	int iCut = 2;
-	float ptCut = OTFHistograms::ptBins[OTFHistograms::ptCutsGmt[iCut]];
 	int iCand = 0;
+	float ptCut = OTFHistograms::ptBins[OTFHistograms::ptCutsGmt[iCut]];
 
 	std::vector<L1Obj> * myL1Coll = &(theEvent->l1ObjectsGmt);
 	std::string hName = "h2DRate"+selType+"Gmt";
@@ -171,8 +174,11 @@ bool OTFAnalyzer::analyze(const EventProxyBase& iEvent){
   theEvent = myEvent.events;
 
   //if(theEvent->eta>1.6 || theEvent->eta<1.25) return true;
+
+  //if(theEvent->eta<1.25) return true;
+
   //if(theEvent->eta>0.83) return true;
-  //if(theEvent->eta<0.83 || theEvent->eta>1.24) return true;
+  if(theEvent->eta<0.83 || theEvent->eta>1.24) return true;
   //if(theEvent->eta<1.24 || theEvent->eta>2.1) return true;
   //if(theEvent->eta<2.1) return true;
 
@@ -187,6 +193,7 @@ bool OTFAnalyzer::analyze(const EventProxyBase& iEvent){
   
   //omp_set_num_threads(2);
   //pragma omp parallel for
+  
   for(int iCut=0;iCut<22;++iCut){
 	  if(iCut>0 && iCut<14) continue;
 	  //std::cout<<"thread number: "<<omp_get_thread_num()<<std::endl;
@@ -195,6 +202,7 @@ bool OTFAnalyzer::analyze(const EventProxyBase& iEvent){
 	  fillTurnOnCurve(iCut,sysTypeRpc,selType);
 	  fillTurnOnCurve(iCut,sysTypeOther,selType);
   }
+
   ////////////////
   int iCut = 2;
   bool pass = false;
@@ -209,8 +217,7 @@ bool OTFAnalyzer::analyze(const EventProxyBase& iEvent){
 	  fillTurnOnCurve(OTFHistograms::ptCutsGmt[iCut],sysTypeGmt,selType);
 	  fillTurnOnCurve(OTFHistograms::ptCutsGmt[iCut],sysTypeRpc,selType);
 	  fillTurnOnCurve(OTFHistograms::ptCutsGmt[iCut],sysTypeOther,selType);
-	  fillTurnOnCurve(OTFHistograms::ptCutsOtf[iCut],sysTypeOtf,selType);
-
+	  fillTurnOnCurve(OTFHistograms::ptCutsOtf[iCut],sysTypeOtf,selType);	  
   }
   /////////////////
   fillRateHisto("Gmt","Tot");

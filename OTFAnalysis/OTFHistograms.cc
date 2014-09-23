@@ -20,9 +20,9 @@ const float OTFHistograms::ptBins[33]={0., 0.1,
   		 160. };
 
 const int OTFHistograms::color[6] = {kBlack, kRed, kGreen, kBlue, kMagenta, kTeal};
-const int OTFHistograms::ptCutsGmt[4] = {0, 16, 18, 19};
-const int OTFHistograms::ptCutsOtf[4] = {0, 15, 16, 18};
-
+const int OTFHistograms::ptCutsGmt[4] =     {0, 16, 18, 19};
+const int OTFHistograms::ptCutsOtf[4] =     {0, 15, 16, 18};
+//const int OTFHistograms::ptCutsOtf[4] = {0, 16, 17, 18};//eta>2.1
 
 OTFHistograms::OTFHistograms(std::string fileName, int opt){
 
@@ -88,13 +88,21 @@ void OTFHistograms::defineHistograms(){
  if(!histosInitialized_){
  //Make template histos
  add2DHistogram("h2DPt","",150,0,150,2,-0.5,1.5,file_);
+
  add2DHistogram("h2DEtaHit","",8*26,0.8,1.25,2,-0.5,1.5,file_);
  add2DHistogram("h2DPhiHit","",5*32,-M_PI,M_PI,2,-0.5,1.5,file_);
- add2DHistogram("h2DEtaVx","",8*25,-0.1,2.4,2,-0.5,1.5,file_);
+
+ //add2DHistogram("h2DEtaVx","",8*25,-0.1,2.4,2,-0.5,1.5,file_);
+ add2DHistogram("h2DEtaVx","",8*25,0.8,1.25,2,-0.5,1.5,file_);
+
  add2DHistogram("h2DPhiVx","",5*32,-M_PI,M_PI,2,-0.5,1.5,file_);
  //Rate histos
  add2DHistogram("h2DRateTot","",400,1,201,142,0,142,file_);
- add2DHistogram("h2DRateVsEta","",400,1,201,2*25,-0.1,2.4,file_);
+ //add2DHistogram("h2DRateVsEta","",400,1,201,2*25,-0.1,2.4,file_);
+ //add2DHistogram("h2DRateVsEta","",400,1,201,25,-0.1,0.9,file_);//Barrel
+ add2DHistogram("h2DRateVsEta","",400,1,201,25,0.8,1.25,file_);//Overlap
+ //add2DHistogram("h2DRateVsEta","",400,1,201,25,1.25,2.25,file_);//Endcap
+ //add2DHistogram("h2DRateVsEta","",400,1,201,25,2.0,2.5,file_);//High eta
 
    histosInitialized_ = true;
  }
@@ -295,7 +303,7 @@ void OTFHistograms::plotEffVsVar(const std::string & sysType,
     	hDenom->Print();
     	TH1D* hEff =DivideErr(hNum,hDenom,"Pt_Int","B");
     	hEff->SetStats(kFALSE);
-    	hEff->SetMinimum(0.8);
+    	//hEff->SetMinimum(0.8);
     	hEff->SetMaximum(1.04);
     	hEff->SetMarkerStyle(21+icut);
     	hEff->SetMarkerColor(color[icut]);
@@ -326,8 +334,6 @@ void OTFHistograms::plotEffVsEta(const std::string & sysType){
   l.SetFillColor(10);
   c->SetGrid(0,1);
 
-  TH2F *h2D = new TH2F("h2D","",8*26,0.8,1.25,2,-0.5,1.5);
-
   const int *ptCuts = ptCutsOtf;
   if(sysType=="Gmt" || sysType=="Rpc" || sysType=="Other") ptCuts = ptCutsGmt;
 
@@ -354,20 +360,20 @@ void OTFHistograms::plotEffVsEta(const std::string & sysType){
     if (iType==0)hEff->DrawCopy();
     else hEff->DrawCopy("same");
     std::string nameCut = std::to_string((int)OTFHistograms::ptBins[ptCuts[iCut]])+" GeV/c";
-    if (iType==0) nameCut = "p_{T}^{#mu}>p_{T}^{cut} + 20 GeV";
-    if (iType==1) nameCut = "p_{T}^{cut}<p_{T}^{#mu}<#dot p_{T}^{cut} + 5 GeV/c";
+    if (iType==0) nameCut = "p_{T}^{#mu}>p_{T}^{cut GMT} + 20 GeV";
+    if (iType==1) nameCut = "p_{T}^{cut GMT}<p_{T}^{#mu}<#dot p_{T}^{cut GMT} + 5 GeV/c";
     if (iType==2) nameCut = "p_{T}^{#mu}<10 GeV/c (#epsilon #times 10)";
     l.AddEntry(hEff,nameCut.c_str());
   }
-  l.SetHeader(TString::Format("p_{T}^{cut} = %d  GeV/c",(int)OTFHistograms::ptBins[ptCuts[iCut]]).Data());
-  l.DrawClone();
-
-   ///OTF eta range used for generating patterns.
+ ///OTF eta range used for generating patterns.
   TLine *aLine = new TLine(0,0,0,0);
   aLine->SetLineWidth(2);
   aLine->SetLineColor(2);
   aLine->DrawLine(0.83,0,0.83,1.0);
   aLine->DrawLine(1.24,0,1.24,1.0);
+
+  l.SetHeader(TString::Format("p_{T}^{cut %s} = %d  GeV/c",sysType.c_str(),(int)OTFHistograms::ptBins[ptCuts[iCut]]).Data());
+  l.DrawClone();
 
   c->Print(TString::Format("fig_eps/EffVsEta_%s.eps",sysType.c_str()).Data());
   c->Print(TString::Format("fig_png/EffVsEta_%s.png",sysType.c_str()).Data());
@@ -414,7 +420,8 @@ void OTFHistograms::plotOtfVsGmt(int iPtCut,
 
     std::cout<<ptCut<<" "<<ptBins[iPtCut+iCut]<<" Otf: "<<effOtf
     		  <<" Gmt: "<<effGmt<<" diff: "<<fabs(effGmt-effOtf)<<std::endl;
-    if(fabs(effGmt-effOtf)<delta){
+    //if(fabs(effGmt-effOtf)<delta){
+    if(effGmt-effOtf<delta){
       match = iPtCut+iCut;
       delta = fabs(effGmt-effOtf);
       effOtfMatch = effOtf;
@@ -431,7 +438,7 @@ void OTFHistograms::plotOtfVsGmt(int iPtCut,
   hEffOtf->SetYTitle("Efficiency");
   hEffOtf->SetMinimum(0.0001);
   hEffOtf->SetMaximum(1.04);
-  hEffOtf->GetXaxis()->SetRange(4,100);
+  hEffOtf->GetXaxis()->SetRange(2,100);
   hEffOtf->SetMarkerStyle(8);
   hEffOtf->SetMarkerColor(3);
   hEffOtf->SetStats(kFALSE);
@@ -592,8 +599,8 @@ void OTFHistograms::plotEffVsRate(int iPtCut){
   grOtf->SetMarkerStyle(22);
   grOtf->SetMarkerSize(1.3);
 
-  float effNom, rateNom;
-  for(int iCut=-2;iCut<=2;++iCut){
+  float effNom, rateNom; 
+  for(int iCut=-3;iCut<=2;++iCut){
     ///
     std::string hName = "h2DOtfPt"+std::to_string((int)ptBins[iPtCut+iCut]);
     TH2F* h2D = this->get2DHistogram(hName);
@@ -620,12 +627,19 @@ void OTFHistograms::plotEffVsRate(int iPtCut){
   }
 
   Double_t maxY, minY, tmp;
+  float effMin=0.8, effMax=1.0;
   grGmt->GetPoint(0,tmp,maxY);
+  effMax = tmp;
   grOtf->GetPoint(4,tmp,minY);
   maxY*=1.3;
   minY*=0.7;
-  
-  TH1F *hFrame = new TH1F("hFrame",";Efficiency;Rate",2,0.80,1.0);
+  effMin = tmp;
+  effMin-=0.05;
+  effMax+=0.05;
+
+  std::cout<<"effMin: "<<effMin<<" effMax: "<<effMax<<std::endl;
+ 
+  TH1F *hFrame = new TH1F("hFrame",";Efficiency;Rate",2,effMin,effMax);
   hFrame->SetMinimum(minY);
   hFrame->SetMaximum(maxY);
   hFrame->GetYaxis()->SetTitleOffset(1.7);
