@@ -1,12 +1,12 @@
 {
 //=========Macro generated from canvas: cEffVsRate/EffVsRate
-//=========  (Tue Sep 23 10:12:07 2014) by ROOT version5.34/07
+//=========  (Thu Sep 25 13:27:32 2014) by ROOT version5.34/07
    TCanvas *cEffVsRate = new TCanvas("cEffVsRate", "EffVsRate",0,0,460,500);
    gStyle->SetOptFit(1);
    gStyle->SetOptStat(0);
    gStyle->SetOptTitle(0);
    cEffVsRate->SetHighLightColor(2);
-   cEffVsRate->Range(-0.01826928,-4675.646,1.069895,34742.1);
+   cEffVsRate->Range(0.1438945,-4201.129,1.06136,34692.33);
    cEffVsRate->SetFillColor(0);
    cEffVsRate->SetBorderMode(0);
    cEffVsRate->SetBorderSize(2);
@@ -24,9 +24,9 @@
    cEffVsRate->SetFrameBorderMode(0);
    cEffVsRate->SetFrameBorderSize(0);
    
-   TH1F *hFrame = new TH1F("hFrame","",2,0.1503962,1.015487);
-   hFrame->SetMinimum(645.7495);
-   hFrame->SetMaximum(30997.41);
+   TH1F *hFrame = new TH1F("hFrame","",2,0.2861017,1.015487);
+   hFrame->SetMinimum(1049.488);
+   hFrame->SetMaximum(30997.45);
    hFrame->GetXaxis()->SetTitle("Efficiency for p_{T}^{gen}>20 GeV/c");
    hFrame->GetXaxis()->SetLabelFont(42);
    hFrame->GetXaxis()->SetLabelOffset(0.004);
@@ -52,15 +52,15 @@
    graph->SetMarkerColor(2);
    graph->SetMarkerStyle(20);
    graph->SetMarkerSize(1.3);
-   graph->SetPoint(0,0.9654869437,23844.16211);
-   graph->SetPoint(1,0.9612559676,19371.58789);
-   graph->SetPoint(2,0.9435433745,15066.01367);
-   graph->SetPoint(3,0.8602814674,10860.89258);
-   graph->SetPoint(4,0.6735404134,8750.751953);
+   graph->SetPoint(0,0.9654869437,23844.19141);
+   graph->SetPoint(1,0.9612559676,19371.60742);
+   graph->SetPoint(2,0.9435433745,15066.03613);
+   graph->SetPoint(3,0.8602814674,10860.90625);
+   graph->SetPoint(4,0.6735404134,8750.764648);
    
    TH1F *Graph_Graph1 = new TH1F("Graph_Graph1","",100,0.6443458,0.9946816);
-   Graph_Graph1->SetMinimum(7241.411);
-   Graph_Graph1->SetMaximum(25353.5);
+   Graph_Graph1->SetMinimum(7241.422);
+   Graph_Graph1->SetMaximum(25353.53);
    Graph_Graph1->SetDirectory(0);
    Graph_Graph1->SetStats(0);
    Graph_Graph1->GetXaxis()->SetLabelFont(42);
@@ -90,15 +90,15 @@
    graph->SetMarkerColor(4);
    graph->SetMarkerStyle(22);
    graph->SetMarkerSize(1.3);
-   graph->SetPoint(0,0.5530347228,3971.728516);
-   graph->SetPoint(1,0.5381444097,2727.971191);
-   graph->SetPoint(2,0.485378027,1883.442505);
-   graph->SetPoint(3,0.3551222086,1263.033569);
-   graph->SetPoint(4,0.20039621,922.4993286);
+   graph->SetPoint(0,0.9365894198,6592.490723);
+   graph->SetPoint(1,0.9099391103,4529.857422);
+   graph->SetPoint(2,0.8180701733,3146.888672);
+   graph->SetPoint(3,0.5971665382,2131.436768);
+   graph->SetPoint(4,0.336101681,1499.268555);
    
-   TH1F *Graph_Graph2 = new TH1F("Graph_Graph2","",100,0.1651324,0.5882986);
-   Graph_Graph2->SetMinimum(617.5764);
-   Graph_Graph2->SetMaximum(4276.651);
+   TH1F *Graph_Graph2 = new TH1F("Graph_Graph2","",100,0.2760529,0.9966382);
+   Graph_Graph2->SetMinimum(989.9463);
+   Graph_Graph2->SetMaximum(7101.813);
    Graph_Graph2->SetDirectory(0);
    Graph_Graph2->SetStats(0);
    Graph_Graph2->GetXaxis()->SetLabelFont(42);
@@ -120,7 +120,7 @@
    graph->SetHistogram(Graph_Graph2);
    
    graph->Draw("p");
-   TMarker *marker = new TMarker(0.9435434,15066.01,4);
+   TMarker *marker = new TMarker(0.9435434,15066.04,4);
    marker->SetMarkerStyle(4);
    marker->SetMarkerSize(2.1);
    marker->Draw();
