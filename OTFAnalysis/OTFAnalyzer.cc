@@ -58,6 +58,12 @@ bool OTFAnalyzer::passQuality(std::vector<L1Obj> * myL1Coll,
 		 const std::string & sysType, 
 		 int iCand){
 
+  if(sysType.find("Gmt")!=std::string::npos){
+    return myL1Coll->size()>iCand &&
+      myL1Coll->operator[](iCand).eta>0.8 &&
+      myL1Coll->operator[](iCand).eta<1.3;
+  }
+
   if(sysType.find("Otf")!=std::string::npos){
   return myL1Coll->size()>iCand &&
     /*
@@ -72,7 +78,7 @@ bool OTFAnalyzer::passQuality(std::vector<L1Obj> * myL1Coll,
     myL1Coll->operator[](iCand).q!=503 &&
     */
     //myL1Coll->operator[](iCand).disc>-2 &&
-    myL1Coll->operator[](iCand).q%100>3;   
+    myL1Coll->operator[](iCand).q%100>3 &&
     true;
   }
   else return myL1Coll->size();
@@ -101,6 +107,7 @@ void OTFAnalyzer::fillTurnOnCurve(const int & iPtCut,
   if(sysType=="Otf") {
     iCand = iCandOTF;
     myL1Coll = &(theEvent->l1ObjectsOtf);
+    if(myL1Coll->size()>1 && myL1Coll->operator[](0).q<myL1Coll->operator[](1).q) iCand = 1;
     hName = "h2DOtf"+selType;
   }
   
@@ -173,16 +180,7 @@ bool OTFAnalyzer::analyze(const EventProxyBase& iEvent){
   const EventProxyOTF & myEvent = static_cast<const EventProxyOTF&>(iEvent);
   theEvent = myEvent.events;
 
-  //if(theEvent->eta>1.6 || theEvent->eta<1.25) return true;
-
-  //if(theEvent->eta<1.25) return true;
-
-  //if(theEvent->eta>0.83) return true;
   if(theEvent->eta<0.83 || theEvent->eta>1.24) return true;
-  //if(theEvent->eta<1.24 || theEvent->eta>2.1) return true;
-  //if(theEvent->eta<2.1) return true;
-
-  //if(theEvent->eta<1.73 && theEvent->eta>1.61) return true;
 
   std::string selType = "";
   std::string sysTypeGmt="Gmt";
