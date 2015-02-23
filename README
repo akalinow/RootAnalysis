@@ -1,6 +1,6 @@
 git clone https://github.com/akalinow/RootAnalysis
 cd RootAnalysis
-git checkout 23_02_2015
+git checkout 24_02_2015
 libtoolize
 aclocal
 automake --add-missing
