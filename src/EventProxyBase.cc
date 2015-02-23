@@ -4,7 +4,6 @@
 EventProxyBase::EventProxyBase():
   fileNames_(), treeName_(""), eventIndex_(0), accumulatedSize_(0){
 
-	std::cout<<__func__<<std::endl;
 
 }
 
