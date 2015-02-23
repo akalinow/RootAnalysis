@@ -95,7 +95,7 @@ void OTFHistograms::defineHistograms(){
  //add2DHistogram("h2DEtaVx","",8*25,-0.1,2.4,2,-0.5,1.5,file_);
  add2DHistogram("h2DEtaVx","",8*25,0.8,1.25,2,-0.5,1.5,file_);
 
- add2DHistogram("h2DPhiVx","",5*32,-M_PI,M_PI,2,-0.5,1.5,file_);
+ add2DHistogram("h2DPhiVx","",4*32,-M_PI,M_PI,2,-0.5,1.5,file_);
  //Rate histos
  add2DHistogram("h2DRateTot","",400,1,201,142,0,142,file_);
  //add2DHistogram("h2DRateVsEta","",400,1,201,2*25,-0.1,2.4,file_);
@@ -665,8 +665,8 @@ void OTFHistograms::plotEffVsRate(int iPtCut){
   c->Print(TString::Format("fig_png/RateVsEff_%d.C",(int)ptBins[iPtCut]).Data());
 
 }
-
-
+////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////
 float  OTFHistograms::getEfficiency(TH2F *h2D, float ptCut){
 
   TH1D *hNum = h2D->ProjectionX("hNum",2,2);

@@ -65,20 +65,8 @@ bool OTFAnalyzer::passQuality(std::vector<L1Obj> * myL1Coll,
   }
 
   if(sysType.find("Otf")!=std::string::npos){
-  return myL1Coll->size()>iCand &&
-    /*
-    myL1Coll->operator[](iCand).q!=101 &&
-    myL1Coll->operator[](iCand).q!=102 &&
-    myL1Coll->operator[](iCand).q!=103 &&
-    myL1Coll->operator[](iCand).q!=201 &&
-    myL1Coll->operator[](iCand).q!=202 &&
-    myL1Coll->operator[](iCand).q!=203 && 
-    myL1Coll->operator[](iCand).q!=501 &&
-    myL1Coll->operator[](iCand).q!=502 &&
-    myL1Coll->operator[](iCand).q!=503 &&
-    */
-    //myL1Coll->operator[](iCand).disc>-2 &&
-    myL1Coll->operator[](iCand).q%100>3 &&
+  return myL1Coll->size()>iCand &&   
+    myL1Coll->operator[](iCand).q>3 &&
     true;
   }
   else return myL1Coll->size();
@@ -155,6 +143,7 @@ void OTFAnalyzer::fillRateHisto(const std::string & sysType,
 	if(sysType=="Otf") {
 	  iCand = iCandOTF;
 	  myL1Coll = &(theEvent->l1ObjectsOtf);
+	  if(myL1Coll->size()>1 && myL1Coll->operator[](0).q<myL1Coll->operator[](1).q) iCand = 1;
 	  hName = "h2DRate"+selType+"Otf";
 	  ptCut = OTFHistograms::ptBins[OTFHistograms::ptCutsOtf[iCut]];
 
@@ -181,6 +170,7 @@ bool OTFAnalyzer::analyze(const EventProxyBase& iEvent){
   theEvent = myEvent.events;
 
   if(theEvent->eta<0.83 || theEvent->eta>1.24) return true;
+  //if(theEvent->eta>1.13) return true;
 
   std::string selType = "";
   std::string sysTypeGmt="Gmt";
