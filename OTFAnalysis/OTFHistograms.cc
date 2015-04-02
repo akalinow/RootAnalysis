@@ -65,6 +65,8 @@ bool OTFHistograms::fill2DHistogram(const std::string& name, float val1, float v
 		if(name.find("PhiVx")!=std::string::npos) hTemplateName = "h2DPhiVx";
 		if(name.find("RateTot")!=std::string::npos) hTemplateName = "h2DRateTot";
 		if(name.find("RateVsEta")!=std::string::npos) hTemplateName = "h2DRateVsEta";
+		if(name.find("RateVsPt")!=std::string::npos) hTemplateName = "h2DRateVsPt";
+		if(name.find("RateVsQuality")!=std::string::npos) hTemplateName = "h2DRateVsQuality";                                              
 		std::cout<<"Adding histogram: "<<name<<std::endl;
 		this->add2DHistogram(name,"",
 				this->get2DHistogram(hTemplateName)->GetNbinsX(),
@@ -95,7 +97,8 @@ void OTFHistograms::defineHistograms(){
  //add2DHistogram("h2DEtaVx","",8*25,-0.1,2.4,2,-0.5,1.5,file_);
  add2DHistogram("h2DEtaVx","",8*25,0.8,1.25,2,-0.5,1.5,file_);
 
- add2DHistogram("h2DPhiVx","",4*32,-M_PI,M_PI,2,-0.5,1.5,file_);
+ //add2DHistogram("h2DPhiVx","",8*32,-M_PI,M_PI,2,-0.5,1.5,file_);
+ add2DHistogram("h2DPhiVx","",4*32,-0.2,2.2,2,-0.5,1.5,file_);
  //Rate histos
  add2DHistogram("h2DRateTot","",400,1,201,142,0,142,file_);
  //add2DHistogram("h2DRateVsEta","",400,1,201,2*25,-0.1,2.4,file_);
@@ -103,6 +106,10 @@ void OTFHistograms::defineHistograms(){
  add2DHistogram("h2DRateVsEta","",400,1,201,25,0.8,1.25,file_);//Overlap
  //add2DHistogram("h2DRateVsEta","",400,1,201,25,1.25,2.25,file_);//Endcap
  //add2DHistogram("h2DRateVsEta","",400,1,201,25,2.0,2.5,file_);//High eta
+
+ add2DHistogram("h2DRateVsPt","",400,1,201,60,0,30,file_);
+
+ add2DHistogram("h2DRateVsQuality","",400,1,201,11,-0.5,10.5,file_);
 
    histosInitialized_ = true;
  }
@@ -150,6 +157,9 @@ void OTFHistograms::finalizeHistograms(int nRuns, float weight){
 
   plotRate("Tot");
   plotRate("VsEta");
+  plotRate("VsPt");
+  plotRate("VsQuality");
+
   plotEffVsRate(18);
 }
 /////////////////////////////////////////////////////////
@@ -182,8 +192,8 @@ TH1* OTFHistograms::Integrate(TH1 * histoD) {
   delete [] errs;
   return histoI;
 }
-
-
+/////////////////////////////////////////////////////////
+/////////////////////////////////////////////////////////
 TH1D * OTFHistograms::DivideErr(TH1D * h1,
                  TH1D * h2,
                  const char * name,
@@ -220,8 +230,8 @@ TH1D * OTFHistograms::DivideErr(TH1D * h1,
 
   return hout;
 }
-
-
+/////////////////////////////////////////////////////////
+/////////////////////////////////////////////////////////
 void OTFHistograms::plotEffPanel(const std::string & sysType){
 
   TCanvas* c = new TCanvas(TString::Format("EffVsPt_%s",sysType.c_str()),
@@ -270,8 +280,8 @@ void OTFHistograms::plotEffPanel(const std::string & sysType){
   c->Print(TString::Format("fig_eps/PanelVsPt_%s_log.eps",sysType.c_str()).Data());
   c->Print(TString::Format("fig_png/PanelVsPt_%s_log.png",sysType.c_str()).Data());
 }
-
-
+////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////
 void OTFHistograms::plotEffVsVar(const std::string & sysType,
 		const std::string & varName){
 
@@ -303,7 +313,7 @@ void OTFHistograms::plotEffVsVar(const std::string & sysType,
     	hDenom->Print();
     	TH1D* hEff =DivideErr(hNum,hDenom,"Pt_Int","B");
     	hEff->SetStats(kFALSE);
-    	//hEff->SetMinimum(0.8);
+    	hEff->SetMinimum(0.0);////TEST
     	hEff->SetMaximum(1.04);
     	hEff->SetMarkerStyle(21+icut);
     	hEff->SetMarkerColor(color[icut]);
@@ -320,7 +330,8 @@ void OTFHistograms::plotEffVsVar(const std::string & sysType,
   c->Print(TString::Format("fig_eps/EffVs%s_%s.eps",varName.c_str(), sysType.c_str()).Data());
   c->Print(TString::Format("fig_png/EffVs%s_%s.png",varName.c_str(), sysType.c_str()).Data());
 }
-
+////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////
 void OTFHistograms::plotEffVsEta(const std::string & sysType){
 
   TCanvas* c = new TCanvas(TString::Format("EffVsEta_%s",sysType.c_str()),
@@ -378,7 +389,8 @@ void OTFHistograms::plotEffVsEta(const std::string & sysType){
   c->Print(TString::Format("fig_eps/EffVsEta_%s.eps",sysType.c_str()).Data());
   c->Print(TString::Format("fig_png/EffVsEta_%s.png",sysType.c_str()).Data());
 }
-
+////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////
 void OTFHistograms::plotOtfVsGmt(int iPtCut,
 				 const std::string sysType){
 
@@ -465,7 +477,8 @@ void OTFHistograms::plotOtfVsGmt(int iPtCut,
   c->Print(TString::Format("fig_png/OtfVs%s_%d_log.png",sysType.c_str(),(int)ptCut).Data());
 
 }
-
+////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////
 TH2F* OTFHistograms::makeRateWeights(TH2 *hOrig){
 
   TF1 *fIntVxMuRate = new TF1("fIntVxMuRate","TMath::Power(x,[0]*TMath::Log(x))*TMath::Power(x,[1])*TMath::Exp([2])",1,1000);
@@ -488,16 +501,16 @@ TH2F* OTFHistograms::makeRateWeights(TH2 *hOrig){
   }
   return hWeights;
 }
-
+////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////
 TH1* OTFHistograms::getRateHisto(std::string sysType, 
 				 std::string type){
 
   std::string hName = "h2DRate"+type+sysType;
   if(sysType=="Vx") hName = "h2DRate"+type+"Gmt";
 
-  std::cout<<hName<<std::endl;
-
   TH2F* h2D = (TH2F*)this->get2DHistogram(hName)->Clone("h2D");
+
   if(!h2D) return 0;
   TH2F *hWeights = makeRateWeights(h2D);
   h2D->Multiply(hWeights);
@@ -509,19 +522,21 @@ TH1* OTFHistograms::getRateHisto(std::string sysType,
   hRate->SetLineWidth(3);
 
   if(type=="VsEta") return (TH1*)hRate->Clone("hRateClone");
+  if(type=="VsPt") return (TH1*)hRate->Clone("hRateClone");
+  if(type=="VsQuality") return (TH1*)hRate->Clone("hRateClone");
   return Integrate(hRate);    
 }
-
+////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////
 void OTFHistograms::plotRate(std::string type){
 
-  TH1 *hRateVx = getRateHisto("Vx",type);
   TH1 *hRateGmt = getRateHisto("Gmt",type);
+  TH1 *hRateVx = getRateHisto("Vx",type);
   TH1 *hRateOtf = getRateHisto("Otf",type);
+
   if(!hRateVx || !hRateGmt || !hRateOtf) return;
 
-  hRateGmt->Print();
-  hRateOtf->Print();
-
+ 
   TF1 *fIntVxMuRate = new TF1("fIntVxMuRate","TMath::Power(x,[0]*TMath::Log(x))*TMath::Power(x,[1])*TMath::Exp([2])",1,1000);
   fIntVxMuRate->SetParameters(-0.235801, -2.82346, 17.162);
   fIntVxMuRate->SetLineColor(6);
@@ -530,6 +545,7 @@ void OTFHistograms::plotRate(std::string type){
   hRateGmt->SetLineWidth(3);
   hRateOtf->SetLineWidth(3);
 
+  hRateVx->SetLineColor(1);
   hRateGmt->SetLineColor(2);
   hRateOtf->SetLineColor(4);
 
@@ -547,7 +563,7 @@ void OTFHistograms::plotRate(std::string type){
 
   if(type=="Tot"){
     int iBinMin = hRateVx->FindBin(1); 
-    int iBinMax = hRateVx->FindBin(100); 
+    int iBinMax = hRateVx->FindBin(30); 
     hRateVx->GetXaxis()->SetRange(iBinMin,iBinMax);
     hRateVx->SetMinimum(1E3);
     hRateVx->SetMaximum(1E6);
@@ -555,6 +571,7 @@ void OTFHistograms::plotRate(std::string type){
     hRateVx->Draw();
     hRateGmt->Draw("same");
     hRateOtf->Draw("same");
+    fIntVxMuRate->Draw("same");
     leg->AddEntry(hRateVx,"#mu rate@Vx");
   }
   if(type=="VsEta"){
@@ -563,6 +580,20 @@ void OTFHistograms::plotRate(std::string type){
     hRateGmt->Draw();
     hRateOtf->Draw("same");
   }
+  if(type=="VsPt"){
+    c->SetLogy(0);  
+    hRateGmt->SetXTitle("p_{T}^{gen} [GeV/c]");
+    hRateOtf->Draw();    
+    hRateGmt->Draw("same");
+
+  }
+  if(type=="VsQuality"){
+    c->SetLogy(0);  
+    hRateGmt->SetXTitle("quality");
+    //hRateGmt->Draw();
+    hRateOtf->Draw();    
+  }
+
   
   leg->AddEntry(hRateGmt,"GMT");
   leg->AddEntry(hRateOtf,"OTF");
@@ -572,7 +603,8 @@ void OTFHistograms::plotRate(std::string type){
   c->Print(("fig_png/Rate"+type+".png").c_str());
 
 }
-
+////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////
 void OTFHistograms::plotEffVsRate(int iPtCut){
 
   TCanvas* c = new TCanvas("cEffVsRate","EffVsRate",460,500);
@@ -681,3 +713,5 @@ float  OTFHistograms::getEfficiency(TH2F *h2D, float ptCut){
   
   return eff;
 }
+////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////

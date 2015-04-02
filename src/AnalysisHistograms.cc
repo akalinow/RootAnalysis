@@ -26,8 +26,8 @@ AnalysisHistograms::~AnalysisHistograms(){
   finalizeHistograms();
 
 }
-
-
+/////////////////////////////////////////////////////////
+/////////////////////////////////////////////////////////
 void AnalysisHistograms::addProfile(const std::string& name, 
 				    const std::string& title, 
 				    int nBinsX, float xlow, float xhigh, 
@@ -162,7 +162,7 @@ bool  AnalysisHistograms::fill1DHistogram(const std::string& name, float val, fl
 
   if(my1Dhistograms_.find(name)!=my1Dhistograms_.end()) my1Dhistograms_[name]->Fill(val,weight);
   else{
-	  cout<<"ERROR: Histogram: "<<name<<" not found!"<<endl;
+    //cout<<"ERROR: Histogram: "<<name<<" not found!"<<endl;
 	  return false;
   }
   return true;
@@ -174,7 +174,7 @@ bool AnalysisHistograms::fill2DHistogram(const std::string& name, float val1, fl
 
   if(my2Dhistograms_.find(name)!=my2Dhistograms_.end()) my2Dhistograms_[name]->Fill(val1,val2,weight);
   else{
-	  cout<<"ERROR: Histogram: "<<name<<" not found!"<<endl;
+    //cout<<"ERROR: Histogram: "<<name<<" not found!"<<endl;
 	  return false;
   }
   return true;
@@ -187,7 +187,7 @@ bool  AnalysisHistograms::fill3DHistogram(const std::string& name, float val1, f
 
  if(my3Dhistograms_.find(name)!=my3Dhistograms_.end()) my3Dhistograms_[name]->Fill(val1,val2,val3,weight);
   else{
-	  cout<<"ERROR: Histogram: "<<name<<" not found!"<<endl;
+    //cout<<"ERROR: Histogram: "<<name<<" not found!"<<endl;
 	  return false;
   }
  return true;
@@ -215,11 +215,12 @@ TH1F* AnalysisHistograms::get1DHistogram(const std::string& name){
 
 }
 //////////////////////////////////////////////////////////////////////////////
-TH2F* AnalysisHistograms::get2DHistogram(const std::string& name){
+TH2F* AnalysisHistograms::get2DHistogram(const std::string& name, bool noClone){
 
  using namespace std;
 
- if(my2Dhistograms_.find(name)!=my2Dhistograms_.end()) return (TH2F*)(my2Dhistograms_[name]->Clone());
+ if(noClone && my2Dhistograms_.find(name)!=my2Dhistograms_.end()) return my2Dhistograms_[name];
+ else if(my2Dhistograms_.find(name)!=my2Dhistograms_.end()) return (TH2F*)(my2Dhistograms_[name]->Clone());
  else cout<<"ERROR: Histogram: "<<name<<" not found!"<<endl;
  return 0;
 

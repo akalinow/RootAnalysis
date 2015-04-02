@@ -54,6 +54,8 @@ class OTFAnalyzer:public Analyzer{
 
   //TriggerHistograms *myHistos_;
   float eventWeight_;
+
+  std::map<int, float> tmpMap;
   
 };
 

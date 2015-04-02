@@ -45,7 +45,7 @@ class AnalysisHistograms {
   
   TProfile* getProfile(const std::string& name);
   TH1F* get1DHistogram(const std::string& name);
-  TH2F* get2DHistogram(const std::string& name);
+  TH2F* get2DHistogram(const std::string& name, bool noClone = false);
   TH3F* get3DHistogram(const std::string& name);
   
 
