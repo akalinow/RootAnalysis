@@ -28,8 +28,6 @@ class Analyzer{
 
     //default is to do whatever the analyzer does
     filterEvent_ = false;
-
-    std::cout<<"Analyzer "<<__func__<<std::endl;
 };
   
 

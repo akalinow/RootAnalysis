@@ -109,7 +109,7 @@ void OTFHistograms::defineHistograms(){
 
  add2DHistogram("h2DRateVsPt","",400,1,201,60,0,30,file_);
 
- add2DHistogram("h2DRateVsQuality","",400,1,201,11,-0.5,10.5,file_);
+ add2DHistogram("h2DRateVsQuality","",400,1,201,130,-0.5,130.5,file_);
 
    histosInitialized_ = true;
  }

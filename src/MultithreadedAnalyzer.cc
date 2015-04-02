@@ -43,6 +43,7 @@
      
    }
  void MultithreadedAnalyzer::finalize(){
+
       piece1DHistogramsTogether();
       piece2DHistogramsTogether();
       piece3DHistogramsTogether();
