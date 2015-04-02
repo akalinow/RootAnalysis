@@ -27,7 +27,7 @@
 
       bool isValid() const;
       operator bool() const;
-
+      void skip(int n);
       TFile* getTFile() const { return fChain->GetFile();}
 
       virtual void init(std::vector<std::string> const& iFileNames);

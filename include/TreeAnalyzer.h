@@ -11,7 +11,7 @@
 #include "Analyzer.h"
 #include "ObjectMessenger.h"
 #include "TFileService.h"
-
+#include "omp.h"
 class TH1D;
 class TProofOutputFile;
 //class FWLiteSummaryAnalyzer;
@@ -23,7 +23,7 @@ class TreeAnalyzer: public Analyzer{
   friend class Analyzer;
 
 public :
-
+  int threads;
   ///Default conctructor takes the configuration cfg.py file name
   ///optional: pointer to the PROOF outputfile
   TreeAnalyzer(const std::string & name, 

@@ -9,22 +9,25 @@
 //
 //
 #include "AnalysisHistograms.h"
-
+#include "omp.h"
 
 class OTFHistograms: public AnalysisHistograms {
    public:
-
+  void pieceHistogramsTogether();
   OTFHistograms(std::string fileName="Histos.root", int opt=0);
 
   OTFHistograms(TFileDirectory *myDir);
 
   OTFHistograms(TFileDirectory *myDir, const std::vector<std::string> & flavours);
 
-  virtual ~OTFHistograms();
+  virtual ~OTFHistograms(); 
 
   void finalizeHistograms(int nRuns, float weight=1.0);
+  
+  virtual void finalizeHistograms();
 
   virtual bool fill2DHistogram(const std::string &name, float val1, float val2, float weight=1.0);
+    void pieceHistogramsTogetherAll();
 
   static const int color[6];
   static const int ptCutsGmt[4];
@@ -32,8 +35,9 @@ class OTFHistograms: public AnalysisHistograms {
   static const int ptCutsOtfHigh[4];
   static const unsigned int nPtBins;
   static const float ptBins[33];
-
-
+  
+  static int THREADNUM;
+  
    private:
 
   virtual void defineHistograms();
@@ -51,7 +55,8 @@ class OTFHistograms: public AnalysisHistograms {
 
   void plotEffVsVar(const std::string & sysType,
 		  	  	  	const std::string & varName);
-
+ 
+  
   void plotOtfVsGmt(int iPt, std::string sysType="Gmt");
 
   TH2F* makeRateWeights(TH2 *hOrig);
@@ -60,7 +65,7 @@ class OTFHistograms: public AnalysisHistograms {
   void plotRate(std::string type);
   void plotEffVsRate(int iPtCut);
   float getEfficiency(TH2F *h2D, float ptCut);
-
+ 
   ///Types of the selection flow
   std::vector<std::string> selectionFlavours_;
 

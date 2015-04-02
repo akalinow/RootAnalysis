@@ -1,8 +1,10 @@
 #include "EventProxyBase.h"
 
-
+//
 EventProxyBase::EventProxyBase():
   fileNames_(), treeName_(""), eventIndex_(0), accumulatedSize_(0){
+
+	std::cout<<__func__<<std::endl;
 
 }
 
@@ -37,6 +39,12 @@ EventProxyBase::operator++(){
 	fChain->GetEntry(eventIndex_++);
 
    return *this;
+}
+
+void EventProxyBase::skip(int n) 
+{
+  eventIndex_+= n;
+  fChain->GetEntry(eventIndex_);
 }
 
 /** Go to the very first Event*/

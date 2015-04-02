@@ -2,14 +2,15 @@
 #include <fstream>
 #include <iterator>
 #include <string>
-
+#include <omp.h>
 #include "TreeAnalyzer.h"
 //#include "SummaryAnalyzer.h"
 #include "ObjectMessenger.h"
 #include "EventProxyBase.h"
 
 #include "boost/functional/hash.hpp"
-
+#include "../OTFAnalysis/EventProxyOTF.h"
+#include "../OTFAnalysis/OTFHistograms.h"
 #include "TFile.h"
 #include "TH1D.h"
 #include "TProofOutputFile.h"
@@ -115,14 +116,9 @@ void TreeAnalyzer::parseCfg(const std::string & cfgFileName){
   eventWeight_ = 1.0;
   filePath_ = "./";
 
-  //fileNames_.push_back("/home/akalinow/scratch/CMS/OverlapTrackFinder/Emulator/job_4_ana/5760_100k_4xMerging/EfficiencyTree.root");
-  //fileNames_.push_back("/home/akalinow/scratch/CMS/OverlapTrackFinder/Emulator/job_4_ana/5760_20k_noMerging/EfficiencyTree.root");
-
   fileNames_.push_back("/home/akalinow/scratch/CMS/OverlapTrackFinder/Emulator/job_4_ana/EfficiencyTree.root");
-
-  //fileNames_.push_back("/home/akalinow/scratch/CMS/OverlapTrackFinder/EmulatorStable/job_4_ana/EfficiencyTree.root");
-
 }
+
 //////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////
 void  TreeAnalyzer::init(std::vector<Analyzer*> myAnalyzers){
@@ -151,45 +147,66 @@ void  TreeAnalyzer::finalize(){
   for(unsigned int i=0;i<myAnalyzers_.size();++i) myAnalyzers_[i]->finalize();
 }
 //////////////////////////////////////////////////////////////////////////////
-//////////////////////////////////////////////////////////////////////////////
+/////////////////////////////////////////////////////////////////////////////
 int TreeAnalyzer::loop(){
 
   std::cout<<"Events total: "<<myProxy_->size()<<std::endl;
-
+  TH1::AddDirectory(kFALSE);
   nEventsAnalyzed_ = 0;
   nEventsSkipped_ = 0;
   nEventsToAnalyze_ = myProxy_->size();
+  
   int eventPreviouslyPrinted=-1;
   ///////
-   for(myProxy_->toBegin();
-       !myProxy_->atEnd() && (nEventsToAnalyze_<0 || (nEventsAnalyzed_+nEventsSkipped_)<nEventsToAnalyze_); ++(*myProxy_)){
-     
-     if((( nEventsAnalyzed_ < 10) ||
-	 nEventsAnalyzed_%100000==0) &&  nEventsAnalyzed_ != eventPreviouslyPrinted ) {
-       eventPreviouslyPrinted = nEventsAnalyzed_;
-       std::cout<<"Events analyzed: "<<nEventsAnalyzed_<<std::endl;
+    myProxy_->toBegin();
+    //omp_set_dynamic(0);
+    EventProxyBase * evProBas[threads];
+    for(int a=0;a<threads;++a) {
+      evProBas[a] = new EventProxyOTF();
+      evProBas[a]->init(fileNames_);
+      evProBas[a]->toBegin();
+      for(int b=0;b <a;++b) ++(*evProBas[a]);
+    }
+    omp_set_num_threads(threads);
+    #pragma omp parallel
+    {
+   for(int a =0;a < nEventsToAnalyze_;a+=threads ){  
+     int i = omp_get_thread_num();
+     if(i ==0) {
+    // if(myProxy_->atEnd() || (nEventsToAnalyze_>=0 && (nEventsAnalyzed_+nEventsSkipped_)>=nEventsToAnalyze_))continue;
+      if((( nEventsAnalyzed_ < 10) ||
+	  nEventsAnalyzed_%100000==0) &&  nEventsAnalyzed_ != eventPreviouslyPrinted ) {
+	eventPreviouslyPrinted = nEventsAnalyzed_;
+	std::cout<<"Events analyzed: "<<nEventsAnalyzed_<<std::endl;
+      }
+   // ++(*myProxy_);
      }
-     analyze(*myProxy_);
-   }
-   
+      analyze(*evProBas[i]);
+     evProBas[i]->skip(threads);
+      }
+    }
    std::cout << "Events skipped: " << nEventsSkipped_ << std::endl ;
+      for(int a=0;a<threads;++a) 
+        delete evProBas[a];
    return nEventsAnalyzed_;
+  
 }
 //////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////
 bool TreeAnalyzer::analyze(const EventProxyBase& iEvent){
 
-  clear();
+ //clear();
     ///////
     for(unsigned int i=0;i<myAnalyzers_.size();++i){
       ///If analyzer returns false, skip to the last one, the Summary, unless filtering is disabled for this analyzer.
-      if(!myAnalyzers_[i]->analyze(iEvent,myObjMessenger_) && myAnalyzers_[i]->filter() && myAnalyzers_.size()>1) i = myAnalyzers_.size()-2;
+      myAnalyzers_[i]->analyze(iEvent,myObjMessenger_);
+      //if(!myAnalyzers_[i]->analyze(iEvent,myObjMessenger_) && myAnalyzers_[i]->filter() && myAnalyzers_.size()>1) i = myAnalyzers_.size()-2;
     }
     ///Clear all the analyzers, even if it was not called in this event.
     ///Important for proper TTree filling.
-    for(unsigned int i=0;i<myAnalyzers_.size();++i) myAnalyzers_[i]->clear(); 
+  // for(unsigned int i=0;i<myAnalyzers_.size();++i) myAnalyzers_[i]->clear(); 
         
-    myObjMessenger_->clear();
+  // myObjMessenger_->clear();
     ++nEventsAnalyzed_;
   
   return 1;
