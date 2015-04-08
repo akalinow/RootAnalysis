@@ -31,5 +31,6 @@ AC_CONFIG_FILES(Makefile
                 test/Makefile
                 src/Makefile
                 include/Makefile
-                OTFAnalysis/Makefile)
+                OTFAnalysis/Makefile
+                PACAnalysis/Makefile)
 AC_OUTPUT

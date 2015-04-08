@@ -118,9 +118,13 @@ void TreeAnalyzer::parseCfg(const std::string & cfgFileName){
   //fileNames_.push_back("/home/akalinow/scratch/CMS/OverlapTrackFinder/Emulator/job_4_ana/5760_100k_4xMerging/EfficiencyTree.root");
   //fileNames_.push_back("/home/akalinow/scratch/CMS/OverlapTrackFinder/Emulator/job_4_ana/5760_20k_noMerging/EfficiencyTree.root");
 
-  fileNames_.push_back("/home/akalinow/scratch/CMS/OverlapTrackFinder/Emulator/job_4_ana/EfficiencyTree.root");
+  //fileNames_.push_back("/home/akalinow/scratch/CMS/OverlapTrackFinder/Emulator/job_4_ana/EfficiencyTree.root");
 
   //fileNames_.push_back("/home/akalinow/scratch/CMS/OverlapTrackFinder/EmulatorStable/job_4_ana/EfficiencyTree.root");
+
+
+  //fileNames_.push_back("/home/akalinow/scratch/CMS/PAC/data/OMTFtrees/EfficiencyTree_2012.root");
+  fileNames_.push_back("/home/akalinow/scratch/CMS/PAC/data/OMTFtrees/EfficiencyTree_PostLS1Ext.root");
 
 }
 //////////////////////////////////////////////////////////////////////////////

@@ -5,71 +5,47 @@
 #include <sstream>
 
 #include "TreeAnalyzer.h"
-#include "OTFAnalyzer.h"
-#include "EventProxyOTF.h"
+#include "PACAnalyzer.h"
+#include "EventProxyPAC.h"
 
 
-int iCandOTF = 0;
+int iCandPAC = 0;
 //////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////
-OTFAnalyzer::OTFAnalyzer(const std::string & aName):Analyzer(aName){
+PACAnalyzer::PACAnalyzer(const std::string & aName):Analyzer(aName){
 
   clear();
 
 }
 //////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////
-OTFAnalyzer::~OTFAnalyzer(){
+PACAnalyzer::~PACAnalyzer(){
 
   delete myHistos_;
 }
 //////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////
-void OTFAnalyzer::initialize(TFileDirectory& aDir,
+void PACAnalyzer::initialize(TFileDirectory& aDir,
 				       pat::strbitset *aSelections){
 
   mySelections_ = aSelections;
 
   ///The histograms for this analyzer will be saved into "TestHistos"
   ///directory of the ROOT file
-  myHistos_ = new OTFHistograms(&aDir, selectionFlavours_);
+  myHistos_ = new PACHistograms(&aDir, selectionFlavours_);
 
   registerCuts();
 
 }
 //////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////
-void OTFAnalyzer::finalize(){ 
-
- std::cout<<"tmpMap.size(): "<<tmpMap.size()<<std::endl;
-
- std::ostringstream stringStr;
- TH2F *h = myHistos_->get2DHistogram("h2DRateVsQualityOtf",true);
-
- for(int iBin=1;iBin<=h->GetYaxis()->GetNbins();++iBin){
-   stringStr.str("");
-   stringStr<<iBin;
-   h->GetYaxis()->SetBinLabel(iBin,stringStr.str().c_str());
- }
-
-
- for(auto it: tmpMap){
-   int iBinX = h->GetYaxis()->FindFixBin(it.second);
-   std::cout<<"iBin: "<<iBinX<<" "<<it.second<<" "<<it.first<<std::endl;
-   std::bitset<18> bits(it.first);
-
-   stringStr.str("");
-   stringStr<<it.first;
-   std::string label = bits.to_string()+" "+stringStr.str();
-   h->GetYaxis()->SetBinLabel(iBinX,label.c_str());
-
- }
+void PACAnalyzer::finalize(){ 
 
   myHistos_->finalizeHistograms(0,1.0); 
 }
 //////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////
-void OTFAnalyzer::registerCuts(){
+void PACAnalyzer::registerCuts(){
 
  for(unsigned int i=0;i<selectionFlavours_.size();++i){
     mySelections_->push_back("HLT"+selectionFlavours_[i]);
@@ -83,53 +59,22 @@ void OTFAnalyzer::registerCuts(){
 }
 //////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////
-bool OTFAnalyzer::passQuality(std::vector<L1Obj> * myL1Coll,
+bool PACAnalyzer::passQuality(std::vector<L1Obj> * myL1Coll,
 		 const std::string & sysType, 
 		 int iCand){
 
-  if(sysType.find("Gmt")!=std::string::npos){
-    return myL1Coll->size()>iCand &&
-      myL1Coll->operator[](iCand).eta>0.8 &&
-      myL1Coll->operator[](iCand).eta<1.3 &&
-      true;
-  }
-
-  if(sysType.find("Otf")!=std::string::npos){
-  return myL1Coll->size()>iCand &&   
-    ///Barrel        
-    myL1Coll->operator[](iCand).bx/100!=98944 &&
-    myL1Coll->operator[](iCand).bx/100!=99840 &&
-    myL1Coll->operator[](iCand).bx/100!=34304 &&
-    myL1Coll->operator[](iCand).bx/100!=3075 &&
-    myL1Coll->operator[](iCand).bx/100!=98816 &&
-    myL1Coll->operator[](iCand).bx/100!=36928 &&
-    myL1Coll->operator[](iCand).bx/100!=66688 &&
-    ////
-    myL1Coll->operator[](iCand).bx/100!=12300 && 
-    //myL1Coll->operator[](iCand).bx/100!=33408 && 
-    //myL1Coll->operator[](iCand).bx/100!=196992 && 
-    
-    ///Endcap
-    myL1Coll->operator[](iCand).bx/100!=98816 &&
-    myL1Coll->operator[](iCand).bx/100!=98944 &&
-
-    myL1Coll->operator[](iCand).bx/100!=33408 &&
-    myL1Coll->operator[](iCand).bx/100!=66688 && 
-    myL1Coll->operator[](iCand).bx/100!=66176 && 
-    ///
-    myL1Coll->operator[](iCand).q>2 &&
-    true;
-  }
+  if(sysType.find("Gmt")!=std::string::npos) return myL1Coll->size()>iCand;
+  else if(sysType.find("Rpc")!=std::string::npos) return myL1Coll->size()>iCand;
   else return myL1Coll->size();
  
 }
 //////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////
-void OTFAnalyzer::fillTurnOnCurve(const int & iPtCut,
+void PACAnalyzer::fillTurnOnCurve(const int & iPtCut,
 				  const std::string & sysType,
 				  const std::string & selType){
 
-  int ptCut = OTFHistograms::ptBins[iPtCut];
+  int ptCut = PACHistograms::ptBins[iPtCut];
   int iCand = 0;
 
   std::vector<L1Obj> * myL1Coll = &(theEvent->l1ObjectsGmt);
@@ -142,12 +87,6 @@ void OTFAnalyzer::fillTurnOnCurve(const int & iPtCut,
   if(sysType=="Other"){
     myL1Coll = &(theEvent->l1ObjectsOther);
     hName = "h2DOther"+selType;
-  }
-  if(sysType=="Otf") {
-    iCand = iCandOTF;
-    myL1Coll = &(theEvent->l1ObjectsOtf);
-    if(myL1Coll->size()>1 && myL1Coll->operator[](0).q<myL1Coll->operator[](1).q) iCand = 1;
-    hName = "h2DOtf"+selType;
   }
   
   bool qualityCut = passQuality(myL1Coll,sysType,iCand);
@@ -173,12 +112,12 @@ void OTFAnalyzer::fillTurnOnCurve(const int & iPtCut,
 }
 
 
-void OTFAnalyzer::fillRateHisto(const std::string & sysType,
+void PACAnalyzer::fillRateHisto(const std::string & sysType,
 				const std::string & selType){
 
 	int iCut = 2;
 	int iCand = 0;
-	float ptCut = OTFHistograms::ptBins[OTFHistograms::ptCutsGmt[iCut]];
+	float ptCut = PACHistograms::ptBins[PACHistograms::ptCutsGmt[iCut]];
 
 	std::vector<L1Obj> * myL1Coll = &(theEvent->l1ObjectsGmt);
 	std::string hName = "h2DRate"+selType+"Gmt";
@@ -191,82 +130,44 @@ void OTFAnalyzer::fillRateHisto(const std::string & sysType,
 			myL1Coll = &(theEvent->l1ObjectsOther);
 			hName = "h2DRate"+selType+"Other";
 	}
-	if(sysType=="Otf") {
-	  iCand = iCandOTF;
-	  myL1Coll = &(theEvent->l1ObjectsOtf);
-	  if(myL1Coll->size()>1){
-	    ///Take lower quality
-	    if(myL1Coll->operator[](0).q<myL1Coll->operator[](1).q) iCand = 1;
-	    ///take lower pt in case of the same quality
-	    else if (myL1Coll->operator[](0).pt>myL1Coll->operator[](1).pt) iCand = 1;
-	  }
-	  hName = "h2DRate"+selType+"Otf";
-	  ptCut = OTFHistograms::ptBins[OTFHistograms::ptCutsOtf[iCut]];
-
-	}
 
 	bool qualityCut = passQuality(myL1Coll,sysType,iCand);
 	bool pass = myL1Coll->size() && qualityCut;
 	float val = 0;
 	if(pass) val = myL1Coll->operator[](iCand).pt;
+
         if(selType=="Tot") myHistos_->fill2DHistogram(hName,theEvent->pt,val);
 
 	///Rate vs selected variable is plotted for given pt cut.
 	pass = pass && (myL1Coll->operator[](iCand).pt>=ptCut);
+	int q = pass*myL1Coll->operator[](iCand).q;
+
 	if(selType=="VsEta") myHistos_->fill2DHistogram(hName,theEvent->pt,pass*theEvent->eta+(!pass)*99);
 	if(selType=="VsPt") myHistos_->fill2DHistogram(hName,theEvent->pt,pass*theEvent->pt+(!pass)*(-100));
-	int q = myL1Coll->operator[](iCand).bx/100;
-	if(!pass) q = -10;
-
-	std::bitset<18> hitsWord(q);
-	if(sysType=="Otf" && selType=="VsQuality"){
-	  if(tmpMap.find(q)==tmpMap.end()) tmpMap[q] = tmpMap.size();
-	  int val = tmpMap[q];
-	  myHistos_->fill2DHistogram(hName,theEvent->pt,pass*val+(!pass)*(-10));
-	}
-	if(sysType=="Gmt" && selType=="VsQuality") myHistos_->fill2DHistogram(hName,theEvent->pt,pass*q+(!pass)*(-10));
-	
-
+	if(selType=="VsQuality") myHistos_->fill2DHistogram(hName,theEvent->pt,pass*q+(!pass)*(-10));	
 }
 
-bool OTFAnalyzer::analyze(const EventProxyBase& iEvent){
+bool PACAnalyzer::analyze(const EventProxyBase& iEvent){
 
   clear();
-  /*
-  std::bitset<17> bits(98816);
-  std::cout<<98816<<" bits: "<<bits.to_string()<<std::endl;
-
-  std::bitset<17> bits1(33408);
-  std::cout<<33408<<" bits: "<<bits1.to_string()<<std::endl;
-
-  bits = std::bitset<17>(98944);
-  std::cout<<98944<<" bits: "<<bits.to_string()<<std::endl;
-
-  bits = std::bitset<17>(196992); 
-  std::cout<<196992<<" bits: "<<bits.to_string()<<std::endl;
-
-  exit(0);
-  */
-
+ 
   eventWeight_ = 1.0;
   /////////////////
-  const EventProxyOTF & myEvent = static_cast<const EventProxyOTF&>(iEvent);
+  const EventProxyPAC & myEvent = static_cast<const EventProxyPAC&>(iEvent);
   theEvent = myEvent.events;
 
-  if(theEvent->eta<0.83 || theEvent->eta>1.24) return true;
-  //if(theEvent->eta<1.15 || theEvent->pt>10000) return true;
+  //if(theEvent->eta<0.0 || theEvent->eta>2.1) return true;
+  if(theEvent->eta<1.24) return true;
 
+ 
   std::string selType = "";
   std::string sysTypeGmt="Gmt";
-  std::string sysTypeOtf="Otf";
   std::string sysTypeRpc="Rpc";
   std::string sysTypeOther="Other";
 
   for(int iCut=0;iCut<22;++iCut){
 	  if(iCut>0 && iCut<14) continue;
-	  //std::cout<<"thread number: "<<omp_get_thread_num()<<std::endl;
 	  fillTurnOnCurve(iCut,sysTypeGmt,selType);
-	  fillTurnOnCurve(iCut,sysTypeOtf,selType);
 	  fillTurnOnCurve(iCut,sysTypeRpc,selType);
 	  fillTurnOnCurve(iCut,sysTypeOther,selType);
   }
@@ -276,37 +177,35 @@ bool OTFAnalyzer::analyze(const EventProxyBase& iEvent){
   int iCut = 2;
   bool pass = false;
   for(int iType=0;iType<=3;++iType){
-	  float ptCut = OTFHistograms::ptBins[OTFHistograms::ptCutsGmt[iCut]];
+	  float ptCut = PACHistograms::ptBins[PACHistograms::ptCutsGmt[iCut]];
 	  if(iType==0) pass = theEvent->pt>(ptCut + 20);
 	  if(iType==1) pass = theEvent->pt>ptCut && theEvent->pt<(ptCut+5);
 	  if(iType==2) pass = theEvent->pt<10;
 	  if(!pass) continue;
 
 	  selType = std::string(TString::Format("Type%d",iType));
-	  fillTurnOnCurve(OTFHistograms::ptCutsGmt[iCut],sysTypeGmt,selType);
-	  fillTurnOnCurve(OTFHistograms::ptCutsGmt[iCut],sysTypeRpc,selType);
-	  fillTurnOnCurve(OTFHistograms::ptCutsGmt[iCut],sysTypeOther,selType);
-	  fillTurnOnCurve(OTFHistograms::ptCutsOtf[iCut],sysTypeOtf,selType);	  
+	  fillTurnOnCurve(PACHistograms::ptCutsGmt[iCut],sysTypeGmt,selType);
+	  fillTurnOnCurve(PACHistograms::ptCutsGmt[iCut],sysTypeRpc,selType);
+	  fillTurnOnCurve(PACHistograms::ptCutsGmt[iCut],sysTypeOther,selType);
   }
   /////////////////
 
-  fillRateHisto("Otf","Tot");
   fillRateHisto("Gmt","Tot");
-
   fillRateHisto("Gmt","VsEta");
   fillRateHisto("Gmt","VsPt");
-
-  fillRateHisto("Otf","VsEta");
-  fillRateHisto("Otf","VsPt");
-
-  fillRateHisto("Otf","VsQuality");
   fillRateHisto("Gmt","VsQuality");
+
+  fillRateHisto("Rpc","Tot");
+  fillRateHisto("Rpc","VsEta");
+  fillRateHisto("Rpc","VsPt");
+  fillRateHisto("Rpc","VsQuality");
+
 
   return true;
 }
 //////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////
-bool  OTFAnalyzer::checkSelections(const std::string & type){
+bool  PACAnalyzer::checkSelections(const std::string & type){
 
   bool decision = false;
 
@@ -316,7 +215,7 @@ bool  OTFAnalyzer::checkSelections(const std::string & type){
 }
 //////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////
-void  OTFAnalyzer::addBranch(TTree *tree){
+void  PACAnalyzer::addBranch(TTree *tree){
 
  for(unsigned int i=0;i<selectionFlavours_.size();++i){ 
    std::map<std::string,float>::const_iterator CI = treeVariables_.begin();
@@ -325,7 +224,7 @@ void  OTFAnalyzer::addBranch(TTree *tree){
 }
 //////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////
-void OTFAnalyzer::clear(){
+void PACAnalyzer::clear(){
 
   ///Clear variables
   std::map<std::string,float>::iterator it=treeVariables_.begin();
