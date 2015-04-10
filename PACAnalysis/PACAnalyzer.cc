@@ -140,7 +140,8 @@ void PACAnalyzer::fillRateHisto(const std::string & sysType,
 
 	///Rate vs selected variable is plotted for given pt cut.
 	pass = pass && (myL1Coll->operator[](iCand).pt>=ptCut);
-	int q = pass*myL1Coll->operator[](iCand).q;
+	int q = 0;
+	if(myL1Coll->size()) myL1Coll->operator[](iCand).q;
 
 	if(selType=="VsEta") myHistos_->fill2DHistogram(hName,theEvent->pt,pass*theEvent->eta+(!pass)*99);
 	if(selType=="VsPt") myHistos_->fill2DHistogram(hName,theEvent->pt,pass*theEvent->pt+(!pass)*(-100));
@@ -157,9 +158,7 @@ bool PACAnalyzer::analyze(const EventProxyBase& iEvent){
   theEvent = myEvent.events;
 
   //if(theEvent->eta<0.0 || theEvent->eta>2.1) return true;
-  if(theEvent->eta<1.24) return true;
-
- 
+   
   std::string selType = "";
   std::string sysTypeGmt="Gmt";
   std::string sysTypeRpc="Rpc";
@@ -199,7 +198,6 @@ bool PACAnalyzer::analyze(const EventProxyBase& iEvent){
   fillRateHisto("Rpc","VsEta");
   fillRateHisto("Rpc","VsPt");
   fillRateHisto("Rpc","VsQuality");
-
 
   return true;
 }

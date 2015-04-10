@@ -96,18 +96,13 @@ bool OTFAnalyzer::passQuality(std::vector<L1Obj> * myL1Coll,
 
   if(sysType.find("Otf")!=std::string::npos){
   return myL1Coll->size()>iCand &&   
-    ///Barrel        
-    myL1Coll->operator[](iCand).bx/100!=98944 &&
+    ///Barrel            
     myL1Coll->operator[](iCand).bx/100!=99840 &&
     myL1Coll->operator[](iCand).bx/100!=34304 &&
     myL1Coll->operator[](iCand).bx/100!=3075 &&
-    myL1Coll->operator[](iCand).bx/100!=98816 &&
     myL1Coll->operator[](iCand).bx/100!=36928 &&
-    myL1Coll->operator[](iCand).bx/100!=66688 &&
     ////
     myL1Coll->operator[](iCand).bx/100!=12300 && 
-    //myL1Coll->operator[](iCand).bx/100!=33408 && 
-    //myL1Coll->operator[](iCand).bx/100!=196992 && 
     
     ///Endcap
     myL1Coll->operator[](iCand).bx/100!=98816 &&
@@ -117,6 +112,7 @@ bool OTFAnalyzer::passQuality(std::vector<L1Obj> * myL1Coll,
     myL1Coll->operator[](iCand).bx/100!=66688 && 
     myL1Coll->operator[](iCand).bx/100!=66176 && 
     ///
+    
     myL1Coll->operator[](iCand).q>2 &&
     true;
   }
@@ -233,17 +229,35 @@ bool OTFAnalyzer::analyze(const EventProxyBase& iEvent){
 
   clear();
   /*
-  std::bitset<17> bits(98816);
+  std::bitset<17> bits(99840);
+  std::cout<<99840<<" bits: "<<bits.to_string()<<std::endl;
+
+  bits = std::bitset<17>(34304);
+  std::cout<<34304<<" bits: "<<bits.to_string()<<std::endl;
+
+  bits = std::bitset<17>(3075); 
+  std::cout<<3075<<" bits: "<<bits.to_string()<<std::endl;
+
+  bits = std::bitset<17>(36928); 
+  std::cout<<36928<<" bits: "<<bits.to_string()<<std::endl;
+
+ bits = std::bitset<17>(12300); 
+  std::cout<<12300<<" bits: "<<bits.to_string()<<std::endl;
+
+ bits = std::bitset<17>(98816); 
   std::cout<<98816<<" bits: "<<bits.to_string()<<std::endl;
 
-  std::bitset<17> bits1(33408);
-  std::cout<<33408<<" bits: "<<bits1.to_string()<<std::endl;
-
-  bits = std::bitset<17>(98944);
+  bits = std::bitset<17>(98944); 
   std::cout<<98944<<" bits: "<<bits.to_string()<<std::endl;
 
-  bits = std::bitset<17>(196992); 
-  std::cout<<196992<<" bits: "<<bits.to_string()<<std::endl;
+ bits = std::bitset<17>(33408); 
+  std::cout<<98944<<" bits: "<<bits.to_string()<<std::endl;
+
+ bits = std::bitset<17>(66688); 
+  std::cout<<98944<<" bits: "<<bits.to_string()<<std::endl;
+
+ bits = std::bitset<17>(66176); 
+  std::cout<<98944<<" bits: "<<bits.to_string()<<std::endl;
 
   exit(0);
   */
@@ -254,7 +268,6 @@ bool OTFAnalyzer::analyze(const EventProxyBase& iEvent){
   theEvent = myEvent.events;
 
   if(theEvent->eta<0.83 || theEvent->eta>1.24) return true;
-  //if(theEvent->eta<1.15 || theEvent->pt>10000) return true;
 
   std::string selType = "";
   std::string sysTypeGmt="Gmt";
@@ -264,7 +277,6 @@ bool OTFAnalyzer::analyze(const EventProxyBase& iEvent){
 
   for(int iCut=0;iCut<22;++iCut){
 	  if(iCut>0 && iCut<14) continue;
-	  //std::cout<<"thread number: "<<omp_get_thread_num()<<std::endl;
 	  fillTurnOnCurve(iCut,sysTypeGmt,selType);
 	  fillTurnOnCurve(iCut,sysTypeOtf,selType);
 	  fillTurnOnCurve(iCut,sysTypeRpc,selType);

@@ -578,9 +578,8 @@ void OTFHistograms::plotRate(std::string type){
   if(type=="VsPt"){
     c->SetLogy(0);  
     hRateGmt->SetXTitle("p_{T}^{gen} [GeV/c]");
-    hRateOtf->Draw();    
-    hRateGmt->Draw("same");
-
+    hRateGmt->Draw();
+    hRateOtf->Draw("same");    
   }
   if(type=="VsQuality"){
     c->SetLogy(0);  
