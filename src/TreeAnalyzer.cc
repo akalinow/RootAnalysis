@@ -9,6 +9,8 @@
 #include "EventProxyBase.h"
 
 #include "boost/functional/hash.hpp"
+#include "boost/property_tree/ptree.hpp"
+#include "boost/property_tree/ini_parser.hpp"
 
 #include "TFile.h"
 #include "TH1D.h"
@@ -113,16 +115,14 @@ void TreeAnalyzer::scaleHistograms(){
 void TreeAnalyzer::parseCfg(const std::string & cfgFileName){
 
   eventWeight_ = 1.0;
-  filePath_ = "./";
 
-  //fileNames_.push_back("/home/akalinow/scratch/CMS/OverlapTrackFinder/Emulator/job_4_ana/5760_100k_4xMerging/EfficiencyTree.root");
-  //fileNames_.push_back("/home/akalinow/scratch/CMS/OverlapTrackFinder/Emulator/job_4_ana/5760_20k_noMerging/EfficiencyTree.root");
+  boost::property_tree::ptree pt;
+  boost::property_tree::ini_parser::read_ini(cfgFileName, pt);
 
-  fileNames_.push_back("/home/akalinow/scratch/CMS/OverlapTrackFinder/Emulator/job_4_ana/EfficiencyTree.root");
-  //fileNames_.push_back("/scratch_local/akalinow/Presentations/L1Trigger_XX_04_2015/NoMerging/EfficiencyTree.root");
+  std::cout<<"Reading file: "<<pt.get<std::string>("TreeAnalyzer.inputFile");
 
-  //fileNames_.push_back("/home/akalinow/scratch/CMS/PAC/data/OMTFtrees/EfficiencyTree_2012.root");
-  //fileNames_.push_back("/home/akalinow/scratch/CMS/PAC/data/OMTFtrees/EfficiencyTree_PostLS1Ext.root");
+  filePath_ = pt.get<std::string>("TreeAnalyzer.outputPath");
+  fileNames_.push_back(pt.get<std::string>("TreeAnalyzer.inputFile"));
 
 }
 //////////////////////////////////////////////////////////////////////////////

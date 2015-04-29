@@ -24,6 +24,10 @@ class OTFHistograms: public AnalysisHistograms {
 
   void finalizeHistograms(int nRuns, float weight=1.0);
 
+  void finalizeDiMuonHistograms(int nRuns, float weight=1.0);
+
+  virtual bool fill1DHistogram(const std::string &name, float val1, float weight=1.0);
+
   virtual bool fill2DHistogram(const std::string &name, float val1, float val2, float weight=1.0);
 
   static const int color[6];
@@ -50,7 +54,10 @@ class OTFHistograms: public AnalysisHistograms {
   void plotEffVsEta(const std::string & sysType);
 
   void plotEffVsVar(const std::string & sysType,
-		  	  	  	const std::string & varName);
+		    const std::string & varName);
+
+  void plotVar(const std::string & sysType,
+	       const std::string & varName);
 
   void plotOtfVsGmt(int iPt, std::string sysType="Gmt");
 

@@ -54,6 +54,23 @@ OTFHistograms::~OTFHistograms(){
 }
 /////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////
+bool OTFHistograms::fill1DHistogram(const std::string& name, float val1, float weight){
+
+	std::string hTemplateName = "";
+	if(!AnalysisHistograms::fill1DHistogram(name,val1,weight)){
+	  if(name.find("DeltaEta")!=std::string::npos) hTemplateName = "h1DDeltaEta";
+	  std::cout<<"Adding histogram: "<<name<<std::endl;
+	  this->add1DHistogram(name,"",
+			       this->get1DHistogram(hTemplateName)->GetNbinsX(),
+			       this->get1DHistogram(hTemplateName)->GetXaxis()->GetXmin(),
+			       this->get1DHistogram(hTemplateName)->GetXaxis()->GetXmax(),
+			       file_);
+	  return AnalysisHistograms::fill1DHistogram(name,val1,weight);
+	}
+	return true;
+}
+/////////////////////////////////////////////////////////
+/////////////////////////////////////////////////////////
 bool OTFHistograms::fill2DHistogram(const std::string& name, float val1, float val2, float weight){
 
 	std::string hTemplateName = "";
@@ -80,15 +97,16 @@ bool OTFHistograms::fill2DHistogram(const std::string& name, float val1, float v
 	}
 	return true;
 }
-
-
-
+/////////////////////////////////////////////////////////
+/////////////////////////////////////////////////////////
 void OTFHistograms::defineHistograms(){
 
  using namespace std;
 
  if(!histosInitialized_){
  //Make template histos
+ add1DHistogram("h1DDeltaEta","",30,0,0.3,file_);
+
  add2DHistogram("h2DPt","",150,0,150,2,-0.5,1.5,file_);
 
  add2DHistogram("h2DEtaHit","",8*26,0.8,1.25,2,-0.5,1.5,file_);
@@ -161,6 +179,20 @@ void OTFHistograms::finalizeHistograms(int nRuns, float weight){
   plotRate("VsQuality");
 
   plotEffVsRate(18);
+}
+/////////////////////////////////////////////////////////
+/////////////////////////////////////////////////////////
+void OTFHistograms::finalizeDiMuonHistograms(int nRuns, float weight){
+
+ plotEffPanel("GmtiMuon0");
+ plotEffPanel("GmtiMuon1");
+
+ plotEffPanel("OtfiMuon0");
+ plotEffPanel("OtfiMuon1");
+
+ plotVar("GmtiMuon00","DeltaEta");
+ plotVar("OtfiMuon00","DeltaEta");
+
 }
 /////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////
@@ -248,7 +280,9 @@ void OTFHistograms::plotEffPanel(const std::string & sysType){
 
   TString hName("");
   const int *ptCuts = ptCutsOtf;
-  if(sysType=="Gmt" || sysType=="Rpc" || sysType=="Other") ptCuts = ptCutsGmt;
+  if(sysType.find("Gmt")!=std::string::npos || 
+     sysType=="Rpc" || 
+     sysType=="Other") ptCuts = ptCutsGmt;
 
   for (int icut=0; icut <=3;++icut){
     float ptCut = OTFHistograms::ptBins[ptCuts[icut]];
@@ -280,6 +314,31 @@ void OTFHistograms::plotEffPanel(const std::string & sysType){
   c->Print(TString::Format("fig_eps/PanelVsPt_%s_log.eps",sysType.c_str()).Data());
   c->Print(TString::Format("fig_png/PanelVsPt_%s_log.png",sysType.c_str()).Data());
 }
+////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////
+void OTFHistograms::plotVar(const std::string & sysType,
+			    const std::string & varName){
+
+  TCanvas* c = new TCanvas(TString::Format("Var%s_%s",varName.c_str(),sysType.c_str()),
+			   TString::Format("Var%s_%s",varName.c_str(),sysType.c_str()),
+			   460,500);
+
+ 
+  TString hName = "h1D"+varName+sysType;
+  TH1F* h1D = this->get1DHistogram(hName.Data());
+  h1D->SetLineWidth(3);
+  h1D->SetStats(kFALSE);
+
+  h1D->Draw();
+
+  std::cout<<sysType<<" integral 0 - 0.15: "<<h1D->Integral(0,h1D->FindBin(0.15))<<std::endl;
+
+ c->Print(TString::Format("fig_eps/Var%s_%s.eps",varName.c_str(), sysType.c_str()).Data());
+ c->Print(TString::Format("fig_png/Var%s_%s.png",varName.c_str(), sysType.c_str()).Data());
+}
+////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////
+
 ////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////
 void OTFHistograms::plotEffVsVar(const std::string & sysType,
