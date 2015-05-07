@@ -59,7 +59,8 @@ bool OTFHistograms::fill1DHistogram(const std::string& name, float val1, float w
 	std::string hTemplateName = "";
 	if(!AnalysisHistograms::fill1DHistogram(name,val1,weight)){
 	  if(name.find("DeltaEta")!=std::string::npos) hTemplateName = "h1DDeltaEta";
-	  std::cout<<"Adding histogram: "<<name<<std::endl;
+	  if(name.find("DeltaPhi")!=std::string::npos) hTemplateName = "h1DDeltaPhi";
+	  std::cout<<"Adding histogram: "<<name<<" with template: "<<hTemplateName<<std::endl;
 	  this->add1DHistogram(name,"",
 			       this->get1DHistogram(hTemplateName)->GetNbinsX(),
 			       this->get1DHistogram(hTemplateName)->GetXaxis()->GetXmin(),
@@ -84,7 +85,8 @@ bool OTFHistograms::fill2DHistogram(const std::string& name, float val1, float v
 		if(name.find("RateVsEta")!=std::string::npos) hTemplateName = "h2DRateVsEta";
 		if(name.find("RateVsPt")!=std::string::npos) hTemplateName = "h2DRateVsPt";
 		if(name.find("RateVsQuality")!=std::string::npos) hTemplateName = "h2DRateVsQuality";                                              
-		std::cout<<"Adding histogram: "<<name<<std::endl;
+		if(name.find("DeltaPhi")!=std::string::npos) hTemplateName = "h2DDeltaPhi";
+		std::cout<<"Adding histogram: "<<name<<" with template: "<<hTemplateName<<std::endl;
 		this->add2DHistogram(name,"",
 				this->get2DHistogram(hTemplateName)->GetNbinsX(),
 				this->get2DHistogram(hTemplateName)->GetXaxis()->GetXmin(),
@@ -106,24 +108,19 @@ void OTFHistograms::defineHistograms(){
  if(!histosInitialized_){
  //Make template histos
  add1DHistogram("h1DDeltaEta","",30,0,0.3,file_);
+ add1DHistogram("h1DDeltaPhi","",5*32,-M_PI,M_PI,file_);
 
  add2DHistogram("h2DPt","",150,0,150,2,-0.5,1.5,file_);
 
  add2DHistogram("h2DEtaHit","",8*26,0.8,1.25,2,-0.5,1.5,file_);
  add2DHistogram("h2DPhiHit","",5*32,-M_PI,M_PI,2,-0.5,1.5,file_);
-
- //add2DHistogram("h2DEtaVx","",8*25,-0.1,2.4,2,-0.5,1.5,file_);
  add2DHistogram("h2DEtaVx","",8*25,0.8,1.25,2,-0.5,1.5,file_);
-
- //add2DHistogram("h2DPhiVx","",8*32,-M_PI,M_PI,2,-0.5,1.5,file_);
  add2DHistogram("h2DPhiVx","",4*32,-0.2,2.2,2,-0.5,1.5,file_);
  //Rate histos
  add2DHistogram("h2DRateTot","",400,1,201,142,0,142,file_);
- //add2DHistogram("h2DRateVsEta","",400,1,201,2*25,-0.1,2.4,file_);
- //add2DHistogram("h2DRateVsEta","",400,1,201,25,-0.1,0.9,file_);//Barrel
  add2DHistogram("h2DRateVsEta","",400,1,201,25,0.8,1.25,file_);//Overlap
- //add2DHistogram("h2DRateVsEta","",400,1,201,25,1.25,2.25,file_);//Endcap
- //add2DHistogram("h2DRateVsEta","",400,1,201,25,2.0,2.5,file_);//High eta
+ //add2DHistogram("h2DDeltaPhi","",40,-M_PI,M_PI,2,-0.5,1.5,file_);
+ add2DHistogram("h2DDeltaPhi","",30,-1,1,2,-0.5,1.5,file_);
 
  add2DHistogram("h2DRateVsPt","",400,1,201,60,0,30,file_);
 
@@ -184,6 +181,10 @@ void OTFHistograms::finalizeHistograms(int nRuns, float weight){
 /////////////////////////////////////////////////////////
 void OTFHistograms::finalizeDiMuonHistograms(int nRuns, float weight){
 
+  plotEffVsVar("Otf","DeltaPhi");
+  plotEffVsVar("Otf","PhiHit");
+
+  /*
  plotEffPanel("GmtiMuon0");
  plotEffPanel("GmtiMuon1");
 
@@ -192,6 +193,7 @@ void OTFHistograms::finalizeDiMuonHistograms(int nRuns, float weight){
 
  plotVar("GmtiMuon00","DeltaEta");
  plotVar("OtfiMuon00","DeltaEta");
+  */
 
 }
 /////////////////////////////////////////////////////////

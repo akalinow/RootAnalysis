@@ -87,6 +87,86 @@ bool OTFDiMuonAnalyzer::passQuality(std::vector<L1Obj> * myL1Coll,
 }
 //////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////
+unsigned int OTFDiMuonAnalyzer::findMuon(const unsigned int iMix){
+
+  std::vector<L1Obj> * myL1Coll = &(theEvent->l1ObjectsOtf);
+
+  L1Obj aCand;
+  L1Obj originalMuon, secondMuon;
+  L1Obj firstRecoMuon, secondRecoMuon;
+
+
+  for(unsigned int iCandTmp=0;iCandTmp<myL1Coll->size();++iCandTmp){
+    if(myL1Coll->operator[](iCandTmp).bx==0) originalMuon = myL1Coll->operator[](iCandTmp);
+    else if(myL1Coll->operator[](iCandTmp).bx%2==1 && 
+	    myL1Coll->operator[](iCandTmp).bx/2==iMix) secondMuon = myL1Coll->operator[](iCandTmp);
+  }
+
+  float deltaR1 = 0.05, deltaR2 = 0.05, tmpR = 999.0;
+  ///Looking for first candidate in di muon event
+  if(originalMuon.pt>0){
+    for(unsigned int iCandTmp=0;iCandTmp<myL1Coll->size();++iCandTmp){
+      if(myL1Coll->operator[](iCandTmp).bx &&
+	 myL1Coll->operator[](iCandTmp).bx%2==0 && 
+	 int(myL1Coll->operator[](iCandTmp).bx-0.5)/2==iMix) aCand = myL1Coll->operator[](iCandTmp);
+      
+      tmpR = sqrt(pow(aCand.phi-originalMuon.phi,2) + 
+		  pow(aCand.eta-originalMuon.eta,2));
+      if(aCand.pt>0 && tmpR<deltaR1 &&
+	 aCand.charge==originalMuon.charge){
+	deltaR1 = tmpR;
+	firstRecoMuon = aCand;
+      }	
+      ///Looking for second candidate in di muon event     
+      tmpR = sqrt(pow(aCand.phi-secondMuon.phi,2) + 
+		  pow(aCand.eta-secondMuon.eta,2));
+      if(tmpR<deltaR2 &&
+	 aCand.charge==secondMuon.charge){
+	deltaR2 = tmpR;
+	secondRecoMuon = aCand;
+      }			  
+    }    
+  }
+
+
+  if(originalMuon.pt>10 && secondMuon.pt>10){
+    float deltaPhi = originalMuon.phi - secondMuon.phi;  
+    if(deltaPhi>M_PI) deltaPhi-=2*M_PI;
+    if(deltaPhi<-M_PI) deltaPhi+=2*M_PI;
+
+    float deltaR =  sqrt(pow(originalMuon.phi-secondMuon.phi,2) + 
+			 pow(originalMuon.eta-secondMuon.eta,2));
+   
+    bool pass = firstRecoMuon.pt>10 && secondRecoMuon.pt>10;
+    int ptCut = 0;
+    std::string selType = "";
+    std::string hName = "h2DOtf"+selType;
+
+    if(fabs(deltaPhi)>0.4 && !pass){
+      std::cout<<originalMuon<<std::endl;
+      std::cout<<secondMuon<<std::endl;
+      std::cout<<"DeltaPhi: "<<deltaPhi<<" deltaR1: "<<deltaR1<<" deltaR2: "<<deltaR2<<std::endl;
+      std::cout<<firstRecoMuon<<std::endl;
+      std::cout<<secondRecoMuon<<std::endl;
+      std::cout<<"----"<<std::endl;
+    }
+
+    std::string tmpName = hName+"DeltaPhi"+std::to_string(ptCut);
+    if(originalMuon.charge*secondMuon.charge==1) myHistos_->fill2DHistogram(tmpName,deltaPhi,pass);
+
+    tmpName = hName+"PhiHit"+std::to_string(ptCut);
+    if(fabs(deltaPhi)<0.1 && originalMuon.charge*secondMuon.charge==1) myHistos_->fill2DHistogram(tmpName,firstRecoMuon.phi,pass);
+    ///
+    ptCut = 14;
+    tmpName = hName+"DeltaPhi"+std::to_string(ptCut);
+    if(originalMuon.charge*secondMuon.charge==1) myHistos_->fill2DHistogram(tmpName,deltaPhi,pass);
+ 
+    tmpName = hName+"PhiHit"+std::to_string(ptCut);
+    if(fabs(deltaPhi)<0.1 && originalMuon.charge*secondMuon.charge==1) myHistos_->fill2DHistogram(tmpName,firstRecoMuon.phi,pass);
+  }
+}
+//////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////////
 void OTFDiMuonAnalyzer::fillTurnOnCurve(const int & iPtCut,
 					const std::string & sysType,
 					const std::string & selType,
@@ -147,7 +227,7 @@ void OTFDiMuonAnalyzer::fillTurnOnCurve(const int & iPtCut,
   myHistos_->fill2DHistogram(tmpName,theEvent->etaMuon(iMuon), pass);
   
   tmpName = hName+"PhiVx"+std::to_string(ptCut);
-  myHistos_->fill2DHistogram(tmpName,theEvent->phiMuon(iMuon), pass);
+  myHistos_->fill2DHistogram(tmpName,theEvent->phiMuon(iMuon),pass);
 }
 ///////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////
@@ -161,8 +241,9 @@ bool OTFDiMuonAnalyzer::analyze(const EventProxyBase& iEvent){
   theEvent = myEvent.events;
 
   if(theEvent->eta<0.83 || theEvent->eta>1.24) return true;
-  if(theEvent->eta1<0.83 || theEvent->eta1>1.24) return true;
-  if(fabs(theEvent->eta-theEvent->eta1)<0.15) return true;
+
+  for(unsigned int iMix=0;iMix<10;++iMix) findMuon(iMix);
+  return true;
 
   std::string selType = "";
   std::string sysTypeGmt="Gmt";

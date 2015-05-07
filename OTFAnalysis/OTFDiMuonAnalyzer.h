@@ -41,6 +41,9 @@ class OTFDiMuonAnalyzer:public Analyzer{
 		   const std::string & sysType, 
 		   int iCand);
 
+
+  unsigned int findMuon(const unsigned int iMuon);
+
   void registerCuts();
   bool checkSelections(const std::string & type);
   void clear();

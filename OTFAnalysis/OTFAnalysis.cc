@@ -41,8 +41,8 @@ int main(int argc, char ** argv) {
 	 std::vector<Analyzer*> myAnalyzers;
 	 EventProxyOTF *myEvent = new EventProxyOTF();
 
-	 //myAnalyzers.push_back(new OTFAnalyzer("OTFAnalyzer"));
-	  myAnalyzers.push_back(new OTFDiMuonAnalyzer("OTFAnalyzer"));
+	 myAnalyzers.push_back(new OTFAnalyzer("OTFAnalyzer"));
+	 //myAnalyzers.push_back(new OTFDiMuonAnalyzer("OTFAnalyzer"));
 
 	  TreeAnalyzer *tree = new TreeAnalyzer("TreeAnalyzer",cfgFileName, myEvent);
 	  tree->init(myAnalyzers);

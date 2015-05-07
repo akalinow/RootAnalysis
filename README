@@ -8,7 +8,11 @@ autoconf
 ./configure
 make
 cd OTFAnalysis
-./test a
+./test otf.ini
+
+
+NOTE: File otf.init containg path to the data file. Please update it before running the code.
+
 
 
 
