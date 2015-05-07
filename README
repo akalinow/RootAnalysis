@@ -11,7 +11,7 @@ cd OTFAnalysis
 ./test otf.ini
 
 
-NOTE: File otf.init containg path to the data file. Please update it before running the code.
+NOTE: File otf.ini contains a path to the data file. Please update it before running the code.
 
 
 
