@@ -25,6 +25,7 @@
    Int_t q;
    Int_t charge;
    Int_t type;
+   Int_t refLayer;
    
  };
 

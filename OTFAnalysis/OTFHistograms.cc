@@ -86,6 +86,7 @@ bool OTFHistograms::fill2DHistogram(const std::string& name, float val1, float v
 		if(name.find("RateVsPt")!=std::string::npos) hTemplateName = "h2DRateVsPt";
 		if(name.find("RateVsQuality")!=std::string::npos) hTemplateName = "h2DRateVsQuality";                                              
 		if(name.find("DeltaPhi")!=std::string::npos) hTemplateName = "h2DDeltaPhi";
+		if(name.find("DeltaPt")!=std::string::npos) hTemplateName = "h2DDeltaPt";
 		std::cout<<"Adding histogram: "<<name<<" with template: "<<hTemplateName<<std::endl;
 		this->add2DHistogram(name,"",
 				this->get2DHistogram(hTemplateName)->GetNbinsX(),
@@ -121,6 +122,7 @@ void OTFHistograms::defineHistograms(){
  add2DHistogram("h2DRateVsEta","",400,1,201,25,0.8,1.25,file_);//Overlap
  //add2DHistogram("h2DDeltaPhi","",40,-M_PI,M_PI,2,-0.5,1.5,file_);
  add2DHistogram("h2DDeltaPhi","",30,-1,1,2,-0.5,1.5,file_);
+ add2DHistogram("h2DDeltaPt","",101,-0.5,100.5,2,-0.5,1.5,file_);
 
  add2DHistogram("h2DRateVsPt","",400,1,201,60,0,30,file_);
 
@@ -181,8 +183,9 @@ void OTFHistograms::finalizeHistograms(int nRuns, float weight){
 /////////////////////////////////////////////////////////
 void OTFHistograms::finalizeDiMuonHistograms(int nRuns, float weight){
 
-  plotEffVsVar("Otf","DeltaPhi");
-  plotEffVsVar("Otf","PhiHit");
+  plotEffVsVar("OtfDi","DeltaPhi");
+  plotEffVsVar("OtfDi","DeltaPt");
+  plotEffVsVar("OtfDi","PhiHit");
 
   /*
  plotEffPanel("GmtiMuon0");
@@ -358,30 +361,39 @@ void OTFHistograms::plotEffVsVar(const std::string & sysType,
   c->SetGrid(0,1);
 
   TString hName("");
-    const int *ptCuts = ptCutsOtf;
-    if(sysType=="Gmt") ptCuts = ptCutsGmt;
+  const int *ptCuts = ptCutsOtf;
+  if(sysType=="Gmt") ptCuts = ptCutsGmt;
 
-    for (int icut=0; icut <=1;++icut){
-    	float ptCut = OTFHistograms::ptBins[ptCuts[icut]];
-    	hName = "h2D"+sysType+varName+std::to_string((int)ptCut);
-    	TH2F* h2D = this->get2DHistogram(hName.Data());
-	if(!h2D) return;
-    	TH1D *hNum = h2D->ProjectionX("hNum",2,2);
-    	TH1D *hDenom = h2D->ProjectionX("hDenom",1,1);
-    	hDenom->Add(hNum);
-    	TH1D* hEff =DivideErr(hNum,hDenom,"Pt_Int","B");
-    	hEff->SetStats(kFALSE);
-    	hEff->SetMinimum(0.0);////TEST
-    	hEff->SetMaximum(1.04);
-    	hEff->SetMarkerStyle(21+icut);
-    	hEff->SetMarkerColor(color[icut]);
-    	hEff->SetXTitle(varName.c_str());
-    	hEff->SetYTitle("Efficiency");
-    	if (icut==0)hEff->DrawCopy("E0");
-    	else hEff->DrawCopy("same E0");
-    	std::string nameCut = std::to_string((int)OTFHistograms::ptBins[ptCuts[icut]])+" GeV/c";
-    	if (icut==0) nameCut = "no p_{T} cut";
-    	l.AddEntry(hEff,nameCut.c_str());
+  for (int icut=0; icut <=1;++icut){
+    float ptCut = OTFHistograms::ptBins[ptCuts[icut]];
+    hName = "h2D"+sysType+varName+std::to_string((int)ptCut);
+    TH2F* h2D = this->get2DHistogram(hName.Data());
+    if(!h2D) return;
+    TH1D *hNum = h2D->ProjectionX("hNum",2,2);
+    TH1D *hDenom = h2D->ProjectionX("hDenom",1,1);
+    hDenom->Add(hNum);
+    TH1D* hEff =DivideErr(hNum,hDenom,"Pt_Int","B");
+    hEff->SetStats(kFALSE);
+    hEff->SetMinimum(0.0);
+    hEff->SetMaximum(1.04);
+    hEff->SetMarkerStyle(21+icut);
+    hEff->SetMarkerColor(color[icut]);
+    hEff->SetXTitle(varName.c_str());
+    hEff->SetYTitle("Efficiency");
+
+    if(sysType=="OtfDi" && hName.Contains("DeltaPt")){
+      hEff->SetMinimum(1E-2);
+      c->SetLogy();
+    }
+
+    if (icut==0)hEff->DrawCopy("E0");
+    else hEff->DrawCopy("same E0");
+    std::string nameCut = std::to_string((int)OTFHistograms::ptBins[ptCuts[icut]])+" GeV/c";
+    if (icut==0) nameCut = "no p_{T} cut";
+    if(sysType=="OtfDi" && icut>0) nameCut = "opposite sign";
+    if(sysType=="OtfDi" && icut==0) nameCut = "same sign";	
+    
+    l.AddEntry(hEff,nameCut.c_str());
   }
   l.DrawClone();
   c->Print(TString::Format("fig_eps/EffVs%s_%s.eps",varName.c_str(), sysType.c_str()).Data());

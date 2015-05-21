@@ -97,22 +97,21 @@ bool OTFAnalyzer::passQuality(std::vector<L1Obj> * myL1Coll,
   if(sysType.find("Otf")!=std::string::npos){
   return myL1Coll->size()>iCand &&   
     ///Barrel            
-    myL1Coll->operator[](iCand).bx/100!=99840 &&
-    myL1Coll->operator[](iCand).bx/100!=34304 &&
-    myL1Coll->operator[](iCand).bx/100!=3075 &&
-    myL1Coll->operator[](iCand).bx/100!=36928 &&
+    myL1Coll->operator[](iCand).q!=99840 &&
+    myL1Coll->operator[](iCand).q!=34304 &&
+    myL1Coll->operator[](iCand).q!=3075 &&
+    myL1Coll->operator[](iCand).q!=36928 &&
     ////
-    myL1Coll->operator[](iCand).bx/100!=12300 && 
+    myL1Coll->operator[](iCand).q!=12300 && 
     
     ///Endcap
-    myL1Coll->operator[](iCand).bx/100!=98816 &&
-    myL1Coll->operator[](iCand).bx/100!=98944 &&
+    myL1Coll->operator[](iCand).q!=98816 &&
+    myL1Coll->operator[](iCand).q!=98944 &&
 
-    myL1Coll->operator[](iCand).bx/100!=33408 &&
-    myL1Coll->operator[](iCand).bx/100!=66688 && 
-    myL1Coll->operator[](iCand).bx/100!=66176 && 
+    myL1Coll->operator[](iCand).q!=33408 &&
+    myL1Coll->operator[](iCand).q!=66688 && 
+    myL1Coll->operator[](iCand).q!=66176 && 
     ///    
-    myL1Coll->operator[](iCand).q>2 &&
     true;
   }
   else return myL1Coll->size();
@@ -210,8 +209,8 @@ void OTFAnalyzer::fillRateHisto(const std::string & sysType,
 	pass = pass && (myL1Coll->operator[](iCand).pt>=ptCut);
 	if(selType=="VsEta") myHistos_->fill2DHistogram(hName,theEvent->pt,pass*theEvent->eta+(!pass)*99);
 	if(selType=="VsPt") myHistos_->fill2DHistogram(hName,theEvent->pt,pass*theEvent->pt+(!pass)*(-100));
-	int q = myL1Coll->operator[](iCand).bx/100;
-	if(!pass) q = -10;
+	int q = -10; 
+	if(pass) myL1Coll->operator[](iCand).q;
 
 	std::bitset<18> hitsWord(q);
 	if(sysType=="Otf" && selType=="VsQuality"){

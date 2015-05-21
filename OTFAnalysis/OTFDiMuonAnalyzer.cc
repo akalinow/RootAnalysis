@@ -63,23 +63,25 @@ bool OTFDiMuonAnalyzer::passQuality(std::vector<L1Obj> * myL1Coll,
   }
 
   if(sysType.find("Otf")!=std::string::npos){
-  return myL1Coll->size()>iCand &&       
-    ///Barrel            
-    myL1Coll->operator[](iCand).bx/100!=99840 &&
-    myL1Coll->operator[](iCand).bx/100!=34304 &&
-    myL1Coll->operator[](iCand).bx/100!=3075 &&
-    myL1Coll->operator[](iCand).bx/100!=36928 &&
-    ////
-    myL1Coll->operator[](iCand).bx/100!=12300 &&     
-    ///Endcap
-    myL1Coll->operator[](iCand).bx/100!=98816 &&
-    myL1Coll->operator[](iCand).bx/100!=98944 &&
 
-    myL1Coll->operator[](iCand).bx/100!=33408 &&
-    myL1Coll->operator[](iCand).bx/100!=66688 && 
-    myL1Coll->operator[](iCand).bx/100!=66176 && 
+    std::bitset<17> bits(myL1Coll->operator[](iCand).q);
+
+    return myL1Coll->size()>iCand &&       
+    ///Barrel            
+    myL1Coll->operator[](iCand).q!=99840 &&
+    myL1Coll->operator[](iCand).q!=34304 &&
+    myL1Coll->operator[](iCand).q!=3075 &&
+    myL1Coll->operator[](iCand).q!=36928 &&
+    ////
+    myL1Coll->operator[](iCand).q!=12300 &&     
+    ///Endcap
+    myL1Coll->operator[](iCand).q!=98816 &&
+    myL1Coll->operator[](iCand).q!=98944 &&
+
+    myL1Coll->operator[](iCand).q!=33408 &&
+    myL1Coll->operator[](iCand).q!=66688 && 
+    myL1Coll->operator[](iCand).q!=66176 && 
     ///        
-    myL1Coll->operator[](iCand).q>2 &&
     true;
   }
   else return myL1Coll->size();
@@ -95,17 +97,24 @@ unsigned int OTFDiMuonAnalyzer::findMuon(const unsigned int iMix){
   L1Obj originalMuon, secondMuon;
   L1Obj firstRecoMuon, secondRecoMuon;
 
+  std::string sysType = "OtfDi";
 
   for(unsigned int iCandTmp=0;iCandTmp<myL1Coll->size();++iCandTmp){
+
+    if(!passQuality(myL1Coll,sysType,iCandTmp)) continue;
+
     if(myL1Coll->operator[](iCandTmp).bx==0) originalMuon = myL1Coll->operator[](iCandTmp);
     else if(myL1Coll->operator[](iCandTmp).bx%2==1 && 
 	    myL1Coll->operator[](iCandTmp).bx/2==iMix) secondMuon = myL1Coll->operator[](iCandTmp);
   }
 
-  float deltaR1 = 0.05, deltaR2 = 0.05, tmpR = 999.0;
+  float deltaR1 = 0.15, deltaR2 = 0.15, tmpR = 999.0;
   ///Looking for first candidate in di muon event
   if(originalMuon.pt>0){
     for(unsigned int iCandTmp=0;iCandTmp<myL1Coll->size();++iCandTmp){
+     
+      if(!passQuality(myL1Coll,sysType,iCandTmp)) continue;
+
       if(myL1Coll->operator[](iCandTmp).bx &&
 	 myL1Coll->operator[](iCandTmp).bx%2==0 && 
 	 int(myL1Coll->operator[](iCandTmp).bx-0.5)/2==iMix) aCand = myL1Coll->operator[](iCandTmp);
@@ -129,20 +138,24 @@ unsigned int OTFDiMuonAnalyzer::findMuon(const unsigned int iMix){
   }
 
 
-  if(originalMuon.pt>10 && secondMuon.pt>10){
-    float deltaPhi = originalMuon.phi - secondMuon.phi;  
+  if(originalMuon.pt>0 && secondMuon.pt>0){
+    float deltaPhi = originalMuon.phi - secondMuon.phi; 
+    float deltaPt = -1000;
+
     if(deltaPhi>M_PI) deltaPhi-=2*M_PI;
     if(deltaPhi<-M_PI) deltaPhi+=2*M_PI;
+
+    if(fabs(deltaPhi)>0.2) return 0;
 
     float deltaR =  sqrt(pow(originalMuon.phi-secondMuon.phi,2) + 
 			 pow(originalMuon.eta-secondMuon.eta,2));
    
-    bool pass = firstRecoMuon.pt>10 && secondRecoMuon.pt>10;
+    bool pass = firstRecoMuon.pt>0 && secondRecoMuon.pt>0;
     int ptCut = 0;
     std::string selType = "";
-    std::string hName = "h2DOtf"+selType;
+    std::string hName = "h2DOtfDi"+selType;
 
-    if(fabs(deltaPhi)>0.4 && !pass){
+    if(false && fabs(deltaPhi)>0.4 && !pass){
       std::cout<<originalMuon<<std::endl;
       std::cout<<secondMuon<<std::endl;
       std::cout<<"DeltaPhi: "<<deltaPhi<<" deltaR1: "<<deltaR1<<" deltaR2: "<<deltaR2<<std::endl;
@@ -151,18 +164,44 @@ unsigned int OTFDiMuonAnalyzer::findMuon(const unsigned int iMix){
       std::cout<<"----"<<std::endl;
     }
 
-    std::string tmpName = hName+"DeltaPhi"+std::to_string(ptCut);
-    if(originalMuon.charge*secondMuon.charge==1) myHistos_->fill2DHistogram(tmpName,deltaPhi,pass);
+    std::string tmpName;
 
-    tmpName = hName+"PhiHit"+std::to_string(ptCut);
-    if(fabs(deltaPhi)<0.1 && originalMuon.charge*secondMuon.charge==1) myHistos_->fill2DHistogram(tmpName,firstRecoMuon.phi,pass);
+    if(originalMuon.charge*secondMuon.charge==1){
+      tmpName = hName+"DeltaPhi"+std::to_string(ptCut);
+      myHistos_->fill2DHistogram(tmpName,deltaPhi,pass);
+      
+      tmpName = hName+"DeltaPt"+std::to_string(ptCut);
+      deltaPt = fabs(originalMuon.pt-firstRecoMuon.pt);
+      for(unsigned int tmpPt=0;tmpPt<100;++tmpPt){	
+	myHistos_->fill2DHistogram(tmpName,tmpPt,false); 
+	if(tmpPt<=deltaPt){
+	  myHistos_->fill2DHistogram(tmpName,tmpPt,true);
+	  myHistos_->fill2DHistogram(tmpName,tmpPt,false,-1);
+	}
+      }
+      
+      tmpName = hName+"PhiHit"+std::to_string(ptCut);
+      if(fabs(deltaPhi)<0.17/2) myHistos_->fill2DHistogram(tmpName,firstRecoMuon.phi,pass);
+    }
     ///
     ptCut = 14;
+    if(originalMuon.charge*secondMuon.charge==-1){
     tmpName = hName+"DeltaPhi"+std::to_string(ptCut);
-    if(originalMuon.charge*secondMuon.charge==1) myHistos_->fill2DHistogram(tmpName,deltaPhi,pass);
+    myHistos_->fill2DHistogram(tmpName,deltaPhi,pass);
  
     tmpName = hName+"PhiHit"+std::to_string(ptCut);
-    if(fabs(deltaPhi)<0.1 && originalMuon.charge*secondMuon.charge==1) myHistos_->fill2DHistogram(tmpName,firstRecoMuon.phi,pass);
+    if(fabs(deltaPhi)<0.17/2) myHistos_->fill2DHistogram(tmpName,firstRecoMuon.phi,pass);
+
+    tmpName = hName+"DeltaPt"+std::to_string(ptCut);
+    deltaPt = fabs(originalMuon.pt-firstRecoMuon.pt);
+    for(unsigned int tmpPt=0;tmpPt<100;++tmpPt){	
+      myHistos_->fill2DHistogram(tmpName,tmpPt,false); 
+      if(tmpPt<=deltaPt){
+	myHistos_->fill2DHistogram(tmpName,tmpPt,true);
+	myHistos_->fill2DHistogram(tmpName,tmpPt,false,-1);
+      }
+    }
+    }
   }
 }
 //////////////////////////////////////////////////////////////////////////////
