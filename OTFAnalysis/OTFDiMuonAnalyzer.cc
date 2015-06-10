@@ -7,6 +7,7 @@
 #include "TreeAnalyzer.h"
 #include "OTFDiMuonAnalyzer.h"
 #include "EventProxyOTF.h"
+#include "TMath.h"
 
 //////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////
@@ -92,11 +93,10 @@ bool OTFDiMuonAnalyzer::passQuality(std::vector<L1Obj> * myL1Coll,
 unsigned int OTFDiMuonAnalyzer::findMuon(const unsigned int iMix){
 
   std::vector<L1Obj> * myL1Coll = &(theEvent->l1ObjectsOtf);
-
-  L1Obj aCand;
+  
   L1Obj originalMuon, secondMuon;
   L1Obj firstRecoMuon, secondRecoMuon;
-
+  
   std::string sysType = "OtfDi";
 
   for(unsigned int iCandTmp=0;iCandTmp<myL1Coll->size();++iCandTmp){
@@ -109,11 +109,13 @@ unsigned int OTFDiMuonAnalyzer::findMuon(const unsigned int iMix){
   }
 
   float deltaR1 = 0.15, deltaR2 = 0.15, tmpR = 999.0;
+  int firstRecoIndex = -1;
   ///Looking for first candidate in di muon event
   if(originalMuon.pt>0){
-    for(unsigned int iCandTmp=0;iCandTmp<myL1Coll->size();++iCandTmp){
-     
+    for(unsigned int iCandTmp=0;iCandTmp<myL1Coll->size();++iCandTmp){    
       if(!passQuality(myL1Coll,sysType,iCandTmp)) continue;
+
+      L1Obj aCand;
 
       if(myL1Coll->operator[](iCandTmp).bx &&
 	 myL1Coll->operator[](iCandTmp).bx%2==0 && 
@@ -124,13 +126,16 @@ unsigned int OTFDiMuonAnalyzer::findMuon(const unsigned int iMix){
       if(aCand.pt>0 && tmpR<deltaR1 &&
 	 aCand.charge==originalMuon.charge){
 	deltaR1 = tmpR;
+	firstRecoIndex = iCandTmp;
 	firstRecoMuon = aCand;
       }	
       ///Looking for second candidate in di muon event     
       tmpR = sqrt(pow(aCand.phi-secondMuon.phi,2) + 
 		  pow(aCand.eta-secondMuon.eta,2));
-      if(tmpR<deltaR2 &&
-	 aCand.charge==secondMuon.charge){
+      
+      if(iCandTmp!=firstRecoIndex &&
+	 tmpR<deltaR2 &&
+	 aCand.charge==secondMuon.charge){	
 	deltaR2 = tmpR;
 	secondRecoMuon = aCand;
       }			  
@@ -145,8 +150,6 @@ unsigned int OTFDiMuonAnalyzer::findMuon(const unsigned int iMix){
     if(deltaPhi>M_PI) deltaPhi-=2*M_PI;
     if(deltaPhi<-M_PI) deltaPhi+=2*M_PI;
 
-    if(fabs(deltaPhi)>0.2) return 0;
-
     float deltaR =  sqrt(pow(originalMuon.phi-secondMuon.phi,2) + 
 			 pow(originalMuon.eta-secondMuon.eta,2));
    
@@ -155,10 +158,12 @@ unsigned int OTFDiMuonAnalyzer::findMuon(const unsigned int iMix){
     std::string selType = "";
     std::string hName = "h2DOtfDi"+selType;
 
-    if(false && fabs(deltaPhi)>0.4 && !pass){
+    if(pass && fabs(deltaPhi)/TMath::Pi()/2.0*5760<80 &&
+       originalMuon.charge==secondMuon.charge){
       std::cout<<originalMuon<<std::endl;
       std::cout<<secondMuon<<std::endl;
-      std::cout<<"DeltaPhi: "<<deltaPhi<<" deltaR1: "<<deltaR1<<" deltaR2: "<<deltaR2<<std::endl;
+      std::cout<<"DeltaPhi: "<<deltaPhi<<" iDelta: "<<fabs(deltaPhi)/TMath::Pi()/2.0*5760
+	       <<" deltaR1: "<<deltaR1<<" deltaR2: "<<deltaR2<<std::endl;
       std::cout<<firstRecoMuon<<std::endl;
       std::cout<<secondRecoMuon<<std::endl;
       std::cout<<"----"<<std::endl;
@@ -166,7 +171,7 @@ unsigned int OTFDiMuonAnalyzer::findMuon(const unsigned int iMix){
 
     std::string tmpName;
 
-    if(originalMuon.charge*secondMuon.charge==1){
+    if(originalMuon.charge==secondMuon.charge){
       tmpName = hName+"DeltaPhi"+std::to_string(ptCut);
       myHistos_->fill2DHistogram(tmpName,deltaPhi,pass);
       
@@ -181,16 +186,16 @@ unsigned int OTFDiMuonAnalyzer::findMuon(const unsigned int iMix){
       }
       
       tmpName = hName+"PhiHit"+std::to_string(ptCut);
-      if(fabs(deltaPhi)<0.17/2) myHistos_->fill2DHistogram(tmpName,firstRecoMuon.phi,pass);
+      myHistos_->fill2DHistogram(tmpName,firstRecoMuon.phi,pass);
     }
     ///
-    ptCut = 14;
-    if(originalMuon.charge*secondMuon.charge==-1){
+    ptCut = 4;
+    if(originalMuon.charge!=secondMuon.charge){
     tmpName = hName+"DeltaPhi"+std::to_string(ptCut);
     myHistos_->fill2DHistogram(tmpName,deltaPhi,pass);
  
     tmpName = hName+"PhiHit"+std::to_string(ptCut);
-    if(fabs(deltaPhi)<0.17/2) myHistos_->fill2DHistogram(tmpName,firstRecoMuon.phi,pass);
+    myHistos_->fill2DHistogram(tmpName,firstRecoMuon.phi,pass);
 
     tmpName = hName+"DeltaPt"+std::to_string(ptCut);
     deltaPt = fabs(originalMuon.pt-firstRecoMuon.pt);
@@ -242,7 +247,7 @@ void OTFDiMuonAnalyzer::fillTurnOnCurve(const int & iPtCut,
   }
 
   bool qualityCut = passQuality(myL1Coll,sysType,iCand);
-  bool pass = myL1Coll->size() && myL1Coll->operator[](iCand).pt>=ptCut && qualityCut && deltaEta<0.15;
+  bool pass = myL1Coll->size() && myL1Coll->operator[](iCand).pt>=ptCut && qualityCut && deltaEta<0.1;
 
   std::string tmpName = "h1DDeltaEta"+sysType+"iMuon"+std::to_string(iMuon)+std::to_string(ptCut);
   myHistos_->fill1DHistogram(tmpName,deltaEta,1.0);
@@ -270,6 +275,24 @@ void OTFDiMuonAnalyzer::fillTurnOnCurve(const int & iPtCut,
 }
 ///////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////
+void  OTFDiMuonAnalyzer::fillTrigEffHisto(const std::string & sysType,
+					  const std::string & selType){
+
+ std::vector<L1Obj> * myL1Coll = &(theEvent->l1ObjectsGmt);
+ std::string hName = "h2DGmt"+selType;
+  
+ if(sysType=="Otf") {
+   myL1Coll = &(theEvent->l1ObjectsOtf);
+   hName = "h2DOtf"+selType;
+ }
+  
+ for(unsigned int iCand=0;iCand<myL1Coll->size();++iCand){
+   bool qualityCut = passQuality(myL1Coll,sysType,iCand);
+   bool trigCut = false;
+ }
+}
+///////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////
 bool OTFDiMuonAnalyzer::analyze(const EventProxyBase& iEvent){
 
   clear();
@@ -280,8 +303,8 @@ bool OTFDiMuonAnalyzer::analyze(const EventProxyBase& iEvent){
   theEvent = myEvent.events;
 
   if(theEvent->eta<0.83 || theEvent->eta>1.24) return true;
-
-  for(unsigned int iMix=0;iMix<10;++iMix) findMuon(iMix);
+  
+  for(unsigned int iMix=0;iMix<20;++iMix) findMuon(iMix);
   return true;
 
   std::string selType = "";
@@ -292,7 +315,7 @@ bool OTFDiMuonAnalyzer::analyze(const EventProxyBase& iEvent){
 
   for(unsigned int iMuon=0;iMuon<2;++iMuon){
     for(int iCut=0;iCut<22;++iCut){
-      if(iCut>0 && iCut<14) continue;
+      //if(iCut>0 && iCut<14) continue;
       fillTurnOnCurve(iCut,sysTypeGmt,selType,iMuon);
       fillTurnOnCurve(iCut,sysTypeOtf,selType,iMuon);
       fillTurnOnCurve(iCut,sysTypeRpc,selType,iMuon);

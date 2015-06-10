@@ -24,4 +24,5 @@ test_LDADD   = @ROOTLIBS@ -lProof @ROOTAUXLIBS@ -lboost_regex
 
 
 # Compiler options for a.out
-test_CPPFLAGS = -I$(top_srcdir)/include -I$(top_srcdir)/OTFAnalysis -I@ROOTINCDIR@
+test_CPPFLAGS = -I$(top_srcdir)/include -I$(top_srcdir)/OTFAnalysis -I@ROOTINCDIR@ -std=c++11
+

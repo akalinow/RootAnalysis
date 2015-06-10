@@ -35,8 +35,13 @@ class OTFDiMuonAnalyzer:public Analyzer{
 		       const unsigned int iMuon);
   
   void fillRateHisto(const std::string & sysType,
-  			         const std::string & selType);
-  
+		     const std::string & selType);
+
+
+  void fillTrigEffHisto(const std::string & sysType,
+			const std::string & selType);
+
+ 
   bool passQuality(std::vector<L1Obj> * myL1Coll,
 		   const std::string & sysType, 
 		   int iCand);

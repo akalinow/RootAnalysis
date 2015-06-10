@@ -20,9 +20,11 @@ const float OTFHistograms::ptBins[33]={0., 0.1,
   		 160. };
 
 const int OTFHistograms::color[6] = {kBlack, kRed, kGreen, kBlue, kMagenta, kTeal};
-const int OTFHistograms::ptCutsGmt[4] =     {0, 16, 18, 19};
-const int OTFHistograms::ptCutsOtf[4] =     {0, 15, 16, 18};
-//const int OTFHistograms::ptCutsOtf[4] = {0, 16, 17, 18};//eta>2.1
+const int OTFHistograms::ptCutsGmt[4] =     {0, 16, 18, 14};
+const int OTFHistograms::ptCutsOtf[4] =     {0, 14, 16, 12};
+///No scale shift
+//const int OTFHistograms::ptCutsOtf[4] =     {0, 15, 16, 18};
+
 
 OTFHistograms::OTFHistograms(std::string fileName, int opt){
 
@@ -122,7 +124,7 @@ void OTFHistograms::defineHistograms(){
  add2DHistogram("h2DRateVsEta","",400,1,201,25,0.8,1.25,file_);//Overlap
  //add2DHistogram("h2DDeltaPhi","",40,-M_PI,M_PI,2,-0.5,1.5,file_);
  add2DHistogram("h2DDeltaPhi","",30,-1,1,2,-0.5,1.5,file_);
- add2DHistogram("h2DDeltaPt","",101,-0.5,100.5,2,-0.5,1.5,file_);
+ add2DHistogram("h2DDeltaPt","",21,-0.5,20.5,2,-0.5,1.5,file_);
 
  add2DHistogram("h2DRateVsPt","",400,1,201,60,0,30,file_);
 
@@ -183,10 +185,11 @@ void OTFHistograms::finalizeHistograms(int nRuns, float weight){
 /////////////////////////////////////////////////////////
 void OTFHistograms::finalizeDiMuonHistograms(int nRuns, float weight){
 
+  
   plotEffVsVar("OtfDi","DeltaPhi");
   plotEffVsVar("OtfDi","DeltaPt");
   plotEffVsVar("OtfDi","PhiHit");
-
+  
   /*
  plotEffPanel("GmtiMuon0");
  plotEffPanel("GmtiMuon1");
@@ -301,7 +304,9 @@ void OTFHistograms::plotEffPanel(const std::string & sysType){
     hEff->SetStats(kFALSE);
     hEff->SetMinimum(0.0001);
     hEff->SetMaximum(1.04);
-    hEff->GetXaxis()->SetRange(4,150);
+    //hEff->GetXaxis()->SetRange(4,150);
+    hEff->GetXaxis()->SetRange(4,20);
+    
     hEff->SetMarkerStyle(21+icut);
     hEff->SetMarkerColor(color[icut]);
     hEff->SetXTitle("muon p_{T} [GeV/c]");
