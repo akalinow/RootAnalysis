@@ -4,6 +4,8 @@
 #include <bitset>
 #include <sstream>
 
+#include <iostream>
+
 #include "TreeAnalyzer.h"
 #include "OTFAnalyzer.h"
 #include "EventProxyOTF.h"
