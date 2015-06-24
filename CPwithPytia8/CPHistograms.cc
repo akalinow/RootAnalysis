@@ -9,6 +9,7 @@
 #include "TF1.h"
 #include "TGraph.h"
 #include "TMarker.h"
+#include "TMath.h"
 
 CPHistograms::CPHistograms(std::string fileName, int opt){
 
@@ -35,31 +36,21 @@ AnalysisHistograms::init(myDir);
 CPHistograms::~CPHistograms(){ }
 /////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////
-bool CPHistograms::fill2DHistogram(const std::string& name, float val1, float val2, float weight){
-
-	std::string hTemplateName = "";
-	if(!AnalysisHistograms::fill2DHistogram(name,val1,val2,weight)){
-		if(name.find("Pt")!=std::string::npos) hTemplateName = "h2DPt";
-		if(name.find("EtaHit")!=std::string::npos) hTemplateName = "h2DEtaHit";
-		if(name.find("PhiHit")!=std::string::npos) hTemplateName = "h2DPhiHit";
-		if(name.find("EtaVx")!=std::string::npos) hTemplateName = "h2DEtaVx";
-		if(name.find("PhiVx")!=std::string::npos) hTemplateName = "h2DPhiVx";
-		if(name.find("RateTot")!=std::string::npos) hTemplateName = "h2DRateTot";
-		if(name.find("RateVsEta")!=std::string::npos) hTemplateName = "h2DRateVsEta";
-		if(name.find("RateVsPt")!=std::string::npos) hTemplateName = "h2DRateVsPt";
-		if(name.find("RateVsQuality")!=std::string::npos) hTemplateName = "h2DRateVsQuality";                                              
-		std::cout<<"Adding histogram: "<<name<<std::endl;
-		this->add2DHistogram(name,"",
-				this->get2DHistogram(hTemplateName)->GetNbinsX(),
-				this->get2DHistogram(hTemplateName)->GetXaxis()->GetXmin(),
-				this->get2DHistogram(hTemplateName)->GetXaxis()->GetXmax(),
-				this->get2DHistogram(hTemplateName)->GetNbinsY(),
-				this->get2DHistogram(hTemplateName)->GetYaxis()->GetXmin(),
-				this->get2DHistogram(hTemplateName)->GetYaxis()->GetXmax(),
-				file_);
-		return AnalysisHistograms::fill2DHistogram(name,val1,val2,weight);
-	}
-	return true;
+bool CPHistograms::fill1DHistogram(const std::string& name, float val, float weight){
+  
+  std::string hTemplateName = "";
+  if(!AnalysisHistograms::fill1DHistogram(name,val,weight)){
+    if(name.find("h1DPhi")!=std::string::npos) hTemplateName = "h1DPhiTemplate";
+    if(name.find("h1DRho")!=std::string::npos) hTemplateName = "h1DRhoTemplate";
+    std::cout<<"Adding histogram: "<<name<<std::endl;
+    this->add1DHistogram(name,"",
+			 this->get1DHistogram(hTemplateName)->GetNbinsX(),
+			 this->get1DHistogram(hTemplateName)->GetXaxis()->GetXmin(),
+			 this->get1DHistogram(hTemplateName)->GetXaxis()->GetXmax(),
+			 file_);
+    return AnalysisHistograms::fill1DHistogram(name,val,weight);
+  }
+  return true;
 }
 /////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////
@@ -68,28 +59,37 @@ void CPHistograms::defineHistograms(){
  using namespace std;
 
  if(!histosInitialized_){
- //Make template histos
- add2DHistogram("h2DPt","",150,0,150,2,-0.5,1.5,file_);
-
- add2DHistogram("h2DEtaHit","",8*26,0.0,1.6,2,-0.5,1.5,file_);
- add2DHistogram("h2DPhiHit","",5*32,-M_PI,M_PI,2,-0.5,1.5,file_);
-
- add2DHistogram("h2DEtaVx","",8*25,0.0,1.6,2,-0.5,1.6,file_);
- add2DHistogram("h2DPhiVx","",4*32,-0.2,2.2,2,-0.5,1.5,file_);
- //Rate histos
- add2DHistogram("h2DRateTot","",400,1,201,142,0,142,file_);
- add2DHistogram("h2DRateVsEta","",400,1,201,25,0.0,1.6,file_);
-
- add2DHistogram("h2DRateVsPt","",400,1,201,60,0,30,file_);
-
- add2DHistogram("h2DRateVsQuality","",400,1,201,10,-0.5,9.5,file_);
-
+   //Make template histos
+   add1DHistogram("h1DPhiTemplate",";#phi^{*} [rad]; Events",32,0,M_PI,file_);
+   add1DHistogram("h1DRhoTemplate",";#rho^{*} [rad]; Events",32,0.5*M_PI,M_PI,file_);
+   add1DHistogram("h1DDPhiTemplate",";#Delta#phi^{*} [rad]; Events",32,-0.5*M_PI,0.5*M_PI,file_);
+   
    histosInitialized_ = true;
  }
 }
 /////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////
 void CPHistograms::finalizeHistograms(int nRuns, float weight){
+
+  plotHistograms();
+  
+}
+/////////////////////////////////////////////////////////
+/////////////////////////////////////////////////////////
+void CPHistograms::plotHistograms(){
+
+
+  std::string sysType = "";
+  TCanvas* c = new TCanvas(TString::Format("Phi_%s",sysType.c_str()),
+			   TString::Format("Phi_%s",sysType.c_str()),
+			   460,500);
+
+  TString hName = "h1DPhi";
+  TH1F* h1D = this->get1DHistogram(hName.Data());
+
+  h1D->Draw();
+
+  c->Print(TString::Format("fig_png/Phi_%s.png",sysType.c_str()).Data());
   
 }
 /////////////////////////////////////////////////////////

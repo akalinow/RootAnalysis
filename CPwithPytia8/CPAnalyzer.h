@@ -23,22 +23,17 @@ class CPAnalyzer: public Analyzer{
 
   CPAnalyzer(const std::string & aName);
 
-  virtual ~CPAnalyzer(){;}
+  virtual ~CPAnalyzer();
   
   ///Initialize the analyzer
   virtual void initialize(TFileDirectory& aDir,
-			  pat::strbitset *aSelections){
-
-    //default is to do whatever the analyzer does
-    filterEvent_ = false;
-};
-  
+			  pat::strbitset *aSelections);
 
   virtual bool analyze(const EventProxyBase& iEvent);
 
   virtual bool analyze(const EventProxyBase& iEvent, ObjectMessenger *aMessenger){return analyze(iEvent); }
 
-  virtual void finalize(){;};
+  virtual void finalize();
 
   virtual void clear(){;};
 
@@ -59,6 +54,9 @@ class CPAnalyzer: public Analyzer{
  private:
 
   std::string myName_;
+
+  ///Histograms storage
+  CPHistograms *myHistos_;
   
   //should this CPAnalyzer be able to filter events
   bool filterEvent_;

@@ -38,7 +38,7 @@ int main(int argc, char ** argv) {
 	timer.Start();
 	  //----------------------------------------------------------
 	 std::vector<Analyzer*> myAnalyzers;
-	 EventProxyCP *myEvent = new EventProxyCP();
+	 EventProxyCPNtuple *myEvent = new EventProxyCPNtuple();
 
 	 myAnalyzers.push_back(new CPAnalyzer("CPAnalyzer"));
 
