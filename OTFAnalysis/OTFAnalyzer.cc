@@ -167,8 +167,8 @@ void OTFAnalyzer::fillTurnOnCurve(const int & iPtCut,
   tmpName = hName+"PhiVx"+std::to_string(ptCut);
   myHistos_->fill2DHistogram(tmpName,theEvent->phi, pass);
 }
-
-
+//////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////////
 void OTFAnalyzer::fillRateHisto(const std::string & sysType,
 				const std::string & selType){
 
@@ -224,7 +224,39 @@ void OTFAnalyzer::fillRateHisto(const std::string & sysType,
 	
 
 }
+//////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////////
+void OTFAnalyzer::fillGhostHisto(const std::string & sysType,
+				 const std::string & selType){
 
+  std::vector<L1Obj> * myL1Coll = &(theEvent->l1ObjectsGmt);
+  std::string hName = "h2DGhostsVsProcessor"+sysType;
+
+  if(sysType=="Otf") myL1Coll = &(theEvent->l1ObjectsOtf);
+  if(sysType=="Gmt") myL1Coll = &(theEvent->l1ObjectsGmt);
+
+  std::vector<unsigned int> myCounts(6), myCountsMinus(6), myCountsPlus(6);
+
+  for(unsigned int iCandTmp=0;iCandTmp<myL1Coll->size();++iCandTmp){    
+    if(!passQuality(myL1Coll,sysType,iCandTmp)) continue;
+    unsigned int iProcessor = myL1Coll->operator[](iCandTmp).phi;
+    if(sysType=="Gmt") iProcessor = 2;
+    unsigned int iCharge = myL1Coll->operator[](iCandTmp).charge;
+    ++myCounts[iProcessor];
+    if(iCharge==0) ++myCountsMinus[iProcessor];
+    if(iCharge==1) ++myCountsPlus[iProcessor];
+  }
+
+  
+  for(unsigned int iProcessor=0;iProcessor<6;++iProcessor){    
+    myHistos_->fill2DHistogram(hName,iProcessor,myCounts[iProcessor]);
+    myHistos_->fill2DHistogram(hName+"SS",iProcessor,abs(myCountsPlus[iProcessor]-myCountsMinus[iProcessor]));
+    myHistos_->fill2DHistogram(hName+"OS",iProcessor,abs(myCountsPlus[iProcessor]*(myCountsPlus[iProcessor]<2)
+							 +myCountsMinus[iProcessor]*(myCountsMinus[iProcessor]<2)));
+  }
+}
+//////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////////
 bool OTFAnalyzer::analyze(const EventProxyBase& iEvent){
 
   clear();
@@ -313,6 +345,9 @@ bool OTFAnalyzer::analyze(const EventProxyBase& iEvent){
 
   fillRateHisto("Otf","VsQuality");
   fillRateHisto("Gmt","VsQuality");
+
+  fillGhostHisto("Otf","VsProcessor");
+  fillGhostHisto("Gmt","VsProcessor");
 
   return true;
 }

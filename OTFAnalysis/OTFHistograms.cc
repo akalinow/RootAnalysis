@@ -20,8 +20,13 @@ const float OTFHistograms::ptBins[33]={0., 0.1,
   		 160. };
 
 const int OTFHistograms::color[6] = {kBlack, kRed, kGreen, kBlue, kMagenta, kTeal};
-const int OTFHistograms::ptCutsGmt[4] =     {0, 16, 18, 14};
-const int OTFHistograms::ptCutsOtf[4] =     {0, 14, 16, 12};
+//Single mu
+//const int OTFHistograms::ptCutsGmt[4] =     {0, 16, 18, 14};
+//const int OTFHistograms::ptCutsOtf[4] =     {0, 16, 18, 14};
+//const int OTFHistograms::ptCutsOtf[4] =     {0, 14, 16, 12};
+//Di muon
+const int OTFHistograms::ptCutsGmt[4] =     {0, 5, 7, 14};
+const int OTFHistograms::ptCutsOtf[4] =     {0, 5, 7, 14};
 ///No scale shift
 //const int OTFHistograms::ptCutsOtf[4] =     {0, 15, 16, 18};
 
@@ -89,6 +94,7 @@ bool OTFHistograms::fill2DHistogram(const std::string& name, float val1, float v
 		if(name.find("RateVsQuality")!=std::string::npos) hTemplateName = "h2DRateVsQuality";                                              
 		if(name.find("DeltaPhi")!=std::string::npos) hTemplateName = "h2DDeltaPhi";
 		if(name.find("DeltaPt")!=std::string::npos) hTemplateName = "h2DDeltaPt";
+		if(name.find("GhostsVsProcessor")!=std::string::npos) hTemplateName = "h2DGhostsVsProcessor";
 		std::cout<<"Adding histogram: "<<name<<" with template: "<<hTemplateName<<std::endl;
 		this->add2DHistogram(name,"",
 				this->get2DHistogram(hTemplateName)->GetNbinsX(),
@@ -110,7 +116,9 @@ void OTFHistograms::defineHistograms(){
 
  if(!histosInitialized_){
  //Make template histos
- add1DHistogram("h1DDeltaEta","",30,0,0.3,file_);
+ //add1DHistogram("h1DDeltaEta","",30,0,0.3,file_);
+ add1DHistogram("h1DDeltaEta","",100,0,5.0,file_);
+   
  add1DHistogram("h1DDeltaPhi","",5*32,-M_PI,M_PI,file_);
 
  add2DHistogram("h2DPt","",150,0,150,2,-0.5,1.5,file_);
@@ -127,10 +135,11 @@ void OTFHistograms::defineHistograms(){
  add2DHistogram("h2DDeltaPt","",21,-0.5,20.5,2,-0.5,1.5,file_);
 
  add2DHistogram("h2DRateVsPt","",400,1,201,60,0,30,file_);
-
  add2DHistogram("h2DRateVsQuality","",400,1,201,17,1.5,18.5,file_);
 
-   histosInitialized_ = true;
+ add2DHistogram("h2DGhostsVsProcessor","",6,-0.5,5.5,5,-0.5,4.5,file_);
+
+ histosInitialized_ = true;
  }
 }
 /////////////////////////////////////////////////////////
@@ -180,6 +189,11 @@ void OTFHistograms::finalizeHistograms(int nRuns, float weight){
   plotRate("VsQuality");
 
   plotEffVsRate(18);
+
+  plotGhostHistos("Gmt","");
+  plotGhostHistos("Otf","");
+  plotGhostHistos("Otf","SS");
+  plotGhostHistos("Otf","OS");
 }
 /////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////
@@ -189,18 +203,22 @@ void OTFHistograms::finalizeDiMuonHistograms(int nRuns, float weight){
   plotEffVsVar("OtfDi","DeltaPhi");
   plotEffVsVar("OtfDi","DeltaPt");
   plotEffVsVar("OtfDi","PhiHit");
-  
+  plotVar("OtfDiMuon1","DeltaEta");
+  plotVar("OtfDiMuon2","DeltaEta");
+
   /*
- plotEffPanel("GmtiMuon0");
- plotEffPanel("GmtiMuon1");
+  plotEffPanel("GmtiMuon0");
+  plotEffPanel("GmtiMuon1");
+  
+  plotEffPanel("OtfiMuon0");
+  plotEffPanel("OtfiMuon1");
+  
+  plotVar("GmtiMuon00","DeltaEta");
+  plotVar("OtfiMuon00","DeltaEta");
 
- plotEffPanel("OtfiMuon0");
- plotEffPanel("OtfiMuon1");
-
- plotVar("GmtiMuon00","DeltaEta");
- plotVar("OtfiMuon00","DeltaEta");
+  plotVar("GmtiMuon01","DeltaEta");
+  plotVar("OtfiMuon01","DeltaEta");
   */
-
 }
 /////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////
@@ -339,9 +357,17 @@ void OTFHistograms::plotVar(const std::string & sysType,
   h1D->SetLineWidth(3);
   h1D->SetStats(kFALSE);
 
+  c->SetLogy();
+
+  h1D->Scale(1.0/h1D->Integral(0,h1D->GetNbinsX()+1));
+  h1D->SetXTitle("#Delta R(RECO - RECO)");
   h1D->Draw();
 
-  std::cout<<sysType<<" integral 0 - 0.15: "<<h1D->Integral(0,h1D->FindBin(0.15))<<std::endl;
+  std::cout<<sysType<<" integral total: "<<h1D->Integral(0,h1D->GetNbinsX()+1)<<std::endl;
+  std::cout<<sysType<<" integral 0 - 1.0: "<<h1D->Integral(0,h1D->FindBin(1.0))<<std::endl;
+  std::cout<<sysType<<" integral 0 - 0.5: "<<h1D->Integral(0,h1D->FindBin(0.5))<<std::endl;
+  std::cout<<sysType<<" integral 0 - 0.05: "<<h1D->Integral(0,h1D->FindBin(0.05))<<std::endl;
+  std::cout<<sysType<<" integral 0 - 0.02: "<<h1D->Integral(0,h1D->FindBin(0.02))<<std::endl;
 
  c->Print(TString::Format("fig_eps/Var%s_%s.eps",varName.c_str(), sysType.c_str()).Data());
  c->Print(TString::Format("fig_png/Var%s_%s.png",varName.c_str(), sysType.c_str()).Data());
@@ -768,6 +794,33 @@ void OTFHistograms::plotEffVsRate(int iPtCut){
   c->Print(TString::Format("fig_png/RateVsEff_%d.png",(int)ptBins[iPtCut]).Data());
   c->Print(TString::Format("fig_png/RateVsEff_%d.C",(int)ptBins[iPtCut]).Data());
 
+}
+////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////
+void OTFHistograms::plotGhostHistos(const std::string & sysType,
+				    const std::string & type){
+
+  TCanvas* c = new TCanvas("cGhostHistos","GhostHistos",460,500);
+  c->SetGrid(1,1);
+  
+  TLegend *leg = new TLegend(0.2149123,0.6716102,0.4539474,0.8644068,NULL,"brNDC");
+  leg->SetTextSize(0.05);
+  leg->SetFillStyle(4000);
+  leg->SetBorderSize(0);
+  leg->SetFillColor(10);
+
+  std::string hName = "h2DGhostsVsProcessor"+sysType+type;
+  TH2F *h2DGhostsVsProcessor = (TH2F*)this->get2DHistogram(hName);
+
+  h2DGhostsVsProcessor->GetYaxis()->SetTitleOffset(1.7);
+  h2DGhostsVsProcessor->SetXTitle("Processor number");
+  h2DGhostsVsProcessor->SetYTitle("Number of candidates");
+  h2DGhostsVsProcessor->SetMarkerSize(2.8);
+  h2DGhostsVsProcessor->Draw("text");
+  h2DGhostsVsProcessor->GetYaxis()->SetRange(1,5);
+
+  c->Print(("fig_eps/GhostsVsProcessor"+sysType+type+".eps").c_str());
+  c->Print(("fig_png/GhostsVsProcessor"+sysType+type+".png").c_str());  
 }
 ////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////

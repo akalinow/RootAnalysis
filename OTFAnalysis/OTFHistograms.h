@@ -66,6 +66,9 @@ class OTFHistograms: public AnalysisHistograms {
 		    std::string type = "Tot");
   void plotRate(std::string type);
   void plotEffVsRate(int iPtCut);
+  void plotGhostHistos(const std::string & sysType,
+		       const std::string & type);
+  
   float getEfficiency(TH2F *h2D, float ptCut);
 
   ///Types of the selection flow

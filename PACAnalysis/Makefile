@@ -243,20 +243,20 @@ PACKAGE_URL =
 PACKAGE_VERSION = 1.0
 PATH_SEPARATOR = :
 RANLIB = ranlib
-ROOTAUXCFLAGS = -pthread -m64
+ROOTAUXCFLAGS = -pthread -std=c++11 -Wno-deprecated-declarations -m64
 ROOTAUXLIBS = -pthread -lm -ldl -rdynamic
-ROOTCFLAGS = -I/usr/local/root_v5.34.28/include/root
-ROOTCINT = /usr/local/root_v5.34.28/bin/rootcint
-ROOTCONF = /usr/local/root_v5.34.28/bin/root-config
-ROOTETCDIR = /etc/root
-ROOTEXEC = /usr/local/root_v5.34.28/bin/root
-ROOTGLIBS = -lGui -lCore -lCint -lRIO -lNet -lHist -lGraf -lGraf3d -lGpad -lTree -lRint -lPostscript -lMatrix -lPhysics -lMathCore -lThread
-ROOTINCDIR = /usr/local/root_v5.34.28/include/root
-ROOTLIBDIR = /usr/local/root_v5.34.28/lib/root
-ROOTLIBS = -lCore -lCint -lRIO -lNet -lHist -lGraf -lGraf3d -lGpad -lTree -lRint -lPostscript -lMatrix -lPhysics -lMathCore -lThread
-ROOTRPATH = /usr/local/root_v5.34.28/lib/root
-ROOTSOVERSION = 5.34
-ROOTVERSION = 5.34/28
+ROOTCFLAGS = -I/usr/local/root-6.04.00/include/root
+ROOTCINT = /usr/local/root-6.04.00/bin/rootcint
+ROOTCONF = /usr/local/root-6.04.00/bin/root-config
+ROOTETCDIR = /usr/local/root-6.04.00/etc/root
+ROOTEXEC = /usr/local/root-6.04.00/bin/root
+ROOTGLIBS = -lGui -lCore -lRIO -lNet -lHist -lGraf -lGraf3d -lGpad -lTree -lRint -lPostscript -lMatrix -lPhysics -lMathCore -lThread
+ROOTINCDIR = /usr/local/root-6.04.00/include/root
+ROOTLIBDIR = /usr/local/root-6.04.00/lib/root
+ROOTLIBS = -lCore -lRIO -lNet -lHist -lGraf -lGraf3d -lGpad -lTree -lRint -lPostscript -lMatrix -lPhysics -lMathCore -lThread
+ROOTRPATH = /usr/local/root-6.04.00/lib/root
+ROOTSOVERSION = 6.04
+ROOTVERSION = 6.04/00
 SED = /bin/sed
 SET_MAKE = 
 SHELL = /bin/sh
@@ -332,11 +332,11 @@ test_SOURCES = PACAnalysis.cc EventProxyPAC.cc PACHistograms.cc PACAnalyzer.cc \
 
 
 # Linker options for a.out
-test_LDFLAGS = $(top_srcdir)/src/libRootAnalysis.la -R /usr/local/root_v5.34.28/lib/root -L/usr/local/root_v5.34.28/lib/root
-test_LDADD = -lCore -lCint -lRIO -lNet -lHist -lGraf -lGraf3d -lGpad -lTree -lRint -lPostscript -lMatrix -lPhysics -lMathCore -lThread -lProof -pthread -lm -ldl -rdynamic -lboost_regex -lgomp
+test_LDFLAGS = $(top_srcdir)/src/libRootAnalysis.la -R /usr/local/root-6.04.00/lib/root -L/usr/local/root-6.04.00/lib/root
+test_LDADD = -lCore -lRIO -lNet -lHist -lGraf -lGraf3d -lGpad -lTree -lRint -lPostscript -lMatrix -lPhysics -lMathCore -lThread -lProof -pthread -lm -ldl -rdynamic -lboost_regex -lgomp
 
 # Compiler options for a.out
-test_CPPFLAGS = -I./ -I$(top_srcdir)/include -I/usr/local/root_v5.34.28/include/root -std=c++11 -fopenmp
+test_CPPFLAGS = -I./ -I$(top_srcdir)/include -I/usr/local/root-6.04.00/include/root -std=c++11 -fopenmp
 BUILT_SOURCES = DictCint.cxx DictCint.h
 CLEANFILES = *Cint.cxx *Cint.h *~ core
 all: $(BUILT_SOURCES)
@@ -758,7 +758,7 @@ uninstall-am:
 
 
 %Cint.cxx %Cint.h :L1Obj.h EventData.h LinkDef.h
-		/usr/local/root_v5.34.28/bin/rootcint -f $*Cint.cxx -c $(INCLUDES) $(AM_CPPFLAGS) $^
+		/usr/local/root-6.04.00/bin/rootcint -f $*Cint.cxx -c $(INCLUDES) $(AM_CPPFLAGS) $^
 
 # Tell versions [3.59,3.63) of GNU make to not export all variables.
 # Otherwise a system limit (for SysV at least) may be exceeded.

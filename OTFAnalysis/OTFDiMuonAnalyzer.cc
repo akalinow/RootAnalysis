@@ -108,13 +108,12 @@ unsigned int OTFDiMuonAnalyzer::findMuon(const unsigned int iMix){
 	    myL1Coll->operator[](iCandTmp).bx/2==iMix) secondMuon = myL1Coll->operator[](iCandTmp);
   }
 
-  float deltaR1 = 0.15, deltaR2 = 0.15, tmpR = 999.0;
+  float deltaR1 = 0.06, deltaR2 = 0.06, tmpR = 999.0;
   int firstRecoIndex = -1;
   ///Looking for first candidate in di muon event
   if(originalMuon.pt>0){
     for(unsigned int iCandTmp=0;iCandTmp<myL1Coll->size();++iCandTmp){    
       if(!passQuality(myL1Coll,sysType,iCandTmp)) continue;
-
       L1Obj aCand;
 
       if(myL1Coll->operator[](iCandTmp).bx &&
@@ -123,6 +122,9 @@ unsigned int OTFDiMuonAnalyzer::findMuon(const unsigned int iMix){
       
       tmpR = sqrt(pow(aCand.phi-originalMuon.phi,2) + 
 		  pow(aCand.eta-originalMuon.eta,2));
+
+      //if(aCand.pt>0) std::cout<<aCand<<" tmpR: "<<tmpR<<" charge: "<<(aCand.charge==originalMuon.charge)<<std::endl;
+      
       if(aCand.pt>0 && tmpR<deltaR1 &&
 	 aCand.charge==originalMuon.charge){
 	deltaR1 = tmpR;
@@ -142,9 +144,22 @@ unsigned int OTFDiMuonAnalyzer::findMuon(const unsigned int iMix){
     }    
   }
 
+  std::string tmpName = "h1DDeltaEta"+sysType+"Muon1";
+  myHistos_->fill1DHistogram(tmpName,deltaR1,1.0);
+  tmpName = "h1DDeltaEta"+sysType+"Muon2";
+  myHistos_->fill1DHistogram(tmpName,deltaR2,1.0);
+
+  if(deltaR1>0.06) firstRecoMuon = L1Obj();
+  if(deltaR2>0.06) secondRecoMuon = L1Obj();
 
   if(originalMuon.pt>0 && secondMuon.pt>0){
-    float deltaPhi = originalMuon.phi - secondMuon.phi; 
+    float deltaPhi = originalMuon.phi - secondMuon.phi;
+    float deltaEta = originalMuon.eta - secondMuon.eta;
+    
+
+    //if( (originalMuon.refLayer!=0 || secondMuon.refLayer!=3) && 
+    //  (secondMuon.refLayer!=0 || originalMuon.refLayer!=3)) return 0;
+    
     float deltaPt = -1000;
 
     if(deltaPhi>M_PI) deltaPhi-=2*M_PI;
@@ -158,8 +173,9 @@ unsigned int OTFDiMuonAnalyzer::findMuon(const unsigned int iMix){
     std::string selType = "";
     std::string hName = "h2DOtfDi"+selType;
 
-    if(pass && fabs(deltaPhi)/TMath::Pi()/2.0*5760<80 &&
-       originalMuon.charge==secondMuon.charge){
+    if(false && !pass && fabs(deltaPhi)>0.2){
+      //if(true){
+      std::cout<<"iMix: "<<iMix<<std::endl;
       std::cout<<originalMuon<<std::endl;
       std::cout<<secondMuon<<std::endl;
       std::cout<<"DeltaPhi: "<<deltaPhi<<" iDelta: "<<fabs(deltaPhi)/TMath::Pi()/2.0*5760
@@ -189,7 +205,7 @@ unsigned int OTFDiMuonAnalyzer::findMuon(const unsigned int iMix){
       myHistos_->fill2DHistogram(tmpName,firstRecoMuon.phi,pass);
     }
     ///
-    ptCut = 4;
+    ptCut = 3;
     if(originalMuon.charge!=secondMuon.charge){
     tmpName = hName+"DeltaPhi"+std::to_string(ptCut);
     myHistos_->fill2DHistogram(tmpName,deltaPhi,pass);
@@ -251,8 +267,6 @@ void OTFDiMuonAnalyzer::fillTurnOnCurve(const int & iPtCut,
 
   std::string tmpName = "h1DDeltaEta"+sysType+"iMuon"+std::to_string(iMuon)+std::to_string(ptCut);
   myHistos_->fill1DHistogram(tmpName,deltaEta,1.0);
-  //std::cout<<"tmpName: "<<tmpName;
-  //exit(0);
 
   tmpName = hName+"Pt"+std::to_string(ptCut);
   myHistos_->fill2DHistogram(tmpName,theEvent->ptMuon(iMuon), pass);
@@ -303,8 +317,9 @@ bool OTFDiMuonAnalyzer::analyze(const EventProxyBase& iEvent){
   theEvent = myEvent.events;
 
   if(theEvent->eta<0.83 || theEvent->eta>1.24) return true;
+  //if(theEvent->eta1<0.83 || theEvent->eta1>1.24) return true;
   
-  for(unsigned int iMix=0;iMix<20;++iMix) findMuon(iMix);
+  for(unsigned int iMix=0;iMix<100;++iMix) findMuon(iMix);
   return true;
 
   std::string selType = "";
@@ -314,8 +329,7 @@ bool OTFDiMuonAnalyzer::analyze(const EventProxyBase& iEvent){
   std::string sysTypeOther="Other";
 
   for(unsigned int iMuon=0;iMuon<2;++iMuon){
-    for(int iCut=0;iCut<22;++iCut){
-      //if(iCut>0 && iCut<14) continue;
+    for(int iCut=0;iCut<15;++iCut){
       fillTurnOnCurve(iCut,sysTypeGmt,selType,iMuon);
       fillTurnOnCurve(iCut,sysTypeOtf,selType,iMuon);
       fillTurnOnCurve(iCut,sysTypeRpc,selType,iMuon);

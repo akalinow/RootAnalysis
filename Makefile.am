@@ -1,2 +1,2 @@
 ACLOCAL_AMFLAGS = -I ./
-SUBDIRS=src include test OTFAnalysis PACAnalysis
+SUBDIRS=src include test OTFAnalysis PACAnalysis CPwithPytia8
