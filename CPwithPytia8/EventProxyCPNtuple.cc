@@ -8,7 +8,7 @@ EventProxyCPNtuple::~EventProxyCPNtuple(){}
 /////////////////////////////////////////////////////////
 void EventProxyCPNtuple::init(std::vector<std::string> const& iFileNames){
 
-	treeName_ = "hTTCPTree";
+	treeName_ = "genAna/hTTCPTree";
 
 	EventProxyBase::init(iFileNames);
 

@@ -123,7 +123,10 @@ void TreeAnalyzer::parseCfg(const std::string & cfgFileName){
 
   filePath_ = pt.get<std::string>("TreeAnalyzer.outputPath");
   fileNames_.push_back(pt.get<std::string>("TreeAnalyzer.inputFile"));
-
+  
+  nEventsToAnalyze_ = pt.get("TreeAnalyzer.eventsToAnalyze",-1);
+  nEventsToPrint_ = pt.get("TreeAnalyzer.eventsToPrint",100);
+  
 }
 //////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////
@@ -159,14 +162,14 @@ int TreeAnalyzer::loop(){
   std::cout<<"Events total: "<<myProxy_->size()<<std::endl;
 
   nEventsAnalyzed_ = 0;
-  nEventsSkipped_ = 0;
-  nEventsToAnalyze_ = myProxy_->size();
+  nEventsSkipped_ = 0;  
+  if(nEventsToAnalyze_<0 || nEventsToAnalyze_>myProxy_->size()) nEventsToAnalyze_ = myProxy_->size();
   int eventPreviouslyPrinted=-1;
   ///////
    for(myProxy_->toBegin();
        !myProxy_->atEnd() && (nEventsToAnalyze_<0 || (nEventsAnalyzed_+nEventsSkipped_)<nEventsToAnalyze_); ++(*myProxy_)){
      
-     if((( nEventsAnalyzed_ < 2000) ||
+     if((( nEventsAnalyzed_ < nEventsToPrint_) ||
 	 nEventsAnalyzed_%100000==0) &&  nEventsAnalyzed_ != eventPreviouslyPrinted ) {
        eventPreviouslyPrinted = nEventsAnalyzed_;
        std::cout<<"Events analyzed: "<<nEventsAnalyzed_<<std::endl;

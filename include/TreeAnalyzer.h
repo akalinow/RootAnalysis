@@ -118,6 +118,9 @@ public :
    ///Number of events to be analyzed.
    int nEventsToAnalyze_;   
 
+   ///Number of initial events numbers to be printed on screen
+   int nEventsToPrint_;   
+   
    ///Weight of single event.
    float eventWeight_;
 

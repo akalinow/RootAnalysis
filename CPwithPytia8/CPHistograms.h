@@ -27,7 +27,7 @@ class CPHistograms: public AnalysisHistograms {
   
   virtual void defineHistograms();
 
-  void plotHistograms();
+  void plotHistograms(const std::string & sysType);
 
   ///Types of the selection flow
   std::vector<std::string> selectionFlavours_;

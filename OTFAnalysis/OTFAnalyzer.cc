@@ -44,28 +44,28 @@ void OTFAnalyzer::initialize(TFileDirectory& aDir,
 void OTFAnalyzer::finalize(){ 
 
  std::cout<<"tmpMap.size(): "<<tmpMap.size()<<std::endl;
-
+ 
  std::ostringstream stringStr;
  TH2F *h = myHistos_->get2DHistogram("h2DRateVsQualityOtf",true);
-
- for(int iBin=1;iBin<=h->GetYaxis()->GetNbins();++iBin){
+ for(int iBin=1;iBin<h->GetYaxis()->GetNbins();++iBin){
    stringStr.str("");
    stringStr<<iBin;
    h->GetYaxis()->SetBinLabel(iBin,stringStr.str().c_str());
  }
 
-
+ 
  for(auto it: tmpMap){
-   int iBinX = h->GetYaxis()->FindFixBin(it.second);
-   std::cout<<"iBin: "<<iBinX<<" "<<it.second<<" "<<it.first<<std::endl;
+   int iBinX = h->GetYaxis()->FindFixBin(it.second);   
+   if(iBinX>=h->GetYaxis()->GetNbins()) continue;
+
    std::bitset<18> bits(it.first);
 
    stringStr.str("");
    stringStr<<it.first;
    std::string label = bits.to_string()+" "+stringStr.str();
    h->GetYaxis()->SetBinLabel(iBinX,label.c_str());
-
  }
+ 
 
   myHistos_->finalizeHistograms(0,1.0); 
 }
@@ -91,14 +91,51 @@ bool OTFAnalyzer::passQuality(std::vector<L1Obj> * myL1Coll,
 
   if(sysType.find("Gmt")!=std::string::npos){
     return myL1Coll->size()>iCand &&
-      myL1Coll->operator[](iCand).eta>0.8 &&
-      myL1Coll->operator[](iCand).eta<1.3 &&
+      //myL1Coll->operator[](iCand).eta>0.8 &&
+      //myL1Coll->operator[](iCand).eta<1.3 &&
       true;
   }
-
+  
   if(sysType.find("Otf")!=std::string::npos){
-  return myL1Coll->size()>iCand &&   
-    ///Barrel            
+  return myL1Coll->size()>iCand &&
+    ///Barrel (l1t::tftype::bmtf)
+    /*
+    myL1Coll->operator[](iCand).q!=9728 &&
+    myL1Coll->operator[](iCand).q!=8960 &&
+    myL1Coll->operator[](iCand).q!=3084 &&
+    myL1Coll->operator[](iCand).q!=771 &&
+    myL1Coll->operator[](iCand).q!=3596 &&
+    myL1Coll->operator[](iCand).q!=7180 &&
+    myL1Coll->operator[](iCand).q!=7168 &&
+    */
+    ///Endcap (l1t::tftype::emtf)
+    /*
+    myL1Coll->operator[](iCand).q!=12288 &&
+    myL1Coll->operator[](iCand).q!=6144 &&
+    myL1Coll->operator[](iCand).q!=9216 &&
+    myL1Coll->operator[](iCand).q!=3072 &&
+    myL1Coll->operator[](iCand).q!=3264 &&
+    myL1Coll->operator[](iCand).q!=1036 &&
+    myL1Coll->operator[](iCand).q!=8195  &&
+    myL1Coll->operator[](iCand).q!=4099  &&
+    myL1Coll->operator[](iCand).q!=10240  &&
+    myL1Coll->operator[](iCand).q!=2051  &&
+    myL1Coll->operator[](iCand).q!=3084  &&
+    myL1Coll->operator[](iCand).q!=1216  &&
+    myL1Coll->operator[](iCand).q!=2240  &&
+    myL1Coll->operator[](iCand).q!=5120  &&
+    myL1Coll->operator[](iCand).q!=2060  &&
+    myL1Coll->operator[](iCand).q!=3276  &&
+    myL1Coll->operator[](iCand).q!=2252  &&
+    myL1Coll->operator[](iCand).q!=8240  &&
+    myL1Coll->operator[](iCand).q!=16380 &&
+    //myL1Coll->operator[](iCand).q!=16368 &&
+    //myL1Coll->operator[](iCand).q!=16188 &&
+    //myL1Coll->operator[](iCand).q!=14332 &&
+    //myL1Coll->operator[](iCand).q!=15356 &&
+    */
+    /*
+    ///Barrel (l1t::tftype::omtf_pos)           
     myL1Coll->operator[](iCand).q!=99840 &&
     myL1Coll->operator[](iCand).q!=34304 &&
     myL1Coll->operator[](iCand).q!=3075 &&
@@ -106,13 +143,14 @@ bool OTFAnalyzer::passQuality(std::vector<L1Obj> * myL1Coll,
     ////
     myL1Coll->operator[](iCand).q!=12300 && 
     
-    ///Endcap
+    ///Endcap (l1t::tftype::omtf_pos)
     myL1Coll->operator[](iCand).q!=98816 &&
     myL1Coll->operator[](iCand).q!=98944 &&
 
     myL1Coll->operator[](iCand).q!=33408 &&
     myL1Coll->operator[](iCand).q!=66688 && 
     myL1Coll->operator[](iCand).q!=66176 && 
+    */
     ///    
     true;
   }
@@ -212,7 +250,7 @@ void OTFAnalyzer::fillRateHisto(const std::string & sysType,
 	if(selType=="VsEta") myHistos_->fill2DHistogram(hName,theEvent->pt,pass*theEvent->eta+(!pass)*99);
 	if(selType=="VsPt") myHistos_->fill2DHistogram(hName,theEvent->pt,pass*theEvent->pt+(!pass)*(-100));
 	int q = -10; 
-	if(pass) myL1Coll->operator[](iCand).q;
+	if(pass) q = myL1Coll->operator[](iCand).q;
 
 	std::bitset<18> hitsWord(q);
 	if(sysType=="Otf" && selType=="VsQuality"){
@@ -299,7 +337,10 @@ bool OTFAnalyzer::analyze(const EventProxyBase& iEvent){
   const EventProxyOTF & myEvent = static_cast<const EventProxyOTF&>(iEvent);
   theEvent = myEvent.events;
 
-  if(theEvent->eta<0.83 || theEvent->eta>1.24) return true;
+  //if(theEvent->eta<0.83 || theEvent->eta>1.24) return true;
+  if(theEvent->eta<1.24 ||  theEvent->eta>1.45) return true;
+  //if(theEvent->pt>10 || theEvent->pt<5) return true;
+  //if(theEvent->pt>3) return true;
 
   std::string selType = "";
   std::string sysTypeGmt="Gmt";
@@ -346,8 +387,8 @@ bool OTFAnalyzer::analyze(const EventProxyBase& iEvent){
   fillRateHisto("Otf","VsQuality");
   fillRateHisto("Gmt","VsQuality");
 
-  fillGhostHisto("Otf","VsProcessor");
-  fillGhostHisto("Gmt","VsProcessor");
+  //fillGhostHisto("Otf","VsProcessor");
+  //fillGhostHisto("Gmt","VsProcessor");
 
   return true;
 }
