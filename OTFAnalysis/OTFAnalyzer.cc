@@ -134,7 +134,6 @@ bool OTFAnalyzer::passQuality(std::vector<L1Obj> * myL1Coll,
     //myL1Coll->operator[](iCand).q!=14332 &&
     //myL1Coll->operator[](iCand).q!=15356 &&
     */
-    /*
     ///Barrel (l1t::tftype::omtf_pos)           
     myL1Coll->operator[](iCand).q!=99840 &&
     myL1Coll->operator[](iCand).q!=34304 &&
@@ -150,7 +149,6 @@ bool OTFAnalyzer::passQuality(std::vector<L1Obj> * myL1Coll,
     myL1Coll->operator[](iCand).q!=33408 &&
     myL1Coll->operator[](iCand).q!=66688 && 
     myL1Coll->operator[](iCand).q!=66176 && 
-    */
     ///    
     true;
   }
@@ -337,8 +335,8 @@ bool OTFAnalyzer::analyze(const EventProxyBase& iEvent){
   const EventProxyOTF & myEvent = static_cast<const EventProxyOTF&>(iEvent);
   theEvent = myEvent.events;
 
-  //if(theEvent->eta<0.83 || theEvent->eta>1.24) return true;
-  if(theEvent->eta<1.24 ||  theEvent->eta>1.45) return true;
+  if(theEvent->eta<0.83 || theEvent->eta>1.24) return true;
+  //if(theEvent->eta<1.24 ||  theEvent->eta>1.45) return true;
   //if(theEvent->pt>10 || theEvent->pt<5) return true;
   //if(theEvent->pt>3) return true;
 

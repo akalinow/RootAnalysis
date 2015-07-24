@@ -124,16 +124,16 @@ void OTFHistograms::defineHistograms(){
 
  add2DHistogram("h2DEtaHit","",8*26,0.8,1.25,2,-0.5,1.5,file_);
  add2DHistogram("h2DPhiHit","",5*32,-M_PI,M_PI,2,-0.5,1.5,file_);
- //add2DHistogram("h2DEtaVx","",8*25,0.8,1.25,2,-0.5,1.5,file_);//Overlap
+ add2DHistogram("h2DEtaVx","",8*25,0.8,1.25,2,-0.5,1.5,file_);//Overlap
  //add2DHistogram("h2DEtaVx","",8*25,-0.1,0.85,2,-0.5,1.5,file_);//Barrel
-  add2DHistogram("h2DEtaVx","",8*25,1.25,2.65,2,-0.5,1.5,file_);//Endcap
+ //add2DHistogram("h2DEtaVx","",8*25,1.25,2.65,2,-0.5,1.5,file_);//Endcap
  
  add2DHistogram("h2DPhiVx","",4*32,-0.2,3.2,2,-0.5,1.5,file_);
  //Rate histos
  add2DHistogram("h2DRateTot","",400,1,201,142,0,142,file_);
- //add2DHistogram("h2DRateVsEta","",400,1,201,25,0.8,1.25,file_);//Overlap
+ add2DHistogram("h2DRateVsEta","",400,1,201,25,0.8,1.25,file_);//Overlap
  //add2DHistogram("h2DRateVsEta","",400,1,201,25,-0.1,0.85,file_);//Barrel
- add2DHistogram("h2DRateVsEta","",400,1,201,25,1.25,2.7,file_);//Encap
+ //add2DHistogram("h2DRateVsEta","",400,1,201,25,1.25,2.7,file_);//Encap
  
  //add2DHistogram("h2DDeltaPhi","",40,-M_PI,M_PI,2,-0.5,1.5,file_);
  add2DHistogram("h2DDeltaPhi","",30,-1,1,2,-0.5,1.5,file_);
