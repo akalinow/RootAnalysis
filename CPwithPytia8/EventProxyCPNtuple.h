@@ -32,7 +32,9 @@
       TVector3        *thePV, *svMinus, *svPlus;
       TVector3        *nPiMinus, *nPiPlus;
       Float_t         phi, rho, phi2, phi3;
-
+      Float_t         yMinus, yPlus, yMinus2, yPlus2;
+      Float_t         yMinusLab, yPlusLab, yMinusLab2, yPlusLab2;
+      
    private:
 
       // List of branches
@@ -44,6 +46,8 @@
       TBranch        *b_thePV, *b_svMinus, *b_svPlus;
       TBranch        *b_nPiMinus, *b_nPiPlus; 
       TBranch        *b_phi, *b_rho, *b_phi2, *b_phi3;
+      TBranch        *b_yMinus, *b_yPlus, *b_yMinus2, *b_yPlus2;
+      TBranch        *b_yMinusLab, *b_yPlusLab, *b_yMinusLab2, *b_yPlusLab2;
       
 };
 #endif

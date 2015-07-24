@@ -62,6 +62,9 @@ class CPAnalyzer: public Analyzer{
 
  private:
 
+  //Check if the event passes analysis like selection cuts.
+  bool analysisSelection(const EventProxyCPNtuple & myEvent);
+
   ///Calculate variabmes for the pi+pi- decay mode
   ///sysType enumarates different reality scenarios
   //(w/o cuts, PV smearing etc.)
@@ -79,8 +82,9 @@ class CPAnalyzer: public Analyzer{
   TVector3 impactParameter(const TVector3& pv, const TVector3& sv, 
 			   const TLorentzVector& momentum);
 
-  ///Return string encoding di-tau decay mode
-  std::string getDecayName(int decModeMinus, int decModePlus);
+  ///Return string encoding di-tau decay mode.
+  ///The event can belong to more than one category
+  std::vector<std::string> getDecayName(int decModeMinus, int decModePlus);
 
   ///Return mother resonance name.
   std::string getMotherName(int bosonId);

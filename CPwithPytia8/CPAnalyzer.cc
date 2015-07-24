@@ -40,6 +40,7 @@ void CPAnalyzer::fillAngles(const EventProxyCPNtuple & myEvent,
 			    const std::string & sysType){
 
   ///Angles between decay planes, and decay products
+  ///Angle betweeny decay products in tau-tau rest frame: http://arxiv.org/abs/hep-ph/0503172, pp. 81
   std::pair<float,float> angles = angleBetweenPlanes(*myEvent.tauMinus, *myEvent.piMinus,
 						     *myEvent.tauPlus, *myEvent.piPlus);
   
@@ -96,20 +97,28 @@ void CPAnalyzer::fillAngles(const EventProxyCPNtuple & myEvent,
   myHistos_->fill1DHistogram("h1DIPMinus"+sysType,nMinus.Mag());
   myHistos_->fill1DHistogram("h1DIPPlus"+sysType,nPlus.Mag());
 
-  ///Method from http://arxiv.org/abs/1108.0670
+  ///Method from http://arxiv.org/abs/1108.0670 (Berger)
   ///take impact parameters instead of tau momentum.
   ///calculate angles in pi+ - pi- rest frame
   std::pair<float,float>  angles2 = angleBetweenPlanes(*myEvent.piMinus,TLorentzVector(nMinus,0),
 						       *myEvent.piPlus,TLorentzVector(nPlus,0));
 
-  myHistos_->fill1DHistogram("h1DPhi2"+sysType,angles2.first);
-  myHistos_->fill1DHistogram("h1DRho2"+sysType,angles2.second);
+  myHistos_->fill1DHistogram("h1DPhi_nVectors"+sysType,angles2.first);
+  myHistos_->fill1DHistogram("h1DRho_nVectors"+sysType,angles2.second);
 
+  //Method from http://arxiv.org/abs/hep-ph/0204292 (Was)
+  //Angle between rho decay planes in the rho-rho 
+  //system.
+  float rho = angleBetweenPlanes(*myEvent.visTauMinus, *myEvent.piMinus,
+				 *myEvent.visTauPlus,  *myEvent.piPlus).first;
 
-  //take visible tau instead full tau momentum.
-  //calculate angles in pi+ - pi- rest frame
-  std::pair<float,float> anglesRho = angleBetweenPlanes(*myEvent.visTauMinus, *myEvent.piMinus,
-							*myEvent.visTauPlus,  *myEvent.piPlus);
+  ///Take Monte Carlo level y1, y2 (calculated in tau rest frames)
+  if(myEvent.yPlus*myEvent.yMinus>0) myHistos_->fill1DHistogram("h1DPhi_Rho_y1y2Plus"+sysType,rho);
+  else myHistos_->fill1DHistogram("h1DPhi_Rho_y1y2Minus"+sysType,rho);
+
+  ///Take reconstruction level y1, y2 (calculated in LAB)
+  if(myEvent.yPlusLab2*myEvent.yMinusLab2>0) myHistos_->fill1DHistogram("h1DPhi_Rho_y1y2PlusLAB"+sysType,rho);
+  else myHistos_->fill1DHistogram("h1DPhi_Rho_y1y2MinusLAB"+sysType,rho);
 
 }
 //////////////////////////////////////////////////////////////////////////////
@@ -119,25 +128,23 @@ bool CPAnalyzer::analyze(const EventProxyBase& iEvent){
   const EventProxyCPNtuple & myEvent = static_cast<const EventProxyCPNtuple&>(iEvent);
 
 
+  //Skip 3-prong and unknown decays.
   if( !(isOneProng(myEvent.decModeMinus) || isLepton(myEvent.decModeMinus) ) ||
       !(isOneProng(myEvent.decModePlus)  || isLepton(myEvent.decModePlus) ) ) return true;
-
-  //if( (*myEvent.piMinus+*myEvent.piPlus).Perp()>100) return true;
-
-  //if(myEvent.piMinus->Perp()<20 || fabs(myEvent.piMinus->Eta())>2.1) return true;
-  //if(myEvent.piPlus->Perp()<20 || fabs(myEvent.piPlus->Eta())>2.1) return true;
-
-  //if(myEvent.tauMinus->Perp()<20 || fabs(myEvent.tauMinus->Eta())>2.1) return true;
-  //if(myEvent.tauPlus->Perp()<20 || fabs(myEvent.tauPlus->Eta())>2.1) return true;
-
-  
-  std::string smearType = "ideal";
-  std::string decayName = getDecayName(myEvent.decModeMinus, myEvent.decModePlus);
+  ///
+  bool accepted = analysisSelection(myEvent);
+  ///
+  std::vector<std::string> decayNames = getDecayName(myEvent.decModeMinus, myEvent.decModePlus);
   std::string motherName = getMotherName(myEvent.bosonId);
-  std::string name = motherName+"_"+decayName+"_"+smearType;
-  
-  fillAngles(myEvent, name);
-
+  std::string smearType = "ideal";
+  std::string name;
+  ///
+  for(auto decayName:decayNames){
+    name = motherName+"_"+decayName+"_"+smearType;
+    fillAngles(myEvent, name);
+    if(accepted) name+="_selected";
+    fillAngles(myEvent, name);
+  }
   
 
 
@@ -151,6 +158,46 @@ bool CPAnalyzer::analyze(const EventProxyBase& iEvent){
 
   
 }
+//////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////////
+bool CPAnalyzer::analysisSelection(const EventProxyCPNtuple & myEvent){
+  // Minimal kinematic selection
+  // lepton+lepton
+  if( isLepton(myEvent.decModeMinus) && !isLepton(myEvent.decModePlus) ){
+    if(myEvent.visTauMinus->Pt()>20 &&
+       std::abs(myEvent.visTauMinus->Eta())<2.4 &&
+       myEvent.visTauPlus->Pt()>20 &&
+       std::abs(myEvent.visTauPlus->Eta())<2.4 ) return true;
+    else return false;
+  }
+  // lepton+tau
+  if( isLepton(myEvent.decModeMinus) && !isLepton(myEvent.decModePlus) ){
+    if(myEvent.visTauMinus->Pt()>20 &&
+       std::abs(myEvent.visTauMinus->Eta())<2.1 &&
+       myEvent.visTauPlus->Pt()>25 &&
+       std::abs(myEvent.visTauPlus->Eta())<2.3 ) return true;
+    else return false;
+  }
+  if( !isLepton(myEvent.decModeMinus) && isLepton(myEvent.decModePlus) ){
+    if(myEvent.visTauMinus->Pt()>25 &&
+       std::abs(myEvent.visTauMinus->Eta())<2.3 &&
+       myEvent.visTauPlus->Pt()>20 &&
+       std::abs(myEvent.visTauPlus->Eta())<2.1 ) return false;
+    else return false;
+  }
+  // tau+tau
+  if( !isLepton(myEvent.decModeMinus) && !isLepton(myEvent.decModePlus) ){
+    if(myEvent.visTauMinus->Pt()>40 &&
+       std::abs(myEvent.visTauMinus->Eta())<2.3 &&
+       myEvent.visTauPlus->Pt()>40 &&
+       std::abs(myEvent.visTauPlus->Eta())<2.3 ) return false;
+    else return false;
+  }
+  //undefined
+  return false;
+}
+
+
 //////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////
 std::pair<float,float> CPAnalyzer::angleBetweenPlanes(const TLorentzVector &tau1, 
@@ -197,27 +244,29 @@ TVector3 CPAnalyzer::impactParameter(const TVector3& pv,
 }
 //////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////
-std::string CPAnalyzer::getDecayName(int decModeMinus, int decModePlus){
+std::vector<std::string> CPAnalyzer::getDecayName(int decModeMinus, int decModePlus){
 
+  std::vector<std::string> types;
 
-  if(decModeMinus==kOneProng0pi0 && decModePlus==kOneProng0pi0) return "PiPi0Pi0";
+  if(decModeMinus==kOneProng0pi0 && decModePlus==kOneProng0pi0) types.push_back("PiPi0Pi0");
 
-  if(isOneProng(decModeMinus) && isOneProng(decModePlus) ) return "1Prong1Prong";
+  if(isOneProng(decModeMinus) && isOneProng(decModePlus) ) types.push_back("1Prong1Prong");
 
   if( (decModeMinus==kOneProng0pi0 && isLepton(decModePlus) ) ||
-      (isLepton(decModeMinus) && decModePlus==kOneProng0pi0)) return "Lepton1Prong0Pi0";
+      (isLepton(decModeMinus) && decModePlus==kOneProng0pi0)) types.push_back("Lepton1Prong0Pi0");
     
   if( (isOneProng(decModeMinus) && isLepton(decModePlus) ) ||
-      ( isLepton(decModeMinus) && isOneProng(decModePlus) ) ) return "Lepton1Prong";
+      ( isLepton(decModeMinus) && isOneProng(decModePlus) ) ) types.push_back("Lepton1Prong");
 
-  if(decModeMinus==kOneProng1pi0 && decModePlus==kOneProng1pi0 ) return "PiPlusPiMinus2Pi0";
+  if(decModeMinus==kOneProng1pi0 && decModePlus==kOneProng1pi0 ) types.push_back("PiPlusPiMinus2Pi0");
+
 
   if( isOneProng(decModeMinus) && decModeMinus!=kOneProng0pi0 && 
-      isOneProng(decModePlus) && decModePlus!=kOneProng0pi0 ) return "1Prong1ProngXPi0";
+      isOneProng(decModePlus) && decModePlus!=kOneProng0pi0 )   types.push_back("1Prong1ProngXPi0");
 
-  if(isLepton(decModePlus) && isLepton(decModeMinus))  return "LeptonLepton";
+  if(isLepton(decModePlus) && isLepton(decModeMinus)) types.push_back("LeptonLepton");
 
-  return "Unknown";
+  return types;
 }
 //////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////

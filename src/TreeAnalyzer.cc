@@ -23,8 +23,7 @@
 TreeAnalyzer::TreeAnalyzer(const std::string & aName,
 				       const std::string & cfgFileName,
 				       EventProxyBase *aProxy,
-				       TProofOutputFile * proofFile)
-  :Analyzer(aName){
+				       TProofOutputFile * proofFile):Analyzer(aName){
 
   ///Analysis control
   nEventsToAnalyze_ = 0;
@@ -119,7 +118,8 @@ void TreeAnalyzer::parseCfg(const std::string & cfgFileName){
   boost::property_tree::ptree pt;
   boost::property_tree::ini_parser::read_ini(cfgFileName, pt);
 
-  std::cout<<"Reading file: "<<pt.get<std::string>("TreeAnalyzer.inputFile");
+  
+  std::cout<<"Reading file: "<<pt.get<std::string>("TreeAnalyzer.inputFile")<<std::endl;
 
   filePath_ = pt.get<std::string>("TreeAnalyzer.outputPath");
   fileNames_.push_back(pt.get<std::string>("TreeAnalyzer.inputFile"));
