@@ -11,6 +11,7 @@
 #include "boost/functional/hash.hpp"
 #include "boost/property_tree/ptree.hpp"
 #include "boost/property_tree/ini_parser.hpp"
+#include "boost/tokenizer.hpp"
 
 #include "TFile.h"
 #include "TH1D.h"
@@ -118,11 +119,18 @@ void TreeAnalyzer::parseCfg(const std::string & cfgFileName){
   boost::property_tree::ptree pt;
   boost::property_tree::ini_parser::read_ini(cfgFileName, pt);
 
-  
-  std::cout<<"Reading file: "<<pt.get<std::string>("TreeAnalyzer.inputFile")<<std::endl;
 
+  typedef boost::tokenizer<boost::char_separator<char> > tokenizer;
+  boost::char_separator<char> sep(",");
+  std::string str = pt.get<std::string>("TreeAnalyzer.inputFile");
+  tokenizer tokens(str, sep);
+  std::cout<<"Reading files: "<<std::endl;
+  for (auto it: tokens){
+    std::cout<<it<<std::endl;
+    fileNames_.push_back(it);
+  }
+  
   filePath_ = pt.get<std::string>("TreeAnalyzer.outputPath");
-  fileNames_.push_back(pt.get<std::string>("TreeAnalyzer.inputFile"));
   
   nEventsToAnalyze_ = pt.get("TreeAnalyzer.eventsToAnalyze",-1);
   nEventsToPrint_ = pt.get("TreeAnalyzer.eventsToPrint",100);
