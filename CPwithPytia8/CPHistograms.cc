@@ -68,7 +68,8 @@ void CPHistograms::defineHistograms(){
    //add1DHistogram("h1DRhoTemplate",";#rho^{*} [rad]; Events",18,0,M_PI,file_);
    add1DHistogram("h1DRhoTemplate",";#rho^{*} [rad]; Events",18,M_PI-0.15,M_PI,file_);
    add1DHistogram("h1DDPhiTemplate",";#Delta#phi^{*} [rad]; Events",32,-0.5*M_PI,0.5*M_PI,file_);
-   add1DHistogram("h1IPTemplate",";#phi^{*} [rad]; Events",20,0,1.0,file_);
+   //add1DHistogram("h1IPTemplate",";#phi^{*} [rad]; Events",100,0,10.0,file_);
+   add1DHistogram("h1IPTemplate",";#phi^{*} [rad]; Events",100,0,1.0,file_);
    
    histosInitialized_ = true;
  }
@@ -83,9 +84,76 @@ void CPHistograms::finalizeHistograms(int nRuns, float weight){
     if(it.first.find(hName)!=std::string::npos &&
        it.first.find("Template")==std::string::npos){
       sysType = it.first.substr(hName.size());
-      std::cout<<sysType<<std::endl;
       plotHistograms(sysType);
+      std::string aType = sysType.substr(4,sysType.size());
+      if(sysType.find("Z0")!=std::string::npos){
+	plot_HAZ_Histograms("h1DPhi",aType);
+	plot_HAZ_Histograms("h1DPhi_nVectors",aType);
+	plot_HAZ_Histograms("h1DRho",aType);
+	plot_HAZ_Histograms("h1DPhi_Rho_y1y2Minus",aType);
+	plot_HAZ_Histograms("h1DPhi_Rho_y1y2MinusLAB",aType);
+	plot_HAZ_Histograms("h1DPhi_Rho_y1y2Plus",aType);
+	plot_HAZ_Histograms("h1DPhi_Rho_y1y2PlusLAB",aType);
+      }
     }
+  }
+}
+/////////////////////////////////////////////////////////
+/////////////////////////////////////////////////////////
+void CPHistograms::plot_HAZ_Histograms(const std::string & hName,
+				       const std::string & sysType){
+
+  TCanvas* c = new TCanvas(TString::Format("%s_%s",hName.c_str(), sysType.c_str()),
+			   TString::Format("%s_%s",hName.c_str(), sysType.c_str()),
+			   460,500);
+
+  TLegend l(0.15,0.7,0.35,0.87,NULL,"brNDC");
+  l.SetTextSize(0.05);
+  l.SetFillStyle(4000);
+  l.SetBorderSize(0);
+  l.SetFillColor(10);
+
+  TLatex aLatex(0,0,"");
+
+  TString name = hName+"_h0_"+sysType;  
+  TH1F* h_h = this->get1DHistogram(name.Data());
+  name = hName+"_A0_"+sysType;
+  TH1F* h_A = this->get1DHistogram(name.Data());
+  name = hName+"_Z0_"+sysType;
+  TH1F* h_Z = this->get1DHistogram(name.Data());
+
+  if(h_h && h_A && h_Z){
+    h_h->SetLineWidth(3);
+    h_A->SetLineWidth(3);
+    h_Z->SetLineWidth(3);
+
+    h_h->SetLineStyle(1);
+    h_A->SetLineStyle(2);
+    h_Z->SetLineStyle(3);
+
+    h_h->Scale(1.0/h_h->Integral(0,h_h->GetNbinsX()+1));
+    h_A->Scale(1.0/h_A->Integral(0,h_A->GetNbinsX()+1));
+    h_Z->Scale(1.0/h_Z->Integral(0,h_Z->GetNbinsX()+1));
+
+    h_h->SetMinimum(0.0);
+    h_h->SetMaximum(0.15);
+    h_h->SetXTitle("#phi^{*}");
+    h_h->SetYTitle("Events");
+    h_h->GetYaxis()->SetTitleOffset(1.4);
+    h_h->SetStats(kFALSE);
+    h_A->SetLineColor(2);
+    h_Z->SetLineColor(3);
+    h_h->Draw();
+    h_A->Draw("same");
+    h_Z->Draw("same");
+    ///
+    l.AddEntry(h_h,"SM h(125)");
+    l.AddEntry(h_A,"MSSM A(125)");
+    l.AddEntry(h_Z,"SM Z(92)");
+    l.Draw();
+    aLatex.DrawLatex(0.05,0.10,sysType.c_str());
+    ///
+    c->Print(TString::Format("fig_png/%s_h_A_Z_%s.png",hName.c_str(), sysType.c_str()).Data());
   }
 }
 /////////////////////////////////////////////////////////
@@ -213,14 +281,16 @@ void CPHistograms::plotHistograms(const std::string & sysType){
   }
   
 
-  hName = "h1DIPPlus"+sysType;
+  hName = "h1DIP_PCA"+sysType;
   h1D = this->get1DHistogram(hName.Data());  
-  hName = "h1DIPMinus"+sysType;
+  hName = "h1DIP_3DIP"+sysType;
   TH1F* h1DMinus = this->get1DHistogram(hName.Data());
   if(h1D && h1DMinus){
     h1D->SetLineWidth(3);
     h1DMinus->SetLineWidth(3);
-    h1D->SetXTitle("3D IP [mm]");
+    h1D->Scale(1.0/h1D->Integral(0,h1D->GetNbinsX()+1));
+    h1DMinus->Scale(1.0/h1DMinus->Integral(0,h1DMinus->GetNbinsX()+1));
+    h1D->SetXTitle("3D IP/PCA distance [mm]");
     h1D->SetYTitle("Events");
     h1D->GetYaxis()->SetTitleOffset(1.4);
     h1D->SetStats(kFALSE);
@@ -228,9 +298,10 @@ void CPHistograms::plotHistograms(const std::string & sysType){
     h1D->Draw();
     h1DMinus->Draw("same");
     l.Clear();
-    l.AddEntry(h1D,"#tau^{+}");
-    l.AddEntry(h1DMinus,"#tau^{-}");
-    l.Draw();  
+    l.AddEntry(h1D,"PCA distance");
+    l.AddEntry(h1DMinus,"3D IP");
+    l.Draw();
+    c->SetLogy();
     c->Print(TString::Format("fig_png/3DIP_%s.png",sysType.c_str()).Data());
   }
 }

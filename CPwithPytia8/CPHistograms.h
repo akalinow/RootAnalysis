@@ -29,6 +29,10 @@ class CPHistograms: public AnalysisHistograms {
 
   void plotHistograms(const std::string & sysType);
 
+  ///Plot histogram hName+sysType for h, A, and Z on single canvas.
+  void plot_HAZ_Histograms(const std::string & hName,
+			   const std::string & sysType);
+
   ///Types of the selection flow
   std::vector<std::string> selectionFlavours_;
 

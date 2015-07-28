@@ -55,7 +55,7 @@ void CPAnalyzer::fillAngles(const EventProxyCPNtuple & myEvent,
   double pullX = 0, pullZ = 0;
   
   if(sysType.find("smearPV")!=std::string::npos){
-    double sigmaX = 12E-3, sigmaY = 12E-3, sigmaZ = 30E-3;//[mm]
+    double sigmaX = 10E-3, sigmaY = 10E-3, sigmaZ = 30E-3;//[mm]
     pullX = aRndm.Gaus(0.0,sigmaX);
     pullZ = aRndm.Gaus(0.0,sigmaZ);
     pv.SetXYZ(pv.X()+pullX,
@@ -71,7 +71,7 @@ void CPAnalyzer::fillAngles(const EventProxyCPNtuple & myEvent,
   
   if(sysType.find("smear")!=std::string::npos &&
      sysType.find("PCA")!=std::string::npos){
-    double sigmaX = 10E-3, sigmaY = 10E-3, sigmaZ = 30E-3; //[mm]
+    double sigmaX = 20E-3, sigmaY = 20E-3, sigmaZ = 20E-3; //[mm]
     /*
     nMinus.SetPerp(nMinus.Perp()+aRndm.Gaus(0.0,sigmaX));
     nMinus.SetZ(nMinus.Z()+aRndm.Gaus(0.0,sigmaZ));
@@ -94,8 +94,8 @@ void CPAnalyzer::fillAngles(const EventProxyCPNtuple & myEvent,
   float cosPhiTauMinusPi = myEvent.tauMinus->Vect().Unit().Dot(myEvent.piMinus->Vect().Unit());
   float cosPhiTauPlusPi = myEvent.tauPlus->Vect().Unit().Dot(myEvent.piPlus->Vect().Unit());
   
-  myHistos_->fill1DHistogram("h1DIPMinus"+sysType,nMinus.Mag());
-  myHistos_->fill1DHistogram("h1DIPPlus"+sysType,nPlus.Mag());
+  myHistos_->fill1DHistogram("h1DIP_PCA"+sysType,nMinus.Mag());
+  myHistos_->fill1DHistogram("h1DIP_3DIP"+sysType,svMinus.Mag());
 
   ///Method from http://arxiv.org/abs/1108.0670 (Berger)
   ///take impact parameters instead of tau momentum.
@@ -127,7 +127,6 @@ bool CPAnalyzer::analyze(const EventProxyBase& iEvent){
 
   const EventProxyCPNtuple & myEvent = static_cast<const EventProxyCPNtuple&>(iEvent);
 
-
   //Skip 3-prong and unknown decays.
   if( !(isOneProng(myEvent.decModeMinus) || isLepton(myEvent.decModeMinus) ) ||
       !(isOneProng(myEvent.decModePlus)  || isLepton(myEvent.decModePlus) ) ) return true;
@@ -140,23 +139,18 @@ bool CPAnalyzer::analyze(const EventProxyBase& iEvent){
   std::string name;
   ///
   for(auto decayName:decayNames){
-    name = motherName+"_"+decayName+"_"+smearType;
+    smearType = "ideal";
+    name = "_"+motherName+"_"+decayName+"_"+smearType;
+    fillAngles(myEvent, name);
+    smearType = "smearPV";
+    name = "_"+motherName+"_"+decayName+"_"+smearType;
+    fillAngles(myEvent, name);
+    smearType = "smearPV_PCA";
+    name = "_"+motherName+"_"+decayName+"_"+smearType;
     fillAngles(myEvent, name);
     if(accepted) name+="_selected";
     fillAngles(myEvent, name);
-  }
-  
-
-
-  /*
-  sysType = "smearPV";
-  fillAngles(myEvent, sysType);
-  sysType = "smearPV_PCA";
-  fillAngles(myEvent, sysType);
-  */
-
-
-  
+  }  
 }
 //////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////
@@ -182,7 +176,7 @@ bool CPAnalyzer::analysisSelection(const EventProxyCPNtuple & myEvent){
     if(myEvent.visTauMinus->Pt()>25 &&
        std::abs(myEvent.visTauMinus->Eta())<2.3 &&
        myEvent.visTauPlus->Pt()>20 &&
-       std::abs(myEvent.visTauPlus->Eta())<2.1 ) return false;
+       std::abs(myEvent.visTauPlus->Eta())<2.1 ) return true;
     else return false;
   }
   // tau+tau
@@ -190,7 +184,7 @@ bool CPAnalyzer::analysisSelection(const EventProxyCPNtuple & myEvent){
     if(myEvent.visTauMinus->Pt()>40 &&
        std::abs(myEvent.visTauMinus->Eta())<2.3 &&
        myEvent.visTauPlus->Pt()>40 &&
-       std::abs(myEvent.visTauPlus->Eta())<2.3 ) return false;
+       std::abs(myEvent.visTauPlus->Eta())<2.3 ) return true;
     else return false;
   }
   //undefined
