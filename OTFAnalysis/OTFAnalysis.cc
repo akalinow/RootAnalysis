@@ -15,7 +15,6 @@
 
 #include <iostream>
 #include "TreeAnalyzer.h"
-#include "MultithreadedAnalyzer.h"
 #include "OTFAnalyzer.h"
 #include "OTFDiMuonAnalyzer.h"
 #include "EventProxyOTF.h"

@@ -9,17 +9,14 @@ void EventProxyBase::init(std::vector<std::string> const& iFileNames){
 
   Int_t cachesize = 10000000; //10 MBytes
   
-  for(unsigned int iThread=0;iThread<omp_get_max_threads();++iThread){
-    
-    fChain[iThread] = boost::shared_ptr<TChain>(new TChain(treeName_.c_str()));
-    for (auto it= iFileNames.begin(), itEnd = iFileNames.end();it!=itEnd; ++it) fChain[iThread]->Add(it->c_str(),-1);
-    
-    accumulatedSize_ = fChain[iThread]->GetEntries();
-
-  fChain[iThread]->SetCacheSize(cachesize);
-  fChain[iThread]->AddBranchToCache("*",kTRUE);
-  fChain[iThread]->SetBranchStatus("*",0);
-  }
+  fChain = boost::shared_ptr<TChain>(new TChain(treeName_.c_str()));
+  for (auto it= iFileNames.begin(), itEnd = iFileNames.end();it!=itEnd; ++it) fChain->Add(it->c_str(),-1);
+  
+  accumulatedSize_ = fChain->GetEntries();
+  
+  fChain->SetCacheSize(cachesize);
+  fChain->AddBranchToCache("*",kTRUE);
+  fChain->SetBranchStatus("*",0);
 }
 //////////////////////////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////////////////////////
@@ -28,8 +25,7 @@ EventProxyBase::~EventProxyBase(){}
 /////////////////////////////////////////////////////////////////////////////
 EventProxyBase const& EventProxyBase::operator++(){
 
-  unsigned int iThread = omp_get_thread_num();
-  fChain[iThread]->GetEntry(eventIndex_[iThread]++);
+  fChain->GetEntry(eventIndex_++);
 
    return *this;
 }
@@ -37,40 +33,33 @@ EventProxyBase const& EventProxyBase::operator++(){
 /////////////////////////////////////////////////////////////////////////////
 void EventProxyBase::skip(int n) {
 
-  unsigned int iThread = omp_get_thread_num();
-
-  eventIndex_[iThread]+= n;
-  fChain[iThread]->GetEntry(eventIndex_[iThread]);
+  eventIndex_+= n;
+  fChain->GetEntry(eventIndex_);
 }
 //////////////////////////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////////////////////////
-TFile* EventProxyBase::getTFile() const {
-  return fChain[omp_get_thread_num()]->GetFile();
-}
+TFile* EventProxyBase::getTFile() const { return fChain->GetFile(); }
 //////////////////////////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////////////////////////
 EventProxyBase const& EventProxyBase::toBegin(){
 
-  unsigned int iThread = omp_get_thread_num();
-  fChain[iThread]->GetEntry(0);
-  eventIndex_[iThread] = 0;
+  fChain->GetEntry(0);
+  eventIndex_ = 0;
   return *this;
 }
 //////////////////////////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////////////////////////
 EventProxyBase const& EventProxyBase::toN(int n){
 
-  unsigned int iThread = omp_get_thread_num();
-  fChain[iThread]->GetEntry(n);
-  eventIndex_[iThread] = n;
+  fChain->GetEntry(n);
+  eventIndex_ = n;
   return *this;
 }
 //////////////////////////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////////////////////////
 bool EventProxyBase::atEnd() const{
 
-  unsigned int iThread = omp_get_thread_num();
-  return eventIndex_[iThread]>=accumulatedSize_;
+  return eventIndex_>=accumulatedSize_;
 }
 //////////////////////////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////////////////////////

@@ -309,7 +309,9 @@ test-EventProxyPAC.o: EventProxyPAC.cc /usr/include/stdc-predef.h \
  /usr/include/c++/5.1.1/bits/random.tcc /usr/include/c++/5.1.1/numeric \
  /usr/include/c++/5.1.1/bits/stl_numeric.h \
  /usr/include/boost/smart_ptr/detail/operator_bool.hpp \
- ../include/EventProxyBase.h /usr/local/root-6.04.00/include/root/TFile.h \
+ ../include/EventProxyBase.h \
+ /usr/lib/gcc/x86_64-redhat-linux/5.1.1/include/omp.h \
+ /usr/local/root-6.04.00/include/root/TFile.h \
  /usr/include/c++/5.1.1/atomic \
  /usr/local/root-6.04.00/include/root/TDirectoryFile.h \
  /usr/local/root-6.04.00/include/root/TDirectory.h \
@@ -1149,6 +1151,8 @@ EventProxyPAC.h:
 /usr/include/boost/smart_ptr/detail/operator_bool.hpp:
 
 ../include/EventProxyBase.h:
+
+/usr/lib/gcc/x86_64-redhat-linux/5.1.1/include/omp.h:
 
 /usr/local/root-6.04.00/include/root/TFile.h:
 

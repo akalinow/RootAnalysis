@@ -38,6 +38,8 @@
 
       virtual void init(std::vector<std::string> const& iFileNames);
 
+
+      virtual EventProxyBase* clone() const {return 0;};
       //
 
       Long64_t size() const{ return accumulatedSize_; }
@@ -45,10 +47,10 @@
    protected:
 
       std::vector<std::string> fileNames_;
-      boost::shared_ptr<TChain> fChain[128]{};
+      boost::shared_ptr<TChain> fChain;
       std::string treeName_;
 
-      Long64_t eventIndex_[128]{};
+      Long64_t eventIndex_;
       Long64_t accumulatedSize_;
 
 };

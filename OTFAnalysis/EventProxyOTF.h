@@ -20,9 +20,11 @@
       virtual ~EventProxyOTF();
 
       void init(std::vector<std::string> const& iFileNames);
+
+      virtual EventProxyBase* clone() const;
       
       // Declaration of leaf types
-      EventData       *events[128]{};
+      EventData       *event;
 
 };
 #endif

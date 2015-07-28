@@ -1,9 +1,18 @@
+#include <iostream>
+
 #include "EventProxyCPNtuple.h"
 
 EventProxyCPNtuple::EventProxyCPNtuple(){}
 /////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////
 EventProxyCPNtuple::~EventProxyCPNtuple(){}
+//////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////
+EventProxyBase* EventProxyCPNtuple::clone() const{
+
+  return new EventProxyCPNtuple();
+  
+}
 /////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////
 void EventProxyCPNtuple::init(std::vector<std::string> const& iFileNames){
@@ -11,6 +20,8 @@ void EventProxyCPNtuple::init(std::vector<std::string> const& iFileNames){
 	treeName_ = "genAna/hTTCPTree";
 
 	EventProxyBase::init(iFileNames);
+
+	std::cout<<"fChain: "<<fChain<<std::endl;
 
 	fChain->SetBranchStatus("*",1);
 	fChain->SetMakeClass(0);
@@ -37,7 +48,7 @@ void EventProxyCPNtuple::init(std::vector<std::string> const& iFileNames){
 	fChain->SetBranchAddress("phi", &phi, &b_phi);
 	fChain->SetBranchAddress("rho", &rho, &b_rho);
 	fChain->SetBranchAddress("phi2", &phi2, &b_phi2);
-	fChain->SetBranchAddress("phi3", &phi3, &b_phi3);
+	//fChain->SetBranchAddress("phi3", &phi3, &b_phi3);
 	//
 	fChain->SetBranchAddress("yMinus", &yMinus, &b_yMinus);
 	fChain->SetBranchAddress("yPlus", &yPlus, &b_yPlus);
@@ -47,6 +58,11 @@ void EventProxyCPNtuple::init(std::vector<std::string> const& iFileNames){
 	fChain->SetBranchAddress("yPlusLab", &yPlusLab, &b_yPlusLab);
 	fChain->SetBranchAddress("yMinusLab2", &yMinusLab2, &b_yMinusLab2);
 	fChain->SetBranchAddress("yPlusLab2", &yPlusLab2, &b_yPlusLab2);
+
+
+	std::cout<<"Here 0"<<std::endl;
+	fChain->GetEntry(0);
+	std::cout<<"Here 1"<<std::endl;
 }
 /////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////

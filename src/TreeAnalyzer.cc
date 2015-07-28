@@ -144,8 +144,8 @@ void TreeAnalyzer::parseCfg(const std::string & cfgFileName){
 //////////////////////////////////////////////////////////////////////////////
 void  TreeAnalyzer::init(std::vector<Analyzer*> myAnalyzers){
 
-  myProxy_->init(fileNames_);
 
+  //myProxy_->init(fileNames_);
   myAnalyzers_ = myAnalyzers;
 
   for(unsigned int i=0;i<myAnalyzers_.size();++i){ 
@@ -155,6 +155,9 @@ void  TreeAnalyzer::init(std::vector<Analyzer*> myAnalyzers){
   }
 
  for(unsigned int iThread=0;iThread<omp_get_max_threads();++iThread){
+   myProxiesThread_[iThread] = myProxy_->clone();
+   std::cout<<"event proxy: "<< myProxiesThread_[iThread]<<std::endl;
+   myProxiesThread_[iThread]->init(fileNames_);
     for(unsigned int iAnalyzer=0;iAnalyzer<myAnalyzers_.size();++iAnalyzer){ 
       myAnalyzersThreads_[iThread].push_back(myAnalyzers_[iAnalyzer]->clone());
     }
@@ -185,13 +188,13 @@ int TreeAnalyzer::loop(){
   ///////
   myProxy_->toBegin();
 
-
 #pragma omp parallel for schedule(dynamic)
   for(int aEvent=0;aEvent<nEventsToAnalyze_;++aEvent){
 
     if( nEventsAnalyzed_ < nEventsToPrint_ || nEventsAnalyzed_%100000==0)
-      std::cout<<"Events analyzed: "<<nEventsAnalyzed_<<" thread: "<<omp_get_thread_num()<<std::endl;       
-    analyze(myProxy_->toN(aEvent));
+      std::cout<<"Events analyzed: "<<nEventsAnalyzed_<<" thread: "<<omp_get_thread_num()<<std::endl;
+    myProxiesThread_[omp_get_thread_num()]->toN(aEvent);
+    //analyze(myProxiesThread_[omp_get_thread_num()]->toN(aEvent));
   }
   
   return nEventsAnalyzed_;    

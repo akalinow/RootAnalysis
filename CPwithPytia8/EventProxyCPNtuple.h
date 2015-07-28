@@ -22,6 +22,8 @@
 
       void init(std::vector<std::string> const& iFileNames);
 
+      virtual EventProxyBase* clone() const;
+
       // Declaration of leaf types
       TLorentzVector  *p4Sum;
       TLorentzVector  *metNu, *met;

@@ -8,18 +8,25 @@ EventProxyOTF::EventProxyOTF(){}
 EventProxyOTF::~EventProxyOTF(){}
 //////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////
+EventProxyBase* EventProxyOTF::clone() const{
+
+  return new EventProxyOTF();
+  
+}
+//////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////
 void EventProxyOTF::init(std::vector<std::string> const& iFileNames){
 
 	treeName_ = "efficiencyTree";
 
 	EventProxyBase::init(iFileNames);
+
+	event = 0;
 	
-	for(unsigned int iThread=0;iThread<omp_get_max_threads();++iThread){	 
-	  fChain[iThread]->SetBranchStatus("*",1);
-	  fChain[iThread]->SetMakeClass(0);
-	  fChain[iThread]->SetBranchAddress("Events",&events[iThread]);
+	fChain->SetBranchStatus("*",1);
+	fChain->SetMakeClass(0);
+	fChain->SetBranchAddress("Events",&event);
 	  
-  }
 }
 //////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////

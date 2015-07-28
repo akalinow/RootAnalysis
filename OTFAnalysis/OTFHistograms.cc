@@ -110,12 +110,8 @@ void OTFHistograms::defineHistograms(){
 
  using namespace std;
 
- std::cout<<"thread: "<< omp_get_thread_num()<<std::endl;
-
  if(!histosInitialized_){
 
-   std::cout<<"init in thread: "<< omp_get_thread_num()<<std::endl;
-   
  //Make template histos
  add1DHistogram("h1DDeltaEtaTemplate","",100,0,5.0,file_);
    
@@ -128,7 +124,7 @@ void OTFHistograms::defineHistograms(){
  add2DHistogram("h2DEtaVxTemplate","",8*25,0.8,1.25,2,-0.5,1.5,file_);//Overlap
  //add2DHistogram("h2DEtaVxTemplate","",8*25,-0.1,0.85,2,-0.5,1.5,file_);//Barrel
  //add2DHistogram("h2DEtaVxTemplate","",8*25,1.25,2.65,2,-0.5,1.5,file_);//Endcap
- 
+
  add2DHistogram("h2DPhiVxTemplate","",4*32,-0.2,3.2,2,-0.5,1.5,file_);
  //Rate histos
  add2DHistogram("h2DRateTotTemplate","",400,1,201,142,0,142,file_);
@@ -153,8 +149,6 @@ void OTFHistograms::defineHistograms(){
 void OTFHistograms::finalizeHistograms(int nRuns, float weight){
 
   AnalysisHistograms::finalizeHistograms();
-  plotRate("Tot");
-  return;
   
   utilsL1RpcStyle()->cd();
 
