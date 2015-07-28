@@ -625,6 +625,7 @@ TH1* OTFHistograms::getRateHisto(std::string sysType,
   std::string hName = "h2DRate"+type+sysType;
   if(sysType=="Vx") hName = "h2DRate"+type+"Gmt";
 
+  if(!this->get2DHistogram(hName)) return 0;
   TH2F* h2D = (TH2F*)this->get2DHistogram(hName)->Clone("h2D");
 
   if(!h2D) return 0;
@@ -645,8 +646,6 @@ TH1* OTFHistograms::getRateHisto(std::string sysType,
 ////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////
 void OTFHistograms::plotRate(std::string type){
-
-  std::cout<<__func__<<std::endl;
 
   TH1 *hRateGmt = getRateHisto("Gmt",type);
   TH1 *hRateVx = getRateHisto("Vx",type);

@@ -153,6 +153,13 @@ void  TreeAnalyzer::init(std::vector<Analyzer*> myAnalyzers){
     myAnalyzers_[i]->initialize(myDirectories_[myDirectories_.size()-1],
 				myStrSelections_);
   }
+
+ for(unsigned int iThread=0;iThread<omp_get_max_threads();++iThread){
+    for(unsigned int iAnalyzer=0;iAnalyzer<myAnalyzers_.size();++iAnalyzer){ 
+      myAnalyzersThreads_[iThread].push_back(myAnalyzers_[iAnalyzer]->clone());
+    }
+  }
+  
 /*
  for(unsigned int i=0;i<myAnalyzers_.size();++i){
    myAnalyzers_[i]->addBranch(mySummary_->getTree());  
@@ -179,7 +186,7 @@ int TreeAnalyzer::loop(){
   myProxy_->toBegin();
 
 
-#pragma omp parallel for
+#pragma omp parallel for schedule(dynamic)
   for(int aEvent=0;aEvent<nEventsToAnalyze_;++aEvent){
 
     if( nEventsAnalyzed_ < nEventsToPrint_ || nEventsAnalyzed_%100000==0)
@@ -197,7 +204,8 @@ bool TreeAnalyzer::analyze(const EventProxyBase& iEvent){
     ///////
     for(unsigned int i=0;i<myAnalyzers_.size();++i){
       ///If analyzer returns false, skip to the last one, the Summary, unless filtering is disabled for this analyzer.
-      myAnalyzers_[i]->analyze(iEvent,myObjMessenger_);
+      //myAnalyzers_[i]->analyze(iEvent,myObjMessenger_);
+      myAnalyzersThreads_[omp_get_thread_num()][i]->analyze(iEvent,myObjMessenger_);
       //if(!myAnalyzers_[i]->analyze(iEvent,myObjMessenger_) && myAnalyzers_[i]->filter() && myAnalyzers_.size()>1) i = myAnalyzers_.size()-2;
     }
     ///Clear all the analyzers, even if it was not called in this event.

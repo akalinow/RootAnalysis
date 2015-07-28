@@ -41,6 +41,15 @@ void OTFAnalyzer::initialize(TFileDirectory& aDir,
 }
 //////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////
+Analyzer* OTFAnalyzer::clone() const{
+
+  OTFAnalyzer* clone = new OTFAnalyzer(name());
+  clone->setHistos(myHistos_);
+  return clone;
+
+};
+//////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////////
 void OTFAnalyzer::finalize(){ 
   /*
  std::cout<<"tmpMap.size(): "<<tmpMap.size()<<std::endl;
@@ -344,7 +353,6 @@ bool OTFAnalyzer::analyze(const EventProxyBase& iEvent){
 
   if(theEvent->eta<0.83 || theEvent->eta>1.24) return true;
 
-#pragma omp critical(dataupdate)
   for(int iCut=0;iCut<22;++iCut){
 	  if(iCut>0 && iCut<14) continue;
 	  fillTurnOnCurve(iCut,sysTypeGmt,selType);
@@ -358,7 +366,6 @@ bool OTFAnalyzer::analyze(const EventProxyBase& iEvent){
   int iCut = 2;
   bool pass = false;
 
-#pragma omp critical(dataupdate)
   for(int iType=0;iType<=3;++iType){
 	  float ptCut = OTFHistograms::ptBins[OTFHistograms::ptCutsGmt[iCut]];
 	  if(iType==0) pass = theEvent->pt>(ptCut + 20);

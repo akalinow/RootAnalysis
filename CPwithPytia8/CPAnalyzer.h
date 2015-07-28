@@ -46,6 +46,8 @@ class CPAnalyzer: public Analyzer{
 
   virtual void clear(){;};
 
+  virtual Analyzer* clone();
+
   virtual void addBranch(TTree *tree){;};
 
   virtual void addCutHistos(TList *aList){;};

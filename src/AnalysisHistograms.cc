@@ -272,7 +272,6 @@ void AnalysisHistograms::finalizeHistograms(){
       if(my2Dhistograms_[iThread].find(it.first)->second){
 	it.second->Add(my2Dhistograms_[iThread].find(it.first)->second);
 	std::cout<<"iThread: "<<iThread<<std::endl;
-	//my2Dhistograms_[iThread].find(it.first)->second->Print();
 	it.second->Print();
       }
     }

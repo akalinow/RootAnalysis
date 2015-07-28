@@ -31,6 +31,8 @@ class Analyzer{
 };
   
 
+  virtual Analyzer * clone() const{ return 0;}
+  
   virtual bool analyze(const EventProxyBase& iEvent) = 0;
 
   virtual bool analyze(const EventProxyBase& iEvent, ObjectMessenger *aMessenger){return analyze(iEvent); }
@@ -43,7 +45,7 @@ class Analyzer{
 
   virtual void addCutHistos(TList *aList){;};
 
-  const std::string & name(){return myName_;};
+  const std::string & name() const{return myName_;};
   bool filter() const{ return filterEvent_;};
 
  protected:

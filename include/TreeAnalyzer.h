@@ -77,6 +77,7 @@ public :
    void clear();
 
    ///Vector with list of analyzers.
+   std::vector<Analyzer*> myAnalyzersThreads_[128];
    std::vector<Analyzer*> myAnalyzers_;
 
    ///Vector with list of TFileDirectory

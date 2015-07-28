@@ -16,16 +16,20 @@ class OTFAnalyzer:public Analyzer{
 
   OTFAnalyzer(const std::string & aName);
 
-  virtual ~OTFAnalyzer();
+  ~OTFAnalyzer();
 
-  virtual void initialize(TFileDirectory& aDir,
-			  pat::strbitset *aSelections);
+  void initialize(TFileDirectory& aDir,
+		  pat::strbitset *aSelections);
 
-  virtual bool analyze(const EventProxyBase& iEvent);
+  bool analyze(const EventProxyBase& iEvent);
 
-  virtual void finalize();
+  void finalize();
 
-  virtual void addBranch(TTree *tree);
+  void addBranch(TTree *tree);
+
+  Analyzer* clone() const;
+
+  void setHistos(OTFHistograms *histos) { myHistos_ = histos;};
 
  private:
 
