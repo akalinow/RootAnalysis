@@ -1,6 +1,6 @@
 git clone https://github.com/akalinow/RootAnalysis
 cd RootAnalysis
-git checkout 24_02_2015
+git checkout relevant_tag
 libtoolize
 aclocal
 automake --add-missing
@@ -8,7 +8,11 @@ autoconf
 ./configure
 make
 cd OTFAnalysis
-./test a
+./test otf.ini
+
+
+NOTE: File otf.ini contains a path to the data file. Please update it before running the code.
+
 
 
 

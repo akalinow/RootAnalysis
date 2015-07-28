@@ -4,6 +4,8 @@
 #include <string>
 #include <typeinfo>
 #include <vector>
+#include <omp.h>
+
 #include "boost/shared_ptr.hpp"
 
 #include "TFile.h"
@@ -23,12 +25,16 @@
 
       // Go to the very first Event.
       EventProxyBase const& toBegin();
+
+      ///Go to event number n
+      EventProxyBase const& toN(int n);
+      
       virtual bool atEnd() const;
 
       bool isValid() const;
       operator bool() const;
       void skip(int n);
-      TFile* getTFile() const { return fChain->GetFile();}
+      TFile* getTFile() const;
 
       virtual void init(std::vector<std::string> const& iFileNames);
 
@@ -39,13 +45,11 @@
    protected:
 
       std::vector<std::string> fileNames_;
-      boost::shared_ptr<TChain> fChain;
+      boost::shared_ptr<TChain> fChain[128]{};
       std::string treeName_;
 
-      Long64_t eventIndex_;
+      Long64_t eventIndex_[128]{};
       Long64_t accumulatedSize_;
-
-
 
 };
 #endif

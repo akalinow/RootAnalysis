@@ -4,19 +4,19 @@
 #define MULTITHREADEDANALYZER_H
 #include"Analyzer.h"
 #include"AnalysisHistograms.h"
-#include"../OTFAnalysis/OTFAnalyzer.h"
 
-#include"../OTFAnalysis/OTFHistograms.h"
 
 #include "omp.h"
 
 #include "TH2.h"
 #include<vector>
+
 using namespace std;
-class MultithreadedAnalyzer : public Analyzer
-{
+class MultithreadedAnalyzer : public Analyzer{
+  
 int threads = 16;
-public:
+
+ public:
     MultithreadedAnalyzer(const string& aName, int threadnum);
     virtual ~MultithreadedAnalyzer();
     

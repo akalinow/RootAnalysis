@@ -14,6 +14,7 @@
 #include <fstream>
 #include <iomanip>
 #include <vector>
+#include <omp.h>
 
 #include "TFileDirectory.h"
 
@@ -25,10 +26,8 @@
 
 class AnalysisHistograms {
  public:
-  static std::vector<AnalysisHistograms*> container;
-  AnalysisHistograms():file_(0), histosInitialized_(false){
-    container.push_back(this);
-  };
+
+  AnalysisHistograms():file_(0), histosInitialized_(false){};
 
 
   AnalysisHistograms(TFileDirectory *myDir,
@@ -41,36 +40,26 @@ class AnalysisHistograms {
   void fillProfile(const std::string& name, float x, float val, float weight=1.0);
   virtual bool fill1DHistogram(const std::string &name, float val, float weight=1.0);
   virtual bool fill2DHistogram(const std::string &name, float val1, float val2, float weight=1.0);
- // virtual bool fill2DHistogram_omp(const std::string &name, float val1, float val2, float weight=1.0);
-  // virtual bool fill2DHistogram_safe(const std::string &name, float val1, float val2, float weight=1.0);
-  
   virtual bool fill3DHistogram(const std::string &name, float val1, float val2, float val3, float weight=1.0);
   
   TProfile* getProfile(const std::string& name);
   TH1F* get1DHistogram(const std::string& name);
   TH2F* get2DHistogram(const std::string& name, bool noClone = false);
-  //  TH2F* get2DHistogram_omp(const std::string& name);
-   //  TH2F* get2DHistogram_safe(const std::string& name);
   TH3F* get3DHistogram(const std::string& name);
-    template <typename THmap> void pieceHistogramsTogether(THmap &map, std::vector<THmap*> & array);
+
+
+  template <typename THmap> void pieceHistogramsTogether(THmap &map, std::vector<THmap*> & array);
   template <typename THmap> void clearTemplatesFromMaps( THmap & map, std::vector<THmap*> & array);
   template <typename THmap> void fixBinErrors( THmap & map);
-  void pieceHistogramsTogether2D(std::vector<std::map<std::string,TH2F*>*> & map);
+
   void pieceHistogramsTogether1D(std::vector<std::map<std::string,TH1F*>*> & map);
+  void pieceHistogramsTogether2D(std::vector<std::map<std::string,TH2F*>*> & map);  
   void pieceHistogramsTogether3D(std::vector<std::map<std::string,TH3F*>*> & map);
   
-  std::map<std::string,TH1F*>* getMy1DHistogramsAdress(){
-    return &my1Dhistograms_;
-  }
-  std::map<std::string,TH2F*>* getMy2DHistogramsAdress(){
-    return &my2Dhistograms_;
-  }
-  std::map<std::string,TH3F*>* getMy3DHistogramsAdress(){
-    return &my3Dhistograms_;
-  }
-  std::map<std::string,TH2F*> my2Dhistograms_;
   virtual void finalizeHistograms();
+
  protected:
+
   void clear();
   
   void write();
@@ -81,7 +70,6 @@ class AnalysisHistograms {
 
   virtual void defineHistograms() = 0;
 
-
   /// The ROOT file with histograms
   TFileDirectory *file_;
 
@@ -91,7 +79,7 @@ class AnalysisHistograms {
   /// The histograms
   std::map<std::string,TProfile*> myProfiles_;
   std::map<std::string,TH1F*> my1Dhistograms_;
-  std::map<std::string,TH2F*>  my2Dhistograms_ex[64];
+  std::map<std::string,TH2F*> my2Dhistograms_[128];
   std::map<std::string,TH3F*> my3Dhistograms_;
 
   void addProfile(const std::string& name, const std::string& title, 
@@ -114,40 +102,30 @@ class AnalysisHistograms {
 		      int nBinsX, float* binsX,
 		      int nBinsY, float* binsY,
 		      const TFileDirectory* myDir);
-//   void add2DHistogram_omp(const std::string& name, const std::string& title,
-// 		      int nBinsX, float xlow, float xhigh,
-// 		      int nBinsY, float ylow, float yhigh,
-// 		      const TFileDirectory* myDir);
-//   void add2DHistogram_safe(const std::string& name, const std::string& title,
-// 		      int nBinsX, float xlow, float xhigh,
-// 		      int nBinsY, float ylow, float yhigh,
-// 		      const TFileDirectory* myDir);
 
   void add2DHistogram(const std::string& name, const std::string& title,
 		      int nBinsX, float xlow, float xhigh,
 		      int nBinsY, double* binsY,
 		      const TFileDirectory* myDir);
+
   void add3DHistogram(const std::string& name, const std::string& title,
 		      int nBinsX, float xlow, float xhigh,
 		      int nBinsY, float ylow, float yhigh,
 		      int nBinsZ, float zlow, float zhigh,
 		      const TFileDirectory* myDir);
+
   void add3DHistogram(const std::string& name, const std::string& title,
 		      int nBinsX, double* binsX,		                                           
 		      int nBinsY, double* binsY,
 		      int nBinsZ, double* binsZ, 
 		      const TFileDirectory* myDir);
-  TH1F*registeredCopy(TH1F * h2f, std::string name, const TFileDirectory* myDir);
-  TH2F*registeredCopy(TH2F * h2f, std::string name, const TFileDirectory* myDir);
-  TH3F*registeredCopy(TH3F * h2f, std::string name, const TFileDirectory* myDir);
+    
   static void resetHistos(std::pair<const std::string, TH1*> aPair);
 
   TFileDirectory *myDirCopy;
   double* equalRanges(int nSteps, double min, double max, double *ranges);
   bool histosInitialized_;
  
-  //template <typename TH> void cleanup(std::map<std::string, TH*> * arr);
-
   ///Name of the histograms set instance
   std::string name_;
 

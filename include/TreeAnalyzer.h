@@ -23,7 +23,7 @@ class TreeAnalyzer: public Analyzer{
   friend class Analyzer;
 
 public :
-  int threads;
+
   ///Default conctructor takes the configuration cfg.py file name
   ///optional: pointer to the PROOF outputfile
   TreeAnalyzer(const std::string & name, 
@@ -85,7 +85,6 @@ public :
    ///List of events to be read
    boost::unordered_map<std::string, bool> eventsToProcessHash_;
 
-
    ///Summary analyzer is a special one
    //FWLiteSummaryAnalyzer *mySummary_;
 
@@ -118,6 +117,9 @@ public :
    ///Number of events to be analyzed.
    int nEventsToAnalyze_;   
 
+   ///Number of initial events numbers to be printed on screen
+   int nEventsToPrint_;   
+   
    ///Weight of single event.
    float eventWeight_;
 
@@ -141,6 +143,10 @@ public :
 
    ///Concrete event proxy
    EventProxyBase *myProxy_;
+   
+   ///Number of parraler threads used in processing.
+   unsigned int nThreads;
+   
 };
 
 #endif

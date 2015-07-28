@@ -9,8 +9,13 @@
 #include "EventProxyBase.h"
 
 #include "boost/functional/hash.hpp"
-#include "../OTFAnalysis/EventProxyOTF.h"
-#include "../OTFAnalysis/OTFHistograms.h"
+
+#include "EventProxyBase.h"
+#include "AnalysisHistograms.h"
+#include "boost/property_tree/ptree.hpp"
+#include "boost/property_tree/ini_parser.hpp"
+#include "boost/tokenizer.hpp"
+
 #include "TFile.h"
 #include "TH1D.h"
 #include "TProofOutputFile.h"
@@ -22,8 +27,7 @@
 TreeAnalyzer::TreeAnalyzer(const std::string & aName,
 				       const std::string & cfgFileName,
 				       EventProxyBase *aProxy,
-				       TProofOutputFile * proofFile)
-  :Analyzer(aName){
+				       TProofOutputFile * proofFile):Analyzer(aName){
 
   ///Analysis control
   nEventsToAnalyze_ = 0;
@@ -114,11 +118,28 @@ void TreeAnalyzer::scaleHistograms(){
 void TreeAnalyzer::parseCfg(const std::string & cfgFileName){
 
   eventWeight_ = 1.0;
-  filePath_ = "./";
 
-  fileNames_.push_back("/home/akalinow/scratch/CMS/OverlapTrackFinder/Emulator/job_4_ana/EfficiencyTree.root");
+  boost::property_tree::ptree pt;
+  boost::property_tree::ini_parser::read_ini(cfgFileName, pt);
+
+  typedef boost::tokenizer<boost::char_separator<char> > tokenizer;
+  boost::char_separator<char> sep(",");
+  std::string str = pt.get<std::string>("TreeAnalyzer.inputFile");
+  tokenizer tokens(str, sep);
+  std::cout<<"Reading files: "<<std::endl;
+  for (auto it: tokens){
+    std::cout<<it<<std::endl;
+    fileNames_.push_back(it);
+  }
+  
+  filePath_ = pt.get<std::string>("TreeAnalyzer.outputPath");
+  
+  nEventsToAnalyze_ = pt.get("TreeAnalyzer.eventsToAnalyze",-1);
+  nEventsToPrint_ = pt.get("TreeAnalyzer.eventsToPrint",100);
+  nThreads = pt.get("TreeAnalyzer.threads",1);
+  omp_set_num_threads(nThreads);  
+  
 }
-
 //////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////
 void  TreeAnalyzer::init(std::vector<Analyzer*> myAnalyzers){
@@ -126,8 +147,6 @@ void  TreeAnalyzer::init(std::vector<Analyzer*> myAnalyzers){
   myProxy_->init(fileNames_);
 
   myAnalyzers_ = myAnalyzers;
-  //mySummary_ = new SummaryAnalyzer("Summary");
-  //myAnalyzers_.push_back(mySummary_);
 
   for(unsigned int i=0;i<myAnalyzers_.size();++i){ 
     myDirectories_.push_back(store_->mkdir(myAnalyzers_[i]->name()));
@@ -154,42 +173,21 @@ int TreeAnalyzer::loop(){
   TH1::AddDirectory(kFALSE);
   nEventsAnalyzed_ = 0;
   nEventsSkipped_ = 0;
-  nEventsToAnalyze_ = myProxy_->size();
-  
+  if(nEventsToAnalyze_<0 || nEventsToAnalyze_>myProxy_->size()) nEventsToAnalyze_ = myProxy_->size();
   int eventPreviouslyPrinted=-1;
   ///////
-    myProxy_->toBegin();
-    //omp_set_dynamic(0);
-    EventProxyBase * evProBas[threads];
-    for(int a=0;a<threads;++a) {
-      evProBas[a] = new EventProxyOTF();
-      evProBas[a]->init(fileNames_);
-      evProBas[a]->toBegin();
-      for(int b=0;b <a;++b) ++(*evProBas[a]);
-    }
-    omp_set_num_threads(threads);
-    #pragma omp parallel
-    {
-   for(int a =0;a < nEventsToAnalyze_;a+=threads ){  
-     int i = omp_get_thread_num();
-     if(i ==0) {
-    // if(myProxy_->atEnd() || (nEventsToAnalyze_>=0 && (nEventsAnalyzed_+nEventsSkipped_)>=nEventsToAnalyze_))continue;
-      if((( nEventsAnalyzed_ < 10) ||
-	  nEventsAnalyzed_%100000==0) &&  nEventsAnalyzed_ != eventPreviouslyPrinted ) {
-	eventPreviouslyPrinted = nEventsAnalyzed_;
-	std::cout<<"Events analyzed: "<<nEventsAnalyzed_<<std::endl;
-      }
-   // ++(*myProxy_);
-     }
-      analyze(*evProBas[i]);
-     evProBas[i]->skip(threads);
-      }
-    }
-   std::cout << "Events skipped: " << nEventsSkipped_ << std::endl ;
-      for(int a=0;a<threads;++a) 
-        delete evProBas[a];
-   return nEventsAnalyzed_;
+  myProxy_->toBegin();
+
+
+#pragma omp parallel for
+  for(int aEvent=0;aEvent<nEventsToAnalyze_;++aEvent){
+
+    if( nEventsAnalyzed_ < nEventsToPrint_ || nEventsAnalyzed_%100000==0)
+      std::cout<<"Events analyzed: "<<nEventsAnalyzed_<<" thread: "<<omp_get_thread_num()<<std::endl;       
+    analyze(myProxy_->toN(aEvent));
+  }
   
+  return nEventsAnalyzed_;    
 }
 //////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////
@@ -207,6 +205,8 @@ bool TreeAnalyzer::analyze(const EventProxyBase& iEvent){
   // for(unsigned int i=0;i<myAnalyzers_.size();++i) myAnalyzers_[i]->clear(); 
         
   // myObjMessenger_->clear();
+
+    #pragma omp atomic
     ++nEventsAnalyzed_;
   
   return 1;

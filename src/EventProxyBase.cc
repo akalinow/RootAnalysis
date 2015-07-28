@@ -1,66 +1,76 @@
 #include "EventProxyBase.h"
 
-//
-EventProxyBase::EventProxyBase():
-  fileNames_(), treeName_(""), eventIndex_(0), accumulatedSize_(0){
-
-	std::cout<<__func__<<std::endl;
-
-}
-
+//////////////////////////////////////////////////////////////////////////////
+/////////////////////////////////////////////////////////////////////////////
+EventProxyBase::EventProxyBase(): fileNames_(), treeName_(""), accumulatedSize_(0){}
+//////////////////////////////////////////////////////////////////////////////
+/////////////////////////////////////////////////////////////////////////////
 void EventProxyBase::init(std::vector<std::string> const& iFileNames){
 
-  fChain = boost::shared_ptr<TChain>(new TChain(treeName_.c_str()));
-
-  for (auto it= iFileNames.begin(), itEnd = iFileNames.end();it!=itEnd; ++it) {
-	  fChain->Add(it->c_str(),-1);
-  }
-
-  //fChain->Print();
-  accumulatedSize_ = fChain->GetEntries();
   Int_t cachesize = 10000000; //10 MBytes
-  fChain->SetCacheSize(cachesize);
-  fChain->AddBranchToCache("*",kTRUE);
-  //fChain->SetParallelUnzip(kTRUE);
+  
+  for(unsigned int iThread=0;iThread<omp_get_max_threads();++iThread){
+    
+    fChain[iThread] = boost::shared_ptr<TChain>(new TChain(treeName_.c_str()));
+    for (auto it= iFileNames.begin(), itEnd = iFileNames.end();it!=itEnd; ++it) fChain[iThread]->Add(it->c_str(),-1);
+    
+    accumulatedSize_ = fChain[iThread]->GetEntries();
 
-  fChain->SetBranchStatus("*",0);
-
+  fChain[iThread]->SetCacheSize(cachesize);
+  fChain[iThread]->AddBranchToCache("*",kTRUE);
+  fChain[iThread]->SetBranchStatus("*",0);
+  }
 }
-
+//////////////////////////////////////////////////////////////////////////////
+/////////////////////////////////////////////////////////////////////////////
 EventProxyBase::~EventProxyBase(){}
+//////////////////////////////////////////////////////////////////////////////
+/////////////////////////////////////////////////////////////////////////////
+EventProxyBase const& EventProxyBase::operator++(){
 
-//
-// member functions
-//
-
-EventProxyBase const&
-EventProxyBase::operator++(){
-
-	fChain->GetEntry(eventIndex_++);
+  unsigned int iThread = omp_get_thread_num();
+  fChain[iThread]->GetEntry(eventIndex_[iThread]++);
 
    return *this;
 }
+//////////////////////////////////////////////////////////////////////////////
+/////////////////////////////////////////////////////////////////////////////
+void EventProxyBase::skip(int n) {
 
-void EventProxyBase::skip(int n) 
-{
-  eventIndex_+= n;
-  fChain->GetEntry(eventIndex_);
+  unsigned int iThread = omp_get_thread_num();
+
+  eventIndex_[iThread]+= n;
+  fChain[iThread]->GetEntry(eventIndex_[iThread]);
 }
-
-/** Go to the very first Event*/
-
-EventProxyBase const&
-EventProxyBase::toBegin()
-{
-
-	fChain->GetEntry(0);
-	eventIndex_ = 0;
-    return *this;
+//////////////////////////////////////////////////////////////////////////////
+/////////////////////////////////////////////////////////////////////////////
+TFile* EventProxyBase::getTFile() const {
+  return fChain[omp_get_thread_num()]->GetFile();
 }
+//////////////////////////////////////////////////////////////////////////////
+/////////////////////////////////////////////////////////////////////////////
+EventProxyBase const& EventProxyBase::toBegin(){
 
-
-bool
-EventProxyBase::atEnd() const{
-
-  return eventIndex_>=accumulatedSize_;
+  unsigned int iThread = omp_get_thread_num();
+  fChain[iThread]->GetEntry(0);
+  eventIndex_[iThread] = 0;
+  return *this;
 }
+//////////////////////////////////////////////////////////////////////////////
+/////////////////////////////////////////////////////////////////////////////
+EventProxyBase const& EventProxyBase::toN(int n){
+
+  unsigned int iThread = omp_get_thread_num();
+  fChain[iThread]->GetEntry(n);
+  eventIndex_[iThread] = n;
+  return *this;
+}
+//////////////////////////////////////////////////////////////////////////////
+/////////////////////////////////////////////////////////////////////////////
+bool EventProxyBase::atEnd() const{
+
+  unsigned int iThread = omp_get_thread_num();
+  return eventIndex_[iThread]>=accumulatedSize_;
+}
+//////////////////////////////////////////////////////////////////////////////
+/////////////////////////////////////////////////////////////////////////////
