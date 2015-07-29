@@ -149,7 +149,7 @@ void CPHistograms::plot_HAZ_Histograms(const std::string & hName,
     ///
     l.AddEntry(h_h,"SM h(125)");
     l.AddEntry(h_A,"MSSM A(125)");
-    l.AddEntry(h_Z,"SM Z(92)");
+    l.AddEntry(h_Z,"SM Z(91)");
     l.Draw();
     aLatex.DrawLatex(0.05,0.10,sysType.c_str());
     ///
@@ -290,7 +290,7 @@ void CPHistograms::plotHistograms(const std::string & sysType){
     h1DMinus->SetLineWidth(3);
     h1D->Scale(1.0/h1D->Integral(0,h1D->GetNbinsX()+1));
     h1DMinus->Scale(1.0/h1DMinus->Integral(0,h1DMinus->GetNbinsX()+1));
-    h1D->SetXTitle("3D IP/PCA distance [mm]");
+    h1D->SetXTitle("distance [cm]");
     h1D->SetYTitle("Events");
     h1D->GetYaxis()->SetTitleOffset(1.4);
     h1D->SetStats(kFALSE);
@@ -299,7 +299,7 @@ void CPHistograms::plotHistograms(const std::string & sysType){
     h1DMinus->Draw("same");
     l.Clear();
     l.AddEntry(h1D,"PCA distance");
-    l.AddEntry(h1DMinus,"3D IP");
+    l.AddEntry(h1DMinus,"3D flight path");
     l.Draw();
     c->SetLogy();
     c->Print(TString::Format("fig_png/3DIP_%s.png",sysType.c_str()).Data());
