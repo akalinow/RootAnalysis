@@ -21,11 +21,26 @@ void EventProxyCPNtuple::init(std::vector<std::string> const& iFileNames){
 
 	EventProxyBase::init(iFileNames);
 
-	std::cout<<"fChain: "<<fChain<<std::endl;
+	///Initialisation to 0 is important for Branch reading.
+	p4Sum=0;
+	metNu=0;
+	met=0;
+	piMinus=0;
+	piPlus=0;
+	tauMinus=0;
+	tauPlus=0;
+	visTauMinus=0;
+	visTauPlus=0;
+	thePV=0;
+	svMinus=0;
+	svPlus=0;
+	nPiMinus=0;
+	nPiPlus=0;
 
 	fChain->SetBranchStatus("*",1);
 	fChain->SetMakeClass(0);
-	fChain->SetBranchAddress("p4Sum.", &p4Sum, &b_p4Sum);
+	fChain->SetBranchAddress("p4Sum.", &p4Sum, &b_p4Sum);	
+	fChain->SetBranchAddress("p4Sum.", &p4Sum, &b_p4Sum);	
 	fChain->SetBranchAddress("metNu.", &metNu, &b_metNu);
 	fChain->SetBranchAddress("met.", &met, &b_met);
 	fChain->SetBranchAddress("piMinus.", &piMinus, &b_piMinus);
@@ -41,10 +56,10 @@ void EventProxyCPNtuple::init(std::vector<std::string> const& iFileNames){
 	//
 	fChain->SetBranchAddress("thePV.", &thePV, &b_thePV);
 	fChain->SetBranchAddress("svMinus.", &svMinus, &b_svMinus);
-	fChain->SetBranchAddress("svPlus.", &svPlus, &b_svPlus);
+	fChain->SetBranchAddress("svPlus.", &svPlus, &b_svPlus);	
 	fChain->SetBranchAddress("nPiMinus.", &nPiMinus, &b_nPiMinus);
 	fChain->SetBranchAddress("nPiPlus.", &nPiPlus, &b_nPiPlus);
-	//
+	//	
 	fChain->SetBranchAddress("phi", &phi, &b_phi);
 	fChain->SetBranchAddress("rho", &rho, &b_rho);
 	fChain->SetBranchAddress("phi2", &phi2, &b_phi2);
@@ -59,10 +74,6 @@ void EventProxyCPNtuple::init(std::vector<std::string> const& iFileNames){
 	fChain->SetBranchAddress("yMinusLab2", &yMinusLab2, &b_yMinusLab2);
 	fChain->SetBranchAddress("yPlusLab2", &yPlusLab2, &b_yPlusLab2);
 
-
-	std::cout<<"Here 0"<<std::endl;
-	fChain->GetEntry(0);
-	std::cout<<"Here 1"<<std::endl;
 }
 /////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////
