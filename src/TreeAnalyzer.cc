@@ -199,19 +199,9 @@ int TreeAnalyzer::loop(){
 //////////////////////////////////////////////////////////////////////////////
 bool TreeAnalyzer::analyze(const EventProxyBase& iEvent){
 
- //clear();
-    ///////
-    for(unsigned int i=0;i<myAnalyzers_.size();++i){
-      ///If analyzer returns false, skip to the last one, the Summary, unless filtering is disabled for this analyzer.
-      //myAnalyzers_[i]->analyze(iEvent,myObjMessenger_);
-      //myAnalyzersThreads_[omp_get_thread_num()][i]->analyze(iEvent,myObjMessenger_);
-      //if(!myAnalyzers_[i]->analyze(iEvent,myObjMessenger_) && myAnalyzers_[i]->filter() && myAnalyzers_.size()>1) i = myAnalyzers_.size()-2;
-    }
-    ///Clear all the analyzers, even if it was not called in this event.
-    ///Important for proper TTree filling.
-  // for(unsigned int i=0;i<myAnalyzers_.size();++i) myAnalyzers_[i]->clear(); 
-        
-  // myObjMessenger_->clear();
+  for(unsigned int i=0;i<myAnalyzers_.size();++i){
+    myAnalyzersThreads_[omp_get_thread_num()][i]->analyze(iEvent,myObjMessenger_);
+  }
 
     #pragma omp atomic
     ++nEventsAnalyzed_;
