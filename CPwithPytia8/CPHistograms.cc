@@ -45,7 +45,7 @@ bool CPHistograms::fill1DHistogram(const std::string& name, float val, float wei
     if(name.find("h1DRho")!=std::string::npos) hTemplateName = "h1DRhoTemplate";
     if(name.find("h1DIP")!=std::string::npos) hTemplateName = "h1IPTemplate";
     if(name.find("h1DVxPull")!=std::string::npos) hTemplateName = "h1DVxPullTemplate";
-    std::cout<<"Adding histogram: "<<name<<std::endl;
+    //std::cout<<"Adding histogram: "<<name<<std::endl;
     this->add1DHistogram(name,"",
 			 this->get1DHistogram(hTemplateName)->GetNbinsX(),
 			 this->get1DHistogram(hTemplateName)->GetXaxis()->GetXmin(),
@@ -78,13 +78,16 @@ void CPHistograms::defineHistograms(){
 /////////////////////////////////////////////////////////
 void CPHistograms::finalizeHistograms(int nRuns, float weight){
 
+  AnalysisHistograms::finalizeHistograms();
+
   std::string hName = "h1DPhi_nVectors";
   std::string sysType;
-  for(auto it:my1Dhistograms_){
+  for(auto it:my1Dhistograms_[0]){//FIX ME access to merged histograms map.
     if(it.first.find(hName)!=std::string::npos &&
        it.first.find("Template")==std::string::npos){
       sysType = it.first.substr(hName.size());
       plotHistograms(sysType);
+      return;
       std::string aType = sysType.substr(4,sysType.size());
       if(sysType.find("Z0")!=std::string::npos){
 	plot_HAZ_Histograms("h1DPhi",aType);
@@ -175,6 +178,9 @@ void CPHistograms::plotHistograms(const std::string & sysType){
   TString hName = "h1DPhi"+sysType;
   TString hName1 = "h1DPhi_nVectors"+sysType;
   TH1F* h1D = this->get1DHistogram(hName.Data());
+
+  h1D->Print();
+  
   TH1F* h1DExp = this->get1DHistogram(hName1.Data());
   if(h1D){
     h1D->SetLineWidth(3);

@@ -46,15 +46,6 @@ class AnalysisHistograms {
   TH1F* get1DHistogram(const std::string& name);
   TH2F* get2DHistogram(const std::string& name, bool noClone = false);
   TH3F* get3DHistogram(const std::string& name);
-
-
-  template <typename THmap> void pieceHistogramsTogether(THmap &map, std::vector<THmap*> & array);
-  template <typename THmap> void clearTemplatesFromMaps( THmap & map, std::vector<THmap*> & array);
-  template <typename THmap> void fixBinErrors( THmap & map);
-
-  void pieceHistogramsTogether1D(std::vector<std::map<std::string,TH1F*>*> & map);
-  void pieceHistogramsTogether2D(std::vector<std::map<std::string,TH2F*>*> & map);  
-  void pieceHistogramsTogether3D(std::vector<std::map<std::string,TH3F*>*> & map);
   
   virtual void finalizeHistograms();
 
@@ -77,10 +68,10 @@ class AnalysisHistograms {
   std::vector<TFileDirectory> mySecondaryDirs_;
 
   /// The histograms
-  std::map<std::string,TProfile*> myProfiles_;
-  std::map<std::string,TH1F*> my1Dhistograms_;
+  std::map<std::string,TProfile*> myProfiles_[128];
+  std::map<std::string,TH1F*> my1Dhistograms_[128];
   std::map<std::string,TH2F*> my2Dhistograms_[128];
-  std::map<std::string,TH3F*> my3Dhistograms_;
+  std::map<std::string,TH3F*> my3Dhistograms_[128];
 
   void addProfile(const std::string& name, const std::string& title, 
 		  int nBinsX, float xlow, float xhigh, 

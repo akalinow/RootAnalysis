@@ -40,7 +40,6 @@ void EventProxyCPNtuple::init(std::vector<std::string> const& iFileNames){
 	fChain->SetBranchStatus("*",1);
 	fChain->SetMakeClass(0);
 	fChain->SetBranchAddress("p4Sum.", &p4Sum, &b_p4Sum);	
-	fChain->SetBranchAddress("p4Sum.", &p4Sum, &b_p4Sum);	
 	fChain->SetBranchAddress("metNu.", &metNu, &b_metNu);
 	fChain->SetBranchAddress("met.", &met, &b_met);
 	fChain->SetBranchAddress("piMinus.", &piMinus, &b_piMinus);
