@@ -12,6 +12,22 @@ void EventProxyCPNtuple::init(std::vector<std::string> const& iFileNames){
 
 	EventProxyBase::init(iFileNames);
 
+	///Initialisation to 0 is important for Branch reading.
+	p4Sum=0;
+	metNu=0;
+	met=0;
+	piMinus=0;
+	piPlus=0;
+	tauMinus=0;
+	tauPlus=0;
+	visTauMinus=0;
+	visTauPlus=0;
+	thePV=0;
+	svMinus=0;
+	svPlus=0;
+	nPiMinus=0;
+	nPiPlus=0;
+
 	fChain->SetBranchStatus("*",1);
 	fChain->SetMakeClass(0);
 	fChain->SetBranchAddress("p4Sum.", &p4Sum, &b_p4Sum);
