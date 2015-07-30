@@ -25,7 +25,7 @@ EventProxyBase::~EventProxyBase(){}
 /////////////////////////////////////////////////////////////////////////////
 EventProxyBase const& EventProxyBase::operator++(){
 
-  fChain->GetEntry(eventIndex_++);
+  fChain->GetEntry(++eventIndex_);
 
    return *this;
 }

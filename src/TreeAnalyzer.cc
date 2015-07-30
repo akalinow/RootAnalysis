@@ -189,7 +189,8 @@ int TreeAnalyzer::loop(){
   for(int aEvent=0;aEvent<nEventsToAnalyze_;++aEvent){
 
     if( nEventsAnalyzed_ < nEventsToPrint_ || nEventsAnalyzed_%100000==0)
-      std::cout<<"Events analyzed: "<<nEventsAnalyzed_<<" thread: "<<omp_get_thread_num()<<std::endl;
+      //std::cout<<"Events analyzed: "<<nEventsAnalyzed_<<" thread: "<<omp_get_thread_num()<<std::endl;
+      std::cout<<"Events analyzed: "<<nEventsAnalyzed_<<std::endl;
     analyze(myProxiesThread_[omp_get_thread_num()]->toN(aEvent));
   }
   
