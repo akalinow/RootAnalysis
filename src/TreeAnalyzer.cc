@@ -180,7 +180,7 @@ int TreeAnalyzer::loop(){
      if((( nEventsAnalyzed_ < nEventsToPrint_) ||
 	 nEventsAnalyzed_%100000==0) &&  nEventsAnalyzed_ != eventPreviouslyPrinted ) {
        eventPreviouslyPrinted = nEventsAnalyzed_;
-       std::cout<<"Events analyzed: "<<nEventsAnalyzed_<<std::endl;
+       std::cout<<"Events analyzed: "<<nEventsAnalyzed_<<"/"<<nEventsToAnalyze_<<"\r"<<std::flush;
      }
      analyze(*myProxy_);
    }

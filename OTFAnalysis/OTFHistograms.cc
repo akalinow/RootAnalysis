@@ -538,8 +538,8 @@ void OTFHistograms::plotOtfVsGmt(int iPtCut,
   int match = -1;
   float delta = 999.0;
   TH1D *hEffOtf = 0;
-  for (int iCut=-2; iCut<=2;++iCut){
-  //TEST for (int iCut=0; iCut<1;++iCut){
+  //for (int iCut=-2; iCut<=2;++iCut){
+  for (int iCut=0; iCut<1;++iCut){//TEST
     std::string hName = "h2DOtfPt"+std::to_string((int)ptBins[iPtCut+iCut]);
     TH2F* h2D = this->get2DHistogram(hName);
     float  effOtf = getEfficiency(h2D,ptCut);
@@ -669,8 +669,8 @@ void OTFHistograms::plotRate(std::string type){
   hRateOtf->SetLineColor(4);
 
   hRateGmt->SetLineStyle(2);
-  
-  TCanvas* c = new TCanvas("cRate","Rate",460,500);
+
+  TCanvas* c = new TCanvas("cRate","Rate",1.5*420,1.5*500);
   c->SetLogy(1);  
   c->SetGrid(1,1);
   
@@ -681,19 +681,41 @@ void OTFHistograms::plotRate(std::string type){
   leg->SetFillColor(10);
 
   if(type=="Tot"){
-    int iBinMin = hRateVx->FindBin(2); 
-    int iBinMax = hRateVx->FindBin(30); 
+    int iBinMin = hRateGmt->FindBin(2); 
+    int iBinMax = hRateGmt->FindBin(60);    
     hRateVx->GetXaxis()->SetRange(iBinMin,iBinMax);
     hRateGmt->GetXaxis()->SetRange(iBinMin,iBinMax);
+    hRateOtf->GetXaxis()->SetRange(iBinMin,iBinMax);
     hRateVx->SetMinimum(1E3);
     hRateVx->SetMaximum(1E6);
-    hRateVx->SetXTitle("p_{T}^{cut} [GeV/c]");
+    hRateGmt->SetXTitle("p_{T}^{cut} [GeV/c]");
+
+    c->Divide(2);
+    TPad *pad1 = (TPad*)c->GetPad(1);
+    TPad *pad2 = (TPad*)c->GetPad(2);
+    pad1->SetPad(0.01,0.29,0.99,0.99);
+    pad2->SetPad(0.01,0.01,0.99,0.29);
+
+     pad1->Draw();
+     pad1->cd();
+     pad1->SetLogy();
     //TEST hRateVx->Draw();
-    hRateGmt->Draw();//TEST
-    hRateGmt->Draw("same");
-    hRateOtf->Draw("same");
+    hRateGmt->DrawCopy();//TEST
+    //hRateGmt->DrawCopy("same");
+    hRateOtf->DrawCopy("same");
     //fIntVxMuRate->Draw("same");
-    leg->AddEntry(hRateVx,"#mu rate@Vx");    
+    //leg->AddEntry(hRateVx,"#mu rate@Vx");
+    c->cd();
+    pad2->Draw();
+    pad2->cd();
+    hRateOtf->SetYTitle("GMT/OMTF");
+    hRateOtf->GetXaxis()->SetLabelSize(0.09);
+    hRateOtf->GetYaxis()->SetLabelSize(0.09);
+    hRateOtf->GetYaxis()->SetTitleSize(0.09);
+    hRateOtf->GetYaxis()->SetTitleOffset(0.5);
+    hRateOtf->Divide(hRateGmt);
+    hRateOtf->DrawCopy();
+    c->cd();
   }
   if(type=="VsEta"){
     c->SetLogy(0);  
