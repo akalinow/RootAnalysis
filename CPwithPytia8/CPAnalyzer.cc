@@ -91,11 +91,14 @@ void CPAnalyzer::fillAngles(const EventProxyCPNtuple & myEvent,
   ////////////////////////////
 
   
-  float cosPhiTauMinusPi = myEvent.tauMinus->Vect().Unit().Dot(myEvent.piMinus->Vect().Unit());
-  float cosPhiTauPlusPi = myEvent.tauPlus->Vect().Unit().Dot(myEvent.piPlus->Vect().Unit());
+  float cosPhiTauMinusPi = (svMinus-pv).Unit().Dot(myEvent.piMinus->Vect().Unit());
+  float cosPhiTauPlusPi = (svPlus-pv).Unit().Dot(myEvent.piPlus->Vect().Unit());
 
   myHistos_->fill1DHistogram("h1DIP_PCA"+sysType,nMinus.Mag());
   myHistos_->fill1DHistogram("h1DIP_3DIP"+sysType,(svMinus-pv).Mag());
+
+  myHistos_->fill1DHistogram("h1DCosPhi_collinearMinus"+sysType,cosPhiTauMinusPi);
+  myHistos_->fill1DHistogram("h1DCosPhi_collinearPlus"+sysType,cosPhiTauPlusPi);
 
   ///Method from http://arxiv.org/abs/1108.0670 (Berger)
   ///take impact parameters instead of tau momentum.
@@ -103,8 +106,10 @@ void CPAnalyzer::fillAngles(const EventProxyCPNtuple & myEvent,
   std::pair<float,float>  angles2 = angleBetweenPlanes(*myEvent.piMinus,TLorentzVector(nMinus,0),
 						       *myEvent.piPlus,TLorentzVector(nPlus,0));
 
+  //if(cosPhiTauMinusPi>0.9999 && cosPhiTauPlusPi>0.9999){
   myHistos_->fill1DHistogram("h1DPhi_nVectors"+sysType,angles2.first);
   myHistos_->fill1DHistogram("h1DRho_nVectors"+sysType,angles2.second);
+  //}
 
   //Method from http://arxiv.org/abs/hep-ph/0204292 (Was)
   //Angle between rho decay planes in the rho-rho 
@@ -114,7 +119,9 @@ void CPAnalyzer::fillAngles(const EventProxyCPNtuple & myEvent,
 
   ///Take Monte Carlo level y1, y2 (calculated in tau rest frames)
   if(myEvent.yPlus*myEvent.yMinus>0) myHistos_->fill1DHistogram("h1DPhi_Rho_y1y2Plus"+sysType,rho);
-  else myHistos_->fill1DHistogram("h1DPhi_Rho_y1y2Minus"+sysType,rho);
+  //else myHistos_->fill1DHistogram("h1DPhi_Rho_y1y2Minus"+sysType,rho);
+
+  myHistos_->fill1DHistogram("h1DPhi_Rho_y1y2Minus"+sysType,rho*myEvent.yPlus*myEvent.yMinus);
 
   ///Take reconstruction level y1, y2 (calculated in LAB)
   if(myEvent.yPlusLab2*myEvent.yMinusLab2>0) myHistos_->fill1DHistogram("h1DPhi_Rho_y1y2PlusLAB"+sysType,rho);
@@ -137,9 +144,6 @@ bool CPAnalyzer::analyze(const EventProxyBase& iEvent){
   std::string motherName = getMotherName(myEvent.bosonId);
   std::string smearType = "ideal";
   std::string name;
-
-std::cout<<myEvent.decModeMinus<<" "<<myEvent.decModeMinus<<" "<<myEvent.tauMinus->Pt()<<std::endl;
-
   ///
   for(auto decayName:decayNames){
     smearType = "ideal";

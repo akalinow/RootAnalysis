@@ -91,8 +91,8 @@ bool OTFAnalyzer::passQuality(std::vector<L1Obj> * myL1Coll,
 
   if(sysType.find("Gmt")!=std::string::npos){
     return myL1Coll->size()>iCand &&
-      //myL1Coll->operator[](iCand).eta>0.8 &&
-      //myL1Coll->operator[](iCand).eta<1.3 &&
+      fabs(myL1Coll->operator[](iCand).eta)>0.8 &&
+      fabs(myL1Coll->operator[](iCand).eta)<1.3 &&
       true;
   }
   
@@ -134,6 +134,49 @@ bool OTFAnalyzer::passQuality(std::vector<L1Obj> * myL1Coll,
     //myL1Coll->operator[](iCand).q!=14332 &&
     //myL1Coll->operator[](iCand).q!=15356 &&
     */
+    
+    /*
+    myL1Coll->operator[](iCand).q!=3075 &&
+    myL1Coll->operator[](iCand).q!=196992 &&
+    myL1Coll->operator[](iCand).q!=198016 &&
+    myL1Coll->operator[](iCand).q!=66688 &&
+    myL1Coll->operator[](iCand).q!=98944 &&
+    myL1Coll->operator[](iCand).q!=12300 &&
+    myL1Coll->operator[](iCand).q!=131456 &&
+    myL1Coll->operator[](iCand).q!=102592 &&
+    myL1Coll->operator[](iCand).q!=36928 &&
+    */
+
+    /*
+    myL1Coll->operator[](iCand).q!=198016 &&
+    myL1Coll->operator[](iCand).q!=3075 &&
+    myL1Coll->operator[](iCand).q!=66688 &&
+    myL1Coll->operator[](iCand).q!=98944 &&
+    myL1Coll->operator[](iCand).q!=12300 &&
+    myL1Coll->operator[](iCand).q!=131456 &&
+    myL1Coll->operator[](iCand).q!=102592 &&
+    myL1Coll->operator[](iCand).q!=33408 &&
+    myL1Coll->operator[](iCand).q!=36928 &&
+    myL1Coll->operator[](iCand).q!=33856 &&
+    myL1Coll->operator[](iCand).q!=65920 &&
+    myL1Coll->operator[](iCand).q!=99840 &&
+    myL1Coll->operator[](iCand).q!=98496 &&
+    myL1Coll->operator[](iCand).q!=99968 &&
+    */
+    
+    
+    /*
+    myL1Coll->operator[](iCand).q!=196992 &&
+    myL1Coll->operator[](iCand).q!=198016 &&
+    myL1Coll->operator[](iCand).q!=35840 &&
+    myL1Coll->operator[](iCand).q!=14336 &&
+    myL1Coll->operator[](iCand).q!=15360 &&
+    myL1Coll->operator[](iCand).q!=7168 &&
+    myL1Coll->operator[](iCand).q!=34880 &&
+    */
+    //myL1Coll->operator[](iCand).q!=7168 &&
+    //myL1Coll->operator[](iCand).q!=132352 &&
+    
     ///Barrel (l1t::tftype::omtf_pos)           
     myL1Coll->operator[](iCand).q!=99840 &&
     myL1Coll->operator[](iCand).q!=34304 &&
@@ -148,8 +191,9 @@ bool OTFAnalyzer::passQuality(std::vector<L1Obj> * myL1Coll,
 
     myL1Coll->operator[](iCand).q!=33408 &&
     myL1Coll->operator[](iCand).q!=66688 && 
-    myL1Coll->operator[](iCand).q!=66176 && 
-    ///    
+    myL1Coll->operator[](iCand).q!=66176 &&     
+    ///
+       
     true;
   }
   else return myL1Coll->size();
@@ -166,7 +210,7 @@ void OTFAnalyzer::fillTurnOnCurve(const int & iPtCut,
 
   std::vector<L1Obj> * myL1Coll = &(theEvent->l1ObjectsGmt);
   std::string hName = "h2DGmt"+selType;
-  
+ 
   if(sysType=="Rpc"){
     myL1Coll = &(theEvent->l1ObjectsRpc);
     hName = "h2DRpc"+selType;
@@ -177,13 +221,27 @@ void OTFAnalyzer::fillTurnOnCurve(const int & iPtCut,
   }
   if(sysType=="Otf") {
     iCand = iCandOTF;
-    myL1Coll = &(theEvent->l1ObjectsOtf);
-    if(myL1Coll->size()>1 && myL1Coll->operator[](0).q<myL1Coll->operator[](1).q) iCand = 1;
+    myL1Coll = &(theEvent->l1ObjectsOtf);   
+    //if(myL1Coll->size()>1 && myL1Coll->operator[](0).q<myL1Coll->operator[](1).q) iCand = 1;
     hName = "h2DOtf"+selType;
+  }
+
+
+  ///Find best matching L1 candidate
+  float deltaR = 0.5, tmpR = 999;
+  for(unsigned int index=0;index<myL1Coll->size();++index){
+    if(!passQuality(myL1Coll,sysType,index)) continue;
+    L1Obj aCand = myL1Coll->operator[](index);
+    tmpR = sqrt(0*pow(theEvent->phi-aCand.phi,2) + //phi is not propaged to vertex
+		pow(theEvent->eta-aCand.eta,2));
+    if(tmpR<deltaR){
+      deltaR = tmpR;
+      iCand = index;
+    }
   }
   
   bool qualityCut = passQuality(myL1Coll,sysType,iCand);
-  bool pass = myL1Coll->size() && myL1Coll->operator[](iCand).pt>=ptCut && qualityCut;
+  bool pass = myL1Coll->size() && myL1Coll->operator[](iCand).pt>=ptCut && qualityCut && deltaR<0.15;
   
   std::string tmpName = hName+"Pt"+std::to_string(ptCut);
   myHistos_->fill2DHistogram(tmpName,theEvent->pt, pass);
@@ -202,6 +260,13 @@ void OTFAnalyzer::fillTurnOnCurve(const int & iPtCut,
   
   tmpName = hName+"PhiVx"+std::to_string(ptCut);
   myHistos_->fill2DHistogram(tmpName,theEvent->phi, pass);
+
+  tmpName = hName+"Quality"+std::to_string(ptCut);
+  int q = -10; 
+  if(myL1Coll->size()) q = myL1Coll->operator[](iCand).q;
+  if(tmpMap.find(q)==tmpMap.end()) tmpMap[q] = tmpMap.size();
+  int xPosition = tmpMap[q];
+  myHistos_->fill2DHistogram(tmpName,xPosition,pass);
 }
 //////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////
@@ -215,6 +280,8 @@ void OTFAnalyzer::fillRateHisto(const std::string & sysType,
 	std::vector<L1Obj> * myL1Coll = &(theEvent->l1ObjectsGmt);
 	std::string hName = "h2DRate"+selType+"Gmt";
 
+	
+
 	if(sysType=="Rpc"){
 			myL1Coll = &(theEvent->l1ObjectsRpc);
 			hName = "h2DRate"+selType+"Rpc";
@@ -227,7 +294,7 @@ void OTFAnalyzer::fillRateHisto(const std::string & sysType,
 	  iCand = iCandOTF;
 	  myL1Coll = &(theEvent->l1ObjectsOtf);
 	  if(myL1Coll->size()>1){
-	    ///Take lower quality
+	    ///Take higher quality
 	    if(myL1Coll->operator[](0).q<myL1Coll->operator[](1).q) iCand = 1;
 	    ///take lower pt in case of the same quality
 	    else if (myL1Coll->operator[](0).pt>myL1Coll->operator[](1).pt) iCand = 1;
@@ -254,7 +321,9 @@ void OTFAnalyzer::fillRateHisto(const std::string & sysType,
 	if(sysType=="Otf" && selType=="VsQuality"){
 	  if(tmpMap.find(q)==tmpMap.end()) tmpMap[q] = tmpMap.size();
 	  int val = tmpMap[q];
-	  myHistos_->fill2DHistogram(hName,theEvent->pt,pass*val+(!pass)*(-10));
+	  float ptGen = theEvent->pt;
+	  //if(ptGen<1) ptGen = 1.1;
+	  myHistos_->fill2DHistogram(hName,ptGen,pass*val+(!pass)*(-10));
 	}
 	if(sysType=="Gmt" && selType=="VsQuality") myHistos_->fill2DHistogram(hName,theEvent->pt,pass*q+(!pass)*(-10));
 	
@@ -335,7 +404,11 @@ bool OTFAnalyzer::analyze(const EventProxyBase& iEvent){
   const EventProxyOTF & myEvent = static_cast<const EventProxyOTF&>(iEvent);
   theEvent = myEvent.events;
 
-  if(theEvent->eta<0.83 || theEvent->eta>1.24) return true;
+  //if(fabs(theEvent->eta)<0.83 || fabs(theEvent->eta)>1.24) return true;
+  //if(theEvent->eta<0.83 || theEvent->eta>1.24) return true;
+  
+  //if(fabs(theEvent->eta-theEvent->eta1)<0.5) return true;
+    
   //if(theEvent->eta<1.24 ||  theEvent->eta>1.45) return true;
   //if(theEvent->pt>10 || theEvent->pt<5) return true;
   //if(theEvent->pt>3) return true;
@@ -346,48 +419,50 @@ bool OTFAnalyzer::analyze(const EventProxyBase& iEvent){
   std::string sysTypeRpc="Rpc";
   std::string sysTypeOther="Other";
 
-  for(int iCut=0;iCut<22;++iCut){
-	  if(iCut>0 && iCut<14) continue;
-	  fillTurnOnCurve(iCut,sysTypeGmt,selType);
-	  fillTurnOnCurve(iCut,sysTypeOtf,selType);
-	  fillTurnOnCurve(iCut,sysTypeRpc,selType);
-	  fillTurnOnCurve(iCut,sysTypeOther,selType);
+  if(theEvent->pt<0.01){
+  
+    fillRateHisto("Otf","Tot");
+    fillRateHisto("Gmt","Tot");
+    
+    fillRateHisto("Gmt","VsEta");
+    fillRateHisto("Gmt","VsPt");
+    
+    fillRateHisto("Otf","VsEta");
+    fillRateHisto("Otf","VsPt");
+    
+    fillRateHisto("Otf","VsQuality");
+    fillRateHisto("Gmt","VsQuality");
+
+    //fillGhostHisto("Otf","VsProcessor");
+    //fillGhostHisto("Gmt","VsProcessor");
   }
-
-
-  ////////////////
-  int iCut = 2;
-  bool pass = false;
-  for(int iType=0;iType<=3;++iType){
-	  float ptCut = OTFHistograms::ptBins[OTFHistograms::ptCutsGmt[iCut]];
-	  if(iType==0) pass = theEvent->pt>(ptCut + 20);
-	  if(iType==1) pass = theEvent->pt>ptCut && theEvent->pt<(ptCut+5);
-	  if(iType==2) pass = theEvent->pt<10;
-	  if(!pass) continue;
-
-	  selType = std::string(TString::Format("Type%d",iType));
-	  fillTurnOnCurve(OTFHistograms::ptCutsGmt[iCut],sysTypeGmt,selType);
-	  fillTurnOnCurve(OTFHistograms::ptCutsGmt[iCut],sysTypeRpc,selType);
-	  fillTurnOnCurve(OTFHistograms::ptCutsGmt[iCut],sysTypeOther,selType);
-	  fillTurnOnCurve(OTFHistograms::ptCutsOtf[iCut],sysTypeOtf,selType);	  
-  }
-  /////////////////
-
-  fillRateHisto("Otf","Tot");
-  fillRateHisto("Gmt","Tot");
-
-  fillRateHisto("Gmt","VsEta");
-  fillRateHisto("Gmt","VsPt");
-
-  fillRateHisto("Otf","VsEta");
-  fillRateHisto("Otf","VsPt");
-
-  fillRateHisto("Otf","VsQuality");
-  fillRateHisto("Gmt","VsQuality");
-
-  //fillGhostHisto("Otf","VsProcessor");
-  //fillGhostHisto("Gmt","VsProcessor");
-
+  else if(fabs(theEvent->eta)>0.83 && fabs(theEvent->eta)<1.24){
+    for(int iCut=0;iCut<22;++iCut){
+      if(iCut>0 && iCut<14) continue;
+      fillTurnOnCurve(iCut,sysTypeGmt,selType);
+      fillTurnOnCurve(iCut,sysTypeOtf,selType);
+      fillTurnOnCurve(iCut,sysTypeRpc,selType);
+      fillTurnOnCurve(iCut,sysTypeOther,selType);
+    }
+    ////////////////
+    int iCut = 2;
+    bool pass = false;
+    for(int iType=0;iType<=3;++iType){
+      float ptCut = OTFHistograms::ptBins[OTFHistograms::ptCutsGmt[iCut]];
+      //if(iType==0) pass = theEvent->pt>(ptCut + 20);
+      if(iType==0) pass = theEvent->pt>24;
+      if(iType==1) pass = theEvent->pt>ptCut && theEvent->pt<(ptCut+5);
+      if(iType==2) pass = theEvent->pt<10;
+      if(!pass) continue;
+      
+      selType = std::string(TString::Format("Type%d",iType));
+      fillTurnOnCurve(OTFHistograms::ptCutsGmt[iCut],sysTypeGmt,selType);
+      fillTurnOnCurve(OTFHistograms::ptCutsGmt[iCut],sysTypeRpc,selType);
+      fillTurnOnCurve(OTFHistograms::ptCutsGmt[iCut],sysTypeOther,selType);
+      fillTurnOnCurve(OTFHistograms::ptCutsOtf[iCut],sysTypeOtf,selType);	  
+    }
+    /////////////////
+  } 
   return true;
 }
 //////////////////////////////////////////////////////////////////////////////
