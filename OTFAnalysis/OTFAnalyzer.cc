@@ -43,6 +43,7 @@ void OTFAnalyzer::initialize(TFileDirectory& aDir,
 //////////////////////////////////////////////////////////////////////////////
 void OTFAnalyzer::finalize(){ 
 
+  /*
  std::cout<<"tmpMap.size(): "<<tmpMap.size()<<std::endl;
  
  std::ostringstream stringStr;
@@ -65,7 +66,7 @@ void OTFAnalyzer::finalize(){
    std::string label = bits.to_string()+" "+stringStr.str();
    h->GetYaxis()->SetBinLabel(iBinX,label.c_str());
  }
- 
+  */
 
   myHistos_->finalizeHistograms(0,1.0); 
 }

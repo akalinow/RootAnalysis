@@ -20,15 +20,34 @@
 class EventProxyCPNtuple;
 class TLorentzVector;
 class TVector3;
+class DiTauData;
 
 class CPAnalyzer: public Analyzer{
 
  public:
-
-  enum tauDecayModes {kElectron, kMuon, 
-		      kOneProng0pi0, kOneProng1pi0, kOneProng2pi0, kOneProng3pi0,
-		      kThreeProng0pi0, kThreeProng1pi0,
-		      kOther, kUndefined};
+  
+  ///Copy from DataFormats/TauReco/interface/PFTauDecayMode.h
+  enum hadronicTauDecayModes 
+  {
+    tauDecay1ChargedPion0PiZero,
+    tauDecay1ChargedPion1PiZero,  // rho (770 MeV) mediated)
+    tauDecay1ChargedPion2PiZero,  // a1  (1.2 GeV) mediated
+    tauDecay1ChargedPion3PiZero,  // contaminated or unmerged photo
+    tauDecay1ChargedPion4PiZero,  // contaminated or unmerged photo
+    tauDecay2ChargedPion0PiZero,  // extra track or un-recod track
+    tauDecay2ChargedPion1PiZero,  // extra track or un-recod track
+    tauDecay2ChargedPion2PiZero,  // extra track or un-recod track
+    tauDecay2ChargedPion3PiZero,  // extra track or un-recod track
+    tauDecay2ChargedPion4PiZero,  // extra track or un-recod track
+    tauDecay3ChargedPion0PiZero,  // a1  (1.2 GeV) mediated
+    tauDecay3ChargedPion1PiZero,  // a1  (1.2 GeV) mediated
+    tauDecay3ChargedPion2PiZero,  // a1  (1.2 GeV) mediated
+    tauDecay3ChargedPion3PiZero,  // a1  (1.2 GeV) mediated
+    tauDecay3ChargedPion4PiZero,  // a1  (1.2 GeV) mediated
+    tauDecaysElectron,
+    tauDecayMuon,
+    tauDecayOther                 // catch-all
+  };
   
   CPAnalyzer(const std::string & aName);
 
@@ -63,12 +82,12 @@ class CPAnalyzer: public Analyzer{
  private:
 
   //Check if the event passes analysis like selection cuts.
-  bool analysisSelection(const EventProxyCPNtuple & myEvent);
+  bool analysisSelection(const DiTauData *aEvent);
 
   ///Calculate variabmes for the pi+pi- decay mode
   ///sysType enumarates different reality scenarios
   //(w/o cuts, PV smearing etc.)
-  void fillAngles(const EventProxyCPNtuple & myEvent,
+  void fillAngles(const DiTauData *aEvent,
 		  const std::string & sysType);
   
 

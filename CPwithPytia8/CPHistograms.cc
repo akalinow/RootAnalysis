@@ -65,8 +65,8 @@ void CPHistograms::defineHistograms(){
  if(!histosInitialized_){
    //Make template histos
    add1DHistogram("h1DVxPullTemplate",";#phi^{*} [rad]; Events",50,-0.1,0.1,file_);
-   //add1DHistogram("h1DPhiTemplate",";#phi^{*} [rad]; Events",18,0,M_PI,file_);
-   add1DHistogram("h1DPhiTemplate",";#phi^{*} [rad]; Events",2*18,-1,1,file_);
+   add1DHistogram("h1DPhiTemplate",";#phi^{*} [rad]; Events",18,0,M_PI,file_);
+   //add1DHistogram("h1DPhiTemplate",";#phi^{*} [rad]; Events",2*18,-1,1,file_);
    add1DHistogram("h1DRhoTemplate",";#rho^{*} [rad]; Events",18,M_PI-0.15,M_PI,file_);
    add1DHistogram("h1DDPhiTemplate",";#Delta#phi^{*} [rad]; Events",32,-0.5*M_PI,0.5*M_PI,file_);
    add1DHistogram("h1IPTemplate",";#phi^{*} [rad]; Events",100,0,1.0,file_);
@@ -91,10 +91,10 @@ void CPHistograms::finalizeHistograms(int nRuns, float weight){
 	plot_HAZ_Histograms("h1DPhi",aType);
 	plot_HAZ_Histograms("h1DPhi_nVectors",aType);
 	plot_HAZ_Histograms("h1DRho",aType);
-	plot_HAZ_Histograms("h1DPhi_Rho_y1y2Minus",aType);
-	plot_HAZ_Histograms("h1DPhi_Rho_y1y2MinusLAB",aType);
-	plot_HAZ_Histograms("h1DPhi_Rho_y1y2Plus",aType);
-	plot_HAZ_Histograms("h1DPhi_Rho_y1y2PlusLAB",aType);
+	//plot_HAZ_Histograms("h1DPhi_Rho_y1y2Minus",aType);
+	//plot_HAZ_Histograms("h1DPhi_Rho_y1y2MinusLAB",aType);
+	//plot_HAZ_Histograms("h1DPhi_Rho_y1y2Plus",aType);
+	//plot_HAZ_Histograms("h1DPhi_Rho_y1y2PlusLAB",aType);
       }
     }
   }
@@ -137,7 +137,7 @@ void CPHistograms::plot_HAZ_Histograms(const std::string & hName,
     h_Z->Scale(1.0/h_Z->Integral(0,h_Z->GetNbinsX()+1));
 
     h_h->SetMinimum(0.0);
-    h_h->SetMaximum(0.3);
+    h_h->SetMaximum(0.15);
     h_h->SetXTitle("#phi^{*}");
     h_h->SetYTitle("Events");
     h_h->GetYaxis()->SetTitleOffset(1.4);
@@ -236,7 +236,7 @@ void CPHistograms::plotHistograms(const std::string & sysType){
     ///
     c->Print(TString::Format("fig_png/Rho_%s.png",sysType.c_str()).Data());
   }
-
+  /*
   hName = "h1DPhi_Rho_y1y2Minus"+sysType;
   hName1 = "h1DPhi_Rho_y1y2Plus"+sysType;
   h1D = this->get1DHistogram(hName.Data());
@@ -293,7 +293,7 @@ void CPHistograms::plotHistograms(const std::string & sysType){
     ///
     c->Print(TString::Format("fig_png/Rho_y1y2LAB_%s.png",sysType.c_str()).Data());
   }
-  
+  */
 
   hName = "h1DIP_PCA"+sysType;
   h1D = this->get1DHistogram(hName.Data());  

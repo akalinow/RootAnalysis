@@ -162,6 +162,9 @@ void OTFHistograms::finalizeHistograms(int nRuns, float weight){
   
   utilsL1RpcStyle()->cd();
 
+  plotRate("Tot");
+  return;
+
   plotEffPanel("Gmt");
   plotEffVsEta("Gmt");
   plotEffVsVar("Gmt","EtaVx");
