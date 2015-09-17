@@ -20,6 +20,7 @@
 class EventProxyCPNtuple;
 class TLorentzVector;
 class TVector3;
+class HTTEvent;
 class DiTauData;
 
 class CPAnalyzer: public Analyzer{
@@ -121,6 +122,8 @@ class CPAnalyzer: public Analyzer{
   
   ///Histograms storage
   CPHistograms *myHistos_;
+
+  HTTEvent *myEvent;
   
   //should this CPAnalyzer be able to filter events
   bool filterEvent_;

@@ -41,6 +41,7 @@ bool CPHistograms::fill1DHistogram(const std::string& name, float val, float wei
   
   std::string hTemplateName = "";
   if(!AnalysisHistograms::fill1DHistogram(name,val,weight)){
+    if(name.find("h1DDeltaR")!=std::string::npos) hTemplateName = "h1DDeltaRTemplate";
     if(name.find("h1DCosPhi")!=std::string::npos) hTemplateName = "h1DCosPhiTemplate";
     if(name.find("h1DPhi")!=std::string::npos) hTemplateName = "h1DPhiTemplate";
     if(name.find("h1DRho")!=std::string::npos) hTemplateName = "h1DRhoTemplate";
@@ -64,13 +65,14 @@ void CPHistograms::defineHistograms(){
 
  if(!histosInitialized_){
    //Make template histos
+   add1DHistogram("h1DDeltaRTemplate",";#Delta R; Events",100,0,0.5,file_);
    add1DHistogram("h1DVxPullTemplate",";#phi^{*} [rad]; Events",50,-0.1,0.1,file_);
    add1DHistogram("h1DPhiTemplate",";#phi^{*} [rad]; Events",18,0,M_PI,file_);
    //add1DHistogram("h1DPhiTemplate",";#phi^{*} [rad]; Events",2*18,-1,1,file_);
    add1DHistogram("h1DRhoTemplate",";#rho^{*} [rad]; Events",18,M_PI-0.15,M_PI,file_);
    add1DHistogram("h1DDPhiTemplate",";#Delta#phi^{*} [rad]; Events",32,-0.5*M_PI,0.5*M_PI,file_);
    add1DHistogram("h1IPTemplate",";#phi^{*} [rad]; Events",100,0,1.0,file_);
-   add1DHistogram("h1DCosPhiTemplate",";cos(#phi); Events",100,0.9995,1.0,file_);
+   add1DHistogram("h1DCosPhiTemplate",";cos(#phi); Events",100,0.0,1.0,file_);
    
    histosInitialized_ = true;
  }
@@ -79,6 +81,11 @@ void CPHistograms::defineHistograms(){
 /////////////////////////////////////////////////////////
 void CPHistograms::finalizeHistograms(int nRuns, float weight){
 
+  plotPCAResolution("h1DCosPhi_nGenRecoMinus");
+
+  //plotAnyHistogram("h1DCosPhi_nGenRecoMinus");
+  //plotAnyHistogram("h1DCosPhi_nGenRecoPlus");
+  
   std::string hName = "h1DPhi_nVectors";
   std::string sysType;
   for(auto it:my1Dhistograms_){
@@ -317,6 +324,77 @@ void CPHistograms::plotHistograms(const std::string & sysType){
     l.Draw();
     c->SetLogy();
     c->Print(TString::Format("fig_png/3DIP_%s.png",sysType.c_str()).Data());
+  }
+}
+/////////////////////////////////////////////////////////
+/////////////////////////////////////////////////////////
+void CPHistograms::plotPCAResolution(const std::string & hName){
+
+  TCanvas* c = new TCanvas("AnyHistogram","AnyHistogram",			   
+			   460,500);
+
+  TLegend l(0.15,0.68,0.35,0.87,NULL,"brNDC");
+  l.SetTextSize(0.05);
+  l.SetFillStyle(4000);
+  l.SetBorderSize(0);
+  l.SetFillColor(10);
+
+  TH1F* h1DAOD = this->get1DHistogram("h1DCosPhi_PCA_AOD");
+  TH1F* h1DGen = this->get1DHistogram("h1DCosPhi_PCA_Gen");
+  TH1F* h1DRefit = this->get1DHistogram("h1DCosPhi_PCA_Refit");
+
+  if(h1DGen){
+    h1DGen->SetLineWidth(3);
+    h1DAOD->SetLineWidth(3);
+    h1DRefit->SetLineWidth(3);
+    //
+    h1DGen->Scale(1.0/h1DGen->Integral(0,h1DGen->GetNbinsX()+1));
+    h1DAOD->Scale(1.0/h1DAOD->Integral(0,h1DAOD->GetNbinsX()+1));
+    h1DRefit->Scale(1.0/h1DRefit->Integral(0,h1DRefit->GetNbinsX()+1));
+    ///
+    h1DAOD->SetLineColor(2);
+    h1DRefit->SetLineColor(4);
+    ///
+    h1DGen->SetYTitle("Events");
+    h1DGen->SetXTitle("#hat{n}_{GEN}^{#pi^{+}} #bullet #hat{n}_{RECO}^{#pi^{+}}");
+    h1DGen->GetYaxis()->SetTitleOffset(1.4);
+    h1DGen->SetStats(kFALSE);
+    h1DGen->Draw();
+    h1DAOD->Draw("same");
+    h1DRefit->Draw("same");
+
+    l.AddEntry(h1DGen,"Generator PV");
+    l.AddEntry(h1DAOD,"AOD PV");
+    l.AddEntry(h1DRefit,"Refitted PV");
+    l.Draw();
+    //c->SetLogy();
+    c->Print(TString::Format("fig_png/%s.png",hName.c_str()).Data());
+  }
+}
+/////////////////////////////////////////////////////////
+/////////////////////////////////////////////////////////
+void CPHistograms::plotAnyHistogram(const std::string & hName){
+  
+   TCanvas* c = new TCanvas("AnyHistogram","AnyHistogram",			   
+			   460,500);
+
+  TLegend l(0.15,0.78,0.35,0.87,NULL,"brNDC");
+  l.SetTextSize(0.05);
+  l.SetFillStyle(4000);
+  l.SetBorderSize(0);
+  l.SetFillColor(10);
+
+  TH1F* h1D = this->get1DHistogram(hName.c_str());
+
+  if(h1D){
+    h1D->SetLineWidth(3);
+    h1D->Scale(1.0/h1D->Integral(0,h1D->GetNbinsX()+1));
+    h1D->SetYTitle("Events");
+    h1D->GetYaxis()->SetTitleOffset(1.4);
+    h1D->SetStats(kFALSE);
+    h1D->Draw();
+    //c->SetLogy();
+    c->Print(TString::Format("fig_png/%s.png",hName.c_str()).Data());
   }
 }
 /////////////////////////////////////////////////////////

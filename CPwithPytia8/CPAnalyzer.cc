@@ -137,9 +137,10 @@ void CPAnalyzer::fillAngles(const DiTauData* aEvent,
 //////////////////////////////////////////////////////////////////////////////
 bool CPAnalyzer::analyze(const EventProxyBase& iEvent){
 
-  const EventProxyCPNtuple & myEvent = static_cast<const EventProxyCPNtuple&>(iEvent);
-  DiTauData* aEventGen = &(myEvent.event->genEvent_);
-  DiTauData* aEventReco = &(myEvent.event->recoEvent_);
+  const EventProxyCPNtuple & myEventProxy = static_cast<const EventProxyCPNtuple&>(iEvent);
+  myEvent = myEventProxy.event;
+  DiTauData* aEventGen = &(myEvent->genEvent_);
+  DiTauData* aEventReco = &(myEvent->recoEvent_);
   DiTauData* aEvent =  aEventReco;
 
   
@@ -152,9 +153,40 @@ bool CPAnalyzer::analyze(const EventProxyBase& iEvent){
   bool accepted = analysisSelection(aEvent);
   accepted = true;//TEST
   ///
-  std::vector<std::string> decayNames = getDecayName(aEventGen->decModeMinus_, aEventGen->decModePlus_);
+  std::vector<std::string> decayNames = getDecayName(aEvent->decModeMinus_, aEvent->decModePlus_);
+  std::vector<std::string> decayNamesGen = getDecayName(aEventGen->decModeMinus_, aEventGen->decModePlus_);
+
+  bool goodGen = false, goodRec = false;
+  for(auto it: decayNames) if(it.find("PiPi0Pi0")!=std::string::npos) goodRec = true;
+  for(auto it: decayNamesGen) if(it.find("PiPi0Pi0")!=std::string::npos) goodGen = true;
+
+  float deltaR_plus = aEventGen->piPlus_.DeltaR(aEventReco->piPlus_);
+  float deltaR_minus = aEventGen->piMinus_.DeltaR(aEventReco->piMinus_);
+
+  myHistos_->fill1DHistogram("h1DDeltaRPlus",deltaR_plus);
+  myHistos_->fill1DHistogram("h1DDeltaRMinus",deltaR_minus);
+
+  float cosPhiMinus = aEventGen->nPiMinus_.Unit().Dot(aEventReco->nPiMinus_.Unit());
+  myHistos_->fill1DHistogram("h1DCosPhi_nGenRecoMinus",cosPhiMinus);
   
-  std::string motherName = getMotherName(myEvent.event->bosonId_);
+  float cosPhiPlus = aEventGen->nPiPlus_.Unit().Dot(aEventReco->nPiPlus_.Unit());
+  myHistos_->fill1DHistogram("h1DCosPhi_nGenRecoPlus",cosPhiPlus);
+
+  cosPhiPlus = aEventGen->nPiPlus_.Unit().Dot(aEventReco->nPiPlusAODvx_.Unit());
+  myHistos_->fill1DHistogram("h1DCosPhi_PCA_AOD",cosPhiPlus);
+  
+  cosPhiPlus = aEventGen->nPiPlus_.Unit().Dot(aEventReco->nPiPlusRefitvx_.Unit());
+  myHistos_->fill1DHistogram("h1DCosPhi_PCA_Refit",cosPhiPlus);
+  
+  cosPhiPlus = aEventGen->nPiPlus_.Unit().Dot(aEventReco->nPiPlusGenvx_.Unit());
+  myHistos_->fill1DHistogram("h1DCosPhi_PCA_Gen",cosPhiPlus);
+  
+  if(!(goodGen&goodRec) || deltaR_plus>0.1 || deltaR_minus>0.1 ||
+     cosPhiMinus<0.8 || cosPhiPlus<0.8){   
+    return true;
+  }
+  
+  std::string motherName = getMotherName(myEvent->bosonId_);
   std::string smearType = "ideal";
   std::string name;
   ///
