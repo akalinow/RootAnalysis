@@ -90,6 +90,11 @@ class CPAnalyzer: public Analyzer{
   //(w/o cuts, PV smearing etc.)
   void fillAngles(const DiTauData *aEvent,
 		  const std::string & sysType);
+
+  ///Fill pulls between generator and various reco vertices.
+  bool fillVertices(const DiTauData* aEventGen,
+		    const DiTauData* aEventReco,
+		    const std::string & sysType);
   
 
   ///Calculate angle between tau decay planes (first element of pair)

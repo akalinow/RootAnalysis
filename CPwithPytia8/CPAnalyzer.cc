@@ -57,32 +57,27 @@ void CPAnalyzer::fillAngles(const DiTauData* aEvent,
   
   if(sysType.find("smearPV")!=std::string::npos){
     double sigmaX = 10E-4, sigmaY = 10E-4, sigmaZ = 30E-4;//[cm]?
-    pullX = aRndm.Gaus(0.0,sigmaX);
-    pullZ = aRndm.Gaus(0.0,sigmaZ);
-    pv.SetXYZ(pv.X()+pullX,
+    pv.SetXYZ(pv.X()+aRndm.Gaus(0.0,sigmaX),
 	      pv.Y()+aRndm.Gaus(0.0,sigmaY),
-	      pv.Z()+pullZ);
+	      pv.Z()+aRndm.Gaus(0.0,sigmaZ));
   }
   //////////////////
-  myHistos_->fill1DHistogram("h1DVxPullX"+sysType,pullX);
-  myHistos_->fill1DHistogram("h1DVxPullZ"+sysType,pullZ);
-  
-  //TVector3 nMinus = impactParameter(pv,svMinus,aEvent->piMinus_);
-  //TVector3 nPlus  = impactParameter(pv,svPlus,aEvent->piPlus_);
   TVector3 nMinus = aEvent->nPiMinus_;
   TVector3 nPlus  = aEvent->nPiPlus_;
+
+  if(sysType.find("AOD")!=std::string::npos){
+    nMinus = myEvent->recoEvent_.nPiMinusAODvx_;
+    nPlus  = myEvent->recoEvent_.nPiPlusAODvx_;
+  }
+
+  if(sysType.find("RECOGEN")!=std::string::npos){
+    nMinus = myEvent->recoEvent_.nPiMinusGenvx_;
+    nPlus  = myEvent->recoEvent_.nPiPlusGenvx_;
+  }
   
   if(sysType.find("smear")!=std::string::npos &&
      sysType.find("PCA")!=std::string::npos){
     double sigmaX = 20E-4, sigmaY = 20E-4, sigmaZ = 20E-4; //[cm]?
-    /*
-    nMinus.SetPerp(nMinus.Perp()+aRndm.Gaus(0.0,sigmaX));
-    nMinus.SetZ(nMinus.Z()+aRndm.Gaus(0.0,sigmaZ));
-
-    nPlus.SetPerp(nPlus.Perp()+aRndm.Gaus(0.0,sigmaX));
-    nPlus.SetZ(nPlus.Z()+aRndm.Gaus(0.0,sigmaZ));
-    */
-    
     nMinus.SetXYZ(nMinus.X()+aRndm.Gaus(0.0,sigmaX),
 		  nMinus.Y()+aRndm.Gaus(0.0,sigmaY),
 		  nMinus.Z()+aRndm.Gaus(0.0,sigmaZ));
@@ -92,7 +87,8 @@ void CPAnalyzer::fillAngles(const DiTauData* aEvent,
 		 nPlus.Z()+aRndm.Gaus(0.0,sigmaZ));    
   }
   ////////////////////////////
-
+  float cosPhiNN = nMinus.Unit().Dot(nPlus.Unit());
+  myHistos_->fill1DHistogram("h1DCosPhiNN"+sysType,cosPhiNN);
   
   float cosPhiTauMinusPi = (svMinus-pv).Unit().Dot(aEvent->piMinus_.Vect().Unit());
   float cosPhiTauPlusPi = (svPlus-pv).Unit().Dot(aEvent->piPlus_.Vect().Unit());
@@ -109,10 +105,8 @@ void CPAnalyzer::fillAngles(const DiTauData* aEvent,
   std::pair<float,float>  angles2 = angleBetweenPlanes(aEvent->piMinus_,TLorentzVector(nMinus,0),
   						       aEvent->piPlus_,TLorentzVector(nPlus,0));
 
-  //if(cosPhiTauMinusPi>0.9999 && cosPhiTauPlusPi>0.9999){
   myHistos_->fill1DHistogram("h1DPhi_nVectors"+sysType,angles2.first);
   myHistos_->fill1DHistogram("h1DRho_nVectors"+sysType,angles2.second);
-  //}
 
   /*
   //Method from http://arxiv.org/abs/hep-ph/0204292 (Was)
@@ -135,75 +129,138 @@ void CPAnalyzer::fillAngles(const DiTauData* aEvent,
 }
 //////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////
+bool CPAnalyzer::fillVertices(const DiTauData* aEventGen,
+			      const DiTauData* aEventReco,
+			      const std::string & sysType){
+
+  TVector3 aVertex;
+  if(sysType.find("AOD")!=std::string::npos) aVertex = aEventReco->thePV_;
+  if(sysType.find("PF")!=std::string::npos) aVertex = aEventReco->pfPV_;
+  if(sysType.find("RefitBS")!=std::string::npos) aVertex = aEventReco->refitPfPV_;
+  if(sysType.find("RefitNoBS")!=std::string::npos) aVertex = aEventReco->refitPfPVNoBS_;
+
+  TVector3 aVertexGen = aEventGen->thePV_;
+  
+  float pullX = aVertexGen.X() - aVertex.X();
+  float pullY = aVertexGen.Y() - aVertex.Y();
+  float pullZ = aVertexGen.Z() - aVertex.Z();
+
+  aVertex.SetZ(aEventReco->thePV_.Z());
+  pullX = (aVertexGen - aVertex).Mag();
+  
+  myHistos_->fill1DHistogram("h1DVxPullX"+sysType,pullX);
+  myHistos_->fill1DHistogram("h1DVxPullY"+sysType,pullY);
+  myHistos_->fill1DHistogram("h1DVxPullZ"+sysType,pullZ);
+
+  
+
+  return true;
+}
+//////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////////
 bool CPAnalyzer::analyze(const EventProxyBase& iEvent){
 
   const EventProxyCPNtuple & myEventProxy = static_cast<const EventProxyCPNtuple&>(iEvent);
   myEvent = myEventProxy.event;
   DiTauData* aEventGen = &(myEvent->genEvent_);
   DiTauData* aEventReco = &(myEvent->recoEvent_);
-  DiTauData* aEvent =  aEventReco;
-
-  
+ 
   //Skip 3-prong and unknown decays.
   if( !(isOneProng(aEventGen->decModeMinus_) || isLepton(aEventGen->decModeMinus_) ) ||
       !(isOneProng(aEventGen->decModePlus_)  || isLepton(aEventGen->decModePlus_) ) ) return true;
   ///Skip lepton decays
   if(isLepton(aEventGen->decModeMinus_) || isLepton(aEventGen->decModePlus_)) return true;
   
-  bool accepted = analysisSelection(aEvent);
-  accepted = true;//TEST
+  //accepted = true;//TEST
+  //if(aEventReco->piMinus_.Perp()>20 || aEventReco->piPlus_.Perp()>20) return true; //TEST
+  //if(fabs(aEventReco->rePfPV_.X() - aEventGen->thePV_.X())>1E-3) return true; //TEST
+  //if(fabs(aEventReco->rePfPV_.Y() - aEventGen->thePV_.Y())>1E-3) return true; //TEST
+  //if(fabs(aEventReco->rePfPV_.Z() - aEventGen->thePV_.Z())>1E-3) return true; //TEST
   ///
-  std::vector<std::string> decayNames = getDecayName(aEvent->decModeMinus_, aEvent->decModePlus_);
+  std::vector<std::string> decayNamesReco = getDecayName(aEventReco->decModeMinus_, aEventReco->decModePlus_);
   std::vector<std::string> decayNamesGen = getDecayName(aEventGen->decModeMinus_, aEventGen->decModePlus_);
-
-  bool goodGen = false, goodRec = false;
-  for(auto it: decayNames) if(it.find("PiPi0Pi0")!=std::string::npos) goodRec = true;
-  for(auto it: decayNamesGen) if(it.find("PiPi0Pi0")!=std::string::npos) goodGen = true;
+  std::string motherName = getMotherName(myEvent->bosonId_);
 
   float deltaR_plus = aEventGen->piPlus_.DeltaR(aEventReco->piPlus_);
   float deltaR_minus = aEventGen->piMinus_.DeltaR(aEventReco->piMinus_);
-
-  myHistos_->fill1DHistogram("h1DDeltaRPlus",deltaR_plus);
-  myHistos_->fill1DHistogram("h1DDeltaRMinus",deltaR_minus);
-
-  float cosPhiMinus = aEventGen->nPiMinus_.Unit().Dot(aEventReco->nPiMinus_.Unit());
-  myHistos_->fill1DHistogram("h1DCosPhi_nGenRecoMinus",cosPhiMinus);
   
+  if(deltaR_plus<0.1 && deltaR_minus<0.1){ 
+    myHistos_->fill1DHistogram("h1DDecayModePlus_"+motherName,aEventReco->decModePlus_);
+    myHistos_->fill1DHistogram("h1DDecayModeMinus_"+motherName,aEventReco->decModeMinus_);
+  }
+
+  bool goodGen = false, goodReco = false;
+  for(auto it: decayNamesReco) if(it.find("PiPi0Pi0")!=std::string::npos) goodReco = true;
+  for(auto it: decayNamesGen) if(it.find("PiPi0Pi0")!=std::string::npos) goodGen = true;
+
+  if(goodGen&goodReco){
+    myHistos_->fill1DHistogram("h1DDeltaRPlus_"+motherName,deltaR_plus);
+    myHistos_->fill1DHistogram("h1DDeltaRMinus_"+motherName,deltaR_minus);
+  }
+
+  ///Select only good matching decay and momentum events.
+  if(!(goodGen&goodReco) || deltaR_plus>0.1 || deltaR_minus>0.1) return true;
+  //if(fabs( (aEventReco->refitPfPV_ - aEventGen->thePV_).Z())>0.01) return true;
+  
+  float cosPhiMinus = aEventGen->nPiMinus_.Unit().Dot(aEventReco->nPiMinus_.Unit());
   float cosPhiPlus = aEventGen->nPiPlus_.Unit().Dot(aEventReco->nPiPlus_.Unit());
-  myHistos_->fill1DHistogram("h1DCosPhi_nGenRecoPlus",cosPhiPlus);
 
   cosPhiPlus = aEventGen->nPiPlus_.Unit().Dot(aEventReco->nPiPlusAODvx_.Unit());
-  myHistos_->fill1DHistogram("h1DCosPhi_PCA_AOD",cosPhiPlus);
-  
-  cosPhiPlus = aEventGen->nPiPlus_.Unit().Dot(aEventReco->nPiPlusRefitvx_.Unit());
-  myHistos_->fill1DHistogram("h1DCosPhi_PCA_Refit",cosPhiPlus);
-  
+  myHistos_->fill1DHistogram("h1DCosPhi_PCA_AOD_"+motherName,cosPhiPlus);
+    
   cosPhiPlus = aEventGen->nPiPlus_.Unit().Dot(aEventReco->nPiPlusGenvx_.Unit());
-  myHistos_->fill1DHistogram("h1DCosPhi_PCA_Gen",cosPhiPlus);
-  
-  if(!(goodGen&goodRec) || deltaR_plus>0.1 || deltaR_minus>0.1 ||
-     cosPhiMinus<0.8 || cosPhiPlus<0.8){   
+  myHistos_->fill1DHistogram("h1DCosPhi_PCA_Gen_"+motherName,cosPhiPlus);
+
+  cosPhiPlus = aEventGen->nPiPlus_.Unit().Dot(aEventReco->nPiPlusRefitvx_.Unit());
+  myHistos_->fill1DHistogram("h1DCosPhi_PCA_Refit_"+motherName,cosPhiPlus);
+
+  /*
+  if(cosPhiMinus>0.8 || cosPhiPlus>0.8){
     return true;
   }
+  */
   
-  std::string motherName = getMotherName(myEvent->bosonId_);
   std::string smearType = "ideal";
   std::string name;
+  bool selected = false;
   ///
-  for(auto decayName:decayNames){
+  fillVertices(aEventGen,aEventReco,"_"+motherName+"_AOD");
+  fillVertices(aEventGen,aEventReco,"_"+motherName+"_PF");
+  fillVertices(aEventGen,aEventReco,"_"+motherName+"_RefitBS");
+  fillVertices(aEventGen,aEventReco,"_"+motherName+"_RefitNoBS");
+  ///TEST
+
+  
+
+  ////
+  selected = analysisSelection(aEventReco);
+  ///
+  for(auto decayName:decayNamesReco){
+    if(decayName!="PiPi0Pi0") continue; //use only PiPi0Pi0 decays
     smearType = "ideal";
     name = "_"+motherName+"_"+decayName+"_"+smearType;
-    fillAngles(aEvent,name);
-    if(accepted) name+="_selected";
-    fillAngles(aEvent, name);
+    fillAngles(aEventReco,name+"_RECO");
+    fillAngles(aEventReco,name+"_RECOGEN");
+    fillAngles(aEventReco,name+"_AOD");    
+    if(selected) fillAngles(aEventReco, name+"_selected"+"_RECO");   
+  }  
+  ///
+  selected = analysisSelection(aEventGen);  
+  for(auto decayName:decayNamesGen){
+    if(decayName!="PiPi0Pi0") continue; //use only PiPi0Pi0 decays
+    smearType = "ideal";
+    name = "_"+motherName+"_"+decayName+"_"+smearType;
+    fillAngles(aEventGen,name+"_GEN");
+    if(selected) fillAngles(aEventGen, name+"_selected"+"_GEN");
+    /*
     smearType = "smearPV";
     name = "_"+motherName+"_"+decayName+"_"+smearType;
-    fillAngles(aEvent, name);
+    fillAngles(aEvent, name+"_GEN");
     smearType = "smearPV_PCA";
     name = "_"+motherName+"_"+decayName+"_"+smearType;
-    fillAngles(aEvent, name);
-    if(accepted) name+="_selected";
-    fillAngles(aEvent, name);
+    fillAngles(aEvent, name+"_GEN");
+    if(selected) fillAngles(aEvent, name+"_selected"+"_GEN");
+    */
   }  
 }
 //////////////////////////////////////////////////////////////////////////////
@@ -273,11 +330,11 @@ std::pair<float,float> CPAnalyzer::angleBetweenPlanes(const TLorentzVector &tau1
 
   ///angle between decay planes
   float phi=TMath::ACos(n1*n2);
+
   ///angle between tau1 and tau2 daughter momentums
   float rho=TMath::ACos( (tau1DaughterStar.Vect().Unit() )*(tau2DaughterStar.Vect().Unit() ) );
 
   return std::make_pair(phi,rho);
-  
 }
 //////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////

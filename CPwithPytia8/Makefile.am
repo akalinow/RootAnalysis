@@ -17,7 +17,7 @@ noinst_PROGRAMS=test
 
 # Sources for the a.out 
 test_SOURCES= CPAnalysis.cc EventProxyCPNtuple.cc \
-              CPHistograms.cc CPAnalyzer.cc
+              CPHistograms.cc CPAnalyzer.cc HTTEvent.cxx
 
 # Linker options for a.out
 test_LDFLAGS = $(top_srcdir)/src/libRootAnalysis.la -R @ROOTLIBDIR@ -L@ROOTLIBDIR@

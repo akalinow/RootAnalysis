@@ -11,6 +11,7 @@
 #include "TMarker.h"
 #include "TMath.h"
 #include "TLatex.h"
+#include "TStyle.h"
 
 CPHistograms::CPHistograms(std::string fileName, int opt){
 
@@ -41,6 +42,7 @@ bool CPHistograms::fill1DHistogram(const std::string& name, float val, float wei
   
   std::string hTemplateName = "";
   if(!AnalysisHistograms::fill1DHistogram(name,val,weight)){
+    if(name.find("h1DDecayMode")!=std::string::npos) hTemplateName = "h1DDecayModeTemplate";
     if(name.find("h1DDeltaR")!=std::string::npos) hTemplateName = "h1DDeltaRTemplate";
     if(name.find("h1DCosPhi")!=std::string::npos) hTemplateName = "h1DCosPhiTemplate";
     if(name.find("h1DPhi")!=std::string::npos) hTemplateName = "h1DPhiTemplate";
@@ -65,14 +67,14 @@ void CPHistograms::defineHistograms(){
 
  if(!histosInitialized_){
    //Make template histos
-   add1DHistogram("h1DDeltaRTemplate",";#Delta R; Events",100,0,0.5,file_);
-   add1DHistogram("h1DVxPullTemplate",";#phi^{*} [rad]; Events",50,-0.1,0.1,file_);
-   add1DHistogram("h1DPhiTemplate",";#phi^{*} [rad]; Events",18,0,M_PI,file_);
-   //add1DHistogram("h1DPhiTemplate",";#phi^{*} [rad]; Events",2*18,-1,1,file_);
+   add1DHistogram("h1DDecayModeTemplate",";Decay mode; Events",11,-0.5,10.5,file_);
+   add1DHistogram("h1DDeltaRTemplate",";#Delta R; Events",20,0,0.05,file_);
+   add1DHistogram("h1DVxPullTemplate",";#phi^{*} [rad]; Events",10,-0.01,0.01,file_);
+   add1DHistogram("h1DPhiTemplate",";#phi^{*} [rad]; Events",10,0,M_PI,file_);//
    add1DHistogram("h1DRhoTemplate",";#rho^{*} [rad]; Events",18,M_PI-0.15,M_PI,file_);
    add1DHistogram("h1DDPhiTemplate",";#Delta#phi^{*} [rad]; Events",32,-0.5*M_PI,0.5*M_PI,file_);
    add1DHistogram("h1IPTemplate",";#phi^{*} [rad]; Events",100,0,1.0,file_);
-   add1DHistogram("h1DCosPhiTemplate",";cos(#phi); Events",100,0.0,1.0,file_);
+   add1DHistogram("h1DCosPhiTemplate",";cos(#phi); Events",10,-1.0,1.0,file_);
    
    histosInitialized_ = true;
  }
@@ -81,10 +83,27 @@ void CPHistograms::defineHistograms(){
 /////////////////////////////////////////////////////////
 void CPHistograms::finalizeHistograms(int nRuns, float weight){
 
-  plotPCAResolution("h1DCosPhi_nGenRecoMinus");
+  plotPCAResolution("_h0");
+  plotPCAResolution("_A0");
+  plotPCAResolution("_Z0");
 
-  //plotAnyHistogram("h1DCosPhi_nGenRecoMinus");
-  //plotAnyHistogram("h1DCosPhi_nGenRecoPlus");
+  plotVerticesPulls("h1DVxPullX_h0");
+  plotVerticesPulls("h1DVxPullX_A0");
+  plotVerticesPulls("h1DVxPullX_Z0");
+
+  plotVerticesPulls("h1DVxPullY_h0");
+  plotVerticesPulls("h1DVxPullY_A0");
+  plotVerticesPulls("h1DVxPullY_Z0");
+
+  plotVerticesPulls("h1DVxPullZ_h0");
+  plotVerticesPulls("h1DVxPullZ_A0");
+  plotVerticesPulls("h1DVxPullZ_Z0");
+
+  plotAnyHistogram("h1DDeltaRPlus_h0");
+  plotAnyHistogram("h1DDeltaRPlus_A0");
+
+  plotAnyHistogram("h1DDecayModePlus_h0");
+  plotAnyHistogram("h1DDecayModeMinus_h0");
   
   std::string hName = "h1DPhi_nVectors";
   std::string sysType;
@@ -97,6 +116,7 @@ void CPHistograms::finalizeHistograms(int nRuns, float weight){
       if(sysType.find("Z0")!=std::string::npos){
 	plot_HAZ_Histograms("h1DPhi",aType);
 	plot_HAZ_Histograms("h1DPhi_nVectors",aType);
+	plot_HAZ_Histograms("h1DCosPhiNN",aType);
 	plot_HAZ_Histograms("h1DRho",aType);
 	//plot_HAZ_Histograms("h1DPhi_Rho_y1y2Minus",aType);
 	//plot_HAZ_Histograms("h1DPhi_Rho_y1y2MinusLAB",aType);
@@ -143,9 +163,14 @@ void CPHistograms::plot_HAZ_Histograms(const std::string & hName,
     h_A->Scale(1.0/h_A->Integral(0,h_A->GetNbinsX()+1));
     h_Z->Scale(1.0/h_Z->Integral(0,h_Z->GetNbinsX()+1));
 
+    float max = h_h->GetMaximum();
+    if(h_A->GetMaximum()>max) max = h_A->GetMaximum();
+    if(h_Z->GetMaximum()>max) max = h_Z->GetMaximum();	
     h_h->SetMinimum(0.0);
-    h_h->SetMaximum(0.15);
+    h_h->SetMaximum(1.1*max);
+    
     h_h->SetXTitle("#phi^{*}");
+    if(name.Contains("CosPhiNN")) h_h->SetXTitle("#hat{n}_{RECO}^{#pi^{+}} #bullet #hat{n}_{RECO}^{#pi^{-}}");
     h_h->SetYTitle("Events");
     h_h->GetYaxis()->SetTitleOffset(1.4);
     h_h->SetStats(kFALSE);
@@ -172,7 +197,7 @@ void CPHistograms::plotHistograms(const std::string & sysType){
 			   TString::Format("Phi_%s",sysType.c_str()),
 			   460,500);
 
-  TLegend l(0.15,0.78,0.35,0.87,NULL,"brNDC");
+  TLegend l(0.15,0.7,0.35,0.87,NULL,"brNDC");
   l.SetTextSize(0.05);
   l.SetFillStyle(4000);
   l.SetBorderSize(0);
@@ -182,19 +207,36 @@ void CPHistograms::plotHistograms(const std::string & sysType){
 
   TString hName = "h1DPhi"+sysType;
   TString hName1 = "h1DPhi_nVectors"+sysType;
-
-  //TString hName = "h1DCosPhi_collinearMinus"+sysType;
-  //TString hName1 = "h1DCosPhi_collinearPlus"+sysType;
+  TString hName2 = "h1DPhi_nVectors"+sysType;
+  TString hName3 = "h1DPhi_nVectors"+sysType;
+  if(hName.Contains("RECO")){
+    hName = "h1DPhi_nVectors"+sysType;
+    hName.ReplaceAll("RECO","GEN");
+    hName2.ReplaceAll("RECO","AOD");
+    hName3.ReplaceAll("RECO","RECOGEN");
+  }
   
   TH1F* h1D = this->get1DHistogram(hName.Data());
   TH1F* h1DExp = this->get1DHistogram(hName1.Data());
+  TH1F* h1DExp2 = this->get1DHistogram(hName2.Data());
+  TH1F* h1DExp3 = this->get1DHistogram(hName3.Data());
+
+  if(sysType.find("GEN")!=std::string::npos){
+    h1DExp2 = 0;
+    h1DExp3 = 0;
+  }
+
   if(h1D){
     h1D->SetLineWidth(3);
     h1DExp->SetLineWidth(3);
+    if(h1DExp2) h1DExp2->SetLineWidth(3);
+    if(h1DExp3) h1DExp3->SetLineWidth(3);	
     h1D->Scale(1.0/h1D->Integral(0,h1D->GetNbinsX()+1));
-    h1DExp->Scale(1.0/h1DExp->Integral(0,h1DExp->GetNbinsX()+1));
+    h1DExp->Scale(1.0/h1DExp->Integral(0,h1DExp->GetNbinsX()+1));    
+    if(h1DExp2) h1DExp2->Scale(1.0/h1DExp2->Integral(0,h1DExp2->GetNbinsX()+1));
+    if(h1DExp3) h1DExp3->Scale(1.0/h1DExp3->Integral(0,h1DExp3->GetNbinsX()+1));
     h1D->SetMinimum(0.0);
-    h1D->SetMaximum(0.15);
+    h1D->SetMaximum(0.2);
     ///TEST
     //h1D->SetMinimum(1E-4);
     //h1D->SetMaximum(1.0);
@@ -204,20 +246,28 @@ void CPHistograms::plotHistograms(const std::string & sysType){
     h1D->SetYTitle("Events");
     h1D->GetYaxis()->SetTitleOffset(1.4);
     h1D->SetStats(kFALSE);
-    h1D->Draw();
+    h1D->Draw("L HIST");
+    h1D->SetLineColor(1);
     h1DExp->SetLineColor(2);
-    h1DExp->Draw("same");
+    if(h1DExp2) h1DExp2->SetLineColor(4);
+    if(h1DExp3) h1DExp3->SetLineColor(8);    
+    h1DExp->Draw("same L HIST");
+    if(h1DExp2) h1DExp2->Draw("same L HIST");
+    if(h1DExp3) h1DExp3->Draw("same L HIST");
     ///
-    l.AddEntry(h1D,"tau momentum");
-    l.AddEntry(h1DExp,"impact param. vectors");
+    if(hName1.Contains("GEN")) l.AddEntry(h1D,"tau momentum");
+    if(hName1.Contains("RECO")) l.AddEntry(h1D,"PCA with GEN PV and SV");
+    if(hName1.Contains("GEN")) l.AddEntry(h1DExp,"PCA with GEN PV and SV");
+    if(hName1.Contains("RECO")) l.AddEntry(h1DExp,"PCA with refit reco vx.");
+    if(h1DExp2) l.AddEntry(h1DExp2,"PCA with AOD vx.");
+    if(h1DExp3) l.AddEntry(h1DExp3,"PCA with GEN vx.");
     l.Draw();
-    aLatex.DrawLatex(0.05,0.12,sysType.c_str());
-
-    //c->SetLogy(); //TEST
+    aLatex.DrawLatex(0.05,0.01,sysType.c_str());
+    
     ///
     c->Print(TString::Format("fig_png/Phi_%s.png",sysType.c_str()).Data());
   }
-
+  /*
   hName = "h1DRho"+sysType;
   hName1 = "h1DRho_nVectors"+sysType;
   h1D = this->get1DHistogram(hName.Data());
@@ -243,6 +293,7 @@ void CPHistograms::plotHistograms(const std::string & sysType){
     ///
     c->Print(TString::Format("fig_png/Rho_%s.png",sysType.c_str()).Data());
   }
+  */
   /*
   hName = "h1DPhi_Rho_y1y2Minus"+sysType;
   hName1 = "h1DPhi_Rho_y1y2Plus"+sysType;
@@ -301,7 +352,7 @@ void CPHistograms::plotHistograms(const std::string & sysType){
     c->Print(TString::Format("fig_png/Rho_y1y2LAB_%s.png",sysType.c_str()).Data());
   }
   */
-
+  /*
   hName = "h1DIP_PCA"+sysType;
   h1D = this->get1DHistogram(hName.Data());  
   hName = "h1DIP_3DIP"+sysType;
@@ -325,10 +376,11 @@ void CPHistograms::plotHistograms(const std::string & sysType){
     c->SetLogy();
     c->Print(TString::Format("fig_png/3DIP_%s.png",sysType.c_str()).Data());
   }
+  */
 }
 /////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////
-void CPHistograms::plotPCAResolution(const std::string & hName){
+void CPHistograms::plotPCAResolution(const std::string & sysType){
 
   TCanvas* c = new TCanvas("AnyHistogram","AnyHistogram",			   
 			   460,500);
@@ -339,11 +391,18 @@ void CPHistograms::plotPCAResolution(const std::string & hName){
   l.SetBorderSize(0);
   l.SetFillColor(10);
 
-  TH1F* h1DAOD = this->get1DHistogram("h1DCosPhi_PCA_AOD");
-  TH1F* h1DGen = this->get1DHistogram("h1DCosPhi_PCA_Gen");
-  TH1F* h1DRefit = this->get1DHistogram("h1DCosPhi_PCA_Refit");
+  TH1F* h1DAOD = this->get1DHistogram("h1DCosPhi_PCA_AOD"+sysType);
+  TH1F* h1DGen = this->get1DHistogram("h1DCosPhi_PCA_Gen"+sysType);
+  TH1F* h1DRefit = this->get1DHistogram("h1DCosPhi_PCA_Refit"+sysType);
 
-  if(h1DGen){
+  //TH1F* h1DGen = this->get1DHistogram("h1DCosPhi_PCA_Gen_A0");
+  //TH1F* h1DRefit = this->get1DHistogram("h1DCosPhi_PCA_Gen_h0");
+
+  //TH1F* h1DGen = this->get1DHistogram("h1DCosPhi_PCA_Refit_A0");
+  //TH1F* h1DRefit = this->get1DHistogram("h1DCosPhi_PCA_Refit_h0");
+  
+
+  if(h1DGen && h1DRefit && h1DAOD){
     h1DGen->SetLineWidth(3);
     h1DAOD->SetLineWidth(3);
     h1DRefit->SetLineWidth(3);
@@ -352,6 +411,7 @@ void CPHistograms::plotPCAResolution(const std::string & hName){
     h1DAOD->Scale(1.0/h1DAOD->Integral(0,h1DAOD->GetNbinsX()+1));
     h1DRefit->Scale(1.0/h1DRefit->Integral(0,h1DRefit->GetNbinsX()+1));
     ///
+    h1DGen->SetLineColor(1);
     h1DAOD->SetLineColor(2);
     h1DRefit->SetLineColor(4);
     ///
@@ -359,6 +419,11 @@ void CPHistograms::plotPCAResolution(const std::string & hName){
     h1DGen->SetXTitle("#hat{n}_{GEN}^{#pi^{+}} #bullet #hat{n}_{RECO}^{#pi^{+}}");
     h1DGen->GetYaxis()->SetTitleOffset(1.4);
     h1DGen->SetStats(kFALSE);
+    float max = h1DGen->GetMaximum();
+    if(h1DAOD->GetMaximum()>max) max = h1DAOD->GetMaximum();
+    if(h1DRefit->GetMaximum()>max) max = h1DRefit->GetMaximum();
+    h1DGen->SetMaximum(1.05*max);
+    
     h1DGen->Draw();
     h1DAOD->Draw("same");
     h1DRefit->Draw("same");
@@ -366,8 +431,76 @@ void CPHistograms::plotPCAResolution(const std::string & hName){
     l.AddEntry(h1DGen,"Generator PV");
     l.AddEntry(h1DAOD,"AOD PV");
     l.AddEntry(h1DRefit,"Refitted PV");
+    //l.AddEntry(h1DRefit,"Generator PV h0");
     l.Draw();
     //c->SetLogy();
+    c->Print(TString::Format("fig_png/%s.png",("CosPhi_PCA"+sysType).c_str()).Data());
+  }
+}
+/////////////////////////////////////////////////////////
+/////////////////////////////////////////////////////////
+void CPHistograms::plotVerticesPulls(const std::string & hName){
+  
+   TCanvas* c = new TCanvas("Vertices","Vertices resolutions",			   
+			   460,500);
+
+  TLegend l(0.15,0.68,0.35,0.87,NULL,"brNDC");
+  l.SetTextSize(0.05);
+  l.SetFillStyle(4000);
+  l.SetBorderSize(0);
+  l.SetFillColor(10);
+
+  TH1F* h1D_AOD = this->get1DHistogram((hName+"_AOD").c_str());
+  TH1F* h1D_PF = this->get1DHistogram((hName+"_PF").c_str());
+  TH1F* h1D_Refit = this->get1DHistogram((hName+"_RefitBS").c_str());
+  TH1F* h1D_RefitNoBS = this->get1DHistogram((hName+"_RefitNoBS").c_str());
+  
+  if(h1D_AOD && h1D_PF && h1D_Refit && h1D_RefitNoBS){
+    
+    h1D_AOD->SetLineWidth(3);
+    h1D_PF->SetLineWidth(3);
+    h1D_Refit->SetLineWidth(3);
+    h1D_RefitNoBS->SetLineWidth(3);
+    ///
+    h1D_AOD->SetLineColor(1);
+    h1D_PF->SetLineColor(2);
+    h1D_Refit->SetLineColor(4);
+    h1D_RefitNoBS->SetLineColor(8);
+    ///
+    h1D_AOD->Scale(1.0/h1D_AOD->Integral(0,h1D_AOD->GetNbinsX()+1));
+    h1D_PF->Scale(1.0/h1D_PF->Integral(0,h1D_PF->GetNbinsX()+1));
+    h1D_Refit->Scale(1.0/h1D_Refit->Integral(0,h1D_Refit->GetNbinsX()+1));
+    h1D_RefitNoBS->Scale(1.0/h1D_RefitNoBS->Integral(0,h1D_RefitNoBS->GetNbinsX()+1));
+    ///
+    h1D_Refit->Fit("gaus");
+    gStyle->SetOptFit(0001);
+    gStyle->SetOptStat(0);
+    ///
+    h1D_AOD->SetYTitle("Events");
+    h1D_AOD->SetXTitle("coordinate GEN - RECO [cm]");
+    h1D_AOD->GetYaxis()->SetTitleOffset(1.4);
+    h1D_AOD->SetStats(kFALSE);    
+    ///
+    float max =     h1D_AOD->GetMaximum();
+    if(h1D_PF->GetMaximum()>max) max = h1D_PF->GetMaximum();
+    if(h1D_Refit->GetMaximum()>max) max = h1D_Refit->GetMaximum();
+    h1D_AOD->SetMaximum(1.05*max);
+    h1D_AOD->Draw();
+    h1D_PF->Draw("same");
+    h1D_Refit->Draw("same");
+    h1D_RefitNoBS->Draw("same");
+
+    //TEST
+    //h1D_Refit->Draw();
+    //h1D_RefitNoBS->Draw("same");
+    //TEST
+
+    l.AddEntry(h1D_AOD,"AOD weights");
+    l.AddEntry(h1D_PF,"PF weights");
+    l.AddEntry(h1D_Refit,"refitted w/o #tau");
+    l.AddEntry(h1D_RefitNoBS,"refitted w/o #tau & BS");
+    l.Draw();
+    
     c->Print(TString::Format("fig_png/%s.png",hName.c_str()).Data());
   }
 }
@@ -393,7 +526,7 @@ void CPHistograms::plotAnyHistogram(const std::string & hName){
     h1D->GetYaxis()->SetTitleOffset(1.4);
     h1D->SetStats(kFALSE);
     h1D->Draw();
-    //c->SetLogy();
+    if(hName.find("DeltaR")!=std::string::npos) c->SetLogy();
     c->Print(TString::Format("fig_png/%s.png",hName.c_str()).Data());
   }
 }

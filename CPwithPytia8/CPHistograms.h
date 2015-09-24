@@ -35,6 +35,9 @@ class CPHistograms: public AnalysisHistograms {
 
   ///PCA resolution related histograms.
   void plotPCAResolution(const std::string & hName);
+
+  ///REsolutions of reconstructed vertices
+  void plotVerticesPulls(const std::string & hName);
   
   ///Plot histogram with given name.
   void plotAnyHistogram(const std::string & hName);
