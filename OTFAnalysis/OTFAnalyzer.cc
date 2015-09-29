@@ -405,7 +405,7 @@ bool OTFAnalyzer::analyze(const EventProxyBase& iEvent){
   const EventProxyOTF & myEvent = static_cast<const EventProxyOTF&>(iEvent);
   theEvent = myEvent.events;
 
-  //if(fabs(theEvent->eta)<0.83 || fabs(theEvent->eta)>1.24) return true;
+  if(fabs(theEvent->eta)<0.83 || fabs(theEvent->eta)>1.24) return true;
   //if(theEvent->eta<0.83 || theEvent->eta>1.24) return true;
   
   //if(fabs(theEvent->eta-theEvent->eta1)<0.5) return true;
@@ -438,6 +438,18 @@ bool OTFAnalyzer::analyze(const EventProxyBase& iEvent){
     //fillGhostHisto("Gmt","VsProcessor");
   }
   else if(fabs(theEvent->eta)>0.83 && fabs(theEvent->eta)<1.24){
+
+    //TEST
+    fillRateHisto("Otf","Tot");
+    fillRateHisto("Gmt","Tot");
+    fillRateHisto("Gmt","VsEta");
+    fillRateHisto("Gmt","VsPt");    
+    fillRateHisto("Otf","VsEta");
+    fillRateHisto("Otf","VsPt");    
+    fillRateHisto("Otf","VsQuality");
+    fillRateHisto("Gmt","VsQuality");
+    ///TEST
+    
     for(int iCut=0;iCut<22;++iCut){
       if(iCut>0 && iCut<14) continue;
       fillTurnOnCurve(iCut,sysTypeGmt,selType);

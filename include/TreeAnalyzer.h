@@ -14,7 +14,7 @@
 
 class TH1D;
 class TProofOutputFile;
-//class FWLiteSummaryAnalyzer;
+class SummaryAnalyzer;
 class ObjectMessenger;
 class EventProxyBase;
 
@@ -86,8 +86,9 @@ public :
    boost::unordered_map<std::string, bool> eventsToProcessHash_;
 
 
-   ///Summary analyzer is a special one
-   //FWLiteSummaryAnalyzer *mySummary_;
+   ///Summary analyzer is a special analyser providing
+   ///bookkeeping services
+   SummaryAnalyzer *mySummary_;
 
    ///Path to the output file.
    std::string filePath_;

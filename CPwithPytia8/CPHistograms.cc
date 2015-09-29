@@ -67,9 +67,9 @@ void CPHistograms::defineHistograms(){
 
  if(!histosInitialized_){
    //Make template histos
-   add1DHistogram("h1DDecayModeTemplate",";Decay mode; Events",11,-0.5,10.5,file_);
+   add1DHistogram("h1DDecayModeTemplate",";Decay mode; Events",19,-0.5,18.5,file_);
    add1DHistogram("h1DDeltaRTemplate",";#Delta R; Events",20,0,0.05,file_);
-   add1DHistogram("h1DVxPullTemplate",";#phi^{*} [rad]; Events",10,-0.01,0.01,file_);
+   add1DHistogram("h1DVxPullTemplate",";#phi^{*} [rad]; Events",11,-0.01,0.01,file_);
    add1DHistogram("h1DPhiTemplate",";#phi^{*} [rad]; Events",10,0,M_PI,file_);//
    add1DHistogram("h1DRhoTemplate",";#rho^{*} [rad]; Events",18,M_PI-0.15,M_PI,file_);
    add1DHistogram("h1DDPhiTemplate",";#Delta#phi^{*} [rad]; Events",32,-0.5*M_PI,0.5*M_PI,file_);
@@ -486,9 +486,9 @@ void CPHistograms::plotVerticesPulls(const std::string & hName){
     if(h1D_Refit->GetMaximum()>max) max = h1D_Refit->GetMaximum();
     h1D_AOD->SetMaximum(1.05*max);
     h1D_AOD->Draw();
-    h1D_PF->Draw("same");
+    //h1D_PF->Draw("same");
     h1D_Refit->Draw("same");
-    h1D_RefitNoBS->Draw("same");
+    //h1D_RefitNoBS->Draw("same");
 
     //TEST
     //h1D_Refit->Draw();
@@ -496,9 +496,9 @@ void CPHistograms::plotVerticesPulls(const std::string & hName){
     //TEST
 
     l.AddEntry(h1D_AOD,"AOD weights");
-    l.AddEntry(h1D_PF,"PF weights");
-    l.AddEntry(h1D_Refit,"refitted w/o #tau");
-    l.AddEntry(h1D_RefitNoBS,"refitted w/o #tau & BS");
+    //l.AddEntry(h1D_PF,"PF weights");
+    l.AddEntry(h1D_Refit,"refitted with BS");
+    //l.AddEntry(h1D_RefitNoBS,"refitted w/o #tau & BS");
     l.Draw();
     
     c->Print(TString::Format("fig_png/%s.png",hName.c_str()).Data());

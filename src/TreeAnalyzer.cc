@@ -4,7 +4,7 @@
 #include <string>
 
 #include "TreeAnalyzer.h"
-//#include "SummaryAnalyzer.h"
+#include "SummaryAnalyzer.h"
 #include "ObjectMessenger.h"
 #include "EventProxyBase.h"
 
@@ -68,7 +68,7 @@ TreeAnalyzer::~TreeAnalyzer(){
 
   std::cout<<"TreeAnalyzer::~TreeAnalyzer() Begin"<<std::endl;
 
-  //delete mySummary_;
+  delete mySummary_;
   delete store_;
 
   std::cout<<"TreeAnalyzer::~TreeAnalyzer() Done"<<std::endl;
@@ -143,20 +143,19 @@ void  TreeAnalyzer::init(std::vector<Analyzer*> myAnalyzers){
   myProxy_->init(fileNames_);
 
   myAnalyzers_ = myAnalyzers;
-  //mySummary_ = new SummaryAnalyzer("Summary");
-  //myAnalyzers_.push_back(mySummary_);
+  mySummary_ = new SummaryAnalyzer("Summary");
+  myAnalyzers_.push_back(mySummary_);
 
   for(unsigned int i=0;i<myAnalyzers_.size();++i){ 
     myDirectories_.push_back(store_->mkdir(myAnalyzers_[i]->name()));
     myAnalyzers_[i]->initialize(myDirectories_[myDirectories_.size()-1],
 				myStrSelections_);
   }
-/*
+
  for(unsigned int i=0;i<myAnalyzers_.size();++i){
    myAnalyzers_[i]->addBranch(mySummary_->getTree());  
    myAnalyzers_[i]->addCutHistos(mySummary_->getHistoList());  
  }
- */
 }
 //////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////
@@ -185,7 +184,7 @@ int TreeAnalyzer::loop(){
      analyze(*myProxy_);
    }
    
-   std::cout << "Events skipped: " << nEventsSkipped_ << std::endl ;
+   std::cout << "\n Events skipped: " << nEventsSkipped_ << std::endl ;
    return nEventsAnalyzed_;
 }
 //////////////////////////////////////////////////////////////////////////////
