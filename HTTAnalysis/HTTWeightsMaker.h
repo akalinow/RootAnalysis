@@ -17,6 +17,7 @@
 #include "Analyzer.h"
 
 class EventProxyHTT;
+class HTTWeightHistograms;
 
 class HTTWeightsMaker: public Analyzer{
 
@@ -63,6 +64,8 @@ class HTTWeightsMaker: public Analyzer{
   ///The PU histogram
   TH1F *hPU;
 
+  ///Histograms storage.
+  HTTWeightHistograms *myHistos_;
   
   //should this HTTWeightsMaker be able to filter events
   bool filterEvent_;

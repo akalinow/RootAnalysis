@@ -2,6 +2,7 @@
 #include <sstream>
 
 #include "HTTWeightsMaker.h"
+#include "HTTWeightHistograms.h"
 #include "EventProxyHTT.h"
 
 //////////////////////////////////////////////////////////////////////////////
@@ -16,7 +17,7 @@ HTTWeightsMaker::~HTTWeightsMaker(){
   delete hPU;
   delete puFile;
 
-  //if(myHistos_) delete myHistos_;
+  if(myHistos_) delete myHistos_;
 
 }
 //////////////////////////////////////////////////////////////////////////////
@@ -34,14 +35,14 @@ void HTTWeightsMaker::initialize(TFileDirectory& aDir,
   
   ///The histograms for this analyzer will be saved into "TestHistos"
   ///directory of the ROOT file
-  //myHistos_ = new CPHistograms(&aDir, selectionFlavours_);
+  myHistos_ = new HTTWeightHistograms(&aDir, selectionFlavours_);
   
 }
 //////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////
 void HTTWeightsMaker::finalize(){ 
 
-  //myHistos_->finalizeHistograms(0,1.0);
+  myHistos_->finalizeHistograms(0,1.0);
  
 }
 //////////////////////////////////////////////////////////////////////////////
@@ -50,13 +51,11 @@ bool HTTWeightsMaker::analyze(const EventProxyBase& iEvent){
 
   const EventProxyHTT & myEventProxy = static_cast<const EventProxyHTT&>(iEvent);
 
+  float weight = 1.0;
+  std::string sampleName = "Test";
+  myHistos_->fill1DHistogram("h1DNPV"+sampleName,myEventProxy.npv,weight);
 
-  int myNpv = myEventProxy.npv;
-
-  //puWeight
-  
-  myNpv+=0;
-  //std::cout<<"npv: "<<myEventProxy.npv<<std::endl;
+  puWeight = 1.0;
   
   return true;
 }
