@@ -21,11 +21,13 @@
       void init(std::vector<std::string> const& iFileNames);
 
       int npv;
+      int run;
       
    private:
 
       // List of branches
       TBranch        *b_npv;
+      TBranch        *b_run;
 
    };
 #endif

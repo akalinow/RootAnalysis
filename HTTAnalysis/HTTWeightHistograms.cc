@@ -43,12 +43,12 @@ bool HTTWeightHistograms::fill1DHistogram(const std::string& name, float val, fl
   std::string hTemplateName = "";
   if(!AnalysisHistograms::fill1DHistogram(name,val,weight)){
     if(name.find("h1DNPV")!=std::string::npos) hTemplateName = "h1DNPVTemplate";
-    //std::cout<<"Adding histogram: "<<name<<std::endl;
+    std::cout<<"Adding histogram: "<<name<<" "<<file_<<" "<<file_->fullPath()<<std::endl;
     this->add1DHistogram(name,"",
-		   this->get1DHistogram(hTemplateName)->GetNbinsX(),
-		   this->get1DHistogram(hTemplateName)->GetXaxis()->GetXmin(),
-		   this->get1DHistogram(hTemplateName)->GetXaxis()->GetXmax(),
-		   file_);
+			 this->get1DHistogram(hTemplateName,true)->GetNbinsX(),
+			 this->get1DHistogram(hTemplateName,true)->GetXaxis()->GetXmin(),
+			 this->get1DHistogram(hTemplateName,true)->GetXaxis()->GetXmax(),
+			 file_);
     return AnalysisHistograms::fill1DHistogram(name,val,weight);
   }
   return true;
@@ -61,6 +61,7 @@ void HTTWeightHistograms::defineHistograms(){
 
  if(!histosInitialized_){
    //Make template histos
+   std::cout<<"Adding histogram: "<<file_<<" "<<file_->fullPath()<<std::endl;
    add1DHistogram("h1DNPVTemplate",";Number of PV; Events",61,-0.5,60.5,file_);
    histosInitialized_ = true;
  }

@@ -12,10 +12,14 @@ void EventProxyHTT::init(std::vector<std::string> const& iFileNames){
 
 	EventProxyBase::init(iFileNames);
 
-	fChain->SetBranchStatus("*",1);
+	fChain->SetBranchStatus("*",0);
 	fChain->SetMakeClass(0);
-       
+
+	fChain->SetBranchStatus("npv",1);
+	fChain->SetBranchStatus("run",1);
+	
 	fChain->SetBranchAddress("npv",&npv);
+	fChain->SetBranchAddress("run",&run);
 
 }
 /////////////////////////////////////////////////////////

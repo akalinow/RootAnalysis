@@ -142,9 +142,7 @@ void  AnalysisHistograms::add3DHistogram(const std::string& name, const std::str
   if(my3Dhistograms_.find(name)==my3Dhistograms_.end()) my3Dhistograms_[name] = hTmp;
   else cout<<"ERROR Substituting existing histogram!"<<endl;
 }
-
-
-
+//////////////////////////////////////////////////////////////////////////////
 void AnalysisHistograms::fillProfile(const std::string& name, float x, float val, float weight) {
   using namespace std;
 
@@ -153,8 +151,6 @@ void AnalysisHistograms::fillProfile(const std::string& name, float x, float val
   else cout<<"ERROR: profile : "<<name<<" not found!"<<endl;
 
 }
-//////////////////////////////////////////////////////////////////////////////
-//////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////
 bool  AnalysisHistograms::fill1DHistogram(const std::string& name, float val, float weight){
 
@@ -193,23 +189,23 @@ bool  AnalysisHistograms::fill3DHistogram(const std::string& name, float val1, f
  return true;
 }
 //////////////////////////////////////////////////////////////////////////////
-
-
-TProfile* AnalysisHistograms::getProfile(const std::string& name) {
+TProfile* AnalysisHistograms::getProfile(const std::string& name, bool noClone){
 
  using namespace std;
 
- if(myProfiles_.find(name)!=myProfiles_.end()) return (TProfile*)(myProfiles_[name]->Clone());
+ if(noClone && myProfiles_.find(name)!=myProfiles_.end()) return myProfiles_[name];
+ else if(myProfiles_.find(name)!=myProfiles_.end()) return (TProfile*)(myProfiles_[name]->Clone());
  else cout<<"ERROR: Profile : "<<name<<" not found!"<<endl;
  return 0;
 
 }
-
-TH1F* AnalysisHistograms::get1DHistogram(const std::string& name){
+//////////////////////////////////////////////////////////////////////////////
+TH1F* AnalysisHistograms::get1DHistogram(const std::string& name, bool noClone){
 
  using namespace std;
 
- if(my1Dhistograms_.find(name)!=my1Dhistograms_.end()) return (TH1F*)(my1Dhistograms_[name]->Clone());
+ if(noClone && my1Dhistograms_.find(name)!=my1Dhistograms_.end()) return my1Dhistograms_[name];
+ else if(my1Dhistograms_.find(name)!=my1Dhistograms_.end()) return (TH1F*)(my1Dhistograms_[name]->Clone());
  else cout<<"ERROR: Histogram: "<<name<<" not found!"<<endl;
  return 0;
 
@@ -226,11 +222,12 @@ TH2F* AnalysisHistograms::get2DHistogram(const std::string& name, bool noClone){
 
 }
 //////////////////////////////////////////////////////////////////////////////
-TH3F* AnalysisHistograms::get3DHistogram(const std::string& name){
+TH3F* AnalysisHistograms::get3DHistogram(const std::string& name, bool noClone){
 
  using namespace std;
 
- if(my3Dhistograms_.find(name)!=my3Dhistograms_.end()) return (TH3F*)(my3Dhistograms_[name]->Clone());
+ if(noClone && my3Dhistograms_.find(name)!=my3Dhistograms_.end()) return my3Dhistograms_[name];
+ else if(my3Dhistograms_.find(name)!=my3Dhistograms_.end()) return (TH3F*)(my3Dhistograms_[name]->Clone());
  else cout<<"ERROR: Histogram: "<<name<<" not found!"<<endl;
  return 0;
 

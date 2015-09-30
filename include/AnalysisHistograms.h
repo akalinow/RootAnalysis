@@ -43,10 +43,10 @@ class AnalysisHistograms {
   virtual bool fill2DHistogram(const std::string &name, float val1, float val2, float weight=1.0);
   virtual bool fill3DHistogram(const std::string &name, float val1, float val2, float val3, float weight=1.0);
   
-  TProfile* getProfile(const std::string& name);
-  TH1F* get1DHistogram(const std::string& name);
+  TProfile* getProfile(const std::string& name, bool noClone = false);
+  TH1F* get1DHistogram(const std::string& name, bool noClone = false);
   TH2F* get2DHistogram(const std::string& name, bool noClone = false);
-  TH3F* get3DHistogram(const std::string& name);
+  TH3F* get3DHistogram(const std::string& name, bool noClone = false);
   
 
  protected:

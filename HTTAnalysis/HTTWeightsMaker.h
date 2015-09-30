@@ -61,8 +61,11 @@ class HTTWeightsMaker: public Analyzer{
   ///ROOT file with PU histogram
   TFile *puFile;
 
-  ///The PU histogram
-  TH1F *hPU;
+  ///The PU reference and current dataset histograms
+  TH1F *hPU, *hDatasetPU;
+
+  ///Histogram with PU weights.
+  TH1F *hPUWeights;
 
   ///Histograms storage.
   HTTWeightHistograms *myHistos_;

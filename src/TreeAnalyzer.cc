@@ -119,7 +119,6 @@ void TreeAnalyzer::parseCfg(const std::string & cfgFileName){
   boost::property_tree::ptree pt;
   boost::property_tree::ini_parser::read_ini(cfgFileName, pt);
 
-
   typedef boost::tokenizer<boost::char_separator<char> > tokenizer;
   boost::char_separator<char> sep(",");
   std::string str = pt.get<std::string>("TreeAnalyzer.inputFile");
@@ -131,9 +130,11 @@ void TreeAnalyzer::parseCfg(const std::string & cfgFileName){
   }
   
   filePath_ = pt.get<std::string>("TreeAnalyzer.outputPath");
+  sampleName_ = pt.get<std::string>("TreeAnalyzer.processName","Test");
   
   nEventsToAnalyze_ = pt.get("TreeAnalyzer.eventsToAnalyze",-1);
   nEventsToPrint_ = pt.get("TreeAnalyzer.eventsToPrint",100);
+  
   
 }
 //////////////////////////////////////////////////////////////////////////////

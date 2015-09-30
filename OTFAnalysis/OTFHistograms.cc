@@ -634,7 +634,7 @@ TH1* OTFHistograms::getRateHisto(std::string sysType,
 
   if(!h2D) return 0;
   TH2F *hWeights = makeRateWeights(h2D);
-  h2D->Multiply(hWeights);//comment for TEST
+  //h2D->Multiply(hWeights);//comment for TEST
 
   TH1D *hRate = h2D->ProjectionY("hRate");
   if(sysType=="Vx") hRate = h2D->ProjectionX("hRate");
