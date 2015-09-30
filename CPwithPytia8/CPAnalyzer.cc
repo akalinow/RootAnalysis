@@ -147,8 +147,6 @@ bool CPAnalyzer::analyze(const EventProxyBase& iEvent){
   std::string smearType = "ideal";
   std::string name;
 
-  std::cout<<myEvent.decModeMinus<<" "<<myEvent.decModeMinus<<" "<<myEvent.tauMinus->Pt()<<std::endl;
-  
   ///
   for(auto decayName:decayNames){
     smearType = "ideal";

@@ -185,7 +185,8 @@ int TreeAnalyzer::loop(){
   int eventPreviouslyPrinted=-1;
   ///////
   
-#pragma omp parallel for schedule(dynamic)
+  //#pragma omp parallel for schedule(dynamic)
+#pragma omp parallel for
   for(int aEvent=0;aEvent<nEventsToAnalyze_;++aEvent){
 
     if( nEventsAnalyzed_ < nEventsToPrint_ || nEventsAnalyzed_%100000==0)
