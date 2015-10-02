@@ -22,12 +22,18 @@
 
       int npv;
       int run;
+
+      float svfit;
+      float puWeight;
       
    private:
 
       // List of branches
       TBranch        *b_npv;
       TBranch        *b_run;
+
+      TBranch        *b_svfit;
+      TBranch        *b_puWeight;
 
    };
 #endif

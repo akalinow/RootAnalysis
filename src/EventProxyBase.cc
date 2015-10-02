@@ -14,7 +14,6 @@ void EventProxyBase::init(std::vector<std::string> const& iFileNames){
 	  fChain->Add(it->c_str(),-1);
   }
 
-  //fChain->Print();
   accumulatedSize_ = fChain->GetEntries();
   Int_t cachesize = 10000000; //10 MBytes
   fChain->SetCacheSize(cachesize);

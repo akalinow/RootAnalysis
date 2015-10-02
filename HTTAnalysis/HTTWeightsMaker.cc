@@ -71,10 +71,11 @@ bool HTTWeightsMaker::analyze(const EventProxyBase& iEvent){
     
   if(hPUWeights) puWeight = hPUWeights->GetBinContent(hPUWeights->FindBin(myEventProxy.npv));
 
-  std::cout<<"hPU: "<<hPU<<" puWeight: "<<puWeight<<std::endl;
-  
   ///Fill histograms with number of PV.
   myHistos_->fill1DHistogram("h1DNPV"+sampleName,myEventProxy.npv,puWeight);
+
+
+  //std::cout<<"svfit: "<<myEventProxy.svfit<<std::endl;
   
   return true;
 }

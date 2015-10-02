@@ -16,7 +16,9 @@ noinst_PROGRAMS=test
 # '_SOURCES' for example.
 
 # Sources for the a.out 
-test_SOURCES= HTTAnalysis.cc EventProxyHTT.cc HTTWeightsMaker.cc HTTWeightHistograms.cc
+test_SOURCES= HTTAnalysis.cc EventProxyHTT.cc HTTWeightsMaker.cc HTTWeightHistograms.cc \
+	      HTTAnalyzer.cc HTTHistograms.cc
+
 
 # Linker options for a.out
 test_LDFLAGS = $(top_srcdir)/src/libRootAnalysis.la -R @ROOTLIBDIR@ -L@ROOTLIBDIR@

@@ -12,7 +12,6 @@
 //ROOT includes
 #include "TTree.h"
 #include "TList.h"
-#include "TRandom3.h"
 
 #include "Analyzer.h"
 

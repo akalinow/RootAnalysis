@@ -13,7 +13,7 @@
 
 #include "EventProxyHTT.h"
 #include "HTTWeightsMaker.h"
-//#include "HTTAnalyzer.h"
+#include "HTTAnalyzer.h"
 
 
 #include "TFile.h"
@@ -37,8 +37,8 @@ int main(int argc, char ** argv) {
 	 std::vector<Analyzer*> myAnalyzers;
 	 EventProxyHTT *myEvent = new EventProxyHTT();
 
-	 myAnalyzers.push_back(new HTTWeightsMaker("HTTWeightsMaker"));
-	 //myAnalyzers.push_back(new HTTAnalyzer("HTTAnalyzer"));
+	 //myAnalyzers.push_back(new HTTWeightsMaker("HTTWeightsMaker"));
+	 myAnalyzers.push_back(new HTTAnalyzer("HTTAnalyzer"));
 
 	 TreeAnalyzer *tree = new TreeAnalyzer("TreeAnalyzer",cfgFileName, myEvent);
 	 tree->init(myAnalyzers);
