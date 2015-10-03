@@ -10,7 +10,9 @@ lib_LTLIBRARIES = libRootAnalysis.la
 # Sources for libRootAnalysis
 libRootAnalysis_la_SOURCES = EventProxyBase.cc TestAnalyzer.cc AnalysisHistograms.cc Analyzer.cc \
 	                         ObjectMessenger.cc strbitset.cc TFileDirectory.cc TFileService.cc \
-	                         TH1AddDirectorySentry.cc TreeAnalyzer.cc SummaryAnalyzer.cc
+	                         TH1AddDirectorySentry.cc TreeAnalyzer.cc SummaryAnalyzer.cc \
+				 commonUtils.cc
+
 
 # Linker options libTestProgram
 #libRootAnalysis_la_LDFLAGS = -version-info 1:0 -R @ROOTLIBDIR@ -L@ROOTLIBDIR@
