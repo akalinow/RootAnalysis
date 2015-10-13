@@ -26,6 +26,8 @@ class HTTHistograms: public AnalysisHistograms {
 
   virtual bool fill1DHistogram(const std::string &name, float val, float weight=1.0);
 
+  float getLumi();
+
    private:
   
   virtual void defineHistograms();

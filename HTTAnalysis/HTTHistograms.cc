@@ -18,6 +18,39 @@
 
 /////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////
+float HTTHistograms::getLumi(){
+
+  return 5579820.829*1E-9//fb-1
+
+}
+/////////////////////////////////////////////////////////
+/////////////////////////////////////////////////////////
+float HTTHistograms::getSampleNormalisation(TFile *file){
+
+float genPresEff = 1.0;
+  float recoPresEff = 1.0;
+  float presEff = genPresEff*recoPresEff;
+  float kFactor = 1.0;
+
+  float crossSection = 1.0;//TEST FIXME
+  int nEventsAnalysed = 1.0;//TEST FIXME
+  
+  float weight = crossSection*presEff/nEventsAnalysed;
+  if(presEff<0 || fabs(fabs(crossSection)-1.0)<1e-5) weight = 1.0;
+
+  std::cout<<"Sample name: "<<file->GetName()<<std::endl;
+  std::cout<<"Mean cross section: "<<crossSection<<" [pb] "<<std::endl;
+  std::cout<<"Number of events analyzed: "<<nEventsAnalysed<<std::endl;
+  std::cout<<"Gen preselection efficiency: "<<genPresEff<<std::endl;
+  std::cout<<"Reco preselection efficiency: "<<recoPresEff<<std::endl;
+  std::cout<<"External scaling: "<<kFactor<<std::endl;
+  std::cout<<"Final weight: "<<weight<<std::endl;
+
+  return weight;  
+
+}
+/////////////////////////////////////////////////////////
+/////////////////////////////////////////////////////////
 HTTHistograms::HTTHistograms(std::string fileName, int opt){
 
   AnalysisHistograms::init(fileName);
@@ -90,7 +123,9 @@ THStack*  HTTHistograms::plotStack(std::string varName, int selType){
   TH1F *hDYJets = get1DHistogram((hName+"MC").c_str());
   TH1F *hSoup = get1DHistogram((hName+"Data").c_str());
 
-  float lumi = 1.0;//FIXME
+  hWJets->Scale(0.0);//FIXME
+  
+  float lumi = getLumi();//FIXME
 
   ///////////
   hSoup->SetLineColor(1);
@@ -159,6 +194,7 @@ THStack*  HTTHistograms::plotStack(std::string varName, int selType){
   
   float max = hs->GetMaximum();
   if(hSoup->GetMaximum()>max) max = hSoup->GetMaximum();
+  max = 1E5;
 
   hs->GetHistogram()->SetTitleOffset(1.0);
   hs->SetMaximum(1.1*max);
