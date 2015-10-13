@@ -28,6 +28,8 @@ class HTTHistograms: public AnalysisHistograms {
 
   float getLumi();
 
+  float getSampleNormalisation();
+
    private:
   
   virtual void defineHistograms();

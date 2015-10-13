@@ -20,14 +20,14 @@
 /////////////////////////////////////////////////////////
 float HTTHistograms::getLumi(){
 
-  return 5579820.829*1E-9//fb-1
+  return 5579820.829*1E-9;//fb-1
 
 }
 /////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////
-float HTTHistograms::getSampleNormalisation(TFile *file){
+float HTTHistograms::getSampleNormalisation(){
 
-float genPresEff = 1.0;
+  float genPresEff = 1.0;
   float recoPresEff = 1.0;
   float presEff = genPresEff*recoPresEff;
   float kFactor = 1.0;
@@ -38,7 +38,7 @@ float genPresEff = 1.0;
   float weight = crossSection*presEff/nEventsAnalysed;
   if(presEff<0 || fabs(fabs(crossSection)-1.0)<1e-5) weight = 1.0;
 
-  std::cout<<"Sample name: "<<file->GetName()<<std::endl;
+  //std::cout<<"Sample name: "<<file->GetName()<<std::endl;
   std::cout<<"Mean cross section: "<<crossSection<<" [pb] "<<std::endl;
   std::cout<<"Number of events analyzed: "<<nEventsAnalysed<<std::endl;
   std::cout<<"Gen preselection efficiency: "<<genPresEff<<std::endl;
