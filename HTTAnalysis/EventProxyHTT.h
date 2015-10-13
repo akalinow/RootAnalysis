@@ -25,6 +25,7 @@
 
       float svfit;
       float puWeight;
+      float genWeight;
       
    private:
 
@@ -34,6 +35,7 @@
 
       TBranch        *b_svfit;
       TBranch        *b_puWeight;
+      TBranch        *b_genWeight;
 
    };
 #endif
