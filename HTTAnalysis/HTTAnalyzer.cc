@@ -48,9 +48,24 @@ bool HTTAnalyzer::analyze(const EventProxyBase& iEvent){
   float scaleFactor = 1.0;
   
   eventWeight *=lumi*scaleFactor;
+
+  ///This is a hack agains bad data (data read without JSON)
+  if(myEventProxy.npv<2) return true;
+
+  std::string sampleName = "DY";
+  if(myEventProxy.run>1){
+    sampleName = "Data";
+    eventWeight = 1.0; //FIXME temporary
+    std::cout<<"svfit: "<<myEventProxy.svfit<<std::endl;
+  }
   
-  std::string sampleName = "MC";
-  if(myEventProxy.run>1) sampleName = "Data";
+
+  //Fill bookkeeping histogram. Bin 1 holds sum of weights.
+  myHistos_->fill1DHistogram("h1DStats"+sampleName,1,eventWeight);
+
+
+  ///This stands now for the baseline selection. 
+  //if(myEventProxy.svfit<0) return true;
   
   ///Fill histograms with number of PV.
   myHistos_->fill1DHistogram("h1DNPV"+sampleName,myEventProxy.npv,eventWeight);

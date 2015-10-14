@@ -20,20 +20,30 @@
 /////////////////////////////////////////////////////////
 float HTTHistograms::getLumi(){
 
-  return 5579820.829*1E-9;//fb-1
+  return 5579820.829*1E-6;//pb-1
 
 }
 /////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////
-float HTTHistograms::getSampleNormalisation(){
+float HTTHistograms::getSampleNormalisation(const std::string & sampleName){
 
   float genPresEff = 1.0;
   float recoPresEff = 1.0;
   float presEff = genPresEff*recoPresEff;
   float kFactor = 1.0;
 
+  std::string hName = "h1DStats"+sampleName;
+  TH1F *hStats = get1DHistogram(hName.c_str());
+  
   float crossSection = 1.0;//TEST FIXME
-  int nEventsAnalysed = 1.0;//TEST FIXME
+  int nEventsAnalysed = hStats->GetBinContent(1);
+
+  ///FIXME stupid if
+  if(sampleName=="DY"){
+    //xsection for 3xZ->mu mu in [pb]
+    //https://twiki.cern.ch/twiki/bin/viewauth/CMS/StandardModelCrossSectionsat13TeVInclusive
+    crossSection = 3*2008.4; 
+  }
   
   float weight = crossSection*presEff/nEventsAnalysed;
   if(presEff<0 || fabs(fabs(crossSection)-1.0)<1e-5) weight = 1.0;
@@ -82,6 +92,7 @@ bool HTTHistograms::fill1DHistogram(const std::string& name, float val, float we
   if(!AnalysisHistograms::fill1DHistogram(name,val,weight)){
     if(name.find("h1DNPV")!=std::string::npos) hTemplateName = "h1DNPVTemplate";
     if(name.find("h1DSVfit")!=std::string::npos) hTemplateName = "h1DSVFitTemplate";
+    if(name.find("h1DStats")!=std::string::npos) hTemplateName = "h1DStatsTemplate";
     std::cout<<"Adding histogram: "<<name<<" "<<file_<<" "<<file_->fullPath()<<std::endl;
     this->add1DHistogram(name,"",
 			 this->get1DHistogram(hTemplateName,true)->GetNbinsX(),
@@ -101,6 +112,7 @@ void HTTHistograms::defineHistograms(){
  if(!histosInitialized_){
    //Make template histos
    std::cout<<"Adding histogram: "<<file_<<" "<<file_->fullPath()<<std::endl;
+   add1DHistogram("h1DStatsTemplate","",10,0.5,10.5,file_);
    add1DHistogram("h1DNPVTemplate",";Number of PV; Events",61,-0.5,60.5,file_);
    add1DHistogram("h1DSVFitTemplate",";SVFit mass [GeV/c^{2}]; Events",50,0,200,file_);
    histosInitialized_ = true;
@@ -119,15 +131,19 @@ void HTTHistograms::finalizeHistograms(int nRuns, float weight){
 THStack*  HTTHistograms::plotStack(std::string varName, int selType){
 
   std::string hName = "h1D"+varName;
-  TH1F *hWJets = get1DHistogram((hName+"MC").c_str());
-  TH1F *hDYJets = get1DHistogram((hName+"MC").c_str());
+  TH1F *hWJets = get1DHistogram((hName+"DY").c_str());
+  TH1F *hDYJets = get1DHistogram((hName+"DY").c_str());
   TH1F *hSoup = get1DHistogram((hName+"Data").c_str());
 
-  hWJets->Scale(0.0);//FIXME
+  float lumi = getLumi();
+  ///Normalise MC histograms according to cross sections
+  std::string sampleName = "DY";
+  float weight = getSampleNormalisation(sampleName);
+  float scale = weight*lumi;
+  hDYJets->Scale(scale);
+  hWJets->Scale(0.0);
+  //////////////////////////////////////////////////////
   
-  float lumi = getLumi();//FIXME
-
-  ///////////
   hSoup->SetLineColor(1);
   hSoup->SetFillColor(1);
 
@@ -194,7 +210,6 @@ THStack*  HTTHistograms::plotStack(std::string varName, int selType){
   
   float max = hs->GetMaximum();
   if(hSoup->GetMaximum()>max) max = hSoup->GetMaximum();
-  max = 1E5;
 
   hs->GetHistogram()->SetTitleOffset(1.0);
   hs->SetMaximum(1.1*max);
@@ -210,7 +225,7 @@ THStack*  HTTHistograms::plotStack(std::string varName, int selType){
   leg->AddEntry(hSoup,"Data","lep");
   leg->AddEntry(hDYJets,"Z#rightarrow ll","f");
   leg->AddEntry(hWJets,"W#rightarrow l #nu","f");
-  leg->SetHeader(Form("#int L = %.3f fb^{-1}",lumi));
+  leg->SetHeader(Form("#int L = %.3f pb^{-1}",lumi));
   leg->Draw();
 
   float x = 0.6*(hs->GetXaxis()->GetXmax() - 
@@ -241,8 +256,8 @@ THStack*  HTTHistograms::plotStack(std::string varName, int selType){
     hMCSum->SetBinError(i,0);
   }
   hMCSum->SetLineWidth(3);
-  hMCSum->SetMinimum(-5);
-  hMCSum->SetMaximum(5);
+  hMCSum->SetMinimum(-2);
+  hMCSum->SetMaximum(2);
   hMCSum->SetStats(kFALSE);
   hMCSum->Draw();
   TLine *aLine = new TLine(hMCSum->GetXaxis()->GetXmin(),0.0,highEnd,0.0);

@@ -65,6 +65,9 @@ bool HTTWeightsMaker::analyze(const EventProxyBase& iEvent){
   if(myEventProxy.run>1) sampleName = "DATA";
   if(sampleName=="DATA") eventWeight = 1.0;
 
+  ///This is a hack agains bad data (data read without JSON)
+  if(myEventProxy.npv<2) return true;
+
   std::string hName = "h1DNPV"+sampleName;
   
   if(hPU && (!hDatasetPU || hDatasetPU->GetName()!=hName)){

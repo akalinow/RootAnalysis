@@ -28,7 +28,7 @@ class HTTHistograms: public AnalysisHistograms {
 
   float getLumi();
 
-  float getSampleNormalisation();
+  float getSampleNormalisation(const std::string & sampleName);
 
    private:
   
