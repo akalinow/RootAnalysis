@@ -43,9 +43,8 @@ void EventProxyHTT::init(std::vector<std::string> const& iFileNames){
 	fChain->SetBranchAddress("sampleWeight",&sampleWeight);
 	fChain->SetBranchAddress("genDecay",&genDecay);	
 
-
-	/*
-	fChain->SetBranchStatus("puWeight",1);	
+	fChain->SetBranchStatus("*",0);	
+	fChain->SetBranchStatus("puWeight",1);
 	fChain->SetBranchStatus("run",1);
 	fChain->SetBranchStatus("pfJetPt",1);
 	fChain->SetBranchStatus("ptL1",1);
@@ -59,6 +58,7 @@ void EventProxyHTT::init(std::vector<std::string> const& iFileNames){
 	fChain->SetBranchStatus("vetoEvent",1);
 	fChain->SetBranchStatus("muFlag",1);
 	fChain->SetBranchStatus("diTauVisMass",1);
+	fChain->SetBranchAddress("diTauNSVfitMass",&diTauNSVfitMass);	
 	fChain->SetBranchStatus("MtLeg1MVA",1);
 	fChain->SetBranchStatus("diTauVisMass",1);
 	fChain->SetBranchStatus("combRelIsoLeg1DBetav2",1);
@@ -67,8 +67,8 @@ void EventProxyHTT::init(std::vector<std::string> const& iFileNames){
 	fChain->SetBranchStatus("HLTx",1);
 	fChain->SetBranchStatus("HLTmatch",1);	
 	fChain->SetBranchStatus("numPV",1);
-	*/
-
+	fChain->SetBranchStatus("sampleWeight",1);
+	fChain->SetBranchStatus("genDecay",1);
 
 }
 /////////////////////////////////////////////////////////

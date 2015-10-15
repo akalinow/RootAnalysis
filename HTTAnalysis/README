@@ -1,6 +1,6 @@
 git clone https://github.com/akalinow/RootAnalysis
 cd RootAnalysis
-git checkout relevant_tag
+git checkout Run2012
 libtoolize
 aclocal
 automake --add-missing
@@ -8,13 +8,11 @@ autoconf
 ./configure
 make
 cd HTTAnalysis
-./test htt_PU.ini #this creates histograms with observed PU
-./test htt_weights.ini #this creates TTree with PU weights
-./test htt.ini      #this runs actual analysis and creates plots in fig_png and fig_C directories
-
+./test htt.ini #this creates histograms with observed PU
 
 NOTE: File htt.ini files contain paths to the data files. Please update it before running the code.
 
+Resulting plots can be found in fig_png directory.
 
 
 

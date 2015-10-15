@@ -36,6 +36,28 @@ void HTTAnalyzer::finalize(){
 }
 //////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////
+std::string HTTAnalyzer::getSampleName(const EventProxyHTT& myEvent){
+
+  float genWeight = myEvent.sampleWeight;
+  
+  std::string sampleName = "MC";
+  if(genWeight==1) sampleName = "Data";
+
+  if(fabs(fabs(myEvent.genDecay/24.0)-13)<1E-5 ||
+     fabs(fabs(myEvent.genDecay/24.0)-15)<1E-5){
+     sampleName = "WJets";
+  }
+  if(fabs(fabs(myEvent.genDecay/23.0)-13)<1E-5 ||
+     fabs(fabs(myEvent.genDecay/23.0)-15)<1E-5){
+    sampleName = "DY";
+  }
+  if(fabs(genWeight-0.0326672)<1E-5) sampleName = "TT";
+  if(fabs(genWeight-0.0031596)<1E-5) sampleName = "Other";
+
+  return sampleName;
+}
+//////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////////
 bool HTTAnalyzer::analyze(const EventProxyBase& iEvent){
 
   const EventProxyHTT & myEventProxy = static_cast<const EventProxyHTT&>(iEvent);
@@ -44,19 +66,7 @@ bool HTTAnalyzer::analyze(const EventProxyBase& iEvent){
   float genWeight = myEventProxy.sampleWeight;
   float eventWeight = puWeight*genWeight;
 
-  std::string sampleName = "MC";
-  if(genWeight==1) sampleName = "Data";
-
-  if(fabs(fabs(myEventProxy.genDecay/24.0)-13)<1E-5 ||
-     fabs(fabs(myEventProxy.genDecay/24.0)-15)<1E-5){
-     sampleName = "WJets";
-  }
-  if(fabs(fabs(myEventProxy.genDecay/23.0)-13)<1E-5 ||
-     fabs(fabs(myEventProxy.genDecay/23.0)-15)<1E-5){
-    sampleName = "DY";
-  }
-  if(fabs(genWeight-0.0326672)<1E-5) sampleName = "TT";
-  if(fabs(genWeight-0.0031596)<1E-5) sampleName = "Other";
+  std::string sampleName = getSampleName(myEventProxy);
 
   //Fill bookkeeping histogram. Bin 1 holds sum of weights.
   myHistos_->fill1DHistogram("h1DStats"+sampleName,1,eventWeight);

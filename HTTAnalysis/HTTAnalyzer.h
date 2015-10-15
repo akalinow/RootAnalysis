@@ -49,6 +49,9 @@ class HTTAnalyzer: public Analyzer{
 
  private:
 
+  //Return name of the sample: DATA, DY, WJets, etc.
+  std::string getSampleName(const EventProxyHTT& myEvent);
+
   ///Histograms storage.
   HTTHistograms *myHistos_;
   
