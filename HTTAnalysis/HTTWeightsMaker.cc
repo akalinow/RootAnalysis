@@ -55,6 +55,7 @@ void HTTWeightsMaker::finalize(){
 //////////////////////////////////////////////////////////////////////////////
 bool HTTWeightsMaker::analyze(const EventProxyBase& iEvent){
 
+
   //const EventProxyHTT & myEventProxy = static_cast<const EventProxyHTT&>(iEvent);
     
   return true;

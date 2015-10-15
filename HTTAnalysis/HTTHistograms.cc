@@ -25,18 +25,33 @@ float HTTHistograms::getLumi(){
 }
 /////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////
-float HTTHistograms::getSampleNormalisation(){
+float HTTHistograms::getSampleNormalisation(const std::string & sampleName){
 
   float genPresEff = 1.0;
   float recoPresEff = 1.0;
   float presEff = genPresEff*recoPresEff;
   float kFactor = 1.0;
 
+  std::string hName = "h1DStats"+sampleName;
+  TH1F *hStats = get1DHistogram(hName.c_str());
+  
   float crossSection = 1.0;//TEST FIXME
-  int nEventsAnalysed = 1.0;//TEST FIXME
+  int nEventsAnalysed = hStats->GetBinContent(1);
+
+  ///FIXME stupid if
+  if(sampleName=="DY"){
+    //xsection for 3xZ->mu mu in [pb]
+    //https://twiki.cern.ch/twiki/bin/viewauth/CMS/StandardModelCrossSectionsat8TeVInclusive
+    crossSection = 3*1177.3;
+    crossSection = 1.0; //sampleweight branch contains scaling to the proper cross section
+  }
+  if(sampleName=="tt" || sampleName=="Other") crossSection = 1.0; //sampleweight branch contains scaling to the proper cross section
   
   float weight = crossSection*presEff/nEventsAnalysed;
   if(presEff<0 || fabs(fabs(crossSection)-1.0)<1e-5) weight = 1.0;
+
+  if(sampleName=="tt" || sampleName=="Other" || sampleName=="DY") weight = 1.0; //sampleweight branch contains scaling to the proper cross section
+  if(sampleName=="WJets") weight = 1/19.0;
 
   //std::cout<<"Sample name: "<<file->GetName()<<std::endl;
   std::cout<<"Mean cross section: "<<crossSection<<" [pb] "<<std::endl;
@@ -82,6 +97,7 @@ bool HTTHistograms::fill1DHistogram(const std::string& name, float val, float we
   if(!AnalysisHistograms::fill1DHistogram(name,val,weight)){
     if(name.find("h1DNPV")!=std::string::npos) hTemplateName = "h1DNPVTemplate";
     if(name.find("h1DSVfit")!=std::string::npos) hTemplateName = "h1DSVFitTemplate";
+    if(name.find("h1DStats")!=std::string::npos) hTemplateName = "h1DStatsTemplate";
     std::cout<<"Adding histogram: "<<name<<" "<<file_<<" "<<file_->fullPath()<<std::endl;
     this->add1DHistogram(name,"",
 			 this->get1DHistogram(hTemplateName,true)->GetNbinsX(),
@@ -101,6 +117,7 @@ void HTTHistograms::defineHistograms(){
  if(!histosInitialized_){
    //Make template histos
    std::cout<<"Adding histogram: "<<file_<<" "<<file_->fullPath()<<std::endl;
+   add1DHistogram("h1DStatsTemplate","",10,0.5,10.5,file_);
    add1DHistogram("h1DNPVTemplate",";Number of PV; Events",61,-0.5,60.5,file_);
    add1DHistogram("h1DSVFitTemplate",";SVFit mass [GeV/c^{2}]; Events",50,0,200,file_);
    histosInitialized_ = true;
@@ -119,18 +136,39 @@ void HTTHistograms::finalizeHistograms(int nRuns, float weight){
 THStack*  HTTHistograms::plotStack(std::string varName, int selType){
 
   std::string hName = "h1D"+varName;
+
   TH1F *hWJets = get1DHistogram((hName+"WJets").c_str());
   TH1F *hDYJets = get1DHistogram((hName+"DY").c_str());
+  TH1F *hTT = get1DHistogram((hName+"TT").c_str());
+  TH1F *hOther = get1DHistogram((hName+"Other").c_str());
   TH1F *hSoup = get1DHistogram((hName+"Data").c_str());
 
-  float lumi = getLumi()/1000.0;//FIXME
+  float lumi = getLumi()/1000.0;
+  ///Normalise MC histograms according to cross sections
+  std::string sampleName = "DY";
+  float weight = getSampleNormalisation(sampleName);
+  float scale = weight*lumi;
+  hDYJets->Scale(scale);
 
-  ///////////
+  sampleName = "WJets";
+  weight = getSampleNormalisation(sampleName);
+  scale = weight*lumi;
+  hWJets->Scale(scale);
+
+  sampleName = "TT";
+  weight = getSampleNormalisation(sampleName);
+  scale = weight*lumi;
+  hTT->Scale(scale);
+  hOther->Scale(scale);
+  //////////////////////////////////////////////////////
+  
   hSoup->SetLineColor(1);
   hSoup->SetFillColor(1);
 
   hWJets->SetFillColor(41);
   hDYJets->SetFillColor(28);
+  hTT->SetFillColor(11);
+  hOther->SetFillColor(30);
 
   hSoup->SetLineWidth(3);
   int rebinFactor = 1;
@@ -138,21 +176,30 @@ THStack*  HTTHistograms::plotStack(std::string varName, int selType){
   hSoup->Rebin(rebinFactor);
   hWJets->Rebin(rebinFactor);
   hDYJets->Rebin(rebinFactor);
+  hTT->Rebin(rebinFactor);
+  hOther->Rebin(rebinFactor);
+  
   
   THStack *hs = new THStack("hs","Stacked histograms");      
   /////////
   hs->Add(hWJets,"hist");
   hs->Add(hDYJets,"hist");
+  hs->Add(hTT,"hist");
+  hs->Add(hOther,"hist");
   ////////
   TH1F *hMCSum = (TH1F*)hWJets->Clone("hMCSum");
   hMCSum->Reset();
   hMCSum->Add(hDYJets);
   hMCSum->Add(hWJets);
+  hMCSum->Add(hTT);
+  hMCSum->Add(hOther);
 
   std::cout<<"Data: "<<hSoup->Integral(0,hSoup->GetNbinsX()+1)<<std::endl;
   std::cout<<"MC: "<<hMCSum->Integral(0,hMCSum->GetNbinsX()+1)<<std::endl;  
   std::cout<<"MC W->l: "<<hWJets->Integral(0,hWJets->GetNbinsX()+1)<<std::endl;
-  std::cout<<"MC Z->ll: "<<hDYJets->Integral(0,hDYJets->GetNbinsX()+1)<<std::endl;  
+  std::cout<<"MC Z->ll: "<<hDYJets->Integral(0,hDYJets->GetNbinsX()+1)<<std::endl;
+  std::cout<<"MC tt: "<<hTT->Integral(0,hTT->GetNbinsX()+1)<<std::endl;
+  std::cout<<"MC other: "<<hOther->Integral(0,hOther->GetNbinsX()+1)<<std::endl;  
 
   TCanvas *c1 = getDefaultCanvas();
   c1->SetName("c1");
@@ -207,7 +254,9 @@ THStack*  HTTHistograms::plotStack(std::string varName, int selType){
   leg->AddEntry(hSoup,"Data","lep");
   leg->AddEntry(hDYJets,"Z#rightarrow ll","f");
   leg->AddEntry(hWJets,"W#rightarrow l #nu","f");
-  leg->SetHeader(Form("#int L = %.3f fb^{-1}",lumi));
+  leg->AddEntry(hTT,"t#bar{t}","f");
+  leg->AddEntry(hOther,"Other","f");
+  leg->SetHeader(Form("#int L = %.3f pb^{-1}",lumi));
   leg->Draw();
 
   float x = 0.6*(hs->GetXaxis()->GetXmax() - 
@@ -238,8 +287,8 @@ THStack*  HTTHistograms::plotStack(std::string varName, int selType){
     hMCSum->SetBinError(i,0);
   }
   hMCSum->SetLineWidth(3);
-  hMCSum->SetMinimum(-5);
-  hMCSum->SetMaximum(5);
+  hMCSum->SetMinimum(-2);
+  hMCSum->SetMaximum(2);
   hMCSum->SetStats(kFALSE);
   hMCSum->Draw();
   TLine *aLine = new TLine(hMCSum->GetXaxis()->GetXmin(),0.0,highEnd,0.0);

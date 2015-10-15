@@ -42,14 +42,11 @@ bool HTTAnalyzer::analyze(const EventProxyBase& iEvent){
   
   float puWeight = myEventProxy.puWeight;
   float genWeight = myEventProxy.sampleWeight;
+  float eventWeight = puWeight*genWeight;
 
-  float lumi = 1.937833e+01;
-    
   std::string sampleName = "MC";
-  if(genWeight==1){
-    sampleName = "Data";
-    lumi = 1.0;
-  }
+  if(genWeight==1) sampleName = "Data";
+
   if(fabs(fabs(myEventProxy.genDecay/24.0)-13)<1E-5 ||
      fabs(fabs(myEventProxy.genDecay/24.0)-15)<1E-5){
      sampleName = "WJets";
@@ -58,9 +55,12 @@ bool HTTAnalyzer::analyze(const EventProxyBase& iEvent){
      fabs(fabs(myEventProxy.genDecay/23.0)-15)<1E-5){
     sampleName = "DY";
   }
+  if(fabs(genWeight-0.0326672)<1E-5) sampleName = "TT";
+  if(fabs(genWeight-0.0031596)<1E-5) sampleName = "Other";
 
-  float eventWeight = lumi*puWeight*genWeight;
-  
+  //Fill bookkeeping histogram. Bin 1 holds sum of weights.
+  myHistos_->fill1DHistogram("h1DStats"+sampleName,1,eventWeight);
+
   bool baselineSelection = myEventProxy.ptL1>20 && myEventProxy.isPFMuon && myEventProxy.isTightMuon &&
     myEventProxy.ptL2>20 && myEventProxy.muFlag!=1 && myEventProxy.vetoEvent==0 &&
     myEventProxy.tightestHPSMVAWP>=0 && myEventProxy.combRelIsoLeg1DBetav2<0.1 &&
