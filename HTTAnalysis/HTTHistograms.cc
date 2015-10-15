@@ -131,13 +131,13 @@ void HTTHistograms::finalizeHistograms(int nRuns, float weight){
 THStack*  HTTHistograms::plotStack(std::string varName, int selType){
 
   std::string hName = "h1D"+varName;
-  TH1F *hWJets = get1DHistogram((hName+"DY").c_str());
-  TH1F *hDYJets = get1DHistogram((hName+"DY").c_str());
+  TH1F *hWJets = get1DHistogram((hName+"Data").c_str());//TEST should be WJets
+  TH1F *hDYJets = get1DHistogram((hName+"Data").c_str());//TEST should be DY
   TH1F *hSoup = get1DHistogram((hName+"Data").c_str());
 
   float lumi = getLumi();
   ///Normalise MC histograms according to cross sections
-  std::string sampleName = "DY";
+  std::string sampleName = "Data";//TEST should be DY
   float weight = getSampleNormalisation(sampleName);
   float scale = weight*lumi;
   hDYJets->Scale(scale);

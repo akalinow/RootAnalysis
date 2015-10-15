@@ -28,6 +28,7 @@
       float genWeight;
 
       Wevent *wevent;
+      std::vector<Wpair>  *wpair;
       
    private:
 

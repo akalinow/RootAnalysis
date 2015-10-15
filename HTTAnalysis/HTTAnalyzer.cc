@@ -31,7 +31,7 @@ void HTTAnalyzer::initialize(TFileDirectory& aDir,
 //////////////////////////////////////////////////////////////////////////////
 void HTTAnalyzer::finalize(){ 
 
-  //myHistos_->finalizeHistograms(0,1.0);
+  myHistos_->finalizeHistograms(0,1.0);
  
 }
 //////////////////////////////////////////////////////////////////////////////
@@ -49,17 +49,13 @@ bool HTTAnalyzer::analyze(const EventProxyBase& iEvent){
   
   eventWeight *=lumi*scaleFactor;
 
-  std::cout<<"test new wevent "<<myEventProxy.wevent<<std::endl;
-  std::cout<<"test new wevent.eun_: "<<myEventProxy.wevent->run()<<std::endl;
-
   ///This is a hack agains bad data (data read without JSON)
-  if(myEventProxy.npv<2) return true;
+  //if(myEventProxy.wevent->npv()<2) return true;
 
   std::string sampleName = "DY";
-  if(myEventProxy.run>1){
+  if(myEventProxy.wevent->run()>1){
     sampleName = "Data";
     eventWeight = 1.0; //FIXME temporary
-    std::cout<<"svfit: "<<myEventProxy.svfit<<std::endl;
   }
   
 
@@ -69,12 +65,14 @@ bool HTTAnalyzer::analyze(const EventProxyBase& iEvent){
 
   ///This stands now for the baseline selection. 
   //if(myEventProxy.svfit<0) return true;
+  if(!myEventProxy.wpair->size()) return true;
   
   ///Fill histograms with number of PV.
-  myHistos_->fill1DHistogram("h1DNPV"+sampleName,myEventProxy.npv,eventWeight);
+  myHistos_->fill1DHistogram("h1DNPV"+sampleName,myEventProxy.wevent->npv(),eventWeight);
 
+  Wpair aPair = (*myEventProxy.wpair)[0];
   ///Fill SVfit mass
-  myHistos_->fill1DHistogram("h1DSVfit"+sampleName,myEventProxy.svfit,eventWeight);
+  myHistos_->fill1DHistogram("h1DSVfit"+sampleName,aPair.svfit(),eventWeight);
   
   return true;
 }

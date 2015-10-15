@@ -40,20 +40,16 @@ void EventProxyHTT::init(std::vector<std::string> const& iFileNames){
 	puWeight = -1;
 	genWeight = 1.0;
 	wevent = 0;//IMPORTNANT!!
+	wpair = 0;//IMPORTNANT!!
 	
-	//fChain->SetBranchAddress("npv",&npv);
-	//fChain->SetBranchAddress("run",&run);	
-	//fChain->SetBranchAddress("svfit",&svfit);
 	//fChain->SetBranchAddress("PUWeight",&puWeight);
 	fChain->SetBranchAddress("wevent",&wevent);
+	fChain->SetBranchAddress("wpair",&wpair);
 
-	fChain->SetBranchStatus("*",0);
+	//fChain->SetBranchStatus("*",0);
 	fChain->SetBranchStatus("wevent",1);
-	//fChain->SetBranchStatus("npv",1);
-	//fChain->SetBranchStatus("run",1);
-	//fChain->SetBranchStatus("svfit",1);
-	//fChain->SetBranchStatus("PUWeight",1);
-	//fChain->SetBranchStatus("generator",1);
+	fChain->SetBranchStatus("wpair",1);
+
 }
 /////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////

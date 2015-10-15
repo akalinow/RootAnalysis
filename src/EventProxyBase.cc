@@ -20,7 +20,7 @@ void EventProxyBase::init(std::vector<std::string> const& iFileNames){
   fChain->AddBranchToCache("*",kTRUE);
   //fChain->SetParallelUnzip(kTRUE);
 
-  fChain->SetBranchStatus("*",0);
+  //fChain->SetBranchStatus("*",0);
 
 }
 
