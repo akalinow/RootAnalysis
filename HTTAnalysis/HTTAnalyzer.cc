@@ -75,6 +75,9 @@ bool HTTAnalyzer::analyze(const EventProxyBase& iEvent){
 
   ///Fill SVfit mass
   myHistos_->fill1DHistogram("h1DSVfit"+sampleName,myEventProxy.diTauNSVfitMass,eventWeight);
+
+  ///Fill transverse mass
+  myHistos_->fill1DHistogram("h1DMt"+sampleName,myEventProxy.MtLeg1MVA,eventWeight);
   
   return true;
 }
