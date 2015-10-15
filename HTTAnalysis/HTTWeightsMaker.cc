@@ -55,29 +55,8 @@ void HTTWeightsMaker::finalize(){
 //////////////////////////////////////////////////////////////////////////////
 bool HTTWeightsMaker::analyze(const EventProxyBase& iEvent){
 
-  const EventProxyHTT & myEventProxy = static_cast<const EventProxyHTT&>(iEvent);
-  
-  puWeight = 1.0;
-  float genWeight = myEventProxy.genWeight;
-  float eventWeight = puWeight*genWeight;
-
-  std::string sampleName = "MC";
-  if(myEventProxy.run>1) sampleName = "DATA";
-  if(sampleName=="DATA") eventWeight = 1.0;
-
-  std::string hName = "h1DNPV"+sampleName;
-  
-  if(hPU && (!hDatasetPU || hDatasetPU->GetName()!=hName)){
-    hDatasetPU = (TH1F*)puFile->Get(("Summary/"+hName).c_str());
-    hDatasetPU->Scale(1.0/hDatasetPU->Integral(0,hDatasetPU->GetNbinsX()+1));
-    hPUWeights->Divide(hPU,hDatasetPU);    
-  }
+  //const EventProxyHTT & myEventProxy = static_cast<const EventProxyHTT&>(iEvent);
     
-  if(hPUWeights) puWeight = hPUWeights->GetBinContent(hPUWeights->FindBin(myEventProxy.npv));
-
-  ///Fill histograms with number of PV.
-  myHistos_->fill1DHistogram("h1DNPV"+sampleName,myEventProxy.npv,eventWeight);
-  
   return true;
 }
 //////////////////////////////////////////////////////////////////////////////

@@ -1,5 +1,7 @@
 #include "EventProxyBase.h"
 
+#include <iostream>
+
 
 EventProxyBase::EventProxyBase():
   fileNames_(), treeName_(""), eventIndex_(0), accumulatedSize_(0){
@@ -15,12 +17,12 @@ void EventProxyBase::init(std::vector<std::string> const& iFileNames){
   }
 
   accumulatedSize_ = fChain->GetEntries();
-  Int_t cachesize = 10000000; //10 MBytes
+  Int_t cachesize = 50000000; //50 MBytes
   fChain->SetCacheSize(cachesize);
   fChain->AddBranchToCache("*",kTRUE);
   //fChain->SetParallelUnzip(kTRUE);
 
-  fChain->SetBranchStatus("*",0);
+  //fChain->SetBranchStatus("*",0);
 
 }
 
@@ -33,7 +35,7 @@ EventProxyBase::~EventProxyBase(){}
 EventProxyBase const&
 EventProxyBase::operator++(){
 
-	fChain->GetEntry(++eventIndex_);
+  fChain->GetEntry(++eventIndex_);
 
    return *this;
 }

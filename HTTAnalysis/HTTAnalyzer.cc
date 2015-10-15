@@ -41,22 +41,40 @@ bool HTTAnalyzer::analyze(const EventProxyBase& iEvent){
   const EventProxyHTT & myEventProxy = static_cast<const EventProxyHTT&>(iEvent);
   
   float puWeight = myEventProxy.puWeight;
-  float genWeight = myEventProxy.puWeight;
-  float eventWeight = puWeight*genWeight;
-  
-  float lumi = 1.0;
-  float scaleFactor = 1.0;
-  
-  eventWeight *=lumi*scaleFactor;
-  
+  float genWeight = myEventProxy.sampleWeight;
+
+  float lumi = 1.937833e+01;
+    
   std::string sampleName = "MC";
-  if(myEventProxy.run>1) sampleName = "Data";
+  if(genWeight==1){
+    sampleName = "Data";
+    lumi = 1.0;
+  }
+  if(fabs(fabs(myEventProxy.genDecay/24.0)-13)<1E-5 ||
+     fabs(fabs(myEventProxy.genDecay/24.0)-15)<1E-5){
+     sampleName = "WJets";
+  }
+  if(fabs(fabs(myEventProxy.genDecay/23.0)-13)<1E-5 ||
+     fabs(fabs(myEventProxy.genDecay/23.0)-15)<1E-5){
+    sampleName = "DY";
+  }
+
+  float eventWeight = lumi*puWeight*genWeight;
   
+  bool baselineSelection = myEventProxy.ptL1>20 && myEventProxy.isPFMuon && myEventProxy.isTightMuon &&
+    myEventProxy.ptL2>20 && myEventProxy.muFlag!=1 && myEventProxy.vetoEvent==0 &&
+    myEventProxy.tightestHPSMVAWP>=0 && myEventProxy.combRelIsoLeg1DBetav2<0.1 &&
+    myEventProxy.diTauCharge==0 && myEventProxy.MtLeg1MVA<40 && 
+    myEventProxy.pairIndex<1 && myEventProxy.HLTx==1 && (myEventProxy.run>=163269 || myEventProxy.run==1) &&
+    myEventProxy.HLTmatch==1;
+
+  if(!baselineSelection) return true;
+    
   ///Fill histograms with number of PV.
-  myHistos_->fill1DHistogram("h1DNPV"+sampleName,myEventProxy.npv,eventWeight);
+  myHistos_->fill1DHistogram("h1DNPV"+sampleName,myEventProxy.numPV,eventWeight);
 
   ///Fill SVfit mass
-  myHistos_->fill1DHistogram("h1DSVfit"+sampleName,myEventProxy.svfit,eventWeight);
+  myHistos_->fill1DHistogram("h1DSVfit"+sampleName,myEventProxy.diTauNSVfitMass,eventWeight);
   
   return true;
 }

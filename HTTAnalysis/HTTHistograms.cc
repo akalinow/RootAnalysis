@@ -20,7 +20,7 @@
 /////////////////////////////////////////////////////////
 float HTTHistograms::getLumi(){
 
-  return 5579820.829*1E-9;//fb-1
+  return 808.472 + 4398.0 + 495.003 + 5719.0 + 652.755 + 31.099 + 7274.0;//fb-1
 
 }
 /////////////////////////////////////////////////////////
@@ -119,13 +119,11 @@ void HTTHistograms::finalizeHistograms(int nRuns, float weight){
 THStack*  HTTHistograms::plotStack(std::string varName, int selType){
 
   std::string hName = "h1D"+varName;
-  TH1F *hWJets = get1DHistogram((hName+"MC").c_str());
-  TH1F *hDYJets = get1DHistogram((hName+"MC").c_str());
+  TH1F *hWJets = get1DHistogram((hName+"WJets").c_str());
+  TH1F *hDYJets = get1DHistogram((hName+"DY").c_str());
   TH1F *hSoup = get1DHistogram((hName+"Data").c_str());
 
-  hWJets->Scale(0.0);//FIXME
-  
-  float lumi = getLumi();//FIXME
+  float lumi = getLumi()/1000.0;//FIXME
 
   ///////////
   hSoup->SetLineColor(1);
@@ -194,7 +192,6 @@ THStack*  HTTHistograms::plotStack(std::string varName, int selType){
   
   float max = hs->GetMaximum();
   if(hSoup->GetMaximum()>max) max = hSoup->GetMaximum();
-  max = 1E5;
 
   hs->GetHistogram()->SetTitleOffset(1.0);
   hs->SetMaximum(1.1*max);

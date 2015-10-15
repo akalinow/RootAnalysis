@@ -20,22 +20,28 @@
 
       void init(std::vector<std::string> const& iFileNames);
 
-      int npv;
-      int run;
-
-      float svfit;
       float puWeight;
-      float genWeight;
+      float pfJetPt;
+      float ptL2, etaL2;
+      float ptL1, etaL1;
+      int tightestHPSMVAWP;
+      int isPFMuon, isTightMuon;
+      int muFlag, vetoEvent;
+      float diTauVisMass;
+      float diTauNSVfitMass;
+      float MtLeg1MVA;
+      float combRelIsoLeg1DBetav2;
+      float diTauCharge;
+      int pairIndex;
+      ULong64_t run;
+      float HLTx;
+      float HLTmatch;
+      float numPV;
+      float sampleWeight;
+      int genDecay;
       
    private:
 
-      // List of branches
-      TBranch        *b_npv;
-      TBranch        *b_run;
-
-      TBranch        *b_svfit;
-      TBranch        *b_puWeight;
-      TBranch        *b_genWeight;
 
    };
 #endif
