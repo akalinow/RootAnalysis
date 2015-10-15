@@ -7,7 +7,7 @@
 #include "boost/shared_ptr.hpp"
 
 #include "EventProxyBase.h"
-//#include "HTTEvent.h"
+#include "HTTEvent.h"
 
 #include "TBranch.h"
 
@@ -26,6 +26,8 @@
       float svfit;
       float puWeight;
       float genWeight;
+
+      Wevent *wevent;
       
    private:
 

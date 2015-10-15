@@ -31,7 +31,7 @@ void HTTAnalyzer::initialize(TFileDirectory& aDir,
 //////////////////////////////////////////////////////////////////////////////
 void HTTAnalyzer::finalize(){ 
 
-  myHistos_->finalizeHistograms(0,1.0);
+  //myHistos_->finalizeHistograms(0,1.0);
  
 }
 //////////////////////////////////////////////////////////////////////////////
@@ -48,6 +48,9 @@ bool HTTAnalyzer::analyze(const EventProxyBase& iEvent){
   float scaleFactor = 1.0;
   
   eventWeight *=lumi*scaleFactor;
+
+  std::cout<<"test new wevent "<<myEventProxy.wevent<<std::endl;
+  std::cout<<"test new wevent.eun_: "<<myEventProxy.wevent->run()<<std::endl;
 
   ///This is a hack agains bad data (data read without JSON)
   if(myEventProxy.npv<2) return true;
