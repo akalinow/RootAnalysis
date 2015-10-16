@@ -58,7 +58,7 @@ void EventProxyHTT::init(std::vector<std::string> const& iFileNames){
 	fChain->SetBranchStatus("vetoEvent",1);
 	fChain->SetBranchStatus("muFlag",1);
 	fChain->SetBranchStatus("diTauVisMass",1);
-	fChain->SetBranchAddress("diTauNSVfitMass",&diTauNSVfitMass);	
+	fChain->SetBranchStatus("diTauNSVfitMass",1);	
 	fChain->SetBranchStatus("MtLeg1MVA",1);
 	fChain->SetBranchStatus("diTauVisMass",1);
 	fChain->SetBranchStatus("combRelIsoLeg1DBetav2",1);
