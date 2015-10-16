@@ -20,25 +20,10 @@
 
       void init(std::vector<std::string> const& iFileNames);
 
-      int npv;
-      int run;
-
-      float svfit;
       float puWeight;
-      float genWeight;
 
       Wevent *wevent;
       std::vector<Wpair>  *wpair;
       
-   private:
-
-      // List of branches
-      TBranch        *b_npv;
-      TBranch        *b_run;
-
-      TBranch        *b_svfit;
-      TBranch        *b_puWeight;
-      TBranch        *b_genWeight;
-
    };
 #endif

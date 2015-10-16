@@ -35,20 +35,26 @@ float HTTHistograms::getSampleNormalisation(const std::string & sampleName){
   std::string hName = "h1DStats"+sampleName;
   TH1F *hStats = get1DHistogram(hName.c_str());
   
-  float crossSection = 1.0;//TEST FIXME
+  float crossSection = 1.0;
   int nEventsAnalysed = hStats->GetBinContent(1);
 
   ///FIXME stupid if
+  ///Cross sections taken from
+  //https://twiki.cern.ch/twiki/bin/viewauth/CMS/StandardModelCrossSectionsat13TeVInclusive
   if(sampleName=="DY"){
-    //xsection for 3xZ->mu mu in [pb]
-    //https://twiki.cern.ch/twiki/bin/viewauth/CMS/StandardModelCrossSectionsat13TeVInclusive
+    //xsection for 3xZ->mu mu M50 in [pb]  
     crossSection = 3*2008.4; 
+  }
+  if(sampleName=="WJets"){
+    //xsection for 3xW->mu nu in [pb]
+    //https://twiki.cern.ch/twiki/bin/viewauth/CMS/StandardModelCrossSectionsat13TeVInclusive
+    crossSection = 3*20508.9; 
   }
   
   float weight = crossSection*presEff/nEventsAnalysed;
   if(presEff<0 || fabs(fabs(crossSection)-1.0)<1e-5) weight = 1.0;
 
-  //std::cout<<"Sample name: "<<file->GetName()<<std::endl;
+  std::cout<<"Sample name: "<<sampleName<<std::endl;
   std::cout<<"Mean cross section: "<<crossSection<<" [pb] "<<std::endl;
   std::cout<<"Number of events analyzed: "<<nEventsAnalysed<<std::endl;
   std::cout<<"Gen preselection efficiency: "<<genPresEff<<std::endl;
@@ -131,17 +137,21 @@ void HTTHistograms::finalizeHistograms(int nRuns, float weight){
 THStack*  HTTHistograms::plotStack(std::string varName, int selType){
 
   std::string hName = "h1D"+varName;
-  TH1F *hWJets = get1DHistogram((hName+"Data").c_str());//TEST should be WJets
-  TH1F *hDYJets = get1DHistogram((hName+"Data").c_str());//TEST should be DY
+  TH1F *hWJets = get1DHistogram((hName+"WJets").c_str());
+  TH1F *hDYJets = get1DHistogram((hName+"DY").c_str());
   TH1F *hSoup = get1DHistogram((hName+"Data").c_str());
 
   float lumi = getLumi();
   ///Normalise MC histograms according to cross sections
-  std::string sampleName = "Data";//TEST should be DY
+  std::string sampleName = "DY";
   float weight = getSampleNormalisation(sampleName);
   float scale = weight*lumi;
   hDYJets->Scale(scale);
-  hWJets->Scale(0.0);
+
+  sampleName = "WJets";
+  weight = getSampleNormalisation(sampleName);
+  scale = weight*lumi;
+  hWJets->Scale(scale);
   //////////////////////////////////////////////////////
   
   hSoup->SetLineColor(1);

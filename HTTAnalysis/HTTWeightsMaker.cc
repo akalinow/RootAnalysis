@@ -29,7 +29,7 @@ void HTTWeightsMaker::initialize(TFileDirectory& aDir,
 
   std::string filePath = "/home/akalinow/scratch/EclipseProjects/RootAnalysis/HTTAnalysis/RootAnalysis_PU.root";
   puFile = new TFile(filePath.c_str());
-  hPU = (TH1F*)puFile->Get("Summary/h1DNPVDATA");
+  hPU = (TH1F*)puFile->Get("Summary/h1DNPVData");
   if(hPU){
     hPU->SetName("hPU");
     hPU->Scale(1.0/hPU->Integral(0,hPU->GetNbinsX()+1));
@@ -57,16 +57,15 @@ bool HTTWeightsMaker::analyze(const EventProxyBase& iEvent){
 
   const EventProxyHTT & myEventProxy = static_cast<const EventProxyHTT&>(iEvent);
   
-  puWeight = 1.0;
-  float genWeight = myEventProxy.genWeight;
-  float eventWeight = puWeight*genWeight;
+  float genWeight = myEventProxy.wevent->genevtweight();
+  float eventWeight = genWeight;
 
   std::string sampleName = "MC";
-  if(myEventProxy.run>1) sampleName = "DATA";
-  if(sampleName=="DATA") eventWeight = 1.0;
+  if(myEventProxy.wevent->sample()==0) sampleName = "Data";
+  if(myEventProxy.wevent->sample()==1) sampleName = "DY";
+  if(myEventProxy.wevent->sample()==2) sampleName = "WJets";
 
-  ///This is a hack agains bad data (data read without JSON)
-  if(myEventProxy.npv<2) return true;
+  if(sampleName=="Data") eventWeight = 1.0;
 
   std::string hName = "h1DNPV"+sampleName;
   
@@ -75,11 +74,13 @@ bool HTTWeightsMaker::analyze(const EventProxyBase& iEvent){
     hDatasetPU->Scale(1.0/hDatasetPU->Integral(0,hDatasetPU->GetNbinsX()+1));
     hPUWeights->Divide(hPU,hDatasetPU);    
   }
-    
-  if(hPUWeights) puWeight = hPUWeights->GetBinContent(hPUWeights->FindBin(myEventProxy.npv));
+
+  puWeight = 1.0;
+  if(hPUWeights) puWeight = hPUWeights->GetBinContent(hPUWeights->FindBin(myEventProxy.wevent->npv()));
+  eventWeight = genWeight*puWeight;
 
   ///Fill histograms with number of PV.
-  myHistos_->fill1DHistogram("h1DNPV"+sampleName,myEventProxy.npv,eventWeight);
+  myHistos_->fill1DHistogram("h1DNPV"+sampleName,myEventProxy.wevent->npv(),eventWeight);
   
   return true;
 }

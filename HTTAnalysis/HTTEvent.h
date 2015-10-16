@@ -1,14 +1,10 @@
-#ifndef WarsawAnalysis_HTTDataFormats_HTTEvent_NEW_h
-#define WarsawAnalysis_HTTDataFormats_HTTEvent_NEW_h
+#ifndef WarsawAnalysis_HTTDataFormats_HTTEvent_A_h
+#define WarsawAnalysis_HTTDataFormats_HTTEvent_A_h
 
 #include "TLorentzVector.h"
 #include "TVector3.h"
 #include <map>
 #include <vector>
-
-//
-// class declaration
-//
 
 class Wevent{
 
@@ -18,6 +14,7 @@ class Wevent{
     int nup_ = -999, npu_ = -999, npv_ = -999; 
     int paircount_ = -1;
     float genevtweight_ = 1;
+    int sample_ = -1;
 
   public:
     Wevent();
@@ -30,6 +27,7 @@ class Wevent{
     void npv(int x){npv_ = x;}
     void paircount(int x){paircount_ = x;}
     void genevtweight(float x){genevtweight_ = x;}
+    void sample(int x){sample_ = x;}
 
     int run(){return run_;}
     float lumi(){return lumi_;}
@@ -39,6 +37,7 @@ class Wevent{
     int npv(){return npv_;}
     int paircount(){return paircount_;}
     float genevtweight(){return genevtweight_;}
+    int sample(){return sample_;}
 };
 
 enum tauidenum {
@@ -73,7 +72,7 @@ class Wtau{
     int charge_ = -999;
     float mt_ = -999;
     
-    std::vector<float> tauID_ = {-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1};
+    std::vector<float> tauID_  = {-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1};
 
   public:
     Wtau();

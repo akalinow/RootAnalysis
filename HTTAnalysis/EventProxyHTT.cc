@@ -14,18 +14,6 @@ void EventProxyHTT::init(std::vector<std::string> const& iFileNames){
 
 	EventProxyBase::init(iFileNames);
 
-	TChain *fFriendChain = new TChain("m2n/pair");
-	TChain *fFriendChain1 = new TChain("m2n/weight");
-	TObjArray* myList = fChain->GetListOfFiles();
-	for(unsigned int i=0;i<myList->GetSize();++i){
-	  TFile *file = (TFile*)myList->At(i);
-	  if(file){
-	    fFriendChain->Add(file->GetTitle(),-1);
-	    fFriendChain1->Add(file->GetTitle(),-1);	
-	  }
-	}
-	fChain->AddFriend(fFriendChain);
-	fChain->AddFriend(fFriendChain1);
 	fChain->SetMakeClass(0);
 	
 	///Add weight friend TTree
@@ -38,15 +26,16 @@ void EventProxyHTT::init(std::vector<std::string> const& iFileNames){
 	}
 	//////////	
 	puWeight = -1;
-	genWeight = 1.0;
+
 	wevent = 0;//IMPORTNANT!!
 	wpair = 0;//IMPORTNANT!!
 	
-	//fChain->SetBranchAddress("PUWeight",&puWeight);
+	fChain->SetBranchAddress("PUWeight",&puWeight);
 	fChain->SetBranchAddress("wevent",&wevent);
 	fChain->SetBranchAddress("wpair",&wpair);
 
 	//fChain->SetBranchStatus("*",0);
+	fChain->SetBranchStatus("PUWeight",1);
 	fChain->SetBranchStatus("wevent",1);
 	fChain->SetBranchStatus("wpair",1);
 
