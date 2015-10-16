@@ -134,7 +134,7 @@ void HTTHistograms::finalizeHistograms(int nRuns, float weight){
   plotStack("SVfit",0);
   plotStack("Mt",0);
 
-  plotAnyHistogram("h1PtMuData");
+  plotAnyHistogram("h1DPtMuData");
   
 }
 /////////////////////////////////////////////////////////
