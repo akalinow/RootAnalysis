@@ -1,4 +1,3 @@
-
 #include <iostream>
 #include <cmath>
 
@@ -132,6 +131,8 @@ void HTTHistograms::finalizeHistograms(int nRuns, float weight){
   plotStack("NPV",0);
   plotStack("SVfit",0);
   plotStack("Mt",0);
+
+  plotAnyHistogram("h1PtMuData");
   
 }
 /////////////////////////////////////////////////////////
@@ -315,6 +316,32 @@ THStack*  HTTHistograms::plotStack(std::string varName, int selType){
   c1->Print(plotName.c_str()); 
 
   return hs;
+}
+/////////////////////////////////////////////////////////
+/////////////////////////////////////////////////////////
+void HTTHistograms::plotAnyHistogram(const std::string & hName){
+  
+   TCanvas* c = new TCanvas("AnyHistogram","AnyHistogram",			   
+			   460,500);
+
+  TLegend l(0.15,0.78,0.35,0.87,NULL,"brNDC");
+  l.SetTextSize(0.05);
+  l.SetFillStyle(4000);
+  l.SetBorderSize(0);
+  l.SetFillColor(10);
+
+  TH1F* h1D = this->get1DHistogram(hName.c_str());
+
+  if(h1D){
+    h1D->SetLineWidth(3);
+    h1D->Scale(1.0/h1D->Integral(0,h1D->GetNbinsX()+1));
+    h1D->SetYTitle("Events");
+    h1D->GetYaxis()->SetTitleOffset(1.4);
+    h1D->SetStats(kFALSE);
+    h1D->Draw();
+    if(hName.find("DeltaR")!=std::string::npos) c->SetLogy();
+    c->Print(TString::Format("fig_png/%s.png",hName.c_str()).Data());
+  }
 }
 /////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////

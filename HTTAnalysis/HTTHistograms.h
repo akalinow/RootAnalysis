@@ -42,6 +42,9 @@ class HTTHistograms: public AnalysisHistograms {
   //selType - selection type, i.e. baseline, background estimation, etc.
   THStack* plotStack(std::string varName, int selType);
 
+  //Plot a single histogram.
+  void plotAnyHistogram(const std::string & hName);
+
 };
 
 #endif
