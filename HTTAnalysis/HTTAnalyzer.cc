@@ -71,8 +71,13 @@ bool HTTAnalyzer::analyze(const EventProxyBase& iEvent){
   myHistos_->fill1DHistogram("h1DNPV"+sampleName,myEventProxy.wevent->npv(),eventWeight);
 
   Wpair aPair = (*myEventProxy.wpair)[0];
+  Wtau aTau = (*myEventProxy.wtau)[0];
   ///Fill SVfit mass
   myHistos_->fill1DHistogram("h1DSVfit"+sampleName,aPair.svfit(),eventWeight);
+
+  ///Fill mT
+  ///Need mT(l,MET)
+  //myHistos_->fill1DHistogram("h1DMt"+sampleName,aTau.mt(),eventWeight);
   
   return true;
 }

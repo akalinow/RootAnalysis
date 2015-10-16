@@ -24,6 +24,7 @@
 
       Wevent *wevent;
       std::vector<Wpair>  *wpair;
+      std::vector<Wtau>  *wtau;
       
    };
 #endif
