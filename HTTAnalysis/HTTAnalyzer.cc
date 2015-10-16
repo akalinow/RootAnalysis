@@ -90,7 +90,7 @@ bool HTTAnalyzer::analyze(const EventProxyBase& iEvent){
   myHistos_->fill1DHistogram("h1DMt"+sampleName,myEventProxy.MtLeg1MVA,eventWeight);
 
   ///Fill muon pt histogram
-  myHistos_->fill1DHistogram("h1PtMu"+sampleName,myEventProxy.ptL1,eventWeight);
+  myHistos_->fill1DHistogram("h1DPtMu"+sampleName,myEventProxy.ptL1,eventWeight);
   
   
   return true;

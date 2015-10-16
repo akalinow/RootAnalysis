@@ -98,7 +98,7 @@ bool HTTHistograms::fill1DHistogram(const std::string& name, float val, float we
     if(name.find("h1DSVfit")!=std::string::npos) hTemplateName = "h1DSVFitTemplate";
     if(name.find("h1DStats")!=std::string::npos) hTemplateName = "h1DStatsTemplate";
     if(name.find("h1DMt")!=std::string::npos) hTemplateName = "h1DMtTemplate";
-    if(name.find("h1Pt")!=std::string::npos) hTemplateName = "h1DPtTemplate";
+    if(name.find("h1DPt")!=std::string::npos) hTemplateName = "h1DPtTemplate";
     std::cout<<"Adding histogram: "<<name<<" "<<file_<<" "<<file_->fullPath()<<std::endl;
     this->add1DHistogram(name,"",
 			 this->get1DHistogram(hTemplateName,true)->GetNbinsX(),
@@ -122,7 +122,7 @@ void HTTHistograms::defineHistograms(){
    add1DHistogram("h1DNPVTemplate",";Number of PV; Events",61,-0.5,60.5,file_);
    add1DHistogram("h1DSVFitTemplate",";SVFit mass [GeV/c^{2}]; Events",50,0,200,file_);
    add1DHistogram("h1DMtTemplate","; Transverse mass; Events",50,0,160,file_);
-   add1DHistogram("h1PtTemplate","; Momentum; Events",50,0,100,file_);
+   add1DHistogram("h1DPtTemplate","; Momentum; Events",50,0,100,file_);
    histosInitialized_ = true;
  }
 }
