@@ -49,7 +49,6 @@ bool CPHistograms::fill1DHistogram(const std::string& name, float val, float wei
     if(name.find("h1DRho")!=std::string::npos) hTemplateName = "h1DRhoTemplate";
     if(name.find("h1DIP")!=std::string::npos) hTemplateName = "h1IPTemplate";
     if(name.find("h1DVxPull")!=std::string::npos) hTemplateName = "h1DVxPullTemplate";
-    //std::cout<<"Adding histogram: "<<name<<std::endl;
     this->add1DHistogram(name,"",
 			 this->get1DHistogram(hTemplateName)->GetNbinsX(),
 			 this->get1DHistogram(hTemplateName)->GetXaxis()->GetXmin(),

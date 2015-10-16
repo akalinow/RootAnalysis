@@ -162,13 +162,14 @@ bool CPAnalyzer::analyze(const EventProxyBase& iEvent){
   myEvent = myEventProxy.event;
   DiTauData* aEventGen = &(myEvent->genEvent_);
   DiTauData* aEventReco = &(myEvent->recoEvent_);
- 
+
   //Skip 3-prong and unknown decays.
   if( !(isOneProng(aEventGen->decModeMinus_) || isLepton(aEventGen->decModeMinus_) ) ||
       !(isOneProng(aEventGen->decModePlus_)  || isLepton(aEventGen->decModePlus_) ) ) return true;
   ///Skip lepton decays
-  //TEST if(isLepton(aEventGen->decModeMinus_) || isLepton(aEventGen->decModePlus_)) return true;
+  if(isLepton(aEventGen->decModeMinus_) || isLepton(aEventGen->decModePlus_)) return true;
   ///
+  
   std::vector<std::string> decayNamesReco = getDecayName(aEventReco->decModeMinus_, aEventReco->decModePlus_);
   std::vector<std::string> decayNamesGen = getDecayName(aEventGen->decModeMinus_, aEventGen->decModePlus_);
   std::string motherName = getMotherName(myEvent->bosonId_);
@@ -176,23 +177,15 @@ bool CPAnalyzer::analyze(const EventProxyBase& iEvent){
   float deltaR_plus = aEventGen->piPlus_.DeltaR(aEventReco->piPlus_);
   float deltaR_minus = aEventGen->piMinus_.DeltaR(aEventReco->piMinus_);
   
-  //if(deltaR_plus<0.1 && deltaR_minus<0.1){ 
+  if(deltaR_plus<0.1 && deltaR_minus<0.1){ 
     myHistos_->fill1DHistogram("h1DDecayModePlus_"+motherName,aEventReco->decModePlus_);
     myHistos_->fill1DHistogram("h1DDecayModeMinus_"+motherName,aEventReco->decModeMinus_);
-    //}
+  }
 
   bool goodGen = false, goodReco = false;
   for(auto it: decayNamesReco) if(it.find("PiPi0Pi0")!=std::string::npos) goodReco = true;
-  for(auto it: decayNamesReco) if(it.find("1Prong1ProngXPi0")!=std::string::npos) goodReco = true;
+  //for(auto it: decayNamesReco) if(it.find("1Prong1ProngXPi0")!=std::string::npos) goodReco = true;
   for(auto it: decayNamesGen) if(it.find("PiPi0Pi0")!=std::string::npos) goodGen = true;
-
-  //TEST
-  goodReco = false;
-  //if(aEventReco->decModeMinus_<2 && aEventReco->decModePlus_<2) goodReco = true;
-  if(aEventReco->decModeMinus_<2 && aEventReco->decModePlus_==16) goodReco = true;
-  if(aEventReco->decModeMinus_==16 && aEventReco->decModePlus_<2) goodReco = true;
-  ///TEST
-
   
   if(goodGen&goodReco){
     myHistos_->fill1DHistogram("h1DDeltaRPlus_"+motherName,deltaR_plus);
@@ -222,18 +215,13 @@ bool CPAnalyzer::analyze(const EventProxyBase& iEvent){
   fillVertices(aEventGen,aEventReco,"_"+motherName+"_PF");
   fillVertices(aEventGen,aEventReco,"_"+motherName+"_RefitBS");
   fillVertices(aEventGen,aEventReco,"_"+motherName+"_RefitNoBS");
-  ///TEST
-
-  
-
-  ////
+  ////  
   selected = analysisSelection(aEventReco);
   ///
   for(auto decayName:decayNamesReco){
-    //if(decayName!="PiPi0Pi0") continue; //use only PiPi0Pi0 decays
+    if(decayName!="PiPi0Pi0") continue; //use only PiPi0Pi0 decays
     smearType = "ideal";
-    //name = "_"+motherName+"_"+decayName+"_"+smearType;
-    name = "_"+motherName+"_"+"PiPi0Pi0"+"_"+smearType;
+    name = "_"+motherName+"_"+decayName+"_"+smearType;
     fillAngles(aEventReco,name+"_RECO");
     fillAngles(aEventReco,name+"_RECOGEN");
     fillAngles(aEventReco,name+"_AOD");    
@@ -367,13 +355,6 @@ std::vector<std::string> CPAnalyzer::getDecayName(int decModeMinus, int decModeP
 
   if(isLepton(decModePlus) && isLepton(decModeMinus)) types.push_back("LeptonLepton");
 
-  /*
-  std::cout<<"------------"<<std::endl;
-  if(decModeMinus<2 && decModePlus<2){
-    std::cout<<decModeMinus<<" "<<decModePlus<<" ";
-    for(auto it:types) std::cout<<it<<std::endl;
-  }
-  */
   return types;
 }
 //////////////////////////////////////////////////////////////////////////////

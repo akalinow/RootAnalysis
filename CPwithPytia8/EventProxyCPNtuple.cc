@@ -19,6 +19,7 @@ void EventProxyCPNtuple::init(std::vector<std::string> const& iFileNames){
 	fChain->SetMakeClass(0);
 	fChain->SetBranchAddress("HTTEvent",&event);
 
+
 }
 /////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////
