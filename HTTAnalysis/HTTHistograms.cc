@@ -157,8 +157,8 @@ THStack*  HTTHistograms::plotStack(std::string varName, int selType){
   hDYJets->Scale(scale);
 
   sampleName = "WJets";
-  weight = getSampleNormalisation(sampleName);
-  scale = weight*lumi;
+  weight = getSampleNormalisation(sampleName);  
+  scale = weight*lumi*mTScale;
   hWJets->Scale(scale);
 
   sampleName = "TT";
@@ -195,10 +195,10 @@ THStack*  HTTHistograms::plotStack(std::string varName, int selType){
   ////////
   TH1F *hMCSum = (TH1F*)hWJets->Clone("hMCSum");
   hMCSum->Reset();
+  hMCSum->Add(hOther);
+  hMCSum->Add(hTT);
   hMCSum->Add(hDYJets);
   hMCSum->Add(hWJets);
-  hMCSum->Add(hTT);
-  hMCSum->Add(hOther);
 
   std::cout<<"Data: "<<hSoup->Integral(0,hSoup->GetNbinsX()+1)<<std::endl;
   std::cout<<"MC: "<<hMCSum->Integral(0,hMCSum->GetNbinsX()+1)<<std::endl;  
