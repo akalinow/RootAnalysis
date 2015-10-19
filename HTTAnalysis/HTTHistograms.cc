@@ -188,10 +188,10 @@ THStack*  HTTHistograms::plotStack(std::string varName, int selType){
   
   THStack *hs = new THStack("hs","Stacked histograms");      
   /////////
+  hs->Add(hOther,"hist");
+  hs->Add(hTT,"hist");
   hs->Add(hWJets,"hist");
   hs->Add(hDYJets,"hist");
-  hs->Add(hTT,"hist");
-  hs->Add(hOther,"hist");
   ////////
   TH1F *hMCSum = (TH1F*)hWJets->Clone("hMCSum");
   hMCSum->Reset();
