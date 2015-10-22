@@ -26,21 +26,24 @@ void EventProxyHTT::init(std::vector<std::string> const& iFileNames){
 	}
 	//////////	
 	puWeight = -1;
-
+	
 	wevent = 0;//IMPORTNANT!!
 	wpair = 0;//IMPORTNANT!!
 	wtau = 0;//IMPORTNANT!!
+	wmu = 0;//IMPORTNANT!!
 	
 	fChain->SetBranchAddress("PUWeight",&puWeight);
 	fChain->SetBranchAddress("wevent",&wevent);
 	fChain->SetBranchAddress("wpair",&wpair);
 	fChain->SetBranchAddress("wtau",&wtau);
+	fChain->SetBranchAddress("wmu",&wmu);
 
 	//fChain->SetBranchStatus("*",0);
 	fChain->SetBranchStatus("PUWeight",1);
 	fChain->SetBranchStatus("wevent",1);
 	fChain->SetBranchStatus("wpair",1);
 	fChain->SetBranchStatus("wtau",1);
+	fChain->SetBranchStatus("wmu",1);
 
 }
 /////////////////////////////////////////////////////////

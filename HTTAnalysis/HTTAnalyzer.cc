@@ -41,6 +41,7 @@ bool HTTAnalyzer::analyze(const EventProxyBase& iEvent){
   const EventProxyHTT & myEventProxy = static_cast<const EventProxyHTT&>(iEvent);
   
   float puWeight = myEventProxy.puWeight;
+  puWeight = 1.0; //TEST
   float genWeight = myEventProxy.wevent->genevtweight();
  
   
@@ -70,14 +71,28 @@ bool HTTAnalyzer::analyze(const EventProxyBase& iEvent){
   ///Fill histograms with number of PV.
   myHistos_->fill1DHistogram("h1DNPV"+sampleName,myEventProxy.wevent->npv(),eventWeight);
 
+  if(!myEventProxy.wpair->size() ||
+     !myEventProxy.wtau->size() ||
+     !myEventProxy.wmu->size()) return true;
+
   Wpair aPair = (*myEventProxy.wpair)[0];
   Wtau aTau = (*myEventProxy.wtau)[0];
-  ///Fill SVfit mass
-  myHistos_->fill1DHistogram("h1DSVfit"+sampleName,aPair.svfit(),eventWeight);
+  Wmu aMuon = (*myEventProxy.wmu)[0];
+  
+  ///Fill SVfit and visible masses
+  myHistos_->fill1DHistogram("h1DMassSV"+sampleName,aPair.svfit(),eventWeight);
+  myHistos_->fill1DHistogram("h1DMassVis"+sampleName,aPair.m_vis(),eventWeight);
 
-  ///Fill mT
-  ///Need mT(l,MET)
-  //myHistos_->fill1DHistogram("h1DMt"+sampleName,aTau.mt(),eventWeight);
+  ///Fill muon pt and eta
+  myHistos_->fill1DHistogram("h1DMassTrans"+sampleName,aMuon.mt(),eventWeight);
+  myHistos_->fill1DHistogram("h1DPtMuon"+sampleName,aMuon.pt(),eventWeight);
+  myHistos_->fill1DHistogram("h1DEtaMuon"+sampleName,aMuon.eta(),eventWeight);
+
+  ///Fill tau pt and eta
+  myHistos_->fill1DHistogram("h1DPtTau"+sampleName,aTau.pt(),eventWeight);
+  myHistos_->fill1DHistogram("h1DEtaTau"+sampleName,aTau.eta(),eventWeight);
+
+
   
   return true;
 }

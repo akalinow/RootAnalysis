@@ -1,11 +1,14 @@
-#ifndef WarsawAnalysis_HTTDataFormats_HTTEvent_A_h
-#define WarsawAnalysis_HTTDataFormats_HTTEvent_A_h
+#ifndef WarsawAnalysis_HTTDataFormats_HTTEvent1_h
+#define WarsawAnalysis_HTTDataFormats_HTTEvent1_h
 
 #include "TLorentzVector.h"
 #include "TVector3.h"
 #include <map>
 #include <vector>
 
+//
+// class declaration
+//
 class Wevent{
 
     int run_ = 0;
@@ -100,6 +103,122 @@ class Wtau{
 };
 typedef std::vector<Wtau> WtauCollection;
 
+
+class Wmu{
+    
+    float pt_ = -999;
+    float phi_ = -999;
+    float eta_ = -999;
+    float mass_ = -999;
+    int charge_ = -999;
+    float mt_ = -999;
+    float d0_ = -999;
+    float dz_ = -999;
+    float isLooseMuon_ = -999;
+    float isTightMuon_ = -999;
+    float isHighPtMuon_ = -999;
+    float isMediumMuon_ = -999;
+    float isTightnovtxMuon_ = -999;
+    float iso_ = -999;
+
+  public:
+    Wmu();
+    ~Wmu();
+    void clear();
+
+    void pt(float x){pt_ = x;}
+    void phi(float x){phi_ = x;}
+    void eta(float x){eta_ = x;}
+    void mass(float x){mass_ = x;}
+    void charge(float x){charge_ = x;}
+    void mt(float x){mt_ = x;}
+    void d0(float x){d0_ = x;}
+    void dz(float x){dz_ = x;}
+    void isLooseMuon(float x){isLooseMuon_ = x;}
+    void isTightMuon(float x){isTightMuon_ = x;}
+    void isHighPtMuon(float x){isHighPtMuon_ = x;}
+    void isMediumMuon(float x){isMediumMuon_ = x;}
+    void isTightnovtxMuon(float x){isTightnovtxMuon_ = x;}
+    void iso(float x){iso_ = x;}
+
+    float pt(){return pt_;}
+    float phi(){return phi_;}
+    float eta(){return eta_;}
+    float mass(){return mass_;}
+    float charge(){return charge_;}
+    float mt(){return mt_;}
+    float d0(){return d0_;}
+    float dz(){return dz_;}
+    float isLooseMuon(){return isLooseMuon_;}
+    float isTightMuon(){return isTightMuon_;}
+    float isHighPtMuon(){return isHighPtMuon_;}
+    float isMediumMuon(){return isMediumMuon_;}
+    float isTightnovtxMuon(){return isTightnovtxMuon_;}
+    float iso(){return iso_;}
+
+
+};
+typedef std::vector<Wmu> WmuCollection;
+
+class Welectron{
+
+    float pt_ = -999;
+    float phi_ = -999;
+    float eta_ = -999;
+    float mass_ = -999;
+    int charge_ = -999;
+
+  public:
+    Welectron();
+    ~Welectron();
+    void clear();
+    
+    void pt(float x){pt_ = x;}
+    void phi(float x){phi_ = x;}
+    void eta(float x){eta_ = x;}
+    void mass(float x){mass_ = x;}
+    void charge(float x){charge_ = x;}
+ 
+    float pt(){return pt_;}
+    float phi(){return phi_;}
+    float eta(){return eta_;}
+    float mass(){return mass_;}
+    float charge(){return charge_;}
+};
+typedef std::vector<Welectron> WelectronCollection;
+
+class Wmet{
+
+
+    float metpx_ = -999;
+    float metpt_ = -999;
+    float metphi_ = -999;
+    float mvacov00_ = -999;
+    float mvacov01_ = -999;
+    float mvacov10_ = -999;
+    float mvacov11_ = -999;
+ 
+  public:
+
+    void metpx(float x){metpx_ = x;}
+    void metpt(float x){metpt_ = x;}
+    void metphi(float x){metphi_ = x;}
+    void mvacov00(float x){mvacov00_ = x;}
+    void mvacov01(float x){mvacov01_ = x;}
+    void mvacov10(float x){mvacov10_ = x;}
+    void mvacov11(float x){mvacov11_ = x;}
+
+    float metpx(){return metpx_;}
+    float metpt(){return metpt_;}
+    float metphi(){return metphi_;}
+    float mvacov00(){return mvacov00_;}
+    float mvacov01(){return mvacov01_;}
+    float mvacov10(){return mvacov10_;}
+    float mvacov11(){return mvacov11_;}
+};
+typedef std::vector<Wmet> WmetCollection;
+
+
 class Wpair{
     
      float svfit_ = -999;
@@ -126,6 +245,45 @@ class Wpair{
 
 };
 typedef std::vector<Wpair> WpairCollection;
+
+class Wjet{
+
+    float pt_ = -999;
+    float eta_ = -999;
+    float phi_ = -999;
+    float id_ = -999;
+    float bptag_ = -999;
+    float csvtag_ = -999;
+    float bjet_ = -999;
+    float jecfactor_ = -999;
+    float jetlooseID_ = -999;
+    float pujetetaid_ = -999;
+  public:
+
+    void pt(float x){pt_ = x;}
+    void eta(float x){eta_ = x;}
+    void phi(float x){phi_ = x;}
+    void id(float x){id_ = x;}
+    void bptag(float x){bptag_ = x;}
+    void csvtag(float x){csvtag_ = x;}
+    void bjet(float x){bjet_ = x;}
+    void jecfactor(float x){jecfactor_ = x;}
+    void jetlooseID(float x){jetlooseID_ = x;}
+    void pujetetaid(float x){pujetetaid_ = x;}
+
+    float pt(){return pt_;}
+    float eta(){return eta_;}
+    float phi(){return phi_;}
+    float id(){return id_;}
+    float bptag(){return bptag_;}
+    float csvtag(){return csvtag_;}
+    float bjet(){return bjet_;}
+    float jecfactor(){return jecfactor_;}
+    float jetlooseID(){return jetlooseID_;}
+    float pujetetaid(){return pujetetaid_;}
+};
+typedef std::vector<Wjet> WjetCollection;
+
 
 enum triggersenum {
     HLT_Mu23_TrkIsoVVL_Ele12_CaloIdL_TrackIdL_IsoVL_v1,

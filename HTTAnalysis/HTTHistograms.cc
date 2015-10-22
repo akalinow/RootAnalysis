@@ -97,9 +97,10 @@ bool HTTHistograms::fill1DHistogram(const std::string& name, float val, float we
   std::string hTemplateName = "";
   if(!AnalysisHistograms::fill1DHistogram(name,val,weight)){
     if(name.find("h1DNPV")!=std::string::npos) hTemplateName = "h1DNPVTemplate";
-    if(name.find("h1DSVfit")!=std::string::npos) hTemplateName = "h1DSVFitTemplate";
+    if(name.find("h1DMass")!=std::string::npos) hTemplateName = "h1DMassTemplate";
     if(name.find("h1DStats")!=std::string::npos) hTemplateName = "h1DStatsTemplate";
-    if(name.find("h1DMt")!=std::string::npos) hTemplateName = "h1DMtTemplate";
+    if(name.find("h1DPt")!=std::string::npos) hTemplateName = "h1DPtTemplate";
+    if(name.find("h1DEta")!=std::string::npos) hTemplateName = "h1DEtaTemplate";
     std::cout<<"Adding histogram: "<<name<<" "<<file_<<" "<<file_->fullPath()<<std::endl;
     this->add1DHistogram(name,"",
 			 this->get1DHistogram(hTemplateName,true)->GetNbinsX(),
@@ -121,8 +122,9 @@ void HTTHistograms::defineHistograms(){
    std::cout<<"Adding histogram: "<<file_<<" "<<file_->fullPath()<<std::endl;
    add1DHistogram("h1DStatsTemplate","",10,0.5,10.5,file_);
    add1DHistogram("h1DNPVTemplate",";Number of PV; Events",61,-0.5,60.5,file_);
-   add1DHistogram("h1DSVFitTemplate",";SVFit mass [GeV/c^{2}]; Events",50,0,200,file_);
-   add1DHistogram("h1DMtTemplate",";mT(lepton,MET); Events",50,0,160,file_);
+   add1DHistogram("h1DMassTemplate",";SVFit mass [GeV/c^{2}]; Events",20,0,200,file_);
+   add1DHistogram("h1DPtTemplate",";p_{T}; Events",20,0,100,file_);
+   add1DHistogram("h1DEtaTemplate",";#eta; Events",24,-2.4,2.4,file_);
    histosInitialized_ = true;
  }
 }
@@ -131,8 +133,16 @@ void HTTHistograms::defineHistograms(){
 void HTTHistograms::finalizeHistograms(int nRuns, float weight){
 
   plotStack("NPV",0);
-  plotStack("SVfit",0);
-  //plotStack("Mt",0);
+
+  plotStack("MassSV",0);
+  plotStack("MassVis",0);  
+  plotStack("MassTrans",0);
+  
+  plotStack("PtMuon",0);
+  plotStack("EtaMuon",0);
+  
+  plotStack("PtTau",0);  
+  plotStack("EtaTau",0);
   
 }
 /////////////////////////////////////////////////////////
@@ -142,7 +152,9 @@ THStack*  HTTHistograms::plotStack(std::string varName, int selType){
   std::string hName = "h1D"+varName;
   TH1F *hWJets = get1DHistogram((hName+"WJets").c_str());
   TH1F *hDYJets = get1DHistogram((hName+"DY").c_str());
-  TH1F *hSoup = get1DHistogram((hName+"Data").c_str());
+  //TEST TH1F *hSoup = get1DHistogram((hName+"Data").c_str());
+  TH1F *hSoup = get1DHistogram((hName+"DY").c_str());
+  hSoup->Scale(0.0);//TEST 
 
   float lumi = getLumi();
   ///Normalise MC histograms according to cross sections
