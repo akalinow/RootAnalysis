@@ -15,14 +15,17 @@ void EventProxyHTT::init(std::vector<std::string> const& iFileNames){
 	EventProxyBase::init(iFileNames);
 
 	fChain->SetMakeClass(0);
+
 	
 	///Add weight friend TTree
+	bool hasWeightFile = false;
 	TChain *fFriendChainWeights = new TChain("Summary/tree");	
 	TFile *file = new TFile("RootAnalysis_Weights.root");
 	TTree *treeWeights;
 	if(file->IsOpen() && file->FindObjectAny("tree")){
 	  treeWeights = (TTree*)file->Get("Summary/tree");
 	  fChain->AddFriend(treeWeights);
+	  hasWeightFile = true;
 	}
 	//////////	
 	puWeight = -1;
@@ -32,7 +35,7 @@ void EventProxyHTT::init(std::vector<std::string> const& iFileNames){
 	wtau = 0;//IMPORTNANT!!
 	wmu = 0;//IMPORTNANT!!
 	
-	fChain->SetBranchAddress("PUWeight",&puWeight);
+	if(hasWeightFile) fChain->SetBranchAddress("PUWeight",&puWeight);
 	fChain->SetBranchAddress("wevent",&wevent);
 	fChain->SetBranchAddress("wpair",&wpair);
 	fChain->SetBranchAddress("wtau",&wtau);

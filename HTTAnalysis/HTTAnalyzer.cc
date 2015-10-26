@@ -41,10 +41,8 @@ bool HTTAnalyzer::analyze(const EventProxyBase& iEvent){
   const EventProxyHTT & myEventProxy = static_cast<const EventProxyHTT&>(iEvent);
   
   float puWeight = myEventProxy.puWeight;
-  puWeight = 1.0; //TEST
   float genWeight = myEventProxy.wevent->genevtweight();
- 
-  
+   
   std::string sampleName = "MC";
   if(myEventProxy.wevent->sample()==0) sampleName = "Data";
   if(myEventProxy.wevent->sample()==1) {

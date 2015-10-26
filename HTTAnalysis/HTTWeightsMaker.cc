@@ -27,7 +27,7 @@ void HTTWeightsMaker::initialize(TFileDirectory& aDir,
 
   mySelections_ = aSelections;
 
-  std::string filePath = "/home/akalinow/scratch/EclipseProjects/RootAnalysis/HTTAnalysis/RootAnalysis_PU.root";
+  std::string filePath = "./RootAnalysis_PU.root";//FIX ME
   puFile = new TFile(filePath.c_str());
   hPU = (TH1F*)puFile->Get("Summary/h1DNPVData");
   if(hPU){
