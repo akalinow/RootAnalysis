@@ -90,6 +90,8 @@ bool HTTAnalyzer::analyze(const EventProxyBase& iEvent){
   myHistos_->fill1DHistogram("h1DPtTau"+sampleName,aTau.pt(),eventWeight);
   myHistos_->fill1DHistogram("h1DEtaTau"+sampleName,aTau.eta(),eventWeight);
 
+  ///Fill isolation variables
+  myHistos_->fill1DHistogram("h1DIsoMuon"+sampleName,aMuon.iso(),eventWeight);
 
   
   return true;

@@ -101,6 +101,7 @@ bool HTTHistograms::fill1DHistogram(const std::string& name, float val, float we
     if(name.find("h1DStats")!=std::string::npos) hTemplateName = "h1DStatsTemplate";
     if(name.find("h1DPt")!=std::string::npos) hTemplateName = "h1DPtTemplate";
     if(name.find("h1DEta")!=std::string::npos) hTemplateName = "h1DEtaTemplate";
+    if(name.find("h1DIso")!=std::string::npos) hTemplateName = "h1DIsoTemplate";
     std::cout<<"Adding histogram: "<<name<<" "<<file_<<" "<<file_->fullPath()<<std::endl;
     this->add1DHistogram(name,"",
 			 this->get1DHistogram(hTemplateName,true)->GetNbinsX(),
@@ -125,6 +126,7 @@ void HTTHistograms::defineHistograms(){
    add1DHistogram("h1DMassTemplate",";SVFit mass [GeV/c^{2}]; Events",20,0,200,file_);
    add1DHistogram("h1DPtTemplate",";p_{T}; Events",20,0,100,file_);
    add1DHistogram("h1DEtaTemplate",";#eta; Events",24,-2.4,2.4,file_);
+   add1DHistogram("h1DIsoTemplate",";Isolation; Events",20,0,2,file_);
    histosInitialized_ = true;
  }
 }
@@ -140,6 +142,7 @@ void HTTHistograms::finalizeHistograms(int nRuns, float weight){
   
   plotStack("PtMuon",0);
   plotStack("EtaMuon",0);
+  plotStack("IsoMuon",0);
   
   plotStack("PtTau",0);  
   plotStack("EtaTau",0);
@@ -152,9 +155,7 @@ THStack*  HTTHistograms::plotStack(std::string varName, int selType){
   std::string hName = "h1D"+varName;
   TH1F *hWJets = get1DHistogram((hName+"WJets").c_str());
   TH1F *hDYJets = get1DHistogram((hName+"DY").c_str());
-  //TEST TH1F *hSoup = get1DHistogram((hName+"Data").c_str());
-  TH1F *hSoup = get1DHistogram((hName+"DY").c_str());
-  hSoup->Scale(0.0);//TEST 
+  TH1F *hSoup = get1DHistogram((hName+"Data").c_str());
 
   float lumi = getLumi();
   ///Normalise MC histograms according to cross sections
