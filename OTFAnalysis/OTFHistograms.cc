@@ -124,8 +124,11 @@ void OTFHistograms::defineHistograms(){
  add2DHistogram("h2DEtaHit","",8*26,0.8,1.25,2,-0.5,1.5,file_);
  add2DHistogram("h2DPhiHit","",5*32,-M_PI,M_PI,2,-0.5,1.5,file_);
 
- add2DHistogram("h2DEtaVx","",40,-1.6,1.6,2,-0.5,1.5,file_);//Full detector
- //add2DHistogram("h2DEtaVx","",8*25,0.8,1.25,2,-0.5,1.5,file_);//Overlap
+ ///add2DHistogram("h2DEtaVx","",40,-1.6,1.6,2,-0.5,1.5,file_);//Full detector
+ //TEST add2DHistogram("h2DEtaVx","",4*25,0.83,1.24,2,-0.5,1.5,file_);//Overlap
+add2DHistogram("h2DEtaVx","",10,1.20,1.24,2,-0.5,1.5,file_);//Overlap
+
+ 
  //add2DHistogram("h2DEtaVx","",8*25,-0.1,0.85,2,-0.5,1.5,file_);//Barrel
  //add2DHistogram("h2DEtaVx","",8*25,1.25,2.65,2,-0.5,1.5,file_);//Endcap
  add2DHistogram("h2DPhiVx","",4*32,-0.2,3.2,2,-0.5,1.5,file_);
@@ -757,14 +760,14 @@ void OTFHistograms::plotRate(std::string type){
     
     for(int iBin=1;iBin<hRateOtf->GetXaxis()->GetNbins();++iBin){
       float rate = hRateOtf->GetBinContent(iBin);
-      rate+=aRndm.Uniform();///Randomize rate values, to avoid having two same keys.
+      rate+=0.001*aRndm.Uniform();///Randomize rate values, to avoid having two same keys.
       rateMap[rate] = hRateOtf->GetXaxis()->GetBinLabel(iBin);
       rateMapBin[rate] = iBin;
     }
     ///Fill histo copy with sorted values
     unsigned int iBin = 1;
     for (auto it = rateMap.rbegin(); it!= rateMap.rend(); ++it){
-      if(iBin<20) std::cout<<"Quality: "<<it->second
+      if(iBin<200 && hEff->GetBinContent(rateMapBin[it->first])>0.01) std::cout<<"Quality: "<<it->second
 			   <<" rate: "<<it->first
 			   <<" efficiency: "<<hEff->GetBinContent(rateMapBin[it->first])
 			   <<std::endl;

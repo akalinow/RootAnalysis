@@ -15,9 +15,13 @@
 #include "HTTWeightsMaker.h"
 #include "HTTAnalyzer.h"
 
-
 #include "TFile.h"
 #include "TStopwatch.h"
+
+#include "boost/functional/hash.hpp"
+#include "boost/property_tree/ptree.hpp"
+#include "boost/property_tree/ini_parser.hpp"
+#include "boost/tokenizer.hpp"
 
 int main(int argc, char ** argv) {
 
@@ -33,12 +37,19 @@ int main(int argc, char ** argv) {
 	std::cout<<"Start"<<std::endl;
 	TStopwatch timer;
 	timer.Start();
-	  //----------------------------------------------------------
+
+	boost::property_tree::ptree pt;
+	boost::property_tree::ini_parser::read_ini(cfgFileName, pt);
+	
+	typedef boost::tokenizer<boost::char_separator<char> > tokenizer;
+	std::string processName = pt.get<std::string>("TreeAnalyzer.processName","Test");
+	
+	//----------------------------------------------------------
 	 std::vector<Analyzer*> myAnalyzers;
 	 EventProxyHTT *myEvent = new EventProxyHTT();
 
-	 //myAnalyzers.push_back(new HTTWeightsMaker("HTTWeightsMaker"));
-	 myAnalyzers.push_back(new HTTAnalyzer("HTTAnalyzer"));
+	 if(processName=="Weights" || processName=="PU") myAnalyzers.push_back(new HTTWeightsMaker("HTTWeightsMaker"));
+	 else myAnalyzers.push_back(new HTTAnalyzer("HTTAnalyzer"));
 
 	 TreeAnalyzer *tree = new TreeAnalyzer("TreeAnalyzer",cfgFileName, myEvent);
 	 tree->init(myAnalyzers);

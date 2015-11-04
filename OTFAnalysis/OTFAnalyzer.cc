@@ -43,31 +43,31 @@ void OTFAnalyzer::initialize(TFileDirectory& aDir,
 //////////////////////////////////////////////////////////////////////////////
 void OTFAnalyzer::finalize(){ 
 
-  /*
+  
  std::cout<<"tmpMap.size(): "<<tmpMap.size()<<std::endl;
  
  std::ostringstream stringStr;
  TH2F *h = myHistos_->get2DHistogram("h2DRateVsQualityOtf",true);
- for(int iBin=1;iBin<h->GetYaxis()->GetNbins();++iBin){
-   stringStr.str("");
-   stringStr<<iBin;
-   h->GetYaxis()->SetBinLabel(iBin,stringStr.str().c_str());
- }
+ if(h){
+   for(int iBin=1;iBin<h->GetYaxis()->GetNbins();++iBin){
+     stringStr.str("");
+     stringStr<<iBin;
+     h->GetYaxis()->SetBinLabel(iBin,stringStr.str().c_str());
+   }
 
+   for(auto it: tmpMap){
+     int iBinX = h->GetYaxis()->FindFixBin(it.second);   
+     if(iBinX>=h->GetYaxis()->GetNbins()) continue;
+     
+     std::bitset<18> bits(it.first);
+     
+     stringStr.str("");
+     stringStr<<it.first;
+     std::string label = bits.to_string()+" "+stringStr.str();
+     h->GetYaxis()->SetBinLabel(iBinX,label.c_str());
+   }
+ }
  
- for(auto it: tmpMap){
-   int iBinX = h->GetYaxis()->FindFixBin(it.second);   
-   if(iBinX>=h->GetYaxis()->GetNbins()) continue;
-
-   std::bitset<18> bits(it.first);
-
-   stringStr.str("");
-   stringStr<<it.first;
-   std::string label = bits.to_string()+" "+stringStr.str();
-   h->GetYaxis()->SetBinLabel(iBinX,label.c_str());
- }
-  */
-
   myHistos_->finalizeHistograms(0,1.0); 
 }
 //////////////////////////////////////////////////////////////////////////////
@@ -177,6 +177,8 @@ bool OTFAnalyzer::passQuality(std::vector<L1Obj> * myL1Coll,
     */
     //myL1Coll->operator[](iCand).q!=7168 &&
     //myL1Coll->operator[](iCand).q!=132352 &&
+
+
     
     ///Barrel (l1t::tftype::omtf_pos)           
     myL1Coll->operator[](iCand).q!=99840 &&
@@ -194,7 +196,9 @@ bool OTFAnalyzer::passQuality(std::vector<L1Obj> * myL1Coll,
     myL1Coll->operator[](iCand).q!=66688 && 
     myL1Coll->operator[](iCand).q!=66176 &&     
     ///
-       
+    ///Added after 03.11.2015 Total rate: 234
+    myL1Coll->operator[](iCand).q!=7168  &&  //Quality: 000001110000000000 7168 rate: 10.6124 efficiency: 0.000465593   
+    myL1Coll->operator[](iCand).q!=34880 && //Quality: 001000100001000000 34880 rate: 6.80543 efficiency: 0.000279356       
     true;
   }
   else return myL1Coll->size();
@@ -410,10 +414,6 @@ bool OTFAnalyzer::analyze(const EventProxyBase& iEvent){
   
   //if(fabs(theEvent->eta-theEvent->eta1)<0.5) return true;
     
-  //if(theEvent->eta<1.24 ||  theEvent->eta>1.45) return true;
-  //if(theEvent->pt>10 || theEvent->pt<5) return true;
-  //if(theEvent->pt>3) return true;
-
   std::string selType = "";
   std::string sysTypeGmt="Gmt";
   std::string sysTypeOtf="Otf";
@@ -438,6 +438,8 @@ bool OTFAnalyzer::analyze(const EventProxyBase& iEvent){
     //fillGhostHisto("Gmt","VsProcessor");
   }
   else if(fabs(theEvent->eta)>0.83 && fabs(theEvent->eta)<1.24){
+  //if(fabs(theEvent->eta)>1.215 && fabs(theEvent->eta)<1.24){
+  //if(fabs(theEvent->eta)>1.20 && fabs(theEvent->eta)<1.215){
     
     for(int iCut=0;iCut<22;++iCut){
       if(iCut>0 && iCut<14) continue;
