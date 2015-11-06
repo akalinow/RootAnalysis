@@ -29,6 +29,7 @@ class HTTHistograms: public AnalysisHistograms {
   float getLumi();
 
   float getSampleNormalisation(const std::string & sampleName);
+  TH1* getQCDbackground(std::string, int);
 
    private:
   
