@@ -125,8 +125,8 @@ void OTFHistograms::defineHistograms(){
  add2DHistogram("h2DPhiHit","",5*32,-M_PI,M_PI,2,-0.5,1.5,file_);
 
  ///add2DHistogram("h2DEtaVx","",40,-1.6,1.6,2,-0.5,1.5,file_);//Full detector
- //TEST add2DHistogram("h2DEtaVx","",4*25,0.83,1.24,2,-0.5,1.5,file_);//Overlap
-add2DHistogram("h2DEtaVx","",10,1.20,1.24,2,-0.5,1.5,file_);//Overlap
+ add2DHistogram("h2DEtaVx","",4*25,0.83,1.24,2,-0.5,1.5,file_);//Overlap
+ //add2DHistogram("h2DEtaVx","",10,1.20,1.24,2,-0.5,1.5,file_);//Overlap
 
  
  //add2DHistogram("h2DEtaVx","",8*25,-0.1,0.85,2,-0.5,1.5,file_);//Barrel
