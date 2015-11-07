@@ -11,6 +11,7 @@
 #include <cmath>
 #include <string>
 #include <map>
+#include <unordered_map>
 #include <fstream>
 #include <iomanip>
 #include <vector>
@@ -71,7 +72,10 @@ class AnalysisHistograms {
 
   /// The histograms
   std::map<std::string,TProfile*> myProfiles_;
-  std::map<std::string,TH1F*> my1Dhistograms_;
+  //std::map<std::string,TH1F*> my1Dhistograms_;
+  std::unordered_map<std::string,TH1F*> my1Dhistograms_;
+
+  
   std::map<std::string,TH2F*> my2Dhistograms_;
   std::map<std::string,TH3F*> my3Dhistograms_;
 

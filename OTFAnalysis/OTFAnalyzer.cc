@@ -196,9 +196,6 @@ bool OTFAnalyzer::passQuality(std::vector<L1Obj> * myL1Coll,
     myL1Coll->operator[](iCand).q!=66688 && 
     myL1Coll->operator[](iCand).q!=66176 &&     
     ///
-    ///Added after 03.11.2015 Total rate: 234
-    myL1Coll->operator[](iCand).q!=7168  &&  //Quality: 000001110000000000 7168 rate: 10.6124 efficiency: 0.000465593   
-    myL1Coll->operator[](iCand).q!=34880 && //Quality: 001000100001000000 34880 rate: 6.80543 efficiency: 0.000279356       
     true;
   }
   else return myL1Coll->size();
@@ -246,7 +243,7 @@ void OTFAnalyzer::fillTurnOnCurve(const int & iPtCut,
   }
   
   bool qualityCut = passQuality(myL1Coll,sysType,iCand);
-  bool pass = myL1Coll->size() && myL1Coll->operator[](iCand).pt>=ptCut && qualityCut && deltaR<0.15;
+  bool pass = myL1Coll->size() && myL1Coll->operator[](iCand).pt>=ptCut && qualityCut && deltaR<0.25;
   
   std::string tmpName = hName+"Pt"+std::to_string(ptCut);
   myHistos_->fill2DHistogram(tmpName,theEvent->pt, pass);
