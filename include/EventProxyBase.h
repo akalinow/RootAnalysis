@@ -36,8 +36,9 @@
       void skip(int n);
       TFile* getTFile() const;
 
-      virtual void init(std::vector<std::string> const& iFileNames);
+      TTree* getTTree() const;
 
+      virtual void init(std::vector<std::string> const& iFileNames);
 
       virtual EventProxyBase* clone() const {return 0;};
       //

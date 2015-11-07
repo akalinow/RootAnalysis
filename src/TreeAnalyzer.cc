@@ -158,18 +158,22 @@ void  TreeAnalyzer::init(std::vector<Analyzer*> myAnalyzers){
 				myStrSelections_);
   }
 
+
+  
  for(unsigned int iThread=0;iThread<omp_get_max_threads();++iThread){
    myProxiesThread_[iThread] = myProxy_->clone();
    myProxiesThread_[iThread]->init(fileNames_);
-    for(unsigned int iAnalyzer=0;iAnalyzer<myAnalyzers_.size();++iAnalyzer){ 
+    for(unsigned int iAnalyzer=0;iAnalyzer<myAnalyzers_.size();++iAnalyzer){
       myAnalyzersThreads_[iThread].push_back(myAnalyzers_[iAnalyzer]->clone());
     }
   }
-  
+
+ /*
  for(unsigned int i=0;i<myAnalyzers_.size();++i){
    myAnalyzers_[i]->addBranch(mySummary_->getTree());  
    myAnalyzers_[i]->addCutHistos(mySummary_->getHistoList());  
  }
+ */
 }
 //////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////
@@ -186,16 +190,29 @@ int TreeAnalyzer::loop(){
   nEventsSkipped_ = 0;
   if(nEventsToAnalyze_<0 || nEventsToAnalyze_>myProxy_->size()) nEventsToAnalyze_ = myProxy_->size();
   int eventPreviouslyPrinted=-1;
-  ///////
-  
-  #pragma omp parallel for
-  for(int aEvent=0;aEvent<nEventsToAnalyze_;++aEvent){
+  int nEventsInTree = nEventsToAnalyze_;
 
-    if( nEventsAnalyzed_ < nEventsToPrint_ || nEventsAnalyzed_%100000==0)
-      //std::cout<<"Events analyzed: "<<nEventsAnalyzed_<<" thread: "<<omp_get_thread_num()<<std::endl;
-      std::cout<<"Events analyzed: "<<nEventsAnalyzed_<<std::endl;
-    analyze(myProxiesThread_[omp_get_thread_num()]->toN(aEvent));
+  myProxiesThread_[0]->toBegin();
+  
+  std::cout<<"omp_get_num_threads(): "<<omp_get_num_threads()<<std::endl;
+  if(omp_get_num_threads()>1) nEventsInTree = myProxiesThread_[0]->getTTree()->GetEntries();
+  ///////
+  while(nEventsAnalyzed_<nEventsToAnalyze_){
+  
+#pragma omp parallel for schedule(dynamic, 10000)
+    for(int aEvent=nEventsAnalyzed_;aEvent<nEventsInTree;++aEvent){
+      if( nEventsAnalyzed_ < nEventsToPrint_ || nEventsAnalyzed_%1000000==0)
+	std::cout<<"Events analyzed: "<<nEventsAnalyzed_<<" thread: "<<omp_get_thread_num()<<std::endl;
+      //std::cout<<"Events analyzed: "<<nEventsAnalyzed_<<std::endl;
+      //std::cout<<" entries: "
+      //     <<myProxiesThread_[omp_get_thread_num()]->getTTree()->GetEntries()<<std::endl;
+      analyze(myProxiesThread_[omp_get_thread_num()]->toN(aEvent));
+    }
+    #pragma omp barrier
+    myProxiesThread_[0]->toN(nEventsInTree+1);
+    nEventsInTree = myProxiesThread_[0]->getTTree()->GetEntries();
   }
+  
   
   return nEventsAnalyzed_;    
 

@@ -337,8 +337,8 @@ test_LDADD = -lCore -lRIO -lNet -lHist -lGraf -lGraf3d -lGpad -lTree -lRint -lPo
 
 # Compiler options for a.out
 test_CPPFLAGS = -I./ -I$(top_srcdir)/include -I/usr/local/root-6.04.00/include/root -std=c++11 -fopenmp
-BUILT_SOURCES = DictCint.cxx DictCint.h
-CLEANFILES = *Cint.cxx *Cint.h *~ core
+BUILT_SOURCES = DictCint.cxx
+CLEANFILES = *Cint.cxx *~ core
 all: $(BUILT_SOURCES)
 	$(MAKE) $(AM_MAKEFLAGS) all-am
 
@@ -757,7 +757,7 @@ uninstall-am:
 .PRECIOUS: Makefile
 
 
-%Cint.cxx %Cint.h :L1Obj.h EventData.h LinkDef.h
+%Cint.cxx	 :L1Obj.h EventData.h LinkDef.h
 		/usr/local/root-6.04.00/bin/rootcint -f $*Cint.cxx -c $(INCLUDES) $(AM_CPPFLAGS) $^
 
 # Tell versions [3.59,3.63) of GNU make to not export all variables.

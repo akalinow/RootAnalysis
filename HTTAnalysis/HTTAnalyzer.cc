@@ -46,7 +46,7 @@ void HTTAnalyzer::finalize(){
 //////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////
 bool HTTAnalyzer::analyze(const EventProxyBase& iEvent){
-
+  
   const EventProxyHTT & myEventProxy = static_cast<const EventProxyHTT&>(iEvent);
   
   float puWeight = myEventProxy.puWeight;

@@ -28,9 +28,9 @@ test_LDADD   = @ROOTLIBS@ -lProof @ROOTAUXLIBS@ -lboost_regex -lgomp
 # Compiler options for a.out
 test_CPPFLAGS = -I./ -I$(top_srcdir)/include -I@ROOTINCDIR@ -std=c++11 -fopenmp
 
-BUILT_SOURCES = DictCint.cxx DictCint.h
+BUILT_SOURCES = DictCint.cxx 
 
 CLEANFILES = *Cint.cxx *Cint.h *~ core
 
-%Cint.cxx %Cint.h :HTTEvent.h LinkDef.h
+%Cint.cxx	 :HTTEvent.h LinkDef.h
 		@ROOTCINT@ -f $*Cint.cxx -c $(INCLUDES) $(AM_CPPFLAGS) $^

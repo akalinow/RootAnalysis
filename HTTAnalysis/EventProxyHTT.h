@@ -20,6 +20,8 @@
 
       void init(std::vector<std::string> const& iFileNames);
 
+      virtual EventProxyBase* clone() const;
+
       float puWeight;
 
       Wevent *wevent;
