@@ -16,8 +16,9 @@ noinst_PROGRAMS=test
 # '_SOURCES' for example.
 
 # Sources for the a.out 
-test_SOURCES= CPAnalysis.cc EventProxyCPNtuple.cc \
-              CPHistograms.cc CPAnalyzer.cc HTTEvent.cxx  DictCint.cxx
+test_SOURCES= HTTAnalysis.cc EventProxyHTT.cc HTTWeightsMaker.cc HTTWeightHistograms.cc \
+	      HTTAnalyzer.cc HTTHistograms.cc HTTEvent.cxx DictCint.cxx
+
 
 # Linker options for a.out
 test_LDFLAGS = $(top_srcdir)/src/libRootAnalysis.la -R @ROOTLIBDIR@ -L@ROOTLIBDIR@
@@ -33,4 +34,3 @@ CLEANFILES = *Cint.cxx *Cint.h *~ core
 
 %Cint.cxx %Cint.h :HTTEvent.h LinkDef.h
 		@ROOTCINT@ -f $*Cint.cxx -c $(INCLUDES) $(AM_CPPFLAGS) $^
-

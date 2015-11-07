@@ -33,6 +33,15 @@ class CPHistograms: public AnalysisHistograms {
   void plot_HAZ_Histograms(const std::string & hName,
 			   const std::string & sysType);
 
+  ///PCA resolution related histograms.
+  void plotPCAResolution(const std::string & hName);
+
+  ///REsolutions of reconstructed vertices
+  void plotVerticesPulls(const std::string & hName);
+  
+  ///Plot histogram with given name.
+  void plotAnyHistogram(const std::string & hName);
+
   ///Types of the selection flow
   std::vector<std::string> selectionFlavours_;
 

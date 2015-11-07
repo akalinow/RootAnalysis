@@ -211,28 +211,34 @@ bool  AnalysisHistograms::fill3DHistogram(const std::string& name, float val1, f
 }
 //////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////
-TProfile* AnalysisHistograms::getProfile(const std::string& name) {
+TProfile* AnalysisHistograms::getProfile(const std::string& name, bool noClone) {
 
  using namespace std;
 
  unsigned int iThread = omp_get_thread_num();
  if(name.find("Template")!=std::string::npos) iThread = 0;
+
+ if(noClone && myProfiles_[iThread].find(name)!=myProfiles_[iThread].end()) return myProfiles_[iThread][name];
+ else if(myProfiles_[iThread].find(name)!=myProfiles_[iThread].end()) return (TProfile*)(myProfiles_[iThread][name]->Clone());
  
- if(myProfiles_[iThread].find(name)!=myProfiles_[iThread].end()) return (TProfile*)(myProfiles_[iThread][name]->Clone());
  else cout<<"ERROR: Profile : "<<name<<" not found!"<<endl;
  return 0;
 }
 //////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////
-TH1F* AnalysisHistograms::get1DHistogram(const std::string& name){
+TH1F* AnalysisHistograms::get1DHistogram(const std::string& name, bool noClone){
 
  using namespace std;
 
  unsigned int iThread = omp_get_thread_num();
  if(name.find("Template")!=std::string::npos) iThread = 0;
+
+ std::unordered_map<std::string,TH1F*>::const_iterator it = my1Dhistograms_[iThread].find(name);
  
- if(my1Dhistograms_[iThread].find(name)!=my1Dhistograms_[iThread].end()) return (TH1F*)(my1Dhistograms_[iThread][name]->Clone());
+ if(noClone && it!=my1Dhistograms_[iThread].end()) return (TH1F*)(my1Dhistograms_[iThread][name]->Clone());
+ else if(it!=my1Dhistograms_[iThread].end()) return (TH1F*)(it->second->Clone());
  else cout<<"ERROR: Histogram: "<<name<<" not found in thread: "<<iThread<<endl;
+
  return 0;
 }
 //////////////////////////////////////////////////////////////////////////////
@@ -250,15 +256,18 @@ TH2F* AnalysisHistograms::get2DHistogram(const std::string& name, bool noClone){
  return 0;
 }
 //////////////////////////////////////////////////////////////////////////////
-TH3F* AnalysisHistograms::get3DHistogram(const std::string& name){
+TH3F* AnalysisHistograms::get3DHistogram(const std::string& name, bool noClone){
 
  using namespace std;
 
  unsigned int iThread = omp_get_thread_num();
  if(name.find("Template")!=std::string::npos) iThread = 0;
- 
+
+ if(noClone && my3Dhistograms_[iThread].find(name)!=my3Dhistograms_[iThread].end()) my3Dhistograms_[iThread][name];
  if(my3Dhistograms_[iThread].find(name)!=my3Dhistograms_[iThread].end()) return (TH3F*)(my3Dhistograms_[iThread][name]->Clone());
  else cout<<"ERROR: Histogram: "<<name<<" not found in thread: "<<iThread<<endl;
+
+
  return 0;
  
 }

@@ -4,7 +4,7 @@
 #include <string>
 #include <omp.h>
 #include "TreeAnalyzer.h"
-//#include "SummaryAnalyzer.h"
+#include "SummaryAnalyzer.h"
 #include "ObjectMessenger.h"
 #include "EventProxyBase.h"
 
@@ -71,7 +71,7 @@ TreeAnalyzer::~TreeAnalyzer(){
 
   std::cout<<"TreeAnalyzer::~TreeAnalyzer() Begin"<<std::endl;
 
-  //delete mySummary_;
+  delete mySummary_;
   delete store_;
 
   std::cout<<"TreeAnalyzer::~TreeAnalyzer() Done"<<std::endl;
@@ -133,11 +133,13 @@ void TreeAnalyzer::parseCfg(const std::string & cfgFileName){
   }
   
   filePath_ = pt.get<std::string>("TreeAnalyzer.outputPath");
+  sampleName_ = pt.get<std::string>("TreeAnalyzer.processName","Test");
   
   nEventsToAnalyze_ = pt.get("TreeAnalyzer.eventsToAnalyze",-1);
   nEventsToPrint_ = pt.get("TreeAnalyzer.eventsToPrint",100);
   nThreads = pt.get("TreeAnalyzer.threads",1);
   omp_set_num_threads(nThreads);  
+  
   
 }
 //////////////////////////////////////////////////////////////////////////////
@@ -146,6 +148,9 @@ void  TreeAnalyzer::init(std::vector<Analyzer*> myAnalyzers){
 
   myProxy_->init(fileNames_);
   myAnalyzers_ = myAnalyzers;
+
+  mySummary_ = new SummaryAnalyzer("Summary");
+  //myAnalyzers_.push_back(mySummary_);
 
   for(unsigned int i=0;i<myAnalyzers_.size();++i){ 
     myDirectories_.push_back(store_->mkdir(myAnalyzers_[i]->name()));
@@ -161,12 +166,10 @@ void  TreeAnalyzer::init(std::vector<Analyzer*> myAnalyzers){
     }
   }
   
-/*
  for(unsigned int i=0;i<myAnalyzers_.size();++i){
    myAnalyzers_[i]->addBranch(mySummary_->getTree());  
    myAnalyzers_[i]->addCutHistos(mySummary_->getHistoList());  
  }
- */
 }
 //////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////
@@ -185,8 +188,7 @@ int TreeAnalyzer::loop(){
   int eventPreviouslyPrinted=-1;
   ///////
   
-  //#pragma omp parallel for schedule(dynamic)
-#pragma omp parallel for
+  #pragma omp parallel for
   for(int aEvent=0;aEvent<nEventsToAnalyze_;++aEvent){
 
     if( nEventsAnalyzed_ < nEventsToPrint_ || nEventsAnalyzed_%100000==0)
@@ -196,6 +198,7 @@ int TreeAnalyzer::loop(){
   }
   
   return nEventsAnalyzed_;    
+
 }
 //////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////
