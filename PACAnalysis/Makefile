@@ -115,23 +115,23 @@ am_test_OBJECTS = test-PACAnalysis.$(OBJEXT) \
 	test-EventData.$(OBJEXT) test-DictCint.$(OBJEXT)
 test_OBJECTS = $(am_test_OBJECTS)
 test_DEPENDENCIES =
-AM_V_lt = $(am__v_lt_$(V))
-am__v_lt_ = $(am__v_lt_$(AM_DEFAULT_VERBOSITY))
+AM_V_lt = $(am__v_lt_@AM_V@)
+am__v_lt_ = $(am__v_lt_@AM_DEFAULT_V@)
 am__v_lt_0 = --silent
 am__v_lt_1 = 
 test_LINK = $(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) \
 	$(LIBTOOLFLAGS) --mode=link $(CXXLD) $(AM_CXXFLAGS) \
 	$(CXXFLAGS) $(test_LDFLAGS) $(LDFLAGS) -o $@
-AM_V_P = $(am__v_P_$(V))
-am__v_P_ = $(am__v_P_$(AM_DEFAULT_VERBOSITY))
+AM_V_P = $(am__v_P_@AM_V@)
+am__v_P_ = $(am__v_P_@AM_DEFAULT_V@)
 am__v_P_0 = false
 am__v_P_1 = :
-AM_V_GEN = $(am__v_GEN_$(V))
-am__v_GEN_ = $(am__v_GEN_$(AM_DEFAULT_VERBOSITY))
+AM_V_GEN = $(am__v_GEN_@AM_V@)
+am__v_GEN_ = $(am__v_GEN_@AM_DEFAULT_V@)
 am__v_GEN_0 = @echo "  GEN     " $@;
 am__v_GEN_1 = 
-AM_V_at = $(am__v_at_$(V))
-am__v_at_ = $(am__v_at_$(AM_DEFAULT_VERBOSITY))
+AM_V_at = $(am__v_at_@AM_V@)
+am__v_at_ = $(am__v_at_@AM_DEFAULT_V@)
 am__v_at_0 = @
 am__v_at_1 = 
 DEFAULT_INCLUDES = -I.
@@ -144,16 +144,16 @@ LTCXXCOMPILE = $(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) \
 	$(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) \
 	$(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) \
 	$(AM_CXXFLAGS) $(CXXFLAGS)
-AM_V_CXX = $(am__v_CXX_$(V))
-am__v_CXX_ = $(am__v_CXX_$(AM_DEFAULT_VERBOSITY))
+AM_V_CXX = $(am__v_CXX_@AM_V@)
+am__v_CXX_ = $(am__v_CXX_@AM_DEFAULT_V@)
 am__v_CXX_0 = @echo "  CXX     " $@;
 am__v_CXX_1 = 
 CXXLD = $(CXX)
 CXXLINK = $(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) \
 	$(LIBTOOLFLAGS) --mode=link $(CXXLD) $(AM_CXXFLAGS) \
 	$(CXXFLAGS) $(AM_LDFLAGS) $(LDFLAGS) -o $@
-AM_V_CXXLD = $(am__v_CXXLD_$(V))
-am__v_CXXLD_ = $(am__v_CXXLD_$(AM_DEFAULT_VERBOSITY))
+AM_V_CXXLD = $(am__v_CXXLD_@AM_V@)
+am__v_CXXLD_ = $(am__v_CXXLD_@AM_DEFAULT_V@)
 am__v_CXXLD_0 = @echo "  CXXLD   " $@;
 am__v_CXXLD_1 = 
 SOURCES = $(test_SOURCES)
@@ -184,13 +184,13 @@ ETAGS = etags
 CTAGS = ctags
 am__DIST_COMMON = $(srcdir)/Makefile.in $(top_srcdir)/depcomp
 DISTFILES = $(DIST_COMMON) $(DIST_SOURCES) $(TEXINFOS) $(EXTRA_DIST)
-ACLOCAL = ${SHELL} /home/akalinow/scratch/EclipseProjects/RootAnalysis/missing aclocal-1.15
-AMTAR = $${TAR-tar}
-AM_DEFAULT_VERBOSITY = 1
+ACLOCAL = ${SHELL} /dmj/hep/olszew/RootAnalysis/missing --run aclocal-1.11
+AMTAR = ${SHELL} /dmj/hep/olszew/RootAnalysis/missing --run tar
+AM_DEFAULT_VERBOSITY = @AM_DEFAULT_VERBOSITY@
 AR = ar
-AUTOCONF = ${SHELL} /home/akalinow/scratch/EclipseProjects/RootAnalysis/missing autoconf
-AUTOHEADER = ${SHELL} /home/akalinow/scratch/EclipseProjects/RootAnalysis/missing autoheader
-AUTOMAKE = ${SHELL} /home/akalinow/scratch/EclipseProjects/RootAnalysis/missing automake-1.15
+AUTOCONF = ${SHELL} /dmj/hep/olszew/RootAnalysis/missing --run autoconf
+AUTOHEADER = ${SHELL} /dmj/hep/olszew/RootAnalysis/missing --run autoheader
+AUTOMAKE = ${SHELL} /dmj/hep/olszew/RootAnalysis/missing --run automake-1.11
 AWK = gawk
 CC = gcc
 CCDEPMODE = depmode=gcc3
@@ -202,9 +202,9 @@ CXXCPP = g++ -E
 CXXDEPMODE = depmode=gcc3
 CXXFLAGS = -Werror -O3
 CYGPATH_W = echo
-DEFS = -DPACKAGE_NAME=\"RootAnalysis\" -DPACKAGE_TARNAME=\"rootanalysis\" -DPACKAGE_VERSION=\"1.0\" -DPACKAGE_STRING=\"RootAnalysis\ 1.0\" -DPACKAGE_BUGREPORT=\"\" -DPACKAGE_URL=\"\" -DHAVE_MKDIR=1 -DSTDC_HEADERS=1 -DHAVE_SYS_TYPES_H=1 -DHAVE_SYS_STAT_H=1 -DHAVE_STDLIB_H=1 -DHAVE_STRING_H=1 -DHAVE_MEMORY_H=1 -DHAVE_STRINGS_H=1 -DHAVE_INTTYPES_H=1 -DHAVE_STDINT_H=1 -DHAVE_UNISTD_H=1 -DHAVE__BOOL=1 -DPACKAGE=\"rootanalysis\" -DVERSION=\"1.0\" -DHAVE_DLFCN_H=1 -DLT_OBJDIR=\".libs/\"
+DEFS = -DPACKAGE_NAME=\"RootAnalysis\" -DPACKAGE_TARNAME=\"rootanalysis\" -DPACKAGE_VERSION=\"1.0\" -DPACKAGE_STRING=\"RootAnalysis\ 1.0\" -DPACKAGE_BUGREPORT=\"\" -DHAVE_MKDIR=1 -DSTDC_HEADERS=1 -DHAVE_SYS_TYPES_H=1 -DHAVE_SYS_STAT_H=1 -DHAVE_STDLIB_H=1 -DHAVE_STRING_H=1 -DHAVE_MEMORY_H=1 -DHAVE_STRINGS_H=1 -DHAVE_INTTYPES_H=1 -DHAVE_STDINT_H=1 -DHAVE_UNISTD_H=1 -DPACKAGE=\"rootanalysis\" -DVERSION=\"1.0\" -DHAVE_DLFCN_H=1 -DLT_OBJDIR=\".libs/\"
 DEPDIR = .deps
-DLLTOOL = false
+DLLTOOL = @DLLTOOL@
 DSYMUTIL = 
 DUMPBIN = 
 ECHO_C = 
@@ -214,12 +214,12 @@ EGREP = /bin/grep -E
 EXEEXT = 
 FGREP = /bin/grep -F
 GREP = /bin/grep
-INSTALL = /bin/install -c
+INSTALL = /usr/bin/install -c
 INSTALL_DATA = ${INSTALL} -m 644
 INSTALL_PROGRAM = ${INSTALL}
 INSTALL_SCRIPT = ${INSTALL}
 INSTALL_STRIP_PROGRAM = $(install_sh) -c -s
-LD = /bin/ld -m elf_x86_64
+LD = /opt/rh/devtoolset-3/root/usr/libexec/gcc/x86_64-redhat-linux/4.9.1/ld -m elf_x86_64
 LDFLAGS = 
 LIBOBJS = 
 LIBS = 
@@ -227,10 +227,10 @@ LIBTOOL = $(SHELL) $(top_builddir)/libtool
 LIPO = 
 LN_S = ln -s
 LTLIBOBJS = 
-MAKEINFO = ${SHELL} /home/akalinow/scratch/EclipseProjects/RootAnalysis/missing makeinfo
-MANIFEST_TOOL = :
+MAKEINFO = ${SHELL} /dmj/hep/olszew/RootAnalysis/missing --run makeinfo
+MANIFEST_TOOL = @MANIFEST_TOOL@
 MKDIR_P = /bin/mkdir -p
-NM = /bin/nm -B
+NM = /opt/rh/devtoolset-3/root/usr/bin/nm -B
 NMEDIT = 
 OBJDUMP = objdump
 OBJEXT = o
@@ -241,22 +241,22 @@ PACKAGE_BUGREPORT =
 PACKAGE_NAME = RootAnalysis
 PACKAGE_STRING = RootAnalysis 1.0
 PACKAGE_TARNAME = rootanalysis
-PACKAGE_URL = 
+PACKAGE_URL = @PACKAGE_URL@
 PACKAGE_VERSION = 1.0
 PATH_SEPARATOR = :
 RANLIB = ranlib
 ROOTAUXCFLAGS = -pthread -std=c++11 -Wno-deprecated-declarations -m64
 ROOTAUXLIBS = -pthread -lm -ldl -rdynamic
-ROOTCFLAGS = -I/usr/local/root-6.04.02/include/root
-ROOTCINT = /usr/local/root-6.04.02/bin/rootcint
-ROOTCONF = /usr/local/root-6.04.02/bin/root-config
-ROOTETCDIR = /usr/local/root-6.04.02/etc/root
-ROOTEXEC = /usr/local/root-6.04.02/bin/root
+ROOTCFLAGS = -I/opt/soft/root-6.04.00/include/root
+ROOTCINT = /opt/soft/root-6.04.00/bin/rootcint
+ROOTCONF = /opt/soft/root-6.04.00/bin/root-config
+ROOTETCDIR = /opt/soft/root-6.04.00/etc/root
+ROOTEXEC = /opt/soft/root-6.04.00/bin/root
 ROOTGLIBS = -lGui -lCore -lRIO -lNet -lHist -lGraf -lGraf3d -lGpad -lTree -lRint -lPostscript -lMatrix -lPhysics -lMathCore -lThread
-ROOTINCDIR = /usr/local/root-6.04.02/include/root
-ROOTLIBDIR = /usr/local/root-6.04.02/lib/root
+ROOTINCDIR = /opt/soft/root-6.04.00/include/root
+ROOTLIBDIR = /opt/soft/root-6.04.00/lib/root
 ROOTLIBS = -lCore -lRIO -lNet -lHist -lGraf -lGraf3d -lGpad -lTree -lRint -lPostscript -lMatrix -lPhysics -lMathCore -lThread
-ROOTRPATH = /usr/local/root-6.04.02/lib/root
+ROOTRPATH = /opt/soft/root-6.04.00/lib/root
 ROOTSOVERSION = 6.04
 ROOTVERSION = 6.04/02
 SED = /bin/sed
@@ -264,19 +264,19 @@ SET_MAKE =
 SHELL = /bin/sh
 STRIP = strip
 VERSION = 1.0
-abs_builddir = /home/akalinow/scratch/EclipseProjects/RootAnalysis/PACAnalysis
-abs_srcdir = /home/akalinow/scratch/EclipseProjects/RootAnalysis/PACAnalysis
-abs_top_builddir = /home/akalinow/scratch/EclipseProjects/RootAnalysis
-abs_top_srcdir = /home/akalinow/scratch/EclipseProjects/RootAnalysis
-ac_ct_AR = ar
+abs_builddir = /dmj/hep/olszew/RootAnalysis/PACAnalysis
+abs_srcdir = /dmj/hep/olszew/RootAnalysis/PACAnalysis
+abs_top_builddir = /dmj/hep/olszew/RootAnalysis
+abs_top_srcdir = /dmj/hep/olszew/RootAnalysis
+ac_ct_AR = @ac_ct_AR@
 ac_ct_CC = gcc
 ac_ct_CXX = g++
 ac_ct_DUMPBIN = 
 am__include = include
 am__leading_dot = .
 am__quote = 
-am__tar = $${TAR-tar} chof - "$$tardir"
-am__untar = $${TAR-tar} xf -
+am__tar = ${AMTAR} chof - "$$tardir"
+am__untar = ${AMTAR} xf -
 bindir = ${exec_prefix}/bin
 build = x86_64-unknown-linux-gnu
 build_alias = 
@@ -297,13 +297,13 @@ host_vendor = unknown
 htmldir = ${docdir}
 includedir = ${prefix}/include
 infodir = ${datarootdir}/info
-install_sh = ${SHELL} /home/akalinow/scratch/EclipseProjects/RootAnalysis/install-sh
+install_sh = ${SHELL} /dmj/hep/olszew/RootAnalysis/install-sh
 libdir = ${exec_prefix}/lib
 libexecdir = ${exec_prefix}/libexec
 localedir = ${datarootdir}/locale
 localstatedir = ${prefix}/var
 mandir = ${datarootdir}/man
-mkdir_p = $(MKDIR_P)
+mkdir_p = /bin/mkdir -p
 oldincludedir = /usr/include
 pdfdir = ${docdir}
 prefix = /usr/local
@@ -334,11 +334,11 @@ test_SOURCES = PACAnalysis.cc EventProxyPAC.cc PACHistograms.cc PACAnalyzer.cc \
 
 
 # Linker options for a.out
-test_LDFLAGS = $(top_srcdir)/src/libRootAnalysis.la -R /usr/local/root-6.04.02/lib/root -L/usr/local/root-6.04.02/lib/root
+test_LDFLAGS = $(top_srcdir)/src/libRootAnalysis.la -R /opt/soft/root-6.04.00/lib/root -L/opt/soft/root-6.04.00/lib/root
 test_LDADD = -lCore -lRIO -lNet -lHist -lGraf -lGraf3d -lGpad -lTree -lRint -lPostscript -lMatrix -lPhysics -lMathCore -lThread -lProof -pthread -lm -ldl -rdynamic -lboost_regex -lgomp
 
 # Compiler options for a.out
-test_CPPFLAGS = -I./ -I$(top_srcdir)/include -I/usr/local/root-6.04.02/include/root -std=c++11 -fopenmp
+test_CPPFLAGS = -I./ -I$(top_srcdir)/include -I/opt/soft/root-6.04.00/include/root -std=c++11 -fopenmp
 BUILT_SOURCES = DictCint.cxx DictCint.h
 CLEANFILES = *Cint.cxx *Cint.h *~ core
 all: $(BUILT_SOURCES)
@@ -408,140 +408,140 @@ include ./$(DEPDIR)/test-PACHistograms.Po
 	$(AM_V_at)$(am__mv) $(DEPDIR)/$*.Tpo $(DEPDIR)/$*.Po
 #	$(AM_V_CXX)source='$<' object='$@' libtool=no \
 #	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) \
-#	$(AM_V_CXX_no)$(CXXCOMPILE) -c -o $@ $<
+#	$(AM_V_CXX@am__nodep@)$(CXXCOMPILE) -c -o $@ $<
 
 .cc.obj:
 	$(AM_V_CXX)$(CXXCOMPILE) -MT $@ -MD -MP -MF $(DEPDIR)/$*.Tpo -c -o $@ `$(CYGPATH_W) '$<'`
 	$(AM_V_at)$(am__mv) $(DEPDIR)/$*.Tpo $(DEPDIR)/$*.Po
 #	$(AM_V_CXX)source='$<' object='$@' libtool=no \
 #	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) \
-#	$(AM_V_CXX_no)$(CXXCOMPILE) -c -o $@ `$(CYGPATH_W) '$<'`
+#	$(AM_V_CXX@am__nodep@)$(CXXCOMPILE) -c -o $@ `$(CYGPATH_W) '$<'`
 
 .cc.lo:
 	$(AM_V_CXX)$(LTCXXCOMPILE) -MT $@ -MD -MP -MF $(DEPDIR)/$*.Tpo -c -o $@ $<
 	$(AM_V_at)$(am__mv) $(DEPDIR)/$*.Tpo $(DEPDIR)/$*.Plo
 #	$(AM_V_CXX)source='$<' object='$@' libtool=yes \
 #	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) \
-#	$(AM_V_CXX_no)$(LTCXXCOMPILE) -c -o $@ $<
+#	$(AM_V_CXX@am__nodep@)$(LTCXXCOMPILE) -c -o $@ $<
 
 test-PACAnalysis.o: PACAnalysis.cc
 	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(test_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT test-PACAnalysis.o -MD -MP -MF $(DEPDIR)/test-PACAnalysis.Tpo -c -o test-PACAnalysis.o `test -f 'PACAnalysis.cc' || echo '$(srcdir)/'`PACAnalysis.cc
 	$(AM_V_at)$(am__mv) $(DEPDIR)/test-PACAnalysis.Tpo $(DEPDIR)/test-PACAnalysis.Po
 #	$(AM_V_CXX)source='PACAnalysis.cc' object='test-PACAnalysis.o' libtool=no \
 #	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) \
-#	$(AM_V_CXX_no)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(test_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o test-PACAnalysis.o `test -f 'PACAnalysis.cc' || echo '$(srcdir)/'`PACAnalysis.cc
+#	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(test_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o test-PACAnalysis.o `test -f 'PACAnalysis.cc' || echo '$(srcdir)/'`PACAnalysis.cc
 
 test-PACAnalysis.obj: PACAnalysis.cc
 	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(test_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT test-PACAnalysis.obj -MD -MP -MF $(DEPDIR)/test-PACAnalysis.Tpo -c -o test-PACAnalysis.obj `if test -f 'PACAnalysis.cc'; then $(CYGPATH_W) 'PACAnalysis.cc'; else $(CYGPATH_W) '$(srcdir)/PACAnalysis.cc'; fi`
 	$(AM_V_at)$(am__mv) $(DEPDIR)/test-PACAnalysis.Tpo $(DEPDIR)/test-PACAnalysis.Po
 #	$(AM_V_CXX)source='PACAnalysis.cc' object='test-PACAnalysis.obj' libtool=no \
 #	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) \
-#	$(AM_V_CXX_no)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(test_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o test-PACAnalysis.obj `if test -f 'PACAnalysis.cc'; then $(CYGPATH_W) 'PACAnalysis.cc'; else $(CYGPATH_W) '$(srcdir)/PACAnalysis.cc'; fi`
+#	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(test_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o test-PACAnalysis.obj `if test -f 'PACAnalysis.cc'; then $(CYGPATH_W) 'PACAnalysis.cc'; else $(CYGPATH_W) '$(srcdir)/PACAnalysis.cc'; fi`
 
 test-EventProxyPAC.o: EventProxyPAC.cc
 	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(test_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT test-EventProxyPAC.o -MD -MP -MF $(DEPDIR)/test-EventProxyPAC.Tpo -c -o test-EventProxyPAC.o `test -f 'EventProxyPAC.cc' || echo '$(srcdir)/'`EventProxyPAC.cc
 	$(AM_V_at)$(am__mv) $(DEPDIR)/test-EventProxyPAC.Tpo $(DEPDIR)/test-EventProxyPAC.Po
 #	$(AM_V_CXX)source='EventProxyPAC.cc' object='test-EventProxyPAC.o' libtool=no \
 #	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) \
-#	$(AM_V_CXX_no)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(test_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o test-EventProxyPAC.o `test -f 'EventProxyPAC.cc' || echo '$(srcdir)/'`EventProxyPAC.cc
+#	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(test_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o test-EventProxyPAC.o `test -f 'EventProxyPAC.cc' || echo '$(srcdir)/'`EventProxyPAC.cc
 
 test-EventProxyPAC.obj: EventProxyPAC.cc
 	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(test_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT test-EventProxyPAC.obj -MD -MP -MF $(DEPDIR)/test-EventProxyPAC.Tpo -c -o test-EventProxyPAC.obj `if test -f 'EventProxyPAC.cc'; then $(CYGPATH_W) 'EventProxyPAC.cc'; else $(CYGPATH_W) '$(srcdir)/EventProxyPAC.cc'; fi`
 	$(AM_V_at)$(am__mv) $(DEPDIR)/test-EventProxyPAC.Tpo $(DEPDIR)/test-EventProxyPAC.Po
 #	$(AM_V_CXX)source='EventProxyPAC.cc' object='test-EventProxyPAC.obj' libtool=no \
 #	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) \
-#	$(AM_V_CXX_no)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(test_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o test-EventProxyPAC.obj `if test -f 'EventProxyPAC.cc'; then $(CYGPATH_W) 'EventProxyPAC.cc'; else $(CYGPATH_W) '$(srcdir)/EventProxyPAC.cc'; fi`
+#	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(test_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o test-EventProxyPAC.obj `if test -f 'EventProxyPAC.cc'; then $(CYGPATH_W) 'EventProxyPAC.cc'; else $(CYGPATH_W) '$(srcdir)/EventProxyPAC.cc'; fi`
 
 test-PACHistograms.o: PACHistograms.cc
 	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(test_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT test-PACHistograms.o -MD -MP -MF $(DEPDIR)/test-PACHistograms.Tpo -c -o test-PACHistograms.o `test -f 'PACHistograms.cc' || echo '$(srcdir)/'`PACHistograms.cc
 	$(AM_V_at)$(am__mv) $(DEPDIR)/test-PACHistograms.Tpo $(DEPDIR)/test-PACHistograms.Po
 #	$(AM_V_CXX)source='PACHistograms.cc' object='test-PACHistograms.o' libtool=no \
 #	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) \
-#	$(AM_V_CXX_no)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(test_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o test-PACHistograms.o `test -f 'PACHistograms.cc' || echo '$(srcdir)/'`PACHistograms.cc
+#	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(test_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o test-PACHistograms.o `test -f 'PACHistograms.cc' || echo '$(srcdir)/'`PACHistograms.cc
 
 test-PACHistograms.obj: PACHistograms.cc
 	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(test_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT test-PACHistograms.obj -MD -MP -MF $(DEPDIR)/test-PACHistograms.Tpo -c -o test-PACHistograms.obj `if test -f 'PACHistograms.cc'; then $(CYGPATH_W) 'PACHistograms.cc'; else $(CYGPATH_W) '$(srcdir)/PACHistograms.cc'; fi`
 	$(AM_V_at)$(am__mv) $(DEPDIR)/test-PACHistograms.Tpo $(DEPDIR)/test-PACHistograms.Po
 #	$(AM_V_CXX)source='PACHistograms.cc' object='test-PACHistograms.obj' libtool=no \
 #	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) \
-#	$(AM_V_CXX_no)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(test_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o test-PACHistograms.obj `if test -f 'PACHistograms.cc'; then $(CYGPATH_W) 'PACHistograms.cc'; else $(CYGPATH_W) '$(srcdir)/PACHistograms.cc'; fi`
+#	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(test_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o test-PACHistograms.obj `if test -f 'PACHistograms.cc'; then $(CYGPATH_W) 'PACHistograms.cc'; else $(CYGPATH_W) '$(srcdir)/PACHistograms.cc'; fi`
 
 test-PACAnalyzer.o: PACAnalyzer.cc
 	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(test_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT test-PACAnalyzer.o -MD -MP -MF $(DEPDIR)/test-PACAnalyzer.Tpo -c -o test-PACAnalyzer.o `test -f 'PACAnalyzer.cc' || echo '$(srcdir)/'`PACAnalyzer.cc
 	$(AM_V_at)$(am__mv) $(DEPDIR)/test-PACAnalyzer.Tpo $(DEPDIR)/test-PACAnalyzer.Po
 #	$(AM_V_CXX)source='PACAnalyzer.cc' object='test-PACAnalyzer.o' libtool=no \
 #	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) \
-#	$(AM_V_CXX_no)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(test_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o test-PACAnalyzer.o `test -f 'PACAnalyzer.cc' || echo '$(srcdir)/'`PACAnalyzer.cc
+#	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(test_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o test-PACAnalyzer.o `test -f 'PACAnalyzer.cc' || echo '$(srcdir)/'`PACAnalyzer.cc
 
 test-PACAnalyzer.obj: PACAnalyzer.cc
 	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(test_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT test-PACAnalyzer.obj -MD -MP -MF $(DEPDIR)/test-PACAnalyzer.Tpo -c -o test-PACAnalyzer.obj `if test -f 'PACAnalyzer.cc'; then $(CYGPATH_W) 'PACAnalyzer.cc'; else $(CYGPATH_W) '$(srcdir)/PACAnalyzer.cc'; fi`
 	$(AM_V_at)$(am__mv) $(DEPDIR)/test-PACAnalyzer.Tpo $(DEPDIR)/test-PACAnalyzer.Po
 #	$(AM_V_CXX)source='PACAnalyzer.cc' object='test-PACAnalyzer.obj' libtool=no \
 #	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) \
-#	$(AM_V_CXX_no)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(test_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o test-PACAnalyzer.obj `if test -f 'PACAnalyzer.cc'; then $(CYGPATH_W) 'PACAnalyzer.cc'; else $(CYGPATH_W) '$(srcdir)/PACAnalyzer.cc'; fi`
+#	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(test_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o test-PACAnalyzer.obj `if test -f 'PACAnalyzer.cc'; then $(CYGPATH_W) 'PACAnalyzer.cc'; else $(CYGPATH_W) '$(srcdir)/PACAnalyzer.cc'; fi`
 
 test-L1Obj.o: L1Obj.cc
 	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(test_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT test-L1Obj.o -MD -MP -MF $(DEPDIR)/test-L1Obj.Tpo -c -o test-L1Obj.o `test -f 'L1Obj.cc' || echo '$(srcdir)/'`L1Obj.cc
 	$(AM_V_at)$(am__mv) $(DEPDIR)/test-L1Obj.Tpo $(DEPDIR)/test-L1Obj.Po
 #	$(AM_V_CXX)source='L1Obj.cc' object='test-L1Obj.o' libtool=no \
 #	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) \
-#	$(AM_V_CXX_no)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(test_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o test-L1Obj.o `test -f 'L1Obj.cc' || echo '$(srcdir)/'`L1Obj.cc
+#	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(test_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o test-L1Obj.o `test -f 'L1Obj.cc' || echo '$(srcdir)/'`L1Obj.cc
 
 test-L1Obj.obj: L1Obj.cc
 	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(test_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT test-L1Obj.obj -MD -MP -MF $(DEPDIR)/test-L1Obj.Tpo -c -o test-L1Obj.obj `if test -f 'L1Obj.cc'; then $(CYGPATH_W) 'L1Obj.cc'; else $(CYGPATH_W) '$(srcdir)/L1Obj.cc'; fi`
 	$(AM_V_at)$(am__mv) $(DEPDIR)/test-L1Obj.Tpo $(DEPDIR)/test-L1Obj.Po
 #	$(AM_V_CXX)source='L1Obj.cc' object='test-L1Obj.obj' libtool=no \
 #	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) \
-#	$(AM_V_CXX_no)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(test_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o test-L1Obj.obj `if test -f 'L1Obj.cc'; then $(CYGPATH_W) 'L1Obj.cc'; else $(CYGPATH_W) '$(srcdir)/L1Obj.cc'; fi`
+#	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(test_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o test-L1Obj.obj `if test -f 'L1Obj.cc'; then $(CYGPATH_W) 'L1Obj.cc'; else $(CYGPATH_W) '$(srcdir)/L1Obj.cc'; fi`
 
 test-EventData.o: EventData.cc
 	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(test_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT test-EventData.o -MD -MP -MF $(DEPDIR)/test-EventData.Tpo -c -o test-EventData.o `test -f 'EventData.cc' || echo '$(srcdir)/'`EventData.cc
 	$(AM_V_at)$(am__mv) $(DEPDIR)/test-EventData.Tpo $(DEPDIR)/test-EventData.Po
 #	$(AM_V_CXX)source='EventData.cc' object='test-EventData.o' libtool=no \
 #	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) \
-#	$(AM_V_CXX_no)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(test_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o test-EventData.o `test -f 'EventData.cc' || echo '$(srcdir)/'`EventData.cc
+#	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(test_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o test-EventData.o `test -f 'EventData.cc' || echo '$(srcdir)/'`EventData.cc
 
 test-EventData.obj: EventData.cc
 	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(test_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT test-EventData.obj -MD -MP -MF $(DEPDIR)/test-EventData.Tpo -c -o test-EventData.obj `if test -f 'EventData.cc'; then $(CYGPATH_W) 'EventData.cc'; else $(CYGPATH_W) '$(srcdir)/EventData.cc'; fi`
 	$(AM_V_at)$(am__mv) $(DEPDIR)/test-EventData.Tpo $(DEPDIR)/test-EventData.Po
 #	$(AM_V_CXX)source='EventData.cc' object='test-EventData.obj' libtool=no \
 #	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) \
-#	$(AM_V_CXX_no)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(test_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o test-EventData.obj `if test -f 'EventData.cc'; then $(CYGPATH_W) 'EventData.cc'; else $(CYGPATH_W) '$(srcdir)/EventData.cc'; fi`
+#	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(test_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o test-EventData.obj `if test -f 'EventData.cc'; then $(CYGPATH_W) 'EventData.cc'; else $(CYGPATH_W) '$(srcdir)/EventData.cc'; fi`
 
 test-DictCint.o: DictCint.cxx
 	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(test_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT test-DictCint.o -MD -MP -MF $(DEPDIR)/test-DictCint.Tpo -c -o test-DictCint.o `test -f 'DictCint.cxx' || echo '$(srcdir)/'`DictCint.cxx
 	$(AM_V_at)$(am__mv) $(DEPDIR)/test-DictCint.Tpo $(DEPDIR)/test-DictCint.Po
 #	$(AM_V_CXX)source='DictCint.cxx' object='test-DictCint.o' libtool=no \
 #	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) \
-#	$(AM_V_CXX_no)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(test_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o test-DictCint.o `test -f 'DictCint.cxx' || echo '$(srcdir)/'`DictCint.cxx
+#	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(test_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o test-DictCint.o `test -f 'DictCint.cxx' || echo '$(srcdir)/'`DictCint.cxx
 
 test-DictCint.obj: DictCint.cxx
 	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(test_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT test-DictCint.obj -MD -MP -MF $(DEPDIR)/test-DictCint.Tpo -c -o test-DictCint.obj `if test -f 'DictCint.cxx'; then $(CYGPATH_W) 'DictCint.cxx'; else $(CYGPATH_W) '$(srcdir)/DictCint.cxx'; fi`
 	$(AM_V_at)$(am__mv) $(DEPDIR)/test-DictCint.Tpo $(DEPDIR)/test-DictCint.Po
 #	$(AM_V_CXX)source='DictCint.cxx' object='test-DictCint.obj' libtool=no \
 #	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) \
-#	$(AM_V_CXX_no)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(test_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o test-DictCint.obj `if test -f 'DictCint.cxx'; then $(CYGPATH_W) 'DictCint.cxx'; else $(CYGPATH_W) '$(srcdir)/DictCint.cxx'; fi`
+#	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(test_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o test-DictCint.obj `if test -f 'DictCint.cxx'; then $(CYGPATH_W) 'DictCint.cxx'; else $(CYGPATH_W) '$(srcdir)/DictCint.cxx'; fi`
 
 .cxx.o:
 	$(AM_V_CXX)$(CXXCOMPILE) -MT $@ -MD -MP -MF $(DEPDIR)/$*.Tpo -c -o $@ $<
 	$(AM_V_at)$(am__mv) $(DEPDIR)/$*.Tpo $(DEPDIR)/$*.Po
 #	$(AM_V_CXX)source='$<' object='$@' libtool=no \
 #	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) \
-#	$(AM_V_CXX_no)$(CXXCOMPILE) -c -o $@ $<
+#	$(AM_V_CXX@am__nodep@)$(CXXCOMPILE) -c -o $@ $<
 
 .cxx.obj:
 	$(AM_V_CXX)$(CXXCOMPILE) -MT $@ -MD -MP -MF $(DEPDIR)/$*.Tpo -c -o $@ `$(CYGPATH_W) '$<'`
 	$(AM_V_at)$(am__mv) $(DEPDIR)/$*.Tpo $(DEPDIR)/$*.Po
 #	$(AM_V_CXX)source='$<' object='$@' libtool=no \
 #	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) \
-#	$(AM_V_CXX_no)$(CXXCOMPILE) -c -o $@ `$(CYGPATH_W) '$<'`
+#	$(AM_V_CXX@am__nodep@)$(CXXCOMPILE) -c -o $@ `$(CYGPATH_W) '$<'`
 
 .cxx.lo:
 	$(AM_V_CXX)$(LTCXXCOMPILE) -MT $@ -MD -MP -MF $(DEPDIR)/$*.Tpo -c -o $@ $<
 	$(AM_V_at)$(am__mv) $(DEPDIR)/$*.Tpo $(DEPDIR)/$*.Plo
 #	$(AM_V_CXX)source='$<' object='$@' libtool=yes \
 #	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) \
-#	$(AM_V_CXX_no)$(LTCXXCOMPILE) -c -o $@ $<
+#	$(AM_V_CXX@am__nodep@)$(LTCXXCOMPILE) -c -o $@ $<
 
 mostlyclean-libtool:
 	-rm -f *.lo
@@ -760,7 +760,7 @@ uninstall-am:
 
 
 %Cint.cxx %Cint.h :L1Obj.h EventData.h LinkDef.h
-		/usr/local/root-6.04.02/bin/rootcint -f $*Cint.cxx -c $(INCLUDES) $(AM_CPPFLAGS) $^
+		/opt/soft/root-6.04.00/bin/rootcint -f $*Cint.cxx -c $(INCLUDES) $(AM_CPPFLAGS) $^
 
 # Tell versions [3.59,3.63) of GNU make to not export all variables.
 # Otherwise a system limit (for SysV at least) may be exceeded.

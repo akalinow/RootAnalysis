@@ -20,7 +20,7 @@
 /////////////////////////////////////////////////////////
 float HTTHistograms::getLumi(){
 
-  return 5579820.829*1E-6;//pb-1
+  return 0.962*(5579820.829*1E-6 + 5854865.530*1E-6);//pb-1
 
 }
 /////////////////////////////////////////////////////////
@@ -102,6 +102,8 @@ bool HTTHistograms::fill1DHistogram(const std::string& name, float val, float we
     if(name.find("h1DPt")!=std::string::npos) hTemplateName = "h1DPtTemplate";
     if(name.find("h1DEta")!=std::string::npos) hTemplateName = "h1DEtaTemplate";
     if(name.find("h1DIso")!=std::string::npos) hTemplateName = "h1DIsoTemplate";
+    if(name.find("h1DPhi")!=std::string::npos) hTemplateName = "h1DPhiTemplate";
+    if(name.find("h1DMt")!=std::string::npos) hTemplateName = "h1DMtTemplate";
     std::cout<<"Adding histogram: "<<name<<" "<<file_<<" "<<file_->fullPath()<<std::endl;
     this->add1DHistogram(name,"",
 			 this->get1DHistogram(hTemplateName,true)->GetNbinsX(),
@@ -123,10 +125,12 @@ void HTTHistograms::defineHistograms(){
    std::cout<<"Adding histogram: "<<file_<<" "<<file_->fullPath()<<std::endl;
    add1DHistogram("h1DStatsTemplate","",10,0.5,10.5,file_);
    add1DHistogram("h1DNPVTemplate",";Number of PV; Events",61,-0.5,60.5,file_);
-   add1DHistogram("h1DMassTemplate",";SVFit mass [GeV/c^{2}]; Events",20,0,200,file_);
+   add1DHistogram("h1DMassTemplate",";SVFit mass [GeV/c^{2}]; Events",50,0,200,file_);
    add1DHistogram("h1DPtTemplate",";p_{T}; Events",20,0,100,file_);
    add1DHistogram("h1DEtaTemplate",";#eta; Events",24,-2.4,2.4,file_);
    add1DHistogram("h1DIsoTemplate",";Isolation; Events",20,0,2,file_);
+   add1DHistogram("h1DPhiTemplate",";#phi; Events",30,-3,3,file_);
+   add1DHistogram("h1DMtTemplate",";m_T; Events",50,0,200,file_);
    histosInitialized_ = true;
  }
 }
@@ -140,14 +144,59 @@ void HTTHistograms::finalizeHistograms(int nRuns, float weight){
   plotStack("MassVis",0);  
   plotStack("MassTrans",0);
   
+
   plotStack("PtMuon",0);
   plotStack("EtaMuon",0);
   plotStack("IsoMuon",0);
   
   plotStack("PtTau",0);  
   plotStack("EtaTau",0);
-  
+ 
+  plotStack("PhiMuon",0);
+  plotStack("PhiTau",0);
+  plotStack("MtTau",0);
+
+  plot("MtTau","DY",0);
 }
+
+
+TH1* HTTHistograms::getQCDbackground(std::string varName, int selType){
+
+  std::string hName = "h1D" + varName;
+
+// SS selection
+  TH1F *hWJets = get1DHistogram((hName+"WJets"+"qcdselSS").c_str());
+  TH1F *hDYJets = get1DHistogram((hName+"DY"+"qcdselSS").c_str());
+  TH1F *hSoup = get1DHistogram((hName+"Data"+"qcdselSS").c_str());
+
+
+  std::cout << "Data SS integral: " <<  hSoup->Integral() << std::endl;
+  float lumi = getLumi();
+  ///Normalise MC histograms according to cross sections
+  std::string sampleName = "DY";
+  float weight = getSampleNormalisation(sampleName);
+  float scale = weight*lumi;
+  hDYJets->Scale(scale);
+
+  sampleName = "WJets";
+  scale = getSampleNormalisation(sampleName);
+  hWJets->Scale(scale);
+
+
+// OS and SS without background
+  TH1F* QCDbackground= new TH1F("datamtloSS","; QCD; Events",hSoup->GetNbinsX(),hSoup->GetXaxis()->GetXmin(),hSoup->GetXaxis()->GetXmax());
+
+  QCDbackground->Add(hSoup,1);
+  QCDbackground->Add(hWJets,-1);
+  QCDbackground->Add(hDYJets,-1);
+
+// scale background
+  scale = 1.06;
+  QCDbackground->Scale(scale);
+
+  return QCDbackground;
+}
+
 /////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////
 THStack*  HTTHistograms::plotStack(std::string varName, int selType){
@@ -156,6 +205,8 @@ THStack*  HTTHistograms::plotStack(std::string varName, int selType){
   TH1F *hWJets = get1DHistogram((hName+"WJets").c_str());
   TH1F *hDYJets = get1DHistogram((hName+"DY").c_str());
   TH1F *hSoup = get1DHistogram((hName+"Data").c_str());
+
+  TH1F *hQCD = (TH1F*)getQCDbackground(varName,0);
 
   float lumi = getLumi();
   ///Normalise MC histograms according to cross sections
@@ -172,11 +223,14 @@ THStack*  HTTHistograms::plotStack(std::string varName, int selType){
   
   hSoup->SetLineColor(1);
   hSoup->SetFillColor(1);
+  hSoup->SetMarkerStyle(20);
+  //hSoup->SetMarkerSize(3);
 
-  hWJets->SetFillColor(41);
-  hDYJets->SetFillColor(28);
+  hWJets->SetFillColor(kRed+2);
+  hDYJets->SetFillColor(kOrange-4);
+  hQCD->SetFillColor(kMagenta-10);
 
-  hSoup->SetLineWidth(3);
+  hSoup->SetLineWidth(1);
   int rebinFactor = 1;
   
   hSoup->Rebin(rebinFactor);
@@ -185,6 +239,7 @@ THStack*  HTTHistograms::plotStack(std::string varName, int selType){
   
   THStack *hs = new THStack("hs","Stacked histograms");      
   /////////
+  hs->Add(hQCD,"hist");
   hs->Add(hWJets,"hist");
   hs->Add(hDYJets,"hist");
   ////////
@@ -192,11 +247,13 @@ THStack*  HTTHistograms::plotStack(std::string varName, int selType){
   hMCSum->Reset();
   hMCSum->Add(hDYJets);
   hMCSum->Add(hWJets);
+  hMCSum->Add(hQCD);
 
   std::cout<<"Data: "<<hSoup->Integral(0,hSoup->GetNbinsX()+1)<<std::endl;
   std::cout<<"MC: "<<hMCSum->Integral(0,hMCSum->GetNbinsX()+1)<<std::endl;  
   std::cout<<"MC W->l: "<<hWJets->Integral(0,hWJets->GetNbinsX()+1)<<std::endl;
   std::cout<<"MC Z->ll: "<<hDYJets->Integral(0,hDYJets->GetNbinsX()+1)<<std::endl;  
+  std::cout<<"QCD: "<<hQCD->Integral(0,hQCD->GetNbinsX()+1)<<std::endl; 
 
   TCanvas *c1 = getDefaultCanvas();
   c1->SetName("c1");
@@ -231,7 +288,7 @@ THStack*  HTTHistograms::plotStack(std::string varName, int selType){
   hs->GetYaxis()->SetTitle(yTitle);
   hs->SetTitle("");
 
-  if(hName.find("svfit")!=std::string::npos)
+  if(hName.find("MassSV")!=std::string::npos)
     hs->GetXaxis()->SetTitle("SVFit mass [GeV/c^{2}]");
   
   float max = hs->GetMaximum();
@@ -251,6 +308,7 @@ THStack*  HTTHistograms::plotStack(std::string varName, int selType){
   leg->AddEntry(hSoup,"Data","lep");
   leg->AddEntry(hDYJets,"Z#rightarrow ll","f");
   leg->AddEntry(hWJets,"W#rightarrow l #nu","f");
+  leg->AddEntry(hQCD,"QCD","f");
   leg->SetHeader(Form("#int L = %.3f pb^{-1}",lumi));
   leg->Draw();
 
@@ -310,3 +368,51 @@ THStack*  HTTHistograms::plotStack(std::string varName, int selType){
 }
 /////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////
+void HTTHistograms::plot(std::string varName, std::string sample, int selType){
+
+  std::string hName = "h1D"+varName + sample;
+  TH1F *h = get1DHistogram((hName).c_str());
+
+  //TH1F *hQCD = (TH1F*)getQCDbackground(varName,0);
+
+
+  //////////////////////////////////////////////////////
+  
+/*
+  hSoup->SetLineColor(1);
+  hSoup->SetLineWidth(1);
+  hSoup->SetFillColor(1);
+  hSoup->SetMarkerStyle(20);
+  //hSoup->SetMarkerSize(3);
+
+  hWJets->SetFillColor(kRed+2);
+  hQCD->SetFillColor(kMagenta-10);
+*/
+  h->SetLineColor(1);
+  h->SetLineWidth(1);
+  h->SetFillColor(kOrange-4);
+
+  TCanvas *c1 = getDefaultCanvas();
+  c1->SetName("c1");
+  c1->SetTitle("HTauTau analysis");
+
+/*
+  TPad *pad1 = (TPad*)c1->GetPad(1);
+  pad1->SetPad(0.01,0.29,0.99,0.99);
+  pad1->SetRightMargin(0.22);
+  ///
+  pad1->Draw();
+  pad1->cd();
+*/
+  /////////
+  
+
+  h->Draw();
+
+
+  string plotName;
+  if(hName.find_last_of("/")<string::npos) plotName = "fig_png/" + hName.substr(hName.find_last_of("/")) + "_.png";    
+  else plotName = "fig_png/hTree_"+hName+Form("_Sel%d",selType)+"_.png";
+  c1->Print(plotName.c_str());
+
+}
