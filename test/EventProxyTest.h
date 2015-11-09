@@ -10,13 +10,8 @@
 
 #include "TBranch.h"
 
-class Point{
-
- public:
-
-  double x;
-  double y;
-  
+struct Point {
+    Double_t x,y;
 };
 //////////////////////////////////////////////
 //////////////////////////////////////////////
@@ -31,7 +26,7 @@ class Point{
 
       Point *myPoint;
 
-      double x;
+      double x,y;
       
    };
 #endif

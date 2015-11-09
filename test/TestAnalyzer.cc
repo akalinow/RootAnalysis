@@ -37,8 +37,9 @@ bool TestAnalyzer::analyze(const EventProxyBase& iEvent){
 
   std::string sampleName = "Signal";
   //Fill bookkeeping histogram. Bin 1 holds sum of weights.
-  myHistos_->fill1DHistogram("h1DX"+sampleName,myEventProxy.myPoint->x);
-  myHistos_->fill1DHistogram("h1DY"+sampleName,myEventProxy.myPoint->y);
+
+  myHistos_->fill1DHistogram("h1DX"+sampleName,myEventProxy.x);
+  myHistos_->fill1DHistogram("h1DY"+sampleName,myEventProxy.y);
 
   return true;
 }

@@ -77,6 +77,7 @@ void TestHistograms::defineHistograms(){
 void TestHistograms::finalizeHistograms(int nRuns, float weight){
 
   plotAnyHistogram("h1DXSignal");
+  plotAnyHistogram("h1DYSignal");
   
 }
 /////////////////////////////////////////////////////////
