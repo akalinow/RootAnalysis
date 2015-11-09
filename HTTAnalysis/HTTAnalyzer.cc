@@ -57,6 +57,12 @@ bool HTTAnalyzer::analyze(const EventProxyBase& iEvent){
     ///normalise them to 1
     genWeight/=225892.45;
   }
+  if(myEventProxy.wevent->sample()==3){
+    sampleName = "TTbar";
+    //single event weights are huge, but all the same except sign.
+    ///normalise them to 1
+    genWeight/=6383;
+  }
 
   float eventWeight = puWeight*genWeight;
 
