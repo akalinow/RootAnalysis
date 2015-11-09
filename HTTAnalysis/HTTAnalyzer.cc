@@ -60,7 +60,7 @@ bool HTTAnalyzer::analyze(const EventProxyBase& iEvent){
 
   float eventWeight = puWeight*genWeight;
 
-
+  if(myEventProxy.wevent->npv()<2) return true; //Temporar y fix against bad PU weights for npv==1
 
   //Fill bookkeeping histogram. Bin 1 holds sum of weights.
   myHistos_->fill1DHistogram("h1DStats"+sampleName,1,eventWeight);

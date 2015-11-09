@@ -139,7 +139,6 @@ void HTTHistograms::defineHistograms(){
 void HTTHistograms::finalizeHistograms(int nRuns, float weight){
 
   plot("MtTau","WJets",0);
-  return;
 
   plotStack("NPV",0);
 
