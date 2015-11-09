@@ -20,7 +20,8 @@
 /////////////////////////////////////////////////////////
 float HTTHistograms::getLumi(){
 
-  return 0.962*(4*5579820.829*1E-6 ); //+ 5854865.530*1E-6);//pb-1
+  //return 0.962*(5579820.829*1E-6 + 16344635.363*1E-6);//pb-1 , data_1 + data_2
+  return 0.962*(16344635.363*1E-6);//pb-1 , data_2
 
 }
 /////////////////////////////////////////////////////////
@@ -49,6 +50,11 @@ float HTTHistograms::getSampleNormalisation(const std::string & sampleName){
     //xsection for 3xW->mu nu in [pb]
     //https://twiki.cern.ch/twiki/bin/viewauth/CMS/StandardModelCrossSectionsat13TeVInclusive
     crossSection = 3*20508.9; 
+  }
+  if(sampleName=="TTbar"){
+    //https://twiki.cern.ch/twiki/bin/viewauth/CMS/KlubTwikiRun2
+    //https://twiki.cern.ch/twiki/bin/viewauth/CMS/StandardModelCrossSectionsat13TeVInclusive
+    crossSection = 831.76; 
   }
   
   float weight = crossSection*presEff/nEventsAnalysed;
@@ -205,6 +211,7 @@ THStack*  HTTHistograms::plotStack(std::string varName, int selType){
 
   std::string hName = "h1D"+varName;
   TH1F *hWJets = get1DHistogram((hName+"WJets").c_str());
+  TH1F *hTTbar = get1DHistogram((hName+"TTbar").c_str());
   TH1F *hDYJets = get1DHistogram((hName+"DY").c_str());
   TH1F *hSoup = get1DHistogram((hName+"Data").c_str());
 
@@ -221,6 +228,11 @@ THStack*  HTTHistograms::plotStack(std::string varName, int selType){
   weight = getSampleNormalisation(sampleName);
   scale = weight*lumi;
   hWJets->Scale(scale);
+
+  sampleName = "TTbar";
+  weight = getSampleNormalisation(sampleName);
+  scale = weight*lumi;
+  hTTbar->Scale(scale);
   //////////////////////////////////////////////////////
   
   hSoup->SetLineColor(1);
@@ -229,6 +241,7 @@ THStack*  HTTHistograms::plotStack(std::string varName, int selType){
   //hSoup->SetMarkerSize(3);
 
   hWJets->SetFillColor(kRed+2);
+  hTTbar->SetFillColor(kBlue+2);
   hDYJets->SetFillColor(kOrange-4);
   hQCD->SetFillColor(kMagenta-10);
 
@@ -237,23 +250,27 @@ THStack*  HTTHistograms::plotStack(std::string varName, int selType){
   
   hSoup->Rebin(rebinFactor);
   hWJets->Rebin(rebinFactor);
+  hTTbar->Rebin(rebinFactor);
   hDYJets->Rebin(rebinFactor);
   
   THStack *hs = new THStack("hs","Stacked histograms");      
   /////////
   hs->Add(hQCD,"hist");
   hs->Add(hWJets,"hist");
+  hs->Add(hTTbar,"hist");
   hs->Add(hDYJets,"hist");
   ////////
   TH1F *hMCSum = (TH1F*)hWJets->Clone("hMCSum");
   hMCSum->Reset();
   hMCSum->Add(hDYJets);
   hMCSum->Add(hWJets);
+  hMCSum->Add(hTTbar);
   hMCSum->Add(hQCD);
 
   std::cout<<"Data: "<<hSoup->Integral(0,hSoup->GetNbinsX()+1)<<std::endl;
   std::cout<<"MC: "<<hMCSum->Integral(0,hMCSum->GetNbinsX()+1)<<std::endl;  
   std::cout<<"MC W->l: "<<hWJets->Integral(0,hWJets->GetNbinsX()+1)<<std::endl;
+  std::cout<<"MC TTbar: "<<hTTbar->Integral(0,hTTbar->GetNbinsX()+1)<<std::endl;
   std::cout<<"MC Z->ll: "<<hDYJets->Integral(0,hDYJets->GetNbinsX()+1)<<std::endl;  
   std::cout<<"QCD: "<<hQCD->Integral(0,hQCD->GetNbinsX()+1)<<std::endl; 
 
@@ -310,6 +327,7 @@ THStack*  HTTHistograms::plotStack(std::string varName, int selType){
   leg->AddEntry(hSoup,"Data","lep");
   leg->AddEntry(hDYJets,"Z#rightarrow ll","f");
   leg->AddEntry(hWJets,"W#rightarrow l #nu","f");
+  leg->AddEntry(hTTbar,"TTbar","f");
   leg->AddEntry(hQCD,"QCD","f");
   leg->SetHeader(Form("#int L = %.3f pb^{-1}",lumi));
   leg->Draw();
