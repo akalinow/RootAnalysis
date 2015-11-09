@@ -178,7 +178,7 @@ int TreeAnalyzer::loop(){
        !myProxy_->atEnd() && (nEventsToAnalyze_<0 || (nEventsAnalyzed_+nEventsSkipped_)<nEventsToAnalyze_); ++(*myProxy_)){
      
      if((( nEventsAnalyzed_ < nEventsToPrint_) ||
-	 nEventsAnalyzed_%100000==0) &&  nEventsAnalyzed_ != eventPreviouslyPrinted ) {
+	 nEventsAnalyzed_%500000==0) &&  nEventsAnalyzed_ != eventPreviouslyPrinted ) {
        eventPreviouslyPrinted = nEventsAnalyzed_;
        std::cout<<"Events analyzed: "<<nEventsAnalyzed_<<"/"<<nEventsToAnalyze_<<"\r"<<std::flush;
      }
