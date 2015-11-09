@@ -138,6 +138,9 @@ void HTTHistograms::defineHistograms(){
 /////////////////////////////////////////////////////////
 void HTTHistograms::finalizeHistograms(int nRuns, float weight){
 
+  plot("MtTau","WJets",0);
+  return;
+
   plotStack("NPV",0);
 
   plotStack("MassSV",0);
@@ -156,7 +159,7 @@ void HTTHistograms::finalizeHistograms(int nRuns, float weight){
   plotStack("PhiTau",0);
   plotStack("MtTau",0);
 
-  plot("MtTau","DY",0);
+
 }
 
 
@@ -373,21 +376,6 @@ void HTTHistograms::plot(std::string varName, std::string sample, int selType){
   std::string hName = "h1D"+varName + sample;
   TH1F *h = get1DHistogram((hName).c_str());
 
-  //TH1F *hQCD = (TH1F*)getQCDbackground(varName,0);
-
-
-  //////////////////////////////////////////////////////
-  
-/*
-  hSoup->SetLineColor(1);
-  hSoup->SetLineWidth(1);
-  hSoup->SetFillColor(1);
-  hSoup->SetMarkerStyle(20);
-  //hSoup->SetMarkerSize(3);
-
-  hWJets->SetFillColor(kRed+2);
-  hQCD->SetFillColor(kMagenta-10);
-*/
   h->SetLineColor(1);
   h->SetLineWidth(1);
   h->SetFillColor(kOrange-4);
@@ -396,19 +384,7 @@ void HTTHistograms::plot(std::string varName, std::string sample, int selType){
   c1->SetName("c1");
   c1->SetTitle("HTauTau analysis");
 
-/*
-  TPad *pad1 = (TPad*)c1->GetPad(1);
-  pad1->SetPad(0.01,0.29,0.99,0.99);
-  pad1->SetRightMargin(0.22);
-  ///
-  pad1->Draw();
-  pad1->cd();
-*/
-  /////////
-  
-
   h->Draw();
-
 
   string plotName;
   if(hName.find_last_of("/")<string::npos) plotName = "fig_png/" + hName.substr(hName.find_last_of("/")) + "_.png";    

@@ -16,7 +16,7 @@ noinst_PROGRAMS=test
 # '_SOURCES' for example.
 
 # Sources for the a.out 
-test_SOURCES= test.cc
+test_SOURCES= EventProxyTest.cc TestAnalysis.cc TestAnalyzer.cc TestHistograms.cc
 
 # Linker options for a.out
 test_LDFLAGS = $(top_srcdir)/src/libRootAnalysis.la -R @ROOTLIBDIR@ -L@ROOTLIBDIR@
