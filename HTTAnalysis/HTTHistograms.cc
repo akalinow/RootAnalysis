@@ -144,7 +144,7 @@ void HTTHistograms::defineHistograms(){
 /////////////////////////////////////////////////////////
 void HTTHistograms::finalizeHistograms(int nRuns, float weight){
 
-  plot("MtTau","WJets",0);
+  plotAnyHistogram("h1DMtTauWJets");
 
   plotStack("NPV",0);
 
@@ -166,8 +166,8 @@ void HTTHistograms::finalizeHistograms(int nRuns, float weight){
 
 
 }
-
-
+/////////////////////////////////////////////////////////
+/////////////////////////////////////////////////////////
 TH1* HTTHistograms::getQCDbackground(std::string varName, int selType){
 
   std::string hName = "h1D" + varName;
@@ -204,7 +204,6 @@ TH1* HTTHistograms::getQCDbackground(std::string varName, int selType){
 
   return QCDbackground;
 }
-
 /////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////
 THStack*  HTTHistograms::plotStack(std::string varName, int selType){
@@ -388,24 +387,28 @@ THStack*  HTTHistograms::plotStack(std::string varName, int selType){
 }
 /////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////
-void HTTHistograms::plot(std::string varName, std::string sample, int selType){
+void HTTHistograms::plotAnyHistogram(const std::string & hName){
+  
+  TCanvas* c = new TCanvas("AnyHistogram","AnyHistogram",			   
+			   460,500);
 
-  std::string hName = "h1D"+varName + sample;
-  TH1F *h = get1DHistogram((hName).c_str());
-
-  h->SetLineColor(1);
-  h->SetLineWidth(1);
-  h->SetFillColor(kOrange-4);
-
-  TCanvas *c1 = getDefaultCanvas();
-  c1->SetName("c1");
-  c1->SetTitle("HTauTau analysis");
-
-  h->Draw();
-
-  string plotName;
-  if(hName.find_last_of("/")<string::npos) plotName = "fig_png/" + hName.substr(hName.find_last_of("/")) + "_.png";    
-  else plotName = "fig_png/hTree_"+hName+Form("_Sel%d",selType)+"_.png";
-  c1->Print(plotName.c_str());
-
+  TLegend l(0.15,0.78,0.35,0.87,NULL,"brNDC");
+  l.SetTextSize(0.05);
+  l.SetFillStyle(4000);
+  l.SetBorderSize(0);
+  l.SetFillColor(10);
+  
+  TH1F* h1D = this->get1DHistogram(hName.c_str());
+  
+  if(h1D){
+    h1D->SetLineWidth(3);
+    h1D->Scale(1.0/h1D->Integral(0,h1D->GetNbinsX()+1));
+    h1D->SetYTitle("Events");
+    h1D->GetYaxis()->SetTitleOffset(1.4);
+    h1D->SetStats(kFALSE);
+    h1D->Draw();
+    c->Print(TString::Format("fig_png/%s.png",hName.c_str()).Data());
+  }
 }
+/////////////////////////////////////////////////////////
+/////////////////////////////////////////////////////////

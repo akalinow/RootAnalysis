@@ -42,7 +42,11 @@ class HTTHistograms: public AnalysisHistograms {
   //varName - name of variable to be plotted,
   //selType - selection type, i.e. baseline, background estimation, etc.
   THStack* plotStack(std::string varName, int selType);
-  void plot(std::string varName, std::string sample, int selType);
+
+  //Plot a single histogram. One has to provide the full
+  //histogram name, e.g. including h1D prefix.
+  void plotAnyHistogram(const std::string & hName);
+
 
 };
 
