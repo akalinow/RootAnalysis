@@ -1,0 +1,28 @@
+#include "EventProxyTest.h"
+
+#include "TLeaf.h"
+
+#include <iostream>
+
+EventProxyTest::EventProxyTest(){}
+/////////////////////////////////////////////////////////
+/////////////////////////////////////////////////////////
+EventProxyTest::~EventProxyTest(){}
+/////////////////////////////////////////////////////////
+/////////////////////////////////////////////////////////
+void EventProxyTest::init(std::vector<std::string> const& iFileNames){
+
+	treeName_ = "SignalT";
+
+	EventProxyBase::init(iFileNames);
+
+	fChain->SetMakeClass(0);
+
+	myPoint = 0;//IMPORTANT
+
+	//fChain->SetBranchAddress("points",&myPoint);
+	fChain->GetBranch("points")->GetLeaf("x")->SetAddress(&x);
+	fChain->GetBranch("points")->GetLeaf("y")->SetAddress(&y);	
+}
+/////////////////////////////////////////////////////////
+/////////////////////////////////////////////////////////

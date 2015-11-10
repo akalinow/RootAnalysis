@@ -31,6 +31,6 @@ BUILT_SOURCES = DictCint.cxx
 
 CLEANFILES = *Cint.cxx *~ core
 
-%Cint.cxx %Cint.h :HTTEvent.h LinkDef.h
+%Cint.cxx	 :HTTEvent.h LinkDef.h
 		@ROOTCINT@ -f $*Cint.cxx -c $(INCLUDES) $(AM_CPPFLAGS) $^
 

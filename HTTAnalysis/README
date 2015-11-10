@@ -6,14 +6,45 @@ aclocal
 automake --add-missing
 autoconf
 ./configure
-make
+make -j 4
 cd HTTAnalysis
-./test htt_PU.ini #this creates histograms with observed PU
-./test htt_weights.ini #this creates TTree with PU weights
+
+#NOTE: File htt.ini files contain paths to the data files. Please update it before running the code.
+#Running the analysis requires three steps:
+# 1) - making histograms with observed number of primary vertices.
+#     Steps 1) and 2) are expectedd to be run only once, when new data files are produced.
+#     for this one has to set. Before this please remove old ROOT files:
+
+rm -f RootAnalysis*
+
+#
+#processName = PU
+#
+# in htt.iti
+
+./test htt.ini #this creates histograms with observed PU
+
+# 2) Make the event weights tree. This TTree has lenght equal to sum of lenghts of
+# input TTrees, so in particular order of tress in htt.ini is RELEVANT.
+#To run this step one has to set
+#
+#
+#processName = Weights
+#
+
+./test htt.ini #this creates TTree with PU weights
+
+
+#  3) The main analysis. This step is expected to be run many times.
+#  To run this step one has to set
+#
+#processName = Analysis
+#
+
 ./test htt.ini      #this runs actual analysis and creates plots in fig_png and fig_C directories
 
+#For the step 3) the processName can be any string except PU and Weights, which reserved for steps 1) and 2).
 
-NOTE: File htt.ini files contain paths to the data files. Please update it before running the code.
 
 
 

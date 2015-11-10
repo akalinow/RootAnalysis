@@ -30,7 +30,6 @@ AC_PROG_LIBTOOL
 AC_CONFIG_FILES(Makefile
                 test/Makefile
                 src/Makefile
-                include/Makefile
                 OTFAnalysis/Makefile
                 PACAnalysis/Makefile
 		CPwithPytia8/Makefile

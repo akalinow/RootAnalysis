@@ -13,7 +13,7 @@
 
  struct L1Obj{
 
- L1Obj() : pt(-1.),eta(99.),phi(99.),disc(-999), bx(0),q(-1), charge(99), type(0) {}
+ L1Obj() : pt(-1.),eta(99.),phi(99.),disc(-999), bx(0),q(-1), hits(0), charge(99), type(0) {}
 
    UInt_t fUniqueID;
    UInt_t fBits;
@@ -23,6 +23,7 @@
    Float_t disc;
    Int_t bx;
    Int_t q;
+   Int_t hits;
    Int_t charge;
    Int_t type;
    Int_t refLayer;

@@ -29,6 +29,7 @@ class HTTHistograms: public AnalysisHistograms {
   float getLumi();
 
   float getSampleNormalisation(const std::string & sampleName);
+  TH1* getQCDbackground(std::string, int);
 
    private:
   
@@ -41,6 +42,11 @@ class HTTHistograms: public AnalysisHistograms {
   //varName - name of variable to be plotted,
   //selType - selection type, i.e. baseline, background estimation, etc.
   THStack* plotStack(std::string varName, int selType);
+
+  //Plot a single histogram. One has to provide the full
+  //histogram name, e.g. including h1D prefix.
+  void plotAnyHistogram(const std::string & hName);
+
 
 };
 

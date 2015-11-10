@@ -29,9 +29,10 @@ test_CPPFLAGS = -I./ -I$(top_srcdir)/include -I@ROOTINCDIR@ -std=c++11 -fopenmp
 
 BUILT_SOURCES = DictCint.cxx
 
-CLEANFILES = *Cint.cxx *~ core
 
-%Cint.cxx	 :L1Obj.h EventData.h LinkDef.h
+CLEANFILES = *Cint.cxx*~ core
+
+%Cint.cxx 	:L1Obj.h EventData.h LinkDef.h
 		@ROOTCINT@ -f $*Cint.cxx -c $(INCLUDES) $(AM_CPPFLAGS) $^
 
 

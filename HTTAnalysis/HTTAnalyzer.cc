@@ -51,6 +51,8 @@ bool HTTAnalyzer::analyze(const EventProxyBase& iEvent){
   
   float puWeight = myEventProxy.puWeight;
   float genWeight = myEventProxy.wevent->genevtweight();
+
+  if(myEventProxy.wevent->npv()<2) return true; //Temporary fix against bad PU weights for npv==1
    
   std::string sampleName = "MC";
   if(myEventProxy.wevent->sample()==0) sampleName = "Data";
@@ -65,6 +67,12 @@ bool HTTAnalyzer::analyze(const EventProxyBase& iEvent){
     //single event weights are huge, but all the same except sign.
     ///normalise them to 1
     genWeight/=225892.45;
+  }
+  if(myEventProxy.wevent->sample()==3){
+    sampleName = "TTbar";
+    //single event weights are huge, but all the same except sign.
+    ///normalise them to 1
+    genWeight/=6383;
   }
 
   float eventWeight = puWeight*genWeight;
@@ -86,6 +94,23 @@ bool HTTAnalyzer::analyze(const EventProxyBase& iEvent){
   Wtau aTau = (*myEventProxy.wtau)[0];
   Wmu aMuon = (*myEventProxy.wmu)[0];
   
+  if(aPair.diq() == 1){
+     myHistos_->fill1DHistogram("h1DMassSV"+sampleName+"qcdselSS", aPair.svfit() ,eventWeight);
+     myHistos_->fill1DHistogram("h1DMassVis"+sampleName+"qcdselSS", aPair.m_vis() ,eventWeight);
+     myHistos_->fill1DHistogram("h1DMassTrans"+sampleName+"qcdselSS", aMuon.mt() ,eventWeight);
+     myHistos_->fill1DHistogram("h1DPtMuon"+sampleName+"qcdselSS", aMuon.pt() ,eventWeight);
+     myHistos_->fill1DHistogram("h1DEtaMuon"+sampleName+"qcdselSS", aMuon.eta() ,eventWeight);
+     myHistos_->fill1DHistogram("h1DPtTau"+sampleName+"qcdselSS", aTau.pt() ,eventWeight);
+     myHistos_->fill1DHistogram("h1DEtaTau"+sampleName+"qcdselSS", aTau.eta() ,eventWeight);
+     myHistos_->fill1DHistogram("h1DNPV"+sampleName+"qcdselSS", myEventProxy.wevent->npv() ,eventWeight);
+
+     myHistos_->fill1DHistogram("h1DPhiMuon"+sampleName+"qcdselSS", aMuon.phi() ,eventWeight);
+     myHistos_->fill1DHistogram("h1DPhiTau"+sampleName+"qcdselSS", aTau.phi() ,eventWeight);
+     myHistos_->fill1DHistogram("h1DMtTau"+sampleName+"qcdselSS", aTau.mt() ,eventWeight);
+     myHistos_->fill1DHistogram("h1DIsoMuon"+sampleName+"qcdselSS", aMuon.iso() ,eventWeight);
+  }
+
+
   ///Fill SVfit and visible masses
   myHistos_->fill1DHistogram("h1DMassSV"+sampleName,aPair.svfit(),eventWeight);
   myHistos_->fill1DHistogram("h1DMassVis"+sampleName,aPair.m_vis(),eventWeight);
@@ -99,8 +124,10 @@ bool HTTAnalyzer::analyze(const EventProxyBase& iEvent){
   myHistos_->fill1DHistogram("h1DPtTau"+sampleName,aTau.pt(),eventWeight);
   myHistos_->fill1DHistogram("h1DEtaTau"+sampleName,aTau.eta(),eventWeight);
 
-  ///Fill isolation variables
   myHistos_->fill1DHistogram("h1DIsoMuon"+sampleName,aMuon.iso(),eventWeight);
+  myHistos_->fill1DHistogram("h1DPhiMuon"+sampleName,  aMuon.phi(),eventWeight);
+  myHistos_->fill1DHistogram("h1DPhiTau"+sampleName, aTau.phi() ,eventWeight);
+  myHistos_->fill1DHistogram("h1DMtTau"+sampleName,  aTau.mt() ,eventWeight);
 
   
   return true;
