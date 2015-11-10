@@ -38,6 +38,8 @@
 
       TTree* getTTree() const;
 
+      TChain* getTChain() const {return fChain.get();};
+
       virtual void init(std::vector<std::string> const& iFileNames);
 
       virtual EventProxyBase* clone() const {return 0;};

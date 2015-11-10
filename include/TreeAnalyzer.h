@@ -148,7 +148,7 @@ public :
    EventProxyBase *myProxiesThread_[128];
    
    ///Number of parraler threads used in processing.
-   unsigned int nThreads;
+   unsigned int nThreads_;
    
 };
 

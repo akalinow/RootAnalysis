@@ -50,7 +50,7 @@ void EventProxyHTT::init(std::vector<std::string> const& iFileNames){
 	
 	
 	fChain->SetBranchStatus("*",0);
-	fChain->SetBranchStatus("PUWeight",1);			  
+	//fChain->SetBranchStatus("PUWeight",1);			  
 	//fChain->SetBranchStatus("wevent",1);
 	fChain->SetBranchStatus("sample_",1);
 	fChain->SetBranchStatus("genevtweight_",1);

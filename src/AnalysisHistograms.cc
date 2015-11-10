@@ -170,7 +170,9 @@ void AnalysisHistograms::fillProfile(const std::string& name, float x, float val
   using namespace std;
 
   unsigned int iThread = omp_get_thread_num();
-  if(myProfiles_[iThread].find(name)!=myProfiles_[iThread].end()) myProfiles_[iThread][name]->Fill(x,val,weight);
+
+  std::unordered_map<std::string,TProfile*>::iterator it = myProfiles_[iThread].find(name); 
+  if(it!=myProfiles_[iThread].end()) it->second->Fill(x,val,weight);
   else cout<<"ERROR: profile : "<<name<<" not found!"<<endl;
 
 }
@@ -181,7 +183,9 @@ bool  AnalysisHistograms::fill1DHistogram(const std::string& name, float val, fl
  using namespace std;
 
  unsigned int iThread = omp_get_thread_num();
- if(my1Dhistograms_[iThread].find(name)!=my1Dhistograms_[iThread].end()) my1Dhistograms_[iThread][name]->Fill(val,weight);
+
+  std::unordered_map<std::string,TH1F*>::iterator it = my1Dhistograms_[iThread].find(name); 
+ if(it!=my1Dhistograms_[iThread].end()) it->second->Fill(val,weight);
  else return false;
  
  return true;
@@ -192,7 +196,9 @@ bool AnalysisHistograms::fill2DHistogram(const std::string& name, float val1, fl
  using namespace std;
 
  unsigned int iThread = omp_get_thread_num();
- if(my2Dhistograms_[iThread].find(name)!=my2Dhistograms_[iThread].end()) my2Dhistograms_[iThread][name]->Fill(val1,val2,weight);
+
+ std::unordered_map<std::string,TH2F*>::iterator it = my2Dhistograms_[iThread].find(name); 
+ if(it!=my2Dhistograms_[iThread].end()) it->second->Fill(val1,val2,weight);
  else return false;
   
  return true;
@@ -204,7 +210,9 @@ bool  AnalysisHistograms::fill3DHistogram(const std::string& name, float val1, f
  using namespace std;
 
  unsigned int iThread = omp_get_thread_num();
- if(my3Dhistograms_[iThread].find(name)!=my3Dhistograms_[iThread].end()) my3Dhistograms_[iThread][name]->Fill(val1,val2,val3,weight);
+
+ std::unordered_map<std::string,TH3F*>::iterator it = my3Dhistograms_[iThread].find(name); 
+ if(it!=my3Dhistograms_[iThread].end()) it->second->Fill(val1,val2,val3,weight);
  else return false;
    
  return true;
@@ -218,8 +226,10 @@ TProfile* AnalysisHistograms::getProfile(const std::string& name, bool noClone) 
  unsigned int iThread = omp_get_thread_num();
  if(name.find("Template")!=std::string::npos) iThread = 0;
 
- if(noClone && myProfiles_[iThread].find(name)!=myProfiles_[iThread].end()) return myProfiles_[iThread][name];
- else if(myProfiles_[iThread].find(name)!=myProfiles_[iThread].end()) return (TProfile*)(myProfiles_[iThread][name]->Clone());
+ std::unordered_map<std::string,TProfile*>::iterator it = myProfiles_[iThread].find(name);
+
+ if(noClone && it!=myProfiles_[iThread].end()) return it->second;
+ else if(it!=myProfiles_[iThread].end()) return (TProfile*)(it->second->Clone());
  
  else cout<<"ERROR: Profile : "<<name<<" not found!"<<endl;
  return 0;
@@ -233,7 +243,7 @@ TH1F* AnalysisHistograms::get1DHistogram(const std::string& name, bool noClone){
  unsigned int iThread = omp_get_thread_num();
  if(name.find("Template")!=std::string::npos) iThread = 0;
 
- std::unordered_map<std::string,TH1F*>::const_iterator it = my1Dhistograms_[iThread].find(name);
+ std::unordered_map<std::string,TH1F*>::iterator it = my1Dhistograms_[iThread].find(name);
  
  if(noClone && it!=my1Dhistograms_[iThread].end()) return (TH1F*)(my1Dhistograms_[iThread][name]->Clone());
  else if(it!=my1Dhistograms_[iThread].end()) return (TH1F*)(it->second->Clone());
@@ -249,9 +259,11 @@ TH2F* AnalysisHistograms::get2DHistogram(const std::string& name, bool noClone){
 
  unsigned int iThread = omp_get_thread_num();
  if(name.find("Template")!=std::string::npos) iThread = 0;
+
+ std::unordered_map<std::string,TH2F*>::iterator it = my2Dhistograms_[iThread].find(name);
  
- if(noClone && my2Dhistograms_[iThread].find(name)!=my2Dhistograms_[iThread].end()) return my2Dhistograms_[iThread][name];
- else if(my2Dhistograms_[iThread].find(name)!=my2Dhistograms_[iThread].end()) return (TH2F*)(my2Dhistograms_[iThread][name]->Clone());
+ if(noClone && it!=my2Dhistograms_[iThread].end()) return it->second;
+ else if(it!=my2Dhistograms_[iThread].end()) return (TH2F*)(it->second->Clone());
  else cout<<"ERROR: Histogram: "<<name<<" not found in thread: "<<iThread<<endl;
  return 0;
 }
@@ -263,13 +275,12 @@ TH3F* AnalysisHistograms::get3DHistogram(const std::string& name, bool noClone){
  unsigned int iThread = omp_get_thread_num();
  if(name.find("Template")!=std::string::npos) iThread = 0;
 
- if(noClone && my3Dhistograms_[iThread].find(name)!=my3Dhistograms_[iThread].end()) my3Dhistograms_[iThread][name];
- if(my3Dhistograms_[iThread].find(name)!=my3Dhistograms_[iThread].end()) return (TH3F*)(my3Dhistograms_[iThread][name]->Clone());
+  std::unordered_map<std::string,TH3F*>::iterator it = my3Dhistograms_[iThread].find(name);
+
+ if(noClone && it!=my3Dhistograms_[iThread].end()) it->second;
+ if(it!=my3Dhistograms_[iThread].end()) return (TH3F*)(it->second->Clone());
  else cout<<"ERROR: Histogram: "<<name<<" not found in thread: "<<iThread<<endl;
-
-
  return 0;
- 
 }
 //////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////
