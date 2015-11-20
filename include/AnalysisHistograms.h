@@ -71,13 +71,10 @@ class AnalysisHistograms {
   std::vector<TFileDirectory> mySecondaryDirs_;
 
   /// The histograms
-  std::map<std::string,TProfile*> myProfiles_;
-  //std::map<std::string,TH1F*> my1Dhistograms_;
-  std::unordered_map<std::string,TH1F*> my1Dhistograms_;
-
-  
-  std::map<std::string,TH2F*> my2Dhistograms_;
-  std::map<std::string,TH3F*> my3Dhistograms_;
+  std::unordered_map<std::string,TProfile*> myProfiles_;
+  std::unordered_map<std::string,TH1F*> my1Dhistograms_; 
+  std::unordered_map<std::string,TH2F*> my2Dhistograms_;
+  std::unordered_map<std::string,TH3F*> my3Dhistograms_;
 
   void addProfile(const std::string& name, const std::string& title, 
 		  int nBinsX, float xlow, float xhigh, 

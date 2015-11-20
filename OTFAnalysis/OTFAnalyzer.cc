@@ -101,101 +101,106 @@ bool OTFAnalyzer::passQuality(std::vector<L1Obj> * myL1Coll,
   return myL1Coll->size()>iCand &&
     ///Barrel (l1t::tftype::bmtf)
     /*
-    myL1Coll->operator[](iCand).q!=9728 &&
-    myL1Coll->operator[](iCand).q!=8960 &&
-    myL1Coll->operator[](iCand).q!=3084 &&
-    myL1Coll->operator[](iCand).q!=771 &&
-    myL1Coll->operator[](iCand).q!=3596 &&
-    myL1Coll->operator[](iCand).q!=7180 &&
-    myL1Coll->operator[](iCand).q!=7168 &&
+    myL1Coll->operator[](iCand).hits!=9728 &&
+    myL1Coll->operator[](iCand).hits!=8960 &&
+    myL1Coll->operator[](iCand).hits!=3084 &&
+    myL1Coll->operator[](iCand).hits!=771 &&
+    myL1Coll->operator[](iCand).hits!=3596 &&
+    myL1Coll->operator[](iCand).hits!=7180 &&
+    myL1Coll->operator[](iCand).hits!=7168 &&
     */
     ///Endcap (l1t::tftype::emtf)
     /*
-    myL1Coll->operator[](iCand).q!=12288 &&
-    myL1Coll->operator[](iCand).q!=6144 &&
-    myL1Coll->operator[](iCand).q!=9216 &&
-    myL1Coll->operator[](iCand).q!=3072 &&
-    myL1Coll->operator[](iCand).q!=3264 &&
-    myL1Coll->operator[](iCand).q!=1036 &&
-    myL1Coll->operator[](iCand).q!=8195  &&
-    myL1Coll->operator[](iCand).q!=4099  &&
-    myL1Coll->operator[](iCand).q!=10240  &&
-    myL1Coll->operator[](iCand).q!=2051  &&
-    myL1Coll->operator[](iCand).q!=3084  &&
-    myL1Coll->operator[](iCand).q!=1216  &&
-    myL1Coll->operator[](iCand).q!=2240  &&
-    myL1Coll->operator[](iCand).q!=5120  &&
-    myL1Coll->operator[](iCand).q!=2060  &&
-    myL1Coll->operator[](iCand).q!=3276  &&
-    myL1Coll->operator[](iCand).q!=2252  &&
-    myL1Coll->operator[](iCand).q!=8240  &&
-    myL1Coll->operator[](iCand).q!=16380 &&
-    //myL1Coll->operator[](iCand).q!=16368 &&
-    //myL1Coll->operator[](iCand).q!=16188 &&
-    //myL1Coll->operator[](iCand).q!=14332 &&
-    //myL1Coll->operator[](iCand).q!=15356 &&
+    myL1Coll->operator[](iCand).hits!=12288 &&
+    myL1Coll->operator[](iCand).hits!=6144 &&
+    myL1Coll->operator[](iCand).hits!=9216 &&
+    myL1Coll->operator[](iCand).hits!=3072 &&
+    myL1Coll->operator[](iCand).hits!=3264 &&
+    myL1Coll->operator[](iCand).hits!=1036 &&
+    myL1Coll->operator[](iCand).hits!=8195  &&
+    myL1Coll->operator[](iCand).hits!=4099  &&
+    myL1Coll->operator[](iCand).hits!=10240  &&
+    myL1Coll->operator[](iCand).hits!=2051  &&
+    myL1Coll->operator[](iCand).hits!=3084  &&
+    myL1Coll->operator[](iCand).hits!=1216  &&
+    myL1Coll->operator[](iCand).hits!=2240  &&
+    myL1Coll->operator[](iCand).hits!=5120  &&
+    myL1Coll->operator[](iCand).hits!=2060  &&
+    myL1Coll->operator[](iCand).hits!=3276  &&
+    myL1Coll->operator[](iCand).hits!=2252  &&
+    myL1Coll->operator[](iCand).hits!=8240  &&
+    myL1Coll->operator[](iCand).hits!=16380 &&
+    //myL1Coll->operator[](iCand).hits!=16368 &&
+    //myL1Coll->operator[](iCand).hits!=16188 &&
+    //myL1Coll->operator[](iCand).hits!=14332 &&
+    //myL1Coll->operator[](iCand).hits!=15356 &&
     */
     
     /*
-    myL1Coll->operator[](iCand).q!=3075 &&
-    myL1Coll->operator[](iCand).q!=196992 &&
-    myL1Coll->operator[](iCand).q!=198016 &&
-    myL1Coll->operator[](iCand).q!=66688 &&
-    myL1Coll->operator[](iCand).q!=98944 &&
-    myL1Coll->operator[](iCand).q!=12300 &&
-    myL1Coll->operator[](iCand).q!=131456 &&
-    myL1Coll->operator[](iCand).q!=102592 &&
-    myL1Coll->operator[](iCand).q!=36928 &&
+    myL1Coll->operator[](iCand).hits!=3075 &&
+    myL1Coll->operator[](iCand).hits!=196992 &&
+    myL1Coll->operator[](iCand).hits!=198016 &&
+    myL1Coll->operator[](iCand).hits!=66688 &&
+    myL1Coll->operator[](iCand).hits!=98944 &&
+    myL1Coll->operator[](iCand).hits!=12300 &&
+    myL1Coll->operator[](iCand).hits!=131456 &&
+    myL1Coll->operator[](iCand).hits!=102592 &&
+    myL1Coll->operator[](iCand).hits!=36928 &&
     */
 
     /*
-    myL1Coll->operator[](iCand).q!=198016 &&
-    myL1Coll->operator[](iCand).q!=3075 &&
-    myL1Coll->operator[](iCand).q!=66688 &&
-    myL1Coll->operator[](iCand).q!=98944 &&
-    myL1Coll->operator[](iCand).q!=12300 &&
-    myL1Coll->operator[](iCand).q!=131456 &&
-    myL1Coll->operator[](iCand).q!=102592 &&
-    myL1Coll->operator[](iCand).q!=33408 &&
-    myL1Coll->operator[](iCand).q!=36928 &&
-    myL1Coll->operator[](iCand).q!=33856 &&
-    myL1Coll->operator[](iCand).q!=65920 &&
-    myL1Coll->operator[](iCand).q!=99840 &&
-    myL1Coll->operator[](iCand).q!=98496 &&
-    myL1Coll->operator[](iCand).q!=99968 &&
+    myL1Coll->operator[](iCand).hits!=198016 &&
+    myL1Coll->operator[](iCand).hits!=3075 &&
+    myL1Coll->operator[](iCand).hits!=66688 &&
+    myL1Coll->operator[](iCand).hits!=98944 &&
+    myL1Coll->operator[](iCand).hits!=12300 &&
+    myL1Coll->operator[](iCand).hits!=131456 &&
+    myL1Coll->operator[](iCand).hits!=102592 &&
+    myL1Coll->operator[](iCand).hits!=33408 &&
+    myL1Coll->operator[](iCand).hits!=36928 &&
+    myL1Coll->operator[](iCand).hits!=33856 &&
+    myL1Coll->operator[](iCand).hits!=65920 &&
+    myL1Coll->operator[](iCand).hits!=99840 &&
+    myL1Coll->operator[](iCand).hits!=98496 &&
+    myL1Coll->operator[](iCand).hits!=99968 &&
     */
     
     
     /*
-    myL1Coll->operator[](iCand).q!=196992 &&
-    myL1Coll->operator[](iCand).q!=198016 &&
-    myL1Coll->operator[](iCand).q!=35840 &&
-    myL1Coll->operator[](iCand).q!=14336 &&
-    myL1Coll->operator[](iCand).q!=15360 &&
-    myL1Coll->operator[](iCand).q!=7168 &&
-    myL1Coll->operator[](iCand).q!=34880 &&
+    myL1Coll->operator[](iCand).hits!=196992 &&
+    myL1Coll->operator[](iCand).hits!=198016 &&
+    myL1Coll->operator[](iCand).hits!=35840 &&
+    myL1Coll->operator[](iCand).hits!=14336 &&
+    myL1Coll->operator[](iCand).hits!=15360 &&
+    myL1Coll->operator[](iCand).hits!=7168 &&
+    myL1Coll->operator[](iCand).hits!=34880 &&
     */
-    //myL1Coll->operator[](iCand).q!=7168 &&
-    //myL1Coll->operator[](iCand).q!=132352 &&
-
-
+    //myL1Coll->operator[](iCand).hits!=7168 &&
+    //myL1Coll->operator[](iCand).hits!=132352 &&
     
     ///Barrel (l1t::tftype::omtf_pos)           
-    myL1Coll->operator[](iCand).q!=99840 &&
-    myL1Coll->operator[](iCand).q!=34304 &&
-    myL1Coll->operator[](iCand).q!=3075 &&
-    myL1Coll->operator[](iCand).q!=36928 &&
+    myL1Coll->operator[](iCand).hits!=99840 &&
+    myL1Coll->operator[](iCand).hits!=34304 &&
+    myL1Coll->operator[](iCand).hits!=3075 &&
+    myL1Coll->operator[](iCand).hits!=36928 &&
     ////
-    myL1Coll->operator[](iCand).q!=12300 && 
+    myL1Coll->operator[](iCand).hits!=12300 && 
     
     ///Endcap (l1t::tftype::omtf_pos)
-    myL1Coll->operator[](iCand).q!=98816 &&
-    myL1Coll->operator[](iCand).q!=98944 &&
+    myL1Coll->operator[](iCand).hits!=98816 &&
+    myL1Coll->operator[](iCand).hits!=98944 &&
 
-    myL1Coll->operator[](iCand).q!=33408 &&
-    myL1Coll->operator[](iCand).q!=66688 && 
-    myL1Coll->operator[](iCand).q!=66176 &&     
+    myL1Coll->operator[](iCand).hits!=33408 &&
+    myL1Coll->operator[](iCand).hits!=66688 && 
+    myL1Coll->operator[](iCand).hits!=66176 &&     
     ///
+    //Added 10.11.2015
+    myL1Coll->operator[](iCand).hits!=7171 &&
+    myL1Coll->operator[](iCand).hits!=20528 &&
+    myL1Coll->operator[](iCand).hits!=33856 &&
+    myL1Coll->operator[](iCand).hits!=35840 &&
+    myL1Coll->operator[](iCand).hits!=4156 &&
+    myL1Coll->operator[](iCand).hits!=34880 &&         
     true;
   }
   else return myL1Coll->size();
@@ -243,7 +248,7 @@ void OTFAnalyzer::fillTurnOnCurve(const int & iPtCut,
   }
   
   bool qualityCut = passQuality(myL1Coll,sysType,iCand);
-  bool pass = myL1Coll->size() && myL1Coll->operator[](iCand).pt>=ptCut && qualityCut && deltaR<0.25;
+  bool pass = myL1Coll->size() && myL1Coll->operator[](iCand).pt>=ptCut && qualityCut && deltaR<0.2;
   
   std::string tmpName = hName+"Pt"+std::to_string(ptCut);
   myHistos_->fill2DHistogram(tmpName,theEvent->pt, pass);
@@ -265,7 +270,7 @@ void OTFAnalyzer::fillTurnOnCurve(const int & iPtCut,
 
   tmpName = hName+"Quality"+std::to_string(ptCut);
   int q = -10; 
-  if(myL1Coll->size()) q = myL1Coll->operator[](iCand).q;
+  if(myL1Coll->size()) q = myL1Coll->operator[](iCand).hits;
   if(tmpMap.find(q)==tmpMap.end()) tmpMap[q] = tmpMap.size();
   int xPosition = tmpMap[q];
   myHistos_->fill2DHistogram(tmpName,xPosition,pass);
@@ -317,7 +322,7 @@ void OTFAnalyzer::fillRateHisto(const std::string & sysType,
 	if(selType=="VsEta") myHistos_->fill2DHistogram(hName,theEvent->pt,pass*theEvent->eta+(!pass)*99);
 	if(selType=="VsPt") myHistos_->fill2DHistogram(hName,theEvent->pt,pass*theEvent->pt+(!pass)*(-100));
 	int q = -10; 
-	if(pass) q = myL1Coll->operator[](iCand).q;
+	if(pass) q = myL1Coll->operator[](iCand).hits;
 
 	std::bitset<18> hitsWord(q);
 	if(sysType=="Otf" && selType=="VsQuality"){
@@ -367,39 +372,6 @@ void OTFAnalyzer::fillGhostHisto(const std::string & sysType,
 bool OTFAnalyzer::analyze(const EventProxyBase& iEvent){
 
   clear();
-  /*
-  std::bitset<17> bits(99840);
-  std::cout<<99840<<" bits: "<<bits.to_string()<<std::endl;
-
-  bits = std::bitset<17>(34304);
-  std::cout<<34304<<" bits: "<<bits.to_string()<<std::endl;
-
-  bits = std::bitset<17>(3075); 
-  std::cout<<3075<<" bits: "<<bits.to_string()<<std::endl;
-
-  bits = std::bitset<17>(36928); 
-  std::cout<<36928<<" bits: "<<bits.to_string()<<std::endl;
-
- bits = std::bitset<17>(12300); 
-  std::cout<<12300<<" bits: "<<bits.to_string()<<std::endl;
-
- bits = std::bitset<17>(98816); 
-  std::cout<<98816<<" bits: "<<bits.to_string()<<std::endl;
-
-  bits = std::bitset<17>(98944); 
-  std::cout<<98944<<" bits: "<<bits.to_string()<<std::endl;
-
- bits = std::bitset<17>(33408); 
-  std::cout<<98944<<" bits: "<<bits.to_string()<<std::endl;
-
- bits = std::bitset<17>(66688); 
-  std::cout<<98944<<" bits: "<<bits.to_string()<<std::endl;
-
- bits = std::bitset<17>(66176); 
-  std::cout<<98944<<" bits: "<<bits.to_string()<<std::endl;
-
-  exit(0);
-  */
 
   eventWeight_ = 1.0;
   /////////////////
@@ -407,9 +379,6 @@ bool OTFAnalyzer::analyze(const EventProxyBase& iEvent){
   theEvent = myEvent.events;
 
   //if(fabs(theEvent->eta)<0.83 || fabs(theEvent->eta)>1.24) return true;
-  //if(theEvent->eta<0.83 || theEvent->eta>1.24) return true;
-  
-  //if(fabs(theEvent->eta-theEvent->eta1)<0.5) return true;
     
   std::string selType = "";
   std::string sysTypeGmt="Gmt";
@@ -435,8 +404,6 @@ bool OTFAnalyzer::analyze(const EventProxyBase& iEvent){
     //fillGhostHisto("Gmt","VsProcessor");
   }
   else if(fabs(theEvent->eta)>0.83 && fabs(theEvent->eta)<1.24){
-  //if(fabs(theEvent->eta)>1.215 && fabs(theEvent->eta)<1.24){
-  //if(fabs(theEvent->eta)>1.20 && fabs(theEvent->eta)<1.215){
     
     for(int iCut=0;iCut<22;++iCut){
       if(iCut>0 && iCut<14) continue;

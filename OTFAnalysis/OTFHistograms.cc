@@ -124,8 +124,8 @@ void OTFHistograms::defineHistograms(){
  add2DHistogram("h2DEtaHit","",8*26,0.8,1.25,2,-0.5,1.5,file_);
  add2DHistogram("h2DPhiHit","",5*32,-M_PI,M_PI,2,-0.5,1.5,file_);
 
- ///add2DHistogram("h2DEtaVx","",40,-1.6,1.6,2,-0.5,1.5,file_);//Full detector
- add2DHistogram("h2DEtaVx","",4*25,0.83,1.24,2,-0.5,1.5,file_);//Overlap
+ add2DHistogram("h2DEtaVx","",40,-1.6,1.6,2,-0.5,1.5,file_);//Full detector
+ //add2DHistogram("h2DEtaVx","",20,0.83,1.24,2,-0.5,1.5,file_);//Overlap
  //add2DHistogram("h2DEtaVx","",10,1.20,1.24,2,-0.5,1.5,file_);//Overlap
 
  
@@ -767,20 +767,25 @@ void OTFHistograms::plotRate(std::string type){
     ///Fill histo copy with sorted values
     unsigned int iBin = 1;
     for (auto it = rateMap.rbegin(); it!= rateMap.rend(); ++it){
-      if(iBin<200 && hEff->GetBinContent(rateMapBin[it->first])>0.01) std::cout<<"Quality: "<<it->second
-			   <<" rate: "<<it->first
-			   <<" efficiency: "<<hEff->GetBinContent(rateMapBin[it->first])
-			   <<std::endl;
+      if(iBin<10){
+	std::cout<<"iBin: "<<iBin
+		 <<" Quality: "<<it->second
+		 <<" rate: "<<it->first
+		 <<" efficiency: "<<hEff->GetBinContent(rateMapBin[it->first])
+		 <<std::endl;
+      }
       hRateOtfSorted->SetBinContent(iBin, it->first);
-      hEffOtfSorted->SetBinContent(iBin, hEff->GetBinContent(rateMapBin[it->first]));
-      
+      hEffOtfSorted->SetBinContent(iBin, hEff->GetBinContent(rateMapBin[it->first]));      
       hRateOtfSorted->GetXaxis()->SetBinLabel(iBin, it->second.c_str());
       ++iBin;
     }
     hRateOtfSorted->GetXaxis()->SetRange(1,10);
-    //hRateOtfSorted->Print("all");
+
     hRateOtfSorted->DrawCopy();
 
+    hEffOtfSorted->SetLineColor(2);
+    //hEffOtfSorted->Scale(1000);    
+    //hEffOtfSorted->DrawCopy("same E0");
     hEffOtfSorted->GetXaxis()->SetRange(1,10);
     delete hRateOtfSorted;
     delete hEffOtfSorted;
@@ -926,7 +931,7 @@ float  OTFHistograms::getEfficiency(TH2F *h2D, float ptCut){
   TH1D* hEffTmp =DivideErr(hNum,hDenom,"hEffTmp","B");
   //Mean eff above pt cut
   int binLow = hEffTmp->FindBin(ptCut);
-  int binHigh = hEffTmp->FindBin(ptCut+10);
+  int binHigh = hEffTmp->FindBin(ptCut+5);
   float range = hEffTmp->GetBinLowEdge(binHigh+1) - hEffTmp->GetBinLowEdge(binLow);
   float eff = hEffTmp->Integral(binLow,binHigh,"width")/range;
   

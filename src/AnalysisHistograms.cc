@@ -204,7 +204,6 @@ TH1F* AnalysisHistograms::get1DHistogram(const std::string& name, bool noClone){
 
  using namespace std;
 
- //std::map<std::string,TH1F*>::const_iterator it = my1Dhistograms_.find(name);
  std::unordered_map<std::string,TH1F*>::const_iterator it = my1Dhistograms_.find(name);
 
  if(noClone && it!=my1Dhistograms_.end()) return it->second;
