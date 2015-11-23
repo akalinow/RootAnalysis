@@ -66,6 +66,9 @@ bool HTTAnalyzer::analyze(const EventProxyBase& iEvent){
     genWeight/=6383;
   }
 
+
+  puWeight = 1.0;
+  //genWeight = 1.0;
   float eventWeight = puWeight*genWeight;
 
   //Fill bookkeeping histogram. Bin 1 holds sum of weights.
@@ -73,6 +76,7 @@ bool HTTAnalyzer::analyze(const EventProxyBase& iEvent){
 
   ///This stands now for the baseline selection. 
   if(!myEventProxy.wpair->size()) return true;
+  
   
   ///Fill histograms with number of PV.
   myHistos_->fill1DHistogram("h1DNPV"+sampleName,myEventProxy.wevent->npv(),eventWeight);
@@ -84,6 +88,11 @@ bool HTTAnalyzer::analyze(const EventProxyBase& iEvent){
   Wpair aPair = (*myEventProxy.wpair)[0];
   Wtau aTau = (*myEventProxy.wtau)[0];
   Wmu aMuon = (*myEventProxy.wmu)[0];
+
+
+  ///This stands now for the baseline selection. 
+  if(aTau.pt()<30 || aMuon.pt()<20 || aMuon.iso()>0.1) return true;
+  
   
   if(aPair.diq() == 1){
      myHistos_->fill1DHistogram("h1DMassSV"+sampleName+"qcdselSS", aPair.svfit() ,eventWeight);

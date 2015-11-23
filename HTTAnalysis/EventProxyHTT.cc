@@ -1,5 +1,7 @@
 #include "EventProxyHTT.h"
 
+#include "TSystem.h"
+
 #include <iostream>
 
 EventProxyHTT::EventProxyHTT(){}
@@ -15,20 +17,21 @@ void EventProxyHTT::init(std::vector<std::string> const& iFileNames){
 	EventProxyBase::init(iFileNames);
 
 	fChain->SetMakeClass(0);
-
 	
 	///Add weight friend TTree
 	bool hasWeightFile = false;
-	/*
-	TChain *fFriendChainWeights = new TChain("Summary/tree");	
-	TFile *file = new TFile("RootAnalysis_Weights.root");
-	TTree *treeWeights;
-	if(file->IsOpen() && file->FindObjectAny("tree")){
-	  treeWeights = (TTree*)file->Get("Summary/tree");
-	  fChain->AddFriend(treeWeights);
-	  hasWeightFile = true;
+	///Protection against non existing file (does not work yet).
+	std::string location("test");
+	if(location.size()){	
+	  TChain *fFriendChainWeights = new TChain("Summary/tree");	
+	  TFile *file = new TFile("RootAnalysis_Weights.root");
+	  TTree *treeWeights;
+	  if(file->IsOpen() && file->FindObjectAny("tree")){
+	    treeWeights = (TTree*)file->Get("Summary/tree");
+	    fChain->AddFriend(treeWeights);
+	    hasWeightFile = true;
+	  }
 	}
-	*/
 	//////////	
 	puWeight = -1;
 	
@@ -38,11 +41,10 @@ void EventProxyHTT::init(std::vector<std::string> const& iFileNames){
 	wmu = 0;//IMPORTNANT!!
 	
 	if(hasWeightFile) fChain->SetBranchAddress("PUWeight",&puWeight);
-	//fChain->SetBranchAddress("wevent",&wevent);
-	//fChain->SetBranchAddress("wpair",&wpair);
+	fChain->SetBranchAddress("wevent",&wevent);
+	fChain->SetBranchAddress("wpair",&wpair);
 	fChain->SetBranchAddress("wtau",&wtau);
-	//fChain->SetBranchAddress("wmu",&wmu);
-
+	fChain->SetBranchAddress("wmu",&wmu);
 	
 	//fChain->SetBranchStatus("*",0);
 	fChain->SetBranchStatus("PUWeight",1);
