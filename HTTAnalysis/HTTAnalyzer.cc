@@ -18,9 +18,13 @@ HTTAnalyzer::~HTTAnalyzer(){
 //////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////
 void HTTAnalyzer::initialize(TFileDirectory& aDir,
-				 pat::strbitset *aSelections){
+			     pat::strbitset *aSelections){
 
   mySelections_ = aSelections;
+
+  ///Load ROOT file with PU histograms.
+  std::string filePath = "./RootAnalysis_Weights.root";//FIX ME
+  puFile_ = new TFile(filePath.c_str());
   
   ///The histograms for this analyzer will be saved into "HTTAnalyzer"
   ///directory of the ROOT file
@@ -31,55 +35,82 @@ void HTTAnalyzer::initialize(TFileDirectory& aDir,
 //////////////////////////////////////////////////////////////////////////////
 void HTTAnalyzer::finalize(){ 
 
-  myHistos_->finalizeHistograms(0,1.0);
+  //myHistos_->finalizeHistograms(0,1.0);
  
+}
+//////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////////
+std::string HTTAnalyzer::getSampleName(const EventProxyHTT & myEventProxy){
+
+  if(myEventProxy.wevent->sample()==0) return "Data";
+  if(myEventProxy.wevent->sample()==1) return "DY";
+  if(myEventProxy.wevent->sample()==2) return "WJets";
+  if(myEventProxy.wevent->sample()==3) return "TTbar";
+
+  return "Unknown";
+}
+//////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////////
+float HTTAnalyzer::getPUWeight(const EventProxyHTT & myEventProxy){
+
+  ///Load histogram only once,later fetch it from vector<TH1F*>
+  ///At the same time divide the histogram to get the weight.
+  ///First load Data PU
+  if(!hPUVec_.size())  hPUVec_.resize(64);
+
+  if(!hPUVec_[myEventProxy.wevent->sample()]){
+    std::string hName = "Summary/h1DNPV"+getSampleName(myEventProxy);
+    std::cout<<"Loading PU histogram hName: "<<hName<<std::endl;
+    TH1F *hPUData = (TH1F*)puFile_->Get("Summary/h1DNPVData");
+    TH1F *hPUSample = (TH1F*)puFile_->Get(hName.c_str());
+    ///Normalise both histograms.
+    hPUData->Scale(1.0/hPUData->Integral(0,hPUData->GetNbinsX()+1));
+    hPUSample->Scale(1.0/hPUSample->Integral(0,hPUSample->GetNbinsX()+1));
+    ///
+    hPUData->SetDirectory(0);
+    hPUSample->SetDirectory(0);
+    hPUData->Divide(hPUSample);
+    hPUData->SetName(("h1DPUWeight"+getSampleName(myEventProxy)).c_str());
+    ///To get uniform treatment put weight=1.0 for under/overlow bins of
+    ///data PU, as nPU for data has a dummy value.
+    if(getSampleName(myEventProxy)=="Data"){
+      hPUData->SetBinContent(0,1.0);
+      hPUData->SetBinContent(hPUData->GetNbinsX()+1,1.0);
+    }
+    hPUVec_[myEventProxy.wevent->sample()] =  hPUData;
+  }
+
+  return  hPUVec_[myEventProxy.wevent->sample()]->GetBinContent(myEventProxy.wevent->npu());
+}
+//////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////////
+float HTTAnalyzer::getGenWeight(const EventProxyHTT & myEventProxy){
+
+  if(myEventProxy.wevent->sample()==0) return 1.0;
+  if(myEventProxy.wevent->sample()==1) return myEventProxy.wevent->genevtweight()/23443.423;  
+  if(myEventProxy.wevent->sample()==2) return myEventProxy.wevent->genevtweight()/225892.45;  
+  if(myEventProxy.wevent->sample()==3) return myEventProxy.wevent->genevtweight()/6383;
+
+  return 1;
 }
 //////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////
 bool HTTAnalyzer::analyze(const EventProxyBase& iEvent){
 
   const EventProxyHTT & myEventProxy = static_cast<const EventProxyHTT&>(iEvent);
-  
-  float puWeight = myEventProxy.puWeight;
-  float genWeight = myEventProxy.wevent->genevtweight();
 
-  if(myEventProxy.wevent->npv()<2) return true; //Temporary fix against bad PU weights for npv==1
-   
-  std::string sampleName = "MC";
-  if(myEventProxy.wevent->sample()==0) sampleName = "Data";
-  if(myEventProxy.wevent->sample()==1) {
-    sampleName = "DY";
-    //single event weights are huge, but all the same except sign.
-    ///normalise them to 1
-    genWeight/=23443.423;
-  }
-  if(myEventProxy.wevent->sample()==2){
-    sampleName = "WJets";
-    //single event weights are huge, but all the same except sign.
-    ///normalise them to 1
-    genWeight/=225892.45;
-  }
-  if(myEventProxy.wevent->sample()==3){
-    sampleName = "TTbar";
-    //single event weights are huge, but all the same except sign.
-    ///normalise them to 1
-    genWeight/=6383;
-  }
+  std::string sampleName = getSampleName(myEventProxy);  
+  float puWeight = getPUWeight(myEventProxy);
+  float genWeight = getGenWeight(myEventProxy);
 
-
-  puWeight = 1.0;
+  //puWeight = 1.0;
   //genWeight = 1.0;
   float eventWeight = puWeight*genWeight;
 
+  if(myEventProxy.wevent->npv()<2) return true; //Temporary fix against bad PU weights for npv==1
+   
   //Fill bookkeeping histogram. Bin 1 holds sum of weights.
   myHistos_->fill1DHistogram("h1DStats"+sampleName,1,eventWeight);
-
-  ///This stands now for the baseline selection. 
-  if(!myEventProxy.wpair->size()) return true;
-  
-  
-  ///Fill histograms with number of PV.
-  myHistos_->fill1DHistogram("h1DNPV"+sampleName,myEventProxy.wevent->npv(),eventWeight);
 
   if(!myEventProxy.wpair->size() ||
      !myEventProxy.wtau->size() ||
@@ -89,10 +120,12 @@ bool HTTAnalyzer::analyze(const EventProxyBase& iEvent){
   Wtau aTau = (*myEventProxy.wtau)[0];
   Wmu aMuon = (*myEventProxy.wmu)[0];
 
-
   ///This stands now for the baseline selection. 
-  if(aTau.pt()<30 || aMuon.pt()<20 || aMuon.iso()>0.1) return true;
-  
+  ///This stands now for the baseline selection. 
+  if(!myEventProxy.wpair->size() || aTau.pt()<30 || aMuon.pt()<20 || aMuon.iso()>0.1) return true;
+
+  ///Fill histograms with number of PV.
+  myHistos_->fill1DHistogram("h1DNPV"+sampleName,myEventProxy.wevent->npv(),eventWeight);
   
   if(aPair.diq() == 1){
      myHistos_->fill1DHistogram("h1DMassSV"+sampleName+"qcdselSS", aPair.svfit() ,eventWeight);

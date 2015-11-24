@@ -38,8 +38,6 @@ class HTTWeightsMaker: public Analyzer{
 
   virtual void clear(){;};
 
-  virtual void addBranch(TTree *tree);
-
   virtual void addCutHistos(TList *aList){;};
 
   bool filter() const{ return filterEvent_;};
@@ -60,11 +58,8 @@ class HTTWeightsMaker: public Analyzer{
   ///ROOT file with PU histogram
   TFile *puFile;
 
-  ///The PU reference and current dataset histograms
-  TH1F *hPU, *hDatasetPU;
-
-  ///Histogram with PU weights.
-  TH1F *hPUWeights;
+  ///The PU reference histogram
+  TH1F *hPU;
 
   ///Histograms storage.
   HTTWeightHistograms *myHistos_;

@@ -21,7 +21,8 @@
 float HTTHistograms::getLumi(){
 
   //return 0.962*(5579820.829*1E-6 + 16344635.363*1E-6);//pb-1 , data_1 + data_2
-  return 0.962*(16344635.363*1E-6);//pb-1 , data_2
+  //return 0.962*(16344635.363*1E-6);//pb-1 , data_2
+  return 553149950.870e-6;//pg-1 data_3
 
 }
 /////////////////////////////////////////////////////////
@@ -110,7 +111,7 @@ bool HTTHistograms::fill1DHistogram(const std::string& name, float val, float we
     if(name.find("h1DIso")!=std::string::npos) hTemplateName = "h1DIsoTemplate";
     if(name.find("h1DPhi")!=std::string::npos) hTemplateName = "h1DPhiTemplate";
     if(name.find("h1DMt")!=std::string::npos) hTemplateName = "h1DMtTemplate";
-    std::cout<<"Adding histogram: "<<name<<" "<<file_<<" "<<file_->fullPath()<<std::endl;
+    std::cout<<"fill1DHistogram Adding histogram: "<<name<<" "<<file_<<" "<<file_->fullPath()<<std::endl;
     this->add1DHistogram(name,"",
 			 this->get1DHistogram(hTemplateName,true)->GetNbinsX(),
 			 this->get1DHistogram(hTemplateName,true)->GetXaxis()->GetXmin(),
@@ -128,7 +129,7 @@ void HTTHistograms::defineHistograms(){
 
  if(!histosInitialized_){
    //Make template histos
-   std::cout<<"Adding histogram: "<<file_<<" "<<file_->fullPath()<<std::endl;
+   std::cout<<"defineHistograms Adding histogram: "<<file_<<" "<<file_->fullPath()<<std::endl;
    add1DHistogram("h1DStatsTemplate","",10,0.5,10.5,file_);
    add1DHistogram("h1DNPVTemplate",";Number of PV; Events",61,-0.5,60.5,file_);
    add1DHistogram("h1DMassTemplate",";SVFit mass [GeV/c^{2}]; Events",50,0,200,file_);

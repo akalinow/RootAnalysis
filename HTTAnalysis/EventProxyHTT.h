@@ -20,8 +20,6 @@
 
       void init(std::vector<std::string> const& iFileNames);
 
-      float puWeight;
-
       Wevent *wevent;
       std::vector<Wpair>  *wpair;
       std::vector<Wtau>  *wtau;
