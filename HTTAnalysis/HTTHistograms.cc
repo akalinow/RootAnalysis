@@ -145,9 +145,10 @@ void HTTHistograms::defineHistograms(){
 /////////////////////////////////////////////////////////
 void HTTHistograms::finalizeHistograms(int nRuns, float weight){
 
-  plotAnyHistogram("h1DMtTauWJets");
-
   plotStack("NPV",0);
+
+  return;
+  plotAnyHistogram("h1DMtTauWJets");
 
   plotStack("MassSV",0);
   plotStack("MassVis",0);  
@@ -214,7 +215,6 @@ THStack*  HTTHistograms::plotStack(std::string varName, int selType){
   TH1F *hTTbar = get1DHistogram((hName+"TTbar").c_str());
   TH1F *hDYJets = get1DHistogram((hName+"DY").c_str());
   TH1F *hSoup = get1DHistogram((hName+"Data").c_str());
-
   TH1F *hQCD = (TH1F*)getQCDbackground(varName,0);
 
   float lumi = getLumi();
@@ -346,16 +346,15 @@ THStack*  HTTHistograms::plotStack(std::string varName, int selType){
   hMCSum->GetXaxis()->SetRange(binLow,binHigh);
   hMCSum->SetTitle("");
   hMCSum->SetXTitle("");
-  //hMCSum->SetYTitle("#frac{N_{obs} - N_{exp}}{#sqrt{N_{obs}}}");
-  hMCSum->SetYTitle("#frac{N_{obs} - N_{exp}}{N_{obs}}");//TEST
+  hMCSum->SetYTitle("#frac{N_{obs} - N_{exp}}{#sqrt{N_{obs}}}");
   hMCSum->GetXaxis()->SetLabelSize(0.09);
   hMCSum->GetYaxis()->SetLabelSize(0.09);
   hMCSum->GetYaxis()->SetTitleSize(0.09);
   hMCSum->GetYaxis()->SetTitleOffset(0.5);
   hMCSum->Add(hSoup,-1);
   for(int i=0;i<hMCSum->GetNbinsX()+1;++i){
-    //if(hSoup->GetBinContent(i)>0) hMCSum->SetBinContent(i,-hMCSum->GetBinContent(i)/sqrt(hSoup->GetBinContent(i)));
-    if(hSoup->GetBinContent(i)>0) hMCSum->SetBinContent(i,-hMCSum->GetBinContent(i)/hSoup->GetBinContent(i)); //TEST
+    if(hSoup->GetBinContent(i)>0) hMCSum->SetBinContent(i,-hMCSum->GetBinContent(i)/sqrt(hSoup->GetBinContent(i)));
+    //if(hSoup->GetBinContent(i)>0) hMCSum->SetBinContent(i,-hMCSum->GetBinContent(i)/hSoup->GetBinContent(i)); //TEST
     else  hMCSum->SetBinContent(i,0);
     hMCSum->SetBinError(i,0);
   }

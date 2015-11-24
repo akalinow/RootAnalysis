@@ -28,7 +28,7 @@ void EventProxyHTT::init(std::vector<std::string> const& iFileNames){
 	fChain->SetBranchAddress("wtau",&wtau);
 	fChain->SetBranchAddress("wmu",&wmu);
 	
-	fChain->SetBranchStatus("*",0);
+	fChain->SetBranchStatus("*",1);
 
 	fChain->SetBranchStatus("npu_",1);
 	fChain->SetBranchStatus("sample_",1);
