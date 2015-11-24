@@ -43,7 +43,8 @@ class HTTAnalyzer: public Analyzer{
   bool filter() const{ return filterEvent_;};
 
   ///Return human readable sample name (Data, WJets, etc).
-  std::string getSampleName(const EventProxyHTT & myEventProxy);
+  ///Make the methos static, so other modules can use it
+  static std::string getSampleName(const EventProxyHTT & myEventProxy);
 
   ///Return pileup reweighting weight.
   ///Weight is calculatedon fly using the ration of nPU 

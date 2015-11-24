@@ -1,6 +1,7 @@
 
 #include <sstream>
 
+#include "HTTAnalyzer.h"
 #include "HTTWeightsMaker.h"
 #include "HTTWeightHistograms.h"
 #include "EventProxyHTT.h"
@@ -66,10 +67,7 @@ bool HTTWeightsMaker::analyze(const EventProxyBase& iEvent){
   float genWeight = myEventProxy.wevent->genevtweight();
   float eventWeight = genWeight;
 
-  std::string sampleName = "MC";
-  if(myEventProxy.wevent->sample()==0) sampleName = "Data";
-  if(myEventProxy.wevent->sample()==1) sampleName = "DY";
-  if(myEventProxy.wevent->sample()==2) sampleName = "WJets";
+  std::string sampleName  = HTTAnalyzer::getSampleName(myEventProxy);
 
   ///Do not fill PU histo for the data.
   ///Data histo content is copied from external  histogram 
