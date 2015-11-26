@@ -64,8 +64,9 @@ bool HTTWeightsMaker::analyze(const EventProxyBase& iEvent){
 
   const EventProxyHTT & myEventProxy = static_cast<const EventProxyHTT&>(iEvent);
   
-  float genWeight = myEventProxy.wevent->genevtweight();
-  float eventWeight = genWeight;
+  ///For making the PU weights we do not use generator level weights,
+  ///as PU and generator level weights should be independent.
+  float eventWeight = 1.0;
 
   std::string sampleName  = HTTAnalyzer::getSampleName(myEventProxy);
 

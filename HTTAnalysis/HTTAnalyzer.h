@@ -19,6 +19,10 @@
 class EventProxyHTT;
 class HTTHistograms;
 class TH1F;
+class Wtau;
+class Wmu;
+class Wpair;
+class Wevent;
 
 class HTTAnalyzer: public Analyzer{
 
@@ -54,6 +58,13 @@ class HTTAnalyzer: public Analyzer{
   ///Return generator weight. Most samples have large values of weights
   ///which are constant up to + or - sign. We normalise those weights to +-1.
   float getGenWeight(const EventProxyHTT & myEventProxy);
+
+  ///Fill histograms for all control plots.
+  ///Histogram names will end with hNameSuffix
+  void fillControlHistos(Wevent & aEvent, 
+			 Wpair & aPair, Wtau & aTau, Wmu & aMuon,
+			 float eventWeight,
+			 const std::string & hNameSuffix);
 
  protected:
 

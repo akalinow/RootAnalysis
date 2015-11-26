@@ -43,7 +43,7 @@ void HTTAnalyzer::finalize(){
 std::string HTTAnalyzer::getSampleName(const EventProxyHTT & myEventProxy){
 
   if(myEventProxy.wevent->sample()==0) return "Data";
-  if(myEventProxy.wevent->sample()==1) return "DY";
+  if(myEventProxy.wevent->sample()==1) return "DYJets";
   if(myEventProxy.wevent->sample()==2) return "WJets";
   if(myEventProxy.wevent->sample()==3) return "TTbar";
 
@@ -95,9 +95,39 @@ float HTTAnalyzer::getGenWeight(const EventProxyHTT & myEventProxy){
 }
 //////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////
+void HTTAnalyzer::fillControlHistos(Wevent & aEvent, 
+				    Wpair & aPair, Wtau & aTau, Wmu & aMuon,
+				    float eventWeight,
+				    const std::string & hNameSuffix){
+
+  ///Fill histograms with number of PV.
+  myHistos_->fill1DHistogram("h1DNPV"+hNameSuffix,aEvent.npv(),eventWeight);
+
+  ///Fill SVfit and visible masses
+  myHistos_->fill1DHistogram("h1DMassSV"+hNameSuffix,aPair.svfit(),eventWeight);
+  myHistos_->fill1DHistogram("h1DMassVis"+hNameSuffix,aPair.m_vis(),eventWeight);
+  
+  ///Fill muon pt and eta
+  myHistos_->fill1DHistogram("h1DMassTrans"+hNameSuffix,aMuon.mt(),eventWeight);
+  myHistos_->fill1DHistogram("h1DPtMuon"+hNameSuffix,aMuon.pt(),eventWeight);
+  myHistos_->fill1DHistogram("h1DEtaMuon"+hNameSuffix,aMuon.eta(),eventWeight);
+
+  ///Fill tau pt and eta
+  myHistos_->fill1DHistogram("h1DPtTau"+hNameSuffix,aTau.pt(),eventWeight);
+  myHistos_->fill1DHistogram("h1DEtaTau"+hNameSuffix,aTau.eta(),eventWeight);
+
+  myHistos_->fill1DHistogram("h1DIsoMuon"+hNameSuffix,aMuon.iso(),eventWeight);
+  myHistos_->fill1DHistogram("h1DPhiMuon"+hNameSuffix,  aMuon.phi(),eventWeight);
+  myHistos_->fill1DHistogram("h1DPhiTau"+hNameSuffix, aTau.phi() ,eventWeight);
+  myHistos_->fill1DHistogram("h1DMtTau"+hNameSuffix,  aTau.mt() ,eventWeight);
+
+}
+//////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////////
 bool HTTAnalyzer::analyze(const EventProxyBase& iEvent){
 
   const EventProxyHTT & myEventProxy = static_cast<const EventProxyHTT&>(iEvent);
+
 
   std::string sampleName = getSampleName(myEventProxy);  
   float puWeight = getPUWeight(myEventProxy);
@@ -110,57 +140,71 @@ bool HTTAnalyzer::analyze(const EventProxyBase& iEvent){
   //Fill bookkeeping histogram. Bin 1 holds sum of weights.
   myHistos_->fill1DHistogram("h1DStats"+sampleName,1,eventWeight);
 
-  if(!myEventProxy.wpair->size() ||
-     !myEventProxy.wtau->size() ||
-     !myEventProxy.wmu->size()) return true;
+  ///To spedup processing we load only event with at least one tau pair.
+  ///Have to cast away const fromthe event. 
+  ///WARNING: needs check with any new ROOT version, as SetBranchStatus
+  ///behaviour may change.
+  EventProxyHTT & myEventProxyMod = const_cast<EventProxyHTT&>(myEventProxy);
+  if(myEventProxy.wpair->size()){
+    //myEventProxyMod.enableBranches();
+    //myEventProxyMod.reloadEvent();
 
+    Wpair aPair = (*myEventProxy.wpair)[0];
+    /*
+    std::cout<<"Muon pt: "<<(*myEventProxy.wmu)[0].pt()<<std::endl;
+    std::cout<<"Muon mt: "<<(*myEventProxy.wmu)[0].mt()<<std::endl;
+    std::cout<<"Muon iso: "<<(*myEventProxy.wmu)[0].iso()<<std::endl;
+    std::cout<<"Tau pt: "<<(*myEventProxy.wtau)[0].pt()<<std::endl;
+    std::cout<<"SVfit pt: "<<(*myEventProxy.wpair)[0].svfit()<<std::endl;
+    std::cout<<"charge: "<<(*myEventProxy.wpair)[0].diq()<<std::endl;
+    */
+  }  
+  if(!myEventProxy.wpair->size() || !myEventProxy.wtau->size() || !myEventProxy.wmu->size()) return true;
+
+  Wevent aEvent = *myEventProxy.wevent;
   Wpair aPair = (*myEventProxy.wpair)[0];
   Wtau aTau = (*myEventProxy.wtau)[0];
   Wmu aMuon = (*myEventProxy.wmu)[0];
 
-  ///This stands now for the baseline selection. 
-  ///This stands now for the baseline selection. 
-  if(!myEventProxy.wpair->size()) return true;
-  if(aTau.pt()<30 || aMuon.pt()<20 || aMuon.iso()>0.1) return true;
+  ///This stands for core selection, that is common to all regions.
+  if(!myEventProxy.wpair->size() || aTau.pt()<30 || aMuon.pt()<20) return true;
 
-  ///Fill histograms with number of PV.
-  myHistos_->fill1DHistogram("h1DNPV"+sampleName,myEventProxy.wevent->npv(),eventWeight);
-  
-  if(aPair.diq() == 1){
-     myHistos_->fill1DHistogram("h1DMassSV"+sampleName+"qcdselSS", aPair.svfit() ,eventWeight);
-     myHistos_->fill1DHistogram("h1DMassVis"+sampleName+"qcdselSS", aPair.m_vis() ,eventWeight);
-     myHistos_->fill1DHistogram("h1DMassTrans"+sampleName+"qcdselSS", aMuon.mt() ,eventWeight);
-     myHistos_->fill1DHistogram("h1DPtMuon"+sampleName+"qcdselSS", aMuon.pt() ,eventWeight);
-     myHistos_->fill1DHistogram("h1DEtaMuon"+sampleName+"qcdselSS", aMuon.eta() ,eventWeight);
-     myHistos_->fill1DHistogram("h1DPtTau"+sampleName+"qcdselSS", aTau.pt() ,eventWeight);
-     myHistos_->fill1DHistogram("h1DEtaTau"+sampleName+"qcdselSS", aTau.eta() ,eventWeight);
-     myHistos_->fill1DHistogram("h1DNPV"+sampleName+"qcdselSS", myEventProxy.wevent->npv() ,eventWeight);
+  bool baselineSelection = aPair.diq()==-1 && aMuon.mt()<400 && aMuon.iso()<0.1;
+  bool wSelection = aMuon.mt()>60 && aMuon.iso()<0.1;
+  bool qcdSelectionSS = aPair.diq()==1 && aMuon.mt()<400 && aMuon.iso()<0.1;
+  bool qcdSelectionOS = aPair.diq()==-1 && aMuon.mt()<400 && aMuon.iso()<0.1;
 
-     myHistos_->fill1DHistogram("h1DPhiMuon"+sampleName+"qcdselSS", aMuon.phi() ,eventWeight);
-     myHistos_->fill1DHistogram("h1DPhiTau"+sampleName+"qcdselSS", aTau.phi() ,eventWeight);
-     myHistos_->fill1DHistogram("h1DMtTau"+sampleName+"qcdselSS", aTau.mt() ,eventWeight);
-     myHistos_->fill1DHistogram("h1DIsoMuon"+sampleName+"qcdselSS", aMuon.iso() ,eventWeight);
+  ///Histograms for the baseline selection  
+  std::string hNameSuffix = sampleName;
+  if(baselineSelection) fillControlHistos(aEvent, aPair, aTau, aMuon, eventWeight, hNameSuffix);
+
+  ///Histograms for the QCD control region
+  if(qcdSelectionSS){
+    hNameSuffix = sampleName+"qcdselSS";
+    myHistos_->fill1DHistogram("h1DIso"+hNameSuffix,aMuon.iso(),eventWeight);
+    ///Fill SS histos in signal mu isolation region. Those histograms
+    ///provide shapes for QCD estimate in signal region.
+    if(aMuon.iso()) fillControlHistos(aEvent, aPair, aTau, aMuon, eventWeight, hNameSuffix);
   }
 
+  if(qcdSelectionOS){
+    hNameSuffix = sampleName+"qcdselOS";
+    myHistos_->fill1DHistogram("h1DIso"+hNameSuffix,aMuon.iso(),eventWeight);
+    fillControlHistos(aEvent, aPair, aTau, aMuon, eventWeight, hNameSuffix);
+  }
 
-  ///Fill SVfit and visible masses
-  myHistos_->fill1DHistogram("h1DMassSV"+sampleName,aPair.svfit(),eventWeight);
-  myHistos_->fill1DHistogram("h1DMassVis"+sampleName,aPair.m_vis(),eventWeight);
+  ///Histograms for the WJet control region. Selection is split into SS and OS regions.
+  if(wSelection){
+    hNameSuffix = sampleName+"wsel";
+    if(aPair.diq()==-1) myHistos_->fill1DHistogram("h1DMt"+hNameSuffix+"OS",aMuon.mt(),eventWeight);
+    if(aPair.diq()== 1) myHistos_->fill1DHistogram("h1DMt"+hNameSuffix+"SS",aMuon.mt(),eventWeight);
+  }
 
-  ///Fill muon pt and eta
-  myHistos_->fill1DHistogram("h1DMassTrans"+sampleName,aMuon.mt(),eventWeight);
-  myHistos_->fill1DHistogram("h1DPtMuon"+sampleName,aMuon.pt(),eventWeight);
-  myHistos_->fill1DHistogram("h1DEtaMuon"+sampleName,aMuon.eta(),eventWeight);
+  ///Histograms for the tt control region
 
-  ///Fill tau pt and eta
-  myHistos_->fill1DHistogram("h1DPtTau"+sampleName,aTau.pt(),eventWeight);
-  myHistos_->fill1DHistogram("h1DEtaTau"+sampleName,aTau.eta(),eventWeight);
 
-  myHistos_->fill1DHistogram("h1DIsoMuon"+sampleName,aMuon.iso(),eventWeight);
-  myHistos_->fill1DHistogram("h1DPhiMuon"+sampleName,  aMuon.phi(),eventWeight);
-  myHistos_->fill1DHistogram("h1DPhiTau"+sampleName, aTau.phi() ,eventWeight);
-  myHistos_->fill1DHistogram("h1DMtTau"+sampleName,  aTau.mt() ,eventWeight);
-
+  ///Disable branches before loading next event.
+  //myEventProxyMod.disableBranches();
   
   return true;
 }

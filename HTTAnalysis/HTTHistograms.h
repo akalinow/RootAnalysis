@@ -1,4 +1,3 @@
-
 #ifndef HTTHistograms_h
 #define HTTHistograms_h
 
@@ -6,7 +5,11 @@
 //         Created:  wto, 29 wrz 2015, 22:03:48 CEST
 //
 //
+#include <string>
+
 #include "AnalysisHistograms.h"
+
+
 
 class THStack;
 
@@ -28,8 +31,24 @@ class HTTHistograms: public AnalysisHistograms {
 
   float getLumi();
 
+  ///Return sample normalisation based only on
+  ///luminosity and cross section.
+  ///MC to DATA scaling factors should be applied
+  ///on top of this normalisation.
   float getSampleNormalisation(const std::string & sampleName);
+
+
+  ///Estimate QCD background using the SS/OS method.
   TH1* getQCDbackground(std::string, int);
+
+  ///Calculate scaling factor for the WJets MC
+  ///SCaling factor is estimated in high Mt region.
+  ///Other backgrounds are subtracted, basing on MC
+  ///QCD contribution is neglected.
+  std::pair<float,float> getWNormalisation(const std::string & selType);
+
+  ///Calculate QCD OS/SS ratiousing non isolated events.
+  std::pair<float,float> getQCDOStoSS(int selType);
 
    private:
   

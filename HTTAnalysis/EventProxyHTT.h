@@ -24,6 +24,12 @@
       std::vector<Wpair>  *wpair;
       std::vector<Wtau>  *wtau;
       std::vector<Wmu>  *wmu;
+
+      ///Enable branches to be read
+      void enableBranches();
+
+      ///Disable selected branches 
+      void disableBranches();
       
    };
 #endif

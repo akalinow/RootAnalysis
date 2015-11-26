@@ -30,13 +30,24 @@ void EventProxyHTT::init(std::vector<std::string> const& iFileNames){
 	
 	fChain->SetBranchStatus("*",1);
 
-	fChain->SetBranchStatus("npu_",1);
-	fChain->SetBranchStatus("sample_",1);
-	fChain->SetBranchStatus("genevtweight_",1);
+}
+/////////////////////////////////////////////////////////
+/////////////////////////////////////////////////////////
+void  EventProxyHTT::enableBranches(){
 
-	//fChain->SetBranchStatus("wpair",1);
-	//fChain->SetBranchStatus("wtau",1);
-	//fChain->SetBranchStatus("wmu",1);
+  fChain->SetBranchStatus("*",1);
+
+}
+/////////////////////////////////////////////////////////
+/////////////////////////////////////////////////////////
+void  EventProxyHTT::disableBranches(){
+
+  fChain->SetBranchStatus("*",0);
+  fChain->SetBranchStatus("wpair",1);  
+  fChain->SetBranchStatus("sample_",1);
+  fChain->SetBranchStatus("genevtweight_",1);
+  fChain->SetBranchStatus("npu_",1);
+
 }
 /////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////

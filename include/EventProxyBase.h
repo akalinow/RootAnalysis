@@ -23,9 +23,16 @@
 
       // Go to the very first Event.
       EventProxyBase const& toBegin();
+      
       virtual bool atEnd() const;
 
+      ///Reload current event. Can be used if
+      ///some tree branches are enebled/disabled
+      ///en event by event basis.
+      void reloadEvent();
+
       bool isValid() const;
+
       operator bool() const;
 
       TFile* getTFile() const { return fChain->GetFile();}

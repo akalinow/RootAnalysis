@@ -38,6 +38,8 @@ EventProxyBase::operator++(){
    return *this;
 }
 
+void EventProxyBase::reloadEvent(){ fChain->GetEntry(eventIndex_); }
+
 /** Go to the very first Event*/
 
 EventProxyBase const&
