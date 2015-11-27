@@ -22,11 +22,13 @@ void EventProxyHTT::init(std::vector<std::string> const& iFileNames){
 	wpair = 0;//IMPORTNANT!!
 	wtau = 0;//IMPORTNANT!!
 	wmu = 0;//IMPORTNANT!!
+	wjet = 0;//IMPORTNANT!!
 	
 	fChain->SetBranchAddress("wevent",&wevent);
 	fChain->SetBranchAddress("wpair",&wpair);
 	fChain->SetBranchAddress("wtau",&wtau);
 	fChain->SetBranchAddress("wmu",&wmu);
+	fChain->SetBranchAddress("wjet",&wjet);
 	
 	fChain->SetBranchStatus("*",1);
 

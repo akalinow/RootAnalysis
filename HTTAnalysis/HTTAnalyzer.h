@@ -21,6 +21,7 @@ class HTTHistograms;
 class TH1F;
 class Wtau;
 class Wmu;
+class Wjet;
 class Wpair;
 class Wevent;
 
@@ -63,6 +64,7 @@ class HTTAnalyzer: public Analyzer{
   ///Histogram names will end with hNameSuffix
   void fillControlHistos(Wevent & aEvent, 
 			 Wpair & aPair, Wtau & aTau, Wmu & aMuon,
+			 Wjet & aJet,
 			 float eventWeight,
 			 const std::string & hNameSuffix);
 

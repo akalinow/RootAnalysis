@@ -30,7 +30,7 @@ float HTTHistograms::getLumi(){
 }
 /////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////
-float HTTHistograms::getSampleNormalisation(const std::string & sampleName){
+float HTTHistograms::getSampleNormalisation(std::string sampleName){
 
   float genPresEff = 1.0;
   float recoPresEff = 1.0;
@@ -64,12 +64,12 @@ float HTTHistograms::getSampleNormalisation(const std::string & sampleName){
   float weight = crossSection*presEff/nEventsAnalysed;
   if(presEff<0 || fabs(fabs(crossSection)-1.0)<1e-5) weight = 1.0;
 
-  std::cout<<"Sample name: "<<sampleName<<std::endl;
-  std::cout<<"Mean cross section: "<<crossSection<<" [pb] "<<std::endl;
-  std::cout<<"Number of events analyzed: "<<nEventsAnalysed<<std::endl;
-  std::cout<<"Gen preselection efficiency: "<<genPresEff<<std::endl;
-  std::cout<<"Reco preselection efficiency: "<<recoPresEff<<std::endl;
-  std::cout<<"External scaling: "<<kFactor<<std::endl;
+  std::cout<<"Sample name: "<<sampleName<<" ";
+  std::cout<<"Xsection: "<<crossSection<<" [pb] "<<" ";
+  std::cout<<"Events analyzed: "<<nEventsAnalysed<<" ";
+  //std::cout<<"Gen preselection efficiency: "<<genPresEff<<std::endl;
+  //std::cout<<"Reco preselection efficiency: "<<recoPresEff<<std::endl;
+  //std::cout<<"External scaling: "<<kFactor<<std::endl;
   std::cout<<"Final weight: "<<weight<<std::endl;
 
   return weight;  
@@ -103,7 +103,7 @@ HTTHistograms::~HTTHistograms(){ }
 /////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////
 bool HTTHistograms::fill1DHistogram(const std::string& name, float val, float weight){
-  
+
   std::string hTemplateName = "";
   if(!AnalysisHistograms::fill1DHistogram(name,val,weight)){
     if(name.find("h1DNPV")!=std::string::npos) hTemplateName = "h1DNPVTemplate";
@@ -113,7 +113,6 @@ bool HTTHistograms::fill1DHistogram(const std::string& name, float val, float we
     if(name.find("h1DEta")!=std::string::npos) hTemplateName = "h1DEtaTemplate";
     if(name.find("h1DIso")!=std::string::npos) hTemplateName = "h1DIsoTemplate";
     if(name.find("h1DPhi")!=std::string::npos) hTemplateName = "h1DPhiTemplate";
-    if(name.find("h1DMt")!=std::string::npos) hTemplateName = "h1DMtTemplate";
     std::cout<<"fill1DHistogram Adding histogram: "<<name<<" "<<file_<<" "<<file_->fullPath()<<std::endl;
     this->add1DHistogram(name,"",
 			 this->get1DHistogram(hTemplateName,true)->GetNbinsX(),
@@ -140,7 +139,6 @@ void HTTHistograms::defineHistograms(){
    add1DHistogram("h1DEtaTemplate",";#eta; Events",24,-2.4,2.4,file_);
    add1DHistogram("h1DIsoTemplate",";Isolation; Events",20,0,2,file_);
    add1DHistogram("h1DPhiTemplate",";#phi; Events",30,-3,3,file_);
-   add1DHistogram("h1DMtTemplate",";m_T; Events",50,0,200,file_);
    histosInitialized_ = true;
  }
 }
@@ -148,178 +146,83 @@ void HTTHistograms::defineHistograms(){
 /////////////////////////////////////////////////////////
 void HTTHistograms::finalizeHistograms(int nRuns, float weight){
 
+  plotStack("MassTrans","");
+  plotStack("MassTrans","wselOS");
+
+  plotStack("PtLeadingJet","");
+  plotStack("PtLeadingBJet","");
+
+  plotStack("Iso","qcdselOS");
+  plotStack("Iso","qcdselSS");
+  return;
+
+  plotStack("Iso","qcdselOS");
+  plotStack("Iso","qcdselSS");
+  plotStack("MassVis","");  
+  return;
+
+  plotStack("MassVis","wsel");  
+
   //getWNormalisation("wselOS");
   //getWNormalisation("wselSS");
-  //plotAnyHistogram("h1DMtTauWJets");
+  //plotSingleHistogram("h1DMtTauWJets");
   //return;
 
-  plotStack("NPV",0);
+  plotStack("NPV","");
 
-  plotStack("MassSV",0);
-  plotStack("MassVis",0);  
-  plotStack("MassTrans",0);
+  plotStack("MassSV","");
+  plotStack("MassVis","");  
+  plotStack("MassTrans","");
   
-
-  plotStack("PtMuon",0);
-  plotStack("EtaMuon",0);
-  plotStack("IsoMuon",0);
+  plotStack("PtMuon","");
+  plotStack("EtaMuon","");
+  plotStack("IsoMuon","");
   
-  plotStack("PtTau",0);  
-  plotStack("EtaTau",0);
+  plotStack("PtTau","");  
+  plotStack("EtaTau","");
  
-  plotStack("PhiMuon",0);
-  plotStack("PhiTau",0);
-  plotStack("MtTau",0);
+  plotStack("PhiMuon","");
+  plotStack("PhiTau","");
 
+  plotStack("PtLeadingJet","");
+  plotStack("PtLeadingBJet","");
 
 }
 /////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////
-std::pair<float,float> HTTHistograms::getQCDOStoSS(int selType){
-  std::string hName = "h1DIso";
-  // SS selection
-  TH1F *hWJetsQ = get1DHistogram((hName+"WJets"+"qcdselSS").c_str());
-  TH1F *hDYJetsQ = get1DHistogram((hName+"DY"+"qcdselSS").c_str());
-  TH1F *hTTQ = get1DHistogram((hName+"TT"+"qcdselSS").c_str());
-  TH1F *hOtherQ = get1DHistogram((hName+"Other"+"qcdselSS").c_str());
-  TH1F *hSoupQ = get1DHistogram((hName+"Data"+"qcdselSS").c_str());
-  // OS selection
-  TH1F *hWJets = get1DHistogram((hName+"WJets"+"qcdselOS").c_str());
-  TH1F *hDYJets = get1DHistogram((hName+"DY"+"qcdselOS").c_str());
-  TH1F *hTT = get1DHistogram((hName+"TT"+"qcdselOS").c_str());
-  TH1F *hOther = get1DHistogram((hName+"Other"+"qcdselOS").c_str());
-  TH1F *hSoup = get1DHistogram((hName+"Data"+"qcdselOS").c_str());
-  // normalisation:: czy to jest poprawne? lumi jest dla wszystkich tych probek taka sama?
-  float lumi = getLumi()/1000.0;
-  ///Normalise MC histograms according to cross sections
-  std::string sampleName = "DY";
-  float weight = getSampleNormalisation(sampleName);
-  float scale = weight*lumi;
-  hDYJets->Scale(scale);
-  hDYJetsQ->Scale(scale);
-  sampleName = "WJets";
-  scale = getSampleNormalisation(sampleName);
-  hWJets->Scale(scale);
-  hWJetsQ->Scale(scale);
-  sampleName = "TT";
-  weight = getSampleNormalisation(sampleName);
-  scale = weight*lumi;
-  hTT->Scale(scale);
-  hOther->Scale(scale);
-  hTTQ->Scale(scale);
-  hOtherQ->Scale(scale);
-  // OS and SS without background
-  // NA RAZIE ZROBIC BEZ ODEJMOWANIA!!!
-  TH1F* dataIsoSS= new TH1F("dataIsoSS","; Iso; Events",50,0,0.5);
-  TH1F* dataIsoOS= new TH1F("dataIsoOS","; Iso",50,0,0.5);
-  TH1F* dataIsoSSb= new TH1F("dataIsoSS","; Iso; Events",50,0,0.5);
-  TH1F* dataIsoOSb= new TH1F("dataIsoOS","; Iso",50,0,0.5);
-  dataIsoSSb->Add(hSoupQ,1);
-  dataIsoOSb->Add(hSoup,1);
-  dataIsoSS->Add(hSoupQ,1);
-  dataIsoSS->Add(hWJetsQ,-1);
-  dataIsoSS->Add(hDYJetsQ,-1);
-  dataIsoSS->Add(hTTQ,-1);
-  dataIsoSS->Add(hOtherQ,-1);
-  dataIsoOS->Add(hSoup,1);
-  dataIsoOS->Add(hWJets,-1);
-  dataIsoOS->Add(hDYJets,-1);
-  dataIsoOS->Add(hTT,-1);
-  dataIsoOS->Add(hOther,-1);
-  TH1F* diffSS= new TH1F("diffSS","; Iso; Events",50,0,0.5);
-  TH1F* diffOS= new TH1F("diffOS","; Iso",50,0,0.5);
-  diffSS->Add(dataIsoSSb,1);
-  diffSS->Add(dataIsoSS,-1);
-  diffOS->Add(dataIsoOSb,1);
-  diffOS->Add(dataIsoOS,-1);
-  // roznice w zliczeniach:
-  cout<<"!!!! roznica w zliczeniach miedzy histogramami; diffSS "<<diffSS->Integral(30,50)<<" diffOS "<<diffOS->Integral(30,50)<<endl;
-  cout<<"!!!! same histogramy; dataIsoSSb "<<dataIsoSSb->Integral(30,50)<<" dataIsoSS "<<dataIsoSS->Integral(30,50)<<" dataIsoOSb "<<dataIsoOSb->Integral(30,50)<<" dataIsoOS "<<dataIsoOS->Integral(30,50)<<endl;
-  dataIsoOSb->Divide(dataIsoSSb);
-  dataIsoOS->Divide(dataIsoSS);
-  //funtion fitting
-  TF1 *line2=new TF1("line2","[0]",0.3,0.5);
-  line2->SetParameter(0,1);
-  dataIsoOSb->Fit("line2","","",0.3,0.5);
-  TCanvas* c = new TCanvas("AnyHistogram","AnyHistogram",460,500);
-  dataIsoOSb->Draw();
-  line2->SetLineColor(kGreen);
-  line2->Draw("same");
-  c->Print(TString::Format("fig_png/%s.png",hName.c_str()).Data());
-  // fitting do odjetych
-  hName=hName+"BezTla";
-  TF1 *line=new TF1("line","[0]",0.3,0.5);
-  line->SetParameter(0,1);
-  dataIsoOS->Fit("line","","",0.3,0.5);
-  TCanvas* c1 = new TCanvas("AnyHistogram","AnyHistogram",460,500);
-  dataIsoOS->Draw();
-  line->SetLineColor(kGreen);
-  line->Draw("same");
-  c1->Print(TString::Format("fig_png/%s.png",hName.c_str()).Data());
-  // OS/SS
-  float param, dparam;
-  param=line->GetParameter(0);
-  dparam=line->GetParError(0);
-  return std::make_pair(param, dparam);
-}
-/////////////////////////////////////////////////////////
-/////////////////////////////////////////////////////////
-TH1* HTTHistograms::getQCDbackground(std::string varName, int selType){
+THStack*  HTTHistograms::plotStack(std::string varName, std::string selName){
 
-  std::string hName = "h1D" + varName;
-
-  // SS selection
-  TH1F *hWJets = get1DHistogram((hName+"WJets"+"qcdselSS").c_str());
-  TH1F *hDYJets = get1DHistogram((hName+"DYJets"+"qcdselSS").c_str());
-  TH1F *hTTbar = get1DHistogram((hName+"TTbar"+"qcdselSS").c_str());
-  TH1F *hSoup = get1DHistogram((hName+"Data"+"qcdselSS").c_str());
-
-  std::cout << "Data SS integral: " <<  hSoup->Integral() << std::endl;
-  float lumi = getLumi();
-  ///Normalise MC histograms according to cross sections
-  std::string sampleName = "DYJets";
-  float weight = getSampleNormalisation(sampleName);
-  float scale = weight*lumi;
-  hDYJets->Scale(scale);
-
-  sampleName = "WJets";
-  float dataToMCScale = getWNormalisation("wselSS").first;
-  scale = getSampleNormalisation(sampleName)*lumi*dataToMCScale;
-  hWJets->Scale(scale);
-
-  sampleName = "TTbar";
-  weight = getSampleNormalisation(sampleName);
-  scale = weight*lumi;
-  hTTbar->Scale(scale);
-
-  // OS and SS without background
-  hSoup->SetName(("h1DQCDEstimate"+varName).c_str());
-  hSoup->Add(hWJets,-1);
-  hSoup->Add(hDYJets,-1);
-  hSoup->Add(hTTbar,-1);
-
-  // scale background FIXME: has to be computed.
-  scale = 1.06;
-  scale= 1.0;
-  hSoup->Scale(scale);
-
-  return hSoup;
-}
-/////////////////////////////////////////////////////////
-/////////////////////////////////////////////////////////
-THStack*  HTTHistograms::plotStack(std::string varName, int selType){
+  std::cout<<"--- Drawing THStack for variable: "<<varName
+	   <<" selection: "<<selName<<std::endl;
 
   std::string hName = "h1D"+varName;
-  TH1F *hWJets = get1DHistogram((hName+"WJets").c_str());
-  TH1F *hTTbar = get1DHistogram((hName+"TTbar").c_str());
-  TH1F *hDYJets = get1DHistogram((hName+"DYJets").c_str());   
-  TH1F *hSoup = get1DHistogram((hName+"Data").c_str());
-  TH1F *hQCD = (TH1F*)getQCDbackground(varName,0);        
+  TH1F *hWJets = get1DHistogram((hName+"WJets"+selName).c_str());
+  TH1F *hTTbar = get1DHistogram((hName+"TTbar"+selName).c_str());
+  TH1F *hDYJets = get1DHistogram((hName+"DYJets"+selName).c_str());   
+  TH1F *hSoup = get1DHistogram((hName+"Data"+selName).c_str());
+  TH1F *hQCD = (TH1F*)getQCDbackground(varName,selName);
+
+  ///Protection against null pointers
+  ///Null pointers happen when sample was not read, or there were no
+  ///events passing particular selection.
+  if(!hWJets){
+    hWJets = (TH1F*)hSoup->Clone((hName+"WJets"+selName).c_str()); hWJets->Reset();
+  }
+  if(!hDYJets){
+    hDYJets = (TH1F*)hSoup->Clone((hName+"hDYJets"+selName).c_str()); hDYJets->Reset();
+  }
+  if(!hTTbar){
+    hTTbar = (TH1F*)hSoup->Clone((hName+"hTTbar"+selName).c_str()); hDYJets->Reset();
+  }    
+  /////////////////////////////////////////////////////////////////
 
   float lumi = getLumi();
   ///Normalise MC histograms according to cross sections
+  ///We have separate WJets scaling factors for OS and SS regions.
+  ///Should we have more? Non isolated muons etc?
   std::string sampleName = "WJets";
   std::string WselType = "wselOS";
+  if(selName.find("SS")!=std::string::npos) WselType = "wselSS";
   float weight = getSampleNormalisation(sampleName);
   float dataToMCScale = getWNormalisation(WselType).first;
   float scale = weight*lumi*dataToMCScale;
@@ -335,7 +238,6 @@ THStack*  HTTHistograms::plotStack(std::string varName, int selType){
   scale = weight*lumi;
   hTTbar->Scale(scale);
   //////////////////////////////////////////////////////
-  
   hSoup->SetLineColor(1);
   hSoup->SetFillColor(1);
   hSoup->SetMarkerStyle(20);
@@ -347,18 +249,17 @@ THStack*  HTTHistograms::plotStack(std::string varName, int selType){
   hQCD->SetFillColor(kMagenta-10);
 
   hSoup->SetLineWidth(1);
-  int rebinFactor = 1;
-  
+  int rebinFactor = 1;  
   hSoup->Rebin(rebinFactor);
   hWJets->Rebin(rebinFactor);
   hTTbar->Rebin(rebinFactor);
   hDYJets->Rebin(rebinFactor);
-  
+
   THStack *hs = new THStack("hs","Stacked histograms");      
   /////////
   hs->Add(hQCD,"hist");
-  hs->Add(hWJets,"hist");
   hs->Add(hTTbar,"hist");
+  hs->Add(hWJets,"hist");
   hs->Add(hDYJets,"hist");
   ////////
   TH1F *hMCSum = (TH1F*)hWJets->Clone("hMCSum");
@@ -391,9 +292,12 @@ THStack*  HTTHistograms::plotStack(std::string varName, int selType){
   pad1->Draw();
   pad1->cd();
 
-  hs->SetTitle("");
+  if(!selName.size()) selName = "baseline";
+  hs->SetTitle(("Variable: "+varName+" selection: "+selName).c_str());
   hs->SetMaximum(4400);
   hs->Draw("hist");
+  hs->GetXaxis()->SetTitle(varName.c_str());
+  hs->GetYaxis()->SetTitleOffset(1.4);
   hMCSum->SetFillColor(5);
   /////////
   float highEnd = 150;
@@ -405,14 +309,10 @@ THStack*  HTTHistograms::plotStack(std::string varName, int selType){
   int binHigh = hs->GetXaxis()->FindBin(highEnd);  
   int binLow = hs->GetXaxis()->FindBin(lowEnd);
   hs->GetXaxis()->SetRange(binLow,binHigh);
- 
+
   char yTitle[200];
   sprintf(yTitle,"Events/%2.1f",hSoup->GetXaxis()->GetBinWidth(1));
   hs->GetYaxis()->SetTitle(yTitle);
-  hs->SetTitle("");
-
-  if(hName.find("MassSV")!=std::string::npos)
-    hs->GetXaxis()->SetTitle("SVFit mass [GeV/c^{2}]");
   
   float max = hs->GetMaximum();
   if(hSoup->GetMaximum()>max) max = hSoup->GetMaximum();
@@ -458,7 +358,6 @@ THStack*  HTTHistograms::plotStack(std::string varName, int selType){
   hMCSum->Add(hSoup,-1);
   for(int i=0;i<hMCSum->GetNbinsX()+1;++i){
     if(hSoup->GetBinContent(i)>0) hMCSum->SetBinContent(i,-hMCSum->GetBinContent(i)/sqrt(hSoup->GetBinContent(i)));
-    //if(hSoup->GetBinContent(i)>0) hMCSum->SetBinContent(i,-hMCSum->GetBinContent(i)/hSoup->GetBinContent(i)); //TEST
     else  hMCSum->SetBinContent(i,0);
     hMCSum->SetBinError(i,0);
   }
@@ -466,32 +365,34 @@ THStack*  HTTHistograms::plotStack(std::string varName, int selType){
   hMCSum->SetMinimum(-5);
   hMCSum->SetMaximum(5);
   hMCSum->SetStats(kFALSE);
-  hMCSum->Draw();
+  hMCSum->Draw("hist");
   TLine *aLine = new TLine(hMCSum->GetXaxis()->GetXmin(),0.0,highEnd,0.0);
   aLine->SetLineColor(1);
   aLine->SetLineWidth(2);
   aLine->Draw();
 
-
   string plotName;
+  if(!selName.size()) selName = "baseline";
   if(hName.find_last_of("/")<string::npos) plotName = "fig_png/" + hName.substr(hName.find_last_of("/")) + ".png";    
-  else plotName = "fig_png/hTree_"+hName+Form("_Sel%d",selType)+".png";
+  else plotName = "fig_png/hTree_"+hName+Form("_%s",selName.c_str())+".png";
   c1->Print(plotName.c_str());
 
   if(hName.find_last_of("/")<string::npos) plotName = "fig_C/" + hName.substr(hName.find_last_of("/")) + ".C";    
-  else plotName = "fig_C/hTree_"+hName+Form("_Sel%d",selType)+".C";
+  else plotName = "fig_C/hTree_"+hName+Form("_%s",selName.c_str())+".C";
   c1->Print(plotName.c_str()); 
 
   pad1->SetLogy(1);
   if(hName.find_last_of("/")<string::npos) plotName = "fig_png/" + hName.substr(hName.find_last_of("/")) + "_LogY.png";    
-  else plotName = "fig_png/hTree_"+hName+Form("_Sel%d",selType)+"_LogY.png";
+  else plotName = "fig_png/hTree_"+hName+Form("_%s",selName.c_str())+"_LogY.png";
   c1->Print(plotName.c_str()); 
+
+  std::cout<<"-------------------------------------------------------------"<<std::endl;
 
   return hs;
 }
 /////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////
-void HTTHistograms::plotAnyHistogram(const std::string & hName){
+void HTTHistograms::plotSingleHistogram(std::string hName){
   
   TCanvas* c = new TCanvas("AnyHistogram","AnyHistogram",			   
 			   460,500);
@@ -516,18 +417,149 @@ void HTTHistograms::plotAnyHistogram(const std::string & hName){
 }
 /////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////
-std::pair<float,float> HTTHistograms::getWNormalisation(const std::string & selType){
+std::pair<float,float> HTTHistograms::getQCDOStoSS(std::string selName){
 
-  std::string hName = "h1DMt";
-  TH1F *hWJets = get1DHistogram((hName+"WJets"+selType).c_str());
-  TH1F *hDYJets = get1DHistogram((hName+"DYJets"+selType).c_str());
-  TH1F *hTT = get1DHistogram((hName+"TTbar"+selType).c_str());
-  //TH1F *hOther = get1DHistogram((hName+"Other"+selType).c_str());
-  TH1F *hSoup = get1DHistogram((hName+"Data"+selType).c_str());
+  std::cout<<"Calling method: "<<__func__<<std::endl;
+
+  std::string hName = "h1DIso";
+
+  // SS selection
+  TH1F *hWJetsSS = get1DHistogram((hName+"WJets"+"qcdselSS").c_str());
+  TH1F *hDYJetsSS = get1DHistogram((hName+"DYJets"+"qcdselSS").c_str());
+  TH1F *hTTSS = get1DHistogram((hName+"TTbar"+"qcdselSS").c_str());
+  TH1F *hSoupSS = get1DHistogram((hName+"Data"+"qcdselSS").c_str());
+  TH1F *hSoupSSb = get1DHistogram((hName+"Data"+"qcdselSS").c_str());
+  // OS selection
+  TH1F *hWJetsOS = get1DHistogram((hName+"WJets"+"qcdselOS").c_str());
+  TH1F *hDYJetsOS = get1DHistogram((hName+"DYJets"+"qcdselOS").c_str());
+  TH1F *hTTOS = get1DHistogram((hName+"TTbar"+"qcdselOS").c_str());
+  TH1F *hSoupOS = get1DHistogram((hName+"Data"+"qcdselOS").c_str());
+  TH1F *hSoupOSb = get1DHistogram((hName+"Data"+"qcdselOS").c_str());
+
+  float lumi = getLumi();
+  ///Normalise MC histograms according to cross sections
+  std::string sampleName = "DYJets";
+  float weight = getSampleNormalisation(sampleName);
+  float scale = weight*lumi;
+  hDYJetsOS->Scale(scale);
+  hDYJetsSS->Scale(scale);
+  
+  sampleName = "WJets";
+  scale = getSampleNormalisation(sampleName);
+  hWJetsOS->Scale(scale*getWNormalisation("wselOS").first);
+  hWJetsSS->Scale(scale*getWNormalisation("wselSS").first);
+  
+  sampleName = "TTbar";
+  weight = getSampleNormalisation(sampleName);
+  scale = weight*lumi;
+  hTTOS->Scale(scale);
+  hTTSS->Scale(scale);
+ 
+  ///Subtract backgrounds other than QCD using MC
+  hSoupSS->Add(hWJetsSS,-1);
+  hSoupSS->Add(hDYJetsSS,-1);
+  hSoupSS->Add(hTTSS,-1);
+  
+  hSoupOS->Add(hWJetsOS,-1);
+  hSoupOS->Add(hDYJetsOS,-1);
+  hSoupOS->Add(hTTOS,-1);
+  
+  hSoupOS->Divide(hSoupSS);
+
+  //funtion fitting
+  TF1 *line=new TF1("line","[0]",0.3,0.5);
+  line->SetParameter(0,1);
+  TCanvas* c = new TCanvas("QCD_OStoSS","QCD_OStoSS",460,500);
+  hSoupOS->SetLineWidth(3);
+  hSoupOS->GetYaxis()->SetTitleOffset(1.4);
+  hSoupOS->GetYaxis()->SetTitle("OS/SS");
+  hSoupOS->GetXaxis()->SetTitle("muon relative isolation");
+  gStyle->SetOptStat(11);
+  gStyle->SetOptFit(11);
+  hSoupOS->Draw();
+  hSoupOS->Fit("line","","",0.4,1.8);
+  c->Print(TString::Format("fig_png/%s.png",hName.c_str()).Data());
+  c->Print(TString::Format("fig_C/%s.C",hName.c_str()).Data());
+
+  float param, dparam;
+  param=line->GetParameter(0);
+  dparam=line->GetParError(0);
+
+  std::cout<<"QCD OS/SS ratio: "<<param<<" +- "<<dparam<<std::endl;
+
+  return std::make_pair(param, dparam);
+}
+/////////////////////////////////////////////////////////
+/////////////////////////////////////////////////////////
+TH1F* HTTHistograms::getQCDbackground(std::string varName, std::string selName){
+
+  std::cout<<"Calling method: "<<__func__<<std::endl;
+
+  std::string hName = "h1D" + varName;
+  selName = "";////HACK!!!
+
+  // SS selection
+  TH1F *hWJets = get1DHistogram((hName+"WJets"+"qcdselSS"+selName).c_str());
+  TH1F *hDYJets = get1DHistogram((hName+"DYJets"+"qcdselSS"+selName).c_str());
+  TH1F *hTTbar = get1DHistogram((hName+"TTbar"+"qcdselSS"+selName).c_str());
+  TH1F *hSoup = get1DHistogram((hName+"Data"+"qcdselSS"+selName).c_str());
+
+  ///Protection against null pointers
+  ///Null pointers happen when sample was not read, or there were no
+  ///events passing particular selection.
+  if(!hWJets){
+    hWJets = (TH1F*)hSoup->Clone((hName+"WJets"+"qcdselSS").c_str()); hWJets->Reset();
+  }
+  if(!hDYJets){
+    hDYJets = (TH1F*)hSoup->Clone((hName+"hDYJets"+"qcdselSS").c_str()); hDYJets->Reset();
+  }
+  if(!hTTbar){
+    hTTbar = (TH1F*)hSoup->Clone((hName+"hTTbar"+"qcdselSS").c_str()); hDYJets->Reset();
+  }
+  //////////////////////////////////////////////////////////////////////
+  float lumi = getLumi();
+  ///Normalise MC histograms according to cross sections
+  std::string sampleName = "DYJets";
+  float weight = getSampleNormalisation(sampleName);
+  float scale = weight*lumi;
+  hDYJets->Scale(scale);
+
+  sampleName = "WJets";
+  float dataToMCScale = getWNormalisation("wselSS").first;
+  scale = getSampleNormalisation(sampleName)*lumi*dataToMCScale;
+  hWJets->Scale(scale);
+
+  sampleName = "TTbar";
+  weight = getSampleNormalisation(sampleName);
+  scale = weight*lumi;
+  hTTbar->Scale(scale);
+
+  hSoup->SetName(("h1DQCDEstimate"+varName).c_str());
+  hSoup->Add(hWJets,-1);
+  hSoup->Add(hDYJets,-1);
+  hSoup->Add(hTTbar,-1);
+
+  scale = getQCDOStoSS(selName).first;
+  hSoup->Scale(scale);
+
+  return hSoup;
+}
+/////////////////////////////////////////////////////////
+/////////////////////////////////////////////////////////
+std::pair<float,float> HTTHistograms::getWNormalisation(std::string selName){
+
+  std::cout<<"Calling method: "<<__func__<<std::endl;
+
+  std::string hName = "h1DMassTrans";
+  TH1F *hWJets = get1DHistogram((hName+"WJets"+selName).c_str());
+  TH1F *hDYJets = get1DHistogram((hName+"DYJets"+selName).c_str());
+  TH1F *hTT = get1DHistogram((hName+"TTbar"+selName).c_str());
+  //TH1F *hOther = get1DHistogram((hName+"Other"+selName).c_str());
+  TH1F *hSoup = get1DHistogram((hName+"Data"+selName).c_str());
   float lumi = getLumi();
   /* TEST 
-  TH1F *hDYJets = get1DHistogram((hName+"WJets"+selType).c_str());
-  TH1F *hTT = get1DHistogram((hName+"WJets"+selType).c_str());
+  TH1F *hDYJets = get1DHistogram((hName+"WJets"+selName).c_str());
+  TH1F *hTT = get1DHistogram((hName+"WJets"+selName).c_str());
   hDYJets->Reset();
   hTT->Reset();
   */
@@ -567,9 +599,9 @@ std::pair<float,float> HTTHistograms::getWNormalisation(const std::string & selT
   float inthOther = 0;//hOther->Integral(0,hOther->GetNbinsX()+1);
   dweight=((inthSoup+inthDYJets+inthTT+inthOther)/inthWJets/inthWJets+intdata*intdata/(inthWJets*inthWJets*inthWJets));
   dweight=sqrt(dweight);
-  cout<<"Selectino type: "<<selType<<std::endl;
-  cout<<"DATA: "<<inthSoup<<" DYJets: "<<inthDYJets<<" TTbar: "<<inthTT<<" Other: "<<inthOther<<endl;
-  cout<<"MC WJets "<<inthWJets<<endl;
+  cout<<"Selecion name: "<<selName<<std::endl;
+  cout<<"DATA: "<<inthSoup<<" DATA - MC(!WJets): "<<intdata<<" MC WJets "<<inthWJets
+      <<" DYJets: "<<inthDYJets<<" TTbar: "<<inthTT<<" Other: "<<inthOther<<endl;
   cout<<"WJets scale:"<<weight<<" dweight "<<dweight<<endl;
   return std::make_pair(weight, dweight);
 }

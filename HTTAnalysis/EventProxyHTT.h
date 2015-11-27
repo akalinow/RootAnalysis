@@ -24,7 +24,8 @@
       std::vector<Wpair>  *wpair;
       std::vector<Wtau>  *wtau;
       std::vector<Wmu>  *wmu;
-
+      std::vector<Wjet>  *wjet;
+  
       ///Enable branches to be read
       void enableBranches();
 

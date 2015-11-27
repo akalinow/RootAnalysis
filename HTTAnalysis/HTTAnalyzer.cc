@@ -97,6 +97,7 @@ float HTTAnalyzer::getGenWeight(const EventProxyHTT & myEventProxy){
 //////////////////////////////////////////////////////////////////////////////
 void HTTAnalyzer::fillControlHistos(Wevent & aEvent, 
 				    Wpair & aPair, Wtau & aTau, Wmu & aMuon,
+				    Wjet & aJet,
 				    float eventWeight,
 				    const std::string & hNameSuffix){
 
@@ -119,7 +120,10 @@ void HTTAnalyzer::fillControlHistos(Wevent & aEvent,
   myHistos_->fill1DHistogram("h1DIsoMuon"+hNameSuffix,aMuon.iso(),eventWeight);
   myHistos_->fill1DHistogram("h1DPhiMuon"+hNameSuffix,  aMuon.phi(),eventWeight);
   myHistos_->fill1DHistogram("h1DPhiTau"+hNameSuffix, aTau.phi() ,eventWeight);
-  myHistos_->fill1DHistogram("h1DMtTau"+hNameSuffix,  aTau.mt() ,eventWeight);
+
+  ///Fill jets info
+  myHistos_->fill1DHistogram("h1DPtLeadingJet"+hNameSuffix,aJet.pt(),eventWeight);
+  if(aJet.bjet()) myHistos_->fill1DHistogram("h1DPtLeadingBJet"+hNameSuffix,aJet.pt(),eventWeight);
 
 }
 //////////////////////////////////////////////////////////////////////////////
@@ -146,65 +150,66 @@ bool HTTAnalyzer::analyze(const EventProxyBase& iEvent){
   ///behaviour may change.
   EventProxyHTT & myEventProxyMod = const_cast<EventProxyHTT&>(myEventProxy);
   if(myEventProxy.wpair->size()){
-    //myEventProxyMod.enableBranches();
-    //myEventProxyMod.reloadEvent();
-
-    Wpair aPair = (*myEventProxy.wpair)[0];
-    /*
-    std::cout<<"Muon pt: "<<(*myEventProxy.wmu)[0].pt()<<std::endl;
-    std::cout<<"Muon mt: "<<(*myEventProxy.wmu)[0].mt()<<std::endl;
-    std::cout<<"Muon iso: "<<(*myEventProxy.wmu)[0].iso()<<std::endl;
-    std::cout<<"Tau pt: "<<(*myEventProxy.wtau)[0].pt()<<std::endl;
-    std::cout<<"SVfit pt: "<<(*myEventProxy.wpair)[0].svfit()<<std::endl;
-    std::cout<<"charge: "<<(*myEventProxy.wpair)[0].diq()<<std::endl;
-    */
+    myEventProxyMod.enableBranches();
+    myEventProxyMod.reloadEvent();
   }  
+  /////////////////////////////////////////////////////////////////////////////
+
+
   if(!myEventProxy.wpair->size() || !myEventProxy.wtau->size() || !myEventProxy.wmu->size()) return true;
 
   Wevent aEvent = *myEventProxy.wevent;
   Wpair aPair = (*myEventProxy.wpair)[0];
   Wtau aTau = (*myEventProxy.wtau)[0];
   Wmu aMuon = (*myEventProxy.wmu)[0];
+  Wjet aJet;
+  if(!myEventProxy.wjet->size()) aJet = (*myEventProxy.wjet)[0];
 
   ///This stands for core selection, that is common to all regions.
   if(!myEventProxy.wpair->size() || aTau.pt()<30 || aMuon.pt()<20) return true;
 
   bool baselineSelection = aPair.diq()==-1 && aMuon.mt()<400 && aMuon.iso()<0.1;
   bool wSelection = aMuon.mt()>60 && aMuon.iso()<0.1;
-  bool qcdSelectionSS = aPair.diq()==1 && aMuon.mt()<400 && aMuon.iso()<0.1;
-  bool qcdSelectionOS = aPair.diq()==-1 && aMuon.mt()<400 && aMuon.iso()<0.1;
+  bool qcdSelectionSS = aPair.diq()==1 && aMuon.mt()<400;
+  bool qcdSelectionOS = aPair.diq()==-1 && aMuon.mt()<400;
 
   ///Histograms for the baseline selection  
   std::string hNameSuffix = sampleName;
-  if(baselineSelection) fillControlHistos(aEvent, aPair, aTau, aMuon, eventWeight, hNameSuffix);
+  if(baselineSelection) fillControlHistos(aEvent, aPair, aTau, aMuon, aJet, eventWeight, hNameSuffix);
 
   ///Histograms for the QCD control region
   if(qcdSelectionSS){
     hNameSuffix = sampleName+"qcdselSS";
     myHistos_->fill1DHistogram("h1DIso"+hNameSuffix,aMuon.iso(),eventWeight);
+
     ///Fill SS histos in signal mu isolation region. Those histograms
     ///provide shapes for QCD estimate in signal region.
-    if(aMuon.iso()) fillControlHistos(aEvent, aPair, aTau, aMuon, eventWeight, hNameSuffix);
+    if(aMuon.iso()<0.1) fillControlHistos(aEvent, aPair, aTau, aMuon, aJet, eventWeight, hNameSuffix);
   }
+  ///Make QCD shape histograms for specific selection.
+  ///Using the same SS/OS scaling factor for now.    
+  hNameSuffix = sampleName+"qcdselSS";
+  //if(wSelection && aPair.diq()==1) myHistos_->fill1DHistogram("h1DMassTrans"+hNameSuffix+"wselOS",aMuon.mt(),eventWeight); 
 
   if(qcdSelectionOS){
     hNameSuffix = sampleName+"qcdselOS";
     myHistos_->fill1DHistogram("h1DIso"+hNameSuffix,aMuon.iso(),eventWeight);
-    fillControlHistos(aEvent, aPair, aTau, aMuon, eventWeight, hNameSuffix);
   }
 
-  ///Histograms for the WJet control region. Selection is split into SS and OS regions.
+  ///Histograms for the WJet control region. 
+  ///Selection is split into SS and OS regions.
   if(wSelection){
     hNameSuffix = sampleName+"wsel";
-    if(aPair.diq()==-1) myHistos_->fill1DHistogram("h1DMt"+hNameSuffix+"OS",aMuon.mt(),eventWeight);
-    if(aPair.diq()== 1) myHistos_->fill1DHistogram("h1DMt"+hNameSuffix+"SS",aMuon.mt(),eventWeight);
+    if(aPair.diq()==-1) myHistos_->fill1DHistogram("h1DMassTrans"+hNameSuffix+"OS",aMuon.mt(),eventWeight);
+    if(aPair.diq()== 1) myHistos_->fill1DHistogram("h1DMassTrans"+hNameSuffix+"SS",aMuon.mt(),eventWeight);
+
   }
 
   ///Histograms for the tt control region
 
 
   ///Disable branches before loading next event.
-  //myEventProxyMod.disableBranches();
+  myEventProxyMod.disableBranches();
   
   return true;
 }

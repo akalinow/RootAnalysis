@@ -35,20 +35,19 @@ class HTTHistograms: public AnalysisHistograms {
   ///luminosity and cross section.
   ///MC to DATA scaling factors should be applied
   ///on top of this normalisation.
-  float getSampleNormalisation(const std::string & sampleName);
-
+  float getSampleNormalisation(std::string sampleName);
 
   ///Estimate QCD background using the SS/OS method.
-  TH1* getQCDbackground(std::string, int);
+  TH1F* getQCDbackground(std::string varName, std::string selName);
 
   ///Calculate scaling factor for the WJets MC
   ///SCaling factor is estimated in high Mt region.
   ///Other backgrounds are subtracted, basing on MC
   ///QCD contribution is neglected.
-  std::pair<float,float> getWNormalisation(const std::string & selType);
+  std::pair<float,float> getWNormalisation(std::string selName);
 
   ///Calculate QCD OS/SS ratiousing non isolated events.
-  std::pair<float,float> getQCDOStoSS(int selType);
+  std::pair<float,float> getQCDOStoSS(std::string selName);
 
    private:
   
@@ -59,12 +58,12 @@ class HTTHistograms: public AnalysisHistograms {
 
   //Plot stacked histograms for each contributing process.
   //varName - name of variable to be plotted,
-  //selType - selection type, i.e. baseline, background estimation, etc.
-  THStack* plotStack(std::string varName, int selType);
+  //selName - selection type name. For baseline use empty string
+  THStack* plotStack(std::string varName, std::string selName);
 
   //Plot a single histogram. One has to provide the full
   //histogram name, e.g. including h1D prefix.
-  void plotAnyHistogram(const std::string & hName);
+  void plotSingleHistogram(std::string hName);
 
 
 };
