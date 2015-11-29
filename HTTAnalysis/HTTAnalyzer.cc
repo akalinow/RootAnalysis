@@ -123,7 +123,12 @@ void HTTAnalyzer::fillControlHistos(Wevent & aEvent,
 
   ///Fill jets info
   myHistos_->fill1DHistogram("h1DPtLeadingJet"+hNameSuffix,aJet.pt(),eventWeight);
-  if(aJet.bjet()) myHistos_->fill1DHistogram("h1DPtLeadingBJet"+hNameSuffix,aJet.pt(),eventWeight);
+  myHistos_->fill1DHistogram("h1DEtaLeadingJet"+hNameSuffix,aJet.eta(),eventWeight);
+
+  if(aJet.bjet()){
+    myHistos_->fill1DHistogram("h1DPtLeadingBJet"+hNameSuffix,aJet.pt(),eventWeight);
+    myHistos_->fill1DHistogram("h1DEtaLeadingBJet"+hNameSuffix,aJet.pt(),eventWeight);
+  }
 
 }
 //////////////////////////////////////////////////////////////////////////////
@@ -136,9 +141,6 @@ bool HTTAnalyzer::analyze(const EventProxyBase& iEvent){
   std::string sampleName = getSampleName(myEventProxy);  
   float puWeight = getPUWeight(myEventProxy);
   float genWeight = getGenWeight(myEventProxy);
-
-  //puWeight = 1.0;
-  //genWeight = 1.0;
   float eventWeight = puWeight*genWeight;
    
   //Fill bookkeeping histogram. Bin 1 holds sum of weights.
@@ -166,12 +168,15 @@ bool HTTAnalyzer::analyze(const EventProxyBase& iEvent){
   if(!myEventProxy.wjet->size()) aJet = (*myEventProxy.wjet)[0];
 
   ///This stands for core selection, that is common to all regions.
-  if(!myEventProxy.wpair->size() || aTau.pt()<30 || aMuon.pt()<20) return true;
+  //TEST if(!myEventProxy.wpair->size() || aTau.pt()<30 || aMuon.pt()<20) return true;
+  if(!myEventProxy.wpair->size() || aTau.pt()<25 || aMuon.pt()<20) return true;
 
-  bool baselineSelection = aPair.diq()==-1 && aMuon.mt()<400 && aMuon.iso()<0.1;
+  ///Note: parts of the signal/control region selection are applied in the following code.
+  ///FIXME AK: this should be made in a more clear way.
+  bool baselineSelection = aPair.diq()==-1 && aMuon.mt()<40 && aMuon.iso()<0.1;
   bool wSelection = aMuon.mt()>60 && aMuon.iso()<0.1;
-  bool qcdSelectionSS = aPair.diq()==1 && aMuon.mt()<400;
-  bool qcdSelectionOS = aPair.diq()==-1 && aMuon.mt()<400;
+  bool qcdSelectionSS = aPair.diq()==1;
+  bool qcdSelectionOS = aPair.diq()==-1;
 
   ///Histograms for the baseline selection  
   std::string hNameSuffix = sampleName;
@@ -180,20 +185,23 @@ bool HTTAnalyzer::analyze(const EventProxyBase& iEvent){
   ///Histograms for the QCD control region
   if(qcdSelectionSS){
     hNameSuffix = sampleName+"qcdselSS";
-    myHistos_->fill1DHistogram("h1DIso"+hNameSuffix,aMuon.iso(),eventWeight);
-
+    ///SS ans OS isolation histograms are filled only for mT<40 to remove possible contamnation
+    //from TT in high mT region.
+    if(aMuon.mt()<40) myHistos_->fill1DHistogram("h1DIso"+hNameSuffix,aMuon.iso(),eventWeight);
     ///Fill SS histos in signal mu isolation region. Those histograms
-    ///provide shapes for QCD estimate in signal region.
-    if(aMuon.iso()<0.1) fillControlHistos(aEvent, aPair, aTau, aMuon, aJet, eventWeight, hNameSuffix);
+    ///provide shapes for QCD estimate in signal region and in various control regions.
+    ///If control region has OS we still use SS QCD estimate.
+    if(aMuon.mt()<40 && aMuon.iso()<0.1) fillControlHistos(aEvent, aPair, aTau, aMuon, aJet, eventWeight, hNameSuffix);
+    if(aMuon.mt()>60){
+      myHistos_->fill1DHistogram("h1DMassTrans"+hNameSuffix+"wselSS",aMuon.mt(),eventWeight);    
+      myHistos_->fill1DHistogram("h1DMassTrans"+hNameSuffix+"wselOS",aMuon.mt(),eventWeight);    
+    }
   }
   ///Make QCD shape histograms for specific selection.
   ///Using the same SS/OS scaling factor for now.    
-  hNameSuffix = sampleName+"qcdselSS";
-  //if(wSelection && aPair.diq()==1) myHistos_->fill1DHistogram("h1DMassTrans"+hNameSuffix+"wselOS",aMuon.mt(),eventWeight); 
-
   if(qcdSelectionOS){
     hNameSuffix = sampleName+"qcdselOS";
-    myHistos_->fill1DHistogram("h1DIso"+hNameSuffix,aMuon.iso(),eventWeight);
+    if(aMuon.mt()<40) myHistos_->fill1DHistogram("h1DIso"+hNameSuffix,aMuon.iso(),eventWeight);
   }
 
   ///Histograms for the WJet control region. 
@@ -202,7 +210,6 @@ bool HTTAnalyzer::analyze(const EventProxyBase& iEvent){
     hNameSuffix = sampleName+"wsel";
     if(aPair.diq()==-1) myHistos_->fill1DHistogram("h1DMassTrans"+hNameSuffix+"OS",aMuon.mt(),eventWeight);
     if(aPair.diq()== 1) myHistos_->fill1DHistogram("h1DMassTrans"+hNameSuffix+"SS",aMuon.mt(),eventWeight);
-
   }
 
   ///Histograms for the tt control region

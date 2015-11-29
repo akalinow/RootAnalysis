@@ -114,11 +114,23 @@ bool HTTHistograms::fill1DHistogram(const std::string& name, float val, float we
     if(name.find("h1DIso")!=std::string::npos) hTemplateName = "h1DIsoTemplate";
     if(name.find("h1DPhi")!=std::string::npos) hTemplateName = "h1DPhiTemplate";
     std::cout<<"fill1DHistogram Adding histogram: "<<name<<" "<<file_<<" "<<file_->fullPath()<<std::endl;
-    this->add1DHistogram(name,"",
-			 this->get1DHistogram(hTemplateName,true)->GetNbinsX(),
-			 this->get1DHistogram(hTemplateName,true)->GetXaxis()->GetXmin(),
-			 this->get1DHistogram(hTemplateName,true)->GetXaxis()->GetXmax(),
-			 file_);
+    
+    if(get1DHistogram(hTemplateName,true)->GetXaxis()->IsVariableBinSize()){
+      Float_t* binsArray = new Float_t[this->get1DHistogram(hTemplateName,true)->GetNbinsX()+1];
+      for(unsigned int iBin=0;iBin<=this->get1DHistogram(hTemplateName,true)->GetNbinsX();++iBin){
+	binsArray[iBin] = this->get1DHistogram(hTemplateName,true)->GetXaxis()->GetXbins()->At(iBin);
+      }
+      this->add1DHistogram(name,"",this->get1DHistogram(hTemplateName,true)->GetNbinsX(),
+			   binsArray, file_);
+      delete binsArray;      
+    }
+    else{
+      this->add1DHistogram(name,"",
+			   this->get1DHistogram(hTemplateName,true)->GetNbinsX(),
+			   this->get1DHistogram(hTemplateName,true)->GetXaxis()->GetXmin(),
+			   this->get1DHistogram(hTemplateName,true)->GetXaxis()->GetXmax(),
+			   file_);
+    }   
     return AnalysisHistograms::fill1DHistogram(name,val,weight);
   }
   return true;
@@ -137,8 +149,11 @@ void HTTHistograms::defineHistograms(){
    add1DHistogram("h1DMassTemplate",";SVFit mass [GeV/c^{2}]; Events",50,0,200,file_);
    add1DHistogram("h1DPtTemplate",";p_{T}; Events",20,0,100,file_);
    add1DHistogram("h1DEtaTemplate",";#eta; Events",24,-2.4,2.4,file_);
-   add1DHistogram("h1DIsoTemplate",";Isolation; Events",20,0,2,file_);
    add1DHistogram("h1DPhiTemplate",";#phi; Events",30,-3,3,file_);
+   ///Muon isolation histograms has uneven binning.
+   //add1DHistogram("h1DIsoTemplate",";Isolation; Events",10,0,2,file_);
+   float bins[13] = {0, 0.02, 0.04, 0.06, 0.08, 0.1, 0.2, 0.3, 0.4, 0.8, 1.2, 1.6, 2.0};
+   add1DHistogram("h1DIsoTemplate",";Isolation; Events",12,bins,file_);
    histosInitialized_ = true;
  }
 }
@@ -146,34 +161,27 @@ void HTTHistograms::defineHistograms(){
 /////////////////////////////////////////////////////////
 void HTTHistograms::finalizeHistograms(int nRuns, float weight){
 
+  ///TEST
+  /*  
+  plotStack("MassTrans","wselOS");  
+  plotStack("MassTrans","wselSS");  
   plotStack("MassTrans","");
-  plotStack("MassTrans","wselOS");
+  return;
+  */
 
-  plotStack("PtLeadingJet","");
-  plotStack("PtLeadingBJet","");
-
+  ///Control regions plots
   plotStack("Iso","qcdselOS");
   plotStack("Iso","qcdselSS");
-  return;
+  plotStack("MassTrans","wselOS");  
+  plotStack("MassTrans","wselSS");  
 
-  plotStack("Iso","qcdselOS");
-  plotStack("Iso","qcdselSS");
-  plotStack("MassVis","");  
-  return;
-
-  plotStack("MassVis","wsel");  
-
-  //getWNormalisation("wselOS");
-  //getWNormalisation("wselSS");
-  //plotSingleHistogram("h1DMtTauWJets");
-  //return;
-
+  ///Baseline selection plots
   plotStack("NPV","");
 
   plotStack("MassSV","");
   plotStack("MassVis","");  
   plotStack("MassTrans","");
-  
+
   plotStack("PtMuon","");
   plotStack("EtaMuon","");
   plotStack("IsoMuon","");
@@ -185,7 +193,10 @@ void HTTHistograms::finalizeHistograms(int nRuns, float weight){
   plotStack("PhiTau","");
 
   plotStack("PtLeadingJet","");
+  plotStack("EtaLeadingJet","");
+
   plotStack("PtLeadingBJet","");
+  plotStack("EtaLeadingBJet","");
 
 }
 /////////////////////////////////////////////////////////
@@ -200,6 +211,7 @@ THStack*  HTTHistograms::plotStack(std::string varName, std::string selName){
   TH1F *hTTbar = get1DHistogram((hName+"TTbar"+selName).c_str());
   TH1F *hDYJets = get1DHistogram((hName+"DYJets"+selName).c_str());   
   TH1F *hSoup = get1DHistogram((hName+"Data"+selName).c_str());
+  pair<float,float> qcdOStoSS = getQCDOStoSS(selName);
   TH1F *hQCD = (TH1F*)getQCDbackground(varName,selName);
 
   ///Protection against null pointers
@@ -223,9 +235,9 @@ THStack*  HTTHistograms::plotStack(std::string varName, std::string selName){
   std::string sampleName = "WJets";
   std::string WselType = "wselOS";
   if(selName.find("SS")!=std::string::npos) WselType = "wselSS";
+  pair<float,float> dataToMCScale = getWNormalisation(WselType);
   float weight = getSampleNormalisation(sampleName);
-  float dataToMCScale = getWNormalisation(WselType).first;
-  float scale = weight*lumi*dataToMCScale;
+  float scale = weight*lumi*dataToMCScale.first;
   hWJets->Scale(scale);
 
   sampleName = "DYJets";
@@ -269,12 +281,18 @@ THStack*  HTTHistograms::plotStack(std::string varName, std::string selName){
   hMCSum->Add(hTTbar);
   hMCSum->Add(hQCD);
 
+  if(!selName.size()) selName = "baseline";
+  cout<<"Event count summary for selecion name: "<<selName<<std::endl;
   std::cout<<"Data: "<<hSoup->Integral(0,hSoup->GetNbinsX()+1)<<std::endl;
   std::cout<<"MC: "<<hMCSum->Integral(0,hMCSum->GetNbinsX()+1)<<std::endl;  
   std::cout<<"MC W->l: "<<hWJets->Integral(0,hWJets->GetNbinsX()+1)<<std::endl;
   std::cout<<"MC TTbar: "<<hTTbar->Integral(0,hTTbar->GetNbinsX()+1)<<std::endl;
   std::cout<<"MC Z->ll: "<<hDYJets->Integral(0,hDYJets->GetNbinsX()+1)<<std::endl;  
   std::cout<<"QCD: "<<hQCD->Integral(0,hQCD->GetNbinsX()+1)<<std::endl; 
+  std::cout<<"Correction factors:"<<std::endl;
+  std::cout<<"QCD SS to OS: "<<qcdOStoSS.first<<" +- "<<qcdOStoSS.second<<std::endl;
+  std::cout<<"W DATA to MC: "<<dataToMCScale.first<<" +- "<<dataToMCScale.second<<std::endl;
+  std::cout<<"----------------------------------------"<<std::endl;
 
   TCanvas *c1 = getDefaultCanvas();
   c1->SetName("c1");
@@ -302,12 +320,13 @@ THStack*  HTTHistograms::plotStack(std::string varName, std::string selName){
   /////////
   float highEnd = 150;
   float lowEnd = -150;
-  
-  if(hs->GetXaxis()->GetXmax()<highEnd) highEnd = hs->GetXaxis()->GetXmax();
-  if(hs->GetXaxis()->GetXmin()>lowEnd) lowEnd = hs->GetXaxis()->GetXmin();
- 
+
   int binHigh = hs->GetXaxis()->FindBin(highEnd);  
   int binLow = hs->GetXaxis()->FindBin(lowEnd);
+
+  if(hs->GetXaxis()->GetXmax()<highEnd) binHigh = hs->GetXaxis()->GetNbins();
+  if(hs->GetXaxis()->GetXmin()>lowEnd) lowEnd = 1;
+
   hs->GetXaxis()->SetRange(binLow,binHigh);
 
   char yTitle[200];
@@ -372,7 +391,6 @@ THStack*  HTTHistograms::plotStack(std::string varName, std::string selName){
   aLine->Draw();
 
   string plotName;
-  if(!selName.size()) selName = "baseline";
   if(hName.find_last_of("/")<string::npos) plotName = "fig_png/" + hName.substr(hName.find_last_of("/")) + ".png";    
   else plotName = "fig_png/hTree_"+hName+Form("_%s",selName.c_str())+".png";
   c1->Print(plotName.c_str());
@@ -495,9 +513,12 @@ TH1F* HTTHistograms::getQCDbackground(std::string varName, std::string selName){
 
   std::cout<<"Calling method: "<<__func__<<std::endl;
 
-  std::string hName = "h1D" + varName;
-  selName = "";////HACK!!!
+  ///Not very clear and elegant. AK
+  ///Need this to avoid resursive control region labels like
+  ///qcdselSSqcdselOS
+  if(selName.find("qcdsel")!=std::string::npos) selName = "";
 
+  std::string hName = "h1D" + varName;
   // SS selection
   TH1F *hWJets = get1DHistogram((hName+"WJets"+"qcdselSS"+selName).c_str());
   TH1F *hDYJets = get1DHistogram((hName+"DYJets"+"qcdselSS"+selName).c_str());
