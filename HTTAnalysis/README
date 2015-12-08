@@ -9,21 +9,6 @@ autoconf
 make -j 4
 cd HTTAnalysis
 
-#NOTE: File htt.ini files contain paths to the data files. Please update it before running the code.
-#Running the analysis requires three steps:
-# 1) - making histograms with observed number of primary vertices.
-#     Steps 1) and 2) are expectedd to be run only once, when new data files are produced.
-#     for this one has to set. Before this please remove old ROOT files:
-
-rm -f RootAnalysis*
-
-#
-#processName = PU
-#
-# in htt.iti
-
-./test htt.ini #this creates histograms with observed PU
-
 # 2) Make the event weights tree. This TTree has lenght equal to sum of lenghts of
 # input TTrees, so in particular order of tress in htt.ini is RELEVANT.
 #To run this step one has to set
