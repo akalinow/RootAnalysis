@@ -169,7 +169,7 @@ bool HTTAnalyzer::analyze(const EventProxyBase& iEvent){
 
   ///This stands for core selection, that is common to all regions.
   //TEST if(!myEventProxy.wpair->size() || aTau.pt()<30 || aMuon.pt()<20) return true;
-  if(!myEventProxy.wpair->size() || aTau.pt()<25 || aMuon.pt()<20) return true;
+  if(!myEventProxy.wpair->size() || aTau.pt()<20 || aMuon.pt()<19 || fabs(aMuon.eta())>2.1 || fabs(aMuon.isMediumMuon())!=1 || fabs(aMuon.dz())>0.2 || fabs(aMuon.d0())>0.045 || fabs(aTau.eta())>2.3) return true; // || aTau.tauID()<0.5 ;
 
   ///Note: parts of the signal/control region selection are applied in the following code.
   ///FIXME AK: this should be made in a more clear way.
