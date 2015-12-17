@@ -31,7 +31,13 @@
       
       virtual bool atEnd() const;
 
+      ///Reload current event. Can be used if
+      ///some tree branches are enebled/disabled
+      ///en event by event basis.
+      void reloadEvent();
+
       bool isValid() const;
+
       operator bool() const;
       void skip(int n);
       TFile* getTFile() const;

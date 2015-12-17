@@ -1,5 +1,7 @@
 #include "EventProxyHTT.h"
 
+#include "TSystem.h"
+
 #include <iostream>
 
 EventProxyHTT::EventProxyHTT(){}
@@ -21,46 +23,48 @@ void EventProxyHTT::init(std::vector<std::string> const& iFileNames){
 
 	EventProxyBase::init(iFileNames);
 	fChain->SetMakeClass(0);
-	/*
-	///Add weight friend TTree
-	bool hasWeightFile = false;	
-	TFile *file = new TFile("RootAnalysis_Weights.root","READ");
-	TTree *treeWeights;
-	if(file->IsOpen() && file->FindObjectAny("tree")){
-	  treeWeights = (TTree*)file->Get("Summary/tree");
-	  //fChain->AddFriend(treeWeights);
-	  fChain->AddFriend("Summary/tree","RootAnalysis_Weights.root");
-	  hasWeightFile = true;
-	}
-	*/	
-	//////////		
-	puWeight = 1;
-	
+
 	wevent = 0;//IMPORTNANT!!
 	wpair = 0;//IMPORTNANT!!
 	wtau = 0;//IMPORTNANT!!
 	wmu = 0;//IMPORTNANT!!
-
+	wjet = 0;//IMPORTNANT!!
 	
-	//if(hasWeightFile) fChain->SetBranchAddress("PUWeight",&puWeight);	
-	fChain->SetBranchAddress("wevent",&wevent);	
+	fChain->SetBranchAddress("wevent",&wevent);
 	fChain->SetBranchAddress("wpair",&wpair);
 	fChain->SetBranchAddress("wtau",&wtau);
 	fChain->SetBranchAddress("wmu",&wmu);
-	
+	fChain->SetBranchAddress("wjet",&wjet);
 	
 	fChain->SetBranchStatus("*",1);
-	//fChain->SetBranchStatus("PUWeight",1);			  
-	//fChain->SetBranchStatus("wevent",1);
-	fChain->SetBranchStatus("sample_",1);
-	fChain->SetBranchStatus("genevtweight_",1);
-	fChain->SetBranchStatus("npv_",1);
-	fChain->SetBranchStatus("wevent",1);
-	fChain->SetBranchStatus("wpair",1);
-	fChain->SetBranchStatus("wtau",1);
-	fChain->SetBranchStatus("wmu",1);
-	
-	
+
+}
+/////////////////////////////////////////////////////////
+/////////////////////////////////////////////////////////
+void  EventProxyHTT::enableBranches(){
+
+  fChain->SetBranchStatus("*",1);
+
+}
+/////////////////////////////////////////////////////////
+/////////////////////////////////////////////////////////
+void  EventProxyHTT::disableBranches(){
+
+  fChain->SetBranchStatus("*",0);
+  fChain->SetBranchStatus("wpair",1);  
+  fChain->SetBranchStatus("sample_",1);
+  fChain->SetBranchStatus("genevtweight_",1);
+  fChain->SetBranchStatus("npu_",1);
+
+}
+/////////////////////////////////////////////////////////
+/////////////////////////////////////////////////////////
+void  EventProxyHTT::clear(){
+
+  wpair->clear();
+  wtau->clear();
+  wmu->clear();
+  wjet->clear();
 
 }
 /////////////////////////////////////////////////////////

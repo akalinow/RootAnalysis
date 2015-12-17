@@ -240,6 +240,7 @@ TH1F* AnalysisHistograms::get1DHistogram(const std::string& name, bool noClone){
 
  using namespace std;
 
+
  unsigned int iThread = omp_get_thread_num();
  if(name.find("Template")!=std::string::npos) iThread = 0;
 

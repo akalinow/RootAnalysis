@@ -96,7 +96,7 @@ void TreeAnalyzer::scaleHistograms(){
     while ((obj = next())){
       if(obj->IsA()->InheritsFrom("TH1")){ 
 	TH1 *h = (TH1*)summary->Get(obj->GetName());
-	h->Scale(weight);
+	if(h) h->Scale(weight);
       }
       if(obj->IsA()->InheritsFrom("TDirectory")){ 
 	TDirectory* aDir = (TDirectory*)summary->Get(obj->GetName());
@@ -106,7 +106,7 @@ void TreeAnalyzer::scaleHistograms(){
 	while ((obj2 = next2())){
 	  if(obj2->IsA()->InheritsFrom("TH1")){ 
 	    TH1 *h1 = (TH1*)aDir->Get(obj2->GetName());
-	    h1->Scale(weight);
+	    if(h1) h1->Scale(weight);
 	  }
 	}
       }

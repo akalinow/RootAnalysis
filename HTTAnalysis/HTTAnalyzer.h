@@ -2,6 +2,7 @@
 #define RootAnalysis_HTTAnalyzer_H
 
 #include <string>
+#include <vector>
 
 #include "ObjectMessenger.h"
 #include "EventProxyBase.h"
@@ -17,6 +18,12 @@
 
 class EventProxyHTT;
 class HTTHistograms;
+class TH1F;
+class Wtau;
+class Wmu;
+class Wjet;
+class Wpair;
+class Wevent;
 
 class HTTAnalyzer: public Analyzer{
 
@@ -42,6 +49,27 @@ class HTTAnalyzer: public Analyzer{
 
   bool filter() const{ return filterEvent_;};
 
+  ///Return human readable sample name (Data, WJets, etc).
+  ///Make the methos static, so other modules can use it
+  static std::string getSampleName(const EventProxyHTT & myEventProxy);
+
+  ///Return pileup reweighting weight.
+  ///Weight is calculatedon fly using the ration of nPU 
+  ///histograms for data and analyased sample.
+  float getPUWeight(const EventProxyHTT & myEventProxy);
+
+  ///Return generator weight. Most samples have large values of weights
+  ///which are constant up to + or - sign. We normalise those weights to +-1.
+  float getGenWeight(const EventProxyHTT & myEventProxy);
+
+  ///Fill histograms for all control plots.
+  ///Histogram names will end with hNameSuffix
+  void fillControlHistos(Wevent & aEvent, 
+			 Wpair & aPair, Wtau & aTau, Wmu & aMuon,
+			 Wjet & aJet,
+			 float eventWeight,
+			 const std::string & hNameSuffix);
+
  protected:
 
   pat::strbitset *mySelections_;
@@ -55,7 +83,13 @@ class HTTAnalyzer: public Analyzer{
 
   ///Histograms storage.
   HTTHistograms *myHistos_;
-  
+
+  ///ROOT file with PU histogram
+  TFile *puFile_;
+ 
+  ///Vector of PU histograms for MC samples
+  std::vector<TH1F*> hPUVec_;
+ 
   //should this HTTAnalyzer be able to filter events
   bool filterEvent_;
  

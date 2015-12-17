@@ -18,8 +18,10 @@
 #pragma link C++ class Wpair+;
 #pragma link C++ class vector<Wpair>;
 
-#pragma link C++ class Wmet+;
 #pragma link C++ class Wjet+;
+#pragma link C++ class vector<Wjet>;
+
+#pragma link C++ class Wmet+;
 
 #pragma link C++ class Wtriggers+;
 
