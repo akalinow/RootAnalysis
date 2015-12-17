@@ -152,13 +152,14 @@ bool HTTAnalyzer::analyze(const EventProxyBase& iEvent){
   ///behaviour may change.
   EventProxyHTT & myEventProxyMod = const_cast<EventProxyHTT&>(myEventProxy);
   if(myEventProxy.wpair->size()){
-    myEventProxyMod.enableBranches();
-    myEventProxyMod.reloadEvent();
+    //myEventProxyMod.enableBranches();
+    //myEventProxyMod.reloadEvent();
   }  
   /////////////////////////////////////////////////////////////////////////////
 
 
   if(!myEventProxy.wpair->size() || !myEventProxy.wtau->size() || !myEventProxy.wmu->size()) return true;
+  
 
   Wevent aEvent = *myEventProxy.wevent;
   Wpair aPair = (*myEventProxy.wpair)[0];
@@ -169,7 +170,7 @@ bool HTTAnalyzer::analyze(const EventProxyBase& iEvent){
 
   ///This stands for core selection, that is common to all regions.
   //TEST if(!myEventProxy.wpair->size() || aTau.pt()<30 || aMuon.pt()<20) return true;
-  if(!myEventProxy.wpair->size() || aTau.pt()<25 || aMuon.pt()<20) return true;
+  if(!myEventProxy.wpair->size() || aTau.pt()<25 || aMuon.pt()<20) return true;///Loosen pt cuts
 
   ///Note: parts of the signal/control region selection are applied in the following code.
   ///FIXME AK: this should be made in a more clear way.
@@ -216,7 +217,7 @@ bool HTTAnalyzer::analyze(const EventProxyBase& iEvent){
 
 
   ///Disable branches before loading next event.
-  myEventProxyMod.disableBranches();
+  //myEventProxyMod.disableBranches();
   
   return true;
 }

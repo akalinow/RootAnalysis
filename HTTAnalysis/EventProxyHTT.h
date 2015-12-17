@@ -31,6 +31,9 @@
 
       ///Disable selected branches 
       void disableBranches();
+
+      ///Reset the data members.
+      void clear();
       
    };
 #endif

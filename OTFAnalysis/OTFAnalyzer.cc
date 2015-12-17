@@ -99,86 +99,9 @@ bool OTFAnalyzer::passQuality(std::vector<L1Obj> * myL1Coll,
   
   if(sysType.find("Otf")!=std::string::npos){
   return myL1Coll->size()>iCand &&
-    ///Barrel (l1t::tftype::bmtf)
+         myL1Coll->operator[](iCand).q>0 &&
     /*
-    myL1Coll->operator[](iCand).hits!=9728 &&
-    myL1Coll->operator[](iCand).hits!=8960 &&
-    myL1Coll->operator[](iCand).hits!=3084 &&
-    myL1Coll->operator[](iCand).hits!=771 &&
-    myL1Coll->operator[](iCand).hits!=3596 &&
-    myL1Coll->operator[](iCand).hits!=7180 &&
-    myL1Coll->operator[](iCand).hits!=7168 &&
-    */
-    ///Endcap (l1t::tftype::emtf)
-    /*
-    myL1Coll->operator[](iCand).hits!=12288 &&
-    myL1Coll->operator[](iCand).hits!=6144 &&
-    myL1Coll->operator[](iCand).hits!=9216 &&
-    myL1Coll->operator[](iCand).hits!=3072 &&
-    myL1Coll->operator[](iCand).hits!=3264 &&
-    myL1Coll->operator[](iCand).hits!=1036 &&
-    myL1Coll->operator[](iCand).hits!=8195  &&
-    myL1Coll->operator[](iCand).hits!=4099  &&
-    myL1Coll->operator[](iCand).hits!=10240  &&
-    myL1Coll->operator[](iCand).hits!=2051  &&
-    myL1Coll->operator[](iCand).hits!=3084  &&
-    myL1Coll->operator[](iCand).hits!=1216  &&
-    myL1Coll->operator[](iCand).hits!=2240  &&
-    myL1Coll->operator[](iCand).hits!=5120  &&
-    myL1Coll->operator[](iCand).hits!=2060  &&
-    myL1Coll->operator[](iCand).hits!=3276  &&
-    myL1Coll->operator[](iCand).hits!=2252  &&
-    myL1Coll->operator[](iCand).hits!=8240  &&
-    myL1Coll->operator[](iCand).hits!=16380 &&
-    //myL1Coll->operator[](iCand).hits!=16368 &&
-    //myL1Coll->operator[](iCand).hits!=16188 &&
-    //myL1Coll->operator[](iCand).hits!=14332 &&
-    //myL1Coll->operator[](iCand).hits!=15356 &&
-    */
-    
-    /*
-    myL1Coll->operator[](iCand).hits!=3075 &&
-    myL1Coll->operator[](iCand).hits!=196992 &&
-    myL1Coll->operator[](iCand).hits!=198016 &&
-    myL1Coll->operator[](iCand).hits!=66688 &&
-    myL1Coll->operator[](iCand).hits!=98944 &&
-    myL1Coll->operator[](iCand).hits!=12300 &&
-    myL1Coll->operator[](iCand).hits!=131456 &&
-    myL1Coll->operator[](iCand).hits!=102592 &&
-    myL1Coll->operator[](iCand).hits!=36928 &&
-    */
-
-    /*
-    myL1Coll->operator[](iCand).hits!=198016 &&
-    myL1Coll->operator[](iCand).hits!=3075 &&
-    myL1Coll->operator[](iCand).hits!=66688 &&
-    myL1Coll->operator[](iCand).hits!=98944 &&
-    myL1Coll->operator[](iCand).hits!=12300 &&
-    myL1Coll->operator[](iCand).hits!=131456 &&
-    myL1Coll->operator[](iCand).hits!=102592 &&
-    myL1Coll->operator[](iCand).hits!=33408 &&
-    myL1Coll->operator[](iCand).hits!=36928 &&
-    myL1Coll->operator[](iCand).hits!=33856 &&
-    myL1Coll->operator[](iCand).hits!=65920 &&
-    myL1Coll->operator[](iCand).hits!=99840 &&
-    myL1Coll->operator[](iCand).hits!=98496 &&
-    myL1Coll->operator[](iCand).hits!=99968 &&
-    */
-    
-    
-    /*
-    myL1Coll->operator[](iCand).hits!=196992 &&
-    myL1Coll->operator[](iCand).hits!=198016 &&
-    myL1Coll->operator[](iCand).hits!=35840 &&
-    myL1Coll->operator[](iCand).hits!=14336 &&
-    myL1Coll->operator[](iCand).hits!=15360 &&
-    myL1Coll->operator[](iCand).hits!=7168 &&
-    myL1Coll->operator[](iCand).hits!=34880 &&
-    */
-    //myL1Coll->operator[](iCand).hits!=7168 &&
-    //myL1Coll->operator[](iCand).hits!=132352 &&
-    
-    ///Barrel (l1t::tftype::omtf_pos)           
+    ///Barrel (l1t::tftype::omtf_pos)    
     myL1Coll->operator[](iCand).hits!=99840 &&
     myL1Coll->operator[](iCand).hits!=34304 &&
     myL1Coll->operator[](iCand).hits!=3075 &&
@@ -194,13 +117,14 @@ bool OTFAnalyzer::passQuality(std::vector<L1Obj> * myL1Coll,
     myL1Coll->operator[](iCand).hits!=66688 && 
     myL1Coll->operator[](iCand).hits!=66176 &&     
     ///
-    //Added 10.11.2015
+    //Added 10.11.2015    
     myL1Coll->operator[](iCand).hits!=7171 &&
     myL1Coll->operator[](iCand).hits!=20528 &&
     myL1Coll->operator[](iCand).hits!=33856 &&
     myL1Coll->operator[](iCand).hits!=35840 &&
     myL1Coll->operator[](iCand).hits!=4156 &&
     myL1Coll->operator[](iCand).hits!=34880 &&         
+    */
     true;
   }
   else return myL1Coll->size();
@@ -378,7 +302,9 @@ bool OTFAnalyzer::analyze(const EventProxyBase& iEvent){
   const EventProxyOTF & myEvent = static_cast<const EventProxyOTF&>(iEvent);
   theEvent = myEvent.events;
 
-  //if(fabs(theEvent->eta)<0.83 || fabs(theEvent->eta)>1.24) return true;
+  //if(theEvent->eta<0) return true;
+  //if(theEvent->charge>0) return true;
+  //if(fabs(theEvent->eta)<0.83 || fabs(theEvent->eta)>0.9) return true;
     
   std::string selType = "";
   std::string sysTypeGmt="Gmt";
@@ -404,6 +330,7 @@ bool OTFAnalyzer::analyze(const EventProxyBase& iEvent){
     //fillGhostHisto("Gmt","VsProcessor");
   }
   else if(fabs(theEvent->eta)>0.83 && fabs(theEvent->eta)<1.24){
+    //if(fabs(theEvent->eta)>0.83 && fabs(theEvent->eta)<1.24){
     
     for(int iCut=0;iCut<22;++iCut){
       if(iCut>0 && iCut<14) continue;

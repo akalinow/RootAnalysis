@@ -124,13 +124,11 @@ void OTFHistograms::defineHistograms(){
  add2DHistogram("h2DEtaHit","",8*26,0.8,1.25,2,-0.5,1.5,file_);
  add2DHistogram("h2DPhiHit","",5*32,-M_PI,M_PI,2,-0.5,1.5,file_);
 
- add2DHistogram("h2DEtaVx","",40,-1.6,1.6,2,-0.5,1.5,file_);//Full detector
- //add2DHistogram("h2DEtaVx","",20,0.83,1.24,2,-0.5,1.5,file_);//Overlap
- //add2DHistogram("h2DEtaVx","",10,1.20,1.24,2,-0.5,1.5,file_);//Overlap
-
- 
+ //add2DHistogram("h2DEtaVx","",40,-1.6,1.6,2,-0.5,1.5,file_);//Full detector
+ add2DHistogram("h2DEtaVx","",20,0.83,1.24,2,-0.5,1.5,file_);//Overlap 
  //add2DHistogram("h2DEtaVx","",8*25,-0.1,0.85,2,-0.5,1.5,file_);//Barrel
  //add2DHistogram("h2DEtaVx","",8*25,1.25,2.65,2,-0.5,1.5,file_);//Endcap
+ 
  add2DHistogram("h2DPhiVx","",4*32,-0.2,3.2,2,-0.5,1.5,file_);
  
  add2DHistogram("h2DQuality","",1000,1.5,1001.5,2,-0.5,1.5,file_);
@@ -767,7 +765,7 @@ void OTFHistograms::plotRate(std::string type){
     ///Fill histo copy with sorted values
     unsigned int iBin = 1;
     for (auto it = rateMap.rbegin(); it!= rateMap.rend(); ++it){
-      if(iBin<10){
+      if(iBin<20){
 	std::cout<<"iBin: "<<iBin
 		 <<" Quality: "<<it->second
 		 <<" rate: "<<it->first

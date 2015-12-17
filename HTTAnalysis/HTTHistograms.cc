@@ -20,12 +20,23 @@
 /////////////////////////////////////////////////////////
 float HTTHistograms::getLumi(){
 
+  //pileupCalc.py -i 15_12_2015.json --inputLumiJSON pileup_latest.txt --calcMode observed --minBiasXsec 69000 --maxPileupBin 50 --numPileupBins 50 MyDataPileupHistogram.root
+
   //brilcalc lumi --normtag /afs/cern.ch/user/c/cmsbril/public/normtag_json/OfflineNormtagV1.json -i lumiSummary.json
   //| nfill | nrun | nls   | ncms  | totdelivered(/ub) | totrecorded(/ub) |
   //+-------+------+-------+-------+-------------------+------------------+
   //| 19    | 36   | 10256 | 10256 | 573248145.792     | 552672886.226    |
 
-  return 552672886.226e-6;//pb-1 data for NTUPLES_23_11_2015
+  //return 552672886.226e-6;//pb-1 data for NTUPLES_23_11_2015
+
+  //./.local/bin/brilcalc lumi --normtag ~lumipro/public/normtag_file/OfflineNormtagV2.json -i 15_12_2015.json
+  //+-------+------+-------+-------+-------------------+------------------+
+  //| nfill | nrun | nls   | ncms  | totdelivered(/ub) | totrecorded(/ub) |
+  //+-------+------+-------+-------+-------------------+------------------+
+  //| 47    | 115  | 30707 | 30707 | 2135679014.929    | 2066764067.818   |
+  //+-------+------+-------+-------+-------------------+------------------+
+
+  return 2066764067.818e-6;//pb-1 data for NTUPLES_15_12_2015
 
 }
 /////////////////////////////////////////////////////////
@@ -152,8 +163,8 @@ void HTTHistograms::defineHistograms(){
    add1DHistogram("h1DPhiTemplate",";#phi; Events",30,-3,3,file_);
    ///Muon isolation histograms has uneven binning.
    //add1DHistogram("h1DIsoTemplate",";Isolation; Events",10,0,2,file_);
-   float bins[13] = {0, 0.02, 0.04, 0.06, 0.08, 0.1, 0.2, 0.3, 0.4, 0.8, 1.2, 1.6, 2.0};
-   add1DHistogram("h1DIsoTemplate",";Isolation; Events",12,bins,file_);
+   float bins[17] = {0, 0.02, 0.04, 0.06, 0.08, 0.15, 0.2, 0.25, 0.3, 0.35, 0.4, 0.45, 0.5, 0.8, 1.2, 1.6, 2.0};
+   add1DHistogram("h1DIsoTemplate",";Isolation; Events",16,bins,file_);
    histosInitialized_ = true;
  }
 }
@@ -485,7 +496,7 @@ std::pair<float,float> HTTHistograms::getQCDOStoSS(std::string selName){
   hSoupOS->Divide(hSoupSS);
 
   //funtion fitting
-  TF1 *line=new TF1("line","[0]",0.3,0.5);
+  TF1 *line=new TF1("line","[0]",0,2);
   line->SetParameter(0,1);
   TCanvas* c = new TCanvas("QCD_OStoSS","QCD_OStoSS",460,500);
   hSoupOS->SetLineWidth(3);
@@ -495,7 +506,7 @@ std::pair<float,float> HTTHistograms::getQCDOStoSS(std::string selName){
   gStyle->SetOptStat(11);
   gStyle->SetOptFit(11);
   hSoupOS->Draw();
-  hSoupOS->Fit("line","","",0.4,1.8);
+  hSoupOS->Fit("line","","",0.2,0.4);
   c->Print(TString::Format("fig_png/%s.png",hName.c_str()).Data());
   c->Print(TString::Format("fig_C/%s.C",hName.c_str()).Data());
 
