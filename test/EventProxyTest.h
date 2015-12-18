@@ -24,9 +24,9 @@ struct Point {
 
       void init(std::vector<std::string> const& iFileNames);
 
-      Point *myPoint;
+      virtual EventProxyBase* clone() const;
 
-      double x,y;
+      Double_t x,y;
       
    };
 #endif

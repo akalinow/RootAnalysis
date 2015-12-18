@@ -12,6 +12,15 @@ TestAnalyzer::TestAnalyzer(const std::string & aName):Analyzer(aName){ }
 TestAnalyzer::~TestAnalyzer(){ if(myHistos_) delete myHistos_; }
 //////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////
+Analyzer* TestAnalyzer::clone() const{
+
+  TestAnalyzer* clone = new TestAnalyzer(name());
+  clone->setHistos(myHistos_);
+  return clone;
+
+};
+//////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////////
 void TestAnalyzer::initialize(TFileDirectory& aDir,
 				 pat::strbitset *aSelections){
 
@@ -36,7 +45,6 @@ bool TestAnalyzer::analyze(const EventProxyBase& iEvent){
   const EventProxyTest & myEventProxy = static_cast<const EventProxyTest&>(iEvent);
 
   std::string sampleName = "Signal";
-  //Fill bookkeeping histogram. Bin 1 holds sum of weights.
 
   myHistos_->fill1DHistogram("h1DX"+sampleName,myEventProxy.x);
   myHistos_->fill1DHistogram("h1DY"+sampleName,myEventProxy.y);

@@ -66,6 +66,7 @@ int main(int argc, char ** argv) {
 	 printf("RealTime=%f seconds, CpuTime=%f seconds\n",rtime,ctime);
 	 printf("%4.2f events / RealTime second .\n", nEventsAnalysed/rtime);
 	 printf("%4.2f events / CpuTime second .\n", nEventsAnalysed/ctime);
+	 printf("CPU time/Real time %4.2f .\n", ctime/rtime);
 	 
 	 tree->scaleHistograms();
 	 for(unsigned int i=0;i<myAnalyzers.size();++i) delete myAnalyzers[i];

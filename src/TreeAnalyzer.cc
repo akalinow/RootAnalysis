@@ -149,10 +149,14 @@ void  TreeAnalyzer::init(std::vector<Analyzer*> myAnalyzers){
   myProxy_->init(fileNames_);
   myAnalyzers_ = myAnalyzers;
 
+  ///Summary analyzer not used at the moment.
+  ///does not work with multithread.
+  /*
   if(nThreads_==1){
     mySummary_ = new SummaryAnalyzer("Summary");
     myAnalyzers_.push_back(mySummary_);
   }
+  */
 
   for(unsigned int i=0;i<myAnalyzers_.size();++i){ 
     myDirectories_.push_back(store_->mkdir(myAnalyzers_[i]->name()));
@@ -170,6 +174,9 @@ void  TreeAnalyzer::init(std::vector<Analyzer*> myAnalyzers){
     }
   }
 
+ ///Tree making not used at the moment.
+ ///does not work with multithread.
+ /*
  if(nThreads_==1){
    unsigned int iThread = 0;
    for(unsigned int i=0;i<myAnalyzers_.size();++i){
@@ -177,6 +184,7 @@ void  TreeAnalyzer::init(std::vector<Analyzer*> myAnalyzers){
      myAnalyzers_[i]->addCutHistos(mySummary_->getHistoList());
    }
  }
+ */
 }
 //////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////
@@ -217,7 +225,7 @@ int TreeAnalyzer::loop(){
 //////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////
 bool TreeAnalyzer::analyze(const EventProxyBase& iEvent){
-
+  
   for(unsigned int i=0;i<myAnalyzers_.size();++i){
     myAnalyzersThreads_[omp_get_thread_num()][i]->analyze(iEvent,myObjMessenger_);
   }

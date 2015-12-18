@@ -38,6 +38,8 @@ class TestAnalyzer: public Analyzer{
 
   virtual void clear(){;};
 
+  Analyzer* clone() const;
+
   bool filter() const{ return filterEvent_;};
 
  protected:
@@ -48,6 +50,8 @@ class TestAnalyzer: public Analyzer{
   std::vector<std::string> selectionFlavours_;
 
  private:
+
+  void setHistos(TestHistograms *histos) { myHistos_ = histos;};
 
   ///Histograms storage.
   TestHistograms *myHistos_;
