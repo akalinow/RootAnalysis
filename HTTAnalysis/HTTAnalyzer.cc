@@ -156,9 +156,8 @@ void HTTAnalyzer::fillControlHistos(Wevent & aEvent,
 				positiveLeadingTk,TLorentzVector(aTau.nPCA(),0));
   }
 
-  
-  myHistos_->fill1DHistogram("h1DPhi_nVectors"+hNameSuffix,angles.first,weight);
-  myHistos_->fill1DHistogram("h1DRho_nVectors"+hNameSuffix,angles.second);
+  myHistos_->fill1DHistogram("h1DPhi_nVectors"+hNameSuffix,angles.first,eventWeight);
+  myHistos_->fill1DHistogram("h1DRho_nVectors"+hNameSuffix,angles.second,eventWeight);
 
   ///Fill jets info
   myHistos_->fill1DHistogram("h1DPtLeadingJet"+hNameSuffix,aJet.pt(),eventWeight);
