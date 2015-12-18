@@ -121,6 +121,45 @@ void HTTAnalyzer::fillControlHistos(Wevent & aEvent,
   myHistos_->fill1DHistogram("h1DPhiMuon"+hNameSuffix,  aMuon.phi(),eventWeight);
   myHistos_->fill1DHistogram("h1DPhiTau"+hNameSuffix, aTau.phi() ,eventWeight);
 
+  ///Fill leading track pt
+  myHistos_->fill1DHistogram("h1DPtTauLeadingTk"+hNameSuffix,aTau.leadingTk().Pt(),eventWeight);
+
+  ///Method from http://arxiv.org/abs/1108.0670 (Berger)
+  ///take impact parameters instead of tau momentum.
+  ///calculate angles in pi+ - pi- rest frame
+  std::pair<float,float>  angles;
+
+  TLorentzVector positiveLeadingTk;
+  TLorentzVector negativeLeadingTk;
+  
+
+  if(aMuon.charge()>0){
+
+    positiveLeadingTk.SetPtEtaPhiE(aMuon.pt(), aMuon.phi(),
+				   aMuon.eta(), aMuon.mass());
+
+    negativeLeadingTk.SetPtEtaPhiE(aTau.pt(), aTau.phi(),
+				   aTau.eta(), aTau.mass());
+      
+    angles = angleBetweenPlanes(negativeLeadingTk,TLorentzVector(aTau.nPCA(),0),
+				positiveLeadingTk,TLorentzVector(aMuon.nPCA(),0));
+  }
+  else{
+
+    positiveLeadingTk.SetPtEtaPhiE(aTau.pt(), aTau.phi(),
+				   aTau.eta(), aTau.mass());
+
+     negativeLeadingTk.SetPtEtaPhiE(aMuon.pt(), aMuon.phi(),
+				   aMuon.eta(), aMuon.mass());
+    
+    angles = angleBetweenPlanes(negativeLeadingTk,TLorentzVector(aMuon.nPCA(),0),
+				positiveLeadingTk,TLorentzVector(aTau.nPCA(),0));
+  }
+
+  
+  myHistos_->fill1DHistogram("h1DPhi_nVectors"+hNameSuffix,angles.first,weight);
+  myHistos_->fill1DHistogram("h1DRho_nVectors"+hNameSuffix,angles.second);
+
   ///Fill jets info
   myHistos_->fill1DHistogram("h1DPtLeadingJet"+hNameSuffix,aJet.pt(),eventWeight);
   myHistos_->fill1DHistogram("h1DEtaLeadingJet"+hNameSuffix,aJet.eta(),eventWeight);
@@ -130,6 +169,39 @@ void HTTAnalyzer::fillControlHistos(Wevent & aEvent,
     myHistos_->fill1DHistogram("h1DEtaLeadingBJet"+hNameSuffix,aJet.pt(),eventWeight);
   }
 
+}
+//////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////////
+std::pair<float,float> HTTAnalyzer::angleBetweenPlanes(const TLorentzVector &tau1, 
+						       const TLorentzVector &tau1Daughter,
+						       const TLorentzVector &tau2, 
+						       const TLorentzVector &tau2Daughter){
+  //Boost all 4v to (tau1+tau2) rest frame
+  TVector3 boost = (tau1+tau2).BoostVector();
+
+  TLorentzVector tau1Star = tau1;
+  TLorentzVector tau2Star = tau2;
+  tau1Star.Boost(-boost);
+  tau2Star.Boost(-boost);
+  
+  TLorentzVector tau1DaughterStar = tau1Daughter;
+  tau1DaughterStar.Boost(-boost);
+  
+  TLorentzVector tau2DaughterStar = tau2Daughter;
+  tau2DaughterStar.Boost(-boost);
+
+  //define common direction and normal vectors to decay planes
+  TVector3 direction = tau1Star.Vect().Unit();
+  TVector3 n1 = ( direction.Cross( tau1DaughterStar.Vect() ) ).Unit(); 
+  TVector3 n2 = ( direction.Cross( tau2DaughterStar.Vect() ) ).Unit(); 
+
+  ///angle between decay planes
+  float phi=TMath::ACos(n1*n2);
+
+  ///angle between tau1 and tau2 daughter momentums
+  float rho=TMath::ACos( (tau1DaughterStar.Vect().Unit() )*(tau2DaughterStar.Vect().Unit() ) );
+
+  return std::make_pair(phi,rho);
 }
 //////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////
@@ -169,8 +241,7 @@ bool HTTAnalyzer::analyze(const EventProxyBase& iEvent){
   if(!myEventProxy.wjet->size()) aJet = (*myEventProxy.wjet)[0];
 
   ///This stands for core selection, that is common to all regions.
-  //TEST if(!myEventProxy.wpair->size() || aTau.pt()<30 || aMuon.pt()<20) return true;
-  if(!myEventProxy.wpair->size() || aTau.pt()<25 || aMuon.pt()<20) return true;///Loosen pt cuts
+  if(!myEventProxy.wpair->size() || aTau.pt()<30 || aMuon.pt()<20) return true;
 
   ///Note: parts of the signal/control region selection are applied in the following code.
   ///FIXME AK: this should be made in a more clear way.

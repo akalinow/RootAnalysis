@@ -30,8 +30,7 @@ EventProxyBase::~EventProxyBase(){}
 // member functions
 //
 
-EventProxyBase const&
-EventProxyBase::operator++(){
+EventProxyBase const& EventProxyBase::operator++(){
 
 	fChain->GetEntry(++eventIndex_);
 
@@ -42,8 +41,7 @@ void EventProxyBase::reloadEvent(){ fChain->GetEntry(eventIndex_); }
 
 /** Go to the very first Event*/
 
-EventProxyBase const&
-EventProxyBase::toBegin()
+EventProxyBase const& EventProxyBase::toBegin()
 {
 
 	fChain->GetEntry(0);

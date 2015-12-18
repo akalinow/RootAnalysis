@@ -100,7 +100,7 @@ bool OTFAnalyzer::passQuality(std::vector<L1Obj> * myL1Coll,
   if(sysType.find("Otf")!=std::string::npos){
   return myL1Coll->size()>iCand &&
          myL1Coll->operator[](iCand).q>0 &&
-    /*
+    
     ///Barrel (l1t::tftype::omtf_pos)    
     myL1Coll->operator[](iCand).hits!=99840 &&
     myL1Coll->operator[](iCand).hits!=34304 &&
@@ -124,7 +124,7 @@ bool OTFAnalyzer::passQuality(std::vector<L1Obj> * myL1Coll,
     myL1Coll->operator[](iCand).hits!=35840 &&
     myL1Coll->operator[](iCand).hits!=4156 &&
     myL1Coll->operator[](iCand).hits!=34880 &&         
-    */
+    
     true;
   }
   else return myL1Coll->size();

@@ -25,6 +25,8 @@ class Wjet;
 class Wpair;
 class Wevent;
 
+class TLorentzVector;
+
 class HTTAnalyzer: public Analyzer{
 
  public:
@@ -68,6 +70,11 @@ class HTTAnalyzer: public Analyzer{
 			 float eventWeight,
 			 const std::string & hNameSuffix);
 
+  ///Calculate angle between tau decay planes (first element of pair)
+  //and angle betwee decay products (second element of pair)
+  std::pair<float,float> angleBetweenPlanes(const TLorentzVector& tau1, const TLorentzVector& tau1Daughter,
+					    const TLorentzVector& tau2, const TLorentzVector& tau2Daughter);
+  
  protected:
 
   pat::strbitset *mySelections_;
