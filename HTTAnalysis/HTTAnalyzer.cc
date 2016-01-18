@@ -35,7 +35,7 @@ void HTTAnalyzer::initialize(TFileDirectory& aDir,
 //////////////////////////////////////////////////////////////////////////////
 void HTTAnalyzer::finalize(){ 
 
-  //myHistos_->finalizeHistograms(0,1.0);
+  myHistos_->finalizeHistograms(0,1.0);
  
 }
 //////////////////////////////////////////////////////////////////////////////
@@ -122,6 +122,7 @@ void HTTAnalyzer::fillControlHistos(Wevent & aEvent,
   myHistos_->fill1DHistogram("h1DPhiMuon"+hNameSuffix,  aMuon.phi(),eventWeight);
   myHistos_->fill1DHistogram("h1DPhiTau"+hNameSuffix, aTau.phi() ,eventWeight);
 
+  /*
   ///Fill leading track pt
   myHistos_->fill1DHistogram("h1DPtTauLeadingTk"+hNameSuffix,aTau.leadingTk().Pt(),eventWeight);
 
@@ -158,6 +159,7 @@ void HTTAnalyzer::fillControlHistos(Wevent & aEvent,
   
   if(fabs(aTau.leadingTk().Pt()-aTau.pt())<1) myHistos_->fill1DHistogram("h1DPhi_nVectors"+hNameSuffix,angles.first,eventWeight);
   //myHistos_->fill1DHistogram("h1DRho_nVectors"+hNameSuffix,angles.second,eventWeight);
+  */
 
   ///Fill jets info
   myHistos_->fill1DHistogram("h1DPtLeadingJet"+hNameSuffix,aJet.pt(),eventWeight);
@@ -210,9 +212,8 @@ bool HTTAnalyzer::analyze(const EventProxyBase& iEvent){
 
 
   std::string sampleName = getSampleName(myEventProxy);  
-  //TEST float puWeight = getPUWeight(myEventProxy);
-  float puWeight = 1.0;
-
+  float puWeight = getPUWeight(myEventProxy);
+  //float puWeight = 1.0;
   
   float genWeight = getGenWeight(myEventProxy);
   float eventWeight = puWeight*genWeight;
