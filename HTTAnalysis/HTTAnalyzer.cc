@@ -35,7 +35,7 @@ void HTTAnalyzer::initialize(TFileDirectory& aDir,
 //////////////////////////////////////////////////////////////////////////////
 void HTTAnalyzer::finalize(){ 
 
-  myHistos_->finalizeHistograms(0,1.0);
+  //myHistos_->finalizeHistograms(0,1.0);
  
 }
 //////////////////////////////////////////////////////////////////////////////
@@ -46,6 +46,7 @@ std::string HTTAnalyzer::getSampleName(const EventProxyHTT & myEventProxy){
   if(myEventProxy.wevent->sample()==1) return "DYJets";
   if(myEventProxy.wevent->sample()==2) return "WJets";
   if(myEventProxy.wevent->sample()==3) return "TTbar";
+  if(myEventProxy.wevent->sample()==5) return "H";
 
   return "Unknown";
 }
@@ -132,32 +133,31 @@ void HTTAnalyzer::fillControlHistos(Wevent & aEvent,
   TLorentzVector positiveLeadingTk;
   TLorentzVector negativeLeadingTk;
   
-
   if(aMuon.charge()>0){
 
-    positiveLeadingTk.SetPtEtaPhiE(aMuon.pt(), aMuon.phi(),
+    positiveLeadingTk.SetPtEtaPhiM(aMuon.pt(), aMuon.phi(),
 				   aMuon.eta(), aMuon.mass());
 
-    negativeLeadingTk.SetPtEtaPhiE(aTau.pt(), aTau.phi(),
-				   aTau.eta(), aTau.mass());
-      
+    ///For tau leading trakc put pion mass in GeV.
+    negativeLeadingTk = aTau.leadingTk();
+
     angles = angleBetweenPlanes(negativeLeadingTk,TLorentzVector(aTau.nPCA(),0),
 				positiveLeadingTk,TLorentzVector(aMuon.nPCA(),0));
   }
   else{
-
-    positiveLeadingTk.SetPtEtaPhiE(aTau.pt(), aTau.phi(),
-				   aTau.eta(), aTau.mass());
-
-     negativeLeadingTk.SetPtEtaPhiE(aMuon.pt(), aMuon.phi(),
+    
+    positiveLeadingTk = aTau.leadingTk();				 
+    negativeLeadingTk.SetPtEtaPhiM(aMuon.pt(), aMuon.phi(),
 				   aMuon.eta(), aMuon.mass());
     
     angles = angleBetweenPlanes(negativeLeadingTk,TLorentzVector(aMuon.nPCA(),0),
 				positiveLeadingTk,TLorentzVector(aTau.nPCA(),0));
   }
 
-  myHistos_->fill1DHistogram("h1DPhi_nVectors"+hNameSuffix,angles.first,eventWeight);
-  myHistos_->fill1DHistogram("h1DRho_nVectors"+hNameSuffix,angles.second,eventWeight);
+  //std::cout<<"aTau.leadingTk().Pt()-aTau.Pt()): "<<aTau.leadingTk().Pt()-aTau.pt()<<std::endl;
+  
+  if(fabs(aTau.leadingTk().Pt()-aTau.pt())<1) myHistos_->fill1DHistogram("h1DPhi_nVectors"+hNameSuffix,angles.first,eventWeight);
+  //myHistos_->fill1DHistogram("h1DRho_nVectors"+hNameSuffix,angles.second,eventWeight);
 
   ///Fill jets info
   myHistos_->fill1DHistogram("h1DPtLeadingJet"+hNameSuffix,aJet.pt(),eventWeight);
@@ -210,7 +210,10 @@ bool HTTAnalyzer::analyze(const EventProxyBase& iEvent){
 
 
   std::string sampleName = getSampleName(myEventProxy);  
-  float puWeight = getPUWeight(myEventProxy);
+  //TEST float puWeight = getPUWeight(myEventProxy);
+  float puWeight = 1.0;
+
+  
   float genWeight = getGenWeight(myEventProxy);
   float eventWeight = puWeight*genWeight;
    

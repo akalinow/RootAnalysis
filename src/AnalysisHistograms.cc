@@ -194,7 +194,11 @@ TProfile* AnalysisHistograms::getProfile(const std::string& name, bool noClone){
  using namespace std;
 
  if(noClone && myProfiles_.find(name)!=myProfiles_.end()) return myProfiles_[name];
- else if(myProfiles_.find(name)!=myProfiles_.end()) return (TProfile*)(myProfiles_[name]->Clone());
+ else if(myProfiles_.find(name)!=myProfiles_.end()){
+   TProfile *aClone = (TProfile*)(myProfiles_[name]->Clone());
+   aClone->SetDirectory(0);///the cloned object will not be saved to ROOT file.
+   return aClone;
+ }
  else cout<<"ERROR: Profile : "<<name<<" not found!"<<endl;
  return 0;
 
@@ -207,7 +211,11 @@ TH1F* AnalysisHistograms::get1DHistogram(const std::string& name, bool noClone){
  std::unordered_map<std::string,TH1F*>::const_iterator it = my1Dhistograms_.find(name);
 
  if(noClone && it!=my1Dhistograms_.end()) return it->second;
- else if(it!=my1Dhistograms_.end()) return (TH1F*)(it->second->Clone());
+ else if(it!=my1Dhistograms_.end()){
+   TH1F *aClone = (TH1F*)(it->second->Clone());
+   aClone->SetDirectory(0);///the cloned object will not be saved to ROOT file.
+   return aClone;
+ }
  else cout<<"ERROR: Histogram: "<<name<<" not found!"<<endl;
  return 0;
 
@@ -217,8 +225,14 @@ TH2F* AnalysisHistograms::get2DHistogram(const std::string& name, bool noClone){
 
  using namespace std;
 
- if(noClone && my2Dhistograms_.find(name)!=my2Dhistograms_.end()) return my2Dhistograms_[name];
- else if(my2Dhistograms_.find(name)!=my2Dhistograms_.end()) return (TH2F*)(my2Dhistograms_[name]->Clone());
+ std::unordered_map<std::string,TH2F*>::const_iterator it = my2Dhistograms_.find(name);
+
+ if(noClone && it!=my2Dhistograms_.end()) return it->second;
+ else if(it!=my2Dhistograms_.end()){
+   TH2F *aClone = (TH2F*)(it->second->Clone());
+   aClone->SetDirectory(0);///the cloned object will not be saved to ROOT file.
+   return aClone;
+ }
  else cout<<"ERROR: Histogram: "<<name<<" not found!"<<endl;
  return 0;
 
@@ -228,8 +242,14 @@ TH3F* AnalysisHistograms::get3DHistogram(const std::string& name, bool noClone){
 
  using namespace std;
 
- if(noClone && my3Dhistograms_.find(name)!=my3Dhistograms_.end()) return my3Dhistograms_[name];
- else if(my3Dhistograms_.find(name)!=my3Dhistograms_.end()) return (TH3F*)(my3Dhistograms_[name]->Clone());
+ std::unordered_map<std::string,TH3F*>::const_iterator it = my3Dhistograms_.find(name);
+
+ if(noClone && it!=my3Dhistograms_.end()) return it->second;
+ else if(it!=my3Dhistograms_.end()){
+   TH3F *aClone = (TH3F*)(it->second->Clone());
+   aClone->SetDirectory(0);///the cloned object will not be saved to ROOT file.
+   return aClone;
+ }
  else cout<<"ERROR: Histogram: "<<name<<" not found!"<<endl;
  return 0;
 
@@ -273,7 +293,7 @@ void AnalysisHistograms::clear(){
 void AnalysisHistograms::write(){
 
   finalizeHistograms();
-  //file->Write();
+
 }
 //////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////
