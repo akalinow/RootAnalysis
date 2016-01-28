@@ -23,6 +23,8 @@ class CPHistograms: public AnalysisHistograms {
 
   virtual bool fill1DHistogram(const std::string &name, float val, float weight=1.0);
 
+  virtual bool fill2DHistogram(const std::string& name, float valX, float valY, float weight=1.0);
+
    private:
   
   virtual void defineHistograms();

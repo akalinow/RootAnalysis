@@ -60,6 +60,26 @@ bool CPHistograms::fill1DHistogram(const std::string& name, float val, float wei
 }
 /////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////
+bool CPHistograms::fill2DHistogram(const std::string& name,
+				   float valX, float valY, float weight){
+  
+  std::string hTemplateName = "";
+  if(!AnalysisHistograms::fill2DHistogram(name,valX,valY,weight)){
+    if(name.find("h2DVxPullVsNTrack")!=std::string::npos) hTemplateName = "h2DVxPullVsNTrack";
+    this->add2DHistogram(name,"",
+			 this->get2DHistogram(hTemplateName)->GetNbinsX(),
+			 this->get2DHistogram(hTemplateName)->GetXaxis()->GetXmin(),
+			 this->get2DHistogram(hTemplateName)->GetXaxis()->GetXmax(),
+			 this->get2DHistogram(hTemplateName)->GetNbinsY(),
+			 this->get2DHistogram(hTemplateName)->GetYaxis()->GetXmin(),
+			 this->get2DHistogram(hTemplateName)->GetYaxis()->GetXmax(),
+			 file_);
+    return AnalysisHistograms::fill2DHistogram(name,valX,valY,weight);
+  }
+  return true;
+}
+/////////////////////////////////////////////////////////
+/////////////////////////////////////////////////////////
 void CPHistograms::defineHistograms(){
 
  using namespace std;
@@ -74,6 +94,8 @@ void CPHistograms::defineHistograms(){
    add1DHistogram("h1DDPhiTemplate",";#Delta#phi^{*} [rad]; Events",32,-0.5*M_PI,0.5*M_PI,file_);
    add1DHistogram("h1IPTemplate",";#phi^{*} [rad]; Events",100,0,1.0,file_);
    add1DHistogram("h1DCosPhiTemplate",";cos(#phi); Events",10,-1.0,1.0,file_);
+
+   add2DHistogram("h2DVxPullVsNTrack","",21,-0.5,20.5,11,-0.01,0.01,file_);
    
    histosInitialized_ = true;
  }
@@ -97,6 +119,9 @@ void CPHistograms::finalizeHistograms(int nRuns, float weight){
   plotVerticesPulls("h1DVxPullZ_h0");
   plotVerticesPulls("h1DVxPullZ_A0");
   plotVerticesPulls("h1DVxPullZ_Z0");
+
+  plotVerticesPulls("h2DVxPullVsNTrackTrans_Z0");
+  plotVerticesPulls("h2DVxPullVsNTrackLong_Z0");
 
   plotAnyHistogram("h1DDeltaRPlus_h0");
   plotAnyHistogram("h1DDeltaRPlus_A0");
@@ -449,10 +474,40 @@ void CPHistograms::plotVerticesPulls(const std::string & hName){
   l.SetBorderSize(0);
   l.SetFillColor(10);
 
+  if(hName.find("2D")!=std::string::npos){
+    TProfile* hProfile_AOD = this->get2DHistogram((hName+"_AOD").c_str())->ProfileX();
+    TProfile* hProfile_Refit = this->get2DHistogram((hName+"_RefitBS").c_str())->ProfileX();
+    TProfile* hProfile_RefitNoBS = this->get2DHistogram((hName+"_RefitNoBS").c_str())->ProfileX();
+
+    hProfile_AOD->SetLineWidth(3);
+    hProfile_Refit->SetLineWidth(3);
+    hProfile_RefitNoBS->SetLineWidth(3);
+
+    hProfile_AOD->SetLineColor(1);
+    hProfile_Refit->SetLineColor(4);
+    hProfile_RefitNoBS->SetLineColor(8);
+    
+    hProfile_AOD->Draw();
+    hProfile_Refit->Draw("same");
+    hProfile_RefitNoBS->Draw("same");
+
+    l.AddEntry(hProfile_AOD,"AOD weights");
+    l.AddEntry(hProfile_Refit,"refitted with BS");
+    l.AddEntry(hProfile_RefitNoBS,"refitted w/o #tau & BS");
+    l.Draw();
+    
+    c->Print(TString::Format("fig_png/%s.png",hName.c_str()).Data());
+
+    return;
+  }
+
   TH1F* h1D_AOD = this->get1DHistogram((hName+"_AOD").c_str());
   TH1F* h1D_PF = this->get1DHistogram((hName+"_PF").c_str());
   TH1F* h1D_Refit = this->get1DHistogram((hName+"_RefitBS").c_str());
   TH1F* h1D_RefitNoBS = this->get1DHistogram((hName+"_RefitNoBS").c_str());
+
+
+  
   
   if(h1D_AOD && h1D_PF && h1D_Refit && h1D_RefitNoBS){
     

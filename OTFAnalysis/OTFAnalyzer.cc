@@ -302,9 +302,9 @@ bool OTFAnalyzer::analyze(const EventProxyBase& iEvent){
   const EventProxyOTF & myEvent = static_cast<const EventProxyOTF&>(iEvent);
   theEvent = myEvent.events;
 
-  //if(theEvent->eta<0) return true;
+  if(theEvent->eta<0) return true;
   //if(theEvent->charge>0) return true;
-  //if(fabs(theEvent->eta)<0.83 || fabs(theEvent->eta)>0.9) return true;
+  if(fabs(theEvent->eta)<0.83 || fabs(theEvent->eta)>0.9) return true; //TEST
     
   std::string selType = "";
   std::string sysTypeGmt="Gmt";
@@ -312,7 +312,8 @@ bool OTFAnalyzer::analyze(const EventProxyBase& iEvent){
   std::string sysTypeRpc="Rpc";
   std::string sysTypeOther="Other";
 
-  if(theEvent->pt<0.01){
+  //if(theEvent->pt<0.01){
+  if(true){//TEST
   
     fillRateHisto("Otf","Tot");
     fillRateHisto("Gmt","Tot");
@@ -329,8 +330,8 @@ bool OTFAnalyzer::analyze(const EventProxyBase& iEvent){
     //fillGhostHisto("Otf","VsProcessor");
     //fillGhostHisto("Gmt","VsProcessor");
   }
-  else if(fabs(theEvent->eta)>0.83 && fabs(theEvent->eta)<1.24){
-    //if(fabs(theEvent->eta)>0.83 && fabs(theEvent->eta)<1.24){
+  //else if(fabs(theEvent->eta)>0.83 && fabs(theEvent->eta)<1.24){
+  if(fabs(theEvent->eta)>0.83 && fabs(theEvent->eta)<1.24){//TEST
     
     for(int iCut=0;iCut<22;++iCut){
       if(iCut>0 && iCut<14) continue;
