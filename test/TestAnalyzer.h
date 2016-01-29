@@ -58,6 +58,8 @@ class TestAnalyzer: public Analyzer{
   
   //should this TestAnalyzer be able to filter events
   bool filterEvent_;
+
+  std::string tmpName;
  
 };
 

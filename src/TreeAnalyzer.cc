@@ -206,19 +206,21 @@ int TreeAnalyzer::loop(){
   myProxiesThread_[0]->toBegin();  
   if(nThreads_>1) nEventsInTree = myProxiesThread_[0]->getTTree()->GetEntries();
   ///////
-  while(nEventsAnalyzed_<nEventsToAnalyze_){
+  //while(nEventsAnalyzed_<nEventsToAnalyze_){
+  unsigned int testCounter = 0;
 
-#pragma omp parallel for schedule(dynamic, 100000)
-    for(int aEvent=nEventsAnalyzed_;aEvent<nEventsInTree+nEventsAnalyzed_;++aEvent){
-      if( nEventsAnalyzed_ < nEventsToPrint_ || nEventsAnalyzed_%5000000==0)
-	std::cout<<"Events analyzed: "<<nEventsAnalyzed_<<" thread: "<<omp_get_thread_num()<<std::endl;
-      analyze(myProxiesThread_[omp_get_thread_num()]->toN(aEvent));
+    #pragma omp parallel for 
+    for(int aEvent=nEventsAnalyzed_;aEvent<nEventsInTree+nEventsAnalyzed_;++aEvent){      
+      //if( nEventsAnalyzed_ < nEventsToPrint_ || nEventsAnalyzed_%5000000==0)
+      //std::cout<<"Events analyzed: "<<nEventsAnalyzed_<<" thread: "<<omp_get_thread_num()<<std::endl;
+      testCounter+analyze(myProxiesThread_[omp_get_thread_num()]->toN(aEvent));
     }
 
-    for(unsigned int iThread=0;iThread<nThreads_;++iThread) myProxiesThread_[iThread]->getTChain()->GetEntry(nEventsAnalyzed_);
-    nEventsInTree = myProxiesThread_[0]->getTTree()->GetEntries();
-  }
-  
+    //for(unsigned int iThread=0;iThread<nThreads_;++iThread) myProxiesThread_[iThread]->getTChain()->GetEntry(nEventsAnalyzed_);
+    //nEventsInTree = myProxiesThread_[0]->getTTree()->GetEntries();
+    //}
+
+    nEventsAnalyzed_ = testCounter;
   
   return nEventsAnalyzed_;    
 }
@@ -230,8 +232,8 @@ bool TreeAnalyzer::analyze(const EventProxyBase& iEvent){
     myAnalyzersThreads_[omp_get_thread_num()][i]->analyze(iEvent,myObjMessenger_);
   }
 
-    #pragma omp atomic
-    ++nEventsAnalyzed_;
+  //#pragma omp atomic
+  //++nEventsAnalyzed_;
   
   return 1;
 }

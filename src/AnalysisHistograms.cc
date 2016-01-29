@@ -183,9 +183,10 @@ bool  AnalysisHistograms::fill1DHistogram(const std::string& name, float val, fl
  using namespace std;
 
  unsigned int iThread = omp_get_thread_num();
-
-  std::unordered_map<std::string,TH1F*>::iterator it = my1Dhistograms_[iThread].find(name); 
- if(it!=my1Dhistograms_[iThread].end()) it->second->Fill(val,weight);
+ 
+ std::unordered_map<std::string,TH1F*>::iterator it = my1Dhistograms_[iThread].find(name);
+ 
+ if(it!=my1Dhistograms_[iThread].end()) it->second->Fill(val,weight); 
  else return false;
  
  return true;

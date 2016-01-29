@@ -43,7 +43,7 @@ TestHistograms::~TestHistograms(){ }
 /////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////
 bool TestHistograms::fill1DHistogram(const std::string& name, float val, float weight){
-  
+
   std::string hTemplateName = "";
   if(!AnalysisHistograms::fill1DHistogram(name,val,weight)){
     if(name.find("h1DX")!=std::string::npos) hTemplateName = "h1DXTemplate";
