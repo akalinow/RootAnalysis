@@ -29,7 +29,7 @@ void HTTAnalyzer::initialize(TFileDirectory& aDir,
   ///The histograms for this analyzer will be saved into "HTTAnalyzer"
   ///directory of the ROOT file
   ///NOTE: due to a bug hists land in the Summary directory
-  myHistos_ = new HTTHistograms(&aDir, selectionFlavours_);  
+  myHistos_ = new HTTHistograms(&aDir, selectionFlavours_);
 }
 //////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////
@@ -210,11 +210,8 @@ bool HTTAnalyzer::analyze(const EventProxyBase& iEvent){
 
   const EventProxyHTT & myEventProxy = static_cast<const EventProxyHTT&>(iEvent);
 
-
   std::string sampleName = getSampleName(myEventProxy);  
   float puWeight = getPUWeight(myEventProxy);
-  //float puWeight = 1.0;
-  
   float genWeight = getGenWeight(myEventProxy);
   float eventWeight = puWeight*genWeight;
    
