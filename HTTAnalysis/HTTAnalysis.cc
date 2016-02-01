@@ -23,6 +23,10 @@
 #include "boost/property_tree/ini_parser.hpp"
 #include "boost/tokenizer.hpp"
 
+#include "TROOT.h"
+#include "TObject.h"
+
+
 int main(int argc, char ** argv) {
 
 	std::string cfgFileName = "cfg.ini";
