@@ -311,12 +311,18 @@ bool OTFAnalyzer::analyze(const EventProxyBase& iEvent){
   eventWeight_ = 1.0;
   /////////////////
   const EventProxyOTF & myEvent = static_cast<const EventProxyOTF&>(iEvent);
-  theEvent = myEvent.events;
+  theEvent = myEvent.event;
 
   //if(theEvent->eta<0) return true;
   //if(theEvent->charge>0) return true;
   //if(fabs(theEvent->eta)<0.83 || fabs(theEvent->eta)>0.9) return true; //TEST
 
+  std::string selType = "";
+  std::string sysTypeGmt="Gmt";
+  std::string sysTypeOtf="Otf";
+  std::string sysTypeRpc="Rpc";
+  std::string sysTypeOther="Other";
+  
   
   //if(theEvent->pt<0.01){
   if(true){//TEST
