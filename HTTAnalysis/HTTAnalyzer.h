@@ -47,6 +47,8 @@ class HTTAnalyzer: public Analyzer{
 
   virtual void clear(){;};
 
+  Analyzer* clone() const;
+
   bool filter() const{ return filterEvent_;};
 
   ///Return human readable sample name (Data, WJets, etc).
@@ -83,6 +85,8 @@ class HTTAnalyzer: public Analyzer{
   std::vector<std::string> selectionFlavours_;
 
  private:
+
+  void setHistos(HTTHistograms *histos) { myHistos_ = histos;};
 
   ///Histograms storage.
   HTTHistograms *myHistos_;

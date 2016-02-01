@@ -44,6 +44,8 @@ class SummaryAnalyzer: public  Analyzer{
 
  private:
 
+  Analyzer* clone() const;
+
   void fillEffHisto(std::string type);
 
   ///Remove bins corresponding to selections from other flaour,

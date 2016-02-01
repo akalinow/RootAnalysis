@@ -11,7 +11,15 @@ cd test
 
 #This package shows an example of use of the RootAnalysis code.
 # A simple TTree with a single objects is read, and histograms for the
-#two leafs of the TTree are made. The example can be run with following command:
+#two leafs of the TTree are made.
+#The test data file is created with makeTestData.cxx run from ROOT commandline.
+#
+# > root
+# root [0] .x makeTestData.cxx
+#
+#The example can be run with following command:
+# test.ini file contains path to the data files, and number of concurent threads to be used during
+# analysis
 
 ./test test.ini
 

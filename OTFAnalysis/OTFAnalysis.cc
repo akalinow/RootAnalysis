@@ -14,29 +14,28 @@
  */
 
 #include <iostream>
-
 #include "TreeAnalyzer.h"
 #include "OTFAnalyzer.h"
 #include "OTFDiMuonAnalyzer.h"
 #include "EventProxyOTF.h"
-
+#include "OTFHistograms.h"
 #include "TFile.h"
 #include "TStopwatch.h"
 
 int main(int argc, char ** argv) {
+  
+  std::string cfgFileName = "cfg.ini";
+  if(argc<2){
+    std::cout<<"Usage: readEvents cfg.init"<<std::endl;
+    return 1;
+  }
+  else cfgFileName = argv[1];
+  
 
-	std::string cfgFileName = "cfg.ini";
+  std::cout<<"Start"<<std::endl;
+  TStopwatch timer;
+  timer.Start();
 
-	  if(argc<2){
-	    std::cout<<"Usage: readEvents cfg.init"<<std::endl;
-	    return 1;
-	  }
-	  else cfgFileName = argv[1];
-
-
-	std::cout<<"Start"<<std::endl;
-	TStopwatch timer;
-	timer.Start();
 	  //----------------------------------------------------------
 	 std::vector<Analyzer*> myAnalyzers;
 	 EventProxyOTF *myEvent = new EventProxyOTF();
@@ -46,9 +45,9 @@ int main(int argc, char ** argv) {
 
 	  TreeAnalyzer *tree = new TreeAnalyzer("TreeAnalyzer",cfgFileName, myEvent);
 	  tree->init(myAnalyzers);
-	  int nEventsAnalysed = tree->loop();
+	  int nEventsAnalysed = tree->loop();	  
 	  tree->finalize();
-
+	  
 	  timer.Stop();
 	  Double_t rtime = timer.RealTime();
 	  Double_t ctime = timer.CpuTime();
@@ -56,7 +55,6 @@ int main(int argc, char ** argv) {
 	  printf("RealTime=%f seconds, CpuTime=%f seconds\n",rtime,ctime);
 	  printf("%4.2f events / RealTime second .\n", nEventsAnalysed/rtime);
 	  printf("%4.2f events / CpuTime second .\n", nEventsAnalysed/ctime);
-
 	  tree->scaleHistograms();
 	  for(unsigned int i=0;i<myAnalyzers.size();++i) delete myAnalyzers[i];
 	  delete tree;

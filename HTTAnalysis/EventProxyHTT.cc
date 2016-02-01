@@ -10,14 +10,20 @@ EventProxyHTT::EventProxyHTT(){}
 EventProxyHTT::~EventProxyHTT(){}
 /////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////
+EventProxyBase* EventProxyHTT::clone() const{
+
+  return new EventProxyHTT();
+  
+}
+//////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////
 void EventProxyHTT::init(std::vector<std::string> const& iFileNames){
 
 	treeName_ = "m2n/newevent";
 
 	EventProxyBase::init(iFileNames);
-
 	fChain->SetMakeClass(0);
-		
+
 	wevent = 0;//IMPORTNANT!!
 	wpair = 0;//IMPORTNANT!!
 	wtau = 0;//IMPORTNANT!!

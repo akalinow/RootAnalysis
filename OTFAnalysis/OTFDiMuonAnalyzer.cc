@@ -314,7 +314,7 @@ bool OTFDiMuonAnalyzer::analyze(const EventProxyBase& iEvent){
   eventWeight_ = 1.0;
   /////////////////
   const EventProxyOTF & myEvent = static_cast<const EventProxyOTF&>(iEvent);
-  theEvent = myEvent.events;
+  theEvent = myEvent.event;
 
   if(theEvent->eta<0.83 || theEvent->eta>1.24) return true;
   //if(theEvent->eta1<0.83 || theEvent->eta1>1.24) return true;

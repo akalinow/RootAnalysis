@@ -20,6 +20,8 @@
 
       void init(std::vector<std::string> const& iFileNames);
 
+      virtual EventProxyBase* clone() const;
+
       Wevent *wevent;
       std::vector<Wpair>  *wpair;
       std::vector<Wtau>  *wtau;

@@ -30,6 +30,15 @@ void CPAnalyzer::initialize(TFileDirectory& aDir,
 }
 //////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////
+Analyzer* CPAnalyzer::clone() const{
+
+  CPAnalyzer* clone = new CPAnalyzer(name());
+  clone->setHistos(myHistos_);
+  return clone;
+
+};
+//////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////////
 void CPAnalyzer::finalize(){ 
 
  myHistos_->finalizeHistograms(0,1.0);
@@ -212,15 +221,9 @@ bool CPAnalyzer::analyze(const EventProxyBase& iEvent){
  
   std::string smearType = "ideal";
   std::string name;
-  bool selected = false;
+
   ///
-  fillVertices(aEventGen,aEventReco,"_"+motherName+"_AOD");
-  fillVertices(aEventGen,aEventReco,"_"+motherName+"_PF");
-  fillVertices(aEventGen,aEventReco,"_"+motherName+"_RefitBS");
-  fillVertices(aEventGen,aEventReco,"_"+motherName+"_RefitNoBS");
-  ////  
-  selected = analysisSelection(aEventReco);
-  ///
+  bool selected = analysisSelection(aEventGen);  
   for(auto decayName:decayNamesReco){
     if(decayName!="PiPi0Pi0") continue; //use only PiPi0Pi0 decays
     smearType = "ideal";

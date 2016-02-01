@@ -6,10 +6,19 @@
 
 //////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////
-TestAnalyzer::TestAnalyzer(const std::string & aName):Analyzer(aName){ }
+TestAnalyzer::TestAnalyzer(const std::string & aName):Analyzer(aName){ tmpName = "h1DXSignal";}
 //////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////
 TestAnalyzer::~TestAnalyzer(){ if(myHistos_) delete myHistos_; }
+//////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////////
+Analyzer* TestAnalyzer::clone() const{
+
+  TestAnalyzer* clone = new TestAnalyzer(name());
+  clone->setHistos(myHistos_);
+  return clone;
+
+};
 //////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////
 void TestAnalyzer::initialize(TFileDirectory& aDir,
@@ -20,7 +29,7 @@ void TestAnalyzer::initialize(TFileDirectory& aDir,
   ///The histograms for this analyzer will be saved into "TestAnalyzer"
   ///directory of the ROOT file
   ///NOTE: due to a bug hists land in the Summary directory
-  myHistos_ = new TestHistograms(&aDir, selectionFlavours_);  
+  myHistos_ = new TestHistograms(&aDir, selectionFlavours_);
 }
 //////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////
@@ -36,10 +45,17 @@ bool TestAnalyzer::analyze(const EventProxyBase& iEvent){
   const EventProxyTest & myEventProxy = static_cast<const EventProxyTest&>(iEvent);
 
   std::string sampleName = "Signal";
-  //Fill bookkeeping histogram. Bin 1 holds sum of weights.
+  std::string sampleName1 = "Signal";
+  std::string sampleName2 = "Signal";
+  std::string sampleName3 = "Signal";
+  std::string sampleName4 = "Signal";
+  std::string sampleName5 = "Signal";
+  
+  tmpName = "h1DX"+sampleName;
+  myHistos_->fill1DHistogram(tmpName,myEventProxy.x);
 
-  myHistos_->fill1DHistogram("h1DX"+sampleName,myEventProxy.x);
-  myHistos_->fill1DHistogram("h1DY"+sampleName,myEventProxy.y);
+  tmpName = "h1DY"+sampleName;
+  myHistos_->fill1DHistogram(tmpName,myEventProxy.y);
 
   return true;
 }

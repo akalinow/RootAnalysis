@@ -2,7 +2,7 @@ dnl Process this file with autoconf to produce a configure script.
 
 AC_PREREQ(2.59)
 AC_INIT(RootAnalysis, 1.0)
-: ${CXXFLAGS=-Werror -O3}
+: ${CXXFLAGS=-Werror -O3 -std=c++0x -fopenmp}
 AC_PROG_CC
 AC_PROG_CXX
 

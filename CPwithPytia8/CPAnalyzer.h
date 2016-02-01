@@ -66,12 +66,15 @@ class CPAnalyzer: public Analyzer{
 
   virtual void clear(){;};
 
+  virtual Analyzer* clone() const;
+
   virtual void addBranch(TTree *tree){;};
 
   virtual void addCutHistos(TList *aList){;};
 
-  const std::string & name(){return myName_;};
   bool filter() const{ return filterEvent_;};
+
+  void setHistos(CPHistograms *histos) { myHistos_ = histos;};
 
  protected:
 

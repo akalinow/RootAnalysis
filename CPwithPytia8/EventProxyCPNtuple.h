@@ -1,4 +1,3 @@
-
 #ifndef EVENTPROXYCPNtuple_h
 #define EVENTPROXYCPNtuple_h
 
@@ -20,6 +19,8 @@
       virtual ~EventProxyCPNtuple();
 
       void init(std::vector<std::string> const& iFileNames);
+
+      virtual EventProxyBase* clone() const;
 
       // Declaration of leaf types
       HTTEvent       *event;

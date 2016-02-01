@@ -15,6 +15,7 @@
 #include <fstream>
 #include <iomanip>
 #include <vector>
+#include <omp.h>
 
 #include "TFileDirectory.h"
 
@@ -27,14 +28,12 @@
 class AnalysisHistograms {
  public:
 
-  
   AnalysisHistograms():file_(0), histosInitialized_(false){};
 
 
   AnalysisHistograms(TFileDirectory *myDir,
 		     const std::string & name=""): file_(0),
     histosInitialized_(false), name_(name){};
-
 
   virtual ~AnalysisHistograms();
 
@@ -49,6 +48,7 @@ class AnalysisHistograms {
   TH2F* get2DHistogram(const std::string& name, bool noClone = false);
   TH3F* get3DHistogram(const std::string& name, bool noClone = false);
   
+  virtual void finalizeHistograms();
 
  protected:
 
@@ -62,8 +62,6 @@ class AnalysisHistograms {
 
   virtual void defineHistograms() = 0;
 
-  virtual void finalizeHistograms();
-
   /// The ROOT file with histograms
   TFileDirectory *file_;
 
@@ -71,11 +69,11 @@ class AnalysisHistograms {
   std::vector<TFileDirectory> mySecondaryDirs_;
 
   /// The histograms
-  std::unordered_map<std::string,TProfile*> myProfiles_;
-  std::unordered_map<std::string,TH1F*> my1Dhistograms_; 
-  std::unordered_map<std::string,TH2F*> my2Dhistograms_;
-  std::unordered_map<std::string,TH3F*> my3Dhistograms_;
-
+  std::unordered_map<std::string,TProfile*> myProfiles_[128];
+  std::unordered_map<std::string,TH1F*> my1Dhistograms_[128];
+  std::unordered_map<std::string,TH2F*> my2Dhistograms_[128];
+  std::unordered_map<std::string,TH3F*> my3Dhistograms_[128];
+  
   void addProfile(const std::string& name, const std::string& title, 
 		  int nBinsX, float xlow, float xhigh, 
 		  const TFileDirectory* myDir);
@@ -96,28 +94,30 @@ class AnalysisHistograms {
 		      int nBinsX, float* binsX,
 		      int nBinsY, float* binsY,
 		      const TFileDirectory* myDir);
+
   void add2DHistogram(const std::string& name, const std::string& title,
 		      int nBinsX, float xlow, float xhigh,
 		      int nBinsY, double* binsY,
 		      const TFileDirectory* myDir);
+
   void add3DHistogram(const std::string& name, const std::string& title,
 		      int nBinsX, float xlow, float xhigh,
 		      int nBinsY, float ylow, float yhigh,
 		      int nBinsZ, float zlow, float zhigh,
 		      const TFileDirectory* myDir);
+
   void add3DHistogram(const std::string& name, const std::string& title,
 		      int nBinsX, double* binsX,		                                           
 		      int nBinsY, double* binsY,
 		      int nBinsZ, double* binsZ, 
 		      const TFileDirectory* myDir);
-
+    
   static void resetHistos(std::pair<const std::string, TH1*> aPair);
 
-
+  TFileDirectory *myDirCopy;
   double* equalRanges(int nSteps, double min, double max, double *ranges);
   bool histosInitialized_;
-
-
+ 
   ///Name of the histograms set instance
   std::string name_;
 

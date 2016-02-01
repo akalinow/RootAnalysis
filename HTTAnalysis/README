@@ -11,39 +11,34 @@ cd HTTAnalysis
 
 #NOTE: File htt.ini files contain paths to the data files. Please update it before running the code.
 #Running the analysis requires three steps:
-# 1) - making histograms with observed number of primary vertices.
-#     Steps 1) and 2) are expectedd to be run only once, when new data files are produced.
+# 1) - making histograms with number of primary vertices in MC files used in analysis
+#     Step 1) is expectedd to be run only once, when new data files are produced.
 #     for this one has to set. Before this please remove old ROOT files:
 
 rm -f RootAnalysis*
 
-#
-#processName = PU
-#
-# in htt.iti
 
-./test htt.ini #this creates histograms with observed PU
-
-# 2) Make the event weights tree. This TTree has lenght equal to sum of lenghts of
-# input TTrees, so in particular order of tress in htt.ini is RELEVANT.
-#To run this step one has to set
-#
+#  Weights step expects a file in current directory:
+#  MyDataPileupHistogram.root - file with PU estimated in DATA, created using relevant on luminosity JSON.
 #
 #processName = Weights
 #
+# in htt.iti
 
-./test htt.ini #this creates TTree with PU weights
+./test htt.ini #this creates histograms with weights as a fnction of PU used in MC samples.
 
 
-#  3) The main analysis. This step is expected to be run many times.
+#  2) The main analysis. This step is expected to be run many times.
 #  To run this step one has to set
+#  Analysis step expects a file in current directory:
+#  RootAnalysis_Weights.root - file with number of primary vertices in MC files used in analysis
 #
 #processName = Analysis
 #
 
 ./test htt.ini      #this runs actual analysis and creates plots in fig_png and fig_C directories
 
-#For the step 3) the processName can be any string except PU and Weights, which reserved for steps 1) and 2).
+#For the step 3) the processName can be any string except PU and Weights, which reserved for step 1)
 
 
 

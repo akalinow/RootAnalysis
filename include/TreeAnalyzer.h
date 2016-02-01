@@ -11,7 +11,7 @@
 #include "Analyzer.h"
 #include "ObjectMessenger.h"
 #include "TFileService.h"
-
+#include "omp.h"
 class TH1D;
 class TProofOutputFile;
 class SummaryAnalyzer;
@@ -77,6 +77,7 @@ public :
    void clear();
 
    ///Vector with list of analyzers.
+   std::vector<Analyzer*> myAnalyzersThreads_[128];
    std::vector<Analyzer*> myAnalyzers_;
 
    ///Vector with list of TFileDirectory
@@ -84,7 +85,6 @@ public :
 
    ///List of events to be read
    boost::unordered_map<std::string, bool> eventsToProcessHash_;
-
 
    ///Summary analyzer is a special analyser providing
    ///bookkeeping services
@@ -145,6 +145,11 @@ public :
 
    ///Concrete event proxy
    EventProxyBase *myProxy_;
+   EventProxyBase *myProxiesThread_[128];
+   
+   ///Number of parraler threads used in processing.
+   unsigned int nThreads_;
+   
 };
 
 #endif

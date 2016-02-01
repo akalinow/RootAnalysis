@@ -38,6 +38,8 @@ class TestAnalyzer: public Analyzer{
 
   virtual void clear(){;};
 
+  Analyzer* clone() const;
+
   bool filter() const{ return filterEvent_;};
 
  protected:
@@ -49,11 +51,15 @@ class TestAnalyzer: public Analyzer{
 
  private:
 
+  void setHistos(TestHistograms *histos) { myHistos_ = histos;};
+
   ///Histograms storage.
   TestHistograms *myHistos_;
   
   //should this TestAnalyzer be able to filter events
   bool filterEvent_;
+
+  std::string tmpName;
  
 };
 

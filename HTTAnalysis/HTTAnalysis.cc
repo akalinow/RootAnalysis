@@ -47,6 +47,11 @@ int main(int argc, char ** argv) {
 	
 	typedef boost::tokenizer<boost::char_separator<char> > tokenizer;
 	std::string processName = pt.get<std::string>("TreeAnalyzer.processName","Test");
+
+	//Tell Root we want to be multi-threaded
+	ROOT::EnableThreadSafety();
+	//When threading, also have to keep ROOT from logging all TObjects into a list
+	TObject::SetObjectStat(false);
 	
 	//----------------------------------------------------------
 	 std::vector<Analyzer*> myAnalyzers;

@@ -41,9 +41,18 @@ void OTFAnalyzer::initialize(TFileDirectory& aDir,
 }
 //////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////
+Analyzer* OTFAnalyzer::clone() const{
+
+  OTFAnalyzer* clone = new OTFAnalyzer(name());
+  clone->setHistos(myHistos_);
+  return clone;
+
+};
+//////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////////
 void OTFAnalyzer::finalize(){ 
 
-  
+  /* Does not work with multithread
  std::cout<<"tmpMap.size(): "<<tmpMap.size()<<std::endl;
  
  std::ostringstream stringStr;
@@ -67,7 +76,8 @@ void OTFAnalyzer::finalize(){
      h->GetYaxis()->SetBinLabel(iBinX,label.c_str());
    }
  }
- 
+*/ 
+
   myHistos_->finalizeHistograms(0,1.0); 
 }
 //////////////////////////////////////////////////////////////////////////////
@@ -234,11 +244,12 @@ void OTFAnalyzer::fillRateHisto(const std::string & sysType,
 	  ptCut = OTFHistograms::ptBins[OTFHistograms::ptCutsOtf[iCut]];
 
 	}
-
+	
 	bool qualityCut = passQuality(myL1Coll,sysType,iCand);
 	bool pass = myL1Coll->size() && qualityCut;
 	float val = 0;
-	if(pass) val = myL1Coll->operator[](iCand).pt;
+
+	if(pass) val = myL1Coll->operator[](iCand).pt;	
         if(selType=="Tot") myHistos_->fill2DHistogram(hName,theEvent->pt,val);
 
 	///Rate vs selected variable is plotted for given pt cut.
@@ -305,13 +316,8 @@ bool OTFAnalyzer::analyze(const EventProxyBase& iEvent){
   //if(theEvent->eta<0) return true;
   //if(theEvent->charge>0) return true;
   //if(fabs(theEvent->eta)<0.83 || fabs(theEvent->eta)>0.9) return true; //TEST
-    
-  std::string selType = "";
-  std::string sysTypeGmt="Gmt";
-  std::string sysTypeOtf="Otf";
-  std::string sysTypeRpc="Rpc";
-  std::string sysTypeOther="Other";
 
+  
   //if(theEvent->pt<0.01){
   if(true){//TEST
   
@@ -326,13 +332,9 @@ bool OTFAnalyzer::analyze(const EventProxyBase& iEvent){
     
     fillRateHisto("Otf","VsQuality");
     fillRateHisto("Gmt","VsQuality");
-
-    //fillGhostHisto("Otf","VsProcessor");
-    //fillGhostHisto("Gmt","VsProcessor");
   }
   //else if(fabs(theEvent->eta)>0.83 && fabs(theEvent->eta)<1.24){
-  if(fabs(theEvent->eta)>0.83 && fabs(theEvent->eta)<1.24){//TEST
-    
+  if(fabs(theEvent->eta)>0.83 && fabs(theEvent->eta)<1.24){//TEST   
     for(int iCut=0;iCut<22;++iCut){
       if(iCut>0 && iCut<14) continue;
       fillTurnOnCurve(iCut,sysTypeGmt,selType);

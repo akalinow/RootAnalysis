@@ -2,13 +2,16 @@
 #include <fstream>
 #include <iterator>
 #include <string>
-
+#include <omp.h>
 #include "TreeAnalyzer.h"
 #include "SummaryAnalyzer.h"
 #include "ObjectMessenger.h"
 #include "EventProxyBase.h"
 
 #include "boost/functional/hash.hpp"
+
+#include "EventProxyBase.h"
+#include "AnalysisHistograms.h"
 #include "boost/property_tree/ptree.hpp"
 #include "boost/property_tree/ini_parser.hpp"
 #include "boost/tokenizer.hpp"
@@ -134,6 +137,8 @@ void TreeAnalyzer::parseCfg(const std::string & cfgFileName){
   
   nEventsToAnalyze_ = pt.get("TreeAnalyzer.eventsToAnalyze",-1);
   nEventsToPrint_ = pt.get("TreeAnalyzer.eventsToPrint",100);
+  nThreads_ = pt.get("TreeAnalyzer.threads",1);
+  omp_set_num_threads(nThreads_);  
   
   
 }
@@ -142,10 +147,16 @@ void TreeAnalyzer::parseCfg(const std::string & cfgFileName){
 void  TreeAnalyzer::init(std::vector<Analyzer*> myAnalyzers){
 
   myProxy_->init(fileNames_);
-
   myAnalyzers_ = myAnalyzers;
-  mySummary_ = new SummaryAnalyzer("Summary");
-  myAnalyzers_.push_back(mySummary_);
+
+  ///Summary analyzer not used at the moment.
+  ///does not work with multithread.
+  /*
+  if(nThreads_==1){
+    mySummary_ = new SummaryAnalyzer("Summary");
+    myAnalyzers_.push_back(mySummary_);
+  }
+  */
 
   for(unsigned int i=0;i<myAnalyzers_.size();++i){ 
     myDirectories_.push_back(store_->mkdir(myAnalyzers_[i]->name()));
@@ -153,10 +164,27 @@ void  TreeAnalyzer::init(std::vector<Analyzer*> myAnalyzers){
 				myStrSelections_);
   }
 
- for(unsigned int i=0;i<myAnalyzers_.size();++i){
-   myAnalyzers_[i]->addBranch(mySummary_->getTree());  
-   myAnalyzers_[i]->addCutHistos(mySummary_->getHistoList());  
+
+  
+ for(unsigned int iThread=0;iThread<omp_get_max_threads();++iThread){
+   myProxiesThread_[iThread] = myProxy_->clone();
+   myProxiesThread_[iThread]->init(fileNames_);
+    for(unsigned int iAnalyzer=0;iAnalyzer<myAnalyzers_.size();++iAnalyzer){
+      myAnalyzersThreads_[iThread].push_back(myAnalyzers_[iAnalyzer]->clone());
+    }
+  }
+
+ ///Tree making not used at the moment.
+ ///does not work with multithread.
+ /*
+ if(nThreads_==1){
+   unsigned int iThread = 0;
+   for(unsigned int i=0;i<myAnalyzers_.size();++i){
+     myAnalyzers_[i]->addBranch(mySummary_->getTree());  
+     myAnalyzers_[i]->addCutHistos(mySummary_->getHistoList());
+   }
  }
+ */
 }
 //////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////
@@ -164,46 +192,49 @@ void  TreeAnalyzer::finalize(){
   for(unsigned int i=0;i<myAnalyzers_.size();++i) myAnalyzers_[i]->finalize();
 }
 //////////////////////////////////////////////////////////////////////////////
-//////////////////////////////////////////////////////////////////////////////
+/////////////////////////////////////////////////////////////////////////////
 int TreeAnalyzer::loop(){
 
   std::cout<<"Events total: "<<myProxy_->size()<<std::endl;
-
+  TH1::AddDirectory(kFALSE);
   nEventsAnalyzed_ = 0;
-  nEventsSkipped_ = 0;  
+  nEventsSkipped_ = 0;
   if(nEventsToAnalyze_<0 || nEventsToAnalyze_>myProxy_->size()) nEventsToAnalyze_ = myProxy_->size();
   int eventPreviouslyPrinted=-1;
+  int nEventsInTree = nEventsToAnalyze_;
+
+  myProxiesThread_[0]->toBegin();  
+  if(nThreads_>1) nEventsInTree = myProxiesThread_[0]->getTTree()->GetEntries();
   ///////
-   for(myProxy_->toBegin();
-       !myProxy_->atEnd() && (nEventsToAnalyze_<0 || (nEventsAnalyzed_+nEventsSkipped_)<nEventsToAnalyze_); ++(*myProxy_)){
-     
-     if((( nEventsAnalyzed_ < nEventsToPrint_) ||
-	 nEventsAnalyzed_%500000==0) &&  nEventsAnalyzed_ != eventPreviouslyPrinted ) {
-       eventPreviouslyPrinted = nEventsAnalyzed_;
-       std::cout<<"Events analyzed: "<<nEventsAnalyzed_<<"/"<<nEventsToAnalyze_<<" ("<<(float)nEventsAnalyzed_/nEventsToAnalyze_<<")"<<"\r"<<std::flush;
-     }
-     analyze(*myProxy_);
-   }
-   
-   std::cout << "\n Events skipped: " << nEventsSkipped_ << std::endl ;
-   return nEventsAnalyzed_;
+
+  //while(nEventsAnalyzed_<nEventsToAnalyze_){
+  unsigned int testCounter = 0;
+
+    #pragma omp parallel for 
+    for(int aEvent=nEventsAnalyzed_;aEvent<nEventsInTree+nEventsAnalyzed_;++aEvent){      
+      //if( nEventsAnalyzed_ < nEventsToPrint_ || nEventsAnalyzed_%5000000==0)
+      //std::cout<<"Events analyzed: "<<nEventsAnalyzed_<<" thread: "<<omp_get_thread_num()<<std::endl;
+      testCounter+analyze(myProxiesThread_[omp_get_thread_num()]->toN(aEvent));
+    }
+
+    //for(unsigned int iThread=0;iThread<nThreads_;++iThread) myProxiesThread_[iThread]->getTChain()->GetEntry(nEventsAnalyzed_);
+    //nEventsInTree = myProxiesThread_[0]->getTTree()->GetEntries();
+    //}
+
+    nEventsAnalyzed_ = testCounter;
+  
+  return nEventsAnalyzed_;    
 }
 //////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////
 bool TreeAnalyzer::analyze(const EventProxyBase& iEvent){
+  
+  for(unsigned int i=0;i<myAnalyzers_.size();++i){
+    myAnalyzersThreads_[omp_get_thread_num()][i]->analyze(iEvent,myObjMessenger_);
+  }
 
-  clear();
-    ///////
-    for(unsigned int i=0;i<myAnalyzers_.size();++i){
-      ///If analyzer returns false, skip to the last one, the Summary, unless filtering is disabled for this analyzer.
-      if(!myAnalyzers_[i]->analyze(iEvent,myObjMessenger_) && myAnalyzers_[i]->filter() && myAnalyzers_.size()>1) i = myAnalyzers_.size()-2;
-    }
-    ///Clear all the analyzers, even if it was not called in this event.
-    ///Important for proper TTree filling.
-    for(unsigned int i=0;i<myAnalyzers_.size();++i) myAnalyzers_[i]->clear(); 
-        
-    myObjMessenger_->clear();
-    ++nEventsAnalyzed_;
+  //#pragma omp atomic
+  //++nEventsAnalyzed_;
   
   return 1;
 }

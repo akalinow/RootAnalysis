@@ -19,18 +19,12 @@
       EventProxyOTF();
       virtual ~EventProxyOTF();
 
-      //virtual template<T> const T & getEvent() const = 0;
-
       void init(std::vector<std::string> const& iFileNames);
 
+      virtual EventProxyBase* clone() const;
+      
       // Declaration of leaf types
-     EventData       *events;
-
-
-   private:
-
-     // List of branches
-     TBranch        *b_Events;
+      EventData       *event;
 
 };
 #endif
