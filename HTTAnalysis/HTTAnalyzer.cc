@@ -51,6 +51,14 @@ void HTTAnalyzer::finalize(){
 //////////////////////////////////////////////////////////////////////////////
 std::string HTTAnalyzer::getSampleName(const EventProxyHTT & myEventProxy){
 
+  ///Hack for buggy sample setting in 01_02_2016 ntuples
+  std::string fileName(myEventProxy.getTFile()->GetName());
+  if(fileName.find("WJet")!=std::string::npos){
+    EventProxyHTT & myEventProxyMod = const_cast<EventProxyHTT&>(myEventProxy);
+    myEventProxy.wevent->sample(2);
+  }
+  ////
+  
   if(myEventProxy.wevent->sample()==0) return "Data";
   if(myEventProxy.wevent->sample()==1) return "DYJets";
   if(myEventProxy.wevent->sample()==2) return "WJets";
