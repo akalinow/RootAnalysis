@@ -44,7 +44,7 @@ void HTTAnalyzer::initialize(TFileDirectory& aDir,
 //////////////////////////////////////////////////////////////////////////////
 void HTTAnalyzer::finalize(){ 
 
-  myHistos_->finalizeHistograms(0,1.0);
+  //myHistos_->finalizeHistograms(0,1.0);
  
 }
 //////////////////////////////////////////////////////////////////////////////
@@ -219,6 +219,8 @@ std::pair<float,float> HTTAnalyzer::angleBetweenPlanes(const TLorentzVector &tau
 //////////////////////////////////////////////////////////////////////////////
 bool HTTAnalyzer::analyze(const EventProxyBase& iEvent){
 
+  return true;
+
   const EventProxyHTT & myEventProxy = static_cast<const EventProxyHTT&>(iEvent);
 
   std::string sampleName = getSampleName(myEventProxy);  
@@ -229,21 +231,8 @@ bool HTTAnalyzer::analyze(const EventProxyBase& iEvent){
   //Fill bookkeeping histogram. Bin 1 holds sum of weights.
   myHistos_->fill1DHistogram("h1DStats"+sampleName,1,eventWeight);
 
-  ///To spedup processing we load only event with at least one tau pair.
-  ///Have to cast away const fromthe event. 
-  ///WARNING: needs check with any new ROOT version, as SetBranchStatus
-  ///behaviour may change.
-  EventProxyHTT & myEventProxyMod = const_cast<EventProxyHTT&>(myEventProxy);
-  if(myEventProxy.wpair->size()){
-    //myEventProxyMod.enableBranches();
-    //myEventProxyMod.reloadEvent();
-  }  
-  /////////////////////////////////////////////////////////////////////////////
-
-
   if(!myEventProxy.wpair->size() || !myEventProxy.wtau->size() || !myEventProxy.wmu->size()) return true;
   
-
   Wevent aEvent = *myEventProxy.wevent;
   Wpair aPair = (*myEventProxy.wpair)[0];
   Wtau aTau = (*myEventProxy.wtau)[0];
@@ -296,10 +285,6 @@ bool HTTAnalyzer::analyze(const EventProxyBase& iEvent){
   }
 
   ///Histograms for the tt control region
-
-
-  ///Disable branches before loading next event.
-  //myEventProxyMod.disableBranches();
   
   return true;
 }

@@ -126,12 +126,12 @@ void OTFHistograms::defineHistograms(){
  add2DHistogram("h2DEtaHitTemplate","",8*26,0.8,1.25,2,-0.5,1.5,file_);
  add2DHistogram("h2DPhiHitTemplate","",5*32,-M_PI,M_PI,2,-0.5,1.5,file_);
 
- add2DHistogram("h2DEtaVx","",40,-1.6,1.6,2,-0.5,1.5,file_);//Full detector
- //add2DHistogram("h2DEtaVx","",20,0.83,1.24,2,-0.5,1.5,file_);//Overlap 
- //add2DHistogram("h2DEtaVx","",8*25,-0.1,0.85,2,-0.5,1.5,file_);//Barrel
- //add2DHistogram("h2DEtaVx","",8*25,1.25,2.65,2,-0.5,1.5,file_);//Endcap
+ add2DHistogram("h2DEtaVxTemplate","",40,-1.6,1.6,2,-0.5,1.5,file_);//Full detector
+ //add2DHistogram("h2DEtaVxTemplate","",20,0.83,1.24,2,-0.5,1.5,file_);//Overlap 
+ //add2DHistogram("h2DEtaVxTemplate","",8*25,-0.1,0.85,2,-0.5,1.5,file_);//Barrel
+ //add2DHistogram("h2DEtaVxTemplate","",8*25,1.25,2.65,2,-0.5,1.5,file_);//Endcap
  
- add2DHistogram("h2DPhiVx","",4*32,-0.2,3.2,2,-0.5,1.5,file_);
+ add2DHistogram("h2DPhiVxTemplate","",4*32,-0.2,3.2,2,-0.5,1.5,file_);
  
  add2DHistogram("h2DQualityTemplate","",1000,1.5,1001.5,2,-0.5,1.5,file_);
  
