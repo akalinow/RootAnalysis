@@ -8,6 +8,10 @@
 //////////////////////////////////////////////////////////////////////////////
 HTTAnalyzer::HTTAnalyzer(const std::string & aName):Analyzer(aName){
 
+  ///Load ROOT file with PU histograms.
+  std::string filePath = "./RootAnalysis_Weights.root";//FIX ME
+  puFile_ = new TFile(filePath.c_str());
+  
 }
 //////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////
@@ -30,10 +34,6 @@ void HTTAnalyzer::initialize(TFileDirectory& aDir,
 			     pat::strbitset *aSelections){
 
   mySelections_ = aSelections;
-
-  ///Load ROOT file with PU histograms.
-  std::string filePath = "./RootAnalysis_Weights.root";//FIX ME
-  puFile_ = new TFile(filePath.c_str());
   
   ///The histograms for this analyzer will be saved into "HTTAnalyzer"
   ///directory of the ROOT file
@@ -44,21 +44,20 @@ void HTTAnalyzer::initialize(TFileDirectory& aDir,
 //////////////////////////////////////////////////////////////////////////////
 void HTTAnalyzer::finalize(){ 
 
-  //myHistos_->finalizeHistograms(0,1.0);
+  myHistos_->finalizeHistograms(0,1.0);
  
 }
 //////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////
 std::string HTTAnalyzer::getSampleName(const EventProxyHTT & myEventProxy){
-
+  
   ///Hack for buggy sample setting in 01_02_2016 ntuples
-  std::string fileName(myEventProxy.getTFile()->GetName());
-  if(fileName.find("WJet")!=std::string::npos){
+  std::string fileName(myEventProxy.getTTree()->GetCurrentFile()->GetName());
+  if(fileName.find("WJets")!=std::string::npos){
     EventProxyHTT & myEventProxyMod = const_cast<EventProxyHTT&>(myEventProxy);
     myEventProxy.wevent->sample(2);
   }
   ////
-  
   if(myEventProxy.wevent->sample()==0) return "Data";
   if(myEventProxy.wevent->sample()==1) return "DYJets";
   if(myEventProxy.wevent->sample()==2) return "WJets";
@@ -70,9 +69,7 @@ std::string HTTAnalyzer::getSampleName(const EventProxyHTT & myEventProxy){
 //////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////
 float HTTAnalyzer::getPUWeight(const EventProxyHTT & myEventProxy){
-
-  return 1.0;//TEST
-
+  
   ///Load histogram only once,later fetch it from vector<TH1F*>
   ///At the same time divide the histogram to get the weight.
   ///First load Data PU
@@ -226,8 +223,6 @@ std::pair<float,float> HTTAnalyzer::angleBetweenPlanes(const TLorentzVector &tau
 //////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////
 bool HTTAnalyzer::analyze(const EventProxyBase& iEvent){
-
-  return true;
 
   const EventProxyHTT & myEventProxy = static_cast<const EventProxyHTT&>(iEvent);
 

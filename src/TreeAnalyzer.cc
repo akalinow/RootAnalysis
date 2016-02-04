@@ -152,12 +152,9 @@ void  TreeAnalyzer::init(std::vector<Analyzer*> myAnalyzers){
   ///Summary analyzer not used at the moment.
   ///does not work with multithread.
   /*
-  if(nThreads_==1){
-    mySummary_ = new SummaryAnalyzer("Summary");
-    myAnalyzers_.push_back(mySummary_);
-  }
+  mySummary_ = new SummaryAnalyzer("Summary");
+  myAnalyzers_.push_back(mySummary_);
   */
-
   for(unsigned int i=0;i<myAnalyzers_.size();++i){ 
     myDirectories_.push_back(store_->mkdir(myAnalyzers_[i]->name()));
     myAnalyzers_[i]->initialize(myDirectories_[myDirectories_.size()-1],
@@ -201,26 +198,22 @@ int TreeAnalyzer::loop(){
   nEventsSkipped_ = 0;
   if(nEventsToAnalyze_<0 || nEventsToAnalyze_>myProxy_->size()) nEventsToAnalyze_ = myProxy_->size();
   int eventPreviouslyPrinted=-1;
-  int nEventsInTree = nEventsToAnalyze_;
 
   myProxiesThread_[0]->toBegin();  
-  //if(nThreads_>1) nEventsInTree = myProxiesThread_[0]->getTTree()->GetEntries();
-  ///////
 
-  //while(nEventsAnalyzed_<nEventsToAnalyze_){
-
+  unsigned int aEvent=0;
   #pragma omp parallel for schedule(dynamic, 100000)
-    for(int aEvent=nEventsAnalyzed_;aEvent<nEventsInTree+nEventsAnalyzed_;++aEvent){      
-      //if( nEventsAnalyzed_ < nEventsToPrint_ || nEventsAnalyzed_%5000000==0)
-      //std::cout<<"Events analyzed: "<<nEventsAnalyzed_<<" thread: "<<omp_get_thread_num()<<std::endl;
+    for(aEvent=0;aEvent<nEventsToAnalyze_;++aEvent){      
+      if(aEvent< nEventsToPrint_ || aEvent%5000000==0)
+	std::cout<<"Events analyzed: "<<aEvent<<"/"<<nEventsToAnalyze_
+		 <<" ("<<(float)aEvent/nEventsToAnalyze_<<")"
+		 <<" thread: "<<omp_get_thread_num()<<std::endl;
       analyze(myProxiesThread_[omp_get_thread_num()]->toN(aEvent));
     }
 
-    //for(unsigned int iThread=0;iThread<nThreads_;++iThread) myProxiesThread_[iThread]->getTChain()->GetEntry(nEventsAnalyzed_);
-    //nEventsInTree = myProxiesThread_[0]->getTTree()->GetEntries();
-    //}
-  
-  return nEventsAnalyzed_;    
+    std::cout<<"aEvent: "<<aEvent<<std::endl;
+    
+    return nEventsAnalyzed_;   
 }
 //////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////

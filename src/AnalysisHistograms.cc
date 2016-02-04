@@ -231,7 +231,11 @@ TProfile* AnalysisHistograms::getProfile(const std::string& name, bool noClone) 
  std::unordered_map<std::string,TProfile*>::iterator it = myProfiles_[iThread].find(name);
 
  if(noClone && it!=myProfiles_[iThread].end()) return it->second;
- else if(it!=myProfiles_[iThread].end()) return (TProfile*)(it->second->Clone());
+ else if(it!=myProfiles_[iThread].end()){
+     TProfile* hClone =  (TProfile*)(it->second->Clone());
+     hClone->SetDirectory(0);
+     return hClone;
+   }
  
  else cout<<"ERROR: Profile : "<<name<<" not found!"<<endl;
  return 0;
@@ -247,8 +251,12 @@ TH1F* AnalysisHistograms::get1DHistogram(const std::string& name, bool noClone){
 
  std::unordered_map<std::string,TH1F*>::iterator it = my1Dhistograms_[iThread].find(name);
  
- if(noClone && it!=my1Dhistograms_[iThread].end()) return (TH1F*)(my1Dhistograms_[iThread][name]->Clone());
- else if(it!=my1Dhistograms_[iThread].end()) return (TH1F*)(it->second->Clone());
+ if(noClone && it!=my1Dhistograms_[iThread].end()) return it->second;
+ else if(it!=my1Dhistograms_[iThread].end()){
+     TH1F* hClone =  (TH1F*)(it->second->Clone());
+     hClone->SetDirectory(0);
+     return hClone;
+   }
  else cout<<"ERROR: Histogram: "<<name<<" not found in thread: "<<iThread<<endl;
 
  return 0;
@@ -265,7 +273,11 @@ TH2F* AnalysisHistograms::get2DHistogram(const std::string& name, bool noClone){
  std::unordered_map<std::string,TH2F*>::iterator it = my2Dhistograms_[iThread].find(name);
  
  if(noClone && it!=my2Dhistograms_[iThread].end()) return it->second;
- else if(it!=my2Dhistograms_[iThread].end()) return (TH2F*)(it->second->Clone());
+ else if(it!=my2Dhistograms_[iThread].end()){
+   TH2F* hClone =  (TH2F*)(it->second->Clone());
+   hClone->SetDirectory(0);
+   return hClone;
+ }
  else cout<<"ERROR: Histogram: "<<name<<" not found in thread: "<<iThread<<endl;
  return 0;
 }
@@ -280,7 +292,11 @@ TH3F* AnalysisHistograms::get3DHistogram(const std::string& name, bool noClone){
   std::unordered_map<std::string,TH3F*>::iterator it = my3Dhistograms_[iThread].find(name);
 
  if(noClone && it!=my3Dhistograms_[iThread].end()) it->second;
- if(it!=my3Dhistograms_[iThread].end()) return (TH3F*)(it->second->Clone());
+ if(it!=my3Dhistograms_[iThread].end()){
+   TH3F* hClone =  (TH3F*)(it->second->Clone());
+   hClone->SetDirectory(0);
+   return hClone;
+ }
  else cout<<"ERROR: Histogram: "<<name<<" not found in thread: "<<iThread<<endl;
  return 0;
 }
