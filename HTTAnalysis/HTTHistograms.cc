@@ -183,7 +183,15 @@ void HTTHistograms::defineHistograms(){
 /////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////
 void HTTHistograms::finalizeHistograms(int nRuns, float weight){
-
+  /*
+  std::string sampleName = "Data";
+  std::string hName = "h1DStats"+sampleName;
+  TH1F *hStats = get1DHistogram(hName.c_str());
+  int nEventsAnalysed = hStats->GetBinContent(1);
+  std::cout<<"nEventsAnalysed: "<<nEventsAnalysed<<std::endl;
+  return;
+  */
+  
   ///TEST
   /*  
   plotStack("MassTrans","wselOS");  
