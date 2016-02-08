@@ -69,6 +69,8 @@ std::string HTTAnalyzer::getSampleName(const EventProxyHTT & myEventProxy){
 //////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////
 float HTTAnalyzer::getPUWeight(const EventProxyHTT & myEventProxy){
+
+  return 1.0;//TEST
   
   ///Load histogram only once,later fetch it from vector<TH1F*>
   ///At the same time divide the histogram to get the weight.
@@ -137,45 +139,6 @@ void HTTAnalyzer::fillControlHistos(Wevent & aEvent,
   myHistos_->fill1DHistogram("h1DIsoMuon"+hNameSuffix,aMuon.iso(),eventWeight);
   myHistos_->fill1DHistogram("h1DPhiMuon"+hNameSuffix,  aMuon.phi(),eventWeight);
   myHistos_->fill1DHistogram("h1DPhiTau"+hNameSuffix, aTau.phi() ,eventWeight);
-
-  /*
-  ///Fill leading track pt
-  myHistos_->fill1DHistogram("h1DPtTauLeadingTk"+hNameSuffix,aTau.leadingTk().Pt(),eventWeight);
-
-  ///Method from http://arxiv.org/abs/1108.0670 (Berger)
-  ///take impact parameters instead of tau momentum.
-  ///calculate angles in pi+ - pi- rest frame
-  std::pair<float,float>  angles;
-
-  TLorentzVector positiveLeadingTk;
-  TLorentzVector negativeLeadingTk;
-  
-  if(aMuon.charge()>0){
-
-    positiveLeadingTk.SetPtEtaPhiM(aMuon.pt(), aMuon.phi(),
-				   aMuon.eta(), aMuon.mass());
-
-    ///For tau leading trakc put pion mass in GeV.
-    negativeLeadingTk = aTau.leadingTk();
-
-    angles = angleBetweenPlanes(negativeLeadingTk,TLorentzVector(aTau.nPCA(),0),
-				positiveLeadingTk,TLorentzVector(aMuon.nPCA(),0));
-  }
-  else{
-    
-    positiveLeadingTk = aTau.leadingTk();				 
-    negativeLeadingTk.SetPtEtaPhiM(aMuon.pt(), aMuon.phi(),
-				   aMuon.eta(), aMuon.mass());
-    
-    angles = angleBetweenPlanes(negativeLeadingTk,TLorentzVector(aMuon.nPCA(),0),
-				positiveLeadingTk,TLorentzVector(aTau.nPCA(),0));
-  }
-
-  //std::cout<<"aTau.leadingTk().Pt()-aTau.Pt()): "<<aTau.leadingTk().Pt()-aTau.pt()<<std::endl;
-  
-  if(fabs(aTau.leadingTk().Pt()-aTau.pt())<1) myHistos_->fill1DHistogram("h1DPhi_nVectors"+hNameSuffix,angles.first,eventWeight);
-  //myHistos_->fill1DHistogram("h1DRho_nVectors"+hNameSuffix,angles.second,eventWeight);
-  */
 
   ///Fill jets info
   myHistos_->fill1DHistogram("h1DPtLeadingJet"+hNameSuffix,aJet.pt(),eventWeight);

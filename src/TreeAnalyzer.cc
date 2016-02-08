@@ -71,8 +71,8 @@ TreeAnalyzer::~TreeAnalyzer(){
 
   std::cout<<"TreeAnalyzer::~TreeAnalyzer() Begin"<<std::endl;
 
-  delete mySummary_;
-  delete store_;
+  //if(mySummary_) delete mySummary_;
+  //if(store_) delete store_;
 
   std::cout<<"TreeAnalyzer::~TreeAnalyzer() Done"<<std::endl;
 }
