@@ -30,6 +30,29 @@ class TLorentzVector;
 class HTTAnalyzer: public Analyzer{
 
  public:
+
+  ///Copy from DataFormats/TauReco/interface/PFTauDecayMode.h
+  enum hadronicTauDecayModes 
+  {
+    tauDecay1ChargedPion0PiZero,
+    tauDecay1ChargedPion1PiZero,  // rho (770 MeV) mediated)
+    tauDecay1ChargedPion2PiZero,  // a1  (1.2 GeV) mediated
+    tauDecay1ChargedPion3PiZero,  // contaminated or unmerged photo
+    tauDecay1ChargedPion4PiZero,  // contaminated or unmerged photo
+    tauDecay2ChargedPion0PiZero,  // extra track or un-recod track
+    tauDecay2ChargedPion1PiZero,  // extra track or un-recod track
+    tauDecay2ChargedPion2PiZero,  // extra track or un-recod track
+    tauDecay2ChargedPion3PiZero,  // extra track or un-recod track
+    tauDecay2ChargedPion4PiZero,  // extra track or un-recod track
+    tauDecay3ChargedPion0PiZero,  // a1  (1.2 GeV) mediated
+    tauDecay3ChargedPion1PiZero,  // a1  (1.2 GeV) mediated
+    tauDecay3ChargedPion2PiZero,  // a1  (1.2 GeV) mediated
+    tauDecay3ChargedPion3PiZero,  // a1  (1.2 GeV) mediated
+    tauDecay3ChargedPion4PiZero,  // a1  (1.2 GeV) mediated
+    tauDecaysElectron,
+    tauDecayMuon,
+    tauDecayOther                 // catch-all
+  };
   
   HTTAnalyzer(const std::string & aName);
 
@@ -64,16 +87,40 @@ class HTTAnalyzer: public Analyzer{
 
   ///Fill histograms for all control plots.
   ///Histogram names will end with hNameSuffix
-  void fillControlHistos(Wevent & aEvent, 
-			 Wpair & aPair, Wtau & aTau, Wmu & aMuon,
-			 Wjet & aJet,
-			 float eventWeight,
-			 const std::string & hNameSuffix);
+  void fillControlHistos( Wevent &,  Wpair &,
+			  Wtau &,  Wmu &,
+			  Wjet &,
+			  float eventWeight,
+			  std::string & hNameSuffix);
+  
+  ///Fill histograms with cos(phi), where phi is the decay 
+  ///between tau decay planes. Method used for reconstructed
+  ///mu+tau_h mode
+  void fillDecayPlaneAngle(Wtau & aTau,   Wmu & aMuon,
+			   float eventWeight,
+			   std::string & hNameSuffix);
 
+  ///Fill histograms with cos(phi), where phi is the decay 
+  ///between tau decay planes. Method used for 
+  ///generator level taus for all decay modes.
+  void fillDecayPlaneAngle(Wtau & aTauPlus, Wtau & aTauMinus,				      
+			   float eventWeight,
+			   std::string & hNameSuffix);
+  
   ///Calculate angle between tau decay planes (first element of pair)
   //and angle betwee decay products (second element of pair)
   std::pair<float,float> angleBetweenPlanes(const TLorentzVector& tau1, const TLorentzVector& tau1Daughter,
 					    const TLorentzVector& tau2, const TLorentzVector& tau2Daughter);
+
+  ///Return string encoding di-tau decay mode.
+  ///The event can belong to more than one category
+  std::vector<std::string> getTauDecayName(int decModeMinus, int decModePlus);
+
+  ///Check if the decMode points to single prong hadronic tau decay
+  bool isOneProng(int decMode);
+  
+  ///Check if the decMode points to leptonic tau decay
+  bool isLepton(int decMode);
   
  protected:
 

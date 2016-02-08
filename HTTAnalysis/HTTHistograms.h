@@ -61,6 +61,9 @@ class HTTHistograms: public AnalysisHistograms {
   //selName - selection type name. For baseline use empty string
   THStack* plotStack(std::string varName, std::string selName);
 
+  
+  void plotPhiDecayPlanes(const std::string & sysType);
+
   //Plot a single histogram. One has to provide the full
   //histogram name, e.g. including h1D prefix.
   void plotSingleHistogram(std::string hName);

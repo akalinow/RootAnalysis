@@ -171,7 +171,7 @@ void HTTHistograms::defineHistograms(){
    add1DHistogram("h1DMassTemplate",";SVFit mass [GeV/c^{2}]; Events",50,0,200,file_);
    add1DHistogram("h1DPtTemplate",";p_{T}; Events",20,0,100,file_);
    add1DHistogram("h1DEtaTemplate",";#eta; Events",24,-2.4,2.4,file_);
-   add1DHistogram("h1DPhiTemplate",";#phi; Events",30,-3,3,file_);
+   add1DHistogram("h1DPhiTemplate",";#phi; Events",30,-M_PI,M_PI,file_);
    ///Muon isolation histograms has uneven binning.
    //add1DHistogram("h1DIsoTemplate",";Isolation; Events",10,0,2,file_);
    float bins[17] = {0, 0.02, 0.04, 0.06, 0.08, 0.15, 0.2, 0.25, 0.3, 0.35, 0.4, 0.45, 0.5, 0.8, 1.2, 1.6, 2.0};
@@ -184,12 +184,11 @@ void HTTHistograms::defineHistograms(){
 void HTTHistograms::finalizeHistograms(int nRuns, float weight){
 
   ///TEST
-  /*  
-  plotStack("MassTrans","wselOS");  
-  plotStack("MassTrans","wselSS");  
-  plotStack("MassTrans","");
+  //Plot CP sensitive variables
+  
+  plotPhiDecayPlanes("H");
   return;
-  */
+  ////
 
   ///Control regions plots
   plotStack("Iso","qcdselOS");
@@ -220,6 +219,69 @@ void HTTHistograms::finalizeHistograms(int nRuns, float weight){
   plotStack("PtLeadingBJet","");
   plotStack("EtaLeadingBJet","");
 
+}
+/////////////////////////////////////////////////////////
+/////////////////////////////////////////////////////////
+void HTTHistograms::plotPhiDecayPlanes(const std::string & sysType){
+
+  TCanvas* c = new TCanvas(TString::Format("PhiDecayPlanes_%s",sysType.c_str()),
+			   TString::Format("PhiDecayPlanes_%s",sysType.c_str()),
+			   460,500);
+
+  TLegend l(0.15,0.7,0.35,0.87,NULL,"brNDC");
+  l.SetTextSize(0.05);
+  l.SetFillStyle(4000);
+  l.SetBorderSize(0);
+  l.SetFillColor(10);
+
+  TLatex aLatex(0,0,"");
+
+  TString hName = "h1DPhi_nVectors"+sysType+"RefitPV";
+  TH1F* h1DRefitPV = this->get1DHistogram(hName.Data());
+
+  hName = "h1DPhi_nVectors"+sysType+"GenPV";
+  TH1F* h1DGenPV = this->get1DHistogram(hName.Data());
+
+  hName = "h1DPhi_nVectors"+sysType+"Gen";
+  TH1F* h1DGen = this->get1DHistogram(hName.Data());
+
+  if(h1DGen){
+    h1DGen->SetLineWidth(3);
+    h1DGen->Scale(1.0/h1DGen->Integral(0,h1DGen->GetNbinsX()+1));
+    h1DGen->SetLineColor(2);
+    h1DGen->GetXaxis()->SetRangeUser(0,M_PI);
+  }
+
+  if(h1DGenPV){
+    h1DGenPV->SetLineWidth(3);
+    h1DGenPV->Scale(1.0/h1DGenPV->Integral(0,h1DGenPV->GetNbinsX()+1));
+    h1DGenPV->SetLineColor(3);
+    h1DGenPV->GetXaxis()->SetRangeUser(0,M_PI);
+  }
+  
+  if(h1DRefitPV){
+    h1DRefitPV->SetLineWidth(3);
+    h1DRefitPV->Scale(1.0/h1DRefitPV->Integral(0,h1DRefitPV->GetNbinsX()+1));
+    h1DRefitPV->SetXTitle("#phi^{*}");
+    h1DRefitPV->SetYTitle("Events");
+    h1DRefitPV->GetYaxis()->SetTitleOffset(1.4);
+    h1DRefitPV->SetStats(kFALSE);
+    h1DRefitPV->GetXaxis()->SetRangeUser(0,M_PI);
+    h1DRefitPV->Draw("L HISTO");    
+    h1DRefitPV->SetLineColor(1);
+    l.AddEntry(h1DRefitPV,"reco PCA with refit. PV");
+    if(h1DGenPV){
+      h1DGenPV->Draw("L HISTO same");
+      l.AddEntry(h1DGenPV,"reco PCA with gen. PV");
+    }
+    if(h1DGen){
+      h1DGen->Draw("L HISTO same");
+      l.AddEntry(h1DGen,"PCA with gen. particles");
+    }
+    l.Draw();
+    aLatex.DrawLatex(0.071,3,sysType.c_str());
+    c->Print(TString::Format("fig_png/Phi_%s.png",sysType.c_str()).Data());
+  }
 }
 /////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////
