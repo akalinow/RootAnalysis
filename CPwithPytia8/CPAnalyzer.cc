@@ -41,7 +41,7 @@ Analyzer* CPAnalyzer::clone() const{
 //////////////////////////////////////////////////////////////////////////////
 void CPAnalyzer::finalize(){ 
 
- myHistos_->finalizeHistograms(0,1.0);
+  //myHistos_->finalizeHistograms(0,1.0);
  
 }
 //////////////////////////////////////////////////////////////////////////////
@@ -179,7 +179,7 @@ bool CPAnalyzer::analyze(const EventProxyBase& iEvent){
   if( !(isOneProng(aEventGen->decModeMinus_) || isLepton(aEventGen->decModeMinus_) ) ||
       !(isOneProng(aEventGen->decModePlus_)  || isLepton(aEventGen->decModePlus_) ) ) return true;
   ///Skip lepton decays
-  if(isLepton(aEventGen->decModeMinus_) || isLepton(aEventGen->decModePlus_)) return true;
+  //TEST if(isLepton(aEventGen->decModeMinus_) || isLepton(aEventGen->decModePlus_)) return true;
   ///
   
   std::vector<std::string> decayNamesReco = getDecayName(aEventReco->decModeMinus_, aEventReco->decModePlus_);
@@ -193,6 +193,24 @@ bool CPAnalyzer::analyze(const EventProxyBase& iEvent){
     myHistos_->fill1DHistogram("h1DDecayModePlus_"+motherName,aEventReco->decModePlus_);
     myHistos_->fill1DHistogram("h1DDecayModeMinus_"+motherName,aEventReco->decModeMinus_);
   }
+
+
+  ///TEST
+  bool goodGenDecayMode = false;
+  for(auto it: decayNamesGen){
+    if(it.find("Lepton1Prong0Pi0")!=std::string::npos) goodGenDecayMode = true;
+  }
+  if(goodGenDecayMode){
+
+    std::cout<<" "<<aEventGen->nPiMinus_.Mag()
+	     <<" "<<aEventGen->nPiPlus_.Mag()
+	     <<std::endl;
+      
+  }
+  return true;
+  ///////
+
+  
 
   bool goodGen = false, goodReco = false;
   for(auto it: decayNamesReco) if(it.find("PiPi0Pi0")!=std::string::npos) goodReco = true;

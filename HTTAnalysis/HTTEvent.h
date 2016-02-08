@@ -19,7 +19,8 @@ class Wevent{
     int paircount_ = -1;
     float genevtweight_ = 1;
     int sample_ = -1;
-
+    int bosonId_ = 0;
+    
     ///Tau decay modes (if available)
     int decModeMinus_, decModePlus_;
 
@@ -60,6 +61,9 @@ class Wevent{
     void paircount(int x){paircount_ = x;}
     void genevtweight(float x){genevtweight_ = x;}
     void sample(int x){sample_ = x;}
+    void bosonId(int x){bosonId_ = x;}
+    void decModeMinus(int x){decModeMinus_ = x;}
+    void decModePlus(int x){decModePlus_ = x;}
 
     ///Set generated PV
     void genPV(const TVector3 & aPV) {genPV_ = aPV;}
@@ -95,6 +99,9 @@ class Wevent{
     int paircount(){return paircount_;}
     float genevtweight(){return genevtweight_;}
     int sample(){return sample_;}
+    int bosonId(){return bosonId_;}
+    int decModeMinus(){return decModeMinus_;}
+    int decModePlus(){return decModePlus_;}
 
     ///Get generated PV 
     const TVector3 & genPV() const {return genPV_;}
@@ -150,7 +157,10 @@ class Wtau{
     float eta_ = -999;
     float mass_ = -999;
     int charge_ = -999;
+    int decayMode_ = -999;
     float mt_ = -999;
+    float d0_ = -999;
+    float dz_ = -999;
 
     ///Leading tau track four momemntum.
     TLorentzVector leadingTk_;
@@ -176,8 +186,12 @@ class Wtau{
     void eta(float x){eta_ = x;}
     void mass(float x){mass_ = x;}
     void charge(float x){charge_ = x;}
+    void decayMode(int x){decayMode_ = x;}
     void mt(float x){mt_ = x;}
     void tauID(tauidenum y, float x){tauID_[y] = x;}
+    void d0(float x){d0_ = x;}
+    void dz(float x){dz_ = x;}
+    void sv(const TVector3 & x){sv_ = x;}
 
     ///Set tau leading charged track.
     void leadingTk(const TLorentzVector & a4v) {leadingTk_ = a4v;};
@@ -200,7 +214,11 @@ class Wtau{
     float eta(){return eta_;}
     float mass(){return mass_;}
     float charge(){return charge_;}
+    int decayMode(){return decayMode_;}
     float mt(){return mt_;}
+    float d0(){return d0_;}
+    float dz(){return dz_;}
+    TVector3 sv(){return sv_;}
 
     float tauID(tauidenum y){return tauID_[y];}
 
@@ -298,6 +316,10 @@ class Wmu{
     float isTightnovtxMuon(){return isTightnovtxMuon_;}
     float iso(){return iso_;}
 
+    ///
+    ///Get leading charged track
+    TLorentzVector leadingTk() const {TLorentzVector a4v; a4v.SetPtEtaPhiM(pt_, eta_, phi_, 0.105658); return a4v;};
+    
     ///Get PCA vector calculated using PV stored in AOD
     const TVector3 & nPCA() {return nPCA_;};
 
