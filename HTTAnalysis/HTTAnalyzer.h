@@ -133,13 +133,18 @@ class HTTAnalyzer: public Analyzer{
 
  private:
 
+  void getPreselectionEff(const EventProxyHTT & myEventProxy);
+
   void setHistos(HTTHistograms *histos) { myHistos_ = histos;};
 
   ///Histograms storage.
   HTTHistograms *myHistos_;
 
   ///ROOT file with PU histogram
-  TFile *puFile_;
+  TFile *puDataFile_, *puMCFile_;
+
+  ///ROOT file containing current TTree
+  TFile *ntupleFile_;
  
   ///Vector of PU histograms for MC samples
   std::vector<TH1F*> hPUVec_;

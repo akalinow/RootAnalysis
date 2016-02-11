@@ -54,14 +54,14 @@ float HTTHistograms::getLumi(){
 /////////////////////////////////////////////////////////
 float HTTHistograms::getSampleNormalisation(std::string sampleName){
 
-  float genPresEff = 1.0;
-  float recoPresEff = 1.0;
-  float presEff = genPresEff*recoPresEff;
-  float kFactor = 1.0;
-
   std::string hName = "h1DStats"+sampleName;
   TH1F *hStats = get1DHistogram(hName.c_str());
   
+  float genPresEff = 1.0;
+  float recoPresEff = hStats->GetBinContent(3)/hStats->GetBinContent(2);
+  float presEff = genPresEff*recoPresEff;
+  float kFactor = 1.0;
+
   float crossSection = 1.0;
   int nEventsAnalysed = hStats->GetBinContent(1);
 
@@ -90,7 +90,7 @@ float HTTHistograms::getSampleNormalisation(std::string sampleName){
   std::cout<<"Xsection: "<<crossSection<<" [pb] "<<" ";
   std::cout<<"Events analyzed: "<<nEventsAnalysed<<" ";
   //std::cout<<"Gen preselection efficiency: "<<genPresEff<<std::endl;
-  //std::cout<<"Reco preselection efficiency: "<<recoPresEff<<std::endl;
+  std::cout<<"Reco preselection efficiency: "<<recoPresEff<<std::endl;
   //std::cout<<"External scaling: "<<kFactor<<std::endl;
   std::cout<<"Final weight: "<<weight<<std::endl;
 
@@ -167,7 +167,7 @@ void HTTHistograms::defineHistograms(){
    //Make template histos
    std::cout<<"defineHistograms Adding histogram: "<<file_<<" "<<file_->fullPath()<<std::endl;
 
-   add1DHistogram("h1DStatsTemplate","",10,0.5,10.5,file_);
+   add1DHistogram("h1DStatsTemplate","",11,-0.5,10.5,file_);
    add1DHistogram("h1DNPVTemplate",";Number of PV; Events",61,-0.5,60.5,file_);
    add1DHistogram("h1DMassTemplate",";SVFit mass [GeV/c^{2}]; Events",50,0,200,file_);
    add1DHistogram("h1DPtTemplate",";p_{T}; Events",20,0,100,file_);
@@ -186,19 +186,18 @@ void HTTHistograms::finalizeHistograms(int nRuns, float weight){
 
   AnalysisHistograms::finalizeHistograms();
   
-  std::string sampleName = "Data";
-  std::string hName = "h1DStats"+sampleName;
-  TH1F *hStats = get1DHistogram(hName.c_str());
-  int nEventsAnalysed = hStats->GetBinContent(1);
-  std::cout<<"nEventsAnalysed: "<<nEventsAnalysed<<std::endl;
-  return;
-  
-  
   ///TEST
   //Plot CP sensitive variables
   
   plotPhiDecayPlanes("H");
+  plotPhiDecayPlanes("A");
+  plotPhiDecayPlanes("DYJets");
+
+  getSampleNormalisation("H");
+  getSampleNormalisation("A");
+  getSampleNormalisation("DYJets");
   return;
+  
   ////
 
   ///Control regions plots
@@ -226,7 +225,7 @@ void HTTHistograms::finalizeHistograms(int nRuns, float weight){
 
   plotStack("PtLeadingJet","");
   plotStack("EtaLeadingJet","");
-
+  
   plotStack("PtLeadingBJet","");
   plotStack("EtaLeadingBJet","");
 
@@ -235,17 +234,15 @@ void HTTHistograms::finalizeHistograms(int nRuns, float weight){
 /////////////////////////////////////////////////////////
 void HTTHistograms::plotPhiDecayPlanes(const std::string & sysType){
 
-  TCanvas* c = new TCanvas(TString::Format("PhiDecayPlanes_%s",sysType.c_str()),
-			   TString::Format("PhiDecayPlanes_%s",sysType.c_str()),
-			   460,500);
-
-  TLegend l(0.15,0.7,0.35,0.87,NULL,"brNDC");
+  TCanvas aCanvas(TString::Format("PhiDecayPlanes_%s",sysType.c_str()),
+		  TString::Format("PhiDecayPlanes_%s",sysType.c_str()),
+		  460,500);
+  
+  TLegend l(0.15,0.15,0.35,0.37,NULL,"brNDC");
   l.SetTextSize(0.05);
   l.SetFillStyle(4000);
   l.SetBorderSize(0);
   l.SetFillColor(10);
-
-  TLatex aLatex(0,0,"");
 
   TString hName = "h1DPhi_nVectors"+sysType+"RefitPV";
   TH1F* h1DRefitPV = this->get1DHistogram(hName.Data());
@@ -253,7 +250,7 @@ void HTTHistograms::plotPhiDecayPlanes(const std::string & sysType){
   hName = "h1DPhi_nVectors"+sysType+"GenPV";
   TH1F* h1DGenPV = this->get1DHistogram(hName.Data());
 
-  hName = "h1DPhi_nVectors"+sysType+"Gen";
+  hName = "h1DPhi_nVectors"+sysType+"GenNoOfflineSel";
   TH1F* h1DGen = this->get1DHistogram(hName.Data());
 
   if(h1DGen){
@@ -275,9 +272,12 @@ void HTTHistograms::plotPhiDecayPlanes(const std::string & sysType){
     h1DRefitPV->Scale(1.0/h1DRefitPV->Integral(0,h1DRefitPV->GetNbinsX()+1));
     h1DRefitPV->SetXTitle("#phi^{*}");
     h1DRefitPV->SetYTitle("Events");
+    h1DRefitPV->SetTitle(("Boson: "+sysType).c_str());
     h1DRefitPV->GetYaxis()->SetTitleOffset(1.4);
     h1DRefitPV->SetStats(kFALSE);
     h1DRefitPV->GetXaxis()->SetRangeUser(0,M_PI);
+    h1DRefitPV->SetMaximum(0.1);
+    h1DRefitPV->SetMinimum(0.0);
     h1DRefitPV->Draw("L HISTO");    
     h1DRefitPV->SetLineColor(1);
     l.AddEntry(h1DRefitPV,"reco PCA with refit. PV");
@@ -287,11 +287,10 @@ void HTTHistograms::plotPhiDecayPlanes(const std::string & sysType){
     }
     if(h1DGen){
       h1DGen->Draw("L HISTO same");
-      l.AddEntry(h1DGen,"PCA with gen. particles");
+      l.AddEntry(h1DGen,"#splitline{PCA with gen. particles}{no offline selection}");
     }
     l.Draw();
-    aLatex.DrawLatex(0.071,3,sysType.c_str());
-    c->Print(TString::Format("fig_png/Phi_%s.png",sysType.c_str()).Data());
+    aCanvas.Print(TString::Format("fig_png/Phi_%s.png",sysType.c_str()).Data());
   }
 }
 /////////////////////////////////////////////////////////

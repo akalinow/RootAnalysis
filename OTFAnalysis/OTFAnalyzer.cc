@@ -324,8 +324,7 @@ bool OTFAnalyzer::analyze(const EventProxyBase& iEvent){
   std::string sysTypeOther="Other";
   
   
-  //if(theEvent->pt<0.01){
-  if(true){//TEST
+  if(theEvent->pt<0.01){
   
     fillRateHisto("Otf","Tot");
     fillRateHisto("Gmt","Tot");
@@ -339,8 +338,7 @@ bool OTFAnalyzer::analyze(const EventProxyBase& iEvent){
     fillRateHisto("Otf","VsQuality");
     fillRateHisto("Gmt","VsQuality");
   }
-  //else if(fabs(theEvent->eta)>0.83 && fabs(theEvent->eta)<1.24){
-  if(fabs(theEvent->eta)>0.83 && fabs(theEvent->eta)<1.24){//TEST   
+  else if(fabs(theEvent->eta)>0.83 && fabs(theEvent->eta)<1.24){
     for(int iCut=0;iCut<22;++iCut){
       if(iCut>0 && iCut<14) continue;
       fillTurnOnCurve(iCut,sysTypeGmt,selType);

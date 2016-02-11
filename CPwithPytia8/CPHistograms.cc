@@ -49,11 +49,24 @@ bool CPHistograms::fill1DHistogram(const std::string& name, float val, float wei
     if(name.find("h1DRho")!=std::string::npos) hTemplateName = "h1DRhoTemplate";
     if(name.find("h1DIP")!=std::string::npos) hTemplateName = "h1IPTemplate";
     if(name.find("h1DVxPull")!=std::string::npos) hTemplateName = "h1DVxPullTemplate";
-    this->add1DHistogram(name,"",
-			 this->get1DHistogram(hTemplateName)->GetNbinsX(),
-			 this->get1DHistogram(hTemplateName)->GetXaxis()->GetXmin(),
-			 this->get1DHistogram(hTemplateName)->GetXaxis()->GetXmax(),
-			 file_);
+    std::cout<<"fill1DHistogram Adding histogram: "<<name<<" "<<file_<<" "<<file_->fullPath()<<std::endl;
+    
+    if(get1DHistogram(hTemplateName,true)->GetXaxis()->IsVariableBinSize()){
+      Float_t* binsArray = new Float_t[this->get1DHistogram(hTemplateName,true)->GetNbinsX()+1];
+      for(unsigned int iBin=0;iBin<=this->get1DHistogram(hTemplateName,true)->GetNbinsX();++iBin){
+	binsArray[iBin] = this->get1DHistogram(hTemplateName,true)->GetXaxis()->GetXbins()->At(iBin);
+      }
+      this->add1DHistogram(name,"",this->get1DHistogram(hTemplateName,true)->GetNbinsX(),
+			   binsArray, file_);
+      delete binsArray;      
+    }
+    else{
+      this->add1DHistogram(name,"",
+			   this->get1DHistogram(hTemplateName,true)->GetNbinsX(),
+			   this->get1DHistogram(hTemplateName,true)->GetXaxis()->GetXmin(),
+			   this->get1DHistogram(hTemplateName,true)->GetXaxis()->GetXmax(),
+			   file_);
+    }   
     return AnalysisHistograms::fill1DHistogram(name,val,weight);
   }
   return true;
@@ -65,7 +78,7 @@ bool CPHistograms::fill2DHistogram(const std::string& name,
   
   std::string hTemplateName = "";
   if(!AnalysisHistograms::fill2DHistogram(name,valX,valY,weight)){
-    if(name.find("h2DVxPullVsNTrack")!=std::string::npos) hTemplateName = "h2DVxPullVsNTrack";
+    if(name.find("h2DVxPullVsNTrack")!=std::string::npos) hTemplateName = "h2DVxPullVsNTrackTemplate";
     this->add2DHistogram(name,"",
 			 this->get2DHistogram(hTemplateName)->GetNbinsX(),
 			 this->get2DHistogram(hTemplateName)->GetXaxis()->GetXmin(),
@@ -95,7 +108,7 @@ void CPHistograms::defineHistograms(){
    add1DHistogram("h1IPTemplate",";#phi^{*} [rad]; Events",100,0,1.0,file_);
    add1DHistogram("h1DCosPhiTemplate",";cos(#phi); Events",10,-1.0,1.0,file_);
 
-   add2DHistogram("h2DVxPullVsNTrack","",21,-0.5,20.5,11,-0.01,0.01,file_);
+   add2DHistogram("h2DVxPullVsNTrackTemplate","",21,-0.5,20.5,11,-0.01,0.01,file_);
    
    histosInitialized_ = true;
  }
@@ -105,7 +118,7 @@ void CPHistograms::defineHistograms(){
 void CPHistograms::finalizeHistograms(int nRuns, float weight){
 
   AnalysisHistograms::finalizeHistograms();
-
+  
   plotPCAResolution("_h0");
   plotPCAResolution("_A0");
   plotPCAResolution("_Z0");
@@ -137,9 +150,10 @@ void CPHistograms::finalizeHistograms(int nRuns, float weight){
     if(it.first.find(hName)!=std::string::npos &&
        it.first.find("Template")==std::string::npos){
       sysType = it.first.substr(hName.size());
-      plotHistograms(sysType);
-      return;
+      std::cout<<"aType1: "<<sysType<<std::endl;
+      plotHistograms(sysType);      
       std::string aType = sysType.substr(4,sysType.size());
+      std::cout<<"aType2: "<<aType<<std::endl;
       if(sysType.find("Z0")!=std::string::npos){
 	plot_HAZ_Histograms("h1DPhi",aType);
 	plot_HAZ_Histograms("h1DPhi_nVectors",aType);
@@ -236,13 +250,14 @@ void CPHistograms::plotHistograms(const std::string & sysType){
   TString hName1 = "h1DPhi_nVectors"+sysType;
   TString hName2 = "h1DPhi_nVectors"+sysType;
   TString hName3 = "h1DPhi_nVectors"+sysType;
+  /*
   if(hName.Contains("RECO")){
     hName = "h1DPhi_nVectors"+sysType;
     hName.ReplaceAll("RECO","GEN");
     hName2.ReplaceAll("RECO","AOD");
     hName3.ReplaceAll("RECO","RECOGEN");
   }
-  
+  */
   TH1F* h1D = this->get1DHistogram(hName.Data());
 
   h1D->Print();
