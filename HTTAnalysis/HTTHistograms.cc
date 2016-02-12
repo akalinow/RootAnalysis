@@ -182,7 +182,7 @@ void HTTHistograms::defineHistograms(){
    //Make template histos
    std::cout<<"defineHistograms Adding histogram: "<<file_<<" "<<file_->fullPath()<<std::endl;
 
-   add1DHistogram("h1DStatsTemplate","",11,-0.5,10.5,file_);
+   add1DHistogram("h1DStatsTemplate","",16,-0.5,15.5,file_);
    add1DHistogram("h1DNPVTemplate",";Number of PV; Events",61,-0.5,60.5,file_);
    add1DHistogram("h1DMassTemplate",";SVFit mass [GeV/c^{2}]; Events",50,0,200,file_);
    add1DHistogram("h1DPtTemplate",";p_{T}; Events",20,0,100,file_);
@@ -208,8 +208,16 @@ void HTTHistograms::finalizeHistograms(int nRuns, float weight){
   ///Control regions plots
   plotStack("Iso","qcdselOS");
   plotStack("Iso","qcdselSS");
+  plotStack("StatsDecayMode","");
+  
+  plotStack("MassVis","qcdselSS");
+  plotStack("StatsNJets30","qcdselSS");
+  plotStack("CSVBtagLeadingJet","qcdselSS");
+
+  return;
+  
   plotStack("MassTrans","wselOS");  
-  plotStack("MassTrans","wselSS");  
+  plotStack("MassTrans","wselSS");
 
   ///Baseline selection plots
   plotStack("NPV","");
@@ -224,6 +232,8 @@ void HTTHistograms::finalizeHistograms(int nRuns, float weight){
   
   plotStack("PtTau","");  
   plotStack("EtaTau","");
+  plotStack("IDTau","");
+  plotStack("StatsDecayMode","");
  
   plotStack("PhiMuon","");
   plotStack("PhiTau","");
@@ -556,6 +566,7 @@ void HTTHistograms::plotSingleHistogram(std::string hName){
 std::pair<float,float> HTTHistograms::getQCDOStoSS(std::string selName){
 
   std::cout<<"Calling method: "<<__func__<<std::endl;
+  if(selName.find("SS")!=std::string::npos) return  std::make_pair(1.0,0.0);
 
   std::string hName = "h1DIso";
 
