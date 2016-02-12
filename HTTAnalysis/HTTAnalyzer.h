@@ -92,6 +92,7 @@ class HTTAnalyzer: public Analyzer{
   void fillControlHistos( Wevent &,  Wpair &,
 			  Wtau &,  Wmu &,
 			  Wjet &,
+			  int,
 			  float eventWeight,
 			  std::string & hNameSuffix);
   
@@ -123,6 +124,10 @@ class HTTAnalyzer: public Analyzer{
   
   ///Check if the decMode points to leptonic tau decay
   bool isLepton(int decMode);
+
+  ///Get jets separated by deltaR from tau an muon.
+  std::vector<Wjet> getSeparatedJets(const EventProxyHTT & myEventProxy, const Wtau & aTau,
+				     const Wmu & aMuon, float deltaR);
   
  protected:
 

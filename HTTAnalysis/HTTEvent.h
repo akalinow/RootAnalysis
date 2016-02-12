@@ -20,6 +20,9 @@ class Wevent{
     float genevtweight_ = 1;
     int sample_ = -1;
     int bosonId_ = 0;
+
+    ///Boson (H, Z, W) decay mode
+    int decayModeBoson_ = -1;
     
     ///Tau decay modes (if available)
     int decModeMinus_, decModePlus_;
@@ -50,6 +53,9 @@ class Wevent{
     int nTracksInRefit_;
 
   public:
+
+    enum processenum {DATA = 0, DY = 1, WJets=2, TTbar=3, h=3, H=4, A=5, QCD=6};
+    
     Wevent();
     ~Wevent();
     void run(int x){run_ = x;}
@@ -64,6 +70,7 @@ class Wevent{
     void bosonId(int x){bosonId_ = x;}
     void decModeMinus(int x){decModeMinus_ = x;}
     void decModePlus(int x){decModePlus_ = x;}
+    void decayModeBoson(int x){decayModeBoson_ = x;}
 
     ///Set generated PV
     void genPV(const TVector3 & aPV) {genPV_ = aPV;}
@@ -90,18 +97,19 @@ class Wevent{
     ///Reset class data members
     void clear();
 
-    int run(){return run_;}
-    float lumi(){return lumi_;}
-    long int event(){return event_;}
-    int nup(){return nup_;}
-    int npu(){return npu_;}
-    int npv(){return npv_;}
-    int paircount(){return paircount_;}
-    float genevtweight(){return genevtweight_;}
-    int sample(){return sample_;}
-    int bosonId(){return bosonId_;}
-    int decModeMinus(){return decModeMinus_;}
-    int decModePlus(){return decModePlus_;}
+    int run()const{return run_;}
+    float lumi()const{return lumi_;}
+    long int event()const{return event_;}
+    int nup()const{return nup_;}
+    int npu()const{return npu_;}
+    int npv()const{return npv_;}
+    int paircount()const{return paircount_;}
+    float genevtweight()const{return genevtweight_;}
+    int sample()const{return sample_;}
+    int bosonId()const{return bosonId_;}
+    int decModeMinus()const{return decModeMinus_;}
+    int decModePlus()const{return decModePlus_;}
+    int decayModeBoson()const{return decayModeBoson_;}
 
     ///Get generated PV 
     const TVector3 & genPV() const {return genPV_;}
@@ -209,16 +217,16 @@ class Wtau{
     ///Set PCA vector calculated using refitted PV 
     void nPCARefitvx(const TVector3 & a3v) {nPCARefitvx_ = a3v;};
 
-    float pt(){return pt_;}
-    float phi(){return phi_;}
-    float eta(){return eta_;}
-    float mass(){return mass_;}
-    float charge(){return charge_;}
-    int decayMode(){return decayMode_;}
-    float mt(){return mt_;}
-    float d0(){return d0_;}
-    float dz(){return dz_;}
-    TVector3 sv(){return sv_;}
+    float pt()const{return pt_;}
+    float phi()const{return phi_;}
+    float eta()const{return eta_;}
+    float mass()const{return mass_;}
+    float charge()const{return charge_;}
+    int decayMode()const{return decayMode_;}
+    float mt()const{return mt_;}
+    float d0()const{return d0_;}
+    float dz()const{return dz_;}
+    TVector3 sv()const{return sv_;}
 
     float tauID(tauidenum y){return tauID_[y];}
 
@@ -301,20 +309,20 @@ class Wmu{
     ///Set PCA vector calculated using refitted PV 
     void nPCARefitvx(const TVector3 & a3v) {nPCARefitvx_ = a3v;};
 
-    float pt(){return pt_;}
-    float phi(){return phi_;}
-    float eta(){return eta_;}
-    float mass(){return mass_;}
-    float charge(){return charge_;}
-    float mt(){return mt_;}
-    float d0(){return d0_;}
-    float dz(){return dz_;}
-    float isLooseMuon(){return isLooseMuon_;}
-    float isTightMuon(){return isTightMuon_;}
-    float isHighPtMuon(){return isHighPtMuon_;}
-    float isMediumMuon(){return isMediumMuon_;}
-    float isTightnovtxMuon(){return isTightnovtxMuon_;}
-    float iso(){return iso_;}
+    float pt()const{return pt_;}
+    float phi()const{return phi_;}
+    float eta()const{return eta_;}
+    float mass()const{return mass_;}
+    float charge()const{return charge_;}
+    float mt()const{return mt_;}
+    float d0()const{return d0_;}
+    float dz()const{return dz_;}
+    float isLooseMuon()const{return isLooseMuon_;}
+    float isTightMuon()const{return isTightMuon_;}
+    float isHighPtMuon()const{return isHighPtMuon_;}
+    float isMediumMuon()const{return isMediumMuon_;}
+    float isTightnovtxMuon()const{return isTightnovtxMuon_;}
+    float iso()const{return iso_;}
 
     ///
     ///Get leading charged track
@@ -378,11 +386,11 @@ class Welectron{
     ///Set PCA vector calculated using refitted PV 
     void nPCARefitvx(const TVector3 & a3v) {nPCARefitvx_ = a3v;};
  
-    float pt(){return pt_;}
-    float phi(){return phi_;}
-    float eta(){return eta_;}
-    float mass(){return mass_;}
-    float charge(){return charge_;}
+    float pt()const{return pt_;}
+    float phi()const{return phi_;}
+    float eta()const{return eta_;}
+    float mass()const{return mass_;}
+    float charge()const{return charge_;}
 
 
 
@@ -423,13 +431,13 @@ class Wmet{
     void mvacov10(float x){mvacov10_ = x;}
     void mvacov11(float x){mvacov11_ = x;}
 
-    float metpx(){return metpx_;}
-    float metpt(){return metpt_;}
-    float metphi(){return metphi_;}
-    float mvacov00(){return mvacov00_;}
-    float mvacov01(){return mvacov01_;}
-    float mvacov10(){return mvacov10_;}
-    float mvacov11(){return mvacov11_;}
+    float metpx()const{return metpx_;}
+    float metpt()const{return metpt_;}
+    float metphi()const{return metphi_;}
+    float mvacov00()const{return mvacov00_;}
+    float mvacov01()const{return mvacov01_;}
+    float mvacov10()const{return mvacov10_;}
+    float mvacov11()const{return mvacov11_;}
 };
 typedef std::vector<Wmet> WmetCollection;
 
@@ -481,15 +489,15 @@ class Wpair{
     void trigger(triggersenum y, bool x){triggers_[y] = x;}
 
 
-     float svfit(){return svfit_;}
-     float diq(){return diq_;}
-     float pth(){return pth_;}
-     float ptvis(){return ptvis_;}
-     float m_vis(){return m_vis_;}
-    bool ChannelSelector(){return ChannelSelector_;}
-    bool PATPairSelector(){return PATPairSelector_;}
-    bool PairBaselineSelection(){return PairBaselineSelection_;}
-    bool PostSynchSelection(){return PostSynchSelection_;}
+     float svfit()const{return svfit_;}
+     float diq()const{return diq_;}
+     float pth()const{return pth_;}
+     float ptvis()const{return ptvis_;}
+     float m_vis()const{return m_vis_;}
+    bool ChannelSelector()const{return ChannelSelector_;}
+    bool PATPairSelector()const{return PATPairSelector_;}
+    bool PairBaselineSelection()const{return PairBaselineSelection_;}
+    bool PostSynchSelection()const{return PostSynchSelection_;}
     bool trigger(triggersenum y){return triggers_[y];}
 };
 typedef std::vector<Wpair> WpairCollection;
@@ -519,16 +527,16 @@ class Wjet{
     void jetlooseID(float x){jetlooseID_ = x;}
     void pujetetaid(float x){pujetetaid_ = x;}
 
-    float pt(){return pt_;}
-    float eta(){return eta_;}
-    float phi(){return phi_;}
-    float id(){return id_;}
-    float bptag(){return bptag_;}
-    float csvtag(){return csvtag_;}
-    float bjet(){return bjet_;}
-    float jecfactor(){return jecfactor_;}
-    float jetlooseID(){return jetlooseID_;}
-    float pujetetaid(){return pujetetaid_;}
+    float pt()const{return pt_;}
+    float eta()const{return eta_;}
+    float phi()const{return phi_;}
+    float id()const{return id_;}
+    float bptag()const{return bptag_;}
+    float csvtag()const{return csvtag_;}
+    float bjet()const{return bjet_;}
+    float jecfactor()const{return jecfactor_;}
+    float jetlooseID()const{return jetlooseID_;}
+    float pujetetaid()const{return pujetetaid_;}
 };
 typedef std::vector<Wjet> WjetCollection;
 

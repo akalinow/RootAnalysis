@@ -235,7 +235,6 @@ bool CPAnalyzer::analyze(const EventProxyBase& iEvent){
     fillAngles(aEventReco,name+"_RECOGEN");
     fillAngles(aEventReco,name+"_AOD");    
     if(selected) fillAngles(aEventReco, name+"_selected"+"_RECO");
-    continue;
   }  
   ///
   selected = analysisSelection(aEventGen);  

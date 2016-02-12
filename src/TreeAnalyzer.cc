@@ -63,6 +63,7 @@ TreeAnalyzer::TreeAnalyzer(const std::string & aName,
   myObjMessenger_ = new ObjectMessenger("ObjMessenger");
 
   myProxy_ = aProxy;
+  mySummary_ = 0;
 
 }
 //////////////////////////////////////////////////////////////////////////////
@@ -202,7 +203,7 @@ int TreeAnalyzer::loop(){
   myProxiesThread_[0]->toBegin();  
 
   unsigned int aEvent=0;
-  #pragma omp parallel for schedule(dynamic, 100000)
+  #pragma omp parallel for schedule(dynamic)
     for(aEvent=0;aEvent<nEventsToAnalyze_;++aEvent){      
       if(aEvent< nEventsToPrint_ || aEvent%5000000==0)
 	std::cout<<"Events analyzed: "<<aEvent<<"/"<<nEventsToAnalyze_

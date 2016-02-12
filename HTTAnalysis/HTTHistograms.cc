@@ -46,9 +46,16 @@ float HTTHistograms::getLumi(){
   //| 47    | 116  | 32567 | 32567 | 2282566714.405    | 2207823354.548   |
   //+-------+------+-------+-------+-------------------+------------------+
 
-  return 2207823354.548e-6;//pb-1 data for NTUPLES_18_12_2015
+  //return 2207823354.548e-6;//pb-1 data for NTUPLES_18_12_2015
   
-
+  //./.local/bin/brilcalc lumi --normtag ~lumipro/public/normtag_file/OfflineNormtagV2.json -i 12_02_2016_CD.json
+  //+-------+------+-------+-------+-------------------+------------------+
+  //| nfill | nrun | nls   | ncms  | totdelivered(/ub) | totrecorded(/ub) |
+  //+-------+------+-------+-------+-------------------+------------------+
+  //| 47    | 116  | 32702 | 32702 | 2289599379.230    | 2214575536.754   |
+  //+-------+------+-------+-------+-------------------+------------------+
+  return 2214575536.754e-6;//pb-1 data for NTUPLES_12_02_2016
+  
 }
 /////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////
@@ -82,6 +89,12 @@ float HTTHistograms::getSampleNormalisation(std::string sampleName){
     //https://twiki.cern.ch/twiki/bin/viewauth/CMS/StandardModelCrossSectionsat13TeVInclusive
     crossSection = 831.76; 
   }
+  if(sampleName=="H"){
+    ///mH = 125, gg fussion only
+    //https://twiki.cern.ch/twiki/bin/view/LHCPhysics/CERNYellowReportPageAt1314TeV
+    //https://twiki.cern.ch/twiki/bin/view/LHCPhysics/CERNYellowReportPageBR3
+    crossSection = 43.92*6.32E-02; 
+  }
   
   float weight = crossSection*presEff/nEventsAnalysed;
   if(presEff<0 || fabs(fabs(crossSection)-1.0)<1e-5) weight = 1.0;
@@ -89,9 +102,9 @@ float HTTHistograms::getSampleNormalisation(std::string sampleName){
   std::cout<<"Sample name: "<<sampleName<<" ";
   std::cout<<"Xsection: "<<crossSection<<" [pb] "<<" ";
   std::cout<<"Events analyzed: "<<nEventsAnalysed<<" ";
-  //std::cout<<"Gen preselection efficiency: "<<genPresEff<<std::endl;
-  std::cout<<"Reco preselection efficiency: "<<recoPresEff<<std::endl;
-  //std::cout<<"External scaling: "<<kFactor<<std::endl;
+  //std::cout<<"Gen preselection efficiency: "<<genPresEff<<" ";
+  std::cout<<"Reco preselection efficiency: "<<recoPresEff<<" ";
+  //std::cout<<"External scaling: "<<kFactor<<" ";
   std::cout<<"Final weight: "<<weight<<std::endl;
 
   return weight;  
@@ -135,6 +148,8 @@ bool HTTHistograms::fill1DHistogram(const std::string& name, float val, float we
     if(name.find("h1DEta")!=std::string::npos) hTemplateName = "h1DEtaTemplate";
     if(name.find("h1DIso")!=std::string::npos) hTemplateName = "h1DIsoTemplate";
     if(name.find("h1DPhi")!=std::string::npos) hTemplateName = "h1DPhiTemplate";
+    if(name.find("h1DCSVBtag")!=std::string::npos) hTemplateName = "h1DCSVBtagTemplate";
+    if(name.find("h1DID")!=std::string::npos) hTemplateName = "h1DIDTemplate";
     std::cout<<"fill1DHistogram Adding histogram: "<<name<<" "<<file_<<" "<<file_->fullPath()<<std::endl;
     
     if(get1DHistogram(hTemplateName,true)->GetXaxis()->IsVariableBinSize()){
@@ -173,10 +188,10 @@ void HTTHistograms::defineHistograms(){
    add1DHistogram("h1DPtTemplate",";p_{T}; Events",20,0,100,file_);
    add1DHistogram("h1DEtaTemplate",";#eta; Events",24,-2.4,2.4,file_);
    add1DHistogram("h1DPhiTemplate",";#phi; Events",30,-M_PI,M_PI,file_);
-   ///Muon isolation histograms has uneven binning.
-   //add1DHistogram("h1DIsoTemplate",";Isolation; Events",10,0,2,file_);
-   float bins[17] = {0, 0.02, 0.04, 0.06, 0.08, 0.15, 0.2, 0.25, 0.3, 0.35, 0.4, 0.45, 0.5, 0.8, 1.2, 1.6, 2.0};
-   add1DHistogram("h1DIsoTemplate",";Isolation; Events",16,bins,file_);
+   add1DHistogram("h1DCSVBtagTemplate",";CSV btag; Events",20,0,1,file_);
+   add1DHistogram("h1DIsoTemplate",";Isolation; Events",10,0,0.5,file_);
+   add1DHistogram("h1DIDTemplate",";ID; Events",2,-0.5,1.5,file_);
+   
    histosInitialized_ = true;
  }
 }
@@ -185,21 +200,11 @@ void HTTHistograms::defineHistograms(){
 void HTTHistograms::finalizeHistograms(int nRuns, float weight){
 
   AnalysisHistograms::finalizeHistograms();
-  
-  ///TEST
-  //Plot CP sensitive variables
-  
+
   plotPhiDecayPlanes("H");
-  plotPhiDecayPlanes("A");
   plotPhiDecayPlanes("DYJets");
-
-  getSampleNormalisation("H");
-  getSampleNormalisation("A");
-  getSampleNormalisation("DYJets");
-  return;
+  plotPhiDecayPlanes("WJets");
   
-  ////
-
   ///Control regions plots
   plotStack("Iso","qcdselOS");
   plotStack("Iso","qcdselSS");
@@ -223,8 +228,11 @@ void HTTHistograms::finalizeHistograms(int nRuns, float weight){
   plotStack("PhiMuon","");
   plotStack("PhiTau","");
 
+  plotStack("StatsNJets30","");
+  
   plotStack("PtLeadingJet","");
   plotStack("EtaLeadingJet","");
+  plotStack("CSVBtagLeadingJet","");
   
   plotStack("PtLeadingBJet","");
   plotStack("EtaLeadingBJet","");
@@ -301,12 +309,14 @@ THStack*  HTTHistograms::plotStack(std::string varName, std::string selName){
 	   <<" selection: "<<selName<<std::endl;
 
   std::string hName = "h1D"+varName;
+  TH1F *hHiggs = get1DHistogram((hName+"H"+selName).c_str());
   TH1F *hWJets = get1DHistogram((hName+"WJets"+selName).c_str());
   TH1F *hTTbar = get1DHistogram((hName+"TTbar"+selName).c_str());
   TH1F *hDYJets = get1DHistogram((hName+"DYJets"+selName).c_str());   
   TH1F *hSoup = get1DHistogram((hName+"Data"+selName).c_str());
   pair<float,float> qcdOStoSS = getQCDOStoSS(selName);
   TH1F *hQCD = (TH1F*)getQCDbackground(varName,selName);
+  if(varName.find("MassTrans")!=std::string::npos) hQCD->Reset();
 
   ///Protection against null pointers
   ///Null pointers happen when sample was not read, or there were no
@@ -318,8 +328,11 @@ THStack*  HTTHistograms::plotStack(std::string varName, std::string selName){
     hDYJets = (TH1F*)hSoup->Clone((hName+"hDYJets"+selName).c_str()); hDYJets->Reset();
   }
   if(!hTTbar){
-    hTTbar = (TH1F*)hSoup->Clone((hName+"hTTbar"+selName).c_str()); hDYJets->Reset();
-  }    
+    hTTbar = (TH1F*)hSoup->Clone((hName+"hTTbar"+selName).c_str()); hTTbar->Reset();
+  }
+  if(!hHiggs){
+    hHiggs = (TH1F*)hSoup->Clone((hName+"hH"+selName).c_str()); hHiggs->Reset();
+  } 
   /////////////////////////////////////////////////////////////////
 
   float lumi = getLumi();
@@ -343,6 +356,11 @@ THStack*  HTTHistograms::plotStack(std::string varName, std::string selName){
   weight = getSampleNormalisation(sampleName);
   scale = weight*lumi;
   hTTbar->Scale(scale);
+
+  sampleName = "H";
+  weight = getSampleNormalisation(sampleName);
+  scale = weight*lumi;
+  hHiggs->Scale(scale);
   //////////////////////////////////////////////////////
   hSoup->SetLineColor(1);
   hSoup->SetFillColor(1);
@@ -353,6 +371,7 @@ THStack*  HTTHistograms::plotStack(std::string varName, std::string selName){
   hTTbar->SetFillColor(kBlue+2);
   hDYJets->SetFillColor(kOrange-4);
   hQCD->SetFillColor(kMagenta-10);
+  hHiggs->SetFillColor(kCyan+4);
 
   hSoup->SetLineWidth(1);
   int rebinFactor = 1;  
@@ -360,9 +379,11 @@ THStack*  HTTHistograms::plotStack(std::string varName, std::string selName){
   hWJets->Rebin(rebinFactor);
   hTTbar->Rebin(rebinFactor);
   hDYJets->Rebin(rebinFactor);
+  hHiggs->Rebin(rebinFactor);
 
   THStack *hs = new THStack("hs","Stacked histograms");      
   /////////
+  hs->Add(hHiggs,"hist");    
   hs->Add(hQCD,"hist");
   hs->Add(hTTbar,"hist");
   hs->Add(hWJets,"hist");
@@ -374,6 +395,7 @@ THStack*  HTTHistograms::plotStack(std::string varName, std::string selName){
   hMCSum->Add(hWJets);
   hMCSum->Add(hTTbar);
   hMCSum->Add(hQCD);
+  hMCSum->Add(hHiggs);
 
   if(!selName.size()) selName = "baseline";
   cout<<"Event count summary for selecion name: "<<selName<<std::endl;
@@ -381,7 +403,8 @@ THStack*  HTTHistograms::plotStack(std::string varName, std::string selName){
   std::cout<<"MC: "<<hMCSum->Integral(0,hMCSum->GetNbinsX()+1)<<std::endl;  
   std::cout<<"MC W->l: "<<hWJets->Integral(0,hWJets->GetNbinsX()+1)<<std::endl;
   std::cout<<"MC TTbar: "<<hTTbar->Integral(0,hTTbar->GetNbinsX()+1)<<std::endl;
-  std::cout<<"MC Z->ll: "<<hDYJets->Integral(0,hDYJets->GetNbinsX()+1)<<std::endl;  
+  std::cout<<"MC Z->ll: "<<hDYJets->Integral(0,hDYJets->GetNbinsX()+1)<<std::endl;
+  std::cout<<"MC H->tau tau: "<<hHiggs->Integral(0,hHiggs->GetNbinsX()+1)<<std::endl;  
   std::cout<<"QCD: "<<hQCD->Integral(0,hQCD->GetNbinsX()+1)<<std::endl; 
   std::cout<<"Correction factors:"<<std::endl;
   std::cout<<"QCD SS to OS: "<<qcdOStoSS.first<<" +- "<<qcdOStoSS.second<<std::endl;
@@ -418,7 +441,7 @@ THStack*  HTTHistograms::plotStack(std::string varName, std::string selName){
   int binHigh = hs->GetXaxis()->FindBin(highEnd);  
   int binLow = hs->GetXaxis()->FindBin(lowEnd);
 
-  if(hs->GetXaxis()->GetXmax()<highEnd) binHigh = hs->GetXaxis()->GetNbins();
+  if(hs->GetXaxis()->GetXmax()<highEnd || hs->GetXaxis()->GetXmax()>300) binHigh = hs->GetXaxis()->GetNbins();
   if(hs->GetXaxis()->GetXmin()>lowEnd) lowEnd = 1;
 
   hs->GetXaxis()->SetRange(binLow,binHigh);
@@ -446,6 +469,7 @@ THStack*  HTTHistograms::plotStack(std::string varName, std::string selName){
   leg->AddEntry(hWJets,"W#rightarrow l #nu","f");
   leg->AddEntry(hTTbar,"TTbar","f");
   leg->AddEntry(hQCD,"QCD","f");
+  leg->AddEntry(hHiggs,"H#rightarrow #tau #tau","f");
   leg->SetHeader(Form("#int L = %.2f fb^{-1}",lumi/1000));
   leg->Draw();
 

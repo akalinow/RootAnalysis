@@ -150,10 +150,8 @@ void CPHistograms::finalizeHistograms(int nRuns, float weight){
     if(it.first.find(hName)!=std::string::npos &&
        it.first.find("Template")==std::string::npos){
       sysType = it.first.substr(hName.size());
-      std::cout<<"aType1: "<<sysType<<std::endl;
       plotHistograms(sysType);      
       std::string aType = sysType.substr(4,sysType.size());
-      std::cout<<"aType2: "<<aType<<std::endl;
       if(sysType.find("Z0")!=std::string::npos){
 	plot_HAZ_Histograms("h1DPhi",aType);
 	plot_HAZ_Histograms("h1DPhi_nVectors",aType);
@@ -250,18 +248,16 @@ void CPHistograms::plotHistograms(const std::string & sysType){
   TString hName1 = "h1DPhi_nVectors"+sysType;
   TString hName2 = "h1DPhi_nVectors"+sysType;
   TString hName3 = "h1DPhi_nVectors"+sysType;
-  /*
+  
   if(hName.Contains("RECO")){
     hName = "h1DPhi_nVectors"+sysType;
     hName.ReplaceAll("RECO","GEN");
     hName2.ReplaceAll("RECO","AOD");
     hName3.ReplaceAll("RECO","RECOGEN");
   }
-  */
-  TH1F* h1D = this->get1DHistogram(hName.Data());
-
-  h1D->Print();
   
+ 
+  TH1F* h1D = this->get1DHistogram(hName.Data());
   TH1F* h1DExp = this->get1DHistogram(hName1.Data());
   TH1F* h1DExp2 = this->get1DHistogram(hName2.Data());
   TH1F* h1DExp3 = this->get1DHistogram(hName3.Data());
@@ -282,11 +278,6 @@ void CPHistograms::plotHistograms(const std::string & sysType){
     if(h1DExp3) h1DExp3->Scale(1.0/h1DExp3->Integral(0,h1DExp3->GetNbinsX()+1));
     h1D->SetMinimum(0.0);
     h1D->SetMaximum(0.2);
-    ///TEST
-    //h1D->SetMinimum(1E-4);
-    //h1D->SetMaximum(1.0);
-    ///////////
-
     h1D->SetXTitle("#phi^{*}");
     h1D->SetYTitle("Events");
     h1D->GetYaxis()->SetTitleOffset(1.4);
