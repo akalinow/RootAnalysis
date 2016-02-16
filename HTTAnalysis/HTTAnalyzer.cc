@@ -147,20 +147,18 @@ void HTTAnalyzer::fillControlHistos( Wevent & aEvent,
   myHistos_->fill1DHistogram("h1DMassSV"+hNameSuffix,aPair.svfit(),eventWeight);
   myHistos_->fill1DHistogram("h1DMassVis"+hNameSuffix,aPair.m_vis(),eventWeight);
   
-  ///Fill muon pt and eta
+  ///Fill muon
   myHistos_->fill1DHistogram("h1DMassTrans"+hNameSuffix,aMuon.mt(),eventWeight);
   myHistos_->fill1DHistogram("h1DPtMuon"+hNameSuffix,aMuon.pt(),eventWeight);
   myHistos_->fill1DHistogram("h1DEtaMuon"+hNameSuffix,aMuon.eta(),eventWeight);
+  myHistos_->fill1DHistogram("h1DIsoMuon"+hNameSuffix,aMuon.iso(),eventWeight);
+  myHistos_->fill1DHistogram("h1DPhiMuon"+hNameSuffix,aMuon.phi(),eventWeight);
 
-  ///Fill tau pt and eta
+  ///Fill tau
   myHistos_->fill1DHistogram("h1DPtTau"+hNameSuffix,aTau.pt(),eventWeight);
   myHistos_->fill1DHistogram("h1DEtaTau"+hNameSuffix,aTau.eta(),eventWeight);
-
-  myHistos_->fill1DHistogram("h1DIsoMuon"+hNameSuffix,aMuon.iso(),eventWeight);
-  myHistos_->fill1DHistogram("h1DPhiMuon"+hNameSuffix,  aMuon.phi(),eventWeight);
-  myHistos_->fill1DHistogram("h1DPhiTau"+hNameSuffix, aTau.phi() ,eventWeight);
-  myHistos_->fill1DHistogram("h1DIDTau"+hNameSuffix, aTau.tauID(byCombinedIsolationDeltaBetaCorrRaw3Hits) ,eventWeight);
-  
+  myHistos_->fill1DHistogram("h1DPhiTau"+hNameSuffix,aTau.phi() ,eventWeight);
+  myHistos_->fill1DHistogram("h1DIDTau"+hNameSuffix,aTau.tauID(byCombinedIsolationDeltaBetaCorrRaw3Hits) ,eventWeight);  
   myHistos_->fill1DHistogram("h1DStatsDecayMode"+hNameSuffix, aTau.decayMode(), eventWeight);
 
   ///Fill leading tau track pt
@@ -377,12 +375,13 @@ bool HTTAnalyzer::analyze(const EventProxyBase& iEvent){
 
   ///This stands for core selection, that is common to all regions.
   bool tauKinematics = aTau.pt()>30 && fabs(aTau.eta())<2.3;
-  bool tauID = aTau.tauID(byCombinedIsolationDeltaBetaCorrRaw3Hits)<1.5;
+  bool tauID = aTau.tauID(byMediumCombinedIsolationDeltaBetaCorr3Hits);
   bool muonKinematics = aMuon.pt()>19 && fabs(aMuon.eta())<2.1;
   bool trigger = aPair.trigger(HLT_IsoMu17_eta2p1);
   if(sampleName=="Data") trigger = aPair.trigger(HLT_IsoMu18);
+  bool extraRequirements = aTau.decayMode()!=5 && aTau.decayMode()!=6;//TEST
 
-  if(!myEventProxy.wpair->size() || !tauKinematics || !tauID || !muonKinematics || !trigger) return true;
+  if(!myEventProxy.wpair->size() || !tauKinematics || !tauID || !muonKinematics || !trigger || !extraRequirements) return true;
 
   ///Note: parts of the signal/control region selection are applied in the following code.
   ///FIXME AK: this should be made in a more clear way.
@@ -390,6 +389,7 @@ bool HTTAnalyzer::analyze(const EventProxyBase& iEvent){
   bool wSelection = aMuon.mt()>60 && aMuon.iso()<0.1;
   bool qcdSelectionSS = aPair.diq()==1;
   bool qcdSelectionOS = aPair.diq()==-1;
+  bool ttSelection = aJet.csvtag()>0.9 && nJets30>1;
 
   ///Histograms for the baseline selection  
   if(baselineSelection){
@@ -418,6 +418,11 @@ bool HTTAnalyzer::analyze(const EventProxyBase& iEvent){
       myHistos_->fill1DHistogram("h1DMassTrans"+hNameSuffix+"wselSS",aMuon.mt(),eventWeight);    
       myHistos_->fill1DHistogram("h1DMassTrans"+hNameSuffix+"wselOS",aMuon.mt(),eventWeight);    
     }
+    if(ttSelection){
+      myHistos_->fill1DHistogram("h1DMassTrans"+hNameSuffix+"ttselOS",aMuon.mt(),eventWeight);
+      myHistos_->fill1DHistogram("h1DMassTrans"+hNameSuffix+"ttselSS",aMuon.mt(),eventWeight);
+      myHistos_->fill1DHistogram("h1DIsoMuon"+hNameSuffix+"ttselOS",aMuon.iso(),eventWeight);
+    }
   }
   ///Make QCD shape histograms for specific selection.
   ///Using the same SS/OS scaling factor for now.    
@@ -427,7 +432,6 @@ bool HTTAnalyzer::analyze(const EventProxyBase& iEvent){
   }
 
   ///Histograms for the WJet control region. 
-  ///Selection is split into SS and OS regions.
   if(wSelection){
     hNameSuffix = sampleName+"wsel";
     if(aPair.diq()==-1) myHistos_->fill1DHistogram("h1DMassTrans"+hNameSuffix+"OS",aMuon.mt(),eventWeight);
@@ -435,6 +439,14 @@ bool HTTAnalyzer::analyze(const EventProxyBase& iEvent){
   }
 
   ///Histograms for the tt control region
+  if(ttSelection){
+    hNameSuffix = sampleName+"ttsel";
+    if(aPair.diq()==-1){
+      myHistos_->fill1DHistogram("h1DMassTrans"+hNameSuffix+"OS",aMuon.mt(),eventWeight);
+      myHistos_->fill1DHistogram("h1DIsoMuon"+hNameSuffix+"OS",aMuon.iso(),eventWeight);
+    }
+    if(aPair.diq()== 1) myHistos_->fill1DHistogram("h1DMassTrans"+hNameSuffix+"SS",aMuon.mt(),eventWeight);    
+  }
   
   return true;
 }
