@@ -9,38 +9,13 @@ autoconf
 make -j 4
 cd HTTAnalysis
 
-#NOTE: File htt.ini files contain paths to the data files. Please update it before running the code.
-#Running the analysis requires three steps:
-# 1) - making histograms with number of primary vertices in MC files used in analysis
-#     Step 1) is expectedd to be run only once, when new data files are produced.
-#     for this one has to set. Before this please remove old ROOT files:
+#Update the input files paths in htt.ini
+#IMPORTANT: copy/link the official files with PU histograms: MC_Spring15_PU25_Startup.root Data_Pileup_2015D_Feb02.root
+#Those files should be present in NTUPELS_XX_YY_2016 directories provided by AK
+#Set number of threads to be used in the MT (multi thread) mode.
+#WARNING: with nThreads>1 there are occasional crashes due to MT reading of the input ROOT files.
+#Run the analysis:
 
-rm -f RootAnalysis*
-
-
-#  Weights step expects a file in current directory:
-#  MyDataPileupHistogram.root - file with PU estimated in DATA, created using relevant on luminosity JSON.
-#
-#processName = Weights
-#
-# in htt.iti
-
-./test htt.ini #this creates histograms with weights as a fnction of PU used in MC samples.
-
-
-#  2) The main analysis. This step is expected to be run many times.
-#  To run this step one has to set
-#  Analysis step expects a file in current directory:
-#  RootAnalysis_Weights.root - file with number of primary vertices in MC files used in analysis
-#
-#processName = Analysis
-#
-
-./test htt.ini      #this runs actual analysis and creates plots in fig_png and fig_C directories
-
-#For the step 3) the processName can be any string except PU and Weights, which reserved for step 1)
-
-
-
+./test htt.ini 
 
 
