@@ -251,6 +251,9 @@ void HTTHistograms::finalizeHistograms(int nRuns, float weight){
   plotStack("MassTrans","ttselSS");
   plotStack("IsoMuon","ttselOS");
 
+  plotStack("PtMET","mumuselOS");
+  plotStack("PtMET","mumuselSS");
+  
   ///Baseline selection plots
   plotStack("NPV","");
 
@@ -270,6 +273,8 @@ void HTTHistograms::finalizeHistograms(int nRuns, float weight){
  
   plotStack("PhiMuon","");
   plotStack("PhiTau","");
+
+  plotStack("PtMET","");  
 
   plotStack("StatsNJets30","");
   

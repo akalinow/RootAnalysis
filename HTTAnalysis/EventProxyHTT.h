@@ -28,6 +28,7 @@
       std::vector<Wtau>  *wtauGen;
       std::vector<Wmu>  *wmu;
       std::vector<Wjet>  *wjet;
+      std::vector<Wmet>  *wmet;
   
       ///Enable branches to be read
       void enableBranches();

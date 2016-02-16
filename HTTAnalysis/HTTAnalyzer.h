@@ -6,6 +6,7 @@
 
 #include "ObjectMessenger.h"
 #include "EventProxyBase.h"
+#include "EventProxyHTT.h"
 
 #include "strbitset.h"
 #include "TFileDirectory.h"
@@ -16,15 +17,9 @@
 
 #include "Analyzer.h"
 
-class EventProxyHTT;
 class HTTHistograms;
-class TH1F;
-class Wtau;
-class Wmu;
-class Wjet;
-class Wpair;
-class Wevent;
 
+class TH1F;
 class TLorentzVector;
 
 class HTTAnalyzer: public Analyzer{
@@ -74,6 +69,12 @@ class HTTAnalyzer: public Analyzer{
 
   bool filter() const{ return filterEvent_;};
 
+  void setAnalysisObjects(const EventProxyHTT & myEventProxy);
+
+  ///Check it tau decay modes (GEN and RECO) match selected (hardcoded)
+  ///decay mode.
+  std::pair<bool, bool> checkTauDecayMode(const EventProxyHTT & myEventProxy);
+
   ///Return human readable sample name (Data, WJets, etc).
   ///Make the methos static, so other modules can use it
   static std::string getSampleName(const EventProxyHTT & myEventProxy);
@@ -89,26 +90,17 @@ class HTTAnalyzer: public Analyzer{
 
   ///Fill histograms for all control plots.
   ///Histogram names will end with hNameSuffix
-  void fillControlHistos( Wevent &,  Wpair &,
-			  Wtau &,  Wmu &,
-			  Wjet &,
-			  int,
-			  float eventWeight,
-			  std::string & hNameSuffix);
+  void fillControlHistos(float eventWeight, std::string & hNameSuffix);
   
   ///Fill histograms with cos(phi), where phi is the decay 
   ///between tau decay planes. Method used for reconstructed
   ///mu+tau_h mode
-  void fillDecayPlaneAngle(Wtau & aTau,   Wmu & aMuon,
-			   float eventWeight,
-			   std::string & hNameSuffix);
+  void fillDecayPlaneAngle(float eventWeight, std::string & hNameSuffix);
 
   ///Fill histograms with cos(phi), where phi is the decay 
   ///between tau decay planes. Method used for 
   ///generator level taus for all decay modes.
-  void fillDecayPlaneAngle(Wtau & aTauPlus, Wtau & aTauMinus,				      
-			   float eventWeight,
-			   std::string & hNameSuffix);
+  void fillGenDecayPlaneAngle(float eventWeight, std::string & hNameSuffix);
   
   ///Calculate angle between tau decay planes (first element of pair)
   //and angle betwee decay products (second element of pair)
@@ -156,6 +148,18 @@ class HTTAnalyzer: public Analyzer{
  
   //should this HTTAnalyzer be able to filter events
   bool filterEvent_;
+
+  ///Reconstructed objects selected for given event.
+  Wevent aEvent;
+  Wpair aPair;
+  Wtau aTau;
+  Wtau aGenNegativeTau;
+  Wtau aGenPositiveTau;
+  Wmu aMuon;
+  Wmet aMET;
+  std::vector<Wjet> aSeparatedJets;
+  Wjet aJet;
+  int nJets30;
  
 };
 

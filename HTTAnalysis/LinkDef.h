@@ -22,6 +22,7 @@
 #pragma link C++ class vector<Wjet>;
 
 #pragma link C++ class Wmet+;
+#pragma link C++ class vector<Wmet>;
 
 #pragma link C++ class Wtriggers+;
 
