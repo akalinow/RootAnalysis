@@ -182,7 +182,7 @@ class Wtau{
     ///PCA vectors calculated using different PV estimates
     TVector3 nPCAAODvx_, nPCAGenvx_, nPCARefitvx_;
     
-    std::vector<bool> tauID_ = {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0}; 
+    std::vector<float> tauID_ = {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0}; 
 
   public:
     Wtau();

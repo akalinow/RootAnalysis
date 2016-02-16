@@ -71,14 +71,11 @@ std::string HTTAnalyzer::getSampleName(const EventProxyHTT & myEventProxy){
 
   if(myEventProxy.wevent->sample()==0) return "Data";
   if(myEventProxy.wevent->sample()==1){
-    /*
     int decayModeBoson = myEventProxy.wevent->decayModeBoson();
-    if(decayModeBoson==7)     return "DYJetsMuMu";
-    else if(decayModeBoson==6)     return "DYJetsEE";
-    else if(decayModeBoson==0)     return "DYJetsMuTau";
-    else return "DYJets";
-    */
-    return "DYJets"; 
+    if(decayModeBoson==7) return "DYJetsMuMu";
+    else if(decayModeBoson==6) return "DYJetsEE";
+    else if(decayModeBoson==0) return "DYJetsMuTau";
+    else return "DYJetsOther";    
   }
   if(myEventProxy.wevent->sample()==2) return "WJets";
   if(myEventProxy.wevent->sample()==3) return "TTbar";
@@ -100,10 +97,6 @@ float HTTAnalyzer::getPUWeight(const EventProxyHTT & myEventProxy){
     std::string hName = "pileup";
     TH1F *hPUData = (TH1F*)puDataFile_->Get(hName.c_str());
     TH1F *hPUSample = (TH1F*)puMCFile_->Get(hName.c_str());
-    std::cout<<"Loading PU histogram hName: "<<hName
-	     <<" addr: "<<hPUSample
-	     <<" data addr: "<<hPUData
-	     <<std::endl;
     ///Normalise both histograms.
     hPUData->Scale(1.0/hPUData->Integral(0,hPUData->GetNbinsX()+1));
     hPUSample->Scale(1.0/hPUSample->Integral(0,hPUSample->GetNbinsX()+1));
@@ -167,11 +160,11 @@ void HTTAnalyzer::fillControlHistos( Wevent & aEvent,
   myHistos_->fill1DHistogram("h1DPhiMuon"+hNameSuffix,  aMuon.phi(),eventWeight);
   myHistos_->fill1DHistogram("h1DPhiTau"+hNameSuffix, aTau.phi() ,eventWeight);
   myHistos_->fill1DHistogram("h1DIDTau"+hNameSuffix, aTau.tauID(byCombinedIsolationDeltaBetaCorrRaw3Hits) ,eventWeight);
+  
   myHistos_->fill1DHistogram("h1DStatsDecayMode"+hNameSuffix, aTau.decayMode(), eventWeight);
 
   ///Fill leading tau track pt
   myHistos_->fill1DHistogram("h1DPtTauLeadingTk"+hNameSuffix,aTau.leadingTk().Pt(),eventWeight);
-
   ///Fill jets info           
   myHistos_->fill1DHistogram("h1DStatsNJets30"+hNameSuffix,nJets30,eventWeight);
   myHistos_->fill1DHistogram("h1DPtLeadingJet"+hNameSuffix,aJet.pt(),eventWeight);
@@ -384,11 +377,12 @@ bool HTTAnalyzer::analyze(const EventProxyBase& iEvent){
 
   ///This stands for core selection, that is common to all regions.
   bool tauKinematics = aTau.pt()>30 && fabs(aTau.eta())<2.3;
+  bool tauID = aTau.tauID(byCombinedIsolationDeltaBetaCorrRaw3Hits)<1.5;
   bool muonKinematics = aMuon.pt()>19 && fabs(aMuon.eta())<2.1;
   bool trigger = aPair.trigger(HLT_IsoMu17_eta2p1);
   if(sampleName=="Data") trigger = aPair.trigger(HLT_IsoMu18);
 
-  if(!myEventProxy.wpair->size() || !tauKinematics || !muonKinematics || !trigger) return true;
+  if(!myEventProxy.wpair->size() || !tauKinematics || !tauID || !muonKinematics || !trigger) return true;
 
   ///Note: parts of the signal/control region selection are applied in the following code.
   ///FIXME AK: this should be made in a more clear way.
