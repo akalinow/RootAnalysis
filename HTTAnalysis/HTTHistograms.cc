@@ -85,6 +85,27 @@ float HTTHistograms::getSampleNormalisation(std::string sampleName){
     //https://twiki.cern.ch/twiki/bin/viewauth/CMS/StandardModelCrossSectionsat13TeVInclusive
     crossSection = 3*20508.9;
   }
+
+  if(sampleName=="WJetsHT100to200"){
+    //https://twiki.cern.ch/twiki/bin/viewauth/CMS/KlubTwikiRun2#Backgrounds_DY_jets_AN2
+    crossSection = 1345;
+  }
+
+  if(sampleName=="WJetsHT200to400"){
+    //https://twiki.cern.ch/twiki/bin/viewauth/CMS/KlubTwikiRun2#Backgrounds_DY_jets_AN2
+    crossSection = 359.7;
+  }
+
+  if(sampleName=="WJetsHT400to600"){
+    //https://twiki.cern.ch/twiki/bin/viewauth/CMS/KlubTwikiRun2#Backgrounds_DY_jets_AN2
+    crossSection = 48.91;
+  }
+
+  if(sampleName=="WJetsHT600toInf"){
+    //https://twiki.cern.ch/twiki/bin/viewauth/CMS/KlubTwikiRun2#Backgrounds_DY_jets_AN2
+    crossSection = 18.77;
+  }
+  
   if(sampleName=="TTbar"){
     //https://twiki.cern.ch/twiki/bin/viewauth/CMS/KlubTwikiRun2
     //https://twiki.cern.ch/twiki/bin/viewauth/CMS/StandardModelCrossSectionsat13TeVInclusive
@@ -163,6 +184,39 @@ TH1F *HTTHistograms::get1D_DY_Histogram(const std::string& name){
   hDYJetsMuTau->SetName(name.c_str());
 
   return hDYJetsMuTau;
+}
+/////////////////////////////////////////////////////////
+/////////////////////////////////////////////////////////
+TH1F *HTTHistograms::get1D_WJet_Histogram(const std::string& name){
+
+  TString hName = name;
+  TH1F *hWJets = get1DHistogram(hName.Data());
+  return hWJets; //TEST
+
+  if(!hWJets) return hWJets;
+
+  hName = name;
+  hName.ReplaceAll("WJets","WJetsHT100to200");
+  TH1F *hWJets100to200 = get1DHistogram(hName.Data());
+    
+  hName = name;
+  hName.ReplaceAll("WJets","WJetsHT200to400");
+  TH1F *hWJets200to400 = get1DHistogram(hName.Data());
+
+  hName = name;
+  hName.ReplaceAll("WJets","WJetsHT400to600");
+  TH1F *hWJets400to600 = get1DHistogram(hName.Data());
+
+  hName = name;
+  hName.ReplaceAll("WJets","WJetsHT600toInf");
+  TH1F *hWJets600toInf = get1DHistogram(hName.Data());
+
+  if(hWJets200to400) hWJets->Add(hWJets100to200);
+  if(hWJets400to600) hWJets->Add(hWJets200to400);
+  if(hWJets600toInf) hWJets->Add(hWJets400to600);
+  hWJets->SetName(name.c_str());
+
+  return hWJets;
 }
 /////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////
@@ -358,7 +412,7 @@ THStack*  HTTHistograms::plotStack(std::string varName, std::string selName){
 
   std::string hName = "h1D"+varName;
   TH1F *hHiggs = get1DHistogram((hName+"H"+selName).c_str());
-  TH1F *hWJets = get1DHistogram((hName+"WJets"+selName).c_str());
+  TH1F *hWJets = get1D_WJet_Histogram((hName+"WJets"+selName).c_str());
   TH1F *hTTbar = get1DHistogram((hName+"TTbar"+selName).c_str());
 
   TH1F *hDYJetsOther = get1DHistogram((hName+"DYJetsOther"+selName).c_str());
@@ -647,13 +701,13 @@ std::pair<float,float> HTTHistograms::getQCDOStoSS(std::string selName){
   std::string hName = "h1DIso";
 
   // SS selection
-  TH1F *hWJetsSS = get1DHistogram((hName+"WJets"+"qcdselSS").c_str());
+  TH1F *hWJetsSS = get1D_WJet_Histogram((hName+"WJets"+"qcdselSS").c_str());
   TH1F *hDYJetsSS = get1D_DY_Histogram((hName+"DYJets"+"qcdselSS").c_str());  
   TH1F *hTTSS = get1DHistogram((hName+"TTbar"+"qcdselSS").c_str());
   TH1F *hSoupSS = get1DHistogram((hName+"Data"+"qcdselSS").c_str());
   TH1F *hSoupSSb = get1DHistogram((hName+"Data"+"qcdselSS").c_str());
   // OS selection
-  TH1F *hWJetsOS = get1DHistogram((hName+"WJets"+"qcdselOS").c_str());
+  TH1F *hWJetsOS = get1D_WJet_Histogram((hName+"WJets"+"qcdselOS").c_str());
   TH1F *hDYJetsOS = get1D_DY_Histogram((hName+"DYJets"+"qcdselOS").c_str());
   TH1F *hTTOS = get1DHistogram((hName+"TTbar"+"qcdselOS").c_str());
   TH1F *hSoupOS = get1DHistogram((hName+"Data"+"qcdselOS").c_str());
@@ -727,7 +781,7 @@ TH1F* HTTHistograms::getQCDbackground(std::string varName, std::string selName){
 
   std::string hName = "h1D" + varName;
   // SS selection
-  TH1F *hWJets = get1DHistogram((hName+"WJets"+"qcdselSS"+selName).c_str());
+  TH1F *hWJets = get1D_WJet_Histogram((hName+"WJets"+"qcdselSS"+selName).c_str());
   TH1F *hDYJets = get1D_DY_Histogram((hName+"DYJets"+"qcdselSS"+selName).c_str());
   TH1F *hTTbar = get1DHistogram((hName+"TTbar"+"qcdselSS"+selName).c_str());
   TH1F *hSoup = get1DHistogram((hName+"Data"+"qcdselSS"+selName).c_str());
@@ -784,7 +838,7 @@ std::pair<float,float> HTTHistograms::getWNormalisation(std::string selName){
   std::cout<<"Calling method: "<<__func__<<std::endl;
 
   std::string hName = "h1DMassTrans";
-  TH1F *hWJets = get1DHistogram((hName+"WJets"+selName).c_str());
+  TH1F *hWJets = get1D_WJet_Histogram((hName+"WJets"+selName).c_str());
   TH1F *hDYJets = get1D_DY_Histogram((hName+"DYJets"+selName).c_str());
   TH1F *hTT = get1DHistogram((hName+"TTbar"+selName).c_str());
   TH1F *hSoup = get1DHistogram((hName+"Data"+selName).c_str());

@@ -63,8 +63,11 @@ class HTTHistograms: public AnalysisHistograms {
 
   void plotPhiDecayPlanes(const std::string & sysType);
 
-  ///Return histogramd for sum of all DY decay modes.
+  ///Return histogram for sum of all DY decay modes.
   TH1F *get1D_DY_Histogram(const std::string& name);
+
+  ///Return histogram for sum of all WJet HT bins
+  TH1F *get1D_WJet_Histogram(const std::string& name);
 
   //Plot a single histogram. One has to provide the full
   //histogram name, e.g. including h1D prefix.

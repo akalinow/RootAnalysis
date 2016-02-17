@@ -76,7 +76,14 @@ std::string HTTAnalyzer::getSampleName(const EventProxyHTT & myEventProxy){
     else if(decayModeBoson==0) return "DYJetsMuTau";
     else return "DYJetsOther";    
   }
-  if(myEventProxy.wevent->sample()==2) return "WJets";
+  if(myEventProxy.wevent->sample()==2){
+    std::string fileName = myEventProxy.getTTree()->GetCurrentFile()->GetName();
+    if(fileName.find("WJetsHT100to200")!=std::string::npos) return "WJetsHT100to200";
+    if(fileName.find("WJetsHT200to400")!=std::string::npos) return "WJetsHT200to400";
+    if(fileName.find("WJetsHT400to600")!=std::string::npos) return "WJetsHT400to600";
+    if(fileName.find("WJetsHT600toInf")!=std::string::npos) return "WJetsHT600toInf";
+    return "WJets";
+  }
   if(myEventProxy.wevent->sample()==3) return "TTbar";
   if(myEventProxy.wevent->sample()==5) return "H";
   if(myEventProxy.wevent->sample()==6) return "A";
@@ -126,6 +133,16 @@ float HTTAnalyzer::getGenWeight(const EventProxyHTT & myEventProxy){
   if(myEventProxy.wevent->sample()==1) return myEventProxy.wevent->genevtweight()/23443.423;  
   if(myEventProxy.wevent->sample()==2) return myEventProxy.wevent->genevtweight()/225892.45;  
   if(myEventProxy.wevent->sample()==3) return myEventProxy.wevent->genevtweight()/6383;
+  */
+  /*
+  if(myEventProxy.wevent->sample()==2){
+    std::string fileName = myEventProxy.getTTree()->GetCurrentFile()->GetName();
+    if(fileName.find("WJetsHT100to200")!=std::string::npos) return 1345/(3*20508.9+1345+359.7+48.9+18.77);
+    if(fileName.find("WJetsHT200to400")!=std::string::npos) return 359.7/(3*20508.9+1345+359.7+48.9+18.77);
+    if(fileName.find("WJetsHT400to600")!=std::string::npos) return 48.9/(3*20508.9+1345+359.7+48.9+18.77);
+    if(fileName.find("WJetsHT600toInf")!=std::string::npos) return 18.7/(3*20508.9+1345+359.7+48.9+18.77);
+    else return 3*20508.9/(3*20508.9+1345+359.7+48.9+18.77);
+  }
   */
   return 1;
 }
@@ -397,7 +414,7 @@ bool HTTAnalyzer::analyze(const EventProxyBase& iEvent){
   bool qcdSelectionSS = aPair.diq()==1;
   bool qcdSelectionOS = aPair.diq()==-1;
   bool ttSelection = aJet.csvtag()>0.9 && nJets30>1;
-  bool mumuSelection =  aPair.m_vis()>85 && aPair.m_vis()<95;
+  bool mumuSelection =  aMuon.mt()<40 && aMuon.iso()<0.1 && aPair.m_vis()>85 && aPair.m_vis()<95;
 
   ///Histograms for the baseline selection  
   if(baselineSelection){
@@ -463,8 +480,8 @@ bool HTTAnalyzer::analyze(const EventProxyBase& iEvent){
   ///Histograms for the DY->mu mu
   if(mumuSelection){
     hNameSuffix = sampleName+"mumusel";
-     if(aPair.diq()==-1) myHistos_->fill1DHistogram("h1DPtMET"+hNameSuffix+"mumuselOS",aMET.metpt(),eventWeight);
-     if(aPair.diq()==1) myHistos_->fill1DHistogram("h1DPtMET"+hNameSuffix+"mumuselSS",aMET.metpt(),eventWeight);
+    if(aPair.diq()==-1) myHistos_->fill1DHistogram("h1DPtMET"+hNameSuffix+"OS",aMET.metpt(),eventWeight);
+    if(aPair.diq()==1) myHistos_->fill1DHistogram("h1DPtMET"+hNameSuffix+"SS",aMET.metpt(),eventWeight);
   }
   
   return true;
