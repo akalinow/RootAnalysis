@@ -61,7 +61,8 @@ class HTTHistograms: public AnalysisHistograms {
   //selName - selection type name. For baseline use empty string
   THStack* plotStack(std::string varName, std::string selName);
 
-  void plotPhiDecayPlanes(const std::string & sysType);
+  void plotPhiDecayPlanes(const std::string & sysType,
+			  const std::string & cosType);
 
   ///Return histogram for sum of all DY decay modes.
   TH1F *get1D_DY_Histogram(const std::string& name);

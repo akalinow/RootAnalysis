@@ -76,6 +76,7 @@ std::string HTTAnalyzer::getSampleName(const EventProxyHTT & myEventProxy){
     else if(decayModeBoson==0) return "DYJetsMuTau";
     else return "DYJetsOther";    
   }
+  if(myEventProxy.wevent->sample()==11) return "DYJetsLowM";
   if(myEventProxy.wevent->sample()==2){
     std::string fileName = myEventProxy.getTTree()->GetCurrentFile()->GetName();
     if(fileName.find("WJetsHT100to200")!=std::string::npos) return "WJetsHT100to200";
@@ -206,8 +207,6 @@ void HTTAnalyzer::fillDecayPlaneAngle(float eventWeight, std::string & hNameSuff
     negativeLeadingTk = aTau.leadingTk();
     if(hNameSuffix.find("RefitPV")!=std::string::npos) negative_nPCA = TLorentzVector(aTau.nPCARefitvx(),0);
     if(hNameSuffix.find("GenPV")!=std::string::npos) negative_nPCA = TLorentzVector(aTau.nPCAGenvx(),0);
-    
-    negative_nPCA = TLorentzVector(aTau.nPCAGenvx(),0);
   }
   else{    
     positiveLeadingTk = aTau.leadingTk();
@@ -223,6 +222,17 @@ void HTTAnalyzer::fillDecayPlaneAngle(float eventWeight, std::string & hNameSuff
 			      positiveLeadingTk,positive_nPCA);
 
   myHistos_->fill1DHistogram("h1DPhi_nVectors"+hNameSuffix,angles.first,eventWeight);
+
+  
+
+   if(aTau.charge()>0){
+     float cosPositive =  positive_nPCA.Vect().Unit()*aGenPositiveTau.nPCA().Unit();
+    myHistos_->fill1DHistogram("h1DCosPhi_CosPositive"+hNameSuffix,cosPositive,eventWeight);
+  }
+  else {
+    float cosNegative = negative_nPCA.Vect().Unit()*aGenNegativeTau.nPCA().Unit();
+    myHistos_->fill1DHistogram("h1DCosPhi_CosNegative"+hNameSuffix,cosNegative,eventWeight);
+  } 
 }
 //////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////
@@ -391,7 +401,7 @@ bool HTTAnalyzer::analyze(const EventProxyBase& iEvent){
   bool goodGenDecayMode = goodDecayModes.first;
   bool goodRecoDecayMode = goodDecayModes.second;
 
-  if(goodGenDecayMode){
+  if(goodGenDecayMode && goodRecoDecayMode){
     std::string hNameSuffixCP1 = sampleName+"Gen";
     hNameSuffixCP1 = sampleName+"GenNoOfflineSel";
     fillGenDecayPlaneAngle(eventWeight, hNameSuffixCP1);
@@ -403,9 +413,11 @@ bool HTTAnalyzer::analyze(const EventProxyBase& iEvent){
   bool muonKinematics = aMuon.pt()>19 && fabs(aMuon.eta())<2.1;
   bool trigger = aPair.trigger(HLT_IsoMu17_eta2p1);
   if(sampleName=="Data") trigger = aPair.trigger(HLT_IsoMu18);
-  bool extraRequirements = aTau.decayMode()!=5 && aTau.decayMode()!=6;
+  bool extraRequirements = aTau.decayMode()!=5 && aTau.decayMode()!=6 && nJets30==0;
 
-  if(!myEventProxy.wpair->size() || !tauKinematics || !tauID || !muonKinematics || !trigger || !extraRequirements) return true;
+  if(!myEventProxy.wpair->size()) return true;
+  if(!tauKinematics || !tauID || !muonKinematics || !trigger) return true;
+  //if(!extraRequirements) return true;
 
   ///Note: parts of the signal/control region selection are applied in the following code.
   ///FIXME AK: this should be made in a more clear way.
@@ -416,10 +428,11 @@ bool HTTAnalyzer::analyze(const EventProxyBase& iEvent){
   bool ttSelection = aJet.csvtag()>0.9 && nJets30>1;
   bool mumuSelection =  aMuon.mt()<40 && aMuon.iso()<0.1 && aPair.m_vis()>85 && aPair.m_vis()<95;
 
+
   ///Histograms for the baseline selection  
   if(baselineSelection){
     fillControlHistos(eventWeight, hNameSuffix);
-    if(goodRecoDecayMode){
+    if(goodGenDecayMode && goodRecoDecayMode){
       std::string hNameSuffixCP = hNameSuffix+"RefitPV";    
       fillDecayPlaneAngle(eventWeight, hNameSuffixCP);
       hNameSuffixCP = hNameSuffix+"GenPV";
