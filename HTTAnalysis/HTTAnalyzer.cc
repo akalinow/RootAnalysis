@@ -39,16 +39,13 @@ void HTTAnalyzer::initialize(TFileDirectory& aDir,
 
   mySelections_ = aSelections;
   
-  ///The histograms for this analyzer will be saved into "HTTAnalyzer"
-  ///directory of the ROOT file
-  ///NOTE: due to a bug hists land in the Summary directory
   myHistos_ = new HTTHistograms(&aDir, selectionFlavours_);
 }
 //////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////
 void HTTAnalyzer::finalize(){ 
 
-  myHistos_->finalizeHistograms(0,1.0);
+  //myHistos_->finalizeHistograms(0,1.0);
  
 }
 //////////////////////////////////////////////////////////////////////////////
@@ -224,6 +221,7 @@ void HTTAnalyzer::fillDecayPlaneAngle(float eventWeight, std::string & hNameSuff
 
   angles = angleBetweenPlanes(negativeLeadingTk,negative_nPCA,
 			      positiveLeadingTk,positive_nPCA);
+
 
   myHistos_->fill1DHistogram("h1DPhi_nVectors"+hNameSuffix,angles.first,eventWeight);
 

@@ -40,9 +40,7 @@ Analyzer* SummaryAnalyzer::clone() const{
 void SummaryAnalyzer::initialize(TFileDirectory& aDir,
 				 pat::strbitset *aSelections){
   
-  myDir_ = new TFileDirectory(aDir);
-
-  //selectionFlavours_ = ps.getUntrackedParameter<std::vector<std::string> >("selectionFlavours"); 
+  myDir_ = &aDir;
 
   mySelections_ = aSelections;
 

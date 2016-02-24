@@ -153,9 +153,10 @@ HTTHistograms::HTTHistograms(TFileDirectory *myDir){
 /////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////
 HTTHistograms::HTTHistograms(TFileDirectory *myDir, const std::vector<std::string> & flavours){
- selectionFlavours_ = flavours;
 
-AnalysisHistograms::init(myDir);
+  selectionFlavours_ = flavours;
+
+  AnalysisHistograms::init(myDir);
 
 }
 /////////////////////////////////////////////////////////
