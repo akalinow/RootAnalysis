@@ -65,6 +65,8 @@ class HTTAnalyzer: public Analyzer{
 
   virtual void clear(){;};
 
+  virtual void addBranch(TTree *);
+
   Analyzer* clone() const;
 
   bool filter() const{ return filterEvent_;};
@@ -160,6 +162,9 @@ class HTTAnalyzer: public Analyzer{
   std::vector<Wjet> aSeparatedJets;
   Wjet aJet;
   int nJets30;
+
+  ///Variables stored in a TTree
+  Double_t muonPt;
  
 };
 

@@ -150,12 +150,11 @@ void  TreeAnalyzer::init(std::vector<Analyzer*> myAnalyzers){
   myProxy_->init(fileNames_);
   myAnalyzers_ = myAnalyzers;
 
-  ///Summary analyzer not used at the moment.
-  ///does not work with multithread.
-  /*
-  mySummary_ = new SummaryAnalyzer("Summary");
-  myAnalyzers_.push_back(mySummary_);
-  */
+  if(nThreads_==1){
+    mySummary_ = new SummaryAnalyzer("Summary");
+    myAnalyzers_.push_back(mySummary_);
+  }
+    
   for(unsigned int i=0;i<myAnalyzers_.size();++i){ 
     myDirectories_.push_back(store_->mkdir(myAnalyzers_[i]->name()));
     myAnalyzers_[i]->initialize(myDirectories_[myDirectories_.size()-1],
@@ -164,17 +163,17 @@ void  TreeAnalyzer::init(std::vector<Analyzer*> myAnalyzers){
 
 
   
- for(unsigned int iThread=0;iThread<omp_get_max_threads();++iThread){
+ for(unsigned int iThread=0;iThread<omp_get_max_threads();++iThread){   
    myProxiesThread_[iThread] = myProxy_->clone();
    myProxiesThread_[iThread]->init(fileNames_);
     for(unsigned int iAnalyzer=0;iAnalyzer<myAnalyzers_.size();++iAnalyzer){
-      myAnalyzersThreads_[iThread].push_back(myAnalyzers_[iAnalyzer]->clone());
+      if(nThreads_==1) myAnalyzersThreads_[iThread].push_back(myAnalyzers_[iAnalyzer]);
+      else myAnalyzersThreads_[iThread].push_back(myAnalyzers_[iAnalyzer]->clone());
     }
   }
 
  ///Tree making not used at the moment.
  ///does not work with multithread.
- /*
  if(nThreads_==1){
    unsigned int iThread = 0;
    for(unsigned int i=0;i<myAnalyzers_.size();++i){
@@ -182,7 +181,6 @@ void  TreeAnalyzer::init(std::vector<Analyzer*> myAnalyzers){
      myAnalyzers_[i]->addCutHistos(mySummary_->getHistoList());
    }
  }
- */
 }
 //////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////

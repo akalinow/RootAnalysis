@@ -114,7 +114,6 @@ void CPAnalyzer::fillAngles(const DiTauData* aEvent,
   std::pair<float,float>  angles2 = angleBetweenPlanes(aEvent->piMinus_,TLorentzVector(nMinus,0),
   						       aEvent->piPlus_,TLorentzVector(nPlus,0));
 
-
   float weight = myEvent->recoEvent_.nTracksInRefit_;
   weight = 1.0;
   myHistos_->fill1DHistogram("h1DPhi_nVectors"+sysType,angles2.first,weight);

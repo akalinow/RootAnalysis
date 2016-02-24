@@ -32,7 +32,6 @@ SummaryAnalyzer::~SummaryAnalyzer(){ }
 Analyzer* SummaryAnalyzer::clone() const{
 
   SummaryAnalyzer* clone = new SummaryAnalyzer(name());
-  //clone->setHistos(myHistos_);
   return clone;
 
 };

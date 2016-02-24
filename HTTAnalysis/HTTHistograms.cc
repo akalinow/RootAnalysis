@@ -82,7 +82,7 @@ float HTTHistograms::getSampleNormalisation(std::string sampleName){
   //https://twiki.cern.ch/twiki/bin/viewauth/CMS/StandardModelCrossSectionsat13TeVInclusive
   if(sampleName=="DYJets"){
     //xsection for 3xZ->mu mu M50 in [pb]  
-    crossSection = 3*2008.4*0.87; 
+    crossSection = 3*2008.4; 
   }
   if(sampleName=="WJets"){
     //xsection for 3xW->mu nu in [pb]
@@ -275,7 +275,7 @@ void HTTHistograms::defineHistograms(){
    add1DHistogram("h1DMassTemplate",";SVFit mass [GeV/c^{2}]; Events",50,0,200,file_);
    add1DHistogram("h1DPtTemplate",";p_{T}; Events",20,0,100,file_);
    add1DHistogram("h1DEtaTemplate",";#eta; Events",24,-2.4,2.4,file_);
-   add1DHistogram("h1DPhiTemplate",";#phi; Events",9,-M_PI,M_PI,file_);
+   add1DHistogram("h1DPhiTemplate",";#phi; Events",8,-M_PI,M_PI,file_);
    add1DHistogram("h1DCosPhiTemplate",";cos(#phi); Events",10,-1.0,1.0,file_);
    add1DHistogram("h1DCSVBtagTemplate",";CSV btag; Events",20,0,1,file_);
    add1DHistogram("h1DIsoTemplate",";Isolation; Events",10,0,0.5,file_);
@@ -289,10 +289,14 @@ void HTTHistograms::defineHistograms(){
 void HTTHistograms::finalizeHistograms(int nRuns, float weight){
 
   AnalysisHistograms::finalizeHistograms();
-  
-  plotPhiDecayPlanes("WJets","nVectors");
-  plotPhiDecayPlanes("Data","nVectors");
-  
+
+  plotPhiDecayPlanes("Phi_nVectorsData");
+  plotPhiDecayPlanes("Phi_nVectorsH");
+  plotPhiDecayPlanes("Phi_nVectorsA");
+  plotPhiDecayPlanes("Phi_nVectorsDYJetsMuTau");
+  plotPhiDecayPlanes("CosPhi_CosPositiveH");
+  plotPhiDecayPlanes("CosPhi_CosNegativeH");
+    
   ///Control regions plots
   plotStack("Iso","qcdselOS");
   plotStack("Iso","qcdselSS");
@@ -346,11 +350,10 @@ void HTTHistograms::finalizeHistograms(int nRuns, float weight){
 }
 /////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////
-void HTTHistograms::plotPhiDecayPlanes(const std::string & sysType,
-				       const std::string & cosType){
+void HTTHistograms::plotPhiDecayPlanes(const std::string & name){
 
-  TCanvas aCanvas(TString::Format("PhiDecayPlanes_%s",sysType.c_str()),
-		  TString::Format("PhiDecayPlanes_%s",sysType.c_str()),
+  TCanvas aCanvas(TString::Format("PhiDecayPlanes_%s",name.c_str()),
+		  TString::Format("PhiDecayPlanes_%s",name.c_str()),
 		  460,500);
   
   TLegend l(0.15,0.15,0.35,0.37,NULL,"brNDC");
@@ -359,20 +362,28 @@ void HTTHistograms::plotPhiDecayPlanes(const std::string & sysType,
   l.SetBorderSize(0);
   l.SetFillColor(10);
 
-  TString hName = "h1DCosPhi_"+cosType+sysType+"RefitPV";
+  TString hName = "h1D"+name+"RefitPV";
   TH1F* h1DRefitPV = this->get1DHistogram(hName.Data());
 
-  hName = "h1DCosPhi_"+cosType+sysType+"GenPV";
+  hName = "h1D"+name+"AODPV";
+  TH1F* h1DAODPV = this->get1DHistogram(hName.Data());
+  
+  hName = "h1D"+name+"GenPV";
   TH1F* h1DGenPV = this->get1DHistogram(hName.Data());
 
-  hName = "h1DCosPhi_"+cosType+sysType+"GenNoOfflineSel";
+  hName = "h1D"+name+"GenNoOfflineSel";
   TH1F* h1DGen = this->get1DHistogram(hName.Data());
 
   if(h1DGen){
     h1DGen->SetLineWidth(3);
     h1DGen->Scale(1.0/h1DGen->Integral(0,h1DGen->GetNbinsX()+1));
-    h1DGen->SetLineColor(2);
-    h1DGen->Print("all");
+    h1DGen->SetLineColor(1);
+  }
+
+  if(h1DAODPV){
+    h1DAODPV->SetLineWidth(3);
+    h1DAODPV->Scale(1.0/h1DAODPV->Integral(0,h1DAODPV->GetNbinsX()+1));
+    h1DAODPV->SetLineColor(2);
   }
 
   if(h1DGenPV){
@@ -383,28 +394,35 @@ void HTTHistograms::plotPhiDecayPlanes(const std::string & sysType,
   
   if(h1DRefitPV){    
     h1DRefitPV->SetLineWidth(3);
+    h1DRefitPV->SetLineColor(4);
     h1DRefitPV->Scale(1.0/h1DRefitPV->Integral(0,h1DRefitPV->GetNbinsX()+1));
     h1DRefitPV->SetXTitle("#phi^{*}");
     h1DRefitPV->SetYTitle("Events");
-    h1DRefitPV->SetTitle(("Boson: "+sysType).c_str());
+    h1DRefitPV->SetTitle(name.c_str());
     h1DRefitPV->GetYaxis()->SetTitleOffset(1.4);
     h1DRefitPV->SetStats(kFALSE);
-    //h1DRefitPV->GetXaxis()->SetRangeUser(0,M_PI);
-    h1DRefitPV->SetMaximum(0.72);
-    //h1DRefitPV->SetMinimum(0.15);
+    h1DRefitPV->GetXaxis()->SetRangeUser(0,M_PI);
+    //h1DRefitPV->SetMaximum(0.72);
+
+    h1DRefitPV->SetMaximum(0.4);
+    h1DRefitPV->SetMinimum(0.10);
     h1DRefitPV->Draw("HISTO");    
-    h1DRefitPV->SetLineColor(1);
     l.AddEntry(h1DRefitPV,"reco PCA with refit. PV");
     if(h1DGenPV){
       h1DGenPV->Draw("HISTO same");
       l.AddEntry(h1DGenPV,"reco PCA with gen. PV");
+    }
+    
+    if(h1DAODPV){
+      //h1DAODPV->Draw("HISTO same");
+      //l.AddEntry(h1DAODPV,"reco PCA with AOD PV");
     }
     if(h1DGen){
       h1DGen->Draw("HISTO same");
       l.AddEntry(h1DGen,"#splitline{PCA with gen. particles}{no offline selection}");
     }
     l.Draw();
-    aCanvas.Print(TString::Format("fig_png/Phi_%s%s.png",cosType.c_str(),sysType.c_str()).Data());
+    aCanvas.Print(TString::Format("fig_png/%s.png",name.c_str()).Data());
   }
 }
 /////////////////////////////////////////////////////////
@@ -781,7 +799,7 @@ std::pair<float,float> HTTHistograms::getQCDOStoSS(std::string selName){
   gStyle->SetOptStat(11);
   gStyle->SetOptFit(11);
   hSoupOS->Draw();
-  hSoupOS->Fit("line","","",0.3,0.4);
+  hSoupOS->Fit("line","","",0.2,0.3);
   c->Print(TString::Format("fig_png/%s.png",hName.c_str()).Data());
   c->Print(TString::Format("fig_C/%s.C",hName.c_str()).Data());
 

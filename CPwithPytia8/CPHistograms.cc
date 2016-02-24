@@ -459,6 +459,7 @@ void CPHistograms::plotPCAResolution(const std::string & sysType){
     if(h1DAOD->GetMaximum()>max) max = h1DAOD->GetMaximum();
     if(h1DRefit->GetMaximum()>max) max = h1DRefit->GetMaximum();
     h1DGen->SetMaximum(1.05*max);
+    h1DGen->SetMaximum(0.72);
     
     h1DGen->Draw();
     h1DAOD->Draw("same");
