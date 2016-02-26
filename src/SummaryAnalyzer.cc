@@ -39,7 +39,7 @@ Analyzer* SummaryAnalyzer::clone() const{
 //////////////////////////////////////////////////////////////////////////////
 void SummaryAnalyzer::initialize(TFileDirectory& aDir,
 				 pat::strbitset *aSelections){
-  
+
   myDir_ = &aDir;
 
   mySelections_ = aSelections;

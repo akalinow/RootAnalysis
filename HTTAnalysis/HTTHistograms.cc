@@ -1,4 +1,3 @@
-
 #include <iostream>
 #include <cmath>
 
@@ -248,6 +247,7 @@ bool HTTHistograms::fill1DHistogram(const std::string& name, float val, float we
       }
       this->add1DHistogram(name,"",this->get1DHistogram(hTemplateName,true)->GetNbinsX(),
 			   binsArray, file_);
+      this->get1DHistogram(name,true)->SetDirectory(this->get1DHistogram(hTemplateName,true)->GetDirectory());
       delete binsArray;      
     }
     else{
@@ -256,6 +256,7 @@ bool HTTHistograms::fill1DHistogram(const std::string& name, float val, float we
 			   this->get1DHistogram(hTemplateName,true)->GetXaxis()->GetXmin(),
 			   this->get1DHistogram(hTemplateName,true)->GetXaxis()->GetXmax(),
 			   file_);
+      this->get1DHistogram(name,true)->SetDirectory(this->get1DHistogram(hTemplateName,true)->GetDirectory());
     }   
     return AnalysisHistograms::fill1DHistogram(name,val,weight);
   }

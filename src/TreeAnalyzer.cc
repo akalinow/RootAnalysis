@@ -150,38 +150,31 @@ void  TreeAnalyzer::init(std::vector<Analyzer*> myAnalyzers){
   myProxy_->init(fileNames_);
   myAnalyzers_ = myAnalyzers;
 
-  if(nThreads_==10){
+  if(nThreads_==1){
     mySummary_ = new SummaryAnalyzer("Summary");
     myAnalyzers_.push_back(mySummary_);
   }
     
   for(unsigned int i=0;i<myAnalyzers_.size();++i){
     std::string analyzerName = myAnalyzers_[i]->name();
-    myDirectories_.push_back(store_->mkdir(analyzerName));
-    myAnalyzers_[i]->initialize(myDirectories_[myDirectories_.size()-1],
-    				myStrSelections_);
-  }
-
-
-  for(unsigned int i=0;i<myAnalyzers_.size();++i){
-    std::string name = myAnalyzers_[i]->name();  
-    TDirectoryFile* summary = (TDirectoryFile*)store_->file().Get(name.c_str());
-    std::cout<<"TEST "<<name<<" "<<summary<<std::endl;
+    std::string desc = "";
+    myDirectories_.push_back(store_->mkdir(analyzerName,desc));
+    myAnalyzers_[i]->initialize(myDirectories_[i], myStrSelections_);
   }
 
   
- for(unsigned int iThread=0;iThread<omp_get_max_threads();++iThread){   
+ for(unsigned int iThread=0;iThread<omp_get_max_threads();++iThread){
    myProxiesThread_[iThread] = myProxy_->clone();
    myProxiesThread_[iThread]->init(fileNames_);
     for(unsigned int iAnalyzer=0;iAnalyzer<myAnalyzers_.size();++iAnalyzer){
-      if(nThreads_==1) myAnalyzersThreads_[iThread].push_back(myAnalyzers_[iAnalyzer]);
+      if(nThreads_==1 || iThread==0) myAnalyzersThreads_[iThread].push_back(myAnalyzers_[iAnalyzer]);
       else myAnalyzersThreads_[iThread].push_back(myAnalyzers_[iAnalyzer]->clone());
     }
   }
 
  ///Tree making not used at the moment.
  ///does not work with multithread.
- if(nThreads_==10){
+ if(nThreads_==1){
    unsigned int iThread = 0;
    for(unsigned int i=0;i<myAnalyzers_.size();++i){
      myAnalyzers_[i]->addBranch(mySummary_->getTree());  
@@ -217,8 +210,6 @@ int TreeAnalyzer::loop(){
       analyze(myProxiesThread_[omp_get_thread_num()]->toN(aEvent));
     }
 
-    std::cout<<"aEvent: "<<aEvent<<std::endl;
-    
     return nEventsAnalyzed_;   
 }
 //////////////////////////////////////////////////////////////////////////////

@@ -7,6 +7,7 @@
  */
 #include <string>
 #include <exception>
+#include <iostream>
 
 #include "TH1AddDirectorySentry.h"
 
@@ -104,7 +105,7 @@ class TFileDirectory {
       template<typename T, typename Arg1, typename Arg2, typename Arg3, typename Arg4, 
                typename Arg5>
       T * make( const Arg1 & a1, const Arg2 & a2, const Arg3 & a3, const Arg4 & a4, 
-                const Arg5 & a5 ) const {
+                const Arg5 & a5 ) const {		 
          TDirectory *d = _cd();
          T * t =  new T( a1, a2, a3, a4, a5 );
          ROOT::DirAutoAdd_t func = T::Class()->GetDirectoryAutoAdd();
@@ -208,6 +209,8 @@ class TFileDirectory {
       TFileDirectory mkdir( const std::string & dir, const std::string & descr = "" );
       /// return the full path of the stored histograms
       std::string fullPath() const;
+
+      TFile* file() const {return file_;}
 
    private:
       

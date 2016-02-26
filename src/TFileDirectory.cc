@@ -25,6 +25,7 @@ TFileDirectory::cd () const
 TDirectory *
 TFileDirectory::_cd (const string &subdir, bool createNeededDirectories) const
 {
+  
    string fpath = fullPath();
    if (subdir.length())
    {
@@ -38,6 +39,7 @@ TFileDirectory::_cd (const string &subdir, bool createNeededDirectories) const
          fpath = subdir;
       }
    }
+
    TDirectory * dir = file_->GetDirectory( fpath.c_str() );
    if ( dir == 0 ) 
    {      
@@ -147,13 +149,13 @@ TFileDirectory::_getObj (const string &objname, const string &subdir) const
 std::string 
 TFileDirectory::fullPath() const 
 {
-   return string( path_.empty() ? dir_ : path_ + "/" + dir_ );
+  return string( path_.empty() ? dir_ : path_ + "/" + dir_ );
 }
 
 TFileDirectory 
 TFileDirectory::mkdir( const std::string & dir, const std::string & descr ) 
 {
-   TH1AddDirectorySentry sentry;
-   _cd();
-   return TFileDirectory( dir, descr, file_, fullPath() );
+  TH1AddDirectorySentry sentry;
+  _cd();  
+  return TFileDirectory( dir, descr, file_, fullPath() );
 }

@@ -80,7 +80,7 @@ class AnalysisHistograms {
 
   void add1DHistogram(const std::string& name, const std::string& title,
 		      int nBinsX, float xlow, float xhigh, 
-		      const TFileDirectory* myDir);
+		      TFileDirectory* myDir);
 
   void add1DHistogram(const std::string& name, const std::string& title,
 		      int nBinsX, float* bins, 
