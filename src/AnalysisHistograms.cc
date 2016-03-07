@@ -192,15 +192,16 @@ void  AnalysisHistograms::add3DHistogram(const std::string& name, const std::str
 }
 //////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////
-void AnalysisHistograms::fillProfile(const std::string& name, float x, float val, float weight) {
+bool AnalysisHistograms::fillProfile(const std::string& name, float x, float val, float weight) {
   using namespace std;
 
   unsigned int iThread = omp_get_thread_num();
 
   std::unordered_map<std::string,TProfile*>::iterator it = myProfiles_[iThread].find(name); 
   if(it!=myProfiles_[iThread].end()) it->second->Fill(x,val,weight);
-  else cout<<"ERROR: profile : "<<name<<" not found!"<<endl;
+  else return false;
 
+  return true;
 }
 //////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////

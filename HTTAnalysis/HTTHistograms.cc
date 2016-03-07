@@ -292,6 +292,13 @@ void HTTHistograms::finalizeHistograms(int nRuns, float weight){
 
   AnalysisHistograms::finalizeHistograms();
 
+  plotPhiDecayPlanes("Phi_nVectorsH");
+  plotPhiDecayPlanes("Phi_nVectorsA");
+  plotPhiDecayPlanes("Phi_nVectorsDYMuTau");
+  plotPhiDecayPlanes("CosPhi_CosPositiveH");
+  plotPhiDecayPlanes("CosPhi_CosNegativeH");
+  return;
+
   plotPhiDecayPlanes("Phi_nVectorsData");
   plotPhiDecayPlanes("Phi_nVectorsH");
   plotPhiDecayPlanes("Phi_nVectorsA");
@@ -394,20 +401,20 @@ void HTTHistograms::plotPhiDecayPlanes(const std::string & name){
     h1DGenPV->SetLineColor(3);
   }
   
-  if(h1DRefitPV){    
+  if(h1DRefitPV){
     h1DRefitPV->SetLineWidth(3);
-    h1DRefitPV->SetLineColor(4);
+    h1DRefitPV->SetLineColor(4);    
     h1DRefitPV->Scale(1.0/h1DRefitPV->Integral(0,h1DRefitPV->GetNbinsX()+1));
     h1DRefitPV->SetXTitle("#phi^{*}");
     h1DRefitPV->SetYTitle("Events");
     h1DRefitPV->SetTitle(name.c_str());
     h1DRefitPV->GetYaxis()->SetTitleOffset(1.4);
     h1DRefitPV->SetStats(kFALSE);
-    h1DRefitPV->GetXaxis()->SetRangeUser(0,M_PI);
-    //h1DRefitPV->SetMaximum(0.72);
+    //h1DRefitPV->GetXaxis()->SetRangeUser(0,M_PI);
 
-    h1DRefitPV->SetMaximum(0.4);
-    h1DRefitPV->SetMinimum(0.10);
+    h1DRefitPV->SetMaximum(1.02);
+    //h1DRefitPV->SetMaximum(0.4);
+    //h1DRefitPV->SetMinimum(0.10);
     h1DRefitPV->Draw("HISTO");    
     l.AddEntry(h1DRefitPV,"reco PCA with refit. PV");
     if(h1DGenPV){
@@ -416,8 +423,8 @@ void HTTHistograms::plotPhiDecayPlanes(const std::string & name){
     }
     
     if(h1DAODPV){
-      //h1DAODPV->Draw("HISTO same");
-      //l.AddEntry(h1DAODPV,"reco PCA with AOD PV");
+      h1DAODPV->Draw("HISTO same");
+      l.AddEntry(h1DAODPV,"reco PCA with AOD PV");
     }
     if(h1DGen){
       h1DGen->Draw("HISTO same");

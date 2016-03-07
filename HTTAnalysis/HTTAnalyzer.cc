@@ -92,6 +92,8 @@ std::string HTTAnalyzer::getSampleName(const EventProxyHTT & myEventProxy){
 //////////////////////////////////////////////////////////////////////////////
 float HTTAnalyzer::getPUWeight(const EventProxyHTT & myEventProxy){
 
+  return 1.0;
+
   ///Load histogram only once,later fetch it from vector<TH1F*>
   ///At the same time divide the histogram to get the weight.
   ///First load Data PU
@@ -223,20 +225,15 @@ void HTTAnalyzer::fillDecayPlaneAngle(float eventWeight, std::string & hNameSuff
 			      positiveLeadingTk,positive_nPCA);
 
 
-  myHistos_->fill1DHistogram("h1DPhi_nVectors"+hNameSuffix,angles.first,eventWeight);
+  if(aEvent.nTracksInRefit()>3 && positive_nPCA.Vect().Mag()>0.01 && negative_nPCA.Vect().Mag()>0.01)
+    myHistos_->fill1DHistogram("h1DPhi_nVectors"+hNameSuffix,angles.first,eventWeight);
 
-  if(positiveLeadingTk.DeltaR(aGenPositiveTau.leadingTk())<100.1){
-    if(aTau.charge()>0){
-      float cosPositive =  positive_nPCA.Vect().Unit()*aGenPositiveTau.nPCA().Unit();
-      myHistos_->fill1DHistogram("h1DCosPhi_CosPositive"+hNameSuffix,cosPositive,eventWeight);
-    }
-  }
-
-  if(negativeLeadingTk.DeltaR(aGenNegativeTau.leadingTk())<100.1){
-    if(aTau.charge()<0){
-      float cosNegative = negative_nPCA.Vect().Unit()*aGenNegativeTau.nPCA().Unit();
-      myHistos_->fill1DHistogram("h1DCosPhi_CosNegative"+hNameSuffix,cosNegative,eventWeight);
-    }
+  if(aEvent.nTracksInRefit()>3 && positive_nPCA.Vect().Mag()>0.002){
+  float cosPositive =  positive_nPCA.Vect().Unit()*aGenPositiveTau.nPCA().Unit();
+  myHistos_->fill1DHistogram("h1DCosPhi_CosPositive"+hNameSuffix,cosPositive,eventWeight);
+  
+  float cosNegative = negative_nPCA.Vect().Unit()*aGenNegativeTau.nPCA().Unit();
+  myHistos_->fill1DHistogram("h1DCosPhi_CosNegative"+hNameSuffix,cosNegative,eventWeight);
   }
 }
 //////////////////////////////////////////////////////////////////////////////
@@ -387,14 +384,12 @@ std::pair<bool, bool> HTTAnalyzer::checkTauDecayMode(const EventProxyHTT & myEve
 //////////////////////////////////////////////////////////////////////////////
 void HTTAnalyzer::addBranch(TTree *tree){
 
-  tree->Branch("muonPt",&muonPt);
+  //tree->Branch("muonPt",&muonPt);
   
 }
 //////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////
 bool HTTAnalyzer::analyze(const EventProxyBase& iEvent){
-
-  //clearTTreeVariables();
 
   const EventProxyHTT & myEventProxy = static_cast<const EventProxyHTT&>(iEvent);
 
@@ -450,7 +445,7 @@ bool HTTAnalyzer::analyze(const EventProxyBase& iEvent){
   ///Histograms for the baseline selection  
   if(baselineSelection){
     fillControlHistos(eventWeight, hNameSuffix);
-    if(goodRecoDecayMode){
+    if(goodGenDecayMode){
       std::string hNameSuffixCP = hNameSuffix+"RefitPV";    
       fillDecayPlaneAngle(eventWeight, hNameSuffixCP);
       hNameSuffixCP = hNameSuffix+"AODPV";

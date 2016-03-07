@@ -60,7 +60,7 @@ void Wevent::clear(){
 #endif
 
   thePV_ = TVector3();
-  pfPV_ = TVector3();
+  bestPV_ = TVector3();
   refitPfPV_ = TVector3();
   refitPfPVNoBS_ = TVector3();
 

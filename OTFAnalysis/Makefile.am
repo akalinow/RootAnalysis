@@ -18,6 +18,7 @@ noinst_PROGRAMS=test
 # Sources for the a.out 
 test_SOURCES= OTFAnalysis.cc EventProxyOTF.cc \
               OTFHistograms.cc OTFAnalyzer.cc \
+	      HWvsEMULHistograms.cc HWvsEMULAnalyzer.cc \
 	      OTFDiMuonAnalyzer.cc \
 	      L1Obj.cc EventData.cc DictCint.cxx
 

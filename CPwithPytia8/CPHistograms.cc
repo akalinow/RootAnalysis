@@ -38,6 +38,25 @@ AnalysisHistograms::init(myDir);
 CPHistograms::~CPHistograms(){ }
 /////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////
+bool CPHistograms::fillProfile(const std::string& name, float x, float val, float weight){
+  
+  std::string hTemplateName = "";
+  if(!AnalysisHistograms::fillProfile(name,x, val,weight)){
+    if(name.find("hProfPhiVsMag")!=std::string::npos) hTemplateName = "hProfPhiVsMagTemplate";
+    
+    this->addProfile(name,"",
+		     this->getProfile(hTemplateName,true)->GetNbinsX(),
+		     this->getProfile(hTemplateName,true)->GetXaxis()->GetXmin(),
+		     this->getProfile(hTemplateName,true)->GetXaxis()->GetXmax(),
+		     file_);
+    
+    return AnalysisHistograms::fillProfile(name,x,val,weight);
+  }
+  
+  return true;
+}
+/////////////////////////////////////////////////////////
+/////////////////////////////////////////////////////////
 bool CPHistograms::fill1DHistogram(const std::string& name, float val, float weight){
   
   std::string hTemplateName = "";
@@ -49,8 +68,6 @@ bool CPHistograms::fill1DHistogram(const std::string& name, float val, float wei
     if(name.find("h1DRho")!=std::string::npos) hTemplateName = "h1DRhoTemplate";
     if(name.find("h1DIP")!=std::string::npos) hTemplateName = "h1IPTemplate";
     if(name.find("h1DVxPull")!=std::string::npos) hTemplateName = "h1DVxPullTemplate";
-    std::cout<<"fill1DHistogram Adding histogram: "<<name<<" "<<file_<<" "<<file_->fullPath()<<std::endl;
-    
     if(get1DHistogram(hTemplateName,true)->GetXaxis()->IsVariableBinSize()){
       Float_t* binsArray = new Float_t[this->get1DHistogram(hTemplateName,true)->GetNbinsX()+1];
       for(unsigned int iBin=0;iBin<=this->get1DHistogram(hTemplateName,true)->GetNbinsX();++iBin){
@@ -102,14 +119,16 @@ void CPHistograms::defineHistograms(){
    add1DHistogram("h1DDecayModeTemplate",";Decay mode; Events",19,-0.5,18.5,file_);
    add1DHistogram("h1DDeltaRTemplate",";#Delta R; Events",20,0,0.05,file_);
    add1DHistogram("h1DVxPullTemplate",";#phi^{*} [rad]; Events",11,-0.01,0.01,file_);
-   add1DHistogram("h1DPhiTemplate",";#phi^{*} [rad]; Events",10,0,M_PI,file_);//
+   add1DHistogram("h1DPhiTemplate",";#phi^{*} [rad]; Events",4,0,M_PI,file_);//
    add1DHistogram("h1DRhoTemplate",";#rho^{*} [rad]; Events",18,M_PI-0.15,M_PI,file_);
    add1DHistogram("h1DDPhiTemplate",";#Delta#phi^{*} [rad]; Events",32,-0.5*M_PI,0.5*M_PI,file_);
    add1DHistogram("h1IPTemplate",";#phi^{*} [rad]; Events",100,0,1.0,file_);
    add1DHistogram("h1DCosPhiTemplate",";cos(#phi); Events",10,-1.0,1.0,file_);
 
    add2DHistogram("h2DVxPullVsNTrackTemplate","",21,-0.5,20.5,11,-0.01,0.01,file_);
-   
+
+   addProfile("hProfPhiVsMagTemplate","",10,0,0.05,file_);
+
    histosInitialized_ = true;
  }
 }
@@ -118,6 +137,10 @@ void CPHistograms::defineHistograms(){
 void CPHistograms::finalizeHistograms(int nRuns, float weight){
 
   AnalysisHistograms::finalizeHistograms();
+
+  plotProfiles("_h0");
+  plotProfiles("_A0");
+  plotProfiles("_Z0");
   
   plotPCAResolution("_h0");
   plotPCAResolution("_A0");
@@ -459,7 +482,7 @@ void CPHistograms::plotPCAResolution(const std::string & sysType){
     if(h1DAOD->GetMaximum()>max) max = h1DAOD->GetMaximum();
     if(h1DRefit->GetMaximum()>max) max = h1DRefit->GetMaximum();
     h1DGen->SetMaximum(1.05*max);
-    h1DGen->SetMaximum(0.72);
+    //h1DGen->SetMaximum(0.72);
     
     h1DGen->Draw();
     h1DAOD->Draw("same");
@@ -472,6 +495,48 @@ void CPHistograms::plotPCAResolution(const std::string & sysType){
     l.Draw();
     //c->SetLogy();
     c->Print(TString::Format("fig_png/%s.png",("CosPhi_PCA"+sysType).c_str()).Data());
+  }
+}
+/////////////////////////////////////////////////////////
+/////////////////////////////////////////////////////////
+void CPHistograms::plotProfiles(const std::string & sysType){
+
+  TCanvas* c = new TCanvas("AnyHistogram","AnyHistogram",			   
+			   460,500);
+
+  TLegend l(0.55,0.15,0.75,0.35,NULL,"brNDC");
+  l.SetTextSize(0.05);
+  l.SetFillStyle(4000);
+  l.SetBorderSize(0);
+  l.SetFillColor(10);
+
+  TProfile* h1DAOD = this->getProfile("hProfPhiVsMag_AOD"+sysType);
+  TProfile* h1DGen = this->getProfile("hProfPhiVsMag_Gen"+sysType);
+  TProfile* h1DRefit = this->getProfile("hProfPhiVsMag_Refit"+sysType);
+
+  if(h1DGen && h1DRefit && h1DAOD){
+    h1DGen->SetLineWidth(3);
+    h1DAOD->SetLineWidth(3);
+    h1DRefit->SetLineWidth(3);
+    //
+    h1DGen->SetLineColor(1);
+    h1DAOD->SetLineColor(2);
+    h1DRefit->SetLineColor(4);
+    ///
+    h1DGen->SetYTitle("<#hat{n}_{GEN}^{#pi^{+}} #bullet #hat{n}_{RECO}^{#pi^{+}}>");
+    h1DGen->SetXTitle("|n_{RECO}^{#pi^{+}}|");
+    h1DGen->GetYaxis()->SetTitleOffset(1.4);
+    h1DGen->SetStats(kFALSE);
+    
+    h1DGen->Draw();
+    h1DAOD->Draw("same");
+    h1DRefit->Draw("same");
+
+    l.AddEntry(h1DGen,"Generator PV");
+    l.AddEntry(h1DAOD,"AOD PV");
+    l.AddEntry(h1DRefit,"Refitted PV");
+    l.Draw();
+    c->Print(TString::Format("fig_png/%s.png",("CosPhiVsMag_PCA"+sysType).c_str()).Data());
   }
 }
 /////////////////////////////////////////////////////////

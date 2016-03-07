@@ -17,10 +17,15 @@
 #include "TreeAnalyzer.h"
 #include "OTFAnalyzer.h"
 #include "OTFDiMuonAnalyzer.h"
+#include "HWvsEMULAnalyzer.h"
 #include "EventProxyOTF.h"
-#include "OTFHistograms.h"
 #include "TFile.h"
 #include "TStopwatch.h"
+
+#include "boost/functional/hash.hpp"
+#include "boost/property_tree/ptree.hpp"
+#include "boost/property_tree/ini_parser.hpp"
+#include "boost/tokenizer.hpp"
 
 int main(int argc, char ** argv) {
   
@@ -36,6 +41,12 @@ int main(int argc, char ** argv) {
   TStopwatch timer;
   timer.Start();
 
+  boost::property_tree::ptree pt;
+  boost::property_tree::ini_parser::read_ini(cfgFileName, pt);
+  
+  typedef boost::tokenizer<boost::char_separator<char> > tokenizer;
+  std::string processName = pt.get<std::string>("TreeAnalyzer.processName","Test");
+  
   //Tell Root we want to be multi-threaded
   ROOT::EnableThreadSafety();
   //When threading, also have to keep ROOT from logging all TObjects into a list
@@ -45,8 +56,9 @@ int main(int argc, char ** argv) {
   std::vector<Analyzer*> myAnalyzers;
   EventProxyOTF *myEvent = new EventProxyOTF();
   
-  myAnalyzers.push_back(new OTFAnalyzer("OTFAnalyzer"));
-  //myAnalyzers.push_back(new OTFDiMuonAnalyzer("OTFAnalyzer"));
+  if(processName=="EMUL") myAnalyzers.push_back(new OTFAnalyzer("EMULAnalyzer"));
+  if(processName=="HWvsEMUL") myAnalyzers.push_back(new HWvsEMULAnalyzer("HWvsEMULAnalyzer"));
+  if(processName=="DiMuon") myAnalyzers.push_back(new OTFDiMuonAnalyzer("OTFAnalyzer"));
   
   TreeAnalyzer *tree = new TreeAnalyzer("TreeAnalyzer",cfgFileName, myEvent);
   tree->init(myAnalyzers);

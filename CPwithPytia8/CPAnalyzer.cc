@@ -210,12 +210,15 @@ bool CPAnalyzer::analyze(const EventProxyBase& iEvent){
 
   cosPhiPlus = aEventGen->nPiPlus_.Unit().Dot(aEventReco->nPiPlusAODvx_.Unit());
   myHistos_->fill1DHistogram("h1DCosPhi_PCA_AOD_"+motherName,cosPhiPlus);
-    
+  myHistos_->fillProfile("hProfPhiVsMag_AOD_"+motherName,aEventReco->nPiPlusAODvx_.Mag(),cosPhiPlus);
+
   cosPhiPlus = aEventGen->nPiPlus_.Unit().Dot(aEventReco->nPiPlusGenvx_.Unit());
   myHistos_->fill1DHistogram("h1DCosPhi_PCA_Gen_"+motherName,cosPhiPlus);
+  myHistos_->fillProfile("hProfPhiVsMag_Gen_"+motherName,aEventReco->nPiPlusGenvx_.Mag(),cosPhiPlus);
 
   cosPhiPlus = aEventGen->nPiPlus_.Unit().Dot(aEventReco->nPiPlusRefitvx_.Unit());
   myHistos_->fill1DHistogram("h1DCosPhi_PCA_Refit_"+motherName,cosPhiPlus);
+  myHistos_->fillProfile("hProfPhiVsMag_Refit_"+motherName,aEventReco->nPiPlusRefitvx_.Mag(),cosPhiPlus); 
  
   std::string smearType = "ideal";
   std::string name;
@@ -230,7 +233,10 @@ bool CPAnalyzer::analyze(const EventProxyBase& iEvent){
     if(decayName!="PiPi0Pi0") continue; //use only PiPi0Pi0 decays
     smearType = "ideal";
     name = "_"+motherName+"_"+decayName+"_"+smearType;
-    fillAngles(aEventReco,name+"_RECO");
+
+    if(aEventReco->nPiPlusRefitvx_.Mag()>0.005 ||
+       aEventReco->nPiMinusRefitvx_.Mag()>0.005) fillAngles(aEventReco,name+"_RECO");
+     
     fillAngles(aEventReco,name+"_RECOGEN");
     fillAngles(aEventReco,name+"_AOD");    
     if(selected) fillAngles(aEventReco, name+"_selected"+"_RECO");

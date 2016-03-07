@@ -36,9 +36,8 @@ class Wevent{
     //PV stored in miniAOD
     TVector3 thePV_;
 
-    //PV selected with highest score with PF (miniAOD like)
-    //miniAOD uses PF particles instead of tracks
-    TVector3 pfPV_;
+    //Reco PV closes to the Gen PV    
+    TVector3 bestPV_;
 
     ///PV recontructed from PF candidates, refitted
     TVector3 refitPfPV_;
@@ -78,9 +77,8 @@ class Wevent{
     ///Set PV stored in miniAOD
     void thePV(const TVector3 & aPV) {thePV_ = aPV;}
 
-    //Set PV selected with highest score with PF (miniAOD like)
-    //miniAOD uses PF particles instead of tracks
-    void pfPV(const TVector3 & aPV) {pfPV_ = aPV;}
+    //Reco PV closest to the Gen PV
+    void bestPV(const TVector3 & aPV) {bestPV_ = aPV;}
 
     //Set PV refitted using BS
     void refitPfPV(const TVector3 & aPV) {refitPfPV_ = aPV;}
@@ -117,9 +115,8 @@ class Wevent{
     ///Get PV stored in miniAOD
     const TVector3 & thePV() const {return thePV_;}
 
-    //Get PV selected with highest score with PF (miniAOD like)
-    //miniAOD uses PF particles instead of tracks
-    const TVector3 & pfPV() const {return pfPV_;}
+    //Get reco PV closest to the Gen PV    
+    const TVector3 & bestPV() const {return bestPV_;}
 
     //Get PV refitted using BS
     const TVector3 & refitPfPV() const {return refitPfPV_;}
@@ -169,6 +166,9 @@ class Wtau{
     float mt_ = -999;
     float d0_ = -999;
     float dz_ = -999;
+    float idSF_ = 1.0;
+    int   trackPattern_ = 0;
+    float triggerSF_ = 1.0;
 
     ///Leading tau track four momemntum.
     TLorentzVector leadingTk_;
@@ -199,7 +199,10 @@ class Wtau{
     void tauID(tauidenum y, float x){tauID_[y] = x;}
     void d0(float x){d0_ = x;}
     void dz(float x){dz_ = x;}
+    void trackPattern(int x){trackPattern_ = x;}
     void sv(const TVector3 & x){sv_ = x;}
+    void idSF(float x){idSF_ = x;}
+    void triggerSF(float x){triggerSF_ = x;}
 
     ///Set tau leading charged track.
     void leadingTk(const TLorentzVector & a4v) {leadingTk_ = a4v;};
@@ -226,7 +229,10 @@ class Wtau{
     float mt()const{return mt_;}
     float d0()const{return d0_;}
     float dz()const{return dz_;}
+    int trackPattern()const{return trackPattern_;}
     TVector3 sv()const{return sv_;}
+    float idSF()const{return idSF_;}
+    float triggerSF()const{return triggerSF_;}
 
     float tauID(tauidenum y){return tauID_[y];}
 
@@ -260,12 +266,16 @@ class Wmu{
     float mt_ = -999;
     float d0_ = -999;
     float dz_ = -999;
+    int trackPattern_=0;
     float isLooseMuon_ = -999;
     float isTightMuon_ = -999;
     float isHighPtMuon_ = -999;
     float isMediumMuon_ = -999;
     float isTightnovtxMuon_ = -999;
     float iso_ = -999;
+    float idSF_ = 1.0;
+    float triggerSF_ = 1.0;
+     
 
     ///Secondary vertex position (from GEN)
     TVector3 sv_;
@@ -289,12 +299,16 @@ class Wmu{
     void mt(float x){mt_ = x;}
     void d0(float x){d0_ = x;}
     void dz(float x){dz_ = x;}
+    void trackPattern(int x){trackPattern_ = x;}
     void isLooseMuon(float x){isLooseMuon_ = x;}
     void isTightMuon(float x){isTightMuon_ = x;}
     void isHighPtMuon(float x){isHighPtMuon_ = x;}
     void isMediumMuon(float x){isMediumMuon_ = x;}
     void isTightnovtxMuon(float x){isTightnovtxMuon_ = x;}
     void iso(float x){iso_ = x;}
+
+    void idSF(float x){idSF_ = x;}
+    void triggerSF(float x){triggerSF_ = x;}
 
     ///Set PCA vector calculated using PV stored in AOD
     void nPCA(const TVector3 & a3v) {nPCA_ = a3v;};
@@ -317,12 +331,15 @@ class Wmu{
     float mt()const{return mt_;}
     float d0()const{return d0_;}
     float dz()const{return dz_;}
+    int trackPattern()const {return trackPattern_;}
     float isLooseMuon()const{return isLooseMuon_;}
     float isTightMuon()const{return isTightMuon_;}
     float isHighPtMuon()const{return isHighPtMuon_;}
     float isMediumMuon()const{return isMediumMuon_;}
     float isTightnovtxMuon()const{return isTightnovtxMuon_;}
     float iso()const{return iso_;}
+    float idSF()const{return idSF_;}
+    float triggerSF()const{return triggerSF_;}
 
     ///
     ///Get leading charged track
@@ -391,8 +408,6 @@ class Welectron{
     float eta()const{return eta_;}
     float mass()const{return mass_;}
     float charge()const{return charge_;}
-
-
 
     ///Get PCA vector calculated using PV stored in AOD
     const TVector3 & nPCA() {return nPCA_;};
