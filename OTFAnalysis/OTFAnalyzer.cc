@@ -109,8 +109,8 @@ bool OTFAnalyzer::passQuality(std::vector<L1Obj> * myL1Coll,
   
   if(sysType.find("Otf")!=std::string::npos){
   return myL1Coll->size()>iCand &&
-         myL1Coll->operator[](iCand).q>0 &&
-    
+         myL1Coll->operator[](iCand).q>4 &&
+    /*
     ///Barrel (l1t::tftype::omtf_pos)    
     myL1Coll->operator[](iCand).hits!=99840 &&
     myL1Coll->operator[](iCand).hits!=34304 &&
@@ -134,7 +134,7 @@ bool OTFAnalyzer::passQuality(std::vector<L1Obj> * myL1Coll,
     myL1Coll->operator[](iCand).hits!=35840 &&
     myL1Coll->operator[](iCand).hits!=4156 &&
     myL1Coll->operator[](iCand).hits!=34880 &&         
-    
+    */
     true;
   }
   else return myL1Coll->size();
@@ -312,10 +312,6 @@ bool OTFAnalyzer::analyze(const EventProxyBase& iEvent){
   /////////////////
   const EventProxyOTF & myEvent = static_cast<const EventProxyOTF&>(iEvent);
   theEvent = myEvent.event;
-
-  //if(theEvent->eta<0) return true;
-  //if(theEvent->charge>0) return true;
-  //if(fabs(theEvent->eta)<0.83 || fabs(theEvent->eta)>0.9) return true; //TEST
 
   std::string selType = "";
   std::string sysTypeGmt="Gmt";

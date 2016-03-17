@@ -88,11 +88,23 @@ void HWvsEMULAnalyzer::fillCandidates(){
     myHistos_->fill1DHistogram("h1DPtHW",aCandidate.pt);
   }
 
+  if(emulCandidates.size() && hwCandidates.size()){
+    std::cout<<"Event: "<<eventNumber<<" EMUL cands: "<<emulCandidates.size()
+	     <<" hits: "<<std::bitset<17>(emulCandidates[0].hits)
+      	     <<" quality: "<<emulCandidates[0].q
+	     <<" iProcessor: "<<emulCandidates[0].iProcessor
+	     <<" HW cands: "<<hwCandidates.size()
+	     <<" hits: "<<std::bitset<17>(hwCandidates[0].hits>>1)
+      	     <<" quality: "<<hwCandidates[0].q+3
+      	     <<" iProcessor: "<<hwCandidates[0].iProcessor
+	     <<std::endl;
+  }
+  
   if(hwCandidates.size() && emulCandidates.size()==hwCandidates.size()){    
     for(unsigned int iCandidate=0;iCandidate<hwCandidates.size();++iCandidate){
 
-      if(std::bitset<17>(emulCandidates[iCandidate].hits)!=
-      	 std::bitset<17>(hwCandidates[iCandidate].hits>>1)) continue;
+      //if(emulCandidates[iCandidate].iProcessor !=
+      //	 hwCandidates[iCandidate].iProcessor) continue;
       
       float delta =  hwCandidates[iCandidate].pt - emulCandidates[iCandidate].pt;
       myHistos_->fill1DHistogram("h1DDeltaPt",delta);
@@ -104,9 +116,13 @@ void HWvsEMULAnalyzer::fillCandidates(){
       myHistos_->fill1DHistogram("h1DDeltaCharge",delta);
       myHistos_->fill1DHistogram("h1DQualityHW",hwCandidates[iCandidate].q+3);
       myHistos_->fill1DHistogram("h1DQualityEMUL",emulCandidates[iCandidate].q);
-      std::cout<<"emulCandidates[iCandidate].q: "
-	       <<std::bitset<17>(emulCandidates[iCandidate].hits)<<" "
+      /*
+      std::cout<<"Event: "<<eventNumber
+	       <<" EMUL: "
+	       <<std::bitset<17>(emulCandidates[iCandidate].hits)
+	       <<" HW: "
 	       <<std::bitset<17>(hwCandidates[iCandidate].hits>>1)<<std::endl;
+      */
     }
   }
 }
@@ -120,6 +136,9 @@ bool HWvsEMULAnalyzer::analyze(const EventProxyBase& iEvent){
   /////////////////
   const EventProxyOTF & myEvent = static_cast<const EventProxyOTF&>(iEvent);
   theEvent = myEvent.event;
+
+  eventNumber = theEvent->charge;
+  //runNumber = theEvent->charge1;
 
   std::vector<L1Obj> * myL1Coll = &(theEvent->l1ObjectsOtf);
   

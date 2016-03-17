@@ -51,6 +51,7 @@ class HWvsEMULAnalyzer:public Analyzer{
   std::map<std::string,float> treeVariables_;
 
   std::vector<L1Obj> emulCandidates, hwCandidates;
+  unsigned int eventNumber, runNumber;
 
   float eventWeight_;
   
