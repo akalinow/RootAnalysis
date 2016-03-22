@@ -45,11 +45,6 @@ bool TestAnalyzer::analyze(const EventProxyBase& iEvent){
   const EventProxyTest & myEventProxy = static_cast<const EventProxyTest&>(iEvent);
 
   std::string sampleName = "Signal";
-  std::string sampleName1 = "Signal";
-  std::string sampleName2 = "Signal";
-  std::string sampleName3 = "Signal";
-  std::string sampleName4 = "Signal";
-  std::string sampleName5 = "Signal";
   
   tmpName = "h1DX"+sampleName;
   myHistos_->fill1DHistogram(tmpName,myEventProxy.x);

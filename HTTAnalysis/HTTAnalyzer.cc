@@ -56,8 +56,11 @@ void HTTAnalyzer::getPreselectionEff(const EventProxyHTT & myEventProxy){
 
     std::string hName = "h1DStats"+getSampleName(myEventProxy);
     TH1F *hStats = myHistos_->get1DHistogram(hName.c_str(),true);
-    hStats->SetBinContent(2,hStatsFromFile->GetBinContent(hStatsFromFile->FindBin(1)));   
-    hStats->SetBinContent(3,hStatsFromFile->GetBinContent(hStatsFromFile->FindBin(3)));
+
+    float genWeight = getGenWeight(myEventProxy);
+    
+    hStats->SetBinContent(2,hStatsFromFile->GetBinContent(hStatsFromFile->FindBin(1))*genWeight);   
+    hStats->SetBinContent(3,hStatsFromFile->GetBinContent(hStatsFromFile->FindBin(3))*genWeight);
     delete hStatsFromFile;
 
 }
@@ -76,11 +79,11 @@ std::string HTTAnalyzer::getSampleName(const EventProxyHTT & myEventProxy){
   if(myEventProxy.wevent->sample()==11) return "DYJetsLowM";
   if(myEventProxy.wevent->sample()==2){
     std::string fileName = myEventProxy.getTTree()->GetCurrentFile()->GetName();
-    if(fileName.find("WJetsHT100to200")!=std::string::npos) return "WJetsHT100to200";
-    if(fileName.find("WJetsHT200to400")!=std::string::npos) return "WJetsHT200to400";
-    if(fileName.find("WJetsHT400to600")!=std::string::npos) return "WJetsHT400to600";
-    if(fileName.find("WJetsHT600toInf")!=std::string::npos) return "WJetsHT600toInf";
-    return "WJets";
+    if(fileName.find("WJetsToLNu_HT-100To200")!=std::string::npos) return "WJetsHT100to200";
+    if(fileName.find("WJetsToLNu_HT-200To400")!=std::string::npos) return "WJetsHT200to400";
+    if(fileName.find("WJetsToLNu_HT-400To600")!=std::string::npos) return "WJetsHT400to600";
+    if(fileName.find("WJetsToLNu_HT-600ToInf")!=std::string::npos) return "WJetsHT600toInf";
+    return "WJetsHT0";
   }
   if(myEventProxy.wevent->sample()==3) return "TTbar";
   if(myEventProxy.wevent->sample()==5) return "H";
@@ -91,8 +94,6 @@ std::string HTTAnalyzer::getSampleName(const EventProxyHTT & myEventProxy){
 //////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////
 float HTTAnalyzer::getPUWeight(const EventProxyHTT & myEventProxy){
-
-  return 1.0;
 
   ///Load histogram only once,later fetch it from vector<TH1F*>
   ///At the same time divide the histogram to get the weight.
@@ -134,16 +135,18 @@ float HTTAnalyzer::getGenWeight(const EventProxyHTT & myEventProxy){
   if(myEventProxy.wevent->sample()==2) return myEventProxy.wevent->genevtweight()/225892.45;  
   if(myEventProxy.wevent->sample()==3) return myEventProxy.wevent->genevtweight()/6383;
   */
-  /*
+  
   if(myEventProxy.wevent->sample()==2){
+    //https://twiki.cern.ch/twiki/pub/CMS/HiggsToTauTauWorking2015/WplusHtWeights.xls
+    //NLO to LO scaling removed, as NLO cross section used in normalisation.
     std::string fileName = myEventProxy.getTTree()->GetCurrentFile()->GetName();
-    if(fileName.find("WJetsHT100to200")!=std::string::npos) return 1345/(3*20508.9+1345+359.7+48.9+18.77);
-    if(fileName.find("WJetsHT200to400")!=std::string::npos) return 359.7/(3*20508.9+1345+359.7+48.9+18.77);
-    if(fileName.find("WJetsHT400to600")!=std::string::npos) return 48.9/(3*20508.9+1345+359.7+48.9+18.77);
-    if(fileName.find("WJetsHT600toInf")!=std::string::npos) return 18.7/(3*20508.9+1345+359.7+48.9+18.77);
-    else return 3*20508.9/(3*20508.9+1345+359.7+48.9+18.77);
+    if(fileName.find("WJetsToLNu_HT-100To200")!=std::string::npos) return 0.1352710705/1.2137837838;
+    if(fileName.find("WJetsToLNu_HT-200To400")!=std::string::npos) return 0.076142149/1.2137837838;
+    if(fileName.find("WJetsToLNu_HT-400To600")!=std::string::npos) return 0.0326980819/1.2137837838;
+    if(fileName.find("WJetsToLNu_HT-600ToInf")!=std::string::npos) return 0.0213743732/1.2137837838;
+    return 0.8520862372/1.2137837838;
   }
-  */
+  
   return 1;
 }
 //////////////////////////////////////////////////////////////////////////////
