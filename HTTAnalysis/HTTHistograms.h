@@ -27,12 +27,8 @@ class HTTHistograms: public AnalysisHistograms {
 
   void finalizeHistograms(int nRuns, float weight=1.0);
 
-  virtual bool fillProfile(const std::string& name, float x, float val, float weight=1.0);
-
-  virtual bool fill1DHistogram(const std::string &name, float val, float weight=1.0);
-
-  virtual bool fill2DHistogram(const std::string& name, float valX, float valY, float weight=1.0);
-
+  std::string getTemplateName(const std::string& name);
+  
   float getLumi();
 
   ///Return sample normalisation based only on

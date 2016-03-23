@@ -199,8 +199,19 @@ bool AnalysisHistograms::fillProfile(const std::string& name, float x, float val
 
   std::unordered_map<std::string,TProfile*>::iterator it = myProfiles_[iThread].find(name); 
   if(it!=myProfiles_[iThread].end()) it->second->Fill(x,val,weight);
-  else return false;
-
+  else{
+    std::string templateName = getTemplateName(name);
+    TProfile *pTemplate = getProfile(templateName,true);
+    if(!pTemplate) return false;
+    
+    addProfile(name,"",
+	       pTemplate->GetNbinsX(),
+	       pTemplate->GetXaxis()->GetXmin(),
+	       pTemplate->GetXaxis()->GetXmax(),
+	       file_);
+    
+    myProfiles_[iThread].find(name)->second->Fill(x,val,weight);
+  }
   return true;
 }
 //////////////////////////////////////////////////////////////////////////////
@@ -214,7 +225,30 @@ bool  AnalysisHistograms::fill1DHistogram(const std::string& name, float val, fl
  std::unordered_map<std::string,TH1F*>::iterator it = my1Dhistograms_[iThread].find(name);
  
  if(it!=my1Dhistograms_[iThread].end()) it->second->Fill(val,weight); 
- else return false;
+ else{
+   std::string templateName = getTemplateName(name);
+   TH1F *hTemplate = get1DHistogram(templateName,true);
+   if(!hTemplate) return false;
+   
+   if(hTemplate->GetXaxis()->IsVariableBinSize()){
+      Float_t* binsArray = new Float_t[hTemplate->GetNbinsX()+1];
+      for(unsigned int iBin=0;iBin<=hTemplate->GetNbinsX();++iBin){
+	binsArray[iBin] = hTemplate->GetXaxis()->GetXbins()->At(iBin);
+      }
+      add1DHistogram(name,"",hTemplate->GetNbinsX(),binsArray, file_);
+      //if(omp_get_num_threads()==1) get1DHistogram(name,true)->SetDirectory(get1DHistogram(hTemplateName,true)->GetDirectory());
+      delete binsArray;      
+    }
+    else{
+      add1DHistogram(name,"",
+		     hTemplate->GetNbinsX(),
+		     hTemplate->GetXaxis()->GetXmin(),
+		     hTemplate->GetXaxis()->GetXmax(),
+		     file_);
+      //if(omp_get_num_threads()==1) get1DHistogram(name,true)->SetDirectory(get1DHistogram(hTemplateName,true)->GetDirectory());
+    }
+   my1Dhistograms_[iThread].find(name)->second->Fill(val,weight);
+ }
  
  return true;
 }
@@ -227,7 +261,20 @@ bool AnalysisHistograms::fill2DHistogram(const std::string& name, float val1, fl
 
  std::unordered_map<std::string,TH2F*>::iterator it = my2Dhistograms_[iThread].find(name); 
  if(it!=my2Dhistograms_[iThread].end()) it->second->Fill(val1,val2,weight);
- else return false;
+ else{
+   std::string templateName = getTemplateName(name);
+   TH2F *hTemplate = get2DHistogram(templateName,true);
+   if(!hTemplate) return false;
+   add2DHistogram(name,"",
+		  hTemplate->GetNbinsX(),
+		  hTemplate->GetXaxis()->GetXmin(),
+		  hTemplate->GetXaxis()->GetXmax(),
+		  hTemplate->GetNbinsY(),
+		  hTemplate->GetYaxis()->GetXmin(),
+		  hTemplate->GetYaxis()->GetXmax(),
+		  file_);
+   my2Dhistograms_[iThread].find(name)->second->Fill(val1,val2,weight);
+ }
   
  return true;
 }
@@ -241,7 +288,23 @@ bool  AnalysisHistograms::fill3DHistogram(const std::string& name, float val1, f
 
  std::unordered_map<std::string,TH3F*>::iterator it = my3Dhistograms_[iThread].find(name); 
  if(it!=my3Dhistograms_[iThread].end()) it->second->Fill(val1,val2,val3,weight);
- else return false;
+ else{
+   std::string templateName = getTemplateName(name);
+   TH3F *hTemplate = get3DHistogram(templateName,true);
+   if(!hTemplate) return false;
+   add3DHistogram(name,"",
+		  hTemplate->GetNbinsX(),
+		  hTemplate->GetXaxis()->GetXmin(),
+		  hTemplate->GetXaxis()->GetXmax(),
+		  hTemplate->GetNbinsY(),
+		  hTemplate->GetYaxis()->GetXmin(),
+		  hTemplate->GetYaxis()->GetXmax(),
+		  hTemplate->GetNbinsZ(),
+		  hTemplate->GetZaxis()->GetXmin(),
+		  hTemplate->GetZaxis()->GetXmax(),
+		  file_);
+   my3Dhistograms_[iThread].find(name)->second->Fill(val1,val2,val3,weight);  
+ }
    
  return true;
 }
@@ -351,8 +414,6 @@ void AnalysisHistograms::init(TFileDirectory *myDir,
 //////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////
 void AnalysisHistograms::finalizeHistograms(){
-
-  
 
   for(unsigned int iThread = 1;iThread<omp_get_max_threads();++iThread){
     for(auto it:my1Dhistograms_[0]){

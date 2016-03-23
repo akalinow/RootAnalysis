@@ -23,7 +23,7 @@ class TestHistograms: public AnalysisHistograms {
 
   void finalizeHistograms(int nRuns, float weight=1.0);
 
-  virtual bool fill1DHistogram(const std::string &name, float val, float weight=1.0);
+  virtual std::string getTemplateName(const std::string& name);
 
    private:
   

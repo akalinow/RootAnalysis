@@ -36,7 +36,6 @@ class AnalysisHistograms {
     histosInitialized_(false), name_(name){};
 
   virtual ~AnalysisHistograms();
-
   
   virtual bool fillProfile(const std::string& name, float x, float val, float weight=1.0);
   virtual bool fill1DHistogram(const std::string &name, float val, float weight=1.0);
@@ -49,6 +48,8 @@ class AnalysisHistograms {
   TH3F* get3DHistogram(const std::string& name, bool noClone = false);
   
   virtual void finalizeHistograms();
+
+  virtual std::string getTemplateName(const std::string & hName) {return "";};
 
  protected:
 

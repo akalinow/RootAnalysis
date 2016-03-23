@@ -42,21 +42,15 @@ AnalysisHistograms::init(myDir);
 TestHistograms::~TestHistograms(){ }
 /////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////
-bool TestHistograms::fill1DHistogram(const std::string& name, float val, float weight){
+std::string TestHistograms::getTemplateName(const std::string& name){
 
-  std::string hTemplateName = "";
-  if(!AnalysisHistograms::fill1DHistogram(name,val,weight)){
-    if(name.find("h1DX")!=std::string::npos) hTemplateName = "h1DXTemplate";
-    if(name.find("h1DY")!=std::string::npos) hTemplateName = "h1DYTemplate";
-    std::cout<<"Adding histogram: "<<name<<" "<<file_<<" "<<file_->fullPath()<<std::endl;
-    this->add1DHistogram(name,"",
-			 this->get1DHistogram(hTemplateName,true)->GetNbinsX(),
-			 this->get1DHistogram(hTemplateName,true)->GetXaxis()->GetXmin(),
-			 this->get1DHistogram(hTemplateName,true)->GetXaxis()->GetXmax(),
-			 file_);
-    return AnalysisHistograms::fill1DHistogram(name,val,weight);
-  }
-  return true;
+  std::string templateName = "";
+
+  if(name.find("h1DX")!=std::string::npos) templateName = "h1DXTemplate";
+  if(name.find("h1DY")!=std::string::npos) templateName = "h1DYTemplate";
+
+  return templateName;
+
 }
 /////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////

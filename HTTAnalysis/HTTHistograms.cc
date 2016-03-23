@@ -208,98 +208,26 @@ TH1F *HTTHistograms::get1D_WJet_Histogram(const std::string& name){
 }
 /////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////
-bool HTTHistograms::fillProfile(const std::string& name, float x, float val, float weight){
+std::string HTTHistograms::getTemplateName(const std::string& name){
+
+  std::string templateName = "";
+  if(name.find("hProfPhiVsMag")!=std::string::npos) templateName = "hProfPhiVsMagTemplate";
+
+  if(name.find("h1DNPV")!=std::string::npos) templateName = "h1DNPVTemplate";
+  if(name.find("h1DMass")!=std::string::npos) templateName = "h1DMassTemplate";
+  if(name.find("h1DStats")!=std::string::npos) templateName = "h1DStatsTemplate";
+  if(name.find("h1DPt")!=std::string::npos) templateName = "h1DPtTemplate";
+  if(name.find("h1DEta")!=std::string::npos) templateName = "h1DEtaTemplate";
+  if(name.find("h1DIso")!=std::string::npos) templateName = "h1DIsoTemplate";
+  if(name.find("h1DPhi")!=std::string::npos) templateName = "h1DPhiTemplate";
+  if(name.find("h1DCosPhi")!=std::string::npos) templateName = "h1DCosPhiTemplate";
+  if(name.find("h1DCSVBtag")!=std::string::npos) templateName = "h1DCSVBtagTemplate";
+  if(name.find("h1DID")!=std::string::npos) templateName = "h1DIDTemplate";
+  if(name.find("h1DVxPull")!=std::string::npos) templateName = "h1DVxPullTemplate";
+
+  if(name.find("h2DVxPullVsNTrack")!=std::string::npos) templateName = "h2DVxPullVsNTrackTemplate";
   
-  std::string hTemplateName = "";
-  if(!AnalysisHistograms::fillProfile(name,x, val,weight)){
-    if(name.find("hProfPhiVsMag")!=std::string::npos) hTemplateName = "hProfPhiVsMagTemplate";
-
-    TProfile *pTemplate = getProfile(hTemplateName,true);
-    
-    this->addProfile(name,"",
-		     pTemplate->GetNbinsX(),
-		     pTemplate->GetXaxis()->GetXmin(),
-		     pTemplate->GetXaxis()->GetXmax(),
-		     file_);
-    
-    return AnalysisHistograms::fillProfile(name,x,val,weight);
-  }
-  
-  return true;
-}
-/////////////////////////////////////////////////////////
-/////////////////////////////////////////////////////////
-bool HTTHistograms::fill1DHistogram(const std::string& name, float val, float weight){
-
-  std::string hTemplateName = "";
-  if(!AnalysisHistograms::fill1DHistogram(name,val,weight)){
-
-    //std::cout<<"Here 1"<<std::endl;
-    
-    if(name.find("h1DNPV")!=std::string::npos) hTemplateName = "h1DNPVTemplate";
-    if(name.find("h1DMass")!=std::string::npos) hTemplateName = "h1DMassTemplate";
-    if(name.find("h1DStats")!=std::string::npos) hTemplateName = "h1DStatsTemplate";
-    if(name.find("h1DPt")!=std::string::npos) hTemplateName = "h1DPtTemplate";
-    if(name.find("h1DEta")!=std::string::npos) hTemplateName = "h1DEtaTemplate";
-    if(name.find("h1DIso")!=std::string::npos) hTemplateName = "h1DIsoTemplate";
-    if(name.find("h1DPhi")!=std::string::npos) hTemplateName = "h1DPhiTemplate";
-    if(name.find("h1DCosPhi")!=std::string::npos) hTemplateName = "h1DCosPhiTemplate";
-    if(name.find("h1DCSVBtag")!=std::string::npos) hTemplateName = "h1DCSVBtagTemplate";
-    if(name.find("h1DID")!=std::string::npos) hTemplateName = "h1DIDTemplate";
-    if(name.find("h1DVxPull")!=std::string::npos) hTemplateName = "h1DVxPullTemplate";
-
-    TH1F *hTemplate = get1DHistogram(hTemplateName,true);
-    
-    if(hTemplate->GetXaxis()->IsVariableBinSize()){
-
-      //std::cout<<"Here 2"<<std::endl;
-      
-      Float_t* binsArray = new Float_t[hTemplate->GetNbinsX()+1];
-      for(unsigned int iBin=0;iBin<=hTemplate->GetNbinsX();++iBin){
-	binsArray[iBin] = hTemplate->GetXaxis()->GetXbins()->At(iBin);
-      }
-      add1DHistogram(name,"",hTemplate->GetNbinsX(),binsArray, file_);
-      //if(omp_get_num_threads()==1) get1DHistogram(name,true)->SetDirectory(get1DHistogram(hTemplateName,true)->GetDirectory());
-      delete binsArray;      
-    }
-    else{
-      //std::cout<<"Here 3"<<std::endl;
-      add1DHistogram(name,"",
-		     hTemplate->GetNbinsX(),
-		     hTemplate->GetXaxis()->GetXmin(),
-		     hTemplate->GetXaxis()->GetXmax(),
-		     file_);
-      //if(omp_get_num_threads()==1) get1DHistogram(name,true)->SetDirectory(get1DHistogram(hTemplateName,true)->GetDirectory());
-    }
-
-    //std::cout<<"Here 4"<<std::endl;
-    
-    return AnalysisHistograms::fill1DHistogram(name,val,weight);
-  }
-  return true;
-}
-/////////////////////////////////////////////////////////
-/////////////////////////////////////////////////////////
-bool HTTHistograms::fill2DHistogram(const std::string& name,
-				    float valX, float valY, float weight){
-  
-  std::string hTemplateName = "";
-  if(!AnalysisHistograms::fill2DHistogram(name,valX,valY,weight)){
-    if(name.find("h2DVxPullVsNTrack")!=std::string::npos) hTemplateName = "h2DVxPullVsNTrackTemplate";
-
-    TH2F *hTemplate = get2DHistogram(hTemplateName,true);
-    
-    this->add2DHistogram(name,"",
-			 hTemplate->GetNbinsX(),
-			 hTemplate->GetXaxis()->GetXmin(),
-			 hTemplate->GetXaxis()->GetXmax(),
-			 hTemplate->GetNbinsY(),
-			 hTemplate->GetYaxis()->GetXmin(),
-			 hTemplate->GetYaxis()->GetXmax(),
-			 file_);
-    return AnalysisHistograms::fill2DHistogram(name,valX,valY,weight);
-  }
-  return true;
+  return templateName;
 }
 /////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////
