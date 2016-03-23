@@ -208,10 +208,34 @@ TH1F *HTTHistograms::get1D_WJet_Histogram(const std::string& name){
 }
 /////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////
+bool HTTHistograms::fillProfile(const std::string& name, float x, float val, float weight){
+  
+  std::string hTemplateName = "";
+  if(!AnalysisHistograms::fillProfile(name,x, val,weight)){
+    if(name.find("hProfPhiVsMag")!=std::string::npos) hTemplateName = "hProfPhiVsMagTemplate";
+
+    TProfile *pTemplate = getProfile(hTemplateName,true);
+    
+    this->addProfile(name,"",
+		     pTemplate->GetNbinsX(),
+		     pTemplate->GetXaxis()->GetXmin(),
+		     pTemplate->GetXaxis()->GetXmax(),
+		     file_);
+    
+    return AnalysisHistograms::fillProfile(name,x,val,weight);
+  }
+  
+  return true;
+}
+/////////////////////////////////////////////////////////
+/////////////////////////////////////////////////////////
 bool HTTHistograms::fill1DHistogram(const std::string& name, float val, float weight){
 
   std::string hTemplateName = "";
   if(!AnalysisHistograms::fill1DHistogram(name,val,weight)){
+
+    //std::cout<<"Here 1"<<std::endl;
+    
     if(name.find("h1DNPV")!=std::string::npos) hTemplateName = "h1DNPVTemplate";
     if(name.find("h1DMass")!=std::string::npos) hTemplateName = "h1DMassTemplate";
     if(name.find("h1DStats")!=std::string::npos) hTemplateName = "h1DStatsTemplate";
@@ -222,27 +246,58 @@ bool HTTHistograms::fill1DHistogram(const std::string& name, float val, float we
     if(name.find("h1DCosPhi")!=std::string::npos) hTemplateName = "h1DCosPhiTemplate";
     if(name.find("h1DCSVBtag")!=std::string::npos) hTemplateName = "h1DCSVBtagTemplate";
     if(name.find("h1DID")!=std::string::npos) hTemplateName = "h1DIDTemplate";
-    //std::cout<<"fill1DHistogram Adding histogram: "<<name<<" "<<file_<<" "<<file_->fullPath()<<std::endl;
+    if(name.find("h1DVxPull")!=std::string::npos) hTemplateName = "h1DVxPullTemplate";
+
+    TH1F *hTemplate = get1DHistogram(hTemplateName,true);
     
-    if(get1DHistogram(hTemplateName,true)->GetXaxis()->IsVariableBinSize()){
-      Float_t* binsArray = new Float_t[get1DHistogram(hTemplateName,true)->GetNbinsX()+1];
-      for(unsigned int iBin=0;iBin<=get1DHistogram(hTemplateName,true)->GetNbinsX();++iBin){
-	binsArray[iBin] = get1DHistogram(hTemplateName,true)->GetXaxis()->GetXbins()->At(iBin);
+    if(hTemplate->GetXaxis()->IsVariableBinSize()){
+
+      //std::cout<<"Here 2"<<std::endl;
+      
+      Float_t* binsArray = new Float_t[hTemplate->GetNbinsX()+1];
+      for(unsigned int iBin=0;iBin<=hTemplate->GetNbinsX();++iBin){
+	binsArray[iBin] = hTemplate->GetXaxis()->GetXbins()->At(iBin);
       }
-      add1DHistogram(name,"",get1DHistogram(hTemplateName,true)->GetNbinsX(),
-			   binsArray, file_);
+      add1DHistogram(name,"",hTemplate->GetNbinsX(),binsArray, file_);
       //if(omp_get_num_threads()==1) get1DHistogram(name,true)->SetDirectory(get1DHistogram(hTemplateName,true)->GetDirectory());
       delete binsArray;      
     }
     else{
+      //std::cout<<"Here 3"<<std::endl;
       add1DHistogram(name,"",
-			   get1DHistogram(hTemplateName,true)->GetNbinsX(),
-			   get1DHistogram(hTemplateName,true)->GetXaxis()->GetXmin(),
-			   get1DHistogram(hTemplateName,true)->GetXaxis()->GetXmax(),
-			   file_);
+		     hTemplate->GetNbinsX(),
+		     hTemplate->GetXaxis()->GetXmin(),
+		     hTemplate->GetXaxis()->GetXmax(),
+		     file_);
       //if(omp_get_num_threads()==1) get1DHistogram(name,true)->SetDirectory(get1DHistogram(hTemplateName,true)->GetDirectory());
-    }   
+    }
+
+    //std::cout<<"Here 4"<<std::endl;
+    
     return AnalysisHistograms::fill1DHistogram(name,val,weight);
+  }
+  return true;
+}
+/////////////////////////////////////////////////////////
+/////////////////////////////////////////////////////////
+bool HTTHistograms::fill2DHistogram(const std::string& name,
+				    float valX, float valY, float weight){
+  
+  std::string hTemplateName = "";
+  if(!AnalysisHistograms::fill2DHistogram(name,valX,valY,weight)){
+    if(name.find("h2DVxPullVsNTrack")!=std::string::npos) hTemplateName = "h2DVxPullVsNTrackTemplate";
+
+    TH2F *hTemplate = get2DHistogram(hTemplateName,true);
+    
+    this->add2DHistogram(name,"",
+			 hTemplate->GetNbinsX(),
+			 hTemplate->GetXaxis()->GetXmin(),
+			 hTemplate->GetXaxis()->GetXmax(),
+			 hTemplate->GetNbinsY(),
+			 hTemplate->GetYaxis()->GetXmin(),
+			 hTemplate->GetYaxis()->GetXmax(),
+			 file_);
+    return AnalysisHistograms::fill2DHistogram(name,valX,valY,weight);
   }
   return true;
 }
@@ -253,7 +308,7 @@ void HTTHistograms::defineHistograms(){
  using namespace std;
 
  if(!histosInitialized_){
-   //Make template histos
+
    std::cout<<"defineHistograms Adding histogram: "<<file_<<" "<<file_->fullPath()<<std::endl;
 
    add1DHistogram("h1DStatsTemplate","",21,-0.5,20.5,file_);
@@ -266,6 +321,11 @@ void HTTHistograms::defineHistograms(){
    add1DHistogram("h1DCSVBtagTemplate",";CSV btag; Events",20,0,1,file_);
    add1DHistogram("h1DIsoTemplate",";Isolation; Events",10,0,0.5,file_);
    add1DHistogram("h1DIDTemplate",";ID; Events",30,-0.5,15.5,file_);
+   add1DHistogram("h1DVxPullTemplate",";#phi^{*} [rad]; Events",11,-0.01,0.01,file_);
+
+   add2DHistogram("h2DVxPullVsNTrackTemplate","",21,-0.5,20.5,11,-0.01,0.01,file_);
+
+   addProfile("hProfPhiVsMagTemplate","",10,0,0.05,file_);
    
    histosInitialized_ = true;
  }
@@ -276,15 +336,17 @@ void HTTHistograms::finalizeHistograms(int nRuns, float weight){
 
   AnalysisHistograms::finalizeHistograms();
 
-  /*
-  plotPhiDecayPlanes("Phi_nVectorsH");
-  plotPhiDecayPlanes("Phi_nVectorsA");
-  plotPhiDecayPlanes("Phi_nVectorsDYMuTau");
-  plotPhiDecayPlanes("CosPhi_CosPositiveH");
-  plotPhiDecayPlanes("CosPhi_CosNegativeH");
-  //return;
-  */
+  plotProfiles("H");
+  plotProfiles("A");
+  plotProfiles("DYMuTau");
 
+  plotVerticesPulls("h1DVxPullX_H");
+  plotVerticesPulls("h1DVxPullY_H");
+  plotVerticesPulls("h1DVxPullZ_H");
+
+  plotVerticesPulls("h2DVxPullVsNTrackTrans_H");
+  plotVerticesPulls("h2DVxPullVsNTrackLong_H");
+  
   plotPhiDecayPlanes("Phi_nVectorsData");
   plotPhiDecayPlanes("Phi_nVectorsH");
   plotPhiDecayPlanes("Phi_nVectorsA");
@@ -345,6 +407,120 @@ void HTTHistograms::finalizeHistograms(int nRuns, float weight){
 }
 /////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////
+void HTTHistograms::plotVerticesPulls(const std::string & hName){
+  
+   TCanvas* c = new TCanvas("Vertices","Vertices resolutions",			   
+			   460,500);
+
+  TLegend l(0.6,0.6,0.8,0.7,NULL,"brNDC");
+  l.SetTextSize(0.05);
+  l.SetFillStyle(4000);
+  l.SetBorderSize(0);
+  l.SetFillColor(10);
+
+  if(hName.find("2D")!=std::string::npos){
+    TProfile* hProfile_AOD = this->get2DHistogram((hName+"AODPV").c_str())->ProfileX();
+    TProfile* hProfile_Refit = this->get2DHistogram((hName+"RefitPV").c_str())->ProfileX();
+
+    hProfile_AOD->SetLineWidth(3);
+    hProfile_Refit->SetLineWidth(3);
+
+    hProfile_AOD->SetLineColor(1);
+    hProfile_Refit->SetLineColor(4);
+
+    hProfile_AOD->SetMinimum(0.001);
+    
+    hProfile_AOD->Draw();
+    hProfile_Refit->Draw("same");
+
+    l.AddEntry(hProfile_AOD,"PF from AOD");
+    l.AddEntry(hProfile_Refit,"refitted with BS");
+    l.Draw();
+    
+    c->Print(TString::Format("fig_png/%s.png",hName.c_str()).Data());
+    return;
+  }
+
+  TH1F* h1D_AOD = this->get1DHistogram((hName+"AODPV").c_str());
+  TH1F* h1D_Refit = this->get1DHistogram((hName+"RefitPV").c_str());
+  
+  if(h1D_AOD && h1D_Refit){
+    
+    h1D_AOD->SetLineWidth(3);
+    h1D_Refit->SetLineWidth(3);
+    ///
+    h1D_AOD->SetLineColor(1);
+    h1D_Refit->SetLineColor(4);
+    ///
+    h1D_AOD->Scale(1.0/h1D_AOD->Integral(0,h1D_AOD->GetNbinsX()+1));
+    h1D_Refit->Scale(1.0/h1D_Refit->Integral(0,h1D_Refit->GetNbinsX()+1));
+    ///
+    h1D_Refit->Fit("gaus");
+    gStyle->SetOptFit(0001);
+    gStyle->SetOptStat(0);
+    ///
+    h1D_AOD->SetYTitle("Events");
+    h1D_AOD->SetXTitle("coordinate GEN - RECO [cm]");
+    h1D_AOD->GetYaxis()->SetTitleOffset(1.4);
+    h1D_AOD->SetStats(kFALSE);    
+    ///
+    float max =     h1D_AOD->GetMaximum();
+    if(h1D_Refit->GetMaximum()>max) max = h1D_Refit->GetMaximum();
+    h1D_AOD->SetMaximum(1.05*max);
+    h1D_AOD->Draw();
+    h1D_Refit->Draw("same");
+
+    l.AddEntry(h1D_AOD,"AOD weights");
+    l.AddEntry(h1D_Refit,"refitted with BS");
+    l.Draw();
+    
+    c->Print(TString::Format("fig_png/%s.png",hName.c_str()).Data());
+  }
+}
+/////////////////////////////////////////////////////////
+/////////////////////////////////////////////////////////
+void HTTHistograms::plotProfiles(const std::string & sysType){
+
+  TCanvas* c = new TCanvas("AnyHistogram","AnyHistogram",			   
+			   460,500);
+
+  TLegend l(0.55,0.15,0.75,0.35,NULL,"brNDC");
+  l.SetTextSize(0.05);
+  l.SetFillStyle(4000);
+  l.SetBorderSize(0);
+  l.SetFillColor(10);
+
+  TProfile* h1DAOD = this->getProfile("hProfPhiVsMag_"+sysType+"AODPV");
+  TProfile* h1DGen = this->getProfile("hProfPhiVsMag_"+sysType+"GenPV");
+  TProfile* h1DRefit = this->getProfile("hProfPhiVsMag_"+sysType+"RefitPV");
+
+  if(h1DGen && h1DRefit && h1DAOD){
+    h1DGen->SetLineWidth(3);
+    h1DAOD->SetLineWidth(3);
+    h1DRefit->SetLineWidth(3);
+    //
+    h1DGen->SetLineColor(1);
+    h1DAOD->SetLineColor(2);
+    h1DRefit->SetLineColor(4);
+    ///
+    h1DGen->SetYTitle("<#hat{n}_{GEN}^{#pi^{+}} #bullet #hat{n}_{RECO}^{#pi^{+}}>");
+    h1DGen->SetXTitle("|n_{RECO}^{#pi^{+}}|");
+    h1DGen->GetYaxis()->SetTitleOffset(1.4);
+    h1DGen->SetStats(kFALSE);
+    
+    h1DGen->Draw();
+    h1DAOD->Draw("same");
+    h1DRefit->Draw("same");
+
+    l.AddEntry(h1DGen,"Generator PV");
+    l.AddEntry(h1DAOD,"AOD PV");
+    l.AddEntry(h1DRefit,"Refitted PV");
+    l.Draw();
+    c->Print(TString::Format("fig_png/%s.png",("CosPhiVsMag_PCA"+sysType).c_str()).Data());
+  }
+}
+/////////////////////////////////////////////////////////
+/////////////////////////////////////////////////////////
 void HTTHistograms::plotPhiDecayPlanes(const std::string & name){
 
   TCanvas aCanvas(TString::Format("PhiDecayPlanes_%s",name.c_str()),
@@ -370,7 +546,7 @@ void HTTHistograms::plotPhiDecayPlanes(const std::string & name){
   TH1F* h1DGen = get1DHistogram(hName.Data());
 
   if(h1DGen){
-    h1DGen->SetLineWidth(3);
+    h1DGen->SetLineWidth(4);
     h1DGen->Scale(1.0/h1DGen->Integral(0,h1DGen->GetNbinsX()+1));
     h1DGen->SetLineColor(1);
   }
@@ -761,8 +937,12 @@ std::pair<float,float> HTTHistograms::getQCDOStoSS(std::string selName){
   
   sampleName = "WJets";
   scale = getSampleNormalisation(sampleName);
-  hWJetsOS->Scale(scale*getWNormalisation("wselOS").first);
-  hWJetsSS->Scale(scale*getWNormalisation("wselSS").first);
+  //hWJetsOS->Scale(scale*getWNormalisation("wselOS").first);
+  //hWJetsSS->Scale(scale*getWNormalisation("wselSS").first);
+  hWJetsOS->Scale(scale);
+  hWJetsSS->Scale(scale);
+
+  
   
   sampleName = "TTbar";
   weight = getSampleNormalisation(sampleName);
@@ -857,7 +1037,8 @@ TH1F* HTTHistograms::getQCDbackground(std::string varName, std::string selName){
   hDYJets->Scale(scale);
 
   sampleName = "WJets";
-  float dataToMCScale = getWNormalisation("wselSS").first;
+  //float dataToMCScale = getWNormalisation("wselSS").first;
+  float dataToMCScale = 1.0;
   scale = getSampleNormalisation(sampleName)*lumi*dataToMCScale;
   hWJets->Scale(scale);
 
@@ -892,7 +1073,7 @@ std::pair<float,float> HTTHistograms::getWNormalisation(std::string selName){
   TH1F *hDYJets = get1D_DY_Histogram((hName+"DYJets"+selName).c_str());
   TH1F *hDYJetsLowM = get1DHistogram((hName+"DYJetsLowM"+selName).c_str());
   TH1F *hTT = get1DHistogram((hName+"TTbar"+selName).c_str());
-  //TH1F *hQCD = (TH1F*)getQCDbackground("MassTrans",selName);
+  TH1F *hQCD = (TH1F*)getQCDbackground("MassTrans",selName);
   TH1F *hSoup = get1DHistogram((hName+"Data"+selName).c_str());
   float lumi = getLumi();
 
@@ -932,7 +1113,7 @@ std::pair<float,float> HTTHistograms::getWNormalisation(std::string selName){
   datamtlo->Add(hDYJets,-1);
   datamtlo->Add(hDYJetsLowM,-1);
   datamtlo->Add(hTT,-1);
-  //datamtlo->Add(hQCD,-1);
+  datamtlo->Add(hQCD,-1);
 
   float inthWJets=hWJets->Integral(0,hWJets->GetNbinsX()+1);
   float intdata=datamtlo->Integral(0,datamtlo->GetNbinsX()+1);
@@ -944,13 +1125,15 @@ std::pair<float,float> HTTHistograms::getWNormalisation(std::string selName){
   float inthDYJetsLowM = hDYJetsLowM->Integral(0,hDYJetsLowM->GetNbinsX()+1);
   float inthDYJets = hDYJets->Integral(0,hDYJets->GetNbinsX()+1);
   float inthTT = hTT->Integral(0,hTT->GetNbinsX()+1);
+  float inthQCD = hQCD ? hQCD->Integral(0,hQCD->GetNbinsX()+1) : 0;
   float inthOther = 0;//hOther->Integral(0,hOther->GetNbinsX()+1);
   dweight=((inthSoup+inthDYJets+inthTT+inthOther)/inthWJets/inthWJets+intdata*intdata/(inthWJets*inthWJets*inthWJets));
   dweight=sqrt(dweight);
   cout<<"Selecion name: "<<selName<<std::endl;
   cout<<"DATA: "<<inthSoup<<" DATA - MC(!WJets): "<<intdata<<" MC WJets "<<inthWJets
       <<" DYJets: "<<inthDYJets<<" DYJetsLowM: "<<inthDYJetsLowM
-      <<" TTbar: "<<inthTT<<" Other: "<<inthOther<<endl;
+      <<" TTbar: "<<inthTT<<" QCD: "<<inthQCD
+      <<" Other: "<<inthOther<<endl;
   cout<<"WJets scale:"<<weight<<" dweight "<<dweight<<endl;
   return std::make_pair(weight, dweight);
 }

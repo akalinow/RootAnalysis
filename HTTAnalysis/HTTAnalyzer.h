@@ -86,6 +86,9 @@ class HTTAnalyzer: public Analyzer{
   ///histograms for data and analyased sample.
   float getPUWeight(const EventProxyHTT & myEventProxy);
 
+  ///Fill pulls between generator and various reco vertices.
+  bool fillVertices(std::string & sysType);
+  
   ///Return generator weight. Most samples have large values of weights
   ///which are constant up to + or - sign. We normalise those weights to +-1.
   float getGenWeight(const EventProxyHTT & myEventProxy);

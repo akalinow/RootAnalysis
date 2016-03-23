@@ -27,7 +27,11 @@ class HTTHistograms: public AnalysisHistograms {
 
   void finalizeHistograms(int nRuns, float weight=1.0);
 
+  virtual bool fillProfile(const std::string& name, float x, float val, float weight=1.0);
+
   virtual bool fill1DHistogram(const std::string &name, float val, float weight=1.0);
+
+  virtual bool fill2DHistogram(const std::string& name, float valX, float valY, float weight=1.0);
 
   float getLumi();
 
@@ -61,6 +65,10 @@ class HTTHistograms: public AnalysisHistograms {
   //selName - selection type name. For baseline use empty string
   THStack* plotStack(std::string varName, std::string selName);
 
+  void plotVerticesPulls(const std::string & hName);
+
+  void plotProfiles(const std::string & sysType);
+  
   void plotPhiDecayPlanes(const std::string& name);
 
   ///Return histogram for sum of all DY decay modes.

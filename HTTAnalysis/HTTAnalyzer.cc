@@ -71,19 +71,32 @@ std::string HTTAnalyzer::getSampleName(const EventProxyHTT & myEventProxy){
   if(myEventProxy.wevent->sample()==0) return "Data";
   if(myEventProxy.wevent->sample()==1){
     int decayModeBoson = myEventProxy.wevent->decayModeBoson();
-    if(decayModeBoson==7) return "DYJetsMuMu";
-    else if(decayModeBoson==6) return "DYJetsEE";
-    else if(decayModeBoson==0) return "DYJetsMuTau";
-    else return "DYJetsOther";    
+    std::string decayName;
+    if(decayModeBoson==7) decayName = "DYJetsMuMu";
+    else if(decayModeBoson==6) decayName = "DYJetsEE";
+    else if(decayModeBoson==0) decayName = "DYJetsMuTau";
+    else decayName = "DYJetsOther";
+
+    std::string fileName = myEventProxy.getTTree()->GetCurrentFile()->GetName();
+    std::string HTName = "";
+    /*
+    if(fileName.find("DYJetsToLL_M-50_HT-100to200")!=std::string::npos) HTName ="HT100to200";
+    else if(fileName.find("DYJetsToLL_M-50_HT-200to400")!=std::string::npos) HTName = "HT200to400";
+    else if(fileName.find("DYJetsToLL_M-50_HT-400to600")!=std::string::npos) HTName = "HT400to600";
+    else if(fileName.find("DYJetsToLL_M-50_HT-600toInf")!=std::string::npos) HTName = "HT600toInf";
+    else HTName = "HT0";
+    */
+    return decayName+HTName;
+    
   }
   if(myEventProxy.wevent->sample()==11) return "DYJetsLowM";
   if(myEventProxy.wevent->sample()==2){
     std::string fileName = myEventProxy.getTTree()->GetCurrentFile()->GetName();
     if(fileName.find("WJetsToLNu_HT-100To200")!=std::string::npos) return "WJetsHT100to200";
-    if(fileName.find("WJetsToLNu_HT-200To400")!=std::string::npos) return "WJetsHT200to400";
-    if(fileName.find("WJetsToLNu_HT-400To600")!=std::string::npos) return "WJetsHT400to600";
-    if(fileName.find("WJetsToLNu_HT-600ToInf")!=std::string::npos) return "WJetsHT600toInf";
-    return "WJetsHT0";
+    else if(fileName.find("WJetsToLNu_HT-200To400")!=std::string::npos) return "WJetsHT200to400";
+    else if(fileName.find("WJetsToLNu_HT-400To600")!=std::string::npos) return "WJetsHT400to600";
+    else if(fileName.find("WJetsToLNu_HT-600ToInf")!=std::string::npos) return "WJetsHT600toInf";
+    else return "WJetsHT0";
   }
   if(myEventProxy.wevent->sample()==3) return "TTbar";
   if(myEventProxy.wevent->sample()==5) return "H";
@@ -122,6 +135,9 @@ float HTTAnalyzer::getPUWeight(const EventProxyHTT & myEventProxy){
   }
 
   int iBinPU = hPUVec_[myEventProxy.wevent->sample()]->FindBin(myEventProxy.wevent->npu());
+
+  return 1.0;///TEST
+  
   return  hPUVec_[myEventProxy.wevent->sample()]->GetBinContent(iBinPU);
 }
 //////////////////////////////////////////////////////////////////////////////
@@ -141,10 +157,10 @@ float HTTAnalyzer::getGenWeight(const EventProxyHTT & myEventProxy){
     //NLO to LO scaling removed, as NLO cross section used in normalisation.
     std::string fileName = myEventProxy.getTTree()->GetCurrentFile()->GetName();
     if(fileName.find("WJetsToLNu_HT-100To200")!=std::string::npos) return 0.1352710705/1.2137837838;
-    if(fileName.find("WJetsToLNu_HT-200To400")!=std::string::npos) return 0.076142149/1.2137837838;
-    if(fileName.find("WJetsToLNu_HT-400To600")!=std::string::npos) return 0.0326980819/1.2137837838;
-    if(fileName.find("WJetsToLNu_HT-600ToInf")!=std::string::npos) return 0.0213743732/1.2137837838;
-    return 0.8520862372/1.2137837838;
+    else if(fileName.find("WJetsToLNu_HT-200To400")!=std::string::npos) return 0.076142149/1.2137837838;
+    else if(fileName.find("WJetsToLNu_HT-400To600")!=std::string::npos) return 0.0326980819/1.2137837838;
+    else if(fileName.find("WJetsToLNu_HT-600ToInf")!=std::string::npos) return 0.0213743732/1.2137837838;
+    else return 0.8520862372/1.2137837838;
   }
   
   return 1;
@@ -190,7 +206,29 @@ void HTTAnalyzer::fillControlHistos(float eventWeight, std::string & hNameSuffix
   }  
 }
 //////////////////////////////////////////////////////////////////////////////
-//////////////////////////////////////////////////////////////////////////////				      
+//////////////////////////////////////////////////////////////////////////////
+bool HTTAnalyzer::fillVertices(std::string & sysType){
+
+  TVector3 aVertexGen = aEvent.genPV();
+  TVector3 aVertex;
+  if(sysType.find("AODPV")!=std::string::npos) aVertex = aEvent.thePV();
+  if(sysType.find("RefitPV")!=std::string::npos) aVertex = aEvent.refitPfPV();
+  
+  float pullX = aVertexGen.X() - aVertex.X();
+  float pullY = aVertexGen.Y() - aVertex.Y();
+  float pullZ = aVertexGen.Z() - aVertex.Z();
+  
+  myHistos_->fill1DHistogram("h1DVxPullX_"+sysType,pullX);
+  myHistos_->fill1DHistogram("h1DVxPullY_"+sysType,pullY);
+  myHistos_->fill1DHistogram("h1DVxPullZ_"+sysType,pullZ);
+
+  myHistos_->fill2DHistogram("h2DVxPullVsNTrackTrans_"+sysType, aEvent.nTracksInRefit(), sqrt(pullX*pullX + pullY*pullY));
+  myHistos_->fill2DHistogram("h2DVxPullVsNTrackLong_"+sysType, aEvent.nTracksInRefit(), pullZ);
+  
+  return true;
+}
+//////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////////
 void HTTAnalyzer::fillDecayPlaneAngle(float eventWeight, std::string & hNameSuffix){
 
   ///Method from http://arxiv.org/abs/1108.0670 (Berger)
@@ -200,6 +238,8 @@ void HTTAnalyzer::fillDecayPlaneAngle(float eventWeight, std::string & hNameSuff
 
   TLorentzVector positiveLeadingTk, negativeLeadingTk;
   TLorentzVector positive_nPCA, negative_nPCA;
+
+  fillVertices(hNameSuffix);
 
   if(aMuon.charge()>0){
     positiveLeadingTk = aMuon.leadingTk();
@@ -227,17 +267,16 @@ void HTTAnalyzer::fillDecayPlaneAngle(float eventWeight, std::string & hNameSuff
   angles = angleBetweenPlanes(negativeLeadingTk,negative_nPCA,
 			      positiveLeadingTk,positive_nPCA);
 
+  myHistos_->fill1DHistogram("h1DPhi_nVectors"+hNameSuffix,angles.first,eventWeight);
 
-  if(aEvent.nTracksInRefit()>3 && positive_nPCA.Vect().Mag()>0.01 && negative_nPCA.Vect().Mag()>0.01)
-    myHistos_->fill1DHistogram("h1DPhi_nVectors"+hNameSuffix,angles.first,eventWeight);
-
-  if(aEvent.nTracksInRefit()>3 && positive_nPCA.Vect().Mag()>0.002){
   float cosPositive =  positive_nPCA.Vect().Unit()*aGenPositiveTau.nPCA().Unit();
   myHistos_->fill1DHistogram("h1DCosPhi_CosPositive"+hNameSuffix,cosPositive,eventWeight);
+  myHistos_->fillProfile("hProfPhiVsMag_"+hNameSuffix,positive_nPCA.Vect().Mag(),cosPositive);
   
   float cosNegative = negative_nPCA.Vect().Unit()*aGenNegativeTau.nPCA().Unit();
   myHistos_->fill1DHistogram("h1DCosPhi_CosNegative"+hNameSuffix,cosNegative,eventWeight);
-  }
+  myHistos_->fillProfile("hProfPhiVsMag_"+hNameSuffix,negative_nPCA.Vect().Mag(),cosNegative);
+  
 }
 //////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////
@@ -426,7 +465,9 @@ bool HTTAnalyzer::analyze(const EventProxyBase& iEvent){
   bool muonKinematics = aMuon.pt()>19 && fabs(aMuon.eta())<2.1;
   bool trigger = aPair.trigger(HLT_IsoMu17_eta2p1);
   if(sampleName=="Data") trigger = aPair.trigger(HLT_IsoMu18);
-  bool extraRequirements = aTau.decayMode()!=5 && aTau.decayMode()!=6 && nJets30==0;
+  //bool extraRequirements = aTau.decayMode()!=5 && aTau.decayMode()!=6 && nJets30==1;
+  bool extraRequirements = nJets30==0;
+  
 
   if(!myEventProxy.wpair->size()) return true;
   if(!tauKinematics || !muonKinematics || !trigger) return true;
