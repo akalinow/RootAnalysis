@@ -38,47 +38,20 @@ AnalysisHistograms::init(myDir);
 HWvsEMULHistograms::~HWvsEMULHistograms(){ }
 /////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////
-bool HWvsEMULHistograms::fill1DHistogram(const std::string& name, float val1, float weight){
+std::string HWvsEMULHistograms::getTemplateName(const std::string& name){
 
-	std::string hTemplateName = "";
-	if(!AnalysisHistograms::fill1DHistogram(name,val1,weight)){
-	  if(name.find("iProcessor")!=std::string::npos) hTemplateName = "h1DiProcessorTemplate";
-	  if(name.find("Phi")!=std::string::npos) hTemplateName = "h1DPhiTemplate";
-	  if(name.find("Eta")!=std::string::npos) hTemplateName = "h1DEtaTemplate";
-	  if(name.find("Pt")!=std::string::npos) hTemplateName = "h1DPtTemplate";
-	  if(name.find("Quality")!=std::string::npos) hTemplateName = "h1DQualityTemplate";
-	  if(name.find("Delta")!=std::string::npos) hTemplateName = "h1DDeltaTemplate";
-	  this->add1DHistogram(name,"",
-			       this->get1DHistogram(hTemplateName)->GetNbinsX(),
-			       this->get1DHistogram(hTemplateName)->GetXaxis()->GetXmin(),
-			       this->get1DHistogram(hTemplateName)->GetXaxis()->GetXmax(),
-			       file_);
-	  this->get1DHistogram(name,true)->SetDirectory(this->get1DHistogram(hTemplateName,true)->GetDirectory());
-	  return AnalysisHistograms::fill1DHistogram(name,val1,weight);
-	}
-	return true;
-}
-/////////////////////////////////////////////////////////
-/////////////////////////////////////////////////////////
-bool HWvsEMULHistograms::fill2DHistogram(const std::string& name, float val1, float val2, float weight){
+  std::string templateName = "";
 
-	std::string hTemplateName = "";
-	if(!AnalysisHistograms::fill2DHistogram(name,val1,val2,weight)){
-	  
-		if(name.find("Pt")!=std::string::npos) hTemplateName = "h2DPtTemplate";
-	
-		this->add2DHistogram(name,"",
-				this->get2DHistogram(hTemplateName)->GetNbinsX(),
-				this->get2DHistogram(hTemplateName)->GetXaxis()->GetXmin(),
-				this->get2DHistogram(hTemplateName)->GetXaxis()->GetXmax(),
-				this->get2DHistogram(hTemplateName)->GetNbinsY(),
-				this->get2DHistogram(hTemplateName)->GetYaxis()->GetXmin(),
-				this->get2DHistogram(hTemplateName)->GetYaxis()->GetXmax(),
-				file_);
-		this->get2DHistogram(name,true)->SetDirectory(this->get2DHistogram(hTemplateName,true)->GetDirectory());
-		return AnalysisHistograms::fill2DHistogram(name,val1,val2,weight);
-	}
-	return true;
+  if(name.find("iProcessor")!=std::string::npos) templateName = "h1DiProcessorTemplate";
+  if(name.find("Phi")!=std::string::npos) templateName = "h1DPhiTemplate";
+  if(name.find("Eta")!=std::string::npos) templateName = "h1DEtaTemplate";
+  if(name.find("1DPt")!=std::string::npos) templateName = "h1DPtTemplate";
+  if(name.find("Quality")!=std::string::npos) templateName = "h1DQualityTemplate";
+  if(name.find("Delta")!=std::string::npos) templateName = "h1DDeltaTemplate";
+  
+  if(name.find("2DPt")!=std::string::npos) templateName = "h2DPtTemplate";
+  
+  return templateName;
 }
 /////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////

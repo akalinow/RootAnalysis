@@ -58,54 +58,28 @@ AnalysisHistograms::init(myDir);
 OTFHistograms::~OTFHistograms(){ }
 /////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////
-bool OTFHistograms::fill1DHistogram(const std::string& name, float val1, float weight){
+std::string OTFHistograms::getTemplateName(const std::string& name){
 
-	std::string hTemplateName = "";
-	if(!AnalysisHistograms::fill1DHistogram(name,val1,weight)){
-	  if(name.find("DeltaEta")!=std::string::npos) hTemplateName = "h1DDeltaEtaTemplate";
-	  if(name.find("DeltaPhi")!=std::string::npos) hTemplateName = "h1DDeltaPhiTemplate";
-	  std::cout<<"Adding histogram: "<<name<<" with template: "<<hTemplateName<<std::endl;
-	  this->add1DHistogram(name,"",
-			       this->get1DHistogram(hTemplateName)->GetNbinsX(),
-			       this->get1DHistogram(hTemplateName)->GetXaxis()->GetXmin(),
-			       this->get1DHistogram(hTemplateName)->GetXaxis()->GetXmax(),
-			       file_);
-	  return AnalysisHistograms::fill1DHistogram(name,val1,weight);
-	}
-	return true;
-}
-/////////////////////////////////////////////////////////
-/////////////////////////////////////////////////////////
-bool OTFHistograms::fill2DHistogram(const std::string& name, float val1, float val2, float weight){
+  std::string templateName = "";
 
-	std::string hTemplateName = "";
-	if(!AnalysisHistograms::fill2DHistogram(name,val1,val2,weight)){
-	  
-		if(name.find("Pt")!=std::string::npos) hTemplateName = "h2DPtTemplate";
-		if(name.find("EtaHit")!=std::string::npos) hTemplateName = "h2DEtaHitTemplate";
-		if(name.find("PhiHit")!=std::string::npos) hTemplateName = "h2DPhiHitTemplate";
-		if(name.find("EtaVx")!=std::string::npos) hTemplateName = "h2DEtaVxTemplate";
-		if(name.find("PhiVx")!=std::string::npos) hTemplateName = "h2DPhiVxTemplate";
-		if(name.find("Quality")!=std::string::npos) hTemplateName = "h2DQualityTemplate";
-		if(name.find("RateTot")!=std::string::npos) hTemplateName = "h2DRateTotTemplate";
-		if(name.find("RateVsEta")!=std::string::npos) hTemplateName = "h2DRateVsEtaTemplate";
-		if(name.find("RateVsPt")!=std::string::npos) hTemplateName = "h2DRateVsPtTemplate";
-		if(name.find("RateVsQuality")!=std::string::npos) hTemplateName = "h2DRateVsQualityTemplate";                                              
-		if(name.find("DeltaPhi")!=std::string::npos) hTemplateName = "h2DDeltaPhiTemplate";
-		if(name.find("DeltaPt")!=std::string::npos) hTemplateName = "h2DDeltaPtTemplate";
-		if(name.find("GhostsVsProcessor")!=std::string::npos) hTemplateName = "h2DGhostsVsProcessorTemplate";
-		std::cout<<"Adding histogram: "<<name<<" with template: "<<hTemplateName<<std::endl;
-		this->add2DHistogram(name,"",
-				this->get2DHistogram(hTemplateName)->GetNbinsX(),
-				this->get2DHistogram(hTemplateName)->GetXaxis()->GetXmin(),
-				this->get2DHistogram(hTemplateName)->GetXaxis()->GetXmax(),
-				this->get2DHistogram(hTemplateName)->GetNbinsY(),
-				this->get2DHistogram(hTemplateName)->GetYaxis()->GetXmin(),
-				this->get2DHistogram(hTemplateName)->GetYaxis()->GetXmax(),
-				file_);
-		return AnalysisHistograms::fill2DHistogram(name,val1,val2,weight);
-	}
-	return true;
+  if(name.find("DeltaEta")!=std::string::npos) templateName = "h1DDeltaEtaTemplate";
+  if(name.find("DeltaPhi")!=std::string::npos) templateName = "h1DDeltaPhiTemplate";
+
+  if(name.find("Pt")!=std::string::npos) templateName = "h2DPtTemplate";
+  if(name.find("EtaHit")!=std::string::npos) templateName = "h2DEtaHitTemplate";
+  if(name.find("PhiHit")!=std::string::npos) templateName = "h2DPhiHitTemplate";
+  if(name.find("EtaVx")!=std::string::npos) templateName = "h2DEtaVxTemplate";
+  if(name.find("PhiVx")!=std::string::npos) templateName = "h2DPhiVxTemplate";
+  if(name.find("Quality")!=std::string::npos) templateName = "h2DQualityTemplate";
+  if(name.find("RateTot")!=std::string::npos) templateName = "h2DRateTotTemplate";
+  if(name.find("RateVsEta")!=std::string::npos) templateName = "h2DRateVsEtaTemplate";
+  if(name.find("RateVsPt")!=std::string::npos) templateName = "h2DRateVsPtTemplate";
+  if(name.find("RateVsQuality")!=std::string::npos) templateName = "h2DRateVsQualityTemplate";                                              
+  if(name.find("DeltaPhi")!=std::string::npos) templateName = "h2DDeltaPhiTemplate";
+  if(name.find("DeltaPt")!=std::string::npos) templateName = "h2DDeltaPtTemplate";
+  if(name.find("GhostsVsProcessor")!=std::string::npos) templateName = "h2DGhostsVsProcessorTemplate";
+  
+  return templateName;
 }
 /////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////

@@ -38,75 +38,24 @@ AnalysisHistograms::init(myDir);
 CPHistograms::~CPHistograms(){ }
 /////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////
-bool CPHistograms::fillProfile(const std::string& name, float x, float val, float weight){
+std::string CPHistograms::getTemplateName(const std::string& name){
+
+  std::string templateName = "";
+
+  if(name.find("hProfPhiVsMag")!=std::string::npos) templateName = "hProfPhiVsMagTemplate";
+
+  if(name.find("h1DDecayMode")!=std::string::npos) templateName = "h1DDecayModeTemplate";
+  if(name.find("h1DDeltaR")!=std::string::npos) templateName = "h1DDeltaRTemplate";
+  if(name.find("h1DCosPhi")!=std::string::npos) templateName = "h1DCosPhiTemplate";
+  if(name.find("h1DPhi")!=std::string::npos) templateName = "h1DPhiTemplate";
+  if(name.find("h1DRho")!=std::string::npos) templateName = "h1DRhoTemplate";
+  if(name.find("h1DIP")!=std::string::npos) templateName = "h1IPTemplate";
+  if(name.find("h1DVxPull")!=std::string::npos) templateName = "h1DVxPullTemplate";
   
-  std::string hTemplateName = "";
-  if(!AnalysisHistograms::fillProfile(name,x, val,weight)){
-    if(name.find("hProfPhiVsMag")!=std::string::npos) hTemplateName = "hProfPhiVsMagTemplate";
-    
-    this->addProfile(name,"",
-		     this->getProfile(hTemplateName,true)->GetNbinsX(),
-		     this->getProfile(hTemplateName,true)->GetXaxis()->GetXmin(),
-		     this->getProfile(hTemplateName,true)->GetXaxis()->GetXmax(),
-		     file_);
-    
-    return AnalysisHistograms::fillProfile(name,x,val,weight);
-  }
+  if(name.find("h2DVxPullVsNTrack")!=std::string::npos) templateName = "h2DVxPullVsNTrackTemplate";
+
   
-  return true;
-}
-/////////////////////////////////////////////////////////
-/////////////////////////////////////////////////////////
-bool CPHistograms::fill1DHistogram(const std::string& name, float val, float weight){
-  
-  std::string hTemplateName = "";
-  if(!AnalysisHistograms::fill1DHistogram(name,val,weight)){
-    if(name.find("h1DDecayMode")!=std::string::npos) hTemplateName = "h1DDecayModeTemplate";
-    if(name.find("h1DDeltaR")!=std::string::npos) hTemplateName = "h1DDeltaRTemplate";
-    if(name.find("h1DCosPhi")!=std::string::npos) hTemplateName = "h1DCosPhiTemplate";
-    if(name.find("h1DPhi")!=std::string::npos) hTemplateName = "h1DPhiTemplate";
-    if(name.find("h1DRho")!=std::string::npos) hTemplateName = "h1DRhoTemplate";
-    if(name.find("h1DIP")!=std::string::npos) hTemplateName = "h1IPTemplate";
-    if(name.find("h1DVxPull")!=std::string::npos) hTemplateName = "h1DVxPullTemplate";
-    if(get1DHistogram(hTemplateName,true)->GetXaxis()->IsVariableBinSize()){
-      Float_t* binsArray = new Float_t[this->get1DHistogram(hTemplateName,true)->GetNbinsX()+1];
-      for(unsigned int iBin=0;iBin<=this->get1DHistogram(hTemplateName,true)->GetNbinsX();++iBin){
-	binsArray[iBin] = this->get1DHistogram(hTemplateName,true)->GetXaxis()->GetXbins()->At(iBin);
-      }
-      this->add1DHistogram(name,"",this->get1DHistogram(hTemplateName,true)->GetNbinsX(),
-			   binsArray, file_);
-      delete binsArray;      
-    }
-    else{
-      this->add1DHistogram(name,"",
-			   this->get1DHistogram(hTemplateName,true)->GetNbinsX(),
-			   this->get1DHistogram(hTemplateName,true)->GetXaxis()->GetXmin(),
-			   this->get1DHistogram(hTemplateName,true)->GetXaxis()->GetXmax(),
-			   file_);
-    }   
-    return AnalysisHistograms::fill1DHistogram(name,val,weight);
-  }
-  return true;
-}
-/////////////////////////////////////////////////////////
-/////////////////////////////////////////////////////////
-bool CPHistograms::fill2DHistogram(const std::string& name,
-				   float valX, float valY, float weight){
-  
-  std::string hTemplateName = "";
-  if(!AnalysisHistograms::fill2DHistogram(name,valX,valY,weight)){
-    if(name.find("h2DVxPullVsNTrack")!=std::string::npos) hTemplateName = "h2DVxPullVsNTrackTemplate";
-    this->add2DHistogram(name,"",
-			 this->get2DHistogram(hTemplateName)->GetNbinsX(),
-			 this->get2DHistogram(hTemplateName)->GetXaxis()->GetXmin(),
-			 this->get2DHistogram(hTemplateName)->GetXaxis()->GetXmax(),
-			 this->get2DHistogram(hTemplateName)->GetNbinsY(),
-			 this->get2DHistogram(hTemplateName)->GetYaxis()->GetXmin(),
-			 this->get2DHistogram(hTemplateName)->GetYaxis()->GetXmax(),
-			 file_);
-    return AnalysisHistograms::fill2DHistogram(name,valX,valY,weight);
-  }
-  return true;
+  return templateName;
 }
 /////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////

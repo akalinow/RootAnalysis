@@ -27,10 +27,7 @@ class OTFHistograms: public AnalysisHistograms {
 
   void finalizeDiMuonHistograms(int nRuns, float weight=1.0);
 
-  virtual bool fill1DHistogram(const std::string &name, float val1, float weight=1.0);
-
-  virtual bool fill2DHistogram(const std::string &name, float val1, float val2, float weight=1.0);
-    void pieceHistogramsTogetherAll();
+  virtual std::string getTemplateName(const std::string& name);
 
   static const int color[6];
   static const int ptCutsGmt[4];

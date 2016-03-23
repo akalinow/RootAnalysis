@@ -24,9 +24,7 @@ class HWvsEMULHistograms: public AnalysisHistograms {
   
   virtual void finalizeHistograms();
 
-  virtual bool fill1DHistogram(const std::string &name, float val1, float weight=1.0);
-
-  virtual bool fill2DHistogram(const std::string &name, float val1, float val2, float weight=1.0);
+  virtual std::string getTemplateName(const std::string& name);
 
   void plotPhi();
   void plotHWvsEMUL(std::string type);
