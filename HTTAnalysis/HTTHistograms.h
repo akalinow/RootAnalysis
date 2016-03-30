@@ -61,9 +61,12 @@ class HTTHistograms: public AnalysisHistograms {
   //selName - selection type name. For baseline use empty string
   THStack* plotStack(std::string varName, std::string selName);
 
+  void plotnPCA(const std::string & type);
+
   void plotVerticesPulls(const std::string & hName);
 
-  void plotProfiles(const std::string & sysType);
+  void plotProfiles(const std::string & hName,
+		    const std::string & sysType);
   
   void plotPhiDecayPlanes(const std::string& name);
 

@@ -175,10 +175,10 @@ bool CPAnalyzer::analyze(const EventProxyBase& iEvent){
   DiTauData* aEventReco = &(myEvent->recoEvent_);
   
   //Skip 3-prong and unknown decays.
-  if( !(isOneProng(aEventGen->decModeMinus_) || isLepton(aEventGen->decModeMinus_) ) ||
-      !(isOneProng(aEventGen->decModePlus_)  || isLepton(aEventGen->decModePlus_) ) ) return true;
+  //if( !(isOneProng(aEventGen->decModeMinus_)) ||
+  //    !(isOneProng(aEventGen->decModePlus_))) return true;
   ///Skip lepton decays
-  if(isLepton(aEventGen->decModeMinus_) || isLepton(aEventGen->decModePlus_)) return true;
+  //if(isLepton(aEventGen->decModeMinus_) || isLepton(aEventGen->decModePlus_)) return true;
   ///
   
   std::vector<std::string> decayNamesReco = getDecayName(aEventReco->decModeMinus_, aEventReco->decModePlus_);
@@ -195,7 +195,12 @@ bool CPAnalyzer::analyze(const EventProxyBase& iEvent){
 
   bool goodGen = false, goodReco = false;
   for(auto it: decayNamesReco) if(it.find("PiPi0Pi0")!=std::string::npos) goodReco = true;
-  for(auto it: decayNamesGen) if(it.find("PiPi0Pi0")!=std::string::npos) goodGen = true;
+  
+  for(auto it: decayNamesGen){
+    if(it.find("PiPi0Pi0")!=std::string::npos) goodGen = true;
+    else if(it.find("Lepton1Prong0Pi0")!=std::string::npos) goodGen = true;
+    else if(it.find("Lepton1Prong")!=std::string::npos) goodGen = true;
+  }
   
   if(goodGen&goodReco){
     myHistos_->fill1DHistogram("h1DDeltaRPlus_"+motherName,deltaR_plus);
@@ -230,13 +235,10 @@ bool CPAnalyzer::analyze(const EventProxyBase& iEvent){
   
   bool selected = analysisSelection(aEventGen);
   for(auto decayName:decayNamesReco){
-    if(decayName!="PiPi0Pi0") continue; //use only PiPi0Pi0 decays
+    //if(decayName!="PiPi0Pi0") continue; //use only PiPi0Pi0 decays
     smearType = "ideal";
     name = "_"+motherName+"_"+decayName+"_"+smearType;
-
-    if(aEventReco->nPiPlusRefitvx_.Mag()>0.005 ||
-       aEventReco->nPiMinusRefitvx_.Mag()>0.005) fillAngles(aEventReco,name+"_RECO");
-     
+    fillAngles(aEventReco,name+"_RECO");
     fillAngles(aEventReco,name+"_RECOGEN");
     fillAngles(aEventReco,name+"_AOD");    
     if(selected) fillAngles(aEventReco, name+"_selected"+"_RECO");
@@ -244,7 +246,7 @@ bool CPAnalyzer::analyze(const EventProxyBase& iEvent){
   ///
   selected = analysisSelection(aEventGen);  
   for(auto decayName:decayNamesGen){
-    if(decayName!="PiPi0Pi0") continue; //use only PiPi0Pi0 decays
+    //if(decayName!="PiPi0Pi0") continue; //use only PiPi0Pi0 decays
     smearType = "ideal";
     name = "_"+motherName+"_"+decayName+"_"+smearType;
     fillAngles(aEventGen,name+"_GEN");

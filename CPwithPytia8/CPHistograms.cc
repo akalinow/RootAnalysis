@@ -146,7 +146,7 @@ void CPHistograms::plot_HAZ_Histograms(const std::string & hName,
 			   TString::Format("%s_%s",hName.c_str(), sysType.c_str()),
 			   460,500);
 
-  TLegend l(0.15,0.7,0.35,0.87,NULL,"brNDC");
+  TLegend l(0.35,0.7,0.55,0.87,NULL,"brNDC");
   l.SetTextSize(0.05);
   l.SetFillStyle(4000);
   l.SetBorderSize(0);
@@ -195,7 +195,7 @@ void CPHistograms::plot_HAZ_Histograms(const std::string & hName,
     l.AddEntry(h_A,"MSSM A(125)");
     l.AddEntry(h_Z,"SM Z(91)");
     l.Draw();
-    aLatex.DrawLatex(0.05,0.10,sysType.c_str());
+    aLatex.DrawLatex(0.05,0.02,sysType.c_str());
     ///
     c->Print(TString::Format("fig_png/%s_h_A_Z_%s.png",hName.c_str(), sysType.c_str()).Data());
   }

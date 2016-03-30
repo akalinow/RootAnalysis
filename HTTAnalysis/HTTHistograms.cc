@@ -211,7 +211,8 @@ TH1F *HTTHistograms::get1D_WJet_Histogram(const std::string& name){
 std::string HTTHistograms::getTemplateName(const std::string& name){
 
   std::string templateName = "";
-  if(name.find("hProfPhiVsMag")!=std::string::npos) templateName = "hProfPhiVsMagTemplate";
+  if(name.find("hProf")!=std::string::npos && name.find("VsMag")!=std::string::npos) templateName = "hProfVsMagTemplate";
+  if(name.find("hProf")!=std::string::npos && name.find("VsPt")!=std::string::npos) templateName = "hProfVsPtTemplate";
 
   if(name.find("h1DNPV")!=std::string::npos) templateName = "h1DNPVTemplate";
   if(name.find("h1DMass")!=std::string::npos) templateName = "h1DMassTemplate";
@@ -224,6 +225,7 @@ std::string HTTHistograms::getTemplateName(const std::string& name){
   if(name.find("h1DCSVBtag")!=std::string::npos) templateName = "h1DCSVBtagTemplate";
   if(name.find("h1DID")!=std::string::npos) templateName = "h1DIDTemplate";
   if(name.find("h1DVxPull")!=std::string::npos) templateName = "h1DVxPullTemplate";
+  if(name.find("h1DnPCA")!=std::string::npos) templateName = "h1DnPCATemplate";
 
   if(name.find("h2DVxPullVsNTrack")!=std::string::npos) templateName = "h2DVxPullVsNTrackTemplate";
   
@@ -250,10 +252,12 @@ void HTTHistograms::defineHistograms(){
    add1DHistogram("h1DIsoTemplate",";Isolation; Events",10,0,0.5,file_);
    add1DHistogram("h1DIDTemplate",";ID; Events",30,-0.5,15.5,file_);
    add1DHistogram("h1DVxPullTemplate",";#phi^{*} [rad]; Events",11,-0.01,0.01,file_);
+   add1DHistogram("h1DnPCATemplate",";#hat{n}_{RECO}>; Events",10,0,0.015,file_);
 
    add2DHistogram("h2DVxPullVsNTrackTemplate","",21,-0.5,20.5,11,-0.01,0.01,file_);
-
-   addProfile("hProfPhiVsMagTemplate","",10,0,0.05,file_);
+   
+   addProfile("hProfVsMagTemplate","",10,0,0.015,file_);
+   addProfile("hProfVsPtTemplate","",20,15,55,file_);
    
    histosInitialized_ = true;
  }
@@ -264,9 +268,21 @@ void HTTHistograms::finalizeHistograms(int nRuns, float weight){
 
   AnalysisHistograms::finalizeHistograms();
 
-  plotProfiles("H");
-  plotProfiles("A");
-  plotProfiles("DYMuTau");
+  plotProfiles("hProfMagVsPt_","H");
+  plotProfiles("hProfMagVsPt_","A");
+  plotProfiles("hProfMagVsPt_","DYJetsMuTau");
+
+  plotProfiles("hProfPtVsMag_","H");
+  plotProfiles("hProfPtVsMag_","A");
+  plotProfiles("hProfPtVsMag_","DYJetsMuTau");
+
+  plotProfiles("hProfRecoVsMagGen_","H");
+  plotProfiles("hProfRecoVsMagGen_","A");
+  plotProfiles("hProfRecoVsMagGen_","DYJetsMuTau");
+
+  plotProfiles("hProfPhiVsMag_","H");
+  plotProfiles("hProfPhiVsMag_","A");
+  plotProfiles("hProfPhiVsMag_","DYJetsMuTau");
 
   plotVerticesPulls("h1DVxPullX_H");
   plotVerticesPulls("h1DVxPullY_H");
@@ -277,10 +293,23 @@ void HTTHistograms::finalizeHistograms(int nRuns, float weight){
   
   plotPhiDecayPlanes("Phi_nVectorsData");
   plotPhiDecayPlanes("Phi_nVectorsH");
-  plotPhiDecayPlanes("Phi_nVectorsA");
+  plotPhiDecayPlanes("Phi_nVectorsA");  
   plotPhiDecayPlanes("Phi_nVectorsDYJetsMuTau");
   plotPhiDecayPlanes("CosPhi_CosPositiveH");
   plotPhiDecayPlanes("CosPhi_CosNegativeH");
+
+  plotPhiDecayPlanes("CosPhiNN_H");
+  plotPhiDecayPlanes("CosPhiNN_A");
+  plotPhiDecayPlanes("CosPhiNN_DYJetsMuTau");
+
+  plotPhiDecayPlanes("CosPhi_CosPositiveA");
+  plotPhiDecayPlanes("CosPhi_CosNegativeA");
+
+  plotnPCA("H");
+  plotnPCA("A");
+  plotnPCA("DYJetsMuTau");
+  ///////////
+  //return;
     
   ///Control regions plots
   plotStack("Iso","qcdselOS");
@@ -332,6 +361,46 @@ void HTTHistograms::finalizeHistograms(int nRuns, float weight){
 
   plotStack("NPV","");
 
+  plotStack("nPCAMuon","");
+  plotStack("nPCATau","");
+
+}
+/////////////////////////////////////////////////////////
+/////////////////////////////////////////////////////////
+void HTTHistograms::plotnPCA(const std::string & type){
+
+  TH1F* h1DTau = get1DHistogram("h1DnPCATau"+type);
+  TH1F* h1DMuon = get1DHistogram("h1DnPCAMuon"+type);
+  if(!h1DTau || !h1DMuon) return;
+  
+  TCanvas* c = new TCanvas("AnyHistogram","AnyHistogram",			   
+			   460,500);
+
+  TLegend l(0.15,0.12,0.35,0.22,NULL,"brNDC");
+  l.SetTextSize(0.05);
+  l.SetFillStyle(4000);
+  l.SetBorderSize(0);
+  l.SetFillColor(10);
+   
+  h1DTau->SetLineWidth(3);
+  h1DTau->Scale(1.0/h1DTau->Integral(0,h1DTau->GetNbinsX()+1));
+
+  h1DMuon->SetLineWidth(3);
+  h1DMuon->SetLineColor(2);
+  h1DMuon->Scale(1.0/h1DMuon->Integral(0,h1DMuon->GetNbinsX()+1));
+  h1DMuon->GetYaxis()->SetTitleOffset(1.5);
+  h1DMuon->SetStats(kFALSE);
+  h1DMuon->SetYTitle("Events");
+  h1DMuon->SetXTitle("|n_{RECO}|");
+
+  h1DMuon->Draw();
+  h1DTau->Draw("same");
+
+  l.AddEntry(h1DTau,"hadronic tau");
+  l.AddEntry(h1DMuon,"leptonic tau");
+  l.Draw();
+  
+  c->Print(TString::Format("fig_png/nPCA_length_%s.png",type.c_str()).Data());
 }
 /////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////
@@ -340,7 +409,7 @@ void HTTHistograms::plotVerticesPulls(const std::string & hName){
    TCanvas* c = new TCanvas("Vertices","Vertices resolutions",			   
 			   460,500);
 
-  TLegend l(0.6,0.6,0.8,0.7,NULL,"brNDC");
+  TLegend l(0.1,0.7,0.25,0.85,NULL,"brNDC");
   l.SetTextSize(0.05);
   l.SetFillStyle(4000);
   l.SetBorderSize(0);
@@ -355,14 +424,16 @@ void HTTHistograms::plotVerticesPulls(const std::string & hName){
 
     hProfile_AOD->SetLineColor(1);
     hProfile_Refit->SetLineColor(4);
-
-    hProfile_AOD->SetMinimum(0.001);
     
     hProfile_AOD->Draw();
     hProfile_Refit->Draw("same");
 
-    l.AddEntry(hProfile_AOD,"PF from AOD");
-    l.AddEntry(hProfile_Refit,"refitted with BS");
+    float min = hProfile_AOD->GetMinimum();
+    if(hProfile_Refit->GetMinimum()<min) min = hProfile_Refit->GetMinimum();
+    hProfile_AOD->SetMinimum(0.95*min);
+
+    l.AddEntry(hProfile_AOD,"from AOD");
+    l.AddEntry(hProfile_Refit,"#splitline{refitted from}{mAOD, with BS}");
     l.Draw();
     
     c->Print(TString::Format("fig_png/%s.png",hName.c_str()).Data());
@@ -398,8 +469,8 @@ void HTTHistograms::plotVerticesPulls(const std::string & hName){
     h1D_AOD->Draw();
     h1D_Refit->Draw("same");
 
-    l.AddEntry(h1D_AOD,"AOD weights");
-    l.AddEntry(h1D_Refit,"refitted with BS");
+    l.AddEntry(h1D_AOD,"from AOD");
+    l.AddEntry(h1D_Refit,"#splitline{refitted}{with BS}");
     l.Draw();
     
     c->Print(TString::Format("fig_png/%s.png",hName.c_str()).Data());
@@ -407,10 +478,12 @@ void HTTHistograms::plotVerticesPulls(const std::string & hName){
 }
 /////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////
-void HTTHistograms::plotProfiles(const std::string & sysType){
+void HTTHistograms::plotProfiles(const std::string & hName,
+				 const std::string & sysType){
 
   TCanvas* c = new TCanvas("AnyHistogram","AnyHistogram",			   
 			   460,500);
+  c->SetLeftMargin(0.13);
 
   TLegend l(0.55,0.15,0.75,0.35,NULL,"brNDC");
   l.SetTextSize(0.05);
@@ -418,9 +491,10 @@ void HTTHistograms::plotProfiles(const std::string & sysType){
   l.SetBorderSize(0);
   l.SetFillColor(10);
 
-  TProfile* h1DAOD = this->getProfile("hProfPhiVsMag_"+sysType+"AODPV");
-  TProfile* h1DGen = this->getProfile("hProfPhiVsMag_"+sysType+"GenPV");
-  TProfile* h1DRefit = this->getProfile("hProfPhiVsMag_"+sysType+"RefitPV");
+  TProfile* h1DAOD = this->getProfile(hName+sysType+"AODPV");
+  //TProfile* h1DGen = this->getProfile(hName+sysType+"GenNoOfflineSel");
+  TProfile* h1DGen = this->getProfile(hName+sysType+"GenPV");  
+  TProfile* h1DRefit = this->getProfile(hName+sysType+"RefitPV");
 
   if(h1DGen && h1DRefit && h1DAOD){
     h1DGen->SetLineWidth(3);
@@ -431,20 +505,38 @@ void HTTHistograms::plotProfiles(const std::string & sysType){
     h1DAOD->SetLineColor(2);
     h1DRefit->SetLineColor(4);
     ///
-    h1DGen->SetYTitle("<#hat{n}_{GEN}^{#pi^{+}} #bullet #hat{n}_{RECO}^{#pi^{+}}>");
-    h1DGen->SetXTitle("|n_{RECO}^{#pi^{+}}|");
-    h1DGen->GetYaxis()->SetTitleOffset(1.4);
+    h1DGen->SetYTitle("<#hat{n}_{GEN} #bullet #hat{n}_{RECO}}>");
+
+    h1DGen->SetXTitle("|n_{GEN}|");
+    h1DGen->GetYaxis()->SetTitleOffset(1.9);
     h1DGen->SetStats(kFALSE);
+
+    if(hName.find("RecoVsMagGen")!=std::string::npos){
+      h1DGen->SetYTitle("<|n_{RECO}|>");
+      h1DGen->SetMinimum(0);
+    }
+
+    if(hName.find("MagVsPt")!=std::string::npos){
+      h1DGen->SetYTitle("<|n_{GEN}|>");
+      h1DGen->SetXTitle("p_{T}^{leading tk.}");
+      h1DGen->SetMinimum(0);
+    }
     
     h1DGen->Draw();
     h1DAOD->Draw("same");
     h1DRefit->Draw("same");
 
+    if(hName.find("RecoVsMagGen")!=std::string::npos){
+      TF1 *line=new TF1("line","x",0,0.014);
+      line->Draw("same");
+    }
+
     l.AddEntry(h1DGen,"Generator PV");
     l.AddEntry(h1DAOD,"AOD PV");
     l.AddEntry(h1DRefit,"Refitted PV");
-    l.Draw();
-    c->Print(TString::Format("fig_png/%s.png",("CosPhiVsMag_PCA"+sysType).c_str()).Data());
+    if(hName.find("MagVsPt")==std::string::npos) l.Draw();
+    
+    c->Print(TString::Format("fig_png/%s.png",(hName+sysType).c_str()).Data());
   }
 }
 /////////////////////////////////////////////////////////
@@ -455,7 +547,7 @@ void HTTHistograms::plotPhiDecayPlanes(const std::string & name){
 		  TString::Format("PhiDecayPlanes_%s",name.c_str()),
 		  460,500);
   
-  TLegend l(0.15,0.15,0.35,0.37,NULL,"brNDC");
+  TLegend l(0.15,0.65,0.35,0.85,NULL,"brNDC");
   l.SetTextSize(0.05);
   l.SetFillStyle(4000);
   l.SetBorderSize(0);
@@ -502,24 +594,25 @@ void HTTHistograms::plotPhiDecayPlanes(const std::string & name){
     h1DRefitPV->SetStats(kFALSE);
     h1DRefitPV->GetXaxis()->SetRangeUser(0,M_PI);
 
-    //h1DRefitPV->SetMaximum(1.02);
-    h1DRefitPV->SetMaximum(0.4);
-    h1DRefitPV->SetMinimum(0.10);
-    h1DRefitPV->Draw("HISTO");    
-    l.AddEntry(h1DRefitPV,"reco PCA with refit. PV");
+    h1DRefitPV->SetMaximum(0.5);
+    h1DRefitPV->SetMinimum(0.15);
+    h1DRefitPV->Draw("HISTO");
+    
+    l.AddEntry(h1DRefitPV,"nPCA with refit. PV");
     if(h1DGenPV){
       h1DGenPV->Draw("HISTO same");
-      l.AddEntry(h1DGenPV,"reco PCA with gen. PV");
-    }
-    
+      l.AddEntry(h1DGenPV,"nPCA with gen. PV");
+    }    
     if(h1DAODPV){
       h1DAODPV->Draw("HISTO same");
-      l.AddEntry(h1DAODPV,"reco PCA with AOD PV");
+      l.AddEntry(h1DAODPV,"nPCA with AOD PV");
     }
     if(h1DGen){
       h1DGen->Draw("HISTO same");
       l.AddEntry(h1DGen,"#splitline{PCA with gen. particles}{no offline selection}");
     }
+
+    h1DRefitPV->Draw("HISTO same");
     l.Draw();
     aCanvas.Print(TString::Format("fig_png/%s.png",name.c_str()).Data());
   }
@@ -803,6 +896,9 @@ THStack*  HTTHistograms::plotStack(std::string varName, std::string selName){
 /////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////
 void HTTHistograms::plotSingleHistogram(std::string hName){
+
+  TH1F* h1D = get1DHistogram(hName.c_str());
+  if(!h1D) return;
   
   TCanvas* c = new TCanvas("AnyHistogram","AnyHistogram",			   
 			   460,500);
@@ -812,9 +908,7 @@ void HTTHistograms::plotSingleHistogram(std::string hName){
   l.SetFillStyle(4000);
   l.SetBorderSize(0);
   l.SetFillColor(10);
-  
-  TH1F* h1D = get1DHistogram(hName.c_str());
-  
+   
   if(h1D){
     h1D->SetLineWidth(3);
     h1D->Scale(1.0/h1D->Integral(0,h1D->GetNbinsX()+1));
@@ -828,6 +922,8 @@ void HTTHistograms::plotSingleHistogram(std::string hName){
 /////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////
 std::pair<float,float> HTTHistograms::getQCDOStoSS(std::string selName){
+
+  return  std::make_pair(1.0,0.0);
 
   std::cout<<"Calling method: "<<__func__<<std::endl;
   if(selName.find("SS")!=std::string::npos) return  std::make_pair(1.0,0.0);
