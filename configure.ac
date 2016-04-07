@@ -1,31 +1,23 @@
 dnl Process this file with autoconf to produce a configure script.
-
 AC_PREREQ(2.59)
 AC_INIT(RootAnalysis, 1.0)
-: ${CXXFLAGS=-Werror -O3 -std=c++0x -fopenmp}
-AC_PROG_CC
-AC_PROG_CXX
-
-AC_CANONICAL_SYSTEM
-AC_CHECK_FUNCS([mkdir])
-AC_CHECK_HEADER_STDBOOL
-AC_TYPE_SIZE_T
-AC_PROG_RANLIB
-
-ROOT_PATH
-
-dnl Initialize automake
 AM_INIT_AUTOMAKE
-
-dnl this allows us specify individual liking flags for each target
-AM_PROG_CC_C_O 
-
-dnl Initialize Libtool
+: ${CXXFLAGS=-Werror -O3 -std=c++11 -fopenmp}
+AC_PROG_LIBTOOL
 LT_INIT
 
-dnl Check if Libtool is present
-dnl Libtool is used for building share libraries 
-AC_PROG_LIBTOOL
+AC_PROG_CC
+AC_PROG_CXX
+AC_LANG(C++)
+
+AC_CHECK_HEADER_STDBOOL
+ROOT_PATH(6.06, , AC_MSG_ERROR(Your ROOT version is too old))
+BOOST_REQUIRE(1.3, AC_MSG_ERROR(Your BOOST version is too old))
+BOOST_TOKENIZER
+BOOST_HASH
+BOOST_REGEX
+
+AC_CONFIG_MACRO_DIR([m4])
 
 AC_CONFIG_FILES(Makefile
                 test/Makefile
@@ -33,4 +25,6 @@ AC_CONFIG_FILES(Makefile
                 OTFAnalysis/Makefile
 		CPwithPytia8/Makefile
 		HTTAnalysis/Makefile)
+
 AC_OUTPUT
+

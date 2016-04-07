@@ -167,7 +167,7 @@ float HTTAnalyzer::getGenWeight(const EventProxyHTT & myEventProxy){
 }
 //////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////
-void HTTAnalyzer::fillControlHistos(float eventWeight, std::string & hNameSuffix){
+void HTTAnalyzer::fillControlHistos(const std::string & hNameSuffix, float eventWeight){
 
   ///Fill histograms with number of PV.
   myHistos_->fill1DHistogram("h1DNPV"+hNameSuffix,aEvent.npv(),eventWeight);
@@ -201,6 +201,8 @@ void HTTAnalyzer::fillControlHistos(float eventWeight, std::string & hNameSuffix
   myHistos_->fill1DHistogram("h1DCSVBtagLeadingJet"+hNameSuffix,aJet.csvtag(),eventWeight);
 
   myHistos_->fill1DHistogram("h1DPtMET"+hNameSuffix,aMET.metpt(),eventWeight);
+
+  fillDecayPlaneAngle(hNameSuffix, eventWeight);
   
   if(aJet.bjet()){
     myHistos_->fill1DHistogram("h1DPtLeadingBJet"+hNameSuffix,aJet.pt(),eventWeight);
@@ -209,7 +211,7 @@ void HTTAnalyzer::fillControlHistos(float eventWeight, std::string & hNameSuffix
 }
 //////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////
-bool HTTAnalyzer::fillVertices(std::string & sysType){
+bool HTTAnalyzer::fillVertices(const std::string & sysType){
 
   TVector3 aVertexGen = aEvent.genPV();
   TVector3 aVertex;
@@ -219,19 +221,19 @@ bool HTTAnalyzer::fillVertices(std::string & sysType){
   float pullX = aVertexGen.X() - aVertex.X();
   float pullY = aVertexGen.Y() - aVertex.Y();
   float pullZ = aVertexGen.Z() - aVertex.Z();
-  
+
   myHistos_->fill1DHistogram("h1DVxPullX_"+sysType,pullX);
   myHistos_->fill1DHistogram("h1DVxPullY_"+sysType,pullY);
   myHistos_->fill1DHistogram("h1DVxPullZ_"+sysType,pullZ);
 
   myHistos_->fill2DHistogram("h2DVxPullVsNTrackTrans_"+sysType, aEvent.nTracksInRefit(), sqrt(pullX*pullX + pullY*pullY));
   myHistos_->fill2DHistogram("h2DVxPullVsNTrackLong_"+sysType, aEvent.nTracksInRefit(), pullZ);
-  
+
   return true;
 }
 //////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////
-void HTTAnalyzer::fillDecayPlaneAngle(float eventWeight, std::string & hNameSuffix){
+void HTTAnalyzer::fillDecayPlaneAngle(const std::string & hNameSuffix, float eventWeight){
 
   ///Method from http://arxiv.org/abs/1108.0670 (Berger)
   ///take impact parameters instead of tau momentum.
@@ -245,22 +247,26 @@ void HTTAnalyzer::fillDecayPlaneAngle(float eventWeight, std::string & hNameSuff
 
   if(aMuon.charge()>0){
     positiveLeadingTk = aMuon.leadingTk();
+    positive_nPCA = TLorentzVector(aMuon.nPCARefitvx(),0);
     if(hNameSuffix.find("AODPV")!=std::string::npos) positive_nPCA = TLorentzVector(aMuon.nPCA(),0);
     if(hNameSuffix.find("RefitPV")!=std::string::npos) positive_nPCA = TLorentzVector(aMuon.nPCARefitvx(),0);
     if(hNameSuffix.find("GenPV")!=std::string::npos) positive_nPCA = TLorentzVector(aMuon.nPCAGenvx(),0);
 
     negativeLeadingTk = aTau.leadingTk();
+    negative_nPCA = TLorentzVector(aTau.nPCARefitvx(),0);
     if(hNameSuffix.find("AODPV")!=std::string::npos) negative_nPCA = TLorentzVector(aTau.nPCA(),0);
     if(hNameSuffix.find("RefitPV")!=std::string::npos) negative_nPCA = TLorentzVector(aTau.nPCARefitvx(),0);
     if(hNameSuffix.find("GenPV")!=std::string::npos) negative_nPCA = TLorentzVector(aTau.nPCAGenvx(),0);
   }
   else{    
     positiveLeadingTk = aTau.leadingTk();
+    positive_nPCA = TLorentzVector(aTau.nPCARefitvx(),0);
     if(hNameSuffix.find("AODPV")!=std::string::npos) positive_nPCA = TLorentzVector(aTau.nPCA(),0);
     if(hNameSuffix.find("RefitPV")!=std::string::npos) positive_nPCA = TLorentzVector(aTau.nPCARefitvx(),0);
     if(hNameSuffix.find("GenPV")!=std::string::npos) positive_nPCA = TLorentzVector(aTau.nPCAGenvx(),0);
     
     negativeLeadingTk = aMuon.leadingTk();
+    negative_nPCA = TLorentzVector(aMuon.nPCARefitvx(),0);
     if(hNameSuffix.find("AODPV")!=std::string::npos) negative_nPCA = TLorentzVector(aMuon.nPCA(),0);
     if(hNameSuffix.find("RefitPV")!=std::string::npos) negative_nPCA = TLorentzVector(aMuon.nPCARefitvx(),0);
     if(hNameSuffix.find("GenPV")!=std::string::npos) negative_nPCA = TLorentzVector(aMuon.nPCAGenvx(),0);
@@ -299,11 +305,18 @@ void HTTAnalyzer::fillDecayPlaneAngle(float eventWeight, std::string & hNameSuff
   myHistos_->fillProfile("hProfPtVsMag_"+hNameSuffix,aGenPositiveTau.nPCA().Mag(), positiveLeadingTk.Perp());
 
   myHistos_->fillProfile("hProfMagVsPt_"+hNameSuffix, negativeLeadingTk.Perp(), aGenNegativeTau.nPCA().Mag());
-  myHistos_->fillProfile("hProfMagVsPt_"+hNameSuffix, positiveLeadingTk.Perp(), aGenPositiveTau.nPCA().Mag()); 
+  myHistos_->fillProfile("hProfMagVsPt_"+hNameSuffix, positiveLeadingTk.Perp(), aGenPositiveTau.nPCA().Mag());
+
+  //myHistos_->fillProfile("hProfMagVsCos_"+hNameSuffix, negativeLeadingTk.Vect().Unit()*a3v.Unit(), aGenNegativeTau.nPCA().Mag());
+  //myHistos_->fillProfile("hProfMagVsCos_"+hNameSuffix, positiveLeadingTk.Vect().Unit()*a3v.Unit(), aGenPositiveTau.nPCA().Mag());
+
+  myHistos_->fillProfile("hProfMagVsCos_"+hNameSuffix, positiveLeadingTk.Vect().Unit()*a3v.Unit(), negativeLeadingTk.Vect().Unit()*a3v.Unit());
+  //myHistos_->fillProfile("hProfMagVsCos_"+hNameSuffix, negativeLeadingTk.Vect().Unit()*a3v.Unit(), positiveLeadingTk.Vect().Unit()*a3v.Unit());
+  
 }
 //////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////
-void HTTAnalyzer::fillGenDecayPlaneAngle(float eventWeight, std::string & hNameSuffix){
+void HTTAnalyzer::fillGenDecayPlaneAngle(const std::string & hNameSuffix, float eventWeight){
 
   ///Method from http://arxiv.org/abs/1108.0670 (Berger)
   ///take impact parameters instead of tau momentum.
@@ -484,7 +497,7 @@ bool HTTAnalyzer::analyze(const EventProxyBase& iEvent){
   if(goodGenDecayMode && goodRecoDecayMode){
     std::string hNameSuffixCP1 = sampleName+"Gen";
     hNameSuffixCP1 = sampleName+"GenNoOfflineSel";
-    fillGenDecayPlaneAngle(eventWeight, hNameSuffixCP1);
+    fillGenDecayPlaneAngle(sampleName+"GenNoOfflineSel", eventWeight);
   }
 
   ///This stands for core selection, that is common to all regions.
@@ -493,26 +506,36 @@ bool HTTAnalyzer::analyze(const EventProxyBase& iEvent){
   bool muonKinematics = aMuon.pt()>19 && fabs(aMuon.eta())<2.1;
   bool trigger = aPair.trigger(HLT_IsoMu17_eta2p1);
   if(sampleName=="Data") trigger = aPair.trigger(HLT_IsoMu18);
-  //bool extraRequirements = aTau.decayMode()!=5 && aTau.decayMode()!=6 && nJets30==1;
-  //bool extraRequirements = aTau.leadingTk().Perp()<40 && aMuon.leadingTk().Perp()<40;
-  bool extraRequirements = nJets30==0;
+
+  bool extraRequirements = true;
+  //extraRequirements &= nJets30==0;
+  //extraRequirements &= aTau.decayMode()!=5 && aTau.decayMode()!=6 && nJets30==0;
+  //extraRequirements &= (aPair.m_vis()>50 && aPair.m_vis()<100);
   
   if(!myEventProxy.wpair->size()) return true;
   if(!tauKinematics || !tauID || !muonKinematics || !trigger) return true;
-  //if(!extraRequirements) return true;
+  if(!extraRequirements) return true;
 
   //if(aGenPositiveTau.nPCA().Mag()<0.005) return false;
   //if(aGenNegativeTau.nPCA().Mag()<0.005) return false;
   
-  if(aMuon.nPCA().Mag()<0.005) return false; 
-  if(aTau.nPCA().Mag()<0.005) return false;
+  //if(aMuon.nPCA().Mag()<0.004) return false; 
+  //if(aTau.nPCA().Mag()<0.004) return false;
 
   //if(aMuon.nPCARefitvx().Mag()<0.005) return false; 
-  //if(aTau.nPCARefitvx().Mag()<0.005) return false;  
-  
+  //if(aTau.nPCARefitvx().Mag()<0.005) return false;
+  /*
+  if(aMuon.charge()>0){
+    if(aMuon.nPCARefitvx().Unit().Dot(aGenPositiveTau.nPCA().Unit())<0.8) return false;
+    if(aTau.nPCARefitvx().Unit().Dot(aGenNegativeTau.nPCA().Unit())<0.8) return false;
+  }
+  if(aMuon.charge()<0){
+    if(aMuon.nPCARefitvx().Unit().Dot(aGenNegativeTau.nPCA().Unit())<0.8) return false;
+    if(aTau.nPCARefitvx().Unit().Dot(aGenPositiveTau.nPCA().Unit())<0.8) return false;
+  }
+  */
   if(aEvent.nTracksInRefit()<2) return false;
-  
-
+    
   ///Note: parts of the signal/control region selection are applied in the following code.
   ///FIXME AK: this should be made in a more clear way.
   bool baselineSelection = aPair.diq()==-1 && aMuon.mt()<40 && aMuon.iso()<0.1;
@@ -527,16 +550,12 @@ bool HTTAnalyzer::analyze(const EventProxyBase& iEvent){
 
   ///Histograms for the baseline selection  
   if(baselineSelection){
-    fillControlHistos(eventWeight, hNameSuffix);
-    if(goodGenDecayMode){
-      std::string hNameSuffixCP = hNameSuffix+"RefitPV";    
-      fillDecayPlaneAngle(eventWeight, hNameSuffixCP);
-      hNameSuffixCP = hNameSuffix+"AODPV";
-      fillDecayPlaneAngle(eventWeight, hNameSuffixCP);
-      hNameSuffixCP = hNameSuffix+"GenPV";
-      fillDecayPlaneAngle(eventWeight, hNameSuffixCP);
-      hNameSuffixCP = hNameSuffix+"Gen";
-      fillDecayPlaneAngle(eventWeight, hNameSuffixCP);
+    fillControlHistos(hNameSuffix, eventWeight);
+    if(goodGenDecayMode || sampleName.find("WJets")!=std::string::npos){
+      fillDecayPlaneAngle(hNameSuffix+"RefitPV", eventWeight);
+      fillDecayPlaneAngle(hNameSuffix+"AODPV", eventWeight);
+      fillDecayPlaneAngle(hNameSuffix+"GenPV", eventWeight);
+      fillDecayPlaneAngle(hNameSuffix+"Gen", eventWeight);
     }
   }
 
@@ -549,10 +568,11 @@ bool HTTAnalyzer::analyze(const EventProxyBase& iEvent){
     ///Fill SS histos in signal mu isolation region. Those histograms
     ///provide shapes for QCD estimate in signal region and in various control regions.
     ///If control region has OS we still use SS QCD estimate.
-    if(aMuon.mt()<40 && aMuon.iso()<0.1) fillControlHistos(eventWeight, hNameSuffix);
+    if(aMuon.mt()<40 && aMuon.iso()<0.1) fillControlHistos(hNameSuffix, eventWeight);
     if(aMuon.mt()>60){
       myHistos_->fill1DHistogram("h1DMassTrans"+hNameSuffix+"wselSS",aMuon.mt(),eventWeight);    
-      myHistos_->fill1DHistogram("h1DMassTrans"+hNameSuffix+"wselOS",aMuon.mt(),eventWeight);    
+      myHistos_->fill1DHistogram("h1DMassTrans"+hNameSuffix+"wselOS",aMuon.mt(),eventWeight);
+      fillDecayPlaneAngle(hNameSuffix+"wselOS",eventWeight);
     }
     if(ttSelection){
       myHistos_->fill1DHistogram("h1DMassTrans"+hNameSuffix+"ttselOS",aMuon.mt(),eventWeight);
@@ -574,7 +594,10 @@ bool HTTAnalyzer::analyze(const EventProxyBase& iEvent){
   ///Histograms for the WJet control region. 
   if(wSelection){
     hNameSuffix = sampleName+"wsel";
-    if(aPair.diq()==-1) myHistos_->fill1DHistogram("h1DMassTrans"+hNameSuffix+"OS",aMuon.mt(),eventWeight);
+    if(aPair.diq()==-1){
+      myHistos_->fill1DHistogram("h1DMassTrans"+hNameSuffix+"OS",aMuon.mt(),eventWeight);
+      fillDecayPlaneAngle(hNameSuffix+"OS",eventWeight);
+    }
     if(aPair.diq()== 1) myHistos_->fill1DHistogram("h1DMassTrans"+hNameSuffix+"SS",aMuon.mt(),eventWeight);
   }
 

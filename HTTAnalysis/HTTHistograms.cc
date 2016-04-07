@@ -178,10 +178,8 @@ TH1F *HTTHistograms::get1D_WJet_Histogram(const std::string& name){
 
   TString hName = name;
   hName.ReplaceAll("WJets","WJetsHT0");
-  TH1F *hWJets = get1DHistogram(hName.Data());
+  TH1F *hWJets0to100 = get1DHistogram(hName.Data());
   
-  if(!hWJets) return hWJets;
-
   hName = name;
   hName.ReplaceAll("WJets","WJetsHT100to200");
   TH1F *hWJets100to200 = get1DHistogram(hName.Data());
@@ -198,11 +196,19 @@ TH1F *HTTHistograms::get1D_WJet_Histogram(const std::string& name){
   hName.ReplaceAll("WJets","WJetsHT600toInf");
   TH1F *hWJets600toInf = get1DHistogram(hName.Data());
 
+  TH1F *hWJets = 0;
+  if(hWJets0to100) hWJets = (TH1F*)hWJets0to100->Clone(name.c_str());
+  else if(hWJets100to200) hWJets = (TH1F*)hWJets100to200->Clone(name.c_str());
+  else if(hWJets200to400) hWJets = (TH1F*)hWJets200to400->Clone(name.c_str());
+
+  if(!hWJets) return 0;
+  
+  hWJets->Clear();
+  if(hWJets0to100) hWJets->Add(hWJets0to100);
   if(hWJets100to200) hWJets->Add(hWJets100to200);
   if(hWJets200to400) hWJets->Add(hWJets200to400);
   if(hWJets400to600) hWJets->Add(hWJets400to600);
   if(hWJets600toInf) hWJets->Add(hWJets600toInf);
-  hWJets->SetName(name.c_str());
 
   return hWJets;
 }
@@ -213,6 +219,7 @@ std::string HTTHistograms::getTemplateName(const std::string& name){
   std::string templateName = "";
   if(name.find("hProf")!=std::string::npos && name.find("VsMag")!=std::string::npos) templateName = "hProfVsMagTemplate";
   if(name.find("hProf")!=std::string::npos && name.find("VsPt")!=std::string::npos) templateName = "hProfVsPtTemplate";
+  if(name.find("hProf")!=std::string::npos && name.find("VsCos")!=std::string::npos) templateName = "hProfVsCosTemplate";
 
   if(name.find("h1DNPV")!=std::string::npos) templateName = "h1DNPVTemplate";
   if(name.find("h1DMass")!=std::string::npos) templateName = "h1DMassTemplate";
@@ -258,6 +265,7 @@ void HTTHistograms::defineHistograms(){
    
    addProfile("hProfVsMagTemplate","",10,0,0.015,file_);
    addProfile("hProfVsPtTemplate","",20,15,55,file_);
+   addProfile("hProfVsCosTemplate","",20,-1,1,file_);
    
    histosInitialized_ = true;
  }
@@ -268,9 +276,18 @@ void HTTHistograms::finalizeHistograms(int nRuns, float weight){
 
   AnalysisHistograms::finalizeHistograms();
 
+  plotPhiDecayPlanes("CosPhiNN_WJetsHT0");
+  plotPhiDecayPlanes("Phi_nVectorsWJetsHT0");
+  return;
+
+
   plotProfiles("hProfMagVsPt_","H");
   plotProfiles("hProfMagVsPt_","A");
   plotProfiles("hProfMagVsPt_","DYJetsMuTau");
+
+  plotProfiles("hProfMagVsCos_","H");
+  plotProfiles("hProfMagVsCos_","A");
+  plotProfiles("hProfMagVsCos_","DYJetsMuTau");
 
   plotProfiles("hProfPtVsMag_","H");
   plotProfiles("hProfPtVsMag_","A");
@@ -295,12 +312,15 @@ void HTTHistograms::finalizeHistograms(int nRuns, float weight){
   plotPhiDecayPlanes("Phi_nVectorsH");
   plotPhiDecayPlanes("Phi_nVectorsA");  
   plotPhiDecayPlanes("Phi_nVectorsDYJetsMuTau");
+  plotPhiDecayPlanes("Phi_nVectorsWJetsHT0");
+  
   plotPhiDecayPlanes("CosPhi_CosPositiveH");
   plotPhiDecayPlanes("CosPhi_CosNegativeH");
 
   plotPhiDecayPlanes("CosPhiNN_H");
   plotPhiDecayPlanes("CosPhiNN_A");
   plotPhiDecayPlanes("CosPhiNN_DYJetsMuTau");
+  plotPhiDecayPlanes("CosPhiNN_WJetsHT0");
 
   plotPhiDecayPlanes("CosPhi_CosPositiveA");
   plotPhiDecayPlanes("CosPhi_CosNegativeA");
@@ -308,9 +328,14 @@ void HTTHistograms::finalizeHistograms(int nRuns, float weight){
   plotnPCA("H");
   plotnPCA("A");
   plotnPCA("DYJetsMuTau");
+  plotnPCA("WJetsHT0");
   ///////////
-  //return;
-    
+
+  wselOSCorrection =  std::pair<float,float>(1,0);
+  wselSSCorrection =  std::pair<float,float>(1,0);
+  
+  wselOSCorrection = getWNormalisation("wselOS");
+  wselSSCorrection = getWNormalisation("wselSS");
   ///Control regions plots
   plotStack("Iso","qcdselOS");
   plotStack("Iso","qcdselSS");
@@ -363,7 +388,9 @@ void HTTHistograms::finalizeHistograms(int nRuns, float weight){
 
   plotStack("nPCAMuon","");
   plotStack("nPCATau","");
-
+  plotStack("Phi_nVectors","");
+  plotStack("Phi_nVectors","wselOS");
+  
 }
 /////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////
@@ -418,6 +445,8 @@ void HTTHistograms::plotVerticesPulls(const std::string & hName){
   if(hName.find("2D")!=std::string::npos){
     TProfile* hProfile_AOD = this->get2DHistogram((hName+"AODPV").c_str())->ProfileX();
     TProfile* hProfile_Refit = this->get2DHistogram((hName+"RefitPV").c_str())->ProfileX();
+
+    if(!hProfile_AOD || !hProfile_Refit) return;
 
     hProfile_AOD->SetLineWidth(3);
     hProfile_Refit->SetLineWidth(3);
@@ -481,20 +510,21 @@ void HTTHistograms::plotVerticesPulls(const std::string & hName){
 void HTTHistograms::plotProfiles(const std::string & hName,
 				 const std::string & sysType){
 
-  TCanvas* c = new TCanvas("AnyHistogram","AnyHistogram",			   
-			   460,500);
-  c->SetLeftMargin(0.13);
+  TProfile* h1DAOD = this->getProfile(hName+sysType+"AODPV");
+  //TProfile* h1DGen = this->getProfile(hName+sysType+"GenNoOfflineSel");
+  TProfile* h1DGen = this->getProfile(hName+sysType+"GenPV");  
+  TProfile* h1DRefit = this->getProfile(hName+sysType+"RefitPV");
+
+  if(!h1DGen || !h1DRefit || !h1DAOD) return;
+
+  TCanvas c("AnyHistogram","AnyHistogram",460,500);			   
+  c.SetLeftMargin(0.13);
 
   TLegend l(0.55,0.15,0.75,0.35,NULL,"brNDC");
   l.SetTextSize(0.05);
   l.SetFillStyle(4000);
   l.SetBorderSize(0);
   l.SetFillColor(10);
-
-  TProfile* h1DAOD = this->getProfile(hName+sysType+"AODPV");
-  //TProfile* h1DGen = this->getProfile(hName+sysType+"GenNoOfflineSel");
-  TProfile* h1DGen = this->getProfile(hName+sysType+"GenPV");  
-  TProfile* h1DRefit = this->getProfile(hName+sysType+"RefitPV");
 
   if(h1DGen && h1DRefit && h1DAOD){
     h1DGen->SetLineWidth(3);
@@ -505,7 +535,7 @@ void HTTHistograms::plotProfiles(const std::string & hName,
     h1DAOD->SetLineColor(2);
     h1DRefit->SetLineColor(4);
     ///
-    h1DGen->SetYTitle("<#hat{n}_{GEN} #bullet #hat{n}_{RECO}}>");
+    h1DGen->SetYTitle("<#hat{n}_{GEN} #bullet #hat{n}_{RECO}>");
 
     h1DGen->SetXTitle("|n_{GEN}|");
     h1DGen->GetYaxis()->SetTitleOffset(1.9);
@@ -521,6 +551,10 @@ void HTTHistograms::plotProfiles(const std::string & hName,
       h1DGen->SetXTitle("p_{T}^{leading tk.}");
       h1DGen->SetMinimum(0);
     }
+    if(hName.find("MagVsCos")!=std::string::npos){
+      h1DGen->SetYTitle("<|n_{GEN}|>");
+      h1DGen->SetXTitle("cos(#phi)");
+    }
     
     h1DGen->Draw();
     h1DAOD->Draw("same");
@@ -534,9 +568,9 @@ void HTTHistograms::plotProfiles(const std::string & hName,
     l.AddEntry(h1DGen,"Generator PV");
     l.AddEntry(h1DAOD,"AOD PV");
     l.AddEntry(h1DRefit,"Refitted PV");
-    if(hName.find("MagVsPt")==std::string::npos) l.Draw();
+    if(hName.find("RecoVsMagGen")!=std::string::npos) l.Draw();
     
-    c->Print(TString::Format("fig_png/%s.png",(hName+sysType).c_str()).Data());
+    c.Print(TString::Format("fig_png/%s.png",(hName+sysType).c_str()).Data());
   }
 }
 /////////////////////////////////////////////////////////
@@ -592,11 +626,14 @@ void HTTHistograms::plotPhiDecayPlanes(const std::string & name){
     h1DRefitPV->SetTitle(name.c_str());
     h1DRefitPV->GetYaxis()->SetTitleOffset(1.4);
     h1DRefitPV->SetStats(kFALSE);
-    h1DRefitPV->GetXaxis()->SetRangeUser(0,M_PI);
+    //h1DRefitPV->GetXaxis()->SetRangeUser(0,M_PI);
 
-    h1DRefitPV->SetMaximum(0.5);
-    h1DRefitPV->SetMinimum(0.15);
+    //h1DRefitPV->SetMaximum(1);
+    h1DRefitPV->SetMinimum(0);
     h1DRefitPV->Draw("HISTO");
+
+    h1DGenPV->Print();
+    h1DGenPV->Print("all");
     
     l.AddEntry(h1DRefitPV,"nPCA with refit. PV");
     if(h1DGenPV){
@@ -635,7 +672,7 @@ THStack*  HTTHistograms::plotStack(std::string varName, std::string selName){
   TH1F *hDYJetsEE = get1DHistogram((hName+"DYJetsEE"+selName).c_str());
   TH1F *hDYJetsMuTau = get1DHistogram((hName+"DYJetsMuTau"+selName).c_str());  
   TH1F *hSoup = get1DHistogram((hName+"Data"+selName).c_str());
-  pair<float,float> qcdOStoSS = getQCDOStoSS(selName);
+  pair<float,float> qcdOStoSS = getQCDOStoSS(selName, wselOSCorrection, wselSSCorrection);
   TH1F *hQCD = (TH1F*)getQCDbackground(varName,selName);
   ///Protection against null pointers
   ///Null pointers happen when sample was not read, or there were no
@@ -676,8 +713,12 @@ THStack*  HTTHistograms::plotStack(std::string varName, std::string selName){
   std::string sampleName = "WJets";
   std::string WselType = "wselOS";
   if(selName.find("SS")!=std::string::npos) WselType = "wselSS";
-  pair<float,float> dataToMCScale = getWNormalisation(WselType);
   float weight = getSampleNormalisation(sampleName);
+  ///TEST
+  //pair<float,float> dataToMCScale = getWNormalisation(WselType);
+
+  pair<float,float> dataToMCScale = wselOSCorrection;
+  /////
   float scale = weight*lumi*dataToMCScale.first;
   hWJets->Scale(scale);
 
@@ -921,9 +962,9 @@ void HTTHistograms::plotSingleHistogram(std::string hName){
 }
 /////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////
-std::pair<float,float> HTTHistograms::getQCDOStoSS(std::string selName){
-
-  return  std::make_pair(1.0,0.0);
+std::pair<float,float> HTTHistograms::getQCDOStoSS(std::string selName,
+						   std::pair<float,float> wselOSCorrection,
+						   std::pair<float,float> wselSSCorrection){
 
   std::cout<<"Calling method: "<<__func__<<std::endl;
   if(selName.find("SS")!=std::string::npos) return  std::make_pair(1.0,0.0);
@@ -961,12 +1002,8 @@ std::pair<float,float> HTTHistograms::getQCDOStoSS(std::string selName){
   
   sampleName = "WJets";
   scale = getSampleNormalisation(sampleName);
-  //hWJetsOS->Scale(scale*getWNormalisation("wselOS").first);
-  //hWJetsSS->Scale(scale*getWNormalisation("wselSS").first);
-  hWJetsOS->Scale(scale);
-  hWJetsSS->Scale(scale);
-
-  
+  hWJetsOS->Scale(scale*wselOSCorrection.first);
+  hWJetsSS->Scale(scale*wselSSCorrection.first);
   
   sampleName = "TTbar";
   weight = getSampleNormalisation(sampleName);
@@ -1012,11 +1049,14 @@ std::pair<float,float> HTTHistograms::getQCDOStoSS(std::string selName){
 }
 /////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////
-TH1F* HTTHistograms::getQCDbackground(std::string varName, std::string selName){
+TH1F* HTTHistograms::getQCDbackground(std::string varName, std::string selName,
+				      std::pair<float,float> wselOSCorrection,
+				      std::pair<float,float> wselSSCorrection){
+				      
 
   std::cout<<"Calling method: "<<__func__<<std::endl;
 
-  float qcdScale = getQCDOStoSS(selName).first;
+  float qcdScale = getQCDOStoSS(selName, wselOSCorrection, wselSSCorrection).first;
   
   ///Not very clear and elegant. AK
   ///Need this to avoid resursive control region labels like
@@ -1061,9 +1101,7 @@ TH1F* HTTHistograms::getQCDbackground(std::string varName, std::string selName){
   hDYJets->Scale(scale);
 
   sampleName = "WJets";
-  //float dataToMCScale = getWNormalisation("wselSS").first;
-  float dataToMCScale = 1.0;
-  scale = getSampleNormalisation(sampleName)*lumi*dataToMCScale;
+  scale = getSampleNormalisation(sampleName)*lumi*wselSSCorrection.first;
   hWJets->Scale(scale);
 
   sampleName = "TTbar";
@@ -1097,7 +1135,7 @@ std::pair<float,float> HTTHistograms::getWNormalisation(std::string selName){
   TH1F *hDYJets = get1D_DY_Histogram((hName+"DYJets"+selName).c_str());
   TH1F *hDYJetsLowM = get1DHistogram((hName+"DYJetsLowM"+selName).c_str());
   TH1F *hTT = get1DHistogram((hName+"TTbar"+selName).c_str());
-  TH1F *hQCD = (TH1F*)getQCDbackground("MassTrans",selName);
+  TH1F *hQCD = (TH1F*)getQCDbackground("MassTrans",selName, wselOSCorrection, wselSSCorrection);
   TH1F *hSoup = get1DHistogram((hName+"Data"+selName).c_str());
   float lumi = getLumi();
 

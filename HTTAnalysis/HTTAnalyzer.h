@@ -87,7 +87,7 @@ class HTTAnalyzer: public Analyzer{
   float getPUWeight(const EventProxyHTT & myEventProxy);
 
   ///Fill pulls between generator and various reco vertices.
-  bool fillVertices(std::string & sysType);
+  bool fillVertices(const std::string & sysType);
   
   ///Return generator weight. Most samples have large values of weights
   ///which are constant up to + or - sign. We normalise those weights to +-1.
@@ -95,17 +95,17 @@ class HTTAnalyzer: public Analyzer{
 
   ///Fill histograms for all control plots.
   ///Histogram names will end with hNameSuffix
-  void fillControlHistos(float eventWeight, std::string & hNameSuffix);
+  void fillControlHistos(const std::string & hNameSuffix, float eventWeight);
   
   ///Fill histograms with cos(phi), where phi is the decay 
   ///between tau decay planes. Method used for reconstructed
   ///mu+tau_h mode
-  void fillDecayPlaneAngle(float eventWeight, std::string & hNameSuffix);
+  void fillDecayPlaneAngle(const std::string & hNameSuffix, float eventWeight);
 
   ///Fill histograms with cos(phi), where phi is the decay 
   ///between tau decay planes. Method used for 
   ///generator level taus for all decay modes.
-  void fillGenDecayPlaneAngle(float eventWeight, std::string & hNameSuffix);
+  void fillGenDecayPlaneAngle(const std::string & hNameSuffix, float eventWeight);
   
   ///Calculate angle between tau decay planes (first element of pair)
   //and angle betwee decay products (second element of pair)

@@ -20,12 +20,12 @@ test_SOURCES= CPAnalysis.cc EventProxyCPNtuple.cc \
               CPHistograms.cc CPAnalyzer.cc HTTEvent.cxx  DictCint.cxx
 
 # Linker options for a.out
-test_LDFLAGS = $(top_srcdir)/src/libRootAnalysis.la -R @ROOTLIBDIR@ -L@ROOTLIBDIR@
-test_LDADD   = @ROOTLIBS@ -lProof @ROOTAUXLIBS@ -lboost_regex -lgomp
+test_LDFLAGS = $(top_srcdir)/src/libRootAnalysis.la -R @ROOTLIBDIR@ -L@ROOTLIBDIR@  $(BOOST_REGEX_LDFLAGS)
+test_LDADD   = @ROOTLIBS@ -lProof @ROOTAUXLIBS@ -lgomp $(BOOST_REGEX_LIBS)
 
 
 # Compiler options for a.out
-test_CPPFLAGS = -I./ -I$(top_srcdir)/include -I@ROOTINCDIR@ -std=c++11 -fopenmp
+test_CPPFLAGS = -I./ -I$(top_srcdir)/include -I@ROOTINCDIR@
 
 BUILT_SOURCES = DictCint.cxx
 

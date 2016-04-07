@@ -38,7 +38,9 @@ class HTTHistograms: public AnalysisHistograms {
   float getSampleNormalisation(std::string sampleName);
 
   ///Estimate QCD background using the SS/OS method.
-  TH1F* getQCDbackground(std::string varName, std::string selName);
+  TH1F* getQCDbackground(std::string varName, std::string selName,
+			 std::pair<float,float> wselOSCorrection =  std::pair<float,float>(1,0),
+			 std::pair<float,float> wselSSCorrection =  std::pair<float,float>(1,0));
 
   ///Calculate scaling factor for the WJets MC
   ///SCaling factor is estimated in high Mt region.
@@ -47,9 +49,15 @@ class HTTHistograms: public AnalysisHistograms {
   std::pair<float,float> getWNormalisation(std::string selName);
 
   ///Calculate QCD OS/SS ratiousing non isolated events.
-  std::pair<float,float> getQCDOStoSS(std::string selName);
+  std::pair<float,float> getQCDOStoSS(std::string selName,
+				      std::pair<float,float> wselOSCorrection =  std::pair<float,float>(1,0),
+				      std::pair<float,float> wselSSCorrection =  std::pair<float,float>(1,0));
+
 
    private:
+
+  std::pair<float,float> wselOSCorrection;
+  std::pair<float,float> wselSSCorrection;
   
   virtual void defineHistograms();
 

@@ -19,10 +19,10 @@ noinst_PROGRAMS=test
 test_SOURCES= EventProxyTest.cc TestAnalysis.cc TestAnalyzer.cc TestHistograms.cc
 
 # Linker options for a.out
-test_LDFLAGS = $(top_srcdir)/src/libRootAnalysis.la -R @ROOTLIBDIR@ -L@ROOTLIBDIR@
-test_LDADD   = @ROOTLIBS@ -lProof @ROOTAUXLIBS@ -lboost_regex
+test_LDFLAGS = $(top_srcdir)/src/libRootAnalysis.la -R @ROOTLIBDIR@ -L@ROOTLIBDIR@ $(BOOST_REGEX_LDFLAGS)
+test_LDADD   = @ROOTLIBS@ -lProof @ROOTAUXLIBS@ $(BOOST_REGEX_LIBS)
 
 
 # Compiler options for a.out
-test_CPPFLAGS = -I$(top_srcdir)/include -I$(top_srcdir)/OTFAnalysis -I@ROOTINCDIR@ -std=c++11
+test_CPPFLAGS = -I$(top_srcdir)/include -I$(top_srcdir)/test -I@ROOTINCDIR@ $(BOOST_CPPFLAGS)
 

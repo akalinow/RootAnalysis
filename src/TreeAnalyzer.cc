@@ -8,13 +8,12 @@
 #include "ObjectMessenger.h"
 #include "EventProxyBase.h"
 
-#include "boost/functional/hash.hpp"
-
 #include "EventProxyBase.h"
 #include "AnalysisHistograms.h"
 #include "boost/property_tree/ptree.hpp"
 #include "boost/property_tree/ini_parser.hpp"
 #include "boost/tokenizer.hpp"
+#include "boost/functional/hash.hpp"
 
 #include "TFile.h"
 #include "TH1D.h"
