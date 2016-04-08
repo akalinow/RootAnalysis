@@ -235,7 +235,9 @@ std::string HTTHistograms::getTemplateName(const std::string& name){
   if(name.find("h1DnPCA")!=std::string::npos) templateName = "h1DnPCATemplate";
 
   if(name.find("h2DVxPullVsNTrack")!=std::string::npos) templateName = "h2DVxPullVsNTrackTemplate";
-  
+
+  if(name.find("h1DyTau")!=std::string::npos) templateName = "h1DyTauTemplate";
+
   return templateName;
 }
 /////////////////////////////////////////////////////////
@@ -253,12 +255,13 @@ void HTTHistograms::defineHistograms(){
    add1DHistogram("h1DMassTemplate",";SVFit mass [GeV/c^{2}]; Events",50,0,200,file_);
    add1DHistogram("h1DPtTemplate",";p_{T}; Events",20,0,100,file_);
    add1DHistogram("h1DEtaTemplate",";#eta; Events",24,-2.4,2.4,file_);
-   add1DHistogram("h1DPhiTemplate",";#phi; Events",8,-M_PI,M_PI,file_);
+   add1DHistogram("h1DPhiTemplate",";#phi; Events",12,-M_PI,2*M_PI,file_);
    add1DHistogram("h1DCosPhiTemplate",";cos(#phi); Events",10,-1.0,1.0,file_);
    add1DHistogram("h1DCSVBtagTemplate",";CSV btag; Events",20,0,1,file_);
    add1DHistogram("h1DIsoTemplate",";Isolation; Events",10,0,0.5,file_);
    add1DHistogram("h1DIDTemplate",";ID; Events",30,-0.5,15.5,file_);
    add1DHistogram("h1DVxPullTemplate",";#phi^{*} [rad]; Events",11,-0.01,0.01,file_);
+   add1DHistogram("h1DyTauTemplate",";yTau; Events",30,-1.5,1.5,file_);
    add1DHistogram("h1DnPCATemplate",";#hat{n}_{RECO}>; Events",10,0,0.015,file_);
 
    add2DHistogram("h2DVxPullVsNTrackTemplate","",21,-0.5,20.5,11,-0.01,0.01,file_);
@@ -278,7 +281,9 @@ void HTTHistograms::finalizeHistograms(int nRuns, float weight){
 
   plotPhiDecayPlanes("CosPhiNN_WJetsHT0");
   plotPhiDecayPlanes("Phi_nVectorsWJetsHT0");
-  return;
+  plotPhiDecayPlanes("Phi_nVecIP_yTauPosWJetsHT0");
+  plotPhiDecayPlanes("Phi_nVecIP_yTauNegWJetsHT0");
+  //return;
 
 
   plotProfiles("hProfMagVsPt_","H");
@@ -314,6 +319,22 @@ void HTTHistograms::finalizeHistograms(int nRuns, float weight){
   plotPhiDecayPlanes("Phi_nVectorsDYJetsMuTau");
   plotPhiDecayPlanes("Phi_nVectorsWJetsHT0");
   
+  plotPhiDecayPlanes("Phi_nVecIP_yTauPosData");
+  plotPhiDecayPlanes("Phi_nVecIP_yTauNegData");
+  plotPhiDecayPlanes("Phi_nVecIP_yTauPosH");
+  plotPhiDecayPlanes("Phi_nVecIP_yTauNegH");
+  plotPhiDecayPlanes("Phi_nVecIP_yTauPosA");
+  plotPhiDecayPlanes("Phi_nVecIP_yTauNegA");
+  plotPhiDecayPlanes("Phi_nVecIP_yTauPosDYJetsMuTau");
+  plotPhiDecayPlanes("Phi_nVecIP_yTauNegDYJetsMuTau");
+  plotPhiDecayPlanes("Phi_nVecIP_yTauPosWJetsHT0");
+  plotPhiDecayPlanes("Phi_nVecIP_yTauNegWJetsHT0");
+
+  plot1Dh("yTauH");
+  plot1Dh("yTauA");
+  plot1Dh("yTauDYJetsMuTau");
+  plot1Dh("yTauWJetsHT0");
+
   plotPhiDecayPlanes("CosPhi_CosPositiveH");
   plotPhiDecayPlanes("CosPhi_CosNegativeH");
 
@@ -329,6 +350,7 @@ void HTTHistograms::finalizeHistograms(int nRuns, float weight){
   plotnPCA("A");
   plotnPCA("DYJetsMuTau");
   plotnPCA("WJetsHT0");
+  return;
   ///////////
 
   wselOSCorrection =  std::pair<float,float>(1,0);
@@ -428,6 +450,30 @@ void HTTHistograms::plotnPCA(const std::string & type){
   l.Draw();
   
   c->Print(TString::Format("fig_png/nPCA_length_%s.png",type.c_str()).Data());
+}
+/////////////////////////////////////////////////////////
+/////////////////////////////////////////////////////////
+void HTTHistograms::plot1Dh(const std::string & name){
+
+  TString hName = "h1D"+name;
+  TH1F* h1D = get1DHistogram(hName.Data());
+  if(!h1D) return;
+
+  TCanvas* c = new TCanvas("AnyHistogram","AnyHistogram",
+			   460,500);
+
+  TLegend l(0.15,0.12,0.35,0.22,NULL,"brNDC");
+  l.SetTextSize(0.05);
+  l.SetFillStyle(4000);
+  l.SetBorderSize(0);
+  l.SetFillColor(10);
+   
+  h1D->SetLineWidth(3);
+  h1D->Scale(1.0/h1D->Integral(0,h1D->GetNbinsX()+1));
+
+  h1D->Draw("");
+  
+  c->Print(TString::Format("fig_png/%s.png",name.c_str()).Data());
 }
 /////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////

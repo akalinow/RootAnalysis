@@ -239,6 +239,9 @@ class Wtau{
     ///Get leading charged track
     const TLorentzVector & leadingTk() const {return leadingTk_;};
 
+    ///Get 4-momentum
+    TLorentzVector p4() const {TLorentzVector a4v; a4v.SetPtEtaPhiM(pt_, eta_, phi_, mass_); return a4v;};
+
     ///Get PCA vector calculated using PV stored in AOD
     const TVector3 & nPCA() {return nPCA_;};
 
@@ -345,6 +348,9 @@ class Wmu{
     ///Get leading charged track
     TLorentzVector leadingTk() const {TLorentzVector a4v; a4v.SetPtEtaPhiM(pt_, eta_, phi_, 0.105658); return a4v;};
     
+    ///Get 4-momentum
+    TLorentzVector p4() const {TLorentzVector a4v; a4v.SetPtEtaPhiM(pt_, eta_, phi_, 0.105658); return a4v;};
+
     ///Get PCA vector calculated using PV stored in AOD
     const TVector3 & nPCA() {return nPCA_;};
 
@@ -408,6 +414,12 @@ class Welectron{
     float eta()const{return eta_;}
     float mass()const{return mass_;}
     float charge()const{return charge_;}
+
+    ///Get leading charged track
+    TLorentzVector leadingTk() const {TLorentzVector a4v; a4v.SetPtEtaPhiM(pt_, eta_, phi_, 0.); return a4v;};
+    
+    ///Get 4-momentum
+    TLorentzVector p4() const {TLorentzVector a4v; a4v.SetPtEtaPhiM(pt_, eta_, phi_, 0.); return a4v;};
 
     ///Get PCA vector calculated using PV stored in AOD
     const TVector3 & nPCA() {return nPCA_;};
