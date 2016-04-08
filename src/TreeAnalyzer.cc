@@ -199,16 +199,20 @@ int TreeAnalyzer::loop(){
 
   myProxiesThread_[0]->toBegin();  
 
-  unsigned int aEvent=0;
+  unsigned int eventCount[nThreads_]{0};
+  
   #pragma omp parallel for schedule(dynamic)
-    for(aEvent=0;aEvent<nEventsToAnalyze_;++aEvent){      
+    for(unsigned int aEvent=0;aEvent<nEventsToAnalyze_;++aEvent){      
       if(aEvent< nEventsToPrint_ || aEvent%5000000==0)
 	std::cout<<"Events analyzed: "<<aEvent<<"/"<<nEventsToAnalyze_
 		 <<" ("<<(float)aEvent/nEventsToAnalyze_<<")"
 		 <<" thread: "<<omp_get_thread_num()<<std::endl;
       analyze(myProxiesThread_[omp_get_thread_num()]->toN(aEvent));
+      ++eventCount[omp_get_thread_num()];
     }
 
+    for(auto it: eventCount) nEventsAnalyzed_+=it;
+    
     return nEventsAnalyzed_;   
 }
 //////////////////////////////////////////////////////////////////////////////
