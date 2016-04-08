@@ -78,6 +78,8 @@ class HTTHistograms: public AnalysisHistograms {
   
   void plotPhiDecayPlanes(const std::string& name);
 
+  void plot1Dh(const std::string & name);
+
   ///Return histogram for sum of all DY decay modes.
   TH1F *get1D_DY_Histogram(const std::string& name);
 

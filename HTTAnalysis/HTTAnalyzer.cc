@@ -235,13 +235,17 @@ bool HTTAnalyzer::fillVertices(const std::string & sysType){
 //////////////////////////////////////////////////////////////////////////////
 void HTTAnalyzer::fillDecayPlaneAngle(const std::string & hNameSuffix, float eventWeight){
 
-  ///Method from http://arxiv.org/abs/1108.0670 (Berger)
+  ///Method from http://arxiv.org/abs/1108.0670 (S. Berge)
   ///take impact parameters instead of tau momentum.
   ///calculate angles in pi+ - pi- rest frame
   std::pair<float,float>  angles;
 
+  //angles using rho decay of a hadronic leg
+  std::pair<float,float>  anglesIPRho;
+
   TLorentzVector positiveLeadingTk, negativeLeadingTk;
   TLorentzVector positive_nPCA, negative_nPCA;
+  float yTau;
 
   fillVertices(hNameSuffix);
 
@@ -257,6 +261,10 @@ void HTTAnalyzer::fillDecayPlaneAngle(const std::string & hNameSuffix, float eve
     if(hNameSuffix.find("AODPV")!=std::string::npos) negative_nPCA = TLorentzVector(aTau.nPCA(),0);
     if(hNameSuffix.find("RefitPV")!=std::string::npos) negative_nPCA = TLorentzVector(aTau.nPCARefitvx(),0);
     if(hNameSuffix.find("GenPV")!=std::string::npos) negative_nPCA = TLorentzVector(aTau.nPCAGenvx(),0);
+
+    anglesIPRho = angleBetweenPlanes(aTau.leadingTk(), aTau.p4()-aTau.leadingTk(),
+				     aMuon.leadingTk(), positive_nPCA);
+
   }
   else{    
     positiveLeadingTk = aTau.leadingTk();
@@ -270,6 +278,10 @@ void HTTAnalyzer::fillDecayPlaneAngle(const std::string & hNameSuffix, float eve
     if(hNameSuffix.find("AODPV")!=std::string::npos) negative_nPCA = TLorentzVector(aMuon.nPCA(),0);
     if(hNameSuffix.find("RefitPV")!=std::string::npos) negative_nPCA = TLorentzVector(aMuon.nPCARefitvx(),0);
     if(hNameSuffix.find("GenPV")!=std::string::npos) negative_nPCA = TLorentzVector(aMuon.nPCAGenvx(),0);
+
+    anglesIPRho = angleBetweenPlanes(aMuon.leadingTk(), negative_nPCA,
+				     aTau.leadingTk(), aTau.p4()-aTau.leadingTk() );
+
   }
 
   //negative_nPCA = TLorentzVector(aGenNegativeTau.nPCA().Unit()*negative_nPCA.Vect().Mag(),0);
@@ -286,8 +298,27 @@ void HTTAnalyzer::fillDecayPlaneAngle(const std::string & hNameSuffix, float eve
   angles = angleBetweenPlanes(negativeLeadingTk,negative_nPCA,
 			      positiveLeadingTk,positive_nPCA);
 
-  myHistos_->fill1DHistogram("h1DPhi_nVectors"+hNameSuffix,angles.first,eventWeight);
+  yTau =  2.*aTau.leadingTk().Pt()/aTau.pt() - 1.;
 
+
+  if(true
+     //&& aTau.decayMode()==tauDecay1ChargedPion0PiZero
+     && positive_nPCA.Vect().Mag()>0.005 && negative_nPCA.Vect().Mag()>0.005 
+     ){
+    myHistos_->fill1DHistogram("h1DPhi_nVectors"+hNameSuffix,angles.first,eventWeight);
+  }
+
+  if( aTau.decayMode()!=tauDecay1ChargedPion0PiZero && isOneProng( aTau.decayMode() ) 
+      && ( ( aMuon.charge()>0 && positive_nPCA.Vect().Mag()>0.005 ) || ( aMuon.charge()<0 && negative_nPCA.Vect().Mag()>0.005 ) )
+      ){
+     myHistos_->fill1DHistogram("h1DyTau"+hNameSuffix,yTau,eventWeight);
+     if(yTau>0){
+       myHistos_->fill1DHistogram("h1DPhi_nVecIP_yTauPos"+hNameSuffix,anglesIPRho.first,eventWeight);
+     }
+     else{
+       myHistos_->fill1DHistogram("h1DPhi_nVecIP_yTauNeg"+hNameSuffix,anglesIPRho.first,eventWeight);
+     }
+  }
   float cosPositive =  positive_nPCA.Vect().Unit()*aGenPositiveTau.nPCA().Unit();
   myHistos_->fill1DHistogram("h1DCosPhi_CosPositive"+hNameSuffix,cosPositive,eventWeight);
   myHistos_->fillProfile("hProfPhiVsMag_"+hNameSuffix,aGenPositiveTau.nPCA().Mag(),cosPositive);
@@ -322,6 +353,7 @@ void HTTAnalyzer::fillGenDecayPlaneAngle(const std::string & hNameSuffix, float 
   ///take impact parameters instead of tau momentum.
   ///calculate angles in pi+ - pi- rest frame  
   std::pair<float,float>  angles;
+  std::pair<float,float>  anglesIPRho;
 
   TLorentzVector positiveLeadingTk, negativeLeadingTk;
   TLorentzVector positive_nPCA, negative_nPCA;
@@ -334,7 +366,28 @@ void HTTAnalyzer::fillGenDecayPlaneAngle(const std::string & hNameSuffix, float 
 
   angles = angleBetweenPlanes(negativeLeadingTk,negative_nPCA,
 			      positiveLeadingTk,positive_nPCA);
-  
+
+  float yTau;
+  if(aGenPositiveTau.decayMode()!=tauDecay1ChargedPion0PiZero && isOneProng( aGenPositiveTau.decayMode() ) ){
+    anglesIPRho = angleBetweenPlanes(aGenNegativeTau.leadingTk(), negative_nPCA,
+				     aGenPositiveTau.leadingTk(), aGenPositiveTau.p4()-aGenPositiveTau.leadingTk() );
+    yTau=2.*aGenPositiveTau.leadingTk().Pt()/aGenPositiveTau.pt() - 1.;
+    myHistos_->fill1DHistogram("h1DyTau"+hNameSuffix,yTau,eventWeight);
+    if(yTau>0)
+      myHistos_->fill1DHistogram("h1DPhi_nVecIP_yTauPos"+hNameSuffix,anglesIPRho.first,eventWeight);
+    else
+      myHistos_->fill1DHistogram("h1DPhi_nVecIP_yTauNeg"+hNameSuffix,anglesIPRho.first,eventWeight);
+  }
+  if(aGenNegativeTau.decayMode()!=tauDecay1ChargedPion0PiZero && isOneProng( aGenNegativeTau.decayMode() ) ){
+    anglesIPRho = angleBetweenPlanes(aGenNegativeTau.leadingTk(), aGenNegativeTau.p4()-aGenNegativeTau.leadingTk(),
+				     aGenPositiveTau.leadingTk(), positive_nPCA);
+    yTau=2.*aGenNegativeTau.leadingTk().Pt()/aGenNegativeTau.pt() - 1.;
+    myHistos_->fill1DHistogram("h1DyTau"+hNameSuffix,yTau,eventWeight);
+    if(yTau>0)
+      myHistos_->fill1DHistogram("h1DPhi_nVecIP_yTauPos"+hNameSuffix,anglesIPRho.first,eventWeight);
+    else
+      myHistos_->fill1DHistogram("h1DPhi_nVecIP_yTauNeg"+hNameSuffix,anglesIPRho.first,eventWeight);
+  }
   myHistos_->fill1DHistogram("h1DPhi_nVectors"+hNameSuffix,angles.first,eventWeight);
 
   float cosPhiNN =  negative_nPCA.Vect().Unit().Dot(positive_nPCA.Vect().Unit());
@@ -348,7 +401,8 @@ void HTTAnalyzer::fillGenDecayPlaneAngle(const std::string & hNameSuffix, float 
 std::pair<float,float> HTTAnalyzer::angleBetweenPlanes(const TLorentzVector &tau1, 
 						       const TLorentzVector &tau1Daughter,
 						       const TLorentzVector &tau2, 
-						       const TLorentzVector &tau2Daughter){
+						       const TLorentzVector &tau2Daughter,
+						       bool sgn){
   //Boost all 4v to (tau1+tau2) rest frame
   TVector3 boost = (tau1+tau2).BoostVector();
 
@@ -370,6 +424,13 @@ std::pair<float,float> HTTAnalyzer::angleBetweenPlanes(const TLorentzVector &tau
 
   ///angle between decay planes
   float phi=TMath::ACos(n1*n2);
+
+  if(sgn){
+    ///phase
+    float calO = direction * ( n1.Cross(n2) );
+    if(calO<0)
+      phi = 2*TMath::Pi() - phi;
+  }
 
   ///angle between tau1 and tau2 daughter momentums
   float rho=TMath::ACos( (tau1DaughterStar.Vect().Unit() )*(tau2DaughterStar.Vect().Unit() ) );
@@ -458,8 +519,12 @@ std::pair<bool, bool> HTTAnalyzer::checkTauDecayMode(const EventProxyHTT & myEve
   bool goodRecoDecayMode = false;
   std::vector<std::string> decayNamesGen = getTauDecayName(myEventProxy.wevent->decModeMinus(), myEventProxy.wevent->decModePlus());
   std::vector<std::string> decayNamesReco = getTauDecayName(aTau.decayMode(), tauDecayMuon);
+  /*
   for(auto it: decayNamesGen) if(it.find("Lepton1Prong0Pi0")!=std::string::npos) goodGenDecayMode = true;
   for(auto it: decayNamesReco) if(it.find("Lepton1Prong0Pi0")!=std::string::npos) goodRecoDecayMode = true;
+  */
+  for(auto it: decayNamesGen) if(it.find("Lepton1Prong")!=std::string::npos) goodGenDecayMode = true;
+  for(auto it: decayNamesReco) if(it.find("Lepton1Prong")!=std::string::npos) goodRecoDecayMode = true;
 
   return std::pair<bool, bool>(goodGenDecayMode, goodRecoDecayMode);
 }
