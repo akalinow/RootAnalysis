@@ -279,16 +279,7 @@ void HTTHistograms::finalizeHistograms(int nRuns, float weight){
 
   AnalysisHistograms::finalizeHistograms();
 
-  wselOSCorrection =  std::pair<float,float>(1,0);
-  wselSSCorrection =  std::pair<float,float>(1,0);
-  
-  wselOSCorrection = getWNormalisation("wselOS");
-  wselSSCorrection = getWNormalisation("wselSS");
-
-  //plotStack("MassTrans","");
-  //plotStack("MassVis","");
-  //return;
-  
+ 
   //plotPhiDecayPlanes("CosPhiNN_WJetsHT0");
   //plotPhiDecayPlanes("Phi_nVectorsWJetsHT0");
   //return;
