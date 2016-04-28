@@ -519,8 +519,8 @@ bool HTTAnalyzer::analyze(const EventProxyBase& iEvent){
   //if(aGenPositiveTau.nPCA().Mag()<0.005) return false;
   //if(aGenNegativeTau.nPCA().Mag()<0.005) return false;
   
-  //if(aMuon.nPCA().Mag()<0.004) return false; 
-  //if(aTau.nPCA().Mag()<0.004) return false;
+  if(aMuon.nPCA().Mag()<0.005) return false; 
+  if(aTau.nPCA().Mag()<0.005) return false;
 
   //if(aMuon.nPCARefitvx().Mag()<0.005) return false; 
   //if(aTau.nPCARefitvx().Mag()<0.005) return false;

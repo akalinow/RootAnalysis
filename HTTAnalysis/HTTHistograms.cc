@@ -250,7 +250,7 @@ void HTTHistograms::defineHistograms(){
 
    add1DHistogram("h1DStatsTemplate","",21,-0.5,20.5,file_);
    add1DHistogram("h1DNPVTemplate",";Number of PV; Events",61,-0.5,60.5,file_);
-   add1DHistogram("h1DMassTemplate",";SVFit mass [GeV/c^{2}]; Events",50,0,200,file_);
+   add1DHistogram("h1DMassTemplate",";SVFit mass [GeV/c^{2}]; Events",50,0,200,file_);   
    add1DHistogram("h1DPtTemplate",";p_{T}; Events",20,0,100,file_);
    add1DHistogram("h1DEtaTemplate",";#eta; Events",24,-2.4,2.4,file_);
    add1DHistogram("h1DPhiTemplate",";#phi; Events",8,-M_PI,M_PI,file_);
@@ -276,10 +276,18 @@ void HTTHistograms::finalizeHistograms(int nRuns, float weight){
 
   AnalysisHistograms::finalizeHistograms();
 
-  plotPhiDecayPlanes("CosPhiNN_WJetsHT0");
-  plotPhiDecayPlanes("Phi_nVectorsWJetsHT0");
+  wselOSCorrection =  std::pair<float,float>(1,0);
+  wselSSCorrection =  std::pair<float,float>(1,0);
+  
+  wselOSCorrection = getWNormalisation("wselOS");
+  wselSSCorrection = getWNormalisation("wselSS");
+  plotStack("MassTrans","");
+  plotStack("MassVis","");
   return;
-
+  
+  //plotPhiDecayPlanes("CosPhiNN_WJetsHT0");
+  //plotPhiDecayPlanes("Phi_nVectorsWJetsHT0");
+  //return;
 
   plotProfiles("hProfMagVsPt_","H");
   plotProfiles("hProfMagVsPt_","A");
@@ -967,7 +975,7 @@ std::pair<float,float> HTTHistograms::getQCDOStoSS(std::string selName,
 						   std::pair<float,float> wselSSCorrection){
 
   std::cout<<"Calling method: "<<__func__<<std::endl;
-  if(selName.find("SS")!=std::string::npos) return  std::make_pair(1.0,0.0);
+  if(selName.find("SS")!=std::string::npos) return std::make_pair(1.0,0.0);
 
   std::string hName = "h1DIso";
 
@@ -985,6 +993,13 @@ std::pair<float,float> HTTHistograms::getQCDOStoSS(std::string selName,
   TH1F *hTTOS = get1DHistogram((hName+"TTbar"+"qcdselOS").c_str());
   TH1F *hSoupOS = get1DHistogram((hName+"Data"+"qcdselOS").c_str());
   TH1F *hSoupOSb = get1DHistogram((hName+"Data"+"qcdselOS").c_str());
+
+  TH1F *hEmpty = (TH1F*)hSoupSS->Clone("hEmpty");
+  hEmpty->Clear();
+  
+  if(!hSoupSS || !hSoupOS) return std::make_pair(1.0,0.0);
+  if(!hDYJetsLowMSS) hDYJetsLowMSS = (TH1F*)hEmpty->Clone("hDYJetsLowMqcdselSS");
+  if(!hDYJetsLowMOS) hDYJetsLowMOS = (TH1F*)hEmpty->Clone("hDYJetsLowMqcdselOS");
 
   float lumi = getLumi();
   ///Normalise MC histograms according to cross sections
