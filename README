@@ -4,7 +4,7 @@ git checkout relevant_tag
 libtoolize
 aclocal
 automake --add-missing
-autoconf
+autoreconf
 ./configure 
 make
 cd OTFAnalysis
