@@ -110,7 +110,8 @@ class HTTAnalyzer: public Analyzer{
   ///Calculate angle between tau decay planes (first element of pair)
   //and angle betwee decay products (second element of pair)
   std::pair<float,float> angleBetweenPlanes(const TLorentzVector& tau1, const TLorentzVector& tau1Daughter,
-					    const TLorentzVector& tau2, const TLorentzVector& tau2Daughter);
+					    const TLorentzVector& tau2, const TLorentzVector& tau2Daughter,
+					    bool sgn=true);
 
   ///Return string encoding di-tau decay mode.
   ///The event can belong to more than one category
