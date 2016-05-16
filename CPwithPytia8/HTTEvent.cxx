@@ -10,6 +10,12 @@
 HTTEvent::HTTEvent(){
 
   clear();
+
+  bosonIdPtr_ = &bosonId_;
+  
+  genEvent_.setPointers();
+  recoEvent_.setPointers();
+  toyEvent_.setPointers();
   
 }
 //////////////////////////////////////////////
@@ -18,7 +24,7 @@ HTTEvent::~HTTEvent(){;}
 //////////////////////////////////////////////
 //////////////////////////////////////////////
 void HTTEvent::clear(){
-
+  
   run_ = -999;
   lumi_ = -999;
   event_ = -999;
@@ -26,6 +32,69 @@ void HTTEvent::clear(){
 
   genEvent_.clear();
   recoEvent_.clear();
+  toyEvent_.clear();
+
+}
+//////////////////////////////////////////////
+//////////////////////////////////////////////
+void DiTauData::setPointers(){
+
+  decModeMinusPtr_ = &decModeMinus_;
+  decModePlusPtr_ = &decModePlus_;
+  
+  thePVPtr_ = &thePV_;
+  svMinusPtr_ = &svMinus_;
+  svPlusPtr_ = &svPlus_;
+
+  nPiPlusPtr_ = &nPiPlus_;
+  nPiMinusPtr_ = &nPiMinus_;
+  
+  p4SumPtr_ = &p4Sum_;
+  
+  metPtr_ = &met_;
+  metNuPtr_ = &metNu_;
+  piMinusPtr_ = &piMinus_;
+  piPlusPtr_ = &piPlus_;
+
+  neutralMinusPtr_ = &neutralMinus_;
+  neutralPlusPtr_ = &neutralPlus_;
+  piZeroMinusPtr_ = &piZeroMinus_;
+  piZeroPlusPtr_ = &piZeroPlus_;
+  
+  tauMinusPtr_ = &tauMinus_;
+  tauPlusPtr_ = &tauPlus_;
+  visTauMinusPtr_ = &visTauMinus_;
+  visTauPlusPtr_ = &visTauPlus_;
+
+  phiPtr_ = &phi_;
+  phi2Ptr_ = &phi2_;
+
+  rhoPtr_ = &rho_;
+  phiRhoPtr_ = &phiRho_;
+
+  yMinusPtr_ = &yMinus_;
+  yPlusPtr_ = &yPlus_;
+  yMinus2Ptr_ = &yMinus2_;
+  yPlus2Ptr_ = &yPlus2_;
+ 
+  yMinusLabPtr_ = &yMinusLab_;
+  yPlusLabPtr_ = &yPlusLab_;
+  yMinusLab2Ptr_ = &yMinusLab2_;
+  yPlusLab2Ptr_ = &yPlusLab2_;
+
+  isoMinusPtr_ = &isoMinus_;
+  isoPlusPtr_ = &isoPlus_;
+  outerMinusPtr_ = &outerMinus_;
+  outerPlusPtr_ = &outerPlus_;
+
+  nChargedMinusPtr_ = &nChargedMinus_;
+  nChargedPlusPtr_ = &nChargedPlus_;
+  
+  nPiZeroMinusPtr_ = &nPiZeroMinus_;
+  nPiZeroPlusPtr_ = &nPiZeroPlus_;
+
+  nNeutralMinusPtr_ = &nNeutralMinus_;
+  nNeutralPlusPtr_ = &nNeutralPlus_;
 
 }
 //////////////////////////////////////////////

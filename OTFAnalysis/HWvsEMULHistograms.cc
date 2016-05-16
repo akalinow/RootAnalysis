@@ -47,7 +47,9 @@ std::string HWvsEMULHistograms::getTemplateName(const std::string& name){
   if(name.find("Eta")!=std::string::npos) templateName = "h1DEtaTemplate";
   if(name.find("1DPt")!=std::string::npos) templateName = "h1DPtTemplate";
   if(name.find("Quality")!=std::string::npos) templateName = "h1DQualityTemplate";
-  if(name.find("Delta")!=std::string::npos) templateName = "h1DDeltaTemplate";
+
+  if(name.find("DeltaPt")!=std::string::npos) templateName = "h1DDeltaPtTemplate";
+  else if(name.find("Delta")!=std::string::npos) templateName = "h1DDeltaTemplate";
   
   if(name.find("2DPt")!=std::string::npos) templateName = "h2DPtTemplate";
   
@@ -62,12 +64,13 @@ void HWvsEMULHistograms::defineHistograms(){
   if(!histosInitialized_){
     
     //Make template histos
-    add1DHistogram("h1DiProcessorTemplate","",11,-5.5,5.5,file_);
-    add1DHistogram("h1DQualityTemplate","",6,-0.5,5.5,file_);
-    add1DHistogram("h1DPtTemplate","",21,-0.5,20.5,file_);
-    add1DHistogram("h1DPhiTemplate","",40,-3,0,file_);
-    add1DHistogram("h1DEtaTemplate","",30,-2.2,2.2,file_);
-    add1DHistogram("h1DDeltaTemplate","",201,-10,10,file_);
+    add1DHistogram("h1DiProcessorTemplate","",12,-6,6,file_);
+    add1DHistogram("h1DQualityTemplate","",13,-0.5,12.5,file_);
+    add1DHistogram("h1DPtTemplate","",251,-0.5,250.5,file_);
+    add1DHistogram("h1DPhiTemplate","",40,-3.141,3.141,file_);
+    add1DHistogram("h1DEtaTemplate","",481,-240.5,240.5,file_);
+    add1DHistogram("h1DDeltaTemplate","",81,-20.5,20.5,file_);
+    add1DHistogram("h1DDeltaPtTemplate","",500,-250,250,file_);
     
     histosInitialized_ = true;
   }
@@ -80,6 +83,9 @@ void HWvsEMULHistograms::finalizeHistograms(int nRuns, float weight){
 
   plotHWvsEMUL("iProcessor");
   plotHWvsEMUL("Quality");
+  plotHWvsEMUL("Eta");
+  plotHWvsEMUL("PtER");
+  
   plotPhi();
   plotVariable("PtHW");
   plotVariable("EtaHW");
@@ -101,19 +107,31 @@ void HWvsEMULHistograms::plotHWvsEMUL(std::string type){
 
   TCanvas* c = new TCanvas("Counts","",460,500);
 
-  TLegend l(0.6,0.65,0.8,0.8,NULL,"brNDC");
+  TLegend l(0.6,0.5,0.8,0.7,NULL,"brNDC");
   l.SetTextSize(0.05);
   l.SetFillStyle(4000);
   l.SetBorderSize(0);
   l.SetFillColor(10);
   c->SetGrid(0,1);
+  c->SetLeftMargin(0.15);
 
   TH1F* hHW = this->get1DHistogram("h1D"+type+"HW");
   TH1F* hEMUL = this->get1DHistogram("h1D"+type+"EMUL");
 
   if(type=="iProcessor") hHW->SetXTitle("iProcessor * sgn(iEta)");
+  if(type=="Eta"){
+    hHW->GetXaxis()->SetRangeUser(70,115);
+    //hHW->GetXaxis()->SetRangeUser(100,115);
+    hHW->SetXTitle("iEta");
+  }
+  if(type=="PtER"){
+    hHW->SetXTitle("p_{T} [GeV]");
+    hHW->GetXaxis()->SetRangeUser(0,20);
+  }
+  if(type=="Quality") hHW->SetXTitle("Quality");
+  
   hHW->SetYTitle("Candidate count");
-  hHW->GetYaxis()->SetTitleOffset(1.5);
+  hHW->GetYaxis()->SetTitleOffset(1.7);
   hHW->SetStats(kFALSE);
 
   hHW->SetLineWidth(3);
@@ -125,6 +143,7 @@ void HWvsEMULHistograms::plotHWvsEMUL(std::string type){
   hEMUL->SetLineStyle(2);
 
   if(hEMUL->GetMaximum()>hHW->GetMaximum()) hHW->SetMaximum(1.05*hEMUL->GetMaximum());
+  if(hEMUL->GetMinimum()<hHW->GetMinimum()) hHW->SetMinimum(0.95*hEMUL->GetMinimum());
 
   hHW->Draw();
   hEMUL->Draw("same");
@@ -142,7 +161,7 @@ void HWvsEMULHistograms::plotPhi(){
 
   TCanvas* c = new TCanvas("Counts","",460,500);
 
-  TLegend l(0.6,0.55,0.8,0.7,NULL,"brNDC");
+  TLegend l(0.5,0.5,0.7,0.6,NULL,"brNDC");
   l.SetTextSize(0.05);
   l.SetFillStyle(4000);
   l.SetBorderSize(0);
@@ -154,7 +173,7 @@ void HWvsEMULHistograms::plotPhi(){
 
   hHWPositive->SetXTitle("#varphi [radians]");
   hHWPositive->SetYTitle("Candidate count");
-  hHWPositive->GetYaxis()->SetTitleOffset(1.5);
+  hHWPositive->GetYaxis()->SetTitleOffset(1.55);
   hHWPositive->SetStats(kFALSE);
 
   hHWPositive->SetLineWidth(3);
@@ -165,7 +184,11 @@ void HWvsEMULHistograms::plotPhi(){
   hHWNegative->SetLineColor(2);
   hHWNegative->SetLineStyle(2);
 
+  hHWPositive->Rebin(4);
+  hHWNegative->Rebin(4);
+
   if(hHWNegative->GetMaximum()>hHWPositive->GetMaximum()) hHWPositive->SetMaximum(1.05*hHWNegative->GetMaximum());
+  hHWPositive->SetMinimum(0);
 
   hHWPositive->Draw();
   hHWNegative->Draw("same");
@@ -189,21 +212,32 @@ void HWvsEMULHistograms::plotVariable(std::string type){
   l.SetBorderSize(0);
   l.SetFillColor(10);
   c->SetGrid(0,1);
+  c->SetLeftMargin(0.15);
+  
 
   TH1F* hHW = this->get1DHistogram(("h1D"+type).c_str());
 
   hHW->SetXTitle(type.c_str());
   hHW->SetYTitle("Candidate count");
-  hHW->GetYaxis()->SetTitleOffset(1.5);
+  hHW->GetYaxis()->SetTitleOffset(1.7);
   hHW->SetStats(kFALSE);
 
   hHW->SetLineWidth(3);
   hHW->SetLineColor(1);
   hHW->SetLineStyle(1);
 
+  if(type=="EtaHW") hHW->GetXaxis()->SetRangeUser(-116,116);
+  if(type=="PtHW") hHW->GetXaxis()->SetRangeUser(0,20);
   hHW->Draw();
-
   c->Print(TString::Format("fig_png/%s.png",type.c_str()).Data());
+
+  if(type.find("PtHW")!=std::string::npos){
+    hHW->GetXaxis()->SetRangeUser(0,250);
+    hHW->Draw();
+    c->SetLogy();
+    c->Print(TString::Format("fig_png/%s_Range.png",type.c_str()).Data());
+  }
+  
 }
 /////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////
@@ -223,9 +257,12 @@ void HWvsEMULHistograms::plotDelta(std::string type){
   hDelta->SetXTitle(("#Delta(HW-EMUL) "+type).c_str());
   hDelta->SetYTitle("Candidate count");
   hDelta->GetYaxis()->SetTitleOffset(1.6);
-  if(type=="Pt") hDelta->GetXaxis()->SetRangeUser(-6,2);
-  if(type=="Phi") hDelta->GetXaxis()->SetRangeUser(-1,1);
-  if(type=="Eta") hDelta->GetXaxis()->SetRangeUser(-2,2);
+  if(type=="Pt"){
+    c->SetLogy();
+  }
+  if(type=="Phi") hDelta->GetXaxis()->SetRangeUser(-5,5);
+  if(type=="Eta") hDelta->GetXaxis()->SetRangeUser(-20,20);
+  if(type=="Charge") hDelta->GetXaxis()->SetRangeUser(-3,3);
   
   hDelta->SetStats(kFALSE);
 
@@ -233,7 +270,8 @@ void HWvsEMULHistograms::plotDelta(std::string type){
   hDelta->SetLineColor(1);
   hDelta->SetLineStyle(1);
 
-  hDelta->Draw();
+  if(type=="Pt") hDelta->Draw("LH");
+  else hDelta->Draw();
 
   c->Print(TString::Format("fig_png/Delta_%s.png",type.c_str()).Data());
 }

@@ -172,7 +172,7 @@ bool CPAnalyzer::analyze(const EventProxyBase& iEvent){
   const EventProxyCPNtuple & myEventProxy = static_cast<const EventProxyCPNtuple&>(iEvent);
   myEvent = myEventProxy.event;
   DiTauData* aEventGen = &(myEvent->genEvent_);
-  DiTauData* aEventReco = &(myEvent->recoEvent_);
+  DiTauData* aEventReco = &(myEvent->toyEvent_);
   
   //Skip 3-prong and unknown decays.
   //if( !(isOneProng(aEventGen->decModeMinus_)) ||
@@ -196,7 +196,7 @@ bool CPAnalyzer::analyze(const EventProxyBase& iEvent){
   bool goodGen = false, goodReco = false;
   for(auto it: decayNamesReco) if(it.find("PiPi0Pi0")!=std::string::npos) goodReco = true;
   
-  for(auto it: decayNamesGen){
+  for(auto it: decayNamesGen){    
     if(it.find("PiPi0Pi0")!=std::string::npos) goodGen = true;
     else if(it.find("Lepton1Prong0Pi0")!=std::string::npos) goodGen = true;
     else if(it.find("Lepton1Prong")!=std::string::npos) goodGen = true;

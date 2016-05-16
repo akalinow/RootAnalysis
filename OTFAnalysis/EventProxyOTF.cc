@@ -17,8 +17,8 @@ EventProxyBase* EventProxyOTF::clone() const{
 //////////////////////////////////////////////////////////////////////
 void EventProxyOTF::init(std::vector<std::string> const& iFileNames){
 
-  treeName_ = "efficiencyTree";
-  //treeName_ = "omtfAnalyser/eventTree";
+  //treeName_ = "efficiencyTree";
+  treeName_ = "omtfAnalyser/eventTree";
        
 	EventProxyBase::init(iFileNames);
 

@@ -52,32 +52,32 @@ Analyzer* OTFAnalyzer::clone() const{
 //////////////////////////////////////////////////////////////////////////////
 void OTFAnalyzer::finalize(){ 
 
-  /* Does not work with multithread
- std::cout<<"tmpMap.size(): "<<tmpMap.size()<<std::endl;
+  if(omp_get_max_threads()==1){
+    std::cout<<"tmpMap.size(): "<<tmpMap.size()<<std::endl;
  
- std::ostringstream stringStr;
- TH2F *h = myHistos_->get2DHistogram("h2DRateVsQualityOtf",true);
- if(h){
-   for(int iBin=1;iBin<h->GetYaxis()->GetNbins();++iBin){
-     stringStr.str("");
-     stringStr<<iBin;
-     h->GetYaxis()->SetBinLabel(iBin,stringStr.str().c_str());
-   }
-
-   for(auto it: tmpMap){
-     int iBinX = h->GetYaxis()->FindFixBin(it.second);   
-     if(iBinX>=h->GetYaxis()->GetNbins()) continue;
-     
-     std::bitset<18> bits(it.first);
-     
-     stringStr.str("");
-     stringStr<<it.first;
-     std::string label = bits.to_string()+" "+stringStr.str();
-     h->GetYaxis()->SetBinLabel(iBinX,label.c_str());
-   }
- }
-*/ 
-
+    std::ostringstream stringStr;
+    TH2F *h = myHistos_->get2DHistogram("h2DRateVsQualityOtf",true);
+    if(h){
+      for(int iBin=1;iBin<h->GetYaxis()->GetNbins();++iBin){
+	stringStr.str("");
+	stringStr<<iBin;
+	h->GetYaxis()->SetBinLabel(iBin,stringStr.str().c_str());
+      }
+      
+      for(auto it: tmpMap){
+	int iBinX = h->GetYaxis()->FindFixBin(it.second);   
+	if(iBinX>=h->GetYaxis()->GetNbins()) continue;
+	
+	std::bitset<18> bits(it.first);
+	
+	stringStr.str("");
+	stringStr<<it.first;
+	std::string label = bits.to_string()+" "+stringStr.str();
+	h->GetYaxis()->SetBinLabel(iBinX,label.c_str());
+      }
+    }
+  }
+  
   myHistos_->finalizeHistograms(0,1.0); 
 }
 //////////////////////////////////////////////////////////////////////////////

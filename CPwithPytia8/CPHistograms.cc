@@ -94,7 +94,7 @@ void CPHistograms::finalizeHistograms(int nRuns, float weight){
   plotPCAResolution("_h0");
   plotPCAResolution("_A0");
   plotPCAResolution("_Z0");
-
+  /*
   plotVerticesPulls("h1DVxPullX_h0");
   plotVerticesPulls("h1DVxPullX_A0");
   plotVerticesPulls("h1DVxPullX_Z0");
@@ -109,7 +109,7 @@ void CPHistograms::finalizeHistograms(int nRuns, float weight){
 
   plotVerticesPulls("h2DVxPullVsNTrackTrans_Z0");
   plotVerticesPulls("h2DVxPullVsNTrackLong_Z0");
-
+  */
   plotAnyHistogram("h1DDeltaRPlus_h0");
   plotAnyHistogram("h1DDeltaRPlus_A0");
 

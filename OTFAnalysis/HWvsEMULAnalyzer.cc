@@ -78,16 +78,42 @@ void HWvsEMULAnalyzer::clear(){
 void HWvsEMULAnalyzer::fillCandidates(){
 
 
-  for(auto aCandidate: emulCandidates) myHistos_->fill1DHistogram("h1DiProcessorEMUL",aCandidate.iProcessor*(aCandidate.eta/fabs(aCandidate.eta)));    
-  for(auto aCandidate: hwCandidates) myHistos_->fill1DHistogram("h1DiProcessorHW",aCandidate.iProcessor*(aCandidate.eta/fabs(aCandidate.eta)));
 
-  for(auto aCandidate: hwCandidates){
-    myHistos_->fill1DHistogram("h1DPhiHWPositive",aCandidate.phi*(aCandidate.eta>0));
-    myHistos_->fill1DHistogram("h1DPhiHWNegative",aCandidate.phi*(aCandidate.eta<0));
-    myHistos_->fill1DHistogram("h1DEtaHW",aCandidate.eta);
-    myHistos_->fill1DHistogram("h1DPtHW",aCandidate.pt);
+  
+  for(auto aCandidate: emulCandidates)myHistos_->fill1DHistogram("h1DiProcessorEMUL",(aCandidate.iProcessor+0.99)*(aCandidate.eta/fabs(aCandidate.eta)));  
+  for(auto aCandidate: hwCandidates) myHistos_->fill1DHistogram("h1DiProcessorHW",(aCandidate.iProcessor+0.99)*(aCandidate.eta/fabs(aCandidate.eta)));
+
+  for(auto aCandidate: hwCandidates){      
+      myHistos_->fill1DHistogram("h1DPhiHWPositive",aCandidate.phi*(aCandidate.eta>0) + 99*(aCandidate.eta<0));
+      myHistos_->fill1DHistogram("h1DPhiHWNegative",aCandidate.phi*(aCandidate.eta<0) + 99*(aCandidate.eta>0));
+      myHistos_->fill1DHistogram("h1DEtaHW",aCandidate.eta/2.61*240);      
+      myHistos_->fill1DHistogram("h1DPtHW",aCandidate.pt);
   }
 
+  for(auto aCandidate: emulCandidates){      
+      myHistos_->fill1DHistogram("h1DPhiEMULPositive",aCandidate.phi*(aCandidate.eta>0) + 99*(aCandidate.eta<0));
+      myHistos_->fill1DHistogram("h1DPhiEMULNegative",aCandidate.phi*(aCandidate.eta<0) + 99*(aCandidate.eta>0));
+      myHistos_->fill1DHistogram("h1DEtaEMUL",aCandidate.eta/2.61*240);
+      myHistos_->fill1DHistogram("h1DPtEMUL",aCandidate.pt);
+  }
+  /*
+  if(emulCandidates.size()!=hwCandidates.size() && hwCandidates.size()<2 && emulCandidates.size()<2){
+    std::cout<<"Event "
+	     <<" HW size: "<<hwCandidates.size()
+	     <<" EMUL size: "<<emulCandidates.size()
+	     <<std::endl;
+    for(auto aCandidate: hwCandidates){
+      if(fabs(aCandidate.eta/2.61*240)<115) std::cout<<"HW iEta: "<<aCandidate.eta/2.61*240<<" PHI: "<<aCandidate.phi<<" PT: "<<aCandidate.pt<<std::endl;
+	}
+
+    for(auto aCandidate: emulCandidates){
+      if(fabs(aCandidate.eta/2.61*240)<115) std::cout<<"EMUL iEta: "<<aCandidate.eta/2.61*240<<" PHI: "<<aCandidate.phi<<" PT: "<<aCandidate.pt<<std::endl;
+    }    
+  }
+  */
+
+  
+  /*
   if(emulCandidates.size() && hwCandidates.size()){
     std::cout<<"Event: "<<eventNumber<<" EMUL cands: "<<emulCandidates.size()
 	     <<" hits: "<<std::bitset<17>(emulCandidates[0].hits)
@@ -99,22 +125,28 @@ void HWvsEMULAnalyzer::fillCandidates(){
       	     <<" iProcessor: "<<hwCandidates[0].iProcessor
 	     <<std::endl;
   }
+  */
+
   
   if(hwCandidates.size() && emulCandidates.size()==hwCandidates.size()){    
     for(unsigned int iCandidate=0;iCandidate<hwCandidates.size();++iCandidate){
+
+      myHistos_->fill1DHistogram("h1DPtERHW",hwCandidates[iCandidate].pt);
+      myHistos_->fill1DHistogram("h1DPtEREMUL",emulCandidates[iCandidate].pt);
 
       //if(emulCandidates[iCandidate].iProcessor !=
       //	 hwCandidates[iCandidate].iProcessor) continue;
       
       float delta =  hwCandidates[iCandidate].pt - emulCandidates[iCandidate].pt;
       myHistos_->fill1DHistogram("h1DDeltaPt",delta);
-      delta =  hwCandidates[iCandidate].phi - emulCandidates[iCandidate].phi;
+      delta =  (hwCandidates[iCandidate].phi - emulCandidates[iCandidate].phi)*576.0/(2*M_PI);
+      
       myHistos_->fill1DHistogram("h1DDeltaPhi",delta);
-      delta =  hwCandidates[iCandidate].eta - emulCandidates[iCandidate].eta;
+      delta =  (hwCandidates[iCandidate].eta - emulCandidates[iCandidate].eta)/2.61*240;
       myHistos_->fill1DHistogram("h1DDeltaEta",delta);
       delta =  hwCandidates[iCandidate].charge - emulCandidates[iCandidate].charge;
       myHistos_->fill1DHistogram("h1DDeltaCharge",delta);
-      myHistos_->fill1DHistogram("h1DQualityHW",hwCandidates[iCandidate].q+3);
+      myHistos_->fill1DHistogram("h1DQualityHW",hwCandidates[iCandidate].q);
       myHistos_->fill1DHistogram("h1DQualityEMUL",emulCandidates[iCandidate].q);
       /*
       std::cout<<"Event: "<<eventNumber
@@ -137,8 +169,8 @@ bool HWvsEMULAnalyzer::analyze(const EventProxyBase& iEvent){
   const EventProxyOTF & myEvent = static_cast<const EventProxyOTF&>(iEvent);
   theEvent = myEvent.event;
 
-  eventNumber = theEvent->charge;
-  //runNumber = theEvent->charge1;
+  //eventNumber = theEvent->event;
+  //runNumber = theEvent->run;
 
   std::vector<L1Obj> * myL1Coll = &(theEvent->l1ObjectsOtf);
   
