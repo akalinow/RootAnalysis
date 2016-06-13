@@ -283,7 +283,7 @@ void HTTHistograms::finalizeHistograms(int nRuns, float weight){
   //plotPhiDecayPlanes("CosPhiNN_WJetsHT0");
   //plotPhiDecayPlanes("Phi_nVectorsWJetsHT0");
   //return;
-
+  /*
   plotProfiles("hProfMagVsPt_","H");
   plotProfiles("hProfMagVsPt_","A");
   plotProfiles("hProfMagVsPt_","DYJetsMuTau");
@@ -350,12 +350,18 @@ void HTTHistograms::finalizeHistograms(int nRuns, float weight){
   plotnPCA("WJetsHT0");
   return;
   ///////////
+  */
 
   wselOSCorrection =  std::pair<float,float>(1,0);
   wselSSCorrection =  std::pair<float,float>(1,0);
   
   wselOSCorrection = getWNormalisation("wselOS");
   wselSSCorrection = getWNormalisation("wselSS");
+
+  plotStack("MassVis","");
+  plotStack("MassTrans","");
+  return;
+  
   ///Control regions plots
   plotStack("Iso","qcdselOS");
   plotStack("Iso","qcdselSS");

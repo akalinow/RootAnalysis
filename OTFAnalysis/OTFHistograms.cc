@@ -469,7 +469,7 @@ void OTFHistograms::plotEffVsEta(const std::string & sysType){
     else hEff->DrawCopy("same");
     std::string nameCut = std::to_string((int)OTFHistograms::ptBins[ptCuts[iCut]])+" GeV/c";
     if (iType==0) nameCut = "p_{T}^{#mu}>24 GeV";
-    if (iType==1) nameCut = "p_{T}^{cut}<p_{T}^{#mu}<#dot p_{T}^{cut} + 10 GeV/c";
+    if (iType==1) nameCut = "p_{T}^{cut}<p_{T}^{#mu}<#dot p_{T}^{cut} + 5 GeV/c";
     if (iType==2) nameCut = "p_{T}^{#mu}<10 GeV/c (#epsilon #times 10)";
     l.AddEntry(hEff,nameCut.c_str());
   }

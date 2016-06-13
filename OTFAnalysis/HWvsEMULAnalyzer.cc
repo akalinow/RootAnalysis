@@ -76,56 +76,45 @@ void HWvsEMULAnalyzer::clear(){
 //////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////
 void HWvsEMULAnalyzer::fillCandidates(){
-
-
-
   
   for(auto aCandidate: emulCandidates)myHistos_->fill1DHistogram("h1DiProcessorEMUL",(aCandidate.iProcessor+0.99)*(aCandidate.eta/fabs(aCandidate.eta)));  
   for(auto aCandidate: hwCandidates) myHistos_->fill1DHistogram("h1DiProcessorHW",(aCandidate.iProcessor+0.99)*(aCandidate.eta/fabs(aCandidate.eta)));
-
-  for(auto aCandidate: hwCandidates){      
+ 
+  for(auto aCandidate: hwCandidates){
       myHistos_->fill1DHistogram("h1DPhiHWPositive",aCandidate.phi*(aCandidate.eta>0) + 99*(aCandidate.eta<0));
       myHistos_->fill1DHistogram("h1DPhiHWNegative",aCandidate.phi*(aCandidate.eta<0) + 99*(aCandidate.eta>0));
-      myHistos_->fill1DHistogram("h1DEtaHW",aCandidate.eta/2.61*240);      
+      myHistos_->fill1DHistogram("h1DEtaHW",abs(aCandidate.eta/2.61*240));      
       myHistos_->fill1DHistogram("h1DPtHW",aCandidate.pt);
   }
 
   for(auto aCandidate: emulCandidates){      
       myHistos_->fill1DHistogram("h1DPhiEMULPositive",aCandidate.phi*(aCandidate.eta>0) + 99*(aCandidate.eta<0));
       myHistos_->fill1DHistogram("h1DPhiEMULNegative",aCandidate.phi*(aCandidate.eta<0) + 99*(aCandidate.eta>0));
-      myHistos_->fill1DHistogram("h1DEtaEMUL",aCandidate.eta/2.61*240);
+      myHistos_->fill1DHistogram("h1DEtaEMUL",abs(aCandidate.eta/2.61*240));
       myHistos_->fill1DHistogram("h1DPtEMUL",aCandidate.pt);
   }
-  /*
+  
   if(emulCandidates.size()!=hwCandidates.size() && hwCandidates.size()<2 && emulCandidates.size()<2){
     std::cout<<"Event "
 	     <<" HW size: "<<hwCandidates.size()
 	     <<" EMUL size: "<<emulCandidates.size()
 	     <<std::endl;
-    for(auto aCandidate: hwCandidates){
-      if(fabs(aCandidate.eta/2.61*240)<115) std::cout<<"HW iEta: "<<aCandidate.eta/2.61*240<<" PHI: "<<aCandidate.phi<<" PT: "<<aCandidate.pt<<std::endl;
-	}
-
-    for(auto aCandidate: emulCandidates){
-      if(fabs(aCandidate.eta/2.61*240)<115) std::cout<<"EMUL iEta: "<<aCandidate.eta/2.61*240<<" PHI: "<<aCandidate.phi<<" PT: "<<aCandidate.pt<<std::endl;
-    }    
+    for(auto aCandidate: hwCandidates) std::cout<<"HW iEta: "<<aCandidate.eta/2.61*240<<" PHI: "<<aCandidate.phi<<" PT: "<<aCandidate.pt<<std::endl;
+    for(auto aCandidate: emulCandidates) std::cout<<"EMUL iEta: "<<aCandidate.eta/2.61*240<<" PHI: "<<aCandidate.phi<<" PT: "<<aCandidate.pt<<std::endl;
   }
-  */
-
   
-  /*
   if(emulCandidates.size() && hwCandidates.size()){
     std::cout<<"Event: "<<eventNumber<<" EMUL cands: "<<emulCandidates.size()
 	     <<" hits: "<<std::bitset<17>(emulCandidates[0].hits)
       	     <<" quality: "<<emulCandidates[0].q
 	     <<" iProcessor: "<<emulCandidates[0].iProcessor
 	     <<" HW cands: "<<hwCandidates.size()
-	     <<" hits: "<<std::bitset<17>(hwCandidates[0].hits>>1)
-      	     <<" quality: "<<hwCandidates[0].q+3
+	     <<" hits: "<<std::bitset<17>(hwCandidates[0].hits)
+      	     <<" quality: "<<hwCandidates[0].q
       	     <<" iProcessor: "<<hwCandidates[0].iProcessor
 	     <<std::endl;
   }
-  */
+  
 
   
   if(hwCandidates.size() && emulCandidates.size()==hwCandidates.size()){    
@@ -133,9 +122,6 @@ void HWvsEMULAnalyzer::fillCandidates(){
 
       myHistos_->fill1DHistogram("h1DPtERHW",hwCandidates[iCandidate].pt);
       myHistos_->fill1DHistogram("h1DPtEREMUL",emulCandidates[iCandidate].pt);
-
-      //if(emulCandidates[iCandidate].iProcessor !=
-      //	 hwCandidates[iCandidate].iProcessor) continue;
       
       float delta =  hwCandidates[iCandidate].pt - emulCandidates[iCandidate].pt;
       myHistos_->fill1DHistogram("h1DDeltaPt",delta);
@@ -176,6 +162,7 @@ bool HWvsEMULAnalyzer::analyze(const EventProxyBase& iEvent){
   
   std::copy_if(myL1Coll->begin(),myL1Coll->end(), std::back_inserter(emulCandidates), [](const L1Obj & aCand){return (aCand.type==10);});
   std::copy_if(myL1Coll->begin(),myL1Coll->end(), std::back_inserter(hwCandidates), [](const L1Obj & aCand){return (aCand.type==11);});
+
 
   fillCandidates();
   

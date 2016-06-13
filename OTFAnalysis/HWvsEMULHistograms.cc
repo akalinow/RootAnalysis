@@ -85,11 +85,12 @@ void HWvsEMULHistograms::finalizeHistograms(int nRuns, float weight){
   plotHWvsEMUL("Quality");
   plotHWvsEMUL("Eta");
   plotHWvsEMUL("PtER");
+  plotHWvsEMUL("Pt");
   
   plotPhi();
-  plotVariable("PtHW");
-  plotVariable("EtaHW");
-  plotVariable("QualityHW");
+  //plotVariable("PtHW");
+  //plotVariable("EtaHW");
+  //plotVariable("QualityHW");
   plotDelta("Pt");
   plotDelta("Phi");
   plotDelta("Eta");
@@ -107,7 +108,7 @@ void HWvsEMULHistograms::plotHWvsEMUL(std::string type){
 
   TCanvas* c = new TCanvas("Counts","",460,500);
 
-  TLegend l(0.6,0.5,0.8,0.7,NULL,"brNDC");
+  TLegend l(0.6,0.77,0.9,0.87,NULL,"brNDC");
   l.SetTextSize(0.05);
   l.SetFillStyle(4000);
   l.SetBorderSize(0);
@@ -120,13 +121,12 @@ void HWvsEMULHistograms::plotHWvsEMUL(std::string type){
 
   if(type=="iProcessor") hHW->SetXTitle("iProcessor * sgn(iEta)");
   if(type=="Eta"){
-    hHW->GetXaxis()->SetRangeUser(70,115);
-    //hHW->GetXaxis()->SetRangeUser(100,115);
+    hHW->GetXaxis()->SetRangeUser(70,122);
     hHW->SetXTitle("iEta");
   }
-  if(type=="PtER"){
+  if(type=="PtER" || type=="Pt"){
     hHW->SetXTitle("p_{T} [GeV]");
-    hHW->GetXaxis()->SetRangeUser(0,20);
+    hHW->GetXaxis()->SetRangeUser(0,60);
   }
   if(type=="Quality") hHW->SetXTitle("Quality");
   
@@ -142,9 +142,12 @@ void HWvsEMULHistograms::plotHWvsEMUL(std::string type){
   hEMUL->SetLineColor(2);
   hEMUL->SetLineStyle(2);
 
-  if(hEMUL->GetMaximum()>hHW->GetMaximum()) hHW->SetMaximum(1.05*hEMUL->GetMaximum());
+  hHW->SetMaximum(1.3*hHW->GetMaximum());
+  
+  if(hEMUL->GetMaximum()>hHW->GetMaximum()) hHW->SetMaximum(1.1*hEMUL->GetMaximum());
   if(hEMUL->GetMinimum()<hHW->GetMinimum()) hHW->SetMinimum(0.95*hEMUL->GetMinimum());
 
+  hHW->SetMinimum(0);
   hHW->Draw();
   hEMUL->Draw("same");
 
@@ -161,7 +164,7 @@ void HWvsEMULHistograms::plotPhi(){
 
   TCanvas* c = new TCanvas("Counts","",460,500);
 
-  TLegend l(0.5,0.5,0.7,0.6,NULL,"brNDC");
+  TLegend l(0.6,0.2,0.8,0.3,NULL,"brNDC");
   l.SetTextSize(0.05);
   l.SetFillStyle(4000);
   l.SetBorderSize(0);
@@ -206,7 +209,7 @@ void HWvsEMULHistograms::plotVariable(std::string type){
 
   TCanvas* c = new TCanvas("Counts","",460,500);
 
-  TLegend l(0.6,0.55,0.8,0.7,NULL,"brNDC");
+  TLegend l(0.6,0.77,0.9,0.87,NULL,"brNDC");
   l.SetTextSize(0.05);
   l.SetFillStyle(4000);
   l.SetBorderSize(0);
@@ -245,7 +248,7 @@ void HWvsEMULHistograms::plotDelta(std::string type){
 
   TCanvas* c = new TCanvas("Delta","",460,500);
 
-  TLegend l(0.6,0.55,0.8,0.7,NULL,"brNDC");
+  TLegend l(0.6,0.77,0.9,0.87,NULL,"brNDC");      
   l.SetTextSize(0.05);
   l.SetFillStyle(4000);
   l.SetBorderSize(0);
@@ -254,7 +257,7 @@ void HWvsEMULHistograms::plotDelta(std::string type){
 
   TH1F* hDelta = this->get1DHistogram("h1DDelta"+type);
 
-  hDelta->SetXTitle(("#Delta(HW-EMUL) "+type).c_str());
+  hDelta->SetXTitle(("#Delta(HW-EMUL) i"+type).c_str());
   hDelta->SetYTitle("Candidate count");
   hDelta->GetYaxis()->SetTitleOffset(1.6);
   if(type=="Pt"){

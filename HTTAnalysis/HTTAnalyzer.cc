@@ -581,25 +581,11 @@ bool HTTAnalyzer::analyze(const EventProxyBase& iEvent){
   if(!tauKinematics || !tauID || !muonKinematics || !trigger) return true;
   if(!extraRequirements) return true;
 
-  //if(aGenPositiveTau.nPCA().Mag()<0.005) return false;
-  //if(aGenNegativeTau.nPCA().Mag()<0.005) return false;
-  
+  /*
   if(aMuon.nPCA().Mag()<0.005) return false; 
   if(aTau.nPCA().Mag()<0.005) return false;
-
-  //if(aMuon.nPCARefitvx().Mag()<0.005) return false; 
-  //if(aTau.nPCARefitvx().Mag()<0.005) return false;
-  /*
-  if(aMuon.charge()>0){
-    if(aMuon.nPCARefitvx().Unit().Dot(aGenPositiveTau.nPCA().Unit())<0.8) return false;
-    if(aTau.nPCARefitvx().Unit().Dot(aGenNegativeTau.nPCA().Unit())<0.8) return false;
-  }
-  if(aMuon.charge()<0){
-    if(aMuon.nPCARefitvx().Unit().Dot(aGenNegativeTau.nPCA().Unit())<0.8) return false;
-    if(aTau.nPCARefitvx().Unit().Dot(aGenPositiveTau.nPCA().Unit())<0.8) return false;
-  }
-  */
   if(aEvent.nTracksInRefit()<2) return false;
+  */
     
   ///Note: parts of the signal/control region selection are applied in the following code.
   ///FIXME AK: this should be made in a more clear way.
