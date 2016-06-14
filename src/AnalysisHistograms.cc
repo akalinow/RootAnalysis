@@ -56,6 +56,10 @@ void  AnalysisHistograms::add1DHistogram(const std::string& name, const std::str
   unsigned int iThread = omp_get_thread_num();
   TH1F *hTmp = 0;
   hTmp = new TH1F(name.c_str(),title.c_str(),nBinsX,xlow,xhigh);
+  //std::string dirName = "";
+  //hTmp->SetDirectory(myDir->getBareDirectory(dirName));
+  
+  //hTmp = myDir->make<TH1F>(name.c_str(),title.c_str(),nBinsX,xlow,xhigh);
   //if(iThread==0) hTmp = myDir->make<TH1F>(name.c_str(),title.c_str(),nBinsX,xlow,xhigh);
   //else hTmp = new TH1F(name.c_str(),title.c_str(),nBinsX,xlow,xhigh);
 

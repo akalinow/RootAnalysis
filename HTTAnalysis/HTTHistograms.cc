@@ -54,7 +54,15 @@ float HTTHistograms::getLumi(){
   //| 47    | 116  | 32702 | 32702 | 2289599379.230    | 2214575536.754   |
   //+-------+------+-------+-------+-------------------+------------------+
   return 2214575536.754e-6;//pb-1 data for NTUPLES_12_02_2016
-  
+
+    //brilcalc lumi -b "STABLE BEAMS" --hltpath "HLT_IsoMu18_v*" --normtag /afs/cern.ch/user/l/lumipro/public/normtag_file/normtag_DATACERT.json -i
+  //+----------------+-------+------+-------+-------------------+------------------+
+  //| hltpath        | nfill | nrun | ncms  | totdelivered(/ub) | totrecorded(/ub) |
+  //+----------------+-------+------+-------+-------------------+------------------+
+  //| HLT_IsoMu18_v2 | 20    | 57   | 23240 | 163456401.055     | 151493189.852    |
+  //+----------------+-------+------+-------+-------------------+------------------+
+  //return 2214575536.754e-6 + 151493189.852e-6;//pb-1 data for NTUPLES_12_02_2016 + NTUPLES_14_06_2016
+
 }
 /////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////
@@ -283,7 +291,7 @@ void HTTHistograms::finalizeHistograms(int nRuns, float weight){
   //plotPhiDecayPlanes("CosPhiNN_WJetsHT0");
   //plotPhiDecayPlanes("Phi_nVectorsWJetsHT0");
   //return;
-  /*
+  
   plotProfiles("hProfMagVsPt_","H");
   plotProfiles("hProfMagVsPt_","A");
   plotProfiles("hProfMagVsPt_","DYJetsMuTau");
@@ -350,7 +358,7 @@ void HTTHistograms::finalizeHistograms(int nRuns, float weight){
   plotnPCA("WJetsHT0");
   return;
   ///////////
-  */
+  
 
   wselOSCorrection =  std::pair<float,float>(1,0);
   wselSSCorrection =  std::pair<float,float>(1,0);

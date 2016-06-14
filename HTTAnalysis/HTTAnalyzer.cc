@@ -300,17 +300,9 @@ void HTTAnalyzer::fillDecayPlaneAngle(const std::string & hNameSuffix, float eve
 
   yTau =  2.*aTau.leadingTk().Pt()/aTau.pt() - 1.;
 
-
-  if(true
-     //&& aTau.decayMode()==tauDecay1ChargedPion0PiZero
-     && positive_nPCA.Vect().Mag()>0.005 && negative_nPCA.Vect().Mag()>0.005 
-     ){
-    myHistos_->fill1DHistogram("h1DPhi_nVectors"+hNameSuffix,angles.first,eventWeight);
-  }
-
-  if( aTau.decayMode()!=tauDecay1ChargedPion0PiZero && isOneProng( aTau.decayMode() ) 
-      && ( ( aMuon.charge()>0 && positive_nPCA.Vect().Mag()>0.005 ) || ( aMuon.charge()<0 && negative_nPCA.Vect().Mag()>0.005 ) )
-      ){
+  myHistos_->fill1DHistogram("h1DPhi_nVectors"+hNameSuffix,angles.first,eventWeight);
+ 
+  if( aTau.decayMode()!=tauDecay1ChargedPion0PiZero && isOneProng( aTau.decayMode() )){
      myHistos_->fill1DHistogram("h1DyTau"+hNameSuffix,yTau,eventWeight);
      if(yTau>0){
        myHistos_->fill1DHistogram("h1DPhi_nVecIP_yTauPos"+hNameSuffix,anglesIPRho.first,eventWeight);
@@ -581,11 +573,11 @@ bool HTTAnalyzer::analyze(const EventProxyBase& iEvent){
   if(!tauKinematics || !tauID || !muonKinematics || !trigger) return true;
   if(!extraRequirements) return true;
 
-  /*
+  ///Selection used by the CP analysis.  
   if(aMuon.nPCA().Mag()<0.005) return false; 
   if(aTau.nPCA().Mag()<0.005) return false;
   if(aEvent.nTracksInRefit()<2) return false;
-  */
+  
     
   ///Note: parts of the signal/control region selection are applied in the following code.
   ///FIXME AK: this should be made in a more clear way.
