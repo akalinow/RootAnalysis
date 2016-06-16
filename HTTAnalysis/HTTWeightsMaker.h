@@ -7,11 +7,12 @@
 #include "EventProxyBase.h"
 
 #include "strbitset.h"
-#include "TFileDirectory.h"
+#include "TDirectory.h"
 
 //ROOT includes
 #include "TTree.h"
 #include "TList.h"
+#include "TH1F.h"
 
 #include "Analyzer.h"
 
@@ -27,7 +28,7 @@ class HTTWeightsMaker: public Analyzer{
   virtual ~HTTWeightsMaker();
   
   ///Initialize the analyzer
-  virtual void initialize(TFileDirectory& aDir,
+  virtual void initialize(TDirectory* aDir,
 			  pat::strbitset *aSelections);
 
   virtual bool analyze(const EventProxyBase& iEvent);

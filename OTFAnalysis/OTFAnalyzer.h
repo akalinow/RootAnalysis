@@ -18,7 +18,7 @@ class OTFAnalyzer:public Analyzer{
 
   ~OTFAnalyzer();
 
-  void initialize(TFileDirectory& aDir,
+  void initialize(TDirectory* aDir,
 		  pat::strbitset *aSelections);
 
   bool analyze(const EventProxyBase& iEvent);

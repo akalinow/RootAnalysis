@@ -34,12 +34,12 @@ Analyzer* HTTAnalyzer::clone() const{
 };
 //////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////
-void HTTAnalyzer::initialize(TFileDirectory& aDir,
+void HTTAnalyzer::initialize(TDirectory* aDir,
 			     pat::strbitset *aSelections){
 
   mySelections_ = aSelections;
   
-  myHistos_ = new HTTHistograms(&aDir, selectionFlavours_);
+  myHistos_ = new HTTHistograms(aDir, selectionFlavours_);
 }
 //////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////
@@ -135,8 +135,6 @@ float HTTAnalyzer::getPUWeight(const EventProxyHTT & myEventProxy){
   }
 
   int iBinPU = hPUVec_[myEventProxy.wevent->sample()]->FindBin(myEventProxy.wevent->npu());
-
-  return 1.0;///TEST
   
   return  hPUVec_[myEventProxy.wevent->sample()]->GetBinContent(iBinPU);
 }
@@ -573,11 +571,12 @@ bool HTTAnalyzer::analyze(const EventProxyBase& iEvent){
   if(!tauKinematics || !tauID || !muonKinematics || !trigger) return true;
   if(!extraRequirements) return true;
 
+  /*
   ///Selection used by the CP analysis.  
   if(aMuon.nPCA().Mag()<0.005) return false; 
   if(aTau.nPCA().Mag()<0.005) return false;
   if(aEvent.nTracksInRefit()<2) return false;
-  
+  */
     
   ///Note: parts of the signal/control region selection are applied in the following code.
   ///FIXME AK: this should be made in a more clear way.

@@ -13,9 +13,9 @@ class CPHistograms: public AnalysisHistograms {
 
   CPHistograms(std::string fileName="Histos.root", int opt=0);
 
-  CPHistograms(TFileDirectory *myDir);
+  CPHistograms(TDirectory *myDir);
 
-  CPHistograms(TFileDirectory *myDir, const std::vector<std::string> & flavours);
+  CPHistograms(TDirectory *myDir, const std::vector<std::string> & flavours);
 
   virtual ~CPHistograms();
 

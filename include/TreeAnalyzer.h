@@ -10,8 +10,9 @@
 
 #include "Analyzer.h"
 #include "ObjectMessenger.h"
-#include "TFileService.h"
+#include "TFile.h"
 #include "omp.h"
+
 class TH1D;
 class TProofOutputFile;
 class SummaryAnalyzer;
@@ -55,11 +56,8 @@ public :
   ///Method returning the name of the datasample analyzed.
   std::string getSampleName() const {return sampleName_;};
 
-  ///Method returning the ROOT file whre the analysis histograms are stored. 
-  TFile *getHistoFile() const { return &store_->file();};
-
-  ///Method returning the ROOT file whre the analysis histograms are stored. 
-  TFileService *getTFileService() const { return store_;};
+  ///Method returning the ROOT file where the analysis histograms are stored. 
+  TFile *getTFile() const { return store_;};
 
   ///Method to access the selections word
   const pat::strbitset & getSelections() const {return *myStrSelections_;};
@@ -80,8 +78,8 @@ public :
    std::vector<Analyzer*> myAnalyzersThreads_[128];
    std::vector<Analyzer*> myAnalyzers_;
 
-   ///Vector with list of TFileDirectory
-   std::vector<TFileDirectory> myDirectories_;
+   ///Vector with list of TDirectory
+   std::vector<TDirectory*> myDirectories_;
 
    ///List of events to be read
    boost::unordered_map<std::string, bool> eventsToProcessHash_;
@@ -94,7 +92,7 @@ public :
    std::string filePath_;
 
    ///Pointer to the ROOT file holding the histograms.
-   TFileService *store_;
+   TFile *store_;
 
    ///Histogram counting the number of event analyzed.
    ///Necessary for event counting when running on PROOF.
@@ -138,7 +136,6 @@ public :
 
    ///Map of the selections. Selection name is the key in the map.
    pat::strbitset *myStrSelections_;
-
 
    ///Object holding information passed between analyzers
    ObjectMessenger* myObjMessenger_;

@@ -37,15 +37,16 @@ TreeAnalyzer::TreeAnalyzer(const std::string & aName,
 
   if(proofFile){   
     proofFile->SetOutputFileName((filePath_+"/RootAnalysis_"+sampleName_+".root").c_str());
-    store_ = new TFileService(proofFile->OpenFile("RECREATE"));
+    store_ = proofFile->OpenFile("RECREATE");
   }
   else{ 
     // Create histogram store
-    store_ = new TFileService((filePath_+"/RootAnalysis_"+sampleName_+".root").c_str());
+    std::string fullPath = filePath_+"/RootAnalysis_"+sampleName_+".root";
+    store_ = new TFile(fullPath.c_str(),"RECREATE");
   }
 
   ///Histogram with processing statistics. Necessary for the PROOF based analysis
-  hStats_ = store_->mkdir("Statistics").make<TH1D>("hStats","Various statistics",21,-0.5,20.5);
+  hStats_ = new TH1D("hStats","Various statistics",21,-0.5,20.5);
   hStats_->GetXaxis()->SetBinLabel(1,"Xsection");
   hStats_->GetXaxis()->SetBinLabel(2,"external scaling factor");
   hStats_->GetXaxis()->SetBinLabel(3,"number of runs");
@@ -56,6 +57,8 @@ TreeAnalyzer::TreeAnalyzer(const std::string & aName,
   hStats_->GetXaxis()->SetBinLabel(8,"number of events processed at RECO/AOD");
   hStats_->GetXaxis()->SetBinLabel(9,"number of events saved from RECO/AOD");
   hStats_->GetXaxis()->SetBinLabel(10,"reco preselection eff.");
+  TDirectory *aDir = store_->mkdir("Statistics");
+  hStats_->SetDirectory(aDir);
 
   myStrSelections_ = new pat::strbitset(); 
 
@@ -72,7 +75,10 @@ TreeAnalyzer::~TreeAnalyzer(){
   std::cout<<"TreeAnalyzer::~TreeAnalyzer() Begin"<<std::endl;
 
   if(mySummary_) delete mySummary_;
-  if(store_) delete store_;
+  if(store_){
+    store_->Write();
+    delete store_;
+  }
 
   std::cout<<"TreeAnalyzer::~TreeAnalyzer() Done"<<std::endl;
 }
@@ -84,7 +90,7 @@ void TreeAnalyzer::scaleHistograms(){
 
   for(unsigned int i=0;i<myAnalyzers_.size();++i){
     std::string name = myAnalyzers_[i]->name();  
-    TDirectoryFile* summary = (TDirectoryFile*)store_->file().Get(name.c_str());
+    TDirectory* summary = (TDirectory*)store_->Get(name.c_str());
     if(!summary){
       std::cout<<"Histogram directory for analyzer: "<<name.c_str()
 	       <<" not found!"<<std::endl;
@@ -156,9 +162,8 @@ void  TreeAnalyzer::init(std::vector<Analyzer*> myAnalyzers){
     
   for(unsigned int i=0;i<myAnalyzers_.size();++i){
     std::string analyzerName = myAnalyzers_[i]->name();
-    std::string desc = "";
-    myDirectories_.push_back(store_->mkdir(analyzerName,desc));
-    myAnalyzers_[i]->initialize(myDirectories_[i], myStrSelections_);
+    TDirectory *analyzerDir = store_->mkdir(analyzerName.c_str());
+    myAnalyzers_[i]->initialize(analyzerDir, myStrSelections_);
   }
 
   

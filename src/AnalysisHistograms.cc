@@ -31,82 +31,67 @@ AnalysisHistograms::~AnalysisHistograms(){
 void AnalysisHistograms::addProfile(const std::string& name, 
 				    const std::string& title, 
 				    int nBinsX, float xlow, float xhigh, 
-				    const TFileDirectory* myDir) {
+				    TDirectory* myDir) {
   
   using namespace std;
   unsigned int iThread = omp_get_thread_num();
   
   TProfile *hTmp = 0;
   hTmp = new TProfile(name.c_str(),title.c_str(),nBinsX,xlow,xhigh);
-  //if(iThread==0) hTmp = myDir->make<TProfile>(name.c_str(),title.c_str(),nBinsX,xlow,xhigh);
-  //else hTmp = new TProfile(name.c_str(),title.c_str(),nBinsX,xlow,xhigh);
 
-  //hTmp->SetDirectory(0);
+  hTmp->SetDirectory(0);
 
-  //if(iThread==0 && name.find("Template")==std::string::npos) hTmp->SetDirectory(myDir->getBareDirectory());
+  if(iThread==0 && name.find("Template")==std::string::npos) hTmp->SetDirectory(myDir);
   if(myProfiles_[iThread].find(name)==myProfiles_[iThread].end()) myProfiles_[iThread][name] = hTmp;
   else cout<<"ERROR Substituting existing profile!"<<endl;    
 }
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////
 void  AnalysisHistograms::add1DHistogram(const std::string& name, const std::string& title,
-			                             int nBinsX, float xlow, float xhigh,
-					                     TFileDirectory* myDir){
+					 int nBinsX, float xlow, float xhigh,
+					 TDirectory* myDir){
 
   using namespace std;
   unsigned int iThread = omp_get_thread_num();
-  TH1F *hTmp = 0;
-  hTmp = new TH1F(name.c_str(),title.c_str(),nBinsX,xlow,xhigh);
-  //std::string dirName = "";
-  //hTmp->SetDirectory(myDir->getBareDirectory(dirName));
+  TH1F *hTmp = new TH1F(name.c_str(),title.c_str(),nBinsX,xlow,xhigh);
   
-  //hTmp = myDir->make<TH1F>(name.c_str(),title.c_str(),nBinsX,xlow,xhigh);
-  //if(iThread==0) hTmp = myDir->make<TH1F>(name.c_str(),title.c_str(),nBinsX,xlow,xhigh);
-  //else hTmp = new TH1F(name.c_str(),title.c_str(),nBinsX,xlow,xhigh);
-
   hTmp->Sumw2();
-  //hTmp->SetDirectory(0);
+  hTmp->SetDirectory(0);
 
-  //if(iThread==0 && name.find("Template")==std::string::npos) hTmp->SetDirectory(myDir->getBareDirectory());
+  if(iThread==0 && name.find("Template")==std::string::npos) hTmp->SetDirectory(myDir);
   if(my1Dhistograms_[iThread].find(name)==my1Dhistograms_[iThread].end()) my1Dhistograms_[iThread][name] = hTmp;
   else cout<<"ERROR Substituting existing histogram!"<<endl;  
 }
 //////////////////////////////////////////////////////////////////////////////
 void  AnalysisHistograms::add1DHistogram(const std::string& name, const std::string& title, int nBinsX, float* bins,
-					 const TFileDirectory* myDir){
+					 TDirectory* myDir){
 
   using namespace std;
   unsigned int iThread = omp_get_thread_num();
 
-  TH1F *hTmp = 0;
-  hTmp = new TH1F(name.c_str(),title.c_str(),nBinsX,bins);
-  //if(iThread==0) hTmp = myDir->make<TH1F>(name.c_str(),title.c_str(),nBinsX,bins);
-  //else hTmp = new TH1F(name.c_str(),title.c_str(),nBinsX,bins);
+  TH1F *hTmp = new TH1F(name.c_str(),title.c_str(),nBinsX,bins);
 
   hTmp->Sumw2();
-  //hTmp->SetDirectory(0);
+  hTmp->SetDirectory(0);
 
-  //if(iThread==0 && name.find("Template")==std::string::npos) hTmp->SetDirectory(myDir->getBareDirectory());
+  if(iThread==0 && name.find("Template")==std::string::npos) hTmp->SetDirectory(myDir);
   if(my1Dhistograms_[iThread].find(name)==my1Dhistograms_[iThread].end()) my1Dhistograms_[iThread][name] = hTmp;
   else cout<<"ERROR Substituting existing histogram!"<<endl;  
 }
 //////////////////////////////////////////////////////////////////////////////
 void  AnalysisHistograms::add2DHistogram(const std::string& name, const std::string& title,
-					int nBinsX, float xlow, float xhigh,
+					 int nBinsX, float xlow, float xhigh,
 					 int nBinsY, float ylow, float yhigh,
-					 const TFileDirectory* myDir){
+					 TDirectory* myDir){
    
   using namespace std;
   unsigned int iThread = omp_get_thread_num();
 
-  TH2F *hTmp = 0;
-  hTmp = new TH2F(name.c_str(),title.c_str(),nBinsX,xlow,xhigh, nBinsY, ylow,yhigh);
-  //if(iThread==0) hTmp = myDir->make<TH2F>(name.c_str(),title.c_str(),nBinsX,xlow,xhigh, nBinsY, ylow,yhigh);
-  //else hTmp = new TH2F(name.c_str(),title.c_str(),nBinsX,xlow,xhigh, nBinsY, ylow,yhigh);
+  TH2F *hTmp = new TH2F(name.c_str(),title.c_str(),nBinsX,xlow,xhigh, nBinsY, ylow,yhigh);
   
   hTmp->Sumw2();
-  //hTmp->SetDirectory(0);
+  hTmp->SetDirectory(0);
 
-  //if(iThread==0 && name.find("Template")==std::string::npos) hTmp->SetDirectory(myDir->getBareDirectory());
+  if(iThread==0 && name.find("Template")==std::string::npos) hTmp->SetDirectory(myDir);
   if(my2Dhistograms_[iThread].find(name)==my2Dhistograms_[iThread].end()) my2Dhistograms_[iThread][name] = hTmp;
   else cout<<"ERROR Substituting existing histogram!"<<endl;
 }
@@ -114,19 +99,16 @@ void  AnalysisHistograms::add2DHistogram(const std::string& name, const std::str
 void  AnalysisHistograms::add2DHistogram(const std::string& name, const std::string& title,
 					 int nBinsX, float* binsX,
 					 int nBinsY, float* binsY, 					 
-					 const TFileDirectory* myDir){
+					 TDirectory* myDir){
   using namespace std;
   unsigned int iThread = omp_get_thread_num();
   
-  TH2F *hTmp =0;
-  hTmp = new TH2F(name.c_str(),title.c_str(),nBinsX,binsX,nBinsY,binsY);
-  //if(iThread==0) hTmp = myDir->make<TH2F>(name.c_str(),title.c_str(),nBinsX,binsX,nBinsY,binsY);
-  //else hTmp = new TH2F(name.c_str(),title.c_str(),nBinsX,binsX,nBinsY,binsY);
+  TH2F *hTmp = new TH2F(name.c_str(),title.c_str(),nBinsX,binsX,nBinsY,binsY);
 
   hTmp->Sumw2();
-  //hTmp->SetDirectory(0);
+  hTmp->SetDirectory(0);
 
-  //if(iThread==0 && name.find("Template")==std::string::npos) hTmp->SetDirectory(myDir->getBareDirectory());
+  if(iThread==0 && name.find("Template")==std::string::npos) hTmp->SetDirectory(myDir);
   if(my2Dhistograms_[iThread].find(name)==my2Dhistograms_[iThread].end()) my2Dhistograms_[iThread][name] = hTmp;
   else cout<<"ERROR Substituting existing histogram!"<<endl;
 }
@@ -134,20 +116,17 @@ void  AnalysisHistograms::add2DHistogram(const std::string& name, const std::str
 void  AnalysisHistograms::add2DHistogram(const std::string& name, const std::string& title,
 					 int nBinsX, float xlow, float xhigh,
 					 int nBinsY, double* binsY, 					 
-					 const TFileDirectory* myDir){
+					 TDirectory* myDir){
 
   using namespace std;
   unsigned int iThread = omp_get_thread_num();
   
-  TH2F *hTmp = 0;
-  hTmp = new TH2F(name.c_str(),title.c_str(),nBinsX,xlow,xhigh,nBinsY,binsY);
-  //if(iThread==0) hTmp = myDir->make<TH2F>(name.c_str(),title.c_str(),nBinsX,xlow,xhigh,nBinsY,binsY);
-  //else hTmp = new TH2F(name.c_str(),title.c_str(),nBinsX,xlow,xhigh,nBinsY,binsY);
+  TH2F *hTmp = new TH2F(name.c_str(),title.c_str(),nBinsX,xlow,xhigh,nBinsY,binsY);
 
   hTmp->Sumw2();
-  //hTmp->SetDirectory(0);
+  hTmp->SetDirectory(0);
 
-  //if(iThread==0 && name.find("Template")==std::string::npos) hTmp->SetDirectory(myDir->getBareDirectory());
+  if(iThread==0 && name.find("Template")==std::string::npos) hTmp->SetDirectory(myDir);
   if(my2Dhistograms_[iThread].find(name)==my2Dhistograms_[iThread].end()) my2Dhistograms_[iThread][name] = hTmp;
   else cout<<"ERROR Substituting existing histogram!"<<endl;
 }
@@ -156,19 +135,16 @@ void  AnalysisHistograms::add3DHistogram(const std::string& name, const std::str
 					 int nBinsX, float xlow, float xhigh,
 					 int nBinsY, float ylow, float yhigh,
 					 int nBinsZ, float zlow, float zhigh,
-					 const TFileDirectory* myDir){
+					 TDirectory* myDir){
   using namespace std;
   unsigned int iThread = omp_get_thread_num();
   
-  TH3F *hTmp = 0;
-  hTmp = new TH3F(name.c_str(),title.c_str(),nBinsX,xlow,xhigh,nBinsY,ylow,yhigh, nBinsZ,zlow,zhigh);
-  //if(iThread==0) hTmp = myDir->make<TH3F>(name.c_str(),title.c_str(),nBinsX,xlow,xhigh,nBinsY,ylow,yhigh, nBinsZ,zlow,zhigh);
-  //else hTmp = new TH3F(name.c_str(),title.c_str(),nBinsX,xlow,xhigh,nBinsY,ylow,yhigh, nBinsZ,zlow,zhigh);
+  TH3F *hTmp = new TH3F(name.c_str(),title.c_str(),nBinsX,xlow,xhigh,nBinsY,ylow,yhigh, nBinsZ,zlow,zhigh);
 
   hTmp->Sumw2();
-  //hTmp->SetDirectory(0);
+  hTmp->SetDirectory(0);
 
-  //if(iThread==0 && name.find("Template")==std::string::npos) hTmp->SetDirectory(myDir->getBareDirectory());
+  if(iThread==0 && name.find("Template")==std::string::npos) hTmp->SetDirectory(myDir);
   if(my3Dhistograms_[iThread].find(name)==my3Dhistograms_[iThread].end()) my3Dhistograms_[iThread][name] = hTmp;
   else cout<<"ERROR Substituting existing histogram!"<<endl;  
 }
@@ -177,20 +153,17 @@ void  AnalysisHistograms::add3DHistogram(const std::string& name, const std::str
 					 int nBinsX, double* binsX,
 					 int nBinsY, double* binsY,
 					 int nBinsZ, double* binsZ,
-					 const TFileDirectory* myDir){
+					 TDirectory* myDir){
 
   using namespace std;
   unsigned int iThread = omp_get_thread_num();
   
-  TH3F *hTmp = 0;
-  hTmp = new TH3F(name.c_str(),title.c_str(),nBinsX,binsX,nBinsY,binsY,nBinsZ,binsZ);
-  //if(iThread==0) hTmp = myDir->make<TH3F>(name.c_str(),title.c_str(),nBinsX,binsX,nBinsY,binsY,nBinsZ,binsZ);
-  //else hTmp = new TH3F(name.c_str(),title.c_str(),nBinsX,binsX,nBinsY,binsY,nBinsZ,binsZ);
+  TH3F *hTmp = new TH3F(name.c_str(),title.c_str(),nBinsX,binsX,nBinsY,binsY,nBinsZ,binsZ);
 
   hTmp->Sumw2();
-  //hTmp->SetDirectory(0);
+  hTmp->SetDirectory(0);
 
-  //if(iThread==0 && name.find("Template")==std::string::npos) hTmp->SetDirectory(myDir->getBareDirectory());
+  if(iThread==0 && name.find("Template")==std::string::npos) hTmp->SetDirectory(myDir);
   if(my3Dhistograms_[iThread].find(name)==my3Dhistograms_[iThread].end()) my3Dhistograms_[iThread][name] = hTmp;
   else cout<<"ERROR Substituting existing histogram!"<<endl;
 }
@@ -240,7 +213,6 @@ bool  AnalysisHistograms::fill1DHistogram(const std::string& name, float val, fl
 	binsArray[iBin] = hTemplate->GetXaxis()->GetXbins()->At(iBin);
       }
       add1DHistogram(name,"",hTemplate->GetNbinsX(),binsArray, file_);
-      //if(omp_get_num_threads()==1) get1DHistogram(name,true)->SetDirectory(get1DHistogram(hTemplateName,true)->GetDirectory());
       delete binsArray;      
     }
     else{
@@ -249,7 +221,6 @@ bool  AnalysisHistograms::fill1DHistogram(const std::string& name, float val, fl
 		     hTemplate->GetXaxis()->GetXmin(),
 		     hTemplate->GetXaxis()->GetXmax(),
 		     file_);
-      //if(omp_get_num_threads()==1) get1DHistogram(name,true)->SetDirectory(get1DHistogram(hTemplateName,true)->GetDirectory());
     }
    my1Dhistograms_[iThread].find(name)->second->Fill(val,weight);
  }
@@ -401,15 +372,15 @@ void AnalysisHistograms::resetHistos(std::pair<const std::string, TH1*> aPair){
 }
 //////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////
-void AnalysisHistograms::init(TFileDirectory *myDir,
+void AnalysisHistograms::init(TDirectory *myDir,
 			      const std::string & name){
 
   name_ = name;
   myDirCopy = myDir;
   if(!histosInitialized_){
     if(name_.size()){
-      mySecondaryDirs_.push_back(myDir->mkdir(name_));
-      file_ = &mySecondaryDirs_[mySecondaryDirs_.size()-1];
+      mySecondaryDirs_.push_back(myDir->mkdir(name_.c_str()));
+      file_ = mySecondaryDirs_[mySecondaryDirs_.size()-1];
     }
     else file_ = myDir;
     defineHistograms();

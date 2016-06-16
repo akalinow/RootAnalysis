@@ -19,7 +19,7 @@ class OTFDiMuonAnalyzer:public Analyzer{
 
   virtual ~OTFDiMuonAnalyzer();
 
-  virtual void initialize(TFileDirectory& aDir,
+  virtual void initialize(TDirectory* aDir,
 			  pat::strbitset *aSelections);
 
   virtual bool analyze(const EventProxyBase& iEvent);

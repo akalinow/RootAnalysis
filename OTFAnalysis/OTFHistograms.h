@@ -15,9 +15,9 @@ class OTFHistograms: public AnalysisHistograms {
   void pieceHistogramsTogether();
   OTFHistograms(std::string fileName="Histos.root", int opt=0);
 
-  OTFHistograms(TFileDirectory *myDir);
+  OTFHistograms(TDirectory *myDir);
 
-  OTFHistograms(TFileDirectory *myDir, const std::vector<std::string> & flavours);
+  OTFHistograms(TDirectory *myDir, const std::vector<std::string> & flavours);
 
   virtual ~OTFHistograms(); 
 

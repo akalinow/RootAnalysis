@@ -8,7 +8,7 @@ lib_LTLIBRARIES = libRootAnalysis.la
 # Build information for each library
 
 # Sources for libRootAnalysis
-libRootAnalysis_la_SOURCES = EventProxyBase.cc TestAnalyzer.cc AnalysisHistograms.cc Analyzer.cc \
+libRootAnalysis_la_SOURCES = EventProxyBase.cc AnalysisHistograms.cc Analyzer.cc \
 	                         ObjectMessenger.cc strbitset.cc TFileDirectory.cc TFileService.cc \
 	                         TH1AddDirectorySentry.cc TreeAnalyzer.cc SummaryAnalyzer.cc \
 				 commonUtils.cc

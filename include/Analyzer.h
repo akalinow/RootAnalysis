@@ -7,7 +7,7 @@
 #include "EventProxyBase.h"
 
 #include "strbitset.h"
-#include "TFileDirectory.h"
+#include "TDirectory.h"
 
 //ROOT includes
 #include "TTree.h"
@@ -23,7 +23,7 @@ class Analyzer{
   virtual ~Analyzer(){;}
   
   ///Initialize the analyzer
-  virtual void initialize(TFileDirectory& aDir,
+  virtual void initialize(TDirectory* aDir,
 			  pat::strbitset *aSelections){
 
     //default is to do whatever the analyzer does

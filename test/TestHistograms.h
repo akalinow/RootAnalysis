@@ -15,9 +15,9 @@ class TestHistograms: public AnalysisHistograms {
 
   TestHistograms(std::string fileName="Histos.root", int opt=0);
 
-  TestHistograms(TFileDirectory *myDir);
+  TestHistograms(TDirectory *myDir);
 
-  TestHistograms(TFileDirectory *myDir, const std::vector<std::string> & flavours);
+  TestHistograms(TDirectory *myDir, const std::vector<std::string> & flavours);
 
   virtual ~TestHistograms();
 

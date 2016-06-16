@@ -24,14 +24,14 @@ TestHistograms::TestHistograms(std::string fileName, int opt){
 }
 /////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////
-TestHistograms::TestHistograms(TFileDirectory *myDir){
+TestHistograms::TestHistograms(TDirectory *myDir){
 
   AnalysisHistograms::init(myDir);
 
 }
 /////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////
-TestHistograms::TestHistograms(TFileDirectory *myDir, const std::vector<std::string> & flavours){
+TestHistograms::TestHistograms(TDirectory *myDir, const std::vector<std::string> & flavours){
  selectionFlavours_ = flavours;
 
 AnalysisHistograms::init(myDir);
@@ -60,7 +60,6 @@ void TestHistograms::defineHistograms(){
 
  if(!histosInitialized_){
    //Make template histos
-   std::cout<<"Adding histogram: "<<file_<<" "<<file_->fullPath()<<std::endl;
    add1DHistogram("h1DXTemplate","",20,-200,200,file_);
    add1DHistogram("h1DYTemplate","",20,-200,200,file_);
    histosInitialized_ = true;
