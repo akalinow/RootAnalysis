@@ -21,7 +21,7 @@ HTTWeightsMaker::~HTTWeightsMaker(){
 }
 //////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////
-void HTTWeightsMaker::initialize(TFileDirectory& aDir,
+void HTTWeightsMaker::initialize(TDirectory* aDir,
 				 pat::strbitset *aSelections){
 
   mySelections_ = aSelections;
@@ -33,7 +33,7 @@ void HTTWeightsMaker::initialize(TFileDirectory& aDir,
   ///The histograms for this analyzer will be saved into "HTTWeightsMaker"
   ///directory of the ROOT file
   ///NOTE: due to a bug hists land in the Summary directory
-  myHistos_ = new HTTWeightHistograms(&aDir, selectionFlavours_);  
+  myHistos_ = new HTTWeightHistograms(aDir, selectionFlavours_);  
   ///Substitute the default PU histogram ranges, with ranges taken from
   ///reference PU histogram.
   TH1F *h = myHistos_->get1DHistogram("h1DNPVTemplate",true);

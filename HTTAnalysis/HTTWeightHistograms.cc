@@ -20,14 +20,14 @@ HTTWeightHistograms::HTTWeightHistograms(std::string fileName, int opt){
 }
 /////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////
-HTTWeightHistograms::HTTWeightHistograms(TFileDirectory *myDir){
+HTTWeightHistograms::HTTWeightHistograms(TDirectory *myDir){
 
   AnalysisHistograms::init(myDir);
 
 }
 /////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////
-HTTWeightHistograms::HTTWeightHistograms(TFileDirectory *myDir, const std::vector<std::string> & flavours){
+HTTWeightHistograms::HTTWeightHistograms(TDirectory *myDir, const std::vector<std::string> & flavours){
  selectionFlavours_ = flavours;
 
 AnalysisHistograms::init(myDir);
@@ -38,20 +38,11 @@ AnalysisHistograms::init(myDir);
 HTTWeightHistograms::~HTTWeightHistograms(){ }
 /////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////
-bool HTTWeightHistograms::fill1DHistogram(const std::string& name, float val, float weight){
-  
-  std::string hTemplateName = "";
-  if(!AnalysisHistograms::fill1DHistogram(name,val,weight)){
-    if(name.find("h1DNPV")!=std::string::npos) hTemplateName = "h1DNPVTemplate";
-    std::cout<<"fill1DHistogram Adding histogram: "<<name<<" "<<file_<<" "<<file_->fullPath()<<std::endl;
-    this->add1DHistogram(name,"",
-			 this->get1DHistogram(hTemplateName,true)->GetNbinsX(),
-			 this->get1DHistogram(hTemplateName,true)->GetXaxis()->GetXmin(),
-			 this->get1DHistogram(hTemplateName,true)->GetXaxis()->GetXmax(),
-			 file_);
-    return AnalysisHistograms::fill1DHistogram(name,val,weight);
-  }
-  return true;
+std::string HTTWeightHistograms::getTemplateName(const std::string& name){
+
+  std::string templateName = "";
+  if(name.find("h1DNPV")!=std::string::npos) templateName = "h1DNPVTemplate";
+  return templateName;
 }
 /////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////
@@ -61,7 +52,6 @@ void HTTWeightHistograms::defineHistograms(){
 
  if(!histosInitialized_){
    //Make template histos
-   std::cout<<"defineHistograms Adding histogram: "<<file_<<" "<<file_->fullPath()<<std::endl;
    add1DHistogram("h1DNPVTemplate",";Number of PV; Events",61,-0.5,60.5,file_);
    histosInitialized_ = true;
  }

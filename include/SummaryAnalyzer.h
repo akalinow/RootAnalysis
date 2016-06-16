@@ -26,7 +26,7 @@ class SummaryAnalyzer: public  Analyzer{
 
   virtual ~SummaryAnalyzer();
   
-  virtual void initialize(TFileDirectory&,
+  virtual void initialize(TDirectory*,
 			  pat::strbitset *aSelections);  
 
   virtual bool analyze(const EventProxyBase& iEvent);
@@ -58,7 +58,7 @@ class SummaryAnalyzer: public  Analyzer{
 
   TH1D * Integrate(TH1D * histoD);
 
-  TFileDirectory* myDir_;
+  TDirectory* myDir_;
 
   TH1F *hCutNames_;
 

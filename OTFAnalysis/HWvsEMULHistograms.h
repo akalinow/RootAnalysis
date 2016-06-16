@@ -14,9 +14,9 @@ class HWvsEMULHistograms: public AnalysisHistograms {
   void pieceHistogramsTogether();
   HWvsEMULHistograms(std::string fileName="Histos.root", int opt=0);
 
-  HWvsEMULHistograms(TFileDirectory *myDir);
+  HWvsEMULHistograms(TDirectory *myDir);
 
-  HWvsEMULHistograms(TFileDirectory *myDir, const std::vector<std::string> & flavours);
+  HWvsEMULHistograms(TDirectory *myDir, const std::vector<std::string> & flavours);
 
   virtual ~HWvsEMULHistograms(); 
 

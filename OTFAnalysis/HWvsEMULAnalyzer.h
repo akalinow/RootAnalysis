@@ -19,7 +19,7 @@ class HWvsEMULAnalyzer:public Analyzer{
 
   ~HWvsEMULAnalyzer();
 
-  void initialize(TFileDirectory& aDir,
+  void initialize(TDirectory* aDir,
 		  pat::strbitset *aSelections);
 
   bool analyze(const EventProxyBase& iEvent);

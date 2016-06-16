@@ -37,16 +37,18 @@ Analyzer* SummaryAnalyzer::clone() const{
 };
 //////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////
-void SummaryAnalyzer::initialize(TFileDirectory& aDir,
+void SummaryAnalyzer::initialize(TDirectory* aDir,
 				 pat::strbitset *aSelections){
 
-  myDir_ = &aDir;
+  myDir_ = aDir;
 
   mySelections_ = aSelections;
 
   eventWeight_ = 1.0;
 
-  mySelectionsTree_ = aDir.make<TTree>("tree","Selections bit words");
+  mySelectionsTree_ = new TTree("tree","Selections bit words");
+  mySelectionsTree_->SetDirectory(aDir);
+
   branchWeight_ = mySelectionsTree_->Branch("eventWeight", &eventWeight_);
 
   //selectionWord_ = TBits(mySelections_->bits().size());
@@ -57,7 +59,8 @@ void SummaryAnalyzer::initialize(TFileDirectory& aDir,
   int nCuts = (int)(mySelections_->bits().size());
   int nBins = nCuts+1;
 
-  hCutNames_ = aDir.make<TH1F>("hCutNames","Names of the selections",nBins,-0.5,nBins-0.5);
+  hCutNames_ = new TH1F("hCutNames","Names of the selections",nBins,-0.5,nBins-0.5);
+  hCutNames_->SetDirectory(aDir);
 
   const std::vector<std::string> cutNames = mySelections_->strings();
   std::vector<std::string>::const_iterator ci = cutNames.begin();
@@ -121,13 +124,14 @@ void  SummaryAnalyzer::fillEffHisto(std::string type){
     if(h1D && h1D->GetDimension()==1){
     h1D->SetDirectory(0);
     int nBins = nCuts+1;
-    h = myDir_->make<TH2F>(hName.c_str(),
-			   h1D->GetTitle(),h1D->GetNbinsX(),
-			   h1D->GetXaxis()->GetXmin(),
-			   h1D->GetXaxis()->GetXmax(),  
-			   nBins, -0.5,nBins-0.5);
+    h = new TH2F(hName.c_str(),
+		 h1D->GetTitle(),h1D->GetNbinsX(),
+		 h1D->GetXaxis()->GetXmin(),
+		 h1D->GetXaxis()->GetXmax(),  
+		 nBins, -0.5,nBins-0.5);    
     h->SetXTitle(h1D->GetXaxis()->GetTitle());   
     h->Sumw2();
+    h->SetDirectory(myDir_);
     }
     else{
       //std::cout<<"ERROR Histogram: "<<hName<<" not found!"<<std::endl;
@@ -214,9 +218,10 @@ void SummaryAnalyzer::cleanHisto(TH2F *hCutCounter){
   }
   std::string tmpStr(hCutCounter->GetName());
   tmpStr+="1D";
-  TH1F *hCutCounterTmp = myDir_->make<TH1F>(tmpStr.c_str(),
-					    hCutCounter->GetTitle(),
-					    nBinsFill, -0.5,nBinsFill-0.5);
+  TH1F *hCutCounterTmp = new TH1F(tmpStr.c_str(),
+				  hCutCounter->GetTitle(),
+				  nBinsFill, -0.5,nBinsFill-0.5);
+  hCutCounterTmp->SetDirectory(myDir_);
   int iBin = 0;
   for(int i=0;i<hCutCounter->GetNbinsY()+1;++i){
     TString tmpStr(hCutCounter->GetYaxis()->GetBinLabel(i));
@@ -251,9 +256,10 @@ void SummaryAnalyzer::clean2DHisto(TH2F *hCutCounter){
   float highX = hCutCounter->GetXaxis()->GetXmax();
 
   hCutCounter->SetDirectory(0);
-  TH2F *hCutCounterTmp = myDir_->make<TH2F>((hName+"Clean").c_str(),hCutCounter->GetTitle(),
-					    nBinsX, lowX, highX,
-					    nBinsFill, -0.5,nBinsFill-0.5);  
+  TH2F *hCutCounterTmp = new TH2F((hName+"Clean").c_str(),hCutCounter->GetTitle(),
+				  nBinsX, lowX, highX,
+				  nBinsFill, -0.5,nBinsFill-0.5);
+  hCutCounterTmp->SetDirectory(myDir_);
   int iBinY = 0;
   for(int i=0;i<hCutCounter->GetNbinsY()+1;++i){
     TString tmpStr(hCutCounter->GetYaxis()->GetBinLabel(i));

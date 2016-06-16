@@ -20,14 +20,14 @@ CPHistograms::CPHistograms(std::string fileName, int opt){
 }
 /////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////
-CPHistograms::CPHistograms(TFileDirectory *myDir){
+CPHistograms::CPHistograms(TDirectory *myDir){
 
   AnalysisHistograms::init(myDir);
 
 }
 /////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////
-CPHistograms::CPHistograms(TFileDirectory *myDir, const std::vector<std::string> & flavours){
+CPHistograms::CPHistograms(TDirectory *myDir, const std::vector<std::string> & flavours){
  selectionFlavours_ = flavours;
 
 AnalysisHistograms::init(myDir);

@@ -63,6 +63,8 @@ float HTTHistograms::getLumi(){
   //+----------------+-------+------+-------+-------------------+------------------+
   //return 2214575536.754e-6 + 151493189.852e-6;//pb-1 data for NTUPLES_12_02_2016 + NTUPLES_14_06_2016
 
+  //return 3762785.280e-6;
+
 }
 /////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////
@@ -128,21 +130,14 @@ float HTTHistograms::getSampleNormalisation(std::string sampleName){
 }
 /////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////
-HTTHistograms::HTTHistograms(std::string fileName, int opt){
-
-  AnalysisHistograms::init(fileName);
-
-}
-/////////////////////////////////////////////////////////
-/////////////////////////////////////////////////////////
-HTTHistograms::HTTHistograms(TFileDirectory *myDir){
+HTTHistograms::HTTHistograms(TDirectory *myDir){
 
   AnalysisHistograms::init(myDir);
 
 }
 /////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////
-HTTHistograms::HTTHistograms(TFileDirectory *myDir, const std::vector<std::string> & flavours){
+HTTHistograms::HTTHistograms(TDirectory *myDir, const std::vector<std::string> & flavours){
 
   selectionFlavours_ = flavours;
 
@@ -256,8 +251,6 @@ void HTTHistograms::defineHistograms(){
 
  if(!histosInitialized_){
 
-   std::cout<<"defineHistograms Adding histogram: "<<file_<<" "<<file_->fullPath()<<std::endl;
-
    add1DHistogram("h1DStatsTemplate","",21,-0.5,20.5,file_);
    add1DHistogram("h1DNPVTemplate",";Number of PV; Events",61,-0.5,60.5,file_);
    add1DHistogram("h1DMassTemplate",";SVFit mass [GeV/c^{2}]; Events",50,0,200,file_);   
@@ -287,11 +280,7 @@ void HTTHistograms::finalizeHistograms(int nRuns, float weight){
 
   AnalysisHistograms::finalizeHistograms();
 
- 
-  //plotPhiDecayPlanes("CosPhiNN_WJetsHT0");
-  //plotPhiDecayPlanes("Phi_nVectorsWJetsHT0");
-  //return;
-  
+   /*
   plotProfiles("hProfMagVsPt_","H");
   plotProfiles("hProfMagVsPt_","A");
   plotProfiles("hProfMagVsPt_","DYJetsMuTau");
@@ -358,7 +347,7 @@ void HTTHistograms::finalizeHistograms(int nRuns, float weight){
   plotnPCA("WJetsHT0");
   return;
   ///////////
-  
+  */  
 
   wselOSCorrection =  std::pair<float,float>(1,0);
   wselSSCorrection =  std::pair<float,float>(1,0);
@@ -366,10 +355,6 @@ void HTTHistograms::finalizeHistograms(int nRuns, float weight){
   wselOSCorrection = getWNormalisation("wselOS");
   wselSSCorrection = getWNormalisation("wselSS");
 
-  plotStack("MassVis","");
-  plotStack("MassTrans","");
-  return;
-  
   ///Control regions plots
   plotStack("Iso","qcdselOS");
   plotStack("Iso","qcdselSS");

@@ -40,14 +40,14 @@ OTFHistograms::OTFHistograms(std::string fileName, int opt){
 }
 /////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////
-OTFHistograms::OTFHistograms(TFileDirectory *myDir){
+OTFHistograms::OTFHistograms(TDirectory *myDir){
 
   AnalysisHistograms::init(myDir);
 
 }
 /////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////
-OTFHistograms::OTFHistograms(TFileDirectory *myDir, const std::vector<std::string> & flavours){
+OTFHistograms::OTFHistograms(TDirectory *myDir, const std::vector<std::string> & flavours){
  selectionFlavours_ = flavours;
 
 AnalysisHistograms::init(myDir);

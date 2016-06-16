@@ -21,15 +21,15 @@ Analyzer* TestAnalyzer::clone() const{
 };
 //////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////
-void TestAnalyzer::initialize(TFileDirectory& aDir,
-				 pat::strbitset *aSelections){
+void TestAnalyzer::initialize(TDirectory* aDir,
+			      pat::strbitset *aSelections){
 
   mySelections_ = aSelections;
   
   ///The histograms for this analyzer will be saved into "TestAnalyzer"
   ///directory of the ROOT file
   ///NOTE: due to a bug hists land in the Summary directory
-  myHistos_ = new TestHistograms(&aDir, selectionFlavours_);
+  myHistos_ = new TestHistograms(aDir, selectionFlavours_);
 }
 //////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////

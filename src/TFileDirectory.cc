@@ -24,9 +24,9 @@ TFileDirectory::cd () const
 
 TDirectory *
 TFileDirectory::_cd (const string &subdir, bool createNeededDirectories) const
-{
-  
+{  
    string fpath = fullPath();
+
    if (subdir.length())
    {
       // not empty, we need to append it to path
@@ -49,7 +49,6 @@ TFileDirectory::_cd (const string &subdir, bool createNeededDirectories) const
       // complain now that it doesn't exist.
       if (! createNeededDirectories)
       {
-         cout << "here " << fpath << endl;
          throw 
             std::string("InvalidDirectory directory "+fpath+" doesn't exist.");
       }
@@ -95,7 +94,7 @@ TDirectory*
 TFileDirectory::_mkdir (TDirectory *dirPtr, 
                         const string &subdirName, 
                         const string &description) const
-{
+{  
    // do we have this one already
    TDirectory *subdirPtr = dirPtr->GetDirectory (subdirName.c_str());
    if (subdirPtr)
@@ -117,6 +116,7 @@ TFileDirectory::_mkdir (TDirectory *dirPtr,
       // This is not a subdirectory, so we're golden
       parentDir = dirPtr;
    }
+
    subdirPtr = parentDir->mkdir (useName.c_str());
    if ( ! subdirPtr )
    {
@@ -156,6 +156,8 @@ TFileDirectory
 TFileDirectory::mkdir( const std::string & dir, const std::string & descr ) 
 {
   TH1AddDirectorySentry sentry;
-  _cd();  
+
+  _cd();
+  
   return TFileDirectory( dir, descr, file_, fullPath() );
 }

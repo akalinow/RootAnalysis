@@ -20,14 +20,14 @@ HWvsEMULHistograms::HWvsEMULHistograms(std::string fileName, int opt){
 }
 /////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////
-HWvsEMULHistograms::HWvsEMULHistograms(TFileDirectory *myDir){
+HWvsEMULHistograms::HWvsEMULHistograms(TDirectory *myDir){
 
   AnalysisHistograms::init(myDir);
 
 }
 /////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////
-HWvsEMULHistograms::HWvsEMULHistograms(TFileDirectory *myDir, const std::vector<std::string> & flavours){
+HWvsEMULHistograms::HWvsEMULHistograms(TDirectory *myDir, const std::vector<std::string> & flavours){
  selectionFlavours_ = flavours;
 
 AnalysisHistograms::init(myDir);

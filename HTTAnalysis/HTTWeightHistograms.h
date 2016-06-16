@@ -13,15 +13,15 @@ class HTTWeightHistograms: public AnalysisHistograms {
 
   HTTWeightHistograms(std::string fileName="Histos.root", int opt=0);
 
-  HTTWeightHistograms(TFileDirectory *myDir);
+  HTTWeightHistograms(TDirectory *myDir);
 
-  HTTWeightHistograms(TFileDirectory *myDir, const std::vector<std::string> & flavours);
+  HTTWeightHistograms(TDirectory *myDir, const std::vector<std::string> & flavours);
 
   virtual ~HTTWeightHistograms();
 
   void finalizeHistograms(int nRuns, float weight=1.0);
 
-  virtual bool fill1DHistogram(const std::string &name, float val, float weight=1.0);
+  std::string getTemplateName(const std::string& name);
 
    private:
   

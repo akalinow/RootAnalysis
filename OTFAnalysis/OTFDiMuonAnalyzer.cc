@@ -24,17 +24,14 @@ OTFDiMuonAnalyzer::~OTFDiMuonAnalyzer(){
 }
 //////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////
-void OTFDiMuonAnalyzer::initialize(TFileDirectory& aDir,
+void OTFDiMuonAnalyzer::initialize(TDirectory* aDir,
 				       pat::strbitset *aSelections){
 
   mySelections_ = aSelections;
 
-  ///The histograms for this analyzer will be saved into "TestHistos"
-  ///directory of the ROOT file
-  myHistos_ = new OTFHistograms(&aDir, selectionFlavours_);
+  myHistos_ = new OTFHistograms(aDir, selectionFlavours_);
 
   registerCuts();
-
 }
 //////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////

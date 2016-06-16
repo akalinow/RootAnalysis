@@ -17,11 +17,9 @@ class THStack;
 class HTTHistograms: public AnalysisHistograms {
    public:
 
-  HTTHistograms(std::string fileName="Histos.root", int opt=0);
+  HTTHistograms(TDirectory *myDir);
 
-  HTTHistograms(TFileDirectory *myDir);
-
-  HTTHistograms(TFileDirectory *myDir, const std::vector<std::string> & flavours);
+  HTTHistograms(TDirectory *myDir, const std::vector<std::string> & flavours);
 
   virtual ~HTTHistograms();
 

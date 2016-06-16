@@ -25,17 +25,14 @@ HWvsEMULAnalyzer::~HWvsEMULAnalyzer(){
 }
 //////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////
-void HWvsEMULAnalyzer::initialize(TFileDirectory& aDir,
+void HWvsEMULAnalyzer::initialize(TDirectory* aDir,
 				       pat::strbitset *aSelections){
 
   mySelections_ = aSelections;
 
-  ///The histograms for this analyzer will be saved into "TestHistos"
-  ///directory of the ROOT file
-  myHistos_ = new HWvsEMULHistograms(&aDir, selectionFlavours_);
+  myHistos_ = new HWvsEMULHistograms(aDir, selectionFlavours_);
 
   registerCuts();
-
 }
 //////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////
