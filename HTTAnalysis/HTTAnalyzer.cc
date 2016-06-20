@@ -60,7 +60,8 @@ void HTTAnalyzer::getPreselectionEff(const EventProxyHTT & myEventProxy){
     float genWeight = getGenWeight(myEventProxy);
     
     hStats->SetBinContent(2,hStatsFromFile->GetBinContent(hStatsFromFile->FindBin(1))*genWeight);   
-    hStats->SetBinContent(3,hStatsFromFile->GetBinContent(hStatsFromFile->FindBin(3))*genWeight);
+    //TESK AK hStats->SetBinContent(3,hStatsFromFile->GetBinContent(hStatsFromFile->FindBin(3))*genWeight);
+    hStats->SetBinContent(3,hStatsFromFile->GetBinContent(hStatsFromFile->FindBin(2))*genWeight);///buggy weights in DY in NTUPLES_20_06_2016
     delete hStatsFromFile;
 
 }
@@ -108,6 +109,10 @@ std::string HTTAnalyzer::getSampleName(const EventProxyHTT & myEventProxy){
 //////////////////////////////////////////////////////////////////////////////
 float HTTAnalyzer::getPUWeight(const EventProxyHTT & myEventProxy){
 
+  ///RunIIFall15MiniAODv2-PU25nsData2015v1_76X_mcRun2_asymptotic_v12-v1 MINIAOD
+  ///is produced with PU profile matching the Run2015 data. No nee to PU rescale.
+  return 1.0;
+
   ///Load histogram only once,later fetch it from vector<TH1F*>
   ///At the same time divide the histogram to get the weight.
   ///First load Data PU
@@ -143,13 +148,11 @@ float HTTAnalyzer::getPUWeight(const EventProxyHTT & myEventProxy){
 float HTTAnalyzer::getGenWeight(const EventProxyHTT & myEventProxy){
 
   if(myEventProxy.wevent->sample()==0) return 1.0;
-  ///generator weight broken in miniAODv2
-  /*
-  if(myEventProxy.wevent->sample()==1) return myEventProxy.wevent->genevtweight()/23443.423;  
-  if(myEventProxy.wevent->sample()==2) return myEventProxy.wevent->genevtweight()/225892.45;  
-  if(myEventProxy.wevent->sample()==3) return myEventProxy.wevent->genevtweight()/6383;
-  */
-  
+  //if(myEventProxy.wevent->sample()==1) return myEventProxy.wevent->genevtweight()/23443.423;  
+  //if(myEventProxy.wevent->sample()==2) return myEventProxy.wevent->genevtweight()/225892.45;  
+  //if(myEventProxy.wevent->sample()==3) return myEventProxy.wevent->genevtweight()/6383;
+
+  /* Not using the HT samples at the moment.
   if(myEventProxy.wevent->sample()==2){
     //https://twiki.cern.ch/twiki/pub/CMS/HiggsToTauTauWorking2015/WplusHtWeights.xls
     //NLO to LO scaling removed, as NLO cross section used in normalisation.
@@ -160,6 +163,7 @@ float HTTAnalyzer::getGenWeight(const EventProxyHTT & myEventProxy){
     else if(fileName.find("WJetsToLNu_HT-600ToInf")!=std::string::npos) return 0.0213743732/1.2137837838;
     else return 0.8520862372/1.2137837838;
   }
+  */
   
   return 1;
 }
@@ -561,6 +565,7 @@ bool HTTAnalyzer::analyze(const EventProxyBase& iEvent){
   bool muonKinematics = aMuon.pt()>19 && fabs(aMuon.eta())<2.1;
   bool trigger = aPair.trigger(HLT_IsoMu17_eta2p1);
   if(sampleName=="Data") trigger = aPair.trigger(HLT_IsoMu18);
+  trigger = true;
 
   bool extraRequirements = true;
   //extraRequirements &= nJets30==0;
@@ -571,8 +576,9 @@ bool HTTAnalyzer::analyze(const EventProxyBase& iEvent){
   if(!tauKinematics || !tauID || !muonKinematics || !trigger) return true;
   if(!extraRequirements) return true;
 
+  
+  ///Selection used by the CP analysis.
   /*
-  ///Selection used by the CP analysis.  
   if(aMuon.nPCA().Mag()<0.005) return false; 
   if(aTau.nPCA().Mag()<0.005) return false;
   if(aEvent.nTracksInRefit()<2) return false;
@@ -604,14 +610,14 @@ bool HTTAnalyzer::analyze(const EventProxyBase& iEvent){
   ///Histograms for the QCD control region
   if(qcdSelectionSS){
     hNameSuffix = sampleName+"qcdselSS";
-    ///SS ans OS isolation histograms are filled only for mT<40 to remove possible contamnation
+    ///SS ans OS isolation histograms are filled only for mT<40 to remove possible contamination
     //from TT in high mT region.
     if(aMuon.mt()<40) myHistos_->fill1DHistogram("h1DIso"+hNameSuffix,aMuon.iso(),eventWeight);
     ///Fill SS histos in signal mu isolation region. Those histograms
     ///provide shapes for QCD estimate in signal region and in various control regions.
     ///If control region has OS we still use SS QCD estimate.
     if(aMuon.mt()<40 && aMuon.iso()<0.1) fillControlHistos(hNameSuffix, eventWeight);
-    if(aMuon.mt()>60){
+    if(aMuon.mt()>60 && aMuon.iso()<0.1){
       myHistos_->fill1DHistogram("h1DMassTrans"+hNameSuffix+"wselSS",aMuon.mt(),eventWeight);    
       myHistos_->fill1DHistogram("h1DMassTrans"+hNameSuffix+"wselOS",aMuon.mt(),eventWeight);
       fillDecayPlaneAngle(hNameSuffix+"wselOS",eventWeight);

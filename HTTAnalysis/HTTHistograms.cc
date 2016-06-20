@@ -47,24 +47,26 @@ float HTTHistograms::getLumi(){
 
   //return 2207823354.548e-6;//pb-1 data for NTUPLES_18_12_2015
   
-  //./.local/bin/brilcalc lumi --normtag ~lumipro/public/normtag_file/OfflineNormtagV2.json -i 12_02_2016_CD.json
+  //./.local/bin/brilcalc lumi --normtag ~lumipro/public/normtag_file/OfflineNormtagV2.json -i lumiSummary_Run2015C_16Dec2015_v1.json
+  //+-------+------+------+------+-------------------+------------------+
+  //| nfill | nrun | nls  | ncms | totdelivered(/ub) | totrecorded(/ub) |
+  //+-------+------+------+------+-------------------+------------------+
+  //| 6     | 8    | 1099 | 1099 | 17767116.986      | 17225935.728     |
+  //+-------+------+------+------+-------------------+------------------+
+  //./.local/bin/brilcalc lumi --normtag ~lumipro/public/normtag_file/OfflineNormtagV2.json -i lumiSummary_Run2015D_16Dec2015_v1.json
   //+-------+------+-------+-------+-------------------+------------------+
   //| nfill | nrun | nls   | ncms  | totdelivered(/ub) | totrecorded(/ub) |
   //+-------+------+-------+-------+-------------------+------------------+
-  //| 47    | 116  | 32702 | 32702 | 2289599379.230    | 2214575536.754   |
+  //| 41    | 108  | 31592 | 31592 | 2185867468.728    | 2114239169.533   |
   //+-------+------+-------+-------+-------------------+------------------+
-  return 2214575536.754e-6;//pb-1 data for NTUPLES_12_02_2016
-
-    //brilcalc lumi -b "STABLE BEAMS" --hltpath "HLT_IsoMu18_v*" --normtag /afs/cern.ch/user/l/lumipro/public/normtag_file/normtag_DATACERT.json -i
-  //+----------------+-------+------+-------+-------------------+------------------+
-  //| hltpath        | nfill | nrun | ncms  | totdelivered(/ub) | totrecorded(/ub) |
-  //+----------------+-------+------+-------+-------------------+------------------+
-  //| HLT_IsoMu18_v2 | 20    | 57   | 23240 | 163456401.055     | 151493189.852    |
-  //+----------------+-------+------+-------+-------------------+------------------+
-  //return 2214575536.754e-6 + 151493189.852e-6;//pb-1 data for NTUPLES_12_02_2016 + NTUPLES_14_06_2016
-
-  //return 3762785.280e-6;
-
+  //./.local/bin/brilcalc lumi --normtag  /afs/cern.ch/user/l/lumipro/public/normtag_file/normtag_DATACERT.json -i lumiSummary_Run2016B_PromptReco_v2.json
+  //+-------+------+-------+-------+-------------------+------------------+
+  //| nfill | nrun | nls   | ncms  | totdelivered(/ub) | totrecorded(/ub) |
+  //+-------+------+-------+-------+-------------------+------------------+
+  //| 22    | 61   | 24919 | 24914 | 2151456680.808    | 2059830201.769   |
+  //+-------+------+-------+-------+-------------------+------------------+  
+  return (17225935.728 + 2114239169.533 + 2059830201.769)*1e-6;//pb-1 data for NTUPLES_20_06_2016
+  
 }
 /////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////
@@ -168,6 +170,12 @@ TH1F *HTTHistograms::get1D_DY_Histogram(const std::string& name){
   TH1F *hDYJetsOther = get1DHistogram(hName.Data());
 
   if(!hDYJetsMuTau) return 0;
+
+  if(name.find("h1DStats")==std::string::npos){
+    hDYJetsMuTau->Scale(0.85);//TEST AK
+    hDYJetsMuTau->Scale(1.2);//TEST AK
+  }
+  
   if(hDYJetsMuMu) hDYJetsMuTau->Add(hDYJetsMuMu);
   if(hDYJetsEE) hDYJetsMuTau->Add(hDYJetsEE);
   if(hDYJetsOther) hDYJetsMuTau->Add(hDYJetsOther);
@@ -212,7 +220,7 @@ TH1F *HTTHistograms::get1D_WJet_Histogram(const std::string& name){
   if(hWJets200to400) hWJets->Add(hWJets200to400);
   if(hWJets400to600) hWJets->Add(hWJets400to600);
   if(hWJets600toInf) hWJets->Add(hWJets600toInf);
-
+  
   return hWJets;
 }
 /////////////////////////////////////////////////////////
@@ -280,74 +288,7 @@ void HTTHistograms::finalizeHistograms(int nRuns, float weight){
 
   AnalysisHistograms::finalizeHistograms();
 
-   /*
-  plotProfiles("hProfMagVsPt_","H");
-  plotProfiles("hProfMagVsPt_","A");
-  plotProfiles("hProfMagVsPt_","DYJetsMuTau");
-
-  plotProfiles("hProfMagVsCos_","H");
-  plotProfiles("hProfMagVsCos_","A");
-  plotProfiles("hProfMagVsCos_","DYJetsMuTau");
-
-  plotProfiles("hProfPtVsMag_","H");
-  plotProfiles("hProfPtVsMag_","A");
-  plotProfiles("hProfPtVsMag_","DYJetsMuTau");
-
-  plotProfiles("hProfRecoVsMagGen_","H");
-  plotProfiles("hProfRecoVsMagGen_","A");
-  plotProfiles("hProfRecoVsMagGen_","DYJetsMuTau");
-
-  plotProfiles("hProfPhiVsMag_","H");
-  plotProfiles("hProfPhiVsMag_","A");
-  plotProfiles("hProfPhiVsMag_","DYJetsMuTau");
-
-  plotVerticesPulls("h1DVxPullX_H");
-  plotVerticesPulls("h1DVxPullY_H");
-  plotVerticesPulls("h1DVxPullZ_H");
-
-  plotVerticesPulls("h2DVxPullVsNTrackTrans_H");
-  plotVerticesPulls("h2DVxPullVsNTrackLong_H");
-  
-  plotPhiDecayPlanes("Phi_nVectorsData");
-  plotPhiDecayPlanes("Phi_nVectorsH");
-  plotPhiDecayPlanes("Phi_nVectorsA");  
-  plotPhiDecayPlanes("Phi_nVectorsDYJetsMuTau");
-  plotPhiDecayPlanes("Phi_nVectorsWJetsHT0");
-  
-  plotPhiDecayPlanes("Phi_nVecIP_yTauPosData");
-  plotPhiDecayPlanes("Phi_nVecIP_yTauNegData");
-  plotPhiDecayPlanes("Phi_nVecIP_yTauPosH");
-  plotPhiDecayPlanes("Phi_nVecIP_yTauNegH");
-  plotPhiDecayPlanes("Phi_nVecIP_yTauPosA");
-  plotPhiDecayPlanes("Phi_nVecIP_yTauNegA");
-  plotPhiDecayPlanes("Phi_nVecIP_yTauPosDYJetsMuTau");
-  plotPhiDecayPlanes("Phi_nVecIP_yTauNegDYJetsMuTau");
-  plotPhiDecayPlanes("Phi_nVecIP_yTauPosWJetsHT0");
-  plotPhiDecayPlanes("Phi_nVecIP_yTauNegWJetsHT0");
-
-  plot1Dh("yTauH");
-  plot1Dh("yTauA");
-  plot1Dh("yTauDYJetsMuTau");
-  plot1Dh("yTauWJetsHT0");
-
-  plotPhiDecayPlanes("CosPhi_CosPositiveH");
-  plotPhiDecayPlanes("CosPhi_CosNegativeH");
-
-  plotPhiDecayPlanes("CosPhiNN_H");
-  plotPhiDecayPlanes("CosPhiNN_A");
-  plotPhiDecayPlanes("CosPhiNN_DYJetsMuTau");
-  plotPhiDecayPlanes("CosPhiNN_WJetsHT0");
-
-  plotPhiDecayPlanes("CosPhi_CosPositiveA");
-  plotPhiDecayPlanes("CosPhi_CosNegativeA");
-
-  plotnPCA("H");
-  plotnPCA("A");
-  plotnPCA("DYJetsMuTau");
-  plotnPCA("WJetsHT0");
-  return;
-  ///////////
-  */  
+  //plotCPhistograms(nRuns, weight);
 
   wselOSCorrection =  std::pair<float,float>(1,0);
   wselSSCorrection =  std::pair<float,float>(1,0);
@@ -403,12 +344,81 @@ void HTTHistograms::finalizeHistograms(int nRuns, float weight){
   plotStack("PtLeadingBJet","");
   plotStack("EtaLeadingBJet","");
 
-  plotStack("NPV","");
-
   plotStack("nPCAMuon","");
   plotStack("nPCATau","");
   plotStack("Phi_nVectors","");
   plotStack("Phi_nVectors","wselOS");
+
+  plotStack("NPV","");
+}
+/////////////////////////////////////////////////////////
+/////////////////////////////////////////////////////////
+void HTTHistograms::plotCPhistograms(int nRuns, float weight){
+
+  plotProfiles("hProfMagVsPt_","H");
+  plotProfiles("hProfMagVsPt_","A");
+  plotProfiles("hProfMagVsPt_","DYJetsMuTau");
+
+  plotProfiles("hProfMagVsCos_","H");
+  plotProfiles("hProfMagVsCos_","A");
+  plotProfiles("hProfMagVsCos_","DYJetsMuTau");
+
+  plotProfiles("hProfPtVsMag_","H");
+  plotProfiles("hProfPtVsMag_","A");
+  plotProfiles("hProfPtVsMag_","DYJetsMuTau");
+
+  plotProfiles("hProfRecoVsMagGen_","H");
+  plotProfiles("hProfRecoVsMagGen_","A");
+  plotProfiles("hProfRecoVsMagGen_","DYJetsMuTau");
+
+  plotProfiles("hProfPhiVsMag_","H");
+  plotProfiles("hProfPhiVsMag_","A");
+  plotProfiles("hProfPhiVsMag_","DYJetsMuTau");
+
+  plotVerticesPulls("h1DVxPullX_H");
+  plotVerticesPulls("h1DVxPullY_H");
+  plotVerticesPulls("h1DVxPullZ_H");
+
+  plotVerticesPulls("h2DVxPullVsNTrackTrans_H");
+  plotVerticesPulls("h2DVxPullVsNTrackLong_H");
+  
+  plotPhiDecayPlanes("Phi_nVectorsData");
+  plotPhiDecayPlanes("Phi_nVectorsH");
+  plotPhiDecayPlanes("Phi_nVectorsA");  
+  plotPhiDecayPlanes("Phi_nVectorsDYJetsMuTau");
+  plotPhiDecayPlanes("Phi_nVectorsWJetsHT0");
+  
+  plotPhiDecayPlanes("Phi_nVecIP_yTauPosData");
+  plotPhiDecayPlanes("Phi_nVecIP_yTauNegData");
+  plotPhiDecayPlanes("Phi_nVecIP_yTauPosH");
+  plotPhiDecayPlanes("Phi_nVecIP_yTauNegH");
+  plotPhiDecayPlanes("Phi_nVecIP_yTauPosA");
+  plotPhiDecayPlanes("Phi_nVecIP_yTauNegA");
+  plotPhiDecayPlanes("Phi_nVecIP_yTauPosDYJetsMuTau");
+  plotPhiDecayPlanes("Phi_nVecIP_yTauNegDYJetsMuTau");
+  plotPhiDecayPlanes("Phi_nVecIP_yTauPosWJetsHT0");
+  plotPhiDecayPlanes("Phi_nVecIP_yTauNegWJetsHT0");
+
+  plotSingleHistogram("yTauH");
+  plotSingleHistogram("yTauA");
+  plotSingleHistogram("yTauDYJetsMuTau");
+  plotSingleHistogram("yTauWJetsHT0");
+
+  plotPhiDecayPlanes("CosPhi_CosPositiveH");
+  plotPhiDecayPlanes("CosPhi_CosNegativeH");
+
+  plotPhiDecayPlanes("CosPhiNN_H");
+  plotPhiDecayPlanes("CosPhiNN_A");
+  plotPhiDecayPlanes("CosPhiNN_DYJetsMuTau");
+  plotPhiDecayPlanes("CosPhiNN_WJetsHT0");
+
+  plotPhiDecayPlanes("CosPhi_CosPositiveA");
+  plotPhiDecayPlanes("CosPhi_CosNegativeA");
+
+  plotnPCA("H");
+  plotnPCA("A");
+  plotnPCA("DYJetsMuTau");
+  plotnPCA("WJetsHT0");
   
 }
 /////////////////////////////////////////////////////////
@@ -447,30 +457,6 @@ void HTTHistograms::plotnPCA(const std::string & type){
   l.Draw();
   
   c->Print(TString::Format("fig_png/nPCA_length_%s.png",type.c_str()).Data());
-}
-/////////////////////////////////////////////////////////
-/////////////////////////////////////////////////////////
-void HTTHistograms::plot1Dh(const std::string & name){
-
-  TString hName = "h1D"+name;
-  TH1F* h1D = get1DHistogram(hName.Data());
-  if(!h1D) return;
-
-  TCanvas* c = new TCanvas("AnyHistogram","AnyHistogram",
-			   460,500);
-
-  TLegend l(0.15,0.12,0.35,0.22,NULL,"brNDC");
-  l.SetTextSize(0.05);
-  l.SetFillStyle(4000);
-  l.SetBorderSize(0);
-  l.SetFillColor(10);
-   
-  h1D->SetLineWidth(3);
-  h1D->Scale(1.0/h1D->Integral(0,h1D->GetNbinsX()+1));
-
-  h1D->Draw("");
-  
-  c->Print(TString::Format("fig_png/%s.png",name.c_str()).Data());
 }
 /////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////
@@ -774,9 +760,9 @@ THStack*  HTTHistograms::plotStack(std::string varName, std::string selName){
   weight = getSampleNormalisation(sampleName);
   scale = weight*lumi;
   hDYJetsOther->Scale(scale);
-  hDYJetsMuMu->Scale(scale);
+  hDYJetsMuMu->Scale(1.2*scale);//TEST AK
   hDYJetsEE->Scale(scale);
-  hDYJetsMuTau->Scale(scale);
+  hDYJetsMuTau->Scale(0.85*scale);//TEST AK
 
   sampleName = "TTbar";
   weight = getSampleNormalisation(sampleName);
@@ -884,6 +870,8 @@ THStack*  HTTHistograms::plotStack(std::string varName, std::string selName){
   float highEnd = 150;
   float lowEnd = -150;
 
+  if(varName.find("Phi_")!=std::string::npos) lowEnd = 0;
+    
   int binHigh = hs->GetXaxis()->FindBin(highEnd);  
   int binLow = hs->GetXaxis()->FindBin(lowEnd);
 
@@ -1029,6 +1017,11 @@ std::pair<float,float> HTTHistograms::getQCDOStoSS(std::string selName,
   TH1F *hSoupOS = get1DHistogram((hName+"Data"+"qcdselOS").c_str());
   TH1F *hSoupOSb = get1DHistogram((hName+"Data"+"qcdselOS").c_str());
 
+  if(!hSoupSS){
+    std::cout<<"No data histograms for SS category!"<<std::endl;
+    return  std::make_pair(1.0,0.0);
+  }
+  
   TH1F *hEmpty = (TH1F*)hSoupSS->Clone("hEmpty");
   hEmpty->Clear();
   
