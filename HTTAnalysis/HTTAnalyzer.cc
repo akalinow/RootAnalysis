@@ -478,21 +478,19 @@ bool HTTAnalyzer::isLepton(int decMode){
 }
 //////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////
-/*
-std::vector<Wjet> HTTAnalyzer::getSeparatedJets(const EventProxyHTT & myEventProxy, const Wtau & aTau,
-						const Wmu & aMuon, float deltaR){
+std::vector<HTTParticle> HTTAnalyzer::getSeparatedJets(const EventProxyHTT & myEventProxy,
+						float deltaR){
 
-  std::vector<Wjet> separatedJets;
+  std::vector<HTTParticle> separatedJets;
   
-  for(auto aJet: *myEventProxy.wjet){
-    float dRTau = sqrt(pow(aJet.eta() - aTau.eta(),2) + pow(aJet.phi() - aTau.phi(),2));
-    float dRMu = sqrt(pow(aJet.eta() - aMuon.eta(),2) + pow(aMuon.phi() - aTau.phi(),2));
+  for(auto aJet: *myEventProxy.jets){
+    float dRTau = aJet.getP4().DeltaR(aTau.getP4());
+    float dRMu = aMuon.getP4().DeltaR(aTau.getP4());
     if(dRTau>deltaR && dRMu>deltaR) separatedJets.push_back(aJet);
   }
 
   return separatedJets;
 }
-*/
 //////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////
 void HTTAnalyzer::setAnalysisObjects(const EventProxyHTT & myEventProxy){
@@ -508,12 +506,10 @@ void HTTAnalyzer::setAnalysisObjects(const EventProxyHTT & myEventProxy){
   }
   */
 
-  /*
-  aSeparatedJets = getSeparatedJets(myEventProxy, aTau, aMuon, 0.5);
-  aJet = aSeparatedJets.size() ? aSeparatedJets[0] : Wjet();
-  nJets30 = count_if(aSeparatedJets.begin(), aSeparatedJets.end(),[](const Wjet & aJet){return aJet.pt()>30;});
-  */
-
+  aSeparatedJets = getSeparatedJets(myEventProxy, 0.5);
+  aJet = aSeparatedJets.size() ? aSeparatedJets[0] : HTTParticle();
+  nJets30 = count_if(aSeparatedJets.begin(), aSeparatedJets.end(),[](const HTTParticle & aJet){return aJet.getP4().Pt()>30;});
+  
 }
 //////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////
@@ -580,15 +576,8 @@ bool HTTAnalyzer::analyze(const EventProxyBase& iEvent){
   muonKinematics &= aMuon.pt()>22; 
   */
   bool trigger = true;
-
-  bool extraRequirements = true;
-  //extraRequirements &= nJets30==0;
-  //extraRequirements &= aTau.decayMode()!=5 && aTau.decayMode()!=6 && nJets30==0;
-  //extraRequirements &= (aPair.m_vis()>50 && aPair.m_vis()<100);
-  
+ 
   if(!tauKinematics || !tauID || !muonKinematics || !trigger) return true;
-  if(!extraRequirements) return true;
-
   
   ///Selection used by the CP analysis.
   /*

@@ -26,9 +26,11 @@ void EventProxyHTT::init(std::vector<std::string> const& iFileNames){
   
   event = 0;//IMPORTNANT!!
   pairs = 0;//IMPORTNANT!!
+  jets = 0;//IMPORTNANT!!
   
   fChain->SetBranchAddress("HTTEvent",&event);
   fChain->SetBranchAddress("HTTPairCollection",&pairs);
+  fChain->SetBranchAddress("HTTJetCollection",&jets);
   
   fChain->SetBranchStatus("*",1);
   

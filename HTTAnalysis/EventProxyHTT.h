@@ -24,6 +24,7 @@
 
       HTTEvent *event;
       std::vector<HTTPair>  *pairs;
+      std::vector<HTTParticle>  *jets;
   
       ///Enable branches to be read
       void enableBranches();
