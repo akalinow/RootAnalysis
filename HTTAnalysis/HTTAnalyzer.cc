@@ -2,7 +2,6 @@
 
 #include "HTTAnalyzer.h"
 #include "HTTHistograms.h"
-
 //////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////
 HTTAnalyzer::HTTAnalyzer(const std::string & aName):Analyzer(aName){
@@ -52,6 +51,7 @@ void HTTAnalyzer::finalize(){
 //////////////////////////////////////////////////////////////////////////////
 void HTTAnalyzer::getPreselectionEff(const EventProxyHTT & myEventProxy){
 
+  /*
     TH1F *hStatsFromFile = (TH1F*)myEventProxy.getTTree()->GetCurrentFile()->Get("m2n/hStats");
 
     std::string hName = "h1DStats"+getSampleName(myEventProxy);
@@ -63,15 +63,16 @@ void HTTAnalyzer::getPreselectionEff(const EventProxyHTT & myEventProxy){
     //TESK AK hStats->SetBinContent(3,hStatsFromFile->GetBinContent(hStatsFromFile->FindBin(3))*genWeight);
     hStats->SetBinContent(3,hStatsFromFile->GetBinContent(hStatsFromFile->FindBin(2))*genWeight);///buggy weights in DY in NTUPLES_20_06_2016
     delete hStatsFromFile;
+  */
 
 }
 //////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////
 std::string HTTAnalyzer::getSampleName(const EventProxyHTT & myEventProxy){
 
-  if(myEventProxy.wevent->sample()==0) return "Data";
-  if(myEventProxy.wevent->sample()==1){
-    int decayModeBoson = myEventProxy.wevent->decayModeBoson();
+  if(myEventProxy.event->getSampleType()==0) return "Data";
+  if(myEventProxy.event->getSampleType()==1){
+    int decayModeBoson = myEventProxy.event->getDecayModeBoson();
     std::string decayName;
     if(decayModeBoson==7) decayName = "DYJetsMuMu";
     else if(decayModeBoson==6) decayName = "DYJetsEE";
@@ -90,8 +91,8 @@ std::string HTTAnalyzer::getSampleName(const EventProxyHTT & myEventProxy){
     return decayName+HTName;
     
   }
-  if(myEventProxy.wevent->sample()==11) return "DYJetsLowM";
-  if(myEventProxy.wevent->sample()==2){
+  if(myEventProxy.event->getSampleType()==11) return "DYJetsLowM";
+  if(myEventProxy.event->getSampleType()==2){
     std::string fileName = myEventProxy.getTTree()->GetCurrentFile()->GetName();
     if(fileName.find("WJetsToLNu_HT-100To200")!=std::string::npos) return "WJetsHT100to200";
     else if(fileName.find("WJetsToLNu_HT-200To400")!=std::string::npos) return "WJetsHT200to400";
@@ -99,9 +100,9 @@ std::string HTTAnalyzer::getSampleName(const EventProxyHTT & myEventProxy){
     else if(fileName.find("WJetsToLNu_HT-600ToInf")!=std::string::npos) return "WJetsHT600toInf";
     else return "WJetsHT0";
   }
-  if(myEventProxy.wevent->sample()==3) return "TTbar";
-  if(myEventProxy.wevent->sample()==5) return "H";
-  if(myEventProxy.wevent->sample()==6) return "A";
+  if(myEventProxy.event->getSampleType()==3) return "TTbar";
+  if(myEventProxy.event->getSampleType()==5) return "H";
+  if(myEventProxy.event->getSampleType()==6) return "A";
 
   return "Unknown";
 }
@@ -118,7 +119,7 @@ float HTTAnalyzer::getPUWeight(const EventProxyHTT & myEventProxy){
   ///First load Data PU
   if(!hPUVec_.size())  hPUVec_.resize(64);
 
-  if(!hPUVec_[myEventProxy.wevent->sample()]){
+  if(!hPUVec_[myEventProxy.event->getSampleType()]){
     std::string hName = "pileup";
     TH1F *hPUData = (TH1F*)puDataFile_->Get(hName.c_str());
     TH1F *hPUSample = (TH1F*)puMCFile_->Get(hName.c_str());
@@ -136,24 +137,24 @@ float HTTAnalyzer::getPUWeight(const EventProxyHTT & myEventProxy){
       hPUData->SetBinContent(0,1.0);
       hPUData->SetBinContent(hPUData->GetNbinsX()+1,1.0);
     }
-    hPUVec_[myEventProxy.wevent->sample()] =  hPUData;
+    hPUVec_[myEventProxy.event->getSampleType()] =  hPUData;
   }
 
-  int iBinPU = hPUVec_[myEventProxy.wevent->sample()]->FindBin(myEventProxy.wevent->npu());
+  int iBinPU = hPUVec_[myEventProxy.event->getSampleType()]->FindBin(myEventProxy.event->getNPU());
   
-  return  hPUVec_[myEventProxy.wevent->sample()]->GetBinContent(iBinPU);
+  return  hPUVec_[myEventProxy.event->getSampleType()]->GetBinContent(iBinPU);
 }
 //////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////
 float HTTAnalyzer::getGenWeight(const EventProxyHTT & myEventProxy){
 
-  if(myEventProxy.wevent->sample()==0) return 1.0;
-  //if(myEventProxy.wevent->sample()==1) return myEventProxy.wevent->genevtweight()/23443.423;  
-  //if(myEventProxy.wevent->sample()==2) return myEventProxy.wevent->genevtweight()/225892.45;  
-  //if(myEventProxy.wevent->sample()==3) return myEventProxy.wevent->genevtweight()/6383;
+  if(myEventProxy.event->getSampleType()==0) return 1.0;
+  //if(myEventProxy.event->getSampleType()==1) return myEventProxy.event->genevtweight()/23443.423;  
+  //if(myEventProxy.event->getSampleType()==2) return myEventProxy.event->genevtweight()/225892.45;  
+  //if(myEventProxy.event->getSampleType()==3) return myEventProxy.event->genevtweight()/6383;
 
   /* Not using the HT samples at the moment.
-  if(myEventProxy.wevent->sample()==2){
+  if(myEventProxy.event->getSampleType()==2){
     //https://twiki.cern.ch/twiki/pub/CMS/HiggsToTauTauWorking2015/WplusHtWeights.xls
     //NLO to LO scaling removed, as NLO cross section used in normalisation.
     std::string fileName = myEventProxy.getTTree()->GetCurrentFile()->GetName();
@@ -172,28 +173,29 @@ float HTTAnalyzer::getGenWeight(const EventProxyHTT & myEventProxy){
 void HTTAnalyzer::fillControlHistos(const std::string & hNameSuffix, float eventWeight){
 
   ///Fill histograms with number of PV.
-  myHistos_->fill1DHistogram("h1DNPV"+hNameSuffix,aEvent.npv(),eventWeight);
+  myHistos_->fill1DHistogram("h1DNPV"+hNameSuffix,aEvent.getNPV(),eventWeight);
 
   ///Fill SVfit and visible masses
-  myHistos_->fill1DHistogram("h1DMassSV"+hNameSuffix,aPair.svfit(),eventWeight);
-  myHistos_->fill1DHistogram("h1DMassVis"+hNameSuffix,aPair.m_vis(),eventWeight);
+  myHistos_->fill1DHistogram("h1DMassSV"+hNameSuffix,aPair.getP4SVFit().M(),eventWeight);
+  myHistos_->fill1DHistogram("h1DMassVis"+hNameSuffix,aPair.getP4().M(),eventWeight);
   
   ///Fill muon
-  myHistos_->fill1DHistogram("h1DMassTrans"+hNameSuffix,aMuon.mt(),eventWeight);
-  myHistos_->fill1DHistogram("h1DPtMuon"+hNameSuffix,aMuon.pt(),eventWeight);
-  myHistos_->fill1DHistogram("h1DEtaMuon"+hNameSuffix,aMuon.eta(),eventWeight);
-  myHistos_->fill1DHistogram("h1DIsoMuon"+hNameSuffix,aMuon.iso(),eventWeight);
-  myHistos_->fill1DHistogram("h1DPhiMuon"+hNameSuffix,aMuon.phi(),eventWeight);
-  myHistos_->fill1DHistogram("h1DnPCAMuon"+hNameSuffix,aMuon.nPCARefitvx().Mag(),eventWeight);
+  myHistos_->fill1DHistogram("h1DMassTrans"+hNameSuffix,aPair.getMTMuon(),eventWeight);
+  myHistos_->fill1DHistogram("h1DPtMuon"+hNameSuffix,aMuon.getP4().Pt(),eventWeight);
+  myHistos_->fill1DHistogram("h1DEtaMuon"+hNameSuffix,aMuon.getP4().Eta(),eventWeight);
+  myHistos_->fill1DHistogram("h1DPhiMuon"+hNameSuffix,aMuon.getP4().Phi(),eventWeight);
+  myHistos_->fill1DHistogram("h1DIsoMuon"+hNameSuffix,aMuon.getProperty(PropertyEnum::combreliso),eventWeight);
+  //myHistos_->fill1DHistogram("h1DnPCAMuon"+hNameSuffix,aMuon.nPCARefitvx().Mag(),eventWeight);
 
   ///Fill tau
-  myHistos_->fill1DHistogram("h1DPtTau"+hNameSuffix,aTau.pt(),eventWeight);
-  myHistos_->fill1DHistogram("h1DEtaTau"+hNameSuffix,aTau.eta(),eventWeight);
-  myHistos_->fill1DHistogram("h1DPhiTau"+hNameSuffix,aTau.phi() ,eventWeight);
-  myHistos_->fill1DHistogram("h1DIDTau"+hNameSuffix,aTau.tauID(byCombinedIsolationDeltaBetaCorrRaw3Hits) ,eventWeight);  
-  myHistos_->fill1DHistogram("h1DStatsDecayMode"+hNameSuffix, aTau.decayMode(), eventWeight);
-  myHistos_->fill1DHistogram("h1DnPCATau"+hNameSuffix,aTau.nPCARefitvx().Mag(),eventWeight);
+  myHistos_->fill1DHistogram("h1DPtTau"+hNameSuffix,aTau.getP4().Pt(),eventWeight);
+  myHistos_->fill1DHistogram("h1DEtaTau"+hNameSuffix,aTau.getP4().Eta(),eventWeight);
+  myHistos_->fill1DHistogram("h1DPhiTau"+hNameSuffix,aTau.getP4().Phi() ,eventWeight);
+  myHistos_->fill1DHistogram("h1DIDTau"+hNameSuffix,aTau.getProperty(PropertyEnum::byCombinedIsolationDeltaBetaCorrRaw3Hits) ,eventWeight);  
+  myHistos_->fill1DHistogram("h1DStatsDecayMode"+hNameSuffix, aTau.getProperty(PropertyEnum::decayMode), eventWeight);
+  //myHistos_->fill1DHistogram("h1DnPCATau"+hNameSuffix,aTau.nPCARefitvx().Mag(),eventWeight);
 
+  /*
   ///Fill leading tau track pt
   myHistos_->fill1DHistogram("h1DPtTauLeadingTk"+hNameSuffix,aTau.leadingTk().Pt(),eventWeight);
   ///Fill jets info           
@@ -201,20 +203,21 @@ void HTTAnalyzer::fillControlHistos(const std::string & hNameSuffix, float event
   myHistos_->fill1DHistogram("h1DPtLeadingJet"+hNameSuffix,aJet.pt(),eventWeight);
   myHistos_->fill1DHistogram("h1DEtaLeadingJet"+hNameSuffix,aJet.eta(),eventWeight);
   myHistos_->fill1DHistogram("h1DCSVBtagLeadingJet"+hNameSuffix,aJet.csvtag(),eventWeight);
-
-  myHistos_->fill1DHistogram("h1DPtMET"+hNameSuffix,aMET.metpt(),eventWeight);
+  */
+  myHistos_->fill1DHistogram("h1DPtMET"+hNameSuffix,aPair.getMET().Mod(),eventWeight);
 
   fillDecayPlaneAngle(hNameSuffix, eventWeight);
-  
+  /*  
   if(aJet.bjet()){
     myHistos_->fill1DHistogram("h1DPtLeadingBJet"+hNameSuffix,aJet.pt(),eventWeight);
     myHistos_->fill1DHistogram("h1DEtaLeadingBJet"+hNameSuffix,aJet.eta(),eventWeight);
-  }  
+  } 
+  */ 
 }
 //////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////
 bool HTTAnalyzer::fillVertices(const std::string & sysType){
-
+  /*
   TVector3 aVertexGen = aEvent.genPV();
   TVector3 aVertex;
   if(sysType.find("AODPV")!=std::string::npos) aVertex = aEvent.thePV();
@@ -230,13 +233,13 @@ bool HTTAnalyzer::fillVertices(const std::string & sysType){
 
   myHistos_->fill2DHistogram("h2DVxPullVsNTrackTrans_"+sysType, aEvent.nTracksInRefit(), sqrt(pullX*pullX + pullY*pullY));
   myHistos_->fill2DHistogram("h2DVxPullVsNTrackLong_"+sysType, aEvent.nTracksInRefit(), pullZ);
-
+  */
   return true;
 }
 //////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////
 void HTTAnalyzer::fillDecayPlaneAngle(const std::string & hNameSuffix, float eventWeight){
-
+  /*
   ///Method from http://arxiv.org/abs/1108.0670 (S. Berge)
   ///take impact parameters instead of tau momentum.
   ///calculate angles in pi+ - pi- rest frame
@@ -337,12 +340,12 @@ void HTTAnalyzer::fillDecayPlaneAngle(const std::string & hNameSuffix, float eve
 
   myHistos_->fillProfile("hProfMagVsCos_"+hNameSuffix, positiveLeadingTk.Vect().Unit()*a3v.Unit(), negativeLeadingTk.Vect().Unit()*a3v.Unit());
   //myHistos_->fillProfile("hProfMagVsCos_"+hNameSuffix, negativeLeadingTk.Vect().Unit()*a3v.Unit(), positiveLeadingTk.Vect().Unit()*a3v.Unit());
-  
+  */ 
 }
 //////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////
 void HTTAnalyzer::fillGenDecayPlaneAngle(const std::string & hNameSuffix, float eventWeight){
-
+  /*
   ///Method from http://arxiv.org/abs/1108.0670 (Berger)
   ///take impact parameters instead of tau momentum.
   ///calculate angles in pi+ - pi- rest frame  
@@ -389,6 +392,7 @@ void HTTAnalyzer::fillGenDecayPlaneAngle(const std::string & hNameSuffix, float 
   
   myHistos_->fillProfile("hProfPtVsMag_"+hNameSuffix,aGenNegativeTau.nPCA().Mag(),negativeLeadingTk.Perp());
   myHistos_->fillProfile("hProfPtVsMag_"+hNameSuffix,aGenPositiveTau.nPCA().Mag(),positiveLeadingTk.Perp());
+  */
 }
 //////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////
@@ -474,6 +478,7 @@ bool HTTAnalyzer::isLepton(int decMode){
 }
 //////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////
+/*
 std::vector<Wjet> HTTAnalyzer::getSeparatedJets(const EventProxyHTT & myEventProxy, const Wtau & aTau,
 						const Wmu & aMuon, float deltaR){
 
@@ -487,22 +492,27 @@ std::vector<Wjet> HTTAnalyzer::getSeparatedJets(const EventProxyHTT & myEventPro
 
   return separatedJets;
 }
+*/
 //////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////
 void HTTAnalyzer::setAnalysisObjects(const EventProxyHTT & myEventProxy){
 
-  aEvent = *myEventProxy.wevent;  
-  aPair = (*myEventProxy.wpair)[0];
-  aTau = (*myEventProxy.wtau)[0];
+  aEvent = *myEventProxy.event;  
+  aPair = (*myEventProxy.pairs)[0];
+  aTau = aPair.getTau();
+  aMuon = aPair.getMuon();
+  /*
   if(myEventProxy.wtauGen && myEventProxy.wtauGen->size()){
     aGenNegativeTau = (*myEventProxy.wtauGen)[0];
     aGenPositiveTau = (*myEventProxy.wtauGen)[1];
   }
-  aMuon = (*myEventProxy.wmu)[0];
-  aMET = (*myEventProxy.wmet)[0];
+  */
+
+  /*
   aSeparatedJets = getSeparatedJets(myEventProxy, aTau, aMuon, 0.5);
   aJet = aSeparatedJets.size() ? aSeparatedJets[0] : Wjet();
   nJets30 = count_if(aSeparatedJets.begin(), aSeparatedJets.end(),[](const Wjet & aJet){return aJet.pt()>30;});
+  */
 
 }
 //////////////////////////////////////////////////////////////////////////////
@@ -511,8 +521,9 @@ std::pair<bool, bool> HTTAnalyzer::checkTauDecayMode(const EventProxyHTT & myEve
 
   bool goodGenDecayMode = false;
   bool goodRecoDecayMode = false;
-  std::vector<std::string> decayNamesGen = getTauDecayName(myEventProxy.wevent->decModeMinus(), myEventProxy.wevent->decModePlus());
-  std::vector<std::string> decayNamesReco = getTauDecayName(aTau.decayMode(), tauDecayMuon);
+
+  std::vector<std::string> decayNamesGen = getTauDecayName(aEvent.getDecayModeMinus(), aEvent.getDecayModePlus());//FIX
+  std::vector<std::string> decayNamesReco = getTauDecayName(aEvent.getDecayModeMinus(), aEvent.getDecayModePlus());
   /*
   for(auto it: decayNamesGen) if(it.find("Lepton1Prong0Pi0")!=std::string::npos) goodGenDecayMode = true;
   for(auto it: decayNamesReco) if(it.find("Lepton1Prong0Pi0")!=std::string::npos) goodRecoDecayMode = true;
@@ -545,7 +556,7 @@ bool HTTAnalyzer::analyze(const EventProxyBase& iEvent){
   myHistos_->fill1DHistogram("h1DStats"+sampleName,0,eventWeight);
   getPreselectionEff(myEventProxy);
   /////////////////////////////////////////////////////////////////////////////
-  if(!myEventProxy.wpair->size() || !myEventProxy.wtau->size() || !myEventProxy.wmu->size()) return true;
+  if(!myEventProxy.pairs->size()) return true;
 
   setAnalysisObjects(myEventProxy);
 
@@ -560,19 +571,21 @@ bool HTTAnalyzer::analyze(const EventProxyBase& iEvent){
   }
 
   ///This stands for core selection, that is common to all regions.
-  bool tauKinematics = aTau.pt()>30 && fabs(aTau.eta())<2.3;
-  bool tauID = aTau.tauID(byMediumCombinedIsolationDeltaBetaCorr3Hits);
-  bool muonKinematics = aMuon.pt()>19 && fabs(aMuon.eta())<2.1;
+  bool tauKinematics = aTau.getP4().Pt()>30 && fabs(aTau.getP4().Eta())<2.3;
+  bool tauID = aTau.getProperty(PropertyEnum::byCombinedIsolationDeltaBetaCorrRaw3Hits);
+  bool muonKinematics = aMuon.getP4().Pt()>19 && fabs(aMuon.getP4().Eta())<2.1;
+  /*
   bool trigger = aPair.trigger(HLT_IsoMu17_eta2p1);
-  if(sampleName=="Data") trigger = aPair.trigger(HLT_IsoMu18);
-  trigger = true;
+  if(sampleName=="Data") trigger = aPair.trigger(HLT_IsoMu20) || aPair.trigger(HLT_IsoMu18);
+  muonKinematics &= aMuon.pt()>22; 
+  */
+  bool trigger = true;
 
   bool extraRequirements = true;
   //extraRequirements &= nJets30==0;
   //extraRequirements &= aTau.decayMode()!=5 && aTau.decayMode()!=6 && nJets30==0;
   //extraRequirements &= (aPair.m_vis()>50 && aPair.m_vis()<100);
   
-  if(!myEventProxy.wpair->size()) return true;
   if(!tauKinematics || !tauID || !muonKinematics || !trigger) return true;
   if(!extraRequirements) return true;
 
@@ -586,15 +599,15 @@ bool HTTAnalyzer::analyze(const EventProxyBase& iEvent){
     
   ///Note: parts of the signal/control region selection are applied in the following code.
   ///FIXME AK: this should be made in a more clear way.
-  bool baselineSelection = aPair.diq()==-1 && aMuon.mt()<40 && aMuon.iso()<0.1;
-  bool wSelection = aMuon.mt()>60 && aMuon.iso()<0.1;
-  bool qcdSelectionSS = aPair.diq()==1;
-  bool qcdSelectionOS = aPair.diq()==-1;
-  bool ttSelection = aJet.csvtag()>0.9 && nJets30>1;
-  bool mumuSelection =  aMuon.mt()<40 && aMuon.iso()<0.1 && aPair.m_vis()>85 && aPair.m_vis()<95;
-
-  ///Fill variables stored in TTree
-  muonPt = aMuon.pt();
+  bool SS = aTau.getCharge()*aMuon.getCharge() == 1;
+  bool OS = aTau.getCharge()*aMuon.getCharge() == 1;
+  bool baselineSelection = OS && aPair.getMTMuon()<40 && aMuon.getProperty(PropertyEnum::combreliso)<0.1;
+  bool wSelection = aPair.getMTMuon()>60 && aMuon.getProperty(PropertyEnum::combreliso)<0.1;
+  bool qcdSelectionSS = SS;
+  bool qcdSelectionOS = OS;
+  //bool ttSelection = aJet.csvtag()>0.9 && nJets30>1;
+  bool ttSelection = true;
+  bool mumuSelection =  aPair.getMTMuon()<40 &&  aMuon.getProperty(PropertyEnum::combreliso)<0.1 && aPair.getP4().M()>85 && aPair.getP4().M()<95;
 
   ///Histograms for the baseline selection  
   if(baselineSelection){
@@ -612,58 +625,58 @@ bool HTTAnalyzer::analyze(const EventProxyBase& iEvent){
     hNameSuffix = sampleName+"qcdselSS";
     ///SS ans OS isolation histograms are filled only for mT<40 to remove possible contamination
     //from TT in high mT region.
-    if(aMuon.mt()<40) myHistos_->fill1DHistogram("h1DIso"+hNameSuffix,aMuon.iso(),eventWeight);
+    if(aPair.getMTMuon()<40) myHistos_->fill1DHistogram("h1DIso"+hNameSuffix,aMuon.getProperty(PropertyEnum::combreliso),eventWeight);
     ///Fill SS histos in signal mu isolation region. Those histograms
     ///provide shapes for QCD estimate in signal region and in various control regions.
     ///If control region has OS we still use SS QCD estimate.
-    if(aMuon.mt()<40 && aMuon.iso()<0.1) fillControlHistos(hNameSuffix, eventWeight);
-    if(aMuon.mt()>60 && aMuon.iso()<0.1){
-      myHistos_->fill1DHistogram("h1DMassTrans"+hNameSuffix+"wselSS",aMuon.mt(),eventWeight);    
-      myHistos_->fill1DHistogram("h1DMassTrans"+hNameSuffix+"wselOS",aMuon.mt(),eventWeight);
+    if(aPair.getMTMuon()<40 && aMuon.getProperty(PropertyEnum::combreliso)<0.1) fillControlHistos(hNameSuffix, eventWeight);
+    if(aPair.getMTMuon()>60 && aMuon.getProperty(PropertyEnum::combreliso)<0.1){
+      myHistos_->fill1DHistogram("h1DMassTrans"+hNameSuffix+"wselSS",aPair.getMTMuon(),eventWeight);    
+      myHistos_->fill1DHistogram("h1DMassTrans"+hNameSuffix+"wselOS",aPair.getMTMuon(),eventWeight);
       fillDecayPlaneAngle(hNameSuffix+"wselOS",eventWeight);
     }
     if(ttSelection){
-      myHistos_->fill1DHistogram("h1DMassTrans"+hNameSuffix+"ttselOS",aMuon.mt(),eventWeight);
-      myHistos_->fill1DHistogram("h1DMassTrans"+hNameSuffix+"ttselSS",aMuon.mt(),eventWeight);
-      myHistos_->fill1DHistogram("h1DIsoMuon"+hNameSuffix+"ttselOS",aMuon.iso(),eventWeight);
+      myHistos_->fill1DHistogram("h1DMassTrans"+hNameSuffix+"ttselOS",aPair.getMTMuon(),eventWeight);
+      myHistos_->fill1DHistogram("h1DMassTrans"+hNameSuffix+"ttselSS",aPair.getMTMuon(),eventWeight);
+      myHistos_->fill1DHistogram("h1DIsoMuon"+hNameSuffix+"ttselOS",aMuon.getProperty(PropertyEnum::combreliso),eventWeight);
     }
     if(mumuSelection){
-      myHistos_->fill1DHistogram("h1DPtMET"+hNameSuffix+"mumuselSS",aMET.metpt(),eventWeight);
-      myHistos_->fill1DHistogram("h1DPtMET"+hNameSuffix+"mumuselOS",aMET.metpt(),eventWeight);
+      myHistos_->fill1DHistogram("h1DPtMET"+hNameSuffix+"mumuselSS",aPair.getMET().Mod(),eventWeight);
+      myHistos_->fill1DHistogram("h1DPtMET"+hNameSuffix+"mumuselOS",aPair.getMET().Mod(),eventWeight);
     }
   }
   ///Make QCD shape histograms for specific selection.
   ///Using the same SS/OS scaling factor for now.    
   if(qcdSelectionOS){
     hNameSuffix = sampleName+"qcdselOS";
-    if(aMuon.mt()<40) myHistos_->fill1DHistogram("h1DIso"+hNameSuffix,aMuon.iso(),eventWeight);
+    if(aPair.getMTMuon()<40) myHistos_->fill1DHistogram("h1DIso"+hNameSuffix,aMuon.getProperty(PropertyEnum::combreliso),eventWeight);
   }
 
   ///Histograms for the WJet control region. 
   if(wSelection){
     hNameSuffix = sampleName+"wsel";
-    if(aPair.diq()==-1){
-      myHistos_->fill1DHistogram("h1DMassTrans"+hNameSuffix+"OS",aMuon.mt(),eventWeight);
+    if(OS){
+      myHistos_->fill1DHistogram("h1DMassTrans"+hNameSuffix+"OS",aPair.getMTMuon(),eventWeight);
       fillDecayPlaneAngle(hNameSuffix+"OS",eventWeight);
     }
-    if(aPair.diq()== 1) myHistos_->fill1DHistogram("h1DMassTrans"+hNameSuffix+"SS",aMuon.mt(),eventWeight);
+    if(SS) myHistos_->fill1DHistogram("h1DMassTrans"+hNameSuffix+"SS",aPair.getMTMuon(),eventWeight);
   }
 
   ///Histograms for the tt control region
   if(ttSelection){
     hNameSuffix = sampleName+"ttsel";
-    if(aPair.diq()==-1){
-      myHistos_->fill1DHistogram("h1DMassTrans"+hNameSuffix+"OS",aMuon.mt(),eventWeight);
-      myHistos_->fill1DHistogram("h1DIsoMuon"+hNameSuffix+"OS",aMuon.iso(),eventWeight);
+    if(OS){
+      myHistos_->fill1DHistogram("h1DMassTrans"+hNameSuffix+"OS",aPair.getMTMuon(),eventWeight);
+      myHistos_->fill1DHistogram("h1DIsoMuon"+hNameSuffix+"OS",aMuon.getProperty(PropertyEnum::combreliso),eventWeight);
     }
-    if(aPair.diq()== 1) myHistos_->fill1DHistogram("h1DMassTrans"+hNameSuffix+"SS",aMuon.mt(),eventWeight);    
+    if(SS) myHistos_->fill1DHistogram("h1DMassTrans"+hNameSuffix+"SS",aPair.getMTMuon(),eventWeight);    
   }
 
   ///Histograms for the DY->mu mu
   if(mumuSelection){
     hNameSuffix = sampleName+"mumusel";
-    if(aPair.diq()==-1) myHistos_->fill1DHistogram("h1DPtMET"+hNameSuffix+"OS",aMET.metpt(),eventWeight);
-    if(aPair.diq()==1) myHistos_->fill1DHistogram("h1DPtMET"+hNameSuffix+"SS",aMET.metpt(),eventWeight);
+    if(OS) myHistos_->fill1DHistogram("h1DPtMET"+hNameSuffix+"OS",aPair.getMET().Mod(),eventWeight);
+    if(SS) myHistos_->fill1DHistogram("h1DPtMET"+hNameSuffix+"SS",aPair.getMET().Mod(),eventWeight);
   }
   
   return true;

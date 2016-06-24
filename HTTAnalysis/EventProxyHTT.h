@@ -22,13 +22,8 @@
 
       virtual EventProxyBase* clone() const;
 
-      Wevent *wevent;
-      std::vector<Wpair>  *wpair;
-      std::vector<Wtau>  *wtau;
-      std::vector<Wtau>  *wtauGen;
-      std::vector<Wmu>  *wmu;
-      std::vector<Wjet>  *wjet;
-      std::vector<Wmet>  *wmet;
+      HTTEvent *event;
+      std::vector<HTTPair>  *pairs;
   
       ///Enable branches to be read
       void enableBranches();

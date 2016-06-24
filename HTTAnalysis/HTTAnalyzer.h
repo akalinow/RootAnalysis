@@ -122,11 +122,11 @@ class HTTAnalyzer: public Analyzer{
   
   ///Check if the decMode points to leptonic tau decay
   bool isLepton(int decMode);
-
+  /*
   ///Get jets separated by deltaR from tau an muon.
   std::vector<Wjet> getSeparatedJets(const EventProxyHTT & myEventProxy, const Wtau & aTau,
 				     const Wmu & aMuon, float deltaR);
-  
+  */
  protected:
 
   pat::strbitset *mySelections_;
@@ -156,20 +156,12 @@ class HTTAnalyzer: public Analyzer{
   bool filterEvent_;
 
   ///Reconstructed objects selected for given event.
-  Wevent aEvent;
-  Wpair aPair;
-  Wtau aTau;
-  Wtau aGenNegativeTau;
-  Wtau aGenPositiveTau;
-  Wmu aMuon;
-  Wmet aMET;
-  std::vector<Wjet> aSeparatedJets;
-  Wjet aJet;
-  int nJets30;
+  HTTEvent aEvent;
+  HTTPair aPair;
 
-  ///Variables stored in a TTree
-  Double_t muonPt;
- 
+  HTTParticle aTau;
+  HTTParticle aMuon;
+
 };
 
 #endif

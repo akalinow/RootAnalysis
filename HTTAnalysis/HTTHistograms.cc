@@ -64,9 +64,11 @@ float HTTHistograms::getLumi(){
   //| nfill | nrun | nls   | ncms  | totdelivered(/ub) | totrecorded(/ub) |
   //+-------+------+-------+-------+-------------------+------------------+
   //| 22    | 61   | 24919 | 24914 | 2151456680.808    | 2059830201.769   |
-  //+-------+------+-------+-------+-------------------+------------------+  
-  return (17225935.728 + 2114239169.533 + 2059830201.769)*1e-6;//pb-1 data for NTUPLES_20_06_2016
+  //+-------+------+-------+-------+-------------------+------------------+
   
+  float run2015 = (17225935.728 + 2114239169.533)*1E-6;
+  float run2016 =  2059830201.769*1E-6;
+  return run2015 + run2016;//pb-1 data for NTUPLES_20_06_2016
 }
 /////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////
@@ -172,8 +174,8 @@ TH1F *HTTHistograms::get1D_DY_Histogram(const std::string& name){
   if(!hDYJetsMuTau) return 0;
 
   if(name.find("h1DStats")==std::string::npos){
-    hDYJetsMuTau->Scale(0.85);//TEST AK
-    hDYJetsMuTau->Scale(1.2);//TEST AK
+    hDYJetsMuTau->Scale(muTauDYScale);
+    hDYJetsMuMu->Scale(mumuDYScale);
   }
   
   if(hDYJetsMuMu) hDYJetsMuTau->Add(hDYJetsMuMu);
@@ -288,6 +290,9 @@ void HTTHistograms::finalizeHistograms(int nRuns, float weight){
 
   AnalysisHistograms::finalizeHistograms();
 
+  muTauDYScale = 0.85;
+  mumuDYScale = 1.2;
+
   //plotCPhistograms(nRuns, weight);
 
   wselOSCorrection =  std::pair<float,float>(1,0);
@@ -295,6 +300,10 @@ void HTTHistograms::finalizeHistograms(int nRuns, float weight){
   
   wselOSCorrection = getWNormalisation("wselOS");
   wselSSCorrection = getWNormalisation("wselSS");
+
+
+  getQCDOStoSS("baseline", wselOSCorrection, wselSSCorrection);
+  return;
 
   ///Control regions plots
   plotStack("Iso","qcdselOS");
@@ -760,10 +769,10 @@ THStack*  HTTHistograms::plotStack(std::string varName, std::string selName){
   weight = getSampleNormalisation(sampleName);
   scale = weight*lumi;
   hDYJetsOther->Scale(scale);
-  hDYJetsMuMu->Scale(1.2*scale);//TEST AK
+  hDYJetsMuMu->Scale(mumuDYScale*scale);
   hDYJetsEE->Scale(scale);
-  hDYJetsMuTau->Scale(0.85*scale);//TEST AK
-
+  hDYJetsMuTau->Scale(muTauDYScale*scale);
+  
   sampleName = "TTbar";
   weight = getSampleNormalisation(sampleName);
   scale = weight*lumi;

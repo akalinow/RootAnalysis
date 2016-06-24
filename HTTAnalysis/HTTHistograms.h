@@ -88,6 +88,7 @@ class HTTHistograms: public AnalysisHistograms {
   //histogram name, e.g. including h1D prefix.
   void plotSingleHistogram(std::string hName);
 
+  float muTauDYScale, mumuDYScale;
 
 };
 
