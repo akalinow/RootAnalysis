@@ -159,26 +159,22 @@ class HTTParticle{
   ///Data member setters.
   void setP4(const TLorentzVector &aP4) { p4 = aP4;}
 
-  void setCharge(int aCharge) {charge = aCharge;}
-
   void setP4ScaleUp(const TLorentzVector &aP4) { p4ScaleUp = aP4;}
 
   void setP4ScaleDown(const TLorentzVector &aP4) { p4ScaleDown = aP4;}
-
-  void setPDGid(int id){ pdgId = id;}
 
   void setProperties(const std::vector<float> & aProperties) { properties = aProperties;}
 
   ///Data member getters.
   TLorentzVector getP4() const {return p4;}
 
-  int getCharge() const {return charge;}
-
   TLorentzVector getP4ScaleUp() const {return p4ScaleUp;}
 
   TLorentzVector getP4ScaleDown() const {return p4ScaleDown;}
 
-  int getPDGid() const {return pdgId;}
+  int getPDGid() const {return getProperty(PropertyEnum::PDGId);}
+
+  int getCharge() const {return getProperty(PropertyEnum::charge);}
 
   float getProperty(PropertyEnum index) const {return (unsigned int)index<properties.size()?  properties[(unsigned int)index]: -999;}
 
@@ -186,12 +182,6 @@ class HTTParticle{
 
   ///Nominal particle four-momentum
   TLorentzVector p4;
-
-  //Electric charge
-  int charge;
-  
-  //Particle PDG id
-  int pdgId;
 
   ///Particle four-momentum after scaling up/down.
   ///Variated scale depends on the particle type (mu, tau, e)

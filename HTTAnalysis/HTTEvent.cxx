@@ -52,14 +52,10 @@ void HTTParticle::clear(){
 
   p4 = TLorentzVector();
 
-  pdgId = 0;
-
   p4ScaleUp = TLorentzVector();
   p4ScaleDown = TLorentzVector();
 
-
   properties.clear();
-  
 }
 ////////////////////////////////////////////////
 ////////////////////////////////////////////////
