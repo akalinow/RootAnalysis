@@ -264,13 +264,13 @@ void HTTHistograms::defineHistograms(){
    add1DHistogram("h1DMassTemplate",";SVFit mass [GeV/c^{2}]; Events",50,0,200,file_);   
    add1DHistogram("h1DPtTemplate",";p_{T}; Events",20,0,100,file_);
    add1DHistogram("h1DEtaTemplate",";#eta; Events",24,-2.4,2.4,file_);
-   add1DHistogram("h1DPhiTemplate",";#phi; Events",12,-M_PI,2*M_PI,file_);
+   add1DHistogram("h1DPhiTemplate",";#phi; Events",12,0,2*M_PI,file_);
    add1DHistogram("h1DCosPhiTemplate",";cos(#phi); Events",10,-1.0,1.0,file_);
    add1DHistogram("h1DCSVBtagTemplate",";CSV btag; Events",20,0,1,file_);
    add1DHistogram("h1DIsoTemplate",";Isolation; Events",10,0,0.5,file_);
    add1DHistogram("h1DIDTemplate",";ID; Events",30,-0.5,15.5,file_);
    add1DHistogram("h1DVxPullTemplate",";#phi^{*} [rad]; Events",11,-0.01,0.01,file_);
-   add1DHistogram("h1DyTauTemplate",";yTau; Events",30,-1.5,1.5,file_);
+   add1DHistogram("h1DyTauTemplate",";yTau; Events",15,-1,1,file_);
    add1DHistogram("h1DnPCATemplate",";#hat{n}_{RECO}>; Events",10,0,0.015,file_);
 
    add2DHistogram("h2DVxPullVsNTrackTemplate","",21,-0.5,20.5,11,-0.01,0.01,file_);
@@ -288,7 +288,7 @@ void HTTHistograms::finalizeHistograms(int nRuns, float weight){
 
   AnalysisHistograms::finalizeHistograms();
 
-  //plotCPhistograms(nRuns, weight);
+  plotCPhistograms(nRuns, weight);
 
   wselOSCorrection =  std::pair<float,float>(1,0);
   wselSSCorrection =  std::pair<float,float>(1,0);
@@ -354,14 +354,10 @@ void HTTHistograms::finalizeHistograms(int nRuns, float weight){
 /////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////
 void HTTHistograms::plotCPhistograms(int nRuns, float weight){
-
+  
   plotProfiles("hProfMagVsPt_","H");
   plotProfiles("hProfMagVsPt_","A");
   plotProfiles("hProfMagVsPt_","DYJetsMuTau");
-
-  plotProfiles("hProfMagVsCos_","H");
-  plotProfiles("hProfMagVsCos_","A");
-  plotProfiles("hProfMagVsCos_","DYJetsMuTau");
 
   plotProfiles("hProfPtVsMag_","H");
   plotProfiles("hProfPtVsMag_","A");
@@ -387,7 +383,7 @@ void HTTHistograms::plotCPhistograms(int nRuns, float weight){
   plotPhiDecayPlanes("Phi_nVectorsA");  
   plotPhiDecayPlanes("Phi_nVectorsDYJetsMuTau");
   plotPhiDecayPlanes("Phi_nVectorsWJetsHT0");
-  
+
   plotPhiDecayPlanes("Phi_nVecIP_yTauPosData");
   plotPhiDecayPlanes("Phi_nVecIP_yTauNegData");
   plotPhiDecayPlanes("Phi_nVecIP_yTauPosH");
@@ -398,12 +394,13 @@ void HTTHistograms::plotCPhistograms(int nRuns, float weight){
   plotPhiDecayPlanes("Phi_nVecIP_yTauNegDYJetsMuTau");
   plotPhiDecayPlanes("Phi_nVecIP_yTauPosWJetsHT0");
   plotPhiDecayPlanes("Phi_nVecIP_yTauNegWJetsHT0");
+ 
 
-  plotSingleHistogram("yTauH");
-  plotSingleHistogram("yTauA");
-  plotSingleHistogram("yTauDYJetsMuTau");
-  plotSingleHistogram("yTauWJetsHT0");
-
+  plotSingleHistogram("h1DyTauH");
+  plotSingleHistogram("h1DyTauA");
+  plotSingleHistogram("h1DyTauDYJetsMuTau");
+  plotSingleHistogram("h1DyTauWJetsHT0");
+ 
   plotPhiDecayPlanes("CosPhi_CosPositiveH");
   plotPhiDecayPlanes("CosPhi_CosNegativeH");
 
@@ -463,9 +460,10 @@ void HTTHistograms::plotnPCA(const std::string & type){
 void HTTHistograms::plotVerticesPulls(const std::string & hName){
   
    TCanvas* c = new TCanvas("Vertices","Vertices resolutions",			   
-			   460,500);
+			    460,500);
+   c->SetLeftMargin(0.15);
 
-  TLegend l(0.1,0.7,0.25,0.85,NULL,"brNDC");
+  TLegend l(0.5,0.7,0.7,0.85,NULL,"brNDC");
   l.SetTextSize(0.05);
   l.SetFillStyle(4000);
   l.SetBorderSize(0);
@@ -485,6 +483,10 @@ void HTTHistograms::plotVerticesPulls(const std::string & hName){
     
     hProfile_AOD->Draw();
     hProfile_Refit->Draw("same");
+
+    hProfile_AOD->GetXaxis()->SetTitle("number of tracks in PV");
+    hProfile_AOD->GetYaxis()->SetTitle("#sigma(PV^{RECO} - PV^{GEN})");
+    hProfile_AOD->GetYaxis()->SetTitleOffset(2.2);
 
     float min = hProfile_AOD->GetMinimum();
     if(hProfile_Refit->GetMinimum()<min) min = hProfile_Refit->GetMinimum();
@@ -574,10 +576,14 @@ void HTTHistograms::plotProfiles(const std::string & hName,
       h1DGen->SetYTitle("<|n_{RECO}|>");
       h1DGen->SetMinimum(0);
     }
-
     if(hName.find("MagVsPt")!=std::string::npos){
       h1DGen->SetYTitle("<|n_{GEN}|>");
       h1DGen->SetXTitle("p_{T}^{leading tk.}");
+      h1DGen->SetMinimum(0);
+    }
+    if(hName.find("PtVsMag")!=std::string::npos){
+      h1DGen->SetYTitle("p_{T}^{leading tk.}");
+      h1DGen->SetXTitle("<|n_{GEN}|>");
       h1DGen->SetMinimum(0);
     }
     if(hName.find("MagVsCos")!=std::string::npos){
@@ -598,6 +604,7 @@ void HTTHistograms::plotProfiles(const std::string & hName,
     l.AddEntry(h1DAOD,"AOD PV");
     l.AddEntry(h1DRefit,"Refitted PV");
     if(hName.find("RecoVsMagGen")!=std::string::npos) l.Draw();
+    if(hName.find("PhiVsMag")!=std::string::npos) l.Draw();
     
     c.Print(TString::Format("fig_png/%s.png",(hName+sysType).c_str()).Data());
   }
@@ -610,7 +617,7 @@ void HTTHistograms::plotPhiDecayPlanes(const std::string & name){
 		  TString::Format("PhiDecayPlanes_%s",name.c_str()),
 		  460,500);
   
-  TLegend l(0.15,0.65,0.35,0.85,NULL,"brNDC");
+  TLegend l(0.15,0.15,0.35,0.35,NULL,"brNDC");
   l.SetTextSize(0.05);
   l.SetFillStyle(4000);
   l.SetBorderSize(0);
@@ -655,14 +662,12 @@ void HTTHistograms::plotPhiDecayPlanes(const std::string & name){
     h1DRefitPV->SetTitle(name.c_str());
     h1DRefitPV->GetYaxis()->SetTitleOffset(1.4);
     h1DRefitPV->SetStats(kFALSE);
-    //h1DRefitPV->GetXaxis()->SetRangeUser(0,M_PI);
 
     //h1DRefitPV->SetMaximum(1);
     h1DRefitPV->SetMinimum(0);
     h1DRefitPV->Draw("HISTO");
 
     h1DGenPV->Print();
-    h1DGenPV->Print("all");
     
     l.AddEntry(h1DRefitPV,"nPCA with refit. PV");
     if(h1DGenPV){
