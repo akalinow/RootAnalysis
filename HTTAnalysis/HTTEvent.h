@@ -476,7 +476,7 @@ enum triggersenum {
     HLT_IsoMu24_eta2p1,
     HLT_IsoMu27,
     HLT_IsoMu18,
-    HLT_IsoMu22,
+    HLT_IsoMu20,
     HLT_IsoMu17_eta2p1,
     HLT_IsoMu17_eta2p1_LooseIsoPFTau20_SingleL1
 
