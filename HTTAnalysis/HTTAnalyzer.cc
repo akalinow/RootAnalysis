@@ -1,4 +1,5 @@
 #include <sstream>
+#include <bitset>
 
 #include "HTTAnalyzer.h"
 #include "HTTHistograms.h"
@@ -51,8 +52,7 @@ void HTTAnalyzer::finalize(){
 //////////////////////////////////////////////////////////////////////////////
 void HTTAnalyzer::getPreselectionEff(const EventProxyHTT & myEventProxy){
 
-  /*
-    TH1F *hStatsFromFile = (TH1F*)myEventProxy.getTTree()->GetCurrentFile()->Get("m2n/hStats");
+    TH1F *hStatsFromFile = (TH1F*)myEventProxy.getTTree()->GetCurrentFile()->Get("hStats");
 
     std::string hName = "h1DStats"+getSampleName(myEventProxy);
     TH1F *hStats = myHistos_->get1DHistogram(hName.c_str(),true);
@@ -60,10 +60,8 @@ void HTTAnalyzer::getPreselectionEff(const EventProxyHTT & myEventProxy){
     float genWeight = getGenWeight(myEventProxy);
     
     hStats->SetBinContent(2,hStatsFromFile->GetBinContent(hStatsFromFile->FindBin(1))*genWeight);   
-    //TESK AK hStats->SetBinContent(3,hStatsFromFile->GetBinContent(hStatsFromFile->FindBin(3))*genWeight);
-    hStats->SetBinContent(3,hStatsFromFile->GetBinContent(hStatsFromFile->FindBin(2))*genWeight);///buggy weights in DY in NTUPLES_20_06_2016
+    hStats->SetBinContent(3,hStatsFromFile->GetBinContent(hStatsFromFile->FindBin(3))*genWeight);
     delete hStatsFromFile;
-  */
 
 }
 //////////////////////////////////////////////////////////////////////////////
@@ -101,8 +99,8 @@ std::string HTTAnalyzer::getSampleName(const EventProxyHTT & myEventProxy){
     else return "WJetsHT0";
   }
   if(myEventProxy.event->getSampleType()==3) return "TTbar";
-  if(myEventProxy.event->getSampleType()==5) return "H";
-  if(myEventProxy.event->getSampleType()==6) return "A";
+  if(myEventProxy.event->getSampleType()==4) return "H";
+  if(myEventProxy.event->getSampleType()==5) return "A";
 
   return "Unknown";
 }
@@ -149,22 +147,9 @@ float HTTAnalyzer::getPUWeight(const EventProxyHTT & myEventProxy){
 float HTTAnalyzer::getGenWeight(const EventProxyHTT & myEventProxy){
 
   if(myEventProxy.event->getSampleType()==0) return 1.0;
-  //if(myEventProxy.event->getSampleType()==1) return myEventProxy.event->genevtweight()/23443.423;  
-  //if(myEventProxy.event->getSampleType()==2) return myEventProxy.event->genevtweight()/225892.45;  
-  //if(myEventProxy.event->getSampleType()==3) return myEventProxy.event->genevtweight()/6383;
-
-  /* Not using the HT samples at the moment.
-  if(myEventProxy.event->getSampleType()==2){
-    //https://twiki.cern.ch/twiki/pub/CMS/HiggsToTauTauWorking2015/WplusHtWeights.xls
-    //NLO to LO scaling removed, as NLO cross section used in normalisation.
-    std::string fileName = myEventProxy.getTTree()->GetCurrentFile()->GetName();
-    if(fileName.find("WJetsToLNu_HT-100To200")!=std::string::npos) return 0.1352710705/1.2137837838;
-    else if(fileName.find("WJetsToLNu_HT-200To400")!=std::string::npos) return 0.076142149/1.2137837838;
-    else if(fileName.find("WJetsToLNu_HT-400To600")!=std::string::npos) return 0.0326980819/1.2137837838;
-    else if(fileName.find("WJetsToLNu_HT-600ToInf")!=std::string::npos) return 0.0213743732/1.2137837838;
-    else return 0.8520862372/1.2137837838;
-  }
-  */
+  //if(myEventProxy.event->getSampleType()==1) return myEventProxy->getMCWeight()/23443.423;  
+  //if(myEventProxy.event->getSampleType()==2) return myEventProxy->getMCWeight()/225892.45;  
+  //if(myEventProxy.event->getSampleType()==3) return myEventProxy->getMCWeight()/6383;
   
   return 1;
 }
@@ -567,13 +552,19 @@ bool HTTAnalyzer::analyze(const EventProxyBase& iEvent){
 
   ///This stands for core selection, that is common to all regions.
   bool tauKinematics = aTau.getP4().Pt()>30 && fabs(aTau.getP4().Eta())<2.3;
-  bool tauID = aTau.getProperty(PropertyEnum::byCombinedIsolationDeltaBetaCorrRaw3Hits);
+  int tauIDmask = 0;
+  
+  for(unsigned int iBit=0;iBit<aEvent.ntauIds;iBit++){
+    if(aEvent.tauIDStrings[iBit]=="byTightIsolationMVArun2v1DBoldDMwLT") tauIDmask |= (1<<iBit);
+    if(aEvent.tauIDStrings[iBit]=="againstMuonTight3") tauIDmask |= (1<<iBit);
+    if(aEvent.tauIDStrings[iBit]=="againstElectronVLooseMVA6") tauIDmask |= (1<<iBit);
+  }
+
+  bool tauID = ( (int)aTau.getProperty(PropertyEnum::tauID) & tauIDmask) == tauIDmask;
+  
   bool muonKinematics = aMuon.getP4().Pt()>19 && fabs(aMuon.getP4().Eta())<2.1;
-  /*
-  bool trigger = aPair.trigger(HLT_IsoMu17_eta2p1);
-  if(sampleName=="Data") trigger = aPair.trigger(HLT_IsoMu20) || aPair.trigger(HLT_IsoMu18);
-  muonKinematics &= aMuon.pt()>22; 
-  */
+  //bool trigger = aPair.trigger(HLT_IsoMu17_eta2p1);
+  //if(sampleName=="Data") trigger = aPair.trigger(HLT_IsoMu22) || aPair.trigger(HLT_IsoMu18);  
   bool trigger = true;
  
   if(!tauKinematics || !tauID || !muonKinematics || !trigger) return true;
@@ -588,7 +579,7 @@ bool HTTAnalyzer::analyze(const EventProxyBase& iEvent){
   ///Note: parts of the signal/control region selection are applied in the following code.
   ///FIXME AK: this should be made in a more clear way.
   bool SS = aTau.getCharge()*aMuon.getCharge() == 1;
-  bool OS = aTau.getCharge()*aMuon.getCharge() == 1;
+  bool OS = aTau.getCharge()*aMuon.getCharge() == -1;
   bool baselineSelection = OS && aPair.getMTMuon()<40 && aMuon.getProperty(PropertyEnum::combreliso)<0.1;
   bool wSelection = aPair.getMTMuon()>60 && aMuon.getProperty(PropertyEnum::combreliso)<0.1;
   bool qcdSelectionSS = SS;
