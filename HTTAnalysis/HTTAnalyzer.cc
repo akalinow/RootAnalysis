@@ -58,11 +58,11 @@ void HTTAnalyzer::getPreselectionEff(const EventProxyHTT & myEventProxy){
     TH1F *hStats = myHistos_->get1DHistogram(hName.c_str(),true);
 
     float genWeight = getGenWeight(myEventProxy);
-    
+
     hStats->SetBinContent(2,hStatsFromFile->GetBinContent(hStatsFromFile->FindBin(1))*genWeight);   
     hStats->SetBinContent(3,hStatsFromFile->GetBinContent(hStatsFromFile->FindBin(3))*genWeight);
+    
     delete hStatsFromFile;
-
 }
 //////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////
@@ -72,31 +72,30 @@ std::string HTTAnalyzer::getSampleName(const EventProxyHTT & myEventProxy){
   if(myEventProxy.event->getSampleType()==1){
     int decayModeBoson = myEventProxy.event->getDecayModeBoson();
     std::string decayName;
-    if(decayModeBoson==7) decayName = "DYJetsMuMu";
-    else if(decayModeBoson==6) decayName = "DYJetsEE";
-    else if(decayModeBoson==0) decayName = "DYJetsMuTau";
-    else decayName = "DYJetsOther";
+    if(decayModeBoson==7) decayName = "MuMu";
+    else if(decayModeBoson==6) decayName = "EE";
+    else if(decayModeBoson==0) decayName = "MuTau";
+    else decayName = "Other";
 
     std::string fileName = myEventProxy.getTTree()->GetCurrentFile()->GetName();
-    std::string HTName = "";
-    /*
-    if(fileName.find("DYJetsToLL_M-50_HT-100to200")!=std::string::npos) HTName ="HT100to200";
-    else if(fileName.find("DYJetsToLL_M-50_HT-200to400")!=std::string::npos) HTName = "HT200to400";
-    else if(fileName.find("DYJetsToLL_M-50_HT-400to600")!=std::string::npos) HTName = "HT400to600";
-    else if(fileName.find("DYJetsToLL_M-50_HT-600toInf")!=std::string::npos) HTName = "HT600toInf";
-    else HTName = "HT0";
-    */
-    return decayName+HTName;
-    
+    std::string jetsName = "";    
+    if(fileName.find("DY1JetsToLL")!=std::string::npos) jetsName ="DY1Jets";
+    else if(fileName.find("DY2JetsToLL")!=std::string::npos) jetsName = "DY2Jets";
+    else if(fileName.find("DY3JetsToLL")!=std::string::npos) jetsName = "DY3Jets";
+    else if(fileName.find("DY4JetsToLL")!=std::string::npos) jetsName = "DY4Jets";
+    else jetsName = "DYJets";   
+    return jetsName+decayName;    
   }
   if(myEventProxy.event->getSampleType()==11) return "DYJetsLowM";
-  if(myEventProxy.event->getSampleType()==2){
+  if(myEventProxy.event->getSampleType()==2 || myEventProxy.event->getSampleType()==-1){ ///BUG in sample number for nJets
     std::string fileName = myEventProxy.getTTree()->GetCurrentFile()->GetName();
-    if(fileName.find("WJetsToLNu_HT-100To200")!=std::string::npos) return "WJetsHT100to200";
-    else if(fileName.find("WJetsToLNu_HT-200To400")!=std::string::npos) return "WJetsHT200to400";
-    else if(fileName.find("WJetsToLNu_HT-400To600")!=std::string::npos) return "WJetsHT400to600";
-    else if(fileName.find("WJetsToLNu_HT-600ToInf")!=std::string::npos) return "WJetsHT600toInf";
-    else return "WJetsHT0";
+    if(fileName.find("WJetsToLNu")!=std::string::npos && myEventProxy.event->getLHEnOutPartons()==0) return "W0Jets";
+    else if(fileName.find("WJetsToLNu")!=std::string::npos && myEventProxy.event->getLHEnOutPartons()>0) return "WAllJets";
+    else if(fileName.find("W1JetsToLNu")!=std::string::npos) return "W1Jets";
+    else if(fileName.find("W2JetsToLNu")!=std::string::npos) return "W2Jets";
+    else if(fileName.find("W3JetsToLNu")!=std::string::npos) return "W3Jets";
+    else if(fileName.find("W4JetsToLNu")!=std::string::npos) return "W4Jets";
+    else if(fileName.find("W5JetsToLNu")!=std::string::npos) return "W5Jets";
   }
   if(myEventProxy.event->getSampleType()==3) return "TTbar";
   if(myEventProxy.event->getSampleType()==4) return "H";
@@ -150,7 +149,7 @@ float HTTAnalyzer::getGenWeight(const EventProxyHTT & myEventProxy){
   //if(myEventProxy.event->getSampleType()==1) return myEventProxy->getMCWeight()/23443.423;  
   //if(myEventProxy.event->getSampleType()==2) return myEventProxy->getMCWeight()/225892.45;  
   //if(myEventProxy.event->getSampleType()==3) return myEventProxy->getMCWeight()/6383;
-  
+
   return 1;
 }
 //////////////////////////////////////////////////////////////////////////////
@@ -192,7 +191,6 @@ void HTTAnalyzer::fillControlHistos(const std::string & hNameSuffix, float event
 
   fillDecayPlaneAngle(hNameSuffix, eventWeight);
 
-  
   if(aJet.getProperty(PropertyEnum::bDiscriminator)>0.8){
     myHistos_->fill1DHistogram("h1DPtLeadingBJet"+hNameSuffix,aJet.getP4().Pt(),eventWeight);
     myHistos_->fill1DHistogram("h1DEtaLeadingBJet"+hNameSuffix,aJet.getP4().Eta(),eventWeight);
@@ -502,7 +500,7 @@ std::pair<bool, bool> HTTAnalyzer::checkTauDecayMode(const EventProxyHTT & myEve
   bool goodGenDecayMode = false;
   bool goodRecoDecayMode = false;
 
-  std::vector<std::string> decayNamesGen = getTauDecayName(aEvent.getDecayModeMinus(), aEvent.getDecayModePlus());//FIX
+  std::vector<std::string> decayNamesGen = getTauDecayName(aEvent.getDecayModeMinus(), aEvent.getDecayModePlus());//FIX ME.
   std::vector<std::string> decayNamesReco = getTauDecayName(aEvent.getDecayModeMinus(), aEvent.getDecayModePlus());
   /*
   for(auto it: decayNamesGen) if(it.find("Lepton1Prong0Pi0")!=std::string::npos) goodGenDecayMode = true;
@@ -527,6 +525,7 @@ bool HTTAnalyzer::analyze(const EventProxyBase& iEvent){
   const EventProxyHTT & myEventProxy = static_cast<const EventProxyHTT&>(iEvent);
 
   std::string sampleName = getSampleName(myEventProxy);
+
   std::string hNameSuffix = sampleName;
   float puWeight = getPUWeight(myEventProxy);
   float genWeight = getGenWeight(myEventProxy);
@@ -535,7 +534,7 @@ bool HTTAnalyzer::analyze(const EventProxyBase& iEvent){
   //Fill bookkeeping histogram. Bin 1 holds sum of weights.
   myHistos_->fill1DHistogram("h1DStats"+sampleName,0,eventWeight);
   getPreselectionEff(myEventProxy);
-  /////////////////////////////////////////////////////////////////////////////
+
   if(!myEventProxy.pairs->size()) return true;
 
   setAnalysisObjects(myEventProxy);
@@ -563,12 +562,10 @@ bool HTTAnalyzer::analyze(const EventProxyBase& iEvent){
   bool tauID = ( (int)aTau.getProperty(PropertyEnum::tauID) & tauIDmask) == tauIDmask;
   
   bool muonKinematics = aMuon.getP4().Pt()>19 && fabs(aMuon.getP4().Eta())<2.1;
-  //bool trigger = aPair.trigger(HLT_IsoMu17_eta2p1);
-  //if(sampleName=="Data") trigger = aPair.trigger(HLT_IsoMu22) || aPair.trigger(HLT_IsoMu18);  
-  bool trigger = true;
- 
+  bool trigger = aMuon.hasTriggerMatch(TriggerEnum::HLT_IsoMu18);
+  if(sampleName=="Data") trigger = aMuon.hasTriggerMatch(TriggerEnum::HLT_IsoMu22) || aMuon.hasTriggerMatch(TriggerEnum::HLT_IsoMu18); 
   if(!tauKinematics || !tauID || !muonKinematics || !trigger) return true;
-  
+
   ///Selection used by the CP analysis.
   /*
   if(aMuon.nPCA().Mag()<0.005) return false; 
@@ -584,8 +581,8 @@ bool HTTAnalyzer::analyze(const EventProxyBase& iEvent){
   bool wSelection = aPair.getMTMuon()>60 && aMuon.getProperty(PropertyEnum::combreliso)<0.1;
   bool qcdSelectionSS = SS;
   bool qcdSelectionOS = OS;
-  //bool ttSelection = aJet.csvtag()>0.9 && nJets30>1;
-  bool ttSelection = true;
+  //bool ttSelection = aJet.getProperty(PropertyEnum::bDiscriminator)>0.5 && nJets30>1;
+  bool ttSelection = nJets30>1;
   bool mumuSelection =  aPair.getMTMuon()<40 &&  aMuon.getProperty(PropertyEnum::combreliso)<0.1 && aPair.getP4().M()>85 && aPair.getP4().M()<95;
 
   ///Histograms for the baseline selection  

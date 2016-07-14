@@ -84,6 +84,11 @@ class HTTHistograms: public AnalysisHistograms {
   ///Return histogram for sum of all WJet HT bins
   TH1F *get1D_WJet_Histogram(const std::string& name);
 
+  ///Return histogram fro nJets sample normalised by
+  ///preselection/number of analysed events
+  TH1F *getNormalised_NJet_Histogram(const std::string& hName,
+				     const std::string& jetsName);
+
   //Plot a single histogram. One has to provide the full
   //histogram name, e.g. including h1D prefix.
   void plotSingleHistogram(std::string hName);

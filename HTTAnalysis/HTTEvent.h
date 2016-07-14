@@ -8,6 +8,7 @@
 #include <bitset> 
 
 #include "PropertyEnum.h"
+#include "TriggerEnum.h"
 ///////////////////////////////////////////////////
 ///////////////////////////////////////////////////
 class HTTEvent{
@@ -212,6 +213,9 @@ class HTTParticle{
   int getCharge() const {return getProperty(PropertyEnum::charge);}
 
   float getProperty(PropertyEnum index) const {return (unsigned int)index<properties.size()?  properties[(unsigned int)index]: -999;}
+
+  bool hasTriggerMatch(TriggerEnum index) const {return (unsigned int)getProperty(PropertyEnum::isGoodTriggerType)&(unsigned int)index &&
+                                                        (unsigned int)getProperty(PropertyEnum::FilterFired)&(unsigned int)index;}
 
  private:
 
