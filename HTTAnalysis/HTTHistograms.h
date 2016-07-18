@@ -76,6 +76,9 @@ class HTTHistograms: public AnalysisHistograms {
   
   void plotPhiDecayPlanes(const std::string& name);
 
+  void plot_HAZ_Histograms(const std::string & hName,
+			   const std::string & sysType);
+
   void plotCPhistograms(int nRuns, float weight);
 
   ///Return histogram for sum of all DY decay modes.

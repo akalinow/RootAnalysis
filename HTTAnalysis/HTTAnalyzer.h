@@ -159,8 +159,8 @@ class HTTAnalyzer: public Analyzer{
   HTTEvent aEvent;
   HTTPair aPair;
 
-  HTTParticle aTau;
-  HTTParticle aMuon;
+  HTTParticle aTau, aMuon;
+  HTTParticle aGenHadTau, aGenMuonTau;
   HTTParticle aJet;
   std::vector<HTTParticle> aSeparatedJets;
   int nJets30;

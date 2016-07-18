@@ -52,8 +52,15 @@ void HTTParticle::clear(){
 
   p4 = TLorentzVector();
 
+  chargedP4 = TLorentzVector();
+  neutralP4 = TLorentzVector();
+
   p4ScaleUp = TLorentzVector();
   p4ScaleDown = TLorentzVector();
+
+  pca = TVector3();
+  pcaRefitPV = TVector3();
+  pcaGenPV = TVector3();
 
   properties.clear();
 }

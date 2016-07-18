@@ -195,18 +195,38 @@ class HTTParticle{
   ///Data member setters.
   void setP4(const TLorentzVector &aP4) { p4 = aP4;}
 
+  void setChargedP4(const TLorentzVector &aP4) { chargedP4 = aP4;}
+  
+  void setNeutralP4(const TLorentzVector &aP4) { neutralP4 = aP4;}
+
   void setP4ScaleUp(const TLorentzVector &aP4) { p4ScaleUp = aP4;}
 
   void setP4ScaleDown(const TLorentzVector &aP4) { p4ScaleDown = aP4;}
+
+  void setPCA(const TVector3 &aV3) {pca = aV3;}
+
+  void setPCARefitPV(const TVector3 &aV3) {pcaRefitPV = aV3;}
+  
+  void setPCAGenPV(const TVector3 &aV3) {pcaGenPV = aV3;}
 
   void setProperties(const std::vector<float> & aProperties) { properties = aProperties;}
 
   ///Data member getters.
   TLorentzVector getP4() const {return p4;}
 
+  TLorentzVector getChargedP4() const {return chargedP4;}
+
+  TLorentzVector getNeutralP4() const {return neutralP4;}
+
   TLorentzVector getP4ScaleUp() const {return p4ScaleUp;}
 
   TLorentzVector getP4ScaleDown() const {return p4ScaleDown;}
+
+  TVector3 getPCA() const {return pca;}
+
+  TVector3 getPCARefitPV() const {return pcaRefitPV;}
+
+  TVector3 getPCAGenPV() const {return pcaGenPV;}
 
   int getPDGid() const {return getProperty(PropertyEnum::PDGId);}
 
@@ -222,9 +242,16 @@ class HTTParticle{
   ///Nominal particle four-momentum
   TLorentzVector p4;
 
+  ///Charged and neuttral components four-momentum
+  TLorentzVector chargedP4, neutralP4;
+
   ///Particle four-momentum after scaling up/down.
   ///Variated scale depends on the particle type (mu, tau, e)
   TLorentzVector p4ScaleUp, p4ScaleDown;
+
+  ///Vectors from primary vertex to point of closest approach (PCA)
+  ///calculated with respect to AOD vertex, refitted and generated vertex.
+  TVector3 pca, pcaRefitPV, pcaGenPV;
 
   ///Vector of vaious particle properties.
   ///Index generated automatically during conversion from
