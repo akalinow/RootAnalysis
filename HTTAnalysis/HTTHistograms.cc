@@ -305,10 +305,11 @@ void HTTHistograms::finalizeHistograms(int nRuns, float weight){
 
   AnalysisHistograms::finalizeHistograms();
 
+  plotPhiDecayPlanes("Phi_nVectorsUnknown");
+  return;
+
   muTauDYScale = 1.0;
   mumuDYScale = 1.0;
-
-  return;
 
   ///TEST
   /*
@@ -323,7 +324,8 @@ void HTTHistograms::finalizeHistograms(int nRuns, float weight){
   */
   //////////////
 
-  //plotCPhistograms(nRuns, weight);
+  plotCPhistograms(nRuns, weight);
+  return;
 
   wselOSCorrection =  std::pair<float,float>(1,0);
   wselSSCorrection =  std::pair<float,float>(1,0);
