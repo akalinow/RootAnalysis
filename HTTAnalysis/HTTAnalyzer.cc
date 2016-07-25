@@ -258,15 +258,10 @@ void HTTAnalyzer::fillDecayPlaneAngle(const std::string & hNameSuffix, float eve
 
   //fillVertices(hNameSuffix);
 
-  float sign =  0;
-
-    
   if(aMuon.charge()>0){
     positiveLeadingTk = aMuon.leadingTk();
     positive_nPCA = TLorentzVector(aMuon.nPCARefitvx(),0);
 
-    sign = positive_nPCA.Vect().Dot(aMuon.p4().Vect());
-    
     if(hNameSuffix.find("AODPV")!=std::string::npos) positive_nPCA = TLorentzVector(aMuon.nPCA(),0);
     if(hNameSuffix.find("RefitPV")!=std::string::npos) positive_nPCA = TLorentzVector(aMuon.nPCARefitvx(),0);
     if(hNameSuffix.find("GenPV")!=std::string::npos) positive_nPCA = TLorentzVector(aMuon.nPCAGenvx(),0);
@@ -285,8 +280,6 @@ void HTTAnalyzer::fillDecayPlaneAngle(const std::string & hNameSuffix, float eve
     positiveLeadingTk = aTau.leadingTk();
     positive_nPCA = TLorentzVector(aTau.nPCARefitvx(),0);
 
-    sign = positive_nPCA.Vect().Dot(aTau.p4().Vect());
-    
     if(hNameSuffix.find("AODPV")!=std::string::npos) positive_nPCA = TLorentzVector(aTau.nPCA(),0);
     if(hNameSuffix.find("RefitPV")!=std::string::npos) positive_nPCA = TLorentzVector(aTau.nPCARefitvx(),0);
     if(hNameSuffix.find("GenPV")!=std::string::npos) positive_nPCA = TLorentzVector(aTau.nPCAGenvx(),0);
@@ -309,42 +302,70 @@ void HTTAnalyzer::fillDecayPlaneAngle(const std::string & hNameSuffix, float eve
 
   float pullX, pullY, pullZ;
   
-  if(fabs(positive_nPCA.Vect().Z())>-0.0005 &&
-     fabs(positive_nPCA.Vect().X())<0.003 &&
-     fabs(positive_nPCA.Vect().Y())<0.003){
-     myHistos_->fillProfile("hProfRecoVsMagGen_"+hNameSuffix,
-			   aGenPositiveTau.nPCA().Y(),
-			   positive_nPCA.Vect().Y(),
-			   eventWeight);
+  if(fabs(positive_nPCA.Vect().Z())>0.0025
+     && fabs(positive_nPCA.Vect().X())>0.0025
+     && fabs(positive_nPCA.Vect().Y())>0.0025
+     ){
 
-     pullX = positive_nPCA.Vect().X() - aGenPositiveTau.nPCA().X();
-     pullY = positive_nPCA.Vect().Y() - aGenPositiveTau.nPCA().Y();
-     pullZ = positive_nPCA.Vect().Z() - aGenPositiveTau.nPCA().Z();
+    float correctionX = -3.87012e-01*positive_nPCA.Vect().X() -1.19945e-05;
+    float correctionY = -4.32532e-01*positive_nPCA.Vect().Y() -3.77935e-05;
+    float correctionZ = -4.09467e-01*positive_nPCA.Vect().Z() +1.92124e-06;
+
+    correctionX = 0;
+    correctionY = 0;
+    correctionZ = 0;
+    
+    if(hNameSuffix.find("RefitPV")==std::string::npos){
+      correctionX = 0;
+      correctionY = 0;
+      correctionZ = 0;
+    }
+
+    positive_nPCA.SetX(positive_nPCA.X() + correctionX);
+    positive_nPCA.SetY(positive_nPCA.Y() + correctionY);
+    positive_nPCA.SetZ(positive_nPCA.Z() + correctionZ);
+
+    //correctionX = -3.87012e-01*negative_nPCA.Vect().X() -1.19945e-05;
+    //correctionY = -4.32532e-01*negative_nPCA.Vect().Y() -3.77935e-05;
+    //correctionZ = -4.09467e-01*positive_nPCA.Vect().Z() +1.92124e-06;
+
+    if(hNameSuffix.find("RefitPV")==std::string::npos){
+      correctionX = 0;
+      correctionY = 0;
+      correctionZ = 0;
+    }
+
+    negative_nPCA.SetX(negative_nPCA.X() + correctionX);
+    negative_nPCA.SetY(negative_nPCA.Y() + correctionY);
+    negative_nPCA.SetZ(negative_nPCA.Z() + correctionZ);
+
+     myHistos_->fillProfile("hProfRecoVsMagGen_"+hNameSuffix,			    
+			    aGenPositiveTau.nPCA().Phi(),
+			    positive_nPCA.Vect().Phi(),
+			    eventWeight);
+
+     pullX = (positive_nPCA.Vect().Phi() - aGenPositiveTau.nPCA().Phi())*(1-2*(aGenPositiveTau.nPCA().Phi()<0));     
+     pullY = (positive_nPCA.Vect().Theta() - aGenPositiveTau.nPCA().Theta())*(1-2*(aGenPositiveTau.nPCA().Theta()<0));
+     pullZ = (positive_nPCA.Vect().Z() - aGenPositiveTau.nPCA().Z())*(1-2*(aGenPositiveTau.nPCA().Z()<0));
 
      myHistos_->fill1DHistogram("h1DVxPullX_"+hNameSuffix,pullX);
      myHistos_->fill1DHistogram("h1DVxPullY_"+hNameSuffix,pullY);
      myHistos_->fill1DHistogram("h1DVxPullZ_"+hNameSuffix,pullZ);
+
+     myHistos_->fill1DHistogram("h1DPhi_PCA_x_"+hNameSuffix, positive_nPCA.Vect().Phi());
+     myHistos_->fill1DHistogram("h1DPhi_PCA_y_"+hNameSuffix, positive_nPCA.Vect().Y());
+     myHistos_->fill1DHistogram("h1DPhi_PCA_z_"+hNameSuffix, positive_nPCA.Vect().Z());
+
+
      
   }
-
-  if(fabs(negative_nPCA.Vect().Z())>0.0005
-     && fabs(negative_nPCA.Vect().X())<0.003
-     && fabs(negative_nPCA.Vect().Y())<0.003
-     ){
-    myHistos_->fillProfile("hProfRecoVsMagGen_"+hNameSuffix,
-			   aGenNegativeTau.nPCA().Y(),
-			   negative_nPCA.Vect().Y(),
-			   eventWeight);
-  }
-
-
+  /* 
   bool pass = false;
-  if(fabs(positive_nPCA.Vect().Z())>0.0015 
-     && fabs(positive_nPCA.Vect().X())>0.0015 
-     && fabs(positive_nPCA.Vect().Y())>0.0015
+  if(fabs(positive_nPCA.Vect().Z())>0.0015 &&
+     fabs(negative_nPCA.Vect().Z())>0.0015
      ) pass = true;
   if(!pass) return;
-  
+  */
   angles = angleBetweenPlanes(negativeLeadingTk,negative_nPCA,
 			      positiveLeadingTk,positive_nPCA);
 
@@ -629,7 +650,7 @@ bool HTTAnalyzer::analyze(const EventProxyBase& iEvent){
   if(!myEventProxy.wpair->size()) return true;
   if(!tauKinematics || !tauID || !muonKinematics || !trigger) return true;
   if(!extraRequirements) return true;
-  //if(!cpSelection) return true;
+  if(!cpSelection) return true;
     
   ///Note: parts of the signal/control region selection are applied in the following code.
   ///FIXME AK: this should be made in a more clear way.

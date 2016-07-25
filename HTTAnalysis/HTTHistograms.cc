@@ -244,22 +244,25 @@ void HTTHistograms::defineHistograms(){
    add1DHistogram("h1DEtaTemplate",";#eta; Events",24,-2.4,2.4,file_);
 
    //add1DHistogram("h1DPhiTemplate",";#phi; Events",12,0,2*M_PI,file_);
-   add1DHistogram("h1DPhiTemplate",";#phi; Events",6,0,2*M_PI,file_);
+   //add1DHistogram("h1DPhiTemplate",";#phi; Events",6,0,2*M_PI,file_);
+   //add1DHistogram("h1DPhiTemplate",";#phi; Events",20,-3.1,3.1,file_);
+
+   add1DHistogram("h1DPhiTemplate",";#phi; Events",6,0,3.1,file_);
+   
    
    add1DHistogram("h1DCosPhiTemplate",";cos(#phi); Events",10,-1.0,1.0,file_);
    add1DHistogram("h1DCSVBtagTemplate",";CSV btag; Events",20,0,1,file_);
    add1DHistogram("h1DIsoTemplate",";Isolation; Events",10,0,0.5,file_);
    add1DHistogram("h1DIDTemplate",";ID; Events",30,-0.5,15.5,file_);
-   add1DHistogram("h1DVxPullTemplate",";#phi^{*} [rad]; Events",21,-0.001,0.001,file_);
-   //add1DHistogram("h1DVxPullTemplate",";#phi^{*} [rad]; Events",11,-0.05,0.05,file_);
+   add1DHistogram("h1DVxPullTemplate",";#phi^{*} [rad]; Events",21,-3.1,3.1,file_);
+   //add1DHistogram("h1DVxPullTemplate",";#phi^{*} [rad]; Events",11,-0.01,0.01,file_);
    add1DHistogram("h1DyTauTemplate",";yTau; Events",15,-1,1,file_);
    add1DHistogram("h1DnPCATemplate",";#hat{n}_{RECO}>; Events",10,0,0.015,file_);
 
    add2DHistogram("h2DVxPullVsNTrackTemplate","",21,-0.5,20.5,11,-0.01,0.01,file_);
    
    //addProfile("hProfVsMagTemplate","",10,0,0.015,file_);
-
-   addProfile("hProfVsMagTemplate","",20,-0.001,0.001,file_);
+   addProfile("hProfVsMagTemplate","",20,-3.1,3.1,file_);
    
    addProfile("hProfVsPtTemplate","",20,15,55,file_);
    addProfile("hProfVsCosTemplate","",20,-1,1,file_);
@@ -349,13 +352,21 @@ void HTTHistograms::finalizeHistograms(int nRuns, float weight){
 /////////////////////////////////////////////////////////
 void HTTHistograms::plotCPhistograms(int nRuns, float weight){
 
+  plot_HAZ_Histograms("Phi_nVectors","RefitPV");
+  return;
+
   plotProfiles("hProfRecoVsMagGen_","H");
   plotVerticesPulls("h1DVxPullX_H");
   plotVerticesPulls("h1DVxPullY_H");
   plotVerticesPulls("h1DVxPullZ_H");
   plotProfiles("hProfPhiVsMag_","H");
   plotPhiDecayPlanes("CosPhi_CosPositiveH");
+
+  plotPhiDecayPlanes("Phi_PCA_x_H");
+  plotPhiDecayPlanes("Phi_PCA_y_H");
+  plotPhiDecayPlanes("Phi_PCA_z_H");
   return;
+  
 
   plot_HAZ_Histograms("Phi_nVectors","RefitPV");
   plot_HAZ_Histograms("Phi_nVecIP_","RefitPV");
@@ -620,8 +631,9 @@ void HTTHistograms::plotProfiles(const std::string & hName,
     h1DRefit->Draw("same");
 
     if(hName.find("RecoVsMagGen")!=std::string::npos){
-      TF1 *line=new TF1("line","x",-0.014,0.014);
-      line->Draw("same");
+      TF1 *line=new TF1("line","[0]+[1]*x",-1,1);
+      h1DRefit->Fit("line");
+      line->Draw("same");	    
     }
 
     l.AddEntry(h1DGen,"Generator PV");
@@ -765,11 +777,11 @@ void HTTHistograms::plot_HAZ_Histograms(const std::string & hName,
   h_Z->SetLineColor(3);
   h_h->Draw();
   h_A->Draw("same");
-  h_Z->Draw("same");
+  //h_Z->Draw("same");
   ///
   l.AddEntry(h_h,"SM H");
   l.AddEntry(h_A,"MSSM A");
-  l.AddEntry(h_Z,"SM Z");
+  //l.AddEntry(h_Z,"SM Z");
   l.Draw();
   //aLatex.DrawLatex(0.05,0.02,sysType.c_str());
   ///
