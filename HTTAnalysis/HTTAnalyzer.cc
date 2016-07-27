@@ -256,7 +256,7 @@ void HTTAnalyzer::fillDecayPlaneAngle(const std::string & hNameSuffix, float eve
   TLorentzVector positive_nPCA, negative_nPCA;
   float yTau;
 
-  //fillVertices(hNameSuffix);
+  fillVertices(hNameSuffix);
 
   if(aMuon.charge()>0){
     positiveLeadingTk = aMuon.leadingTk();
@@ -294,78 +294,7 @@ void HTTAnalyzer::fillDecayPlaneAngle(const std::string & hNameSuffix, float eve
 				     aTau.leadingTk(), aTau.p4()-aTau.leadingTk() );
 
   }
-  /*
-  std::cout<<" aGenPositiveTau.nPCA().X(): "<<aGenPositiveTau.nPCA().X()
-	   <<" positive_nPCA.Vect().X(): "<<positive_nPCA.Vect().X()
-	   <<std::endl;
-  */
-
-  float pullX, pullY, pullZ;
-  
-  if(fabs(positive_nPCA.Vect().Z())>0.0025
-     && fabs(positive_nPCA.Vect().X())>0.0025
-     && fabs(positive_nPCA.Vect().Y())>0.0025
-     ){
-
-    float correctionX = -3.87012e-01*positive_nPCA.Vect().X() -1.19945e-05;
-    float correctionY = -4.32532e-01*positive_nPCA.Vect().Y() -3.77935e-05;
-    float correctionZ = -4.09467e-01*positive_nPCA.Vect().Z() +1.92124e-06;
-
-    correctionX = 0;
-    correctionY = 0;
-    correctionZ = 0;
     
-    if(hNameSuffix.find("RefitPV")==std::string::npos){
-      correctionX = 0;
-      correctionY = 0;
-      correctionZ = 0;
-    }
-
-    positive_nPCA.SetX(positive_nPCA.X() + correctionX);
-    positive_nPCA.SetY(positive_nPCA.Y() + correctionY);
-    positive_nPCA.SetZ(positive_nPCA.Z() + correctionZ);
-
-    //correctionX = -3.87012e-01*negative_nPCA.Vect().X() -1.19945e-05;
-    //correctionY = -4.32532e-01*negative_nPCA.Vect().Y() -3.77935e-05;
-    //correctionZ = -4.09467e-01*positive_nPCA.Vect().Z() +1.92124e-06;
-
-    if(hNameSuffix.find("RefitPV")==std::string::npos){
-      correctionX = 0;
-      correctionY = 0;
-      correctionZ = 0;
-    }
-
-    negative_nPCA.SetX(negative_nPCA.X() + correctionX);
-    negative_nPCA.SetY(negative_nPCA.Y() + correctionY);
-    negative_nPCA.SetZ(negative_nPCA.Z() + correctionZ);
-
-     myHistos_->fillProfile("hProfRecoVsMagGen_"+hNameSuffix,			    
-			    aGenPositiveTau.nPCA().Phi(),
-			    positive_nPCA.Vect().Phi(),
-			    eventWeight);
-
-     pullX = (positive_nPCA.Vect().Phi() - aGenPositiveTau.nPCA().Phi())*(1-2*(aGenPositiveTau.nPCA().Phi()<0));     
-     pullY = (positive_nPCA.Vect().Theta() - aGenPositiveTau.nPCA().Theta())*(1-2*(aGenPositiveTau.nPCA().Theta()<0));
-     pullZ = (positive_nPCA.Vect().Z() - aGenPositiveTau.nPCA().Z())*(1-2*(aGenPositiveTau.nPCA().Z()<0));
-
-     myHistos_->fill1DHistogram("h1DVxPullX_"+hNameSuffix,pullX);
-     myHistos_->fill1DHistogram("h1DVxPullY_"+hNameSuffix,pullY);
-     myHistos_->fill1DHistogram("h1DVxPullZ_"+hNameSuffix,pullZ);
-
-     myHistos_->fill1DHistogram("h1DPhi_PCA_x_"+hNameSuffix, positive_nPCA.Vect().Phi());
-     myHistos_->fill1DHistogram("h1DPhi_PCA_y_"+hNameSuffix, positive_nPCA.Vect().Y());
-     myHistos_->fill1DHistogram("h1DPhi_PCA_z_"+hNameSuffix, positive_nPCA.Vect().Z());
-
-
-     
-  }
-  /* 
-  bool pass = false;
-  if(fabs(positive_nPCA.Vect().Z())>0.0015 &&
-     fabs(negative_nPCA.Vect().Z())>0.0015
-     ) pass = true;
-  if(!pass) return;
-  */
   angles = angleBetweenPlanes(negativeLeadingTk,negative_nPCA,
 			      positiveLeadingTk,positive_nPCA);
 
@@ -387,14 +316,22 @@ void HTTAnalyzer::fillDecayPlaneAngle(const std::string & hNameSuffix, float eve
   }
 
   if(aTau.decayMode()==tauDecay1ChargedPion0PiZero){
+
+    float deltaPhi  = fabs(positive_nPCA.Vect().Phi() - aGenPositiveTau.nPCA().Phi());
+    float magnitudeRatio = (positive_nPCA.Vect().Mag()/aGenPositiveTau.nPCA().Mag());
+
+    myHistos_->fill1DHistogram("h1DPhi_PCA_deltaPhi_"+hNameSuffix, deltaPhi);
+    myHistos_->fill1DHistogram("h1DPhi_PCA_magnitudeRatio_"+hNameSuffix, magnitudeRatio);
+
+    
     myHistos_->fill1DHistogram("h1DPhi_nVectors"+hNameSuffix,angles.first,eventWeight);
     float cosPositive =  positive_nPCA.Vect().Unit()*aGenPositiveTau.nPCA().Unit();
     myHistos_->fill1DHistogram("h1DCosPhi_CosPositive"+hNameSuffix,cosPositive,eventWeight);
-    myHistos_->fillProfile("hProfPhiVsMag_"+hNameSuffix,aGenPositiveTau.nPCA().Mag(),cosPositive);
+    myHistos_->fillProfile("hProfPhiVsMag_"+hNameSuffix,positive_nPCA.Vect().Perp(),cosPositive);
     
     float cosNegative = negative_nPCA.Vect().Unit()*aGenNegativeTau.nPCA().Unit();
     myHistos_->fill1DHistogram("h1DCosPhi_CosNegative"+hNameSuffix,cosNegative,eventWeight);
-    myHistos_->fillProfile("hProfPhiVsMag_"+hNameSuffix,aGenNegativeTau.nPCA().Mag(),cosNegative);
+    myHistos_->fillProfile("hProfPhiVsMag_"+hNameSuffix,negative_nPCA.Vect().Perp(),cosNegative);
     
     myHistos_->fillProfile("hProfPtVsMag_"+hNameSuffix,aGenNegativeTau.nPCA().Mag(), negativeLeadingTk.Perp());
     myHistos_->fillProfile("hProfPtVsMag_"+hNameSuffix,aGenPositiveTau.nPCA().Mag(), positiveLeadingTk.Perp());
@@ -585,10 +522,10 @@ std::pair<bool, bool> HTTAnalyzer::checkTauDecayMode(const EventProxyHTT & myEve
   bool goodRecoDecayMode = false;
   std::vector<std::string> decayNamesGen = getTauDecayName(myEventProxy.wevent->decModeMinus(), myEventProxy.wevent->decModePlus());
   std::vector<std::string> decayNamesReco = getTauDecayName(aTau.decayMode(), tauDecayMuon);
-  /*
-  for(auto it: decayNamesGen) if(it.find("Lepton1Prong0Pi0")!=std::string::npos) goodGenDecayMode = true;
-  for(auto it: decayNamesReco) if(it.find("Lepton1Prong0Pi0")!=std::string::npos) goodRecoDecayMode = true;
-  */
+  
+  //for(auto it: decayNamesGen) if(it.find("Lepton1Prong0Pi0")!=std::string::npos) goodGenDecayMode = true;
+  //for(auto it: decayNamesReco) if(it.find("Lepton1Prong0Pi0")!=std::string::npos) goodRecoDecayMode = true;
+  
   for(auto it: decayNamesGen) if(it.find("Lepton1Prong")!=std::string::npos) goodGenDecayMode = true;
   for(auto it: decayNamesReco) if(it.find("Lepton1Prong")!=std::string::npos) goodRecoDecayMode = true;
 
@@ -631,17 +568,17 @@ bool HTTAnalyzer::analyze(const EventProxyBase& iEvent){
 
   ///This stands for core selection, that is common to all regions.
   bool tauKinematics = aTau.pt()>30 && fabs(aTau.eta())<2.3;
-  bool tauID = aTau.tauID(byMediumCombinedIsolationDeltaBetaCorr3Hits);
+  bool tauID = aTau.tauID(byMediumCombinedIsolationDeltaBetaCorr3Hits);  
   bool muonKinematics = aMuon.pt()>22 && fabs(aMuon.eta())<2.1;
   bool trigger = aPair.trigger(HLT_IsoMu17_eta2p1);
   if(sampleName=="Data") trigger = aPair.trigger(HLT_IsoMu18) || aPair.trigger(HLT_IsoMu20);
 
-  bool cpMuonSelection = aMuon.nPCA().Mag()>0.005;    
-  bool cpTauSelection = (aTau.decayMode()==tauDecay1ChargedPion0PiZero && aTau.nPCA().Mag()>0.005) ||
+  bool cpMuonSelection = aMuon.nPCARefitvx().Perp()>0.003;    
+  bool cpTauSelection = (aTau.decayMode()==tauDecay1ChargedPion0PiZero && aTau.nPCARefitvx().Perp()>0.003) ||
                         (aTau.decayMode()!=tauDecay1ChargedPion0PiZero && isOneProng(aTau.decayMode()));    
 
   bool cpSelection = aEvent.nTracksInRefit()>=2 && cpMuonSelection && cpTauSelection;
-  
+
   bool extraRequirements = true;
   //extraRequirements &= nJets30==0;
   //extraRequirements &= aTau.decayMode()!=5 && aTau.decayMode()!=6 && nJets30==0;

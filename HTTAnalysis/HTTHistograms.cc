@@ -35,15 +35,23 @@ float HTTHistograms::getLumi(){
   //+-------+------+-------+-------+-------------------+------------------+
   //| nfill | nrun | nls   | ncms  | totdelivered(/ub) | totrecorded(/ub) |
   //+-------+------+-------+-------+-------------------+------------------+
-  //| 34    | 102  | 52030 | 52025 | 6097978646.671    | 5853828610.051   |
+  //| 34    | 102  | 52181 | 52176 | 6123957740.439    | 5878853439.923   |
   //+-------+------+-------+-------+-------------------+------------------+
   //./.local/bin/brilcalc lumi --normtag /afs/cern.ch/user/l/lumipro/public/normtag_file/normtag_DATACERT.json -i lumiSummary_Run2016C_PromptReco_v2.json
-  //+-------+------+------+------+-------------------+------------------+
-  //| nfill | nrun | nls  | ncms | totdelivered(/ub) | totrecorded(/ub) |
-  //+-------+------+------+------+-------------------+------------------+
-  //| 2     | 12   | 2353 | 2353 | 395714044.318     | 377813973.553    |
-  //+-------+------+------+------+-------------------+------------------+
-  return (17225935.728 + 2114239169.533 + 5853828610.051 + 377813973.553)*1e-6;//pb-1 data for NTUPLES_20_06_2016
+  //+-------+------+-------+-------+-------------------+------------------+
+  //| nfill | nrun | nls   | ncms  | totdelivered(/ub) | totrecorded(/ub) |
+  //+-------+------+-------+-------+-------------------+------------------+
+  //| 9     | 37   | 17377 | 17377 | 2761135761.229    | 2645968083.093   |
+  //+-------+------+-------+-------+-------------------+------------------+
+  //./.local/bin/brilcalc lumi --normtag /afs/cern.ch/user/l/lumipro/public/normtag_file/normtag_DATACERT.json -i lumiSummary_Run2016D_PromptReco_v2.json
+  //+-------+------+-------+-------+-------------------+------------------+
+  //| nfill | nrun | nls   | ncms  | totdelivered(/ub) | totrecorded(/ub) |
+  //+-------+------+-------+-------+-------------------+------------------+
+  //| 10    | 37   | 29151 | 29151 | 4525903884.794    | 4353448810.554   |
+  //+-------+------+-------+-------+-------------------+------------------+
+
+  return (17225935.728 + 2114239169.533 + 5878853439.923 + 2645968083.093 + 4353448810.554)*1e-6;//pb-1 data for NTUPLES_20_06_2016
+  //return (17225935.728 + 2114239169.533)*1e-6;//pb-1 data for NTUPLES_20_06_2016
   
 }
 /////////////////////////////////////////////////////////
@@ -150,8 +158,8 @@ TH1F *HTTHistograms::get1D_DY_Histogram(const std::string& name){
   if(!hDYJetsMuTau) return 0;
 
   if(name.find("h1DStats")==std::string::npos){
-    hDYJetsMuTau->Scale(0.85);//TEST AK
-    hDYJetsMuTau->Scale(1.2);//TEST AK
+    hDYJetsMuTau->Scale(1.0);//TEST AK
+    hDYJetsMuTau->Scale(1.0);//TEST AK
   }
   
   if(hDYJetsMuMu) hDYJetsMuTau->Add(hDYJetsMuMu);
@@ -242,27 +250,19 @@ void HTTHistograms::defineHistograms(){
    add1DHistogram("h1DMassTemplate",";SVFit mass [GeV/c^{2}]; Events",50,0,200,file_);   
    add1DHistogram("h1DPtTemplate",";p_{T}; Events",20,0,100,file_);
    add1DHistogram("h1DEtaTemplate",";#eta; Events",24,-2.4,2.4,file_);
-
-   //add1DHistogram("h1DPhiTemplate",";#phi; Events",12,0,2*M_PI,file_);
-   //add1DHistogram("h1DPhiTemplate",";#phi; Events",6,0,2*M_PI,file_);
-   //add1DHistogram("h1DPhiTemplate",";#phi; Events",20,-3.1,3.1,file_);
-
-   add1DHistogram("h1DPhiTemplate",";#phi; Events",6,0,3.1,file_);
-   
-   
+   add1DHistogram("h1DPhiTemplate",";#phi; Events",6,0,2*M_PI,file_);
    add1DHistogram("h1DCosPhiTemplate",";cos(#phi); Events",10,-1.0,1.0,file_);
    add1DHistogram("h1DCSVBtagTemplate",";CSV btag; Events",20,0,1,file_);
    add1DHistogram("h1DIsoTemplate",";Isolation; Events",10,0,0.5,file_);
    add1DHistogram("h1DIDTemplate",";ID; Events",30,-0.5,15.5,file_);
-   add1DHistogram("h1DVxPullTemplate",";#phi^{*} [rad]; Events",21,-3.1,3.1,file_);
-   //add1DHistogram("h1DVxPullTemplate",";#phi^{*} [rad]; Events",11,-0.01,0.01,file_);
+   add1DHistogram("h1DVxPullTemplate",";#phi^{*} [rad]; Events",11,-0.01,0.01,file_);
    add1DHistogram("h1DyTauTemplate",";yTau; Events",15,-1,1,file_);
    add1DHistogram("h1DnPCATemplate",";#hat{n}_{RECO}>; Events",10,0,0.015,file_);
 
    add2DHistogram("h2DVxPullVsNTrackTemplate","",21,-0.5,20.5,11,-0.01,0.01,file_);
    
-   //addProfile("hProfVsMagTemplate","",10,0,0.015,file_);
-   addProfile("hProfVsMagTemplate","",20,-3.1,3.1,file_);
+   addProfile("hProfVsMagTemplate","",10,0,0.015,file_);
+   //addProfile("hProfVsMagTemplate","",15,-25,25,file_);
    
    addProfile("hProfVsPtTemplate","",20,15,55,file_);
    addProfile("hProfVsCosTemplate","",20,-1,1,file_);
@@ -276,9 +276,8 @@ void HTTHistograms::finalizeHistograms(int nRuns, float weight){
 
   AnalysisHistograms::finalizeHistograms();
 
-  plotCPhistograms(nRuns, weight);
-
-  return;
+  //plotCPhistograms(nRuns, weight);
+  //return;
 
   wselOSCorrection =  std::pair<float,float>(1,0);
   wselSSCorrection =  std::pair<float,float>(1,0);
@@ -351,32 +350,19 @@ void HTTHistograms::finalizeHistograms(int nRuns, float weight){
 /////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////
 void HTTHistograms::plotCPhistograms(int nRuns, float weight){
-
-  plot_HAZ_Histograms("Phi_nVectors","RefitPV");
-  return;
-
-  plotProfiles("hProfRecoVsMagGen_","H");
-  plotVerticesPulls("h1DVxPullX_H");
-  plotVerticesPulls("h1DVxPullY_H");
-  plotVerticesPulls("h1DVxPullZ_H");
-  plotProfiles("hProfPhiVsMag_","H");
-  plotPhiDecayPlanes("CosPhi_CosPositiveH");
-
-  plotPhiDecayPlanes("Phi_PCA_x_H");
-  plotPhiDecayPlanes("Phi_PCA_y_H");
-  plotPhiDecayPlanes("Phi_PCA_z_H");
-  return;
-  
-
+  /*
   plot_HAZ_Histograms("Phi_nVectors","RefitPV");
   plot_HAZ_Histograms("Phi_nVecIP_","RefitPV");
+
+  plotPhiDecayPlanes("Phi_PCA_deltaPhi_H");
+  plotPhiDecayPlanes("Phi_PCA_deltaTheta_H");
+  plotPhiDecayPlanes("Phi_PCA_magnitudeRatio_H");
 
   plotPhiDecayPlanes("Phi_nVectorsH");
   plotPhiDecayPlanes("Phi_nVectorsA");
   plotPhiDecayPlanes("Phi_nVectorsDYJetsMuTau");
-  plotPhiDecayPlanes("Phi_nVecIP_");
-  //return;
-  
+  return;
+  */
 
   plot_HAZ_Histograms("Phi_nVecIP_yTauNeg","GenNoOfflineSel");
   plot_HAZ_Histograms("Phi_nVecIP_yTauPos","GenNoOfflineSel");
@@ -389,6 +375,9 @@ void HTTHistograms::plotCPhistograms(int nRuns, float weight){
 
   plot_HAZ_Histograms("Phi_nVectors","RefitPV");
   plot_HAZ_Histograms("Phi_nVecIP_","RefitPV");
+
+  plotPhiDecayPlanes("Phi_PCA_deltaPhi_H");
+  plotPhiDecayPlanes("Phi_PCA_magnitudeRatio_H");
   
   plotProfiles("hProfMagVsPt_","H");
   plotProfiles("hProfMagVsPt_","A");
@@ -397,10 +386,6 @@ void HTTHistograms::plotCPhistograms(int nRuns, float weight){
   plotProfiles("hProfPtVsMag_","H");
   plotProfiles("hProfPtVsMag_","A");
   plotProfiles("hProfPtVsMag_","DYJetsMuTau");
-
-  plotProfiles("hProfRecoVsMagGen_","H");
-  plotProfiles("hProfRecoVsMagGen_","A");
-  plotProfiles("hProfRecoVsMagGen_","DYJetsMuTau");
 
   plotProfiles("hProfPhiVsMag_","H");
   plotProfiles("hProfPhiVsMag_","A");
@@ -482,7 +467,7 @@ void HTTHistograms::plotnPCA(const std::string & type){
   h1DMuon->SetXTitle("|n_{RECO}|");
 
   h1DMuon->Draw();
-  h1DTau->Draw("same");
+  //h1DTau->Draw("same");
 
   l.AddEntry(h1DTau,"hadronic tau");
   l.AddEntry(h1DMuon,"leptonic tau");
@@ -537,17 +522,21 @@ void HTTHistograms::plotVerticesPulls(const std::string & hName){
 
   TH1F* h1D_AOD = this->get1DHistogram((hName+"AODPV").c_str());
   TH1F* h1D_Refit = this->get1DHistogram((hName+"RefitPV").c_str());
+  TH1F* h1D_Gen = this->get1DHistogram((hName+"GenPV").c_str());
   
-  if(h1D_AOD && h1D_Refit){
+  if(h1D_AOD && h1D_Refit && h1D_Gen){
     
     h1D_AOD->SetLineWidth(3);
     h1D_Refit->SetLineWidth(3);
+    h1D_Gen->SetLineWidth(3);
     ///
     h1D_AOD->SetLineColor(1);
     h1D_Refit->SetLineColor(4);
+    h1D_Gen->SetLineColor(6);
     ///
     h1D_AOD->Scale(1.0/h1D_AOD->Integral(0,h1D_AOD->GetNbinsX()+1));
     h1D_Refit->Scale(1.0/h1D_Refit->Integral(0,h1D_Refit->GetNbinsX()+1));
+    h1D_Gen->Scale(1.0/h1D_Gen->Integral(0,h1D_Gen->GetNbinsX()+1));
     ///
     h1D_Refit->Fit("gaus");
     gStyle->SetOptFit(0001);
@@ -558,14 +547,18 @@ void HTTHistograms::plotVerticesPulls(const std::string & hName){
     h1D_AOD->GetYaxis()->SetTitleOffset(1.4);
     h1D_AOD->SetStats(kFALSE);    
     ///
-    float max =     h1D_AOD->GetMaximum();
+    float max = h1D_AOD->GetMaximum();
     if(h1D_Refit->GetMaximum()>max) max = h1D_Refit->GetMaximum();
+    if(h1D_Gen->GetMaximum()>max) max = h1D_Gen->GetMaximum();  
     h1D_AOD->SetMaximum(1.05*max);
+    
     h1D_AOD->Draw();
     h1D_Refit->Draw("same");
+    h1D_Gen->Draw("same");
 
     l.AddEntry(h1D_AOD,"from AOD");
     l.AddEntry(h1D_Refit,"#splitline{refitted}{with BS}");
+    l.AddEntry(h1D_Gen,"generator PV");
     l.Draw();
     
     c->Print(TString::Format("fig_png/%s.png",hName.c_str()).Data());
@@ -767,6 +760,16 @@ void HTTHistograms::plot_HAZ_Histograms(const std::string & hName,
   if(h_Z->GetMaximum()>max) max = h_Z->GetMaximum();	
   h_h->SetMinimum(0.0);
   h_h->SetMaximum(1.1*max);
+
+  std::cout<<sysType<<" Fit H. Func: [0]*(1+9.86960*[1]/16.0*cos(x))"<<std::endl;
+  TF1 *fitFunc_h = new TF1("fitFunc_h","[0]*(1+9.86960*[1]/16.0*cos(x))",0,M_PI);
+  fitFunc_h->SetLineColor(4);
+  h_h->Fit("fitFunc_h");
+
+  std::cout<<sysType<<" Fit A Func: [0]*(1+9.86960*[1]/16.0*cos(x))"<<std::endl;
+  TF1 *fitFunc_A = new TF1("fitFunc_A","[0]*(1+9.86960*[1]/16.0*cos(x))",0,M_PI);
+  fitFunc_A->SetLineColor(2);
+  h_A->Fit("fitFunc_A");
   
   h_h->SetXTitle("#phi^{*}");
   if(name.Contains("CosPhiNN")) h_h->SetXTitle("#hat{n}_{RECO}^{#pi^{+}} #bullet #hat{n}_{RECO}^{#pi^{-}}");
@@ -777,11 +780,11 @@ void HTTHistograms::plot_HAZ_Histograms(const std::string & hName,
   h_Z->SetLineColor(3);
   h_h->Draw();
   h_A->Draw("same");
-  //h_Z->Draw("same");
+  h_Z->Draw("same");
   ///
   l.AddEntry(h_h,"SM H");
   l.AddEntry(h_A,"MSSM A");
-  //l.AddEntry(h_Z,"SM Z");
+  l.AddEntry(h_Z,"SM Z");
   l.Draw();
   //aLatex.DrawLatex(0.05,0.02,sysType.c_str());
   ///
@@ -864,10 +867,10 @@ THStack*  HTTHistograms::plotStack(std::string varName, std::string selName){
   weight = getSampleNormalisation(sampleName);
   scale = weight*lumi;
   hDYJetsOther->Scale(scale);
-  hDYJetsMuMu->Scale(1.2*scale);//TEST AK
+  hDYJetsMuMu->Scale(1.1*scale);//TEST AK
   //hDYJetsMuMu->Scale(scale);
   hDYJetsEE->Scale(scale);
-  hDYJetsMuTau->Scale(0.85*scale);//TEST AK
+  hDYJetsMuTau->Scale(1.0*scale);//TEST AK
   //hDYJetsMuTau->Scale(scale);
 
   sampleName = "TTbar";
