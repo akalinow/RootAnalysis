@@ -207,14 +207,14 @@ bool HTTAnalyzer::analyze(const EventProxyBase& iEvent){
   bool muonKinematics = aMuon.getP4().Pt()>19 && fabs(aMuon.getP4().Eta())<2.1;
   bool trigger = aMuon.hasTriggerMatch(TriggerEnum::HLT_IsoMu18);
   if(sampleName=="Data") trigger = aMuon.hasTriggerMatch(TriggerEnum::HLT_IsoMu22) || aMuon.hasTriggerMatch(TriggerEnum::HLT_IsoMu18);
-  bool cpMuonSelection = aMuon.getPCA().Mag()>0.005;    
-  bool cpTauSelection = (aTau.getProperty(PropertyEnum::decayMode)==tauDecay1ChargedPion0PiZero && aTau.getPCA().Mag()>0.005) ||
+  bool cpMuonSelection = aMuon.getPCARefitPV().Perp()>0.003;    
+  bool cpTauSelection = (aTau.getProperty(PropertyEnum::decayMode)==tauDecay1ChargedPion0PiZero && aTau.getPCARefitPV().Mag()>0.003) ||
                         (aTau.getProperty(PropertyEnum::decayMode)!=tauDecay1ChargedPion0PiZero &&
 			 isOneProng(aTau.getProperty(PropertyEnum::decayMode))); 
   bool cpSelection = cpMuonSelection && cpTauSelection;
-  
+
   if(!tauKinematics || !tauID || !muonKinematics || !trigger) return true;
- //if(!cpSelection) return true;
+  if(!cpSelection) return true;
 
   ///Note: parts of the signal/control region selection are applied in the following code.
   ///FIXME AK: this should be made in a more clear way.
