@@ -276,8 +276,8 @@ void HTTHistograms::finalizeHistograms(int nRuns, float weight){
 
   AnalysisHistograms::finalizeHistograms();
 
-  //plotCPhistograms(nRuns, weight);
-  //return;
+  plotCPhistograms(nRuns, weight);
+  return;
 
   wselOSCorrection =  std::pair<float,float>(1,0);
   wselSSCorrection =  std::pair<float,float>(1,0);
