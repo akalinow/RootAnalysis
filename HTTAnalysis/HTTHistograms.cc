@@ -296,10 +296,7 @@ void HTTHistograms::defineHistograms(){
    add1DHistogram("h1DIDTemplate",";ID; Events",30,-0.5,15.5,file_);
    add1DHistogram("h1DVxPullTemplate",";#phi^{*} [rad]; Events",11,-0.01,0.01,file_);
    add1DHistogram("h1DyTauTemplate",";yTau; Events",15,-1,1,file_);
-   add1DHistogram("h1DnPCATemplate",";#hat{n}_{RECO}>; Events",10,0,0.015,file_);
-
-   add2DHistogram("h2DVxPullVsNTrackTemplate","",21,-0.5,20.5,11,-0.01,0.01,file_);
-   
+   add1DHistogram("h1DnPCATemplate",";#hat{n}_{RECO}>; Events",10,0,0.015,file_);   
    addProfile("hProfVsMagTemplate","",10,0,0.015,file_);
    addProfile("hProfVsPtTemplate","",20,15,55,file_);
    addProfile("hProfVsCosTemplate","",20,-1,1,file_);
@@ -313,8 +310,8 @@ void HTTHistograms::finalizeHistograms(int nRuns, float weight){
 
   AnalysisHistograms::finalizeHistograms();
 
-  plotPhiDecayPlanes("Phi_nVectorsUnknown");
-  return;
+  //plotPhiDecayPlanes("Phi_nVectorsUnknown");
+  //return;
 
   muTauDYScale = 1.0;
   mumuDYScale = 1.0;
@@ -438,9 +435,6 @@ void HTTHistograms::plotCPhistograms(int nRuns, float weight){
   plotVerticesPulls("h1DVxPullX_H");
   plotVerticesPulls("h1DVxPullY_H");
   plotVerticesPulls("h1DVxPullZ_H");
-
-  plotVerticesPulls("h2DVxPullVsNTrackTrans_H");
-  plotVerticesPulls("h2DVxPullVsNTrackLong_H");
   
   plotPhiDecayPlanes("Phi_nVectorsData");
   plotPhiDecayPlanes("Phi_nVectorsH");

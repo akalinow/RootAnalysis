@@ -81,6 +81,12 @@ class HTTAnalyzer: public Analyzer{
   ///Make the methos static, so other modules can use it
   static std::string getSampleName(const EventProxyHTT & myEventProxy);
 
+  ///Return human readable sample name (Data, WJets, etc).
+  ///Make the methos static, so other modules can use it.
+  ///Method used when sample coding in TTree is not present.
+  ///In this case a ROOT file name is used to decode the sample type.
+  static std::string getSampleNameFromFileName(const EventProxyHTT & myEventProxy);
+
   ///Return pileup reweighting weight.
   ///Weight is calculatedon fly using the ration of nPU 
   ///histograms for data and analyased sample.

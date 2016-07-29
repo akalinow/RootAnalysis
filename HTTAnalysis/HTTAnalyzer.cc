@@ -64,13 +64,16 @@ void HTTAnalyzer::setAnalysisObjects(const EventProxyHTT & myEventProxy){
   aPair = (*myEventProxy.pairs)[0];
   aTau = aPair.getTau();
   aMuon = aPair.getMuon();
+  
+  aGenMuonTau = HTTParticle();
+  aGenHadTau = HTTParticle();
 
   if(myEventProxy.genLeptons && myEventProxy.genLeptons->size()){
     HTTParticle aGenTau =  myEventProxy.genLeptons->at(0);    
     if(aGenTau.getProperty(PropertyEnum::decayMode)==tauDecayMuon) aGenMuonTau = aGenTau;
     else if(aGenTau.getProperty(PropertyEnum::decayMode)!=tauDecaysElectron) aGenHadTau = aGenTau;
     if(myEventProxy.genLeptons->size()>1){
-      HTTParticle aGenTau =  myEventProxy.genLeptons->at(1);
+      aGenTau =  myEventProxy.genLeptons->at(1);
       if(aGenTau.getProperty(PropertyEnum::decayMode)==tauDecayMuon) aGenMuonTau = aGenTau;
       else if(aGenTau.getProperty(PropertyEnum::decayMode)!=tauDecaysElectron) aGenHadTau = aGenTau;
     }
@@ -160,9 +163,6 @@ bool HTTAnalyzer::fillVertices(const std::string & sysType){
   myHistos_->fill1DHistogram("h1DVxPullY_"+sysType,pullY);
   myHistos_->fill1DHistogram("h1DVxPullZ_"+sysType,pullZ);
 
-  myHistos_->fill2DHistogram("h2DVxPullVsNTrackTrans_"+sysType, aEvent.getNTracksInRefit(), sqrt(pullX*pullX + pullY*pullY));
-  myHistos_->fill2DHistogram("h2DVxPullVsNTrackLong_"+sysType, aEvent.getNTracksInRefit(), pullZ);
-  
   return true;
 }
 //////////////////////////////////////////////////////////////////////////////
@@ -202,7 +202,8 @@ bool HTTAnalyzer::analyze(const EventProxyBase& iEvent){
     if(aEvent.tauIDStrings[iBit]=="againstElectronVLooseMVA6") tauIDmask |= (1<<iBit);
   }
 
-  bool tauID = ( (int)aTau.getProperty(PropertyEnum::tauID) & tauIDmask) == tauIDmask;
+  //bool tauID = ( (int)aTau.getProperty(PropertyEnum::tauID) & tauIDmask) == tauIDmask;
+  bool tauID = true;
   
   bool muonKinematics = aMuon.getP4().Pt()>19 && fabs(aMuon.getP4().Eta())<2.1;
   bool trigger = aMuon.hasTriggerMatch(TriggerEnum::HLT_IsoMu18);
