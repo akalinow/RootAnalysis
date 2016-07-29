@@ -333,8 +333,8 @@ void HTTAnalyzer::fillDecayPlaneAngle(const std::string & hNameSuffix, float eve
     myHistos_->fill1DHistogram("h1DCosPhi_CosNegative"+hNameSuffix,cosNegative,eventWeight);
     myHistos_->fillProfile("hProfPhiVsMag_"+hNameSuffix,negative_nPCA.Vect().Perp(),cosNegative);
     
-    myHistos_->fillProfile("hProfPtVsMag_"+hNameSuffix,aGenNegativeTau.nPCA().Mag(), negativeLeadingTk.Perp());
-    myHistos_->fillProfile("hProfPtVsMag_"+hNameSuffix,aGenPositiveTau.nPCA().Mag(), positiveLeadingTk.Perp());
+    myHistos_->fillProfile("hProfPtVsMag_"+hNameSuffix,fabs(aGenNegativeTau.nPCA().Eta()), fabs(negativeLeadingTk.Eta()));
+    myHistos_->fillProfile("hProfPtVsMag_"+hNameSuffix,fabs(aGenPositiveTau.nPCA().Eta()), fabs(positiveLeadingTk.Eta()));
     
     myHistos_->fillProfile("hProfMagVsPt_"+hNameSuffix, negativeLeadingTk.Perp(), aGenNegativeTau.nPCA().Mag());
     myHistos_->fillProfile("hProfMagVsPt_"+hNameSuffix, positiveLeadingTk.Perp(), aGenPositiveTau.nPCA().Mag());
@@ -573,8 +573,8 @@ bool HTTAnalyzer::analyze(const EventProxyBase& iEvent){
   bool trigger = aPair.trigger(HLT_IsoMu17_eta2p1);
   if(sampleName=="Data") trigger = aPair.trigger(HLT_IsoMu18) || aPair.trigger(HLT_IsoMu20);
 
-  bool cpMuonSelection = aMuon.nPCARefitvx().Perp()>0.003;    
-  bool cpTauSelection = (aTau.decayMode()==tauDecay1ChargedPion0PiZero && aTau.nPCARefitvx().Perp()>0.003) ||
+  bool cpMuonSelection = aMuon.nPCARefitvx().Perp()>0.004;    
+  bool cpTauSelection = (aTau.decayMode()==tauDecay1ChargedPion0PiZero && aTau.nPCARefitvx().Perp()>0.004) ||
                         (aTau.decayMode()!=tauDecay1ChargedPion0PiZero && isOneProng(aTau.decayMode()));    
 
   bool cpSelection = aEvent.nTracksInRefit()>=2 && cpMuonSelection && cpTauSelection;

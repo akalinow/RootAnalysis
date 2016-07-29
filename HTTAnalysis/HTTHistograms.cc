@@ -257,12 +257,12 @@ void HTTHistograms::defineHistograms(){
    add1DHistogram("h1DIDTemplate",";ID; Events",30,-0.5,15.5,file_);
    add1DHistogram("h1DVxPullTemplate",";#phi^{*} [rad]; Events",11,-0.01,0.01,file_);
    add1DHistogram("h1DyTauTemplate",";yTau; Events",15,-1,1,file_);
-   add1DHistogram("h1DnPCATemplate",";#hat{n}_{RECO}>; Events",10,0,0.015,file_);
+   add1DHistogram("h1DnPCATemplate",";#hat{n}_{RECO}>; Events",20,0,0.015,file_);
 
    add2DHistogram("h2DVxPullVsNTrackTemplate","",21,-0.5,20.5,11,-0.01,0.01,file_);
    
-   addProfile("hProfVsMagTemplate","",10,0,0.015,file_);
-   //addProfile("hProfVsMagTemplate","",15,-25,25,file_);
+   //addProfile("hProfVsMagTemplate","",10,0,0.015,file_);
+   addProfile("hProfVsMagTemplate","",20,-2,2,file_);
    
    addProfile("hProfVsPtTemplate","",20,15,55,file_);
    addProfile("hProfVsCosTemplate","",20,-1,1,file_);
@@ -467,7 +467,7 @@ void HTTHistograms::plotnPCA(const std::string & type){
   h1DMuon->SetXTitle("|n_{RECO}|");
 
   h1DMuon->Draw();
-  //h1DTau->Draw("same");
+  h1DTau->Draw("same");
 
   l.AddEntry(h1DTau,"hadronic tau");
   l.AddEntry(h1DMuon,"leptonic tau");
