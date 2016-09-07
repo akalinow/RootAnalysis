@@ -59,7 +59,9 @@ int main(int argc, char ** argv) {
 	 EventProxyHTT *myEvent = new EventProxyHTT();
 
 	 if(processName=="Weights" || processName=="PU") myAnalyzers.push_back(new HTTWeightsMaker("HTTWeightsMaker"));
-	 else myAnalyzers.push_back(new HTTSynchNTuple("HTTSynchNTuple"));
+	 else 
+	 if(processName=="SynchNTuple") myAnalyzers.push_back(new HTTSynchNTuple("HTTSynchNTuple"));
+	 else myAnalyzers.push_back(new HTTAnalyzer("HTTAnalyzer"));
 
 	 TreeAnalyzer *tree = new TreeAnalyzer("TreeAnalyzer",cfgFileName, myEvent);
 	 tree->init(myAnalyzers);
