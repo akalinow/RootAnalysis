@@ -14,6 +14,7 @@
 #include "EventProxyHTT.h"
 #include "HTTWeightsMaker.h"
 #include "HTTAnalyzer.h"
+#include "HTTSynchNTuple.h"
 
 #include "TFile.h"
 #include "TStopwatch.h"
@@ -58,7 +59,7 @@ int main(int argc, char ** argv) {
 	 EventProxyHTT *myEvent = new EventProxyHTT();
 
 	 if(processName=="Weights" || processName=="PU") myAnalyzers.push_back(new HTTWeightsMaker("HTTWeightsMaker"));
-	 else myAnalyzers.push_back(new HTTAnalyzer("HTTAnalyzer"));
+	 else myAnalyzers.push_back(new HTTSynchNTuple("HTTSynchNTuple"));
 
 	 TreeAnalyzer *tree = new TreeAnalyzer("TreeAnalyzer",cfgFileName, myEvent);
 	 tree->init(myAnalyzers);
