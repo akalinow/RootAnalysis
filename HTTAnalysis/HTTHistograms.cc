@@ -104,7 +104,7 @@ float HTTHistograms::getSampleNormalisation(std::string sampleName){
   //https://twiki.cern.ch/twiki/bin/viewauth/CMS/SummaryTable1G25ns#DY_Z
   if(sampleName=="DYJets"){
     //xsection for 3xZ->mu mu M50 in [pb]  
-    crossSection = 3*1921.8
+    crossSection = 3*1921.8;
   }
   if(sampleName=="WJets"){
     //xsection for 3xW->mu nu in [pb]
