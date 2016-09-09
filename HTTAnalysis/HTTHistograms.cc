@@ -31,32 +31,46 @@ float HTTHistograms::getLumi(){
   //+-------+------+-------+-------+-------------------+------------------+
   //| 41    | 108  | 31592 | 31592 | 2185867468.728    | 2114239169.533   |
   //+-------+------+-------+-------+-------------------+------------------+
-  //./.local/bin/brilcalc lumi --normtag  /afs/cern.ch/user/l/lumipro/public/normtag_file/normtag_DATACERT.json -i lumiSummary_Run2016B_PromptReco_v2.json
-  //+-------+------+-------+-------+-------------------+------------------+
-  //| nfill | nrun | nls   | ncms  | totdelivered(/ub) | totrecorded(/ub) |
-  //+-------+------+-------+-------+-------------------+------------------+
-  //| 34    | 102  | 52181 | 52176 | 6123957740.439    | 5878853439.923   |
-  //+-------+------+-------+-------+-------------------+------------------+
-  //./.local/bin/brilcalc lumi --normtag /afs/cern.ch/user/l/lumipro/public/normtag_file/normtag_DATACERT.json -i lumiSummary_Run2016C_PromptReco_v2.json
-  //+-------+------+-------+-------+-------------------+------------------+
-  //| nfill | nrun | nls   | ncms  | totdelivered(/ub) | totrecorded(/ub) |
-  //+-------+------+-------+-------+-------------------+------------------+
-  //| 9     | 37   | 17377 | 17377 | 2761135761.229    | 2645968083.093   |
-  //+-------+------+-------+-------+-------------------+------------------+
-  //./.local/bin/brilcalc lumi --normtag /afs/cern.ch/user/l/lumipro/public/normtag_file/normtag_DATACERT.json -i lumiSummary_Run2016D_PromptReco_v2.json
-  //+-------+------+-------+-------+-------------------+------------------+
-  //| nfill | nrun | nls   | ncms  | totdelivered(/ub) | totrecorded(/ub) |
-  //+-------+------+-------+-------+-------------------+------------------+
-  //| 10    | 37   | 29151 | 29151 | 4525903884.794    | 4353448810.554   |
-//+-------+------+-------+-------+-------------------+------------------+
-  
+  /*
+  ./.local/bin/brilcalc lumi --normtag /afs/cern.ch/user/l/lumipro/public/normtag_file/normtag_DATACERT.json -i lumiSummary_Run2016B_PromptReco_v12.json
+    +-------+------+-------+-------+-------------------+------------------+
+    | nfill | nrun | nls   | ncms  | totdelivered(/ub) | totrecorded(/ub) |
+    +-------+------+-------+-------+-------------------+------------------+
+    | 34    | 102  | 52184 | 52179 | 6124431327.460    | 5879283691.513   |
+    +-------+------+-------+-------+-------------------+------------------+
+    ./.local/bin/brilcalc lumi --normtag /afs/cern.ch/user/l/lumipro/public/normtag_file/normtag_DATACERT.json -i lumiSummary_Run2016C_PromptReco_v12.json
+    +-------+------+-------+-------+-------------------+------------------+
+    | nfill | nrun | nls   | ncms  | totdelivered(/ub) | totrecorded(/ub) |
+    +-------+------+-------+-------+-------------------+------------------+
+    | 9     | 37   | 17377 | 17377 | 2761135761.229    | 2645968083.093   |
+    +-------+------+-------+-------+-------------------+------------------+
+    ./.local/bin/brilcalc lumi --normtag /afs/cern.ch/user/l/lumipro/public/normtag_file/normtag_DATACERT.json -i lumiSummary_Run2016D_PromptReco_v12.json
+    +-------+------+-------+-------+-------------------+------------------+
+    | nfill | nrun | nls   | ncms  | totdelivered(/ub) | totrecorded(/ub) |
+    +-------+------+-------+-------+-------------------+------------------+
+    | 10    | 37   | 29151 | 29151 | 4525903884.794    | 4353448810.554   |
+    +-------+------+-------+-------+-------------------+------------------+
+     ./.local/bin/brilcalc lumi --normtag /afs/cern.ch/user/l/lumipro/public/normtag_file/normtag_DATACERT.json -i lumiSummary_Run2016E_PromptReco_v12.json
+    +-------+------+-------+-------+-------------------+------------------+
+    | nfill | nrun | nls   | ncms  | totdelivered(/ub) | totrecorded(/ub) |
+    +-------+------+-------+-------+-------------------+------------------+
+    | 8     | 22   | 19180 | 19180 | 3198505763.662    | 3049848991.234   |
+    +-------+------+-------+-------+-------------------+------------------+
+
+  */
   
   float run2015C = 17225935.728*1E-6;
   float run2015D = 2114239169.533*1E-6;
-  float run2016B = 5878853439.923*1E-6; 
+  
+  float run2016B = 5879283691.513*1E-6;
   float run2016C = 2645968083.093*1E-6;
-  float run2016D =  4353448810.554*1E-6;
-  return run2015D;//pb-1 data for NTUPLES_04_07_2016
+  float run2016D = 4353448810.554*1E-6;
+  float run2016E = 3049848991.234*1E-6;
+
+  return run2016B;//TEST
+
+  return run2016B+run2016C+run2016D+run2016E;//pb-1 data for NTUPLES_05_09_2016
+  //return run2015D;//pb-1 data for NTUPLES_04_07_2016
 }
 /////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////
@@ -87,10 +101,10 @@ float HTTHistograms::getSampleNormalisation(std::string sampleName){
     //https://cmsweb.cern.ch/das/request?input=mcm%20prepid=SMP-RunIISpring15MiniAODv2-00016
     crossSection = 71600;
   }
-  //https://twiki.cern.ch/twiki/bin/viewauth/CMS/StandardModelCrossSectionsat13TeVInclusive
+  //https://twiki.cern.ch/twiki/bin/viewauth/CMS/SummaryTable1G25ns#DY_Z
   if(sampleName=="DYJets"){
     //xsection for 3xZ->mu mu M50 in [pb]  
-    crossSection = 3*2008.4; 
+    crossSection = 3*1921.8
   }
   if(sampleName=="WJets"){
     //xsection for 3xW->mu nu in [pb]
@@ -101,7 +115,7 @@ float HTTHistograms::getSampleNormalisation(std::string sampleName){
   if(sampleName=="TTbar"){
     //https://twiki.cern.ch/twiki/bin/viewauth/CMS/KlubTwikiRun2
     //https://twiki.cern.ch/twiki/bin/viewauth/CMS/StandardModelCrossSectionsat13TeVInclusive
-    crossSection = 831.76*0.95; 
+    crossSection = 831.76; 
   }
   if(sampleName=="H"){
     ///mH = 125, gg fussion only
@@ -184,7 +198,9 @@ TH1F *HTTHistograms::getNormalised_NJet_Histogram(const std::string& hName,
 
   TH1F *hNJets = get1DHistogram(hName);
   if(!hNJets) return hNJets;
+
   TH1F *hNJetsStats = get1DHistogram("h1DStats"+jetsName);
+  
   float recoPresEff = hNJetsStats->GetBinContent(3)/hNJetsStats->GetBinContent(2);
   int nEventsAnalysed = hNJetsStats->GetBinContent(1);
 
@@ -203,6 +219,12 @@ TH1F *HTTHistograms::getNormalised_NJet_Histogram(const std::string& hName,
 /////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////
 TH1F *HTTHistograms::get1D_WJet_Histogram(const std::string& name){
+
+  ////Hack for missing nJets samples
+  TH1F *hWAllJets = getNormalised_NJet_Histogram(name.c_str(),"WJets");
+  return hWAllJets;
+  ///////////////
+  
 
   TString hName = name;
   hName.ReplaceAll("WJets","W0Jets");
@@ -310,27 +332,23 @@ void HTTHistograms::finalizeHistograms(int nRuns, float weight){
 
   AnalysisHistograms::finalizeHistograms();
 
-  //plotPhiDecayPlanes("Phi_nVectorsUnknown");
+  ////Code below tests W+n jets normalisation
+  ///Samples split into jet multiplicity are compared to
+  ///inclusive sample.
+  //TH1F *h = get1D_WJet_Histogram("h1DNPartonsWJets");
+  //TH1F *hAllJets = get1D_WJet_Histogram("h1DNPartonsWAllJets");
+  //h->Scale(1.0/h->Integral(2,6));
+  //hAllJets->Scale(1.0/hAllJets->Integral());  
+  //hAllJets->Print("all");
+  //h->Print("all");
+  //return;  
+  //////////////
+
+  //plotCPhistograms(nRuns, weight);
   //return;
 
   muTauDYScale = 1.0;
   mumuDYScale = 1.0;
-
-  ///TEST
-  /*
-  TCanvas *c = new TCanvas();
-  TH1F *h = get1D_WJet_Histogram("h1DNPartonsWJets");
-  //float norm = getSampleNormalisation("WJets");
-  //h->Scale(norm);  
-  h->Draw();
-  h->Print();
-  c->Print("c.png");
-  return;
-  */
-  //////////////
-
-  plotCPhistograms(nRuns, weight);
-  return;
 
   wselOSCorrection =  std::pair<float,float>(1,0);
   wselSSCorrection =  std::pair<float,float>(1,0);
@@ -339,8 +357,9 @@ void HTTHistograms::finalizeHistograms(int nRuns, float weight){
   wselSSCorrection = getWNormalisation("wselSS");
 
   ///TEST ///////////
+  plotStack("NPV","");
   //plotStack("MassVis","");
-  //return;
+  return;
   ////////////////////
 
   ///Control regions plots
@@ -440,7 +459,7 @@ void HTTHistograms::plotCPhistograms(int nRuns, float weight){
   plotPhiDecayPlanes("Phi_nVectorsH");
   plotPhiDecayPlanes("Phi_nVectorsA");  
   plotPhiDecayPlanes("Phi_nVectorsDYJetsMuTau");
-  plotPhiDecayPlanes("Phi_nVectorsWJetsHT0");
+  plotPhiDecayPlanes("Phi_nVectorsWJets");
 
   plotPhiDecayPlanes("Phi_nVecIP_yTauPosData");
   plotPhiDecayPlanes("Phi_nVecIP_yTauNegData");
@@ -450,27 +469,23 @@ void HTTHistograms::plotCPhistograms(int nRuns, float weight){
   plotPhiDecayPlanes("Phi_nVecIP_yTauNegA");
   plotPhiDecayPlanes("Phi_nVecIP_yTauPosDYJetsMuTau");
   plotPhiDecayPlanes("Phi_nVecIP_yTauNegDYJetsMuTau");
-  plotPhiDecayPlanes("Phi_nVecIP_yTauPosWJetsHT0");
-  plotPhiDecayPlanes("Phi_nVecIP_yTauNegWJetsHT0");
+  plotPhiDecayPlanes("Phi_nVecIP_yTauPosWJets");
+  plotPhiDecayPlanes("Phi_nVecIP_yTauNegWJets");
  
-
   plotSingleHistogram("h1DyTauH");
   plotSingleHistogram("h1DyTauA");
   plotSingleHistogram("h1DyTauDYJetsMuTau");
-  plotSingleHistogram("h1DyTauWJetsHT0");
+  plotSingleHistogram("h1DyTauWJets");
  
-  plotPhiDecayPlanes("CosPhi_CosPositiveH");
-  plotPhiDecayPlanes("CosPhi_CosNegativeH");
-
   plotPhiDecayPlanes("CosPhiNN_H");
   plotPhiDecayPlanes("CosPhiNN_A");
   plotPhiDecayPlanes("CosPhiNN_DYJetsMuTau");
-  plotPhiDecayPlanes("CosPhiNN_WJetsHT0");
+  plotPhiDecayPlanes("CosPhiNN_WJets");
 
   plotnPCA("H");
   plotnPCA("A");
   plotnPCA("DYJetsMuTau");
-  plotnPCA("WJetsHT0");
+  plotnPCA("WJets");
   
 }
 /////////////////////////////////////////////////////////
@@ -826,6 +841,7 @@ THStack*  HTTHistograms::plotStack(std::string varName, std::string selName){
   TH1F *hSoup = get1DHistogram((hName+"Data"+selName).c_str());
   pair<float,float> qcdOStoSS = getQCDOStoSS(selName, wselOSCorrection, wselSSCorrection);
   TH1F *hQCD = (TH1F*)getQCDbackground(varName,selName);
+  
   ///Protection against null pointers
   ///Null pointers happen when sample was not read, or there were no
   ///events passing particular selection.
@@ -868,7 +884,6 @@ THStack*  HTTHistograms::plotStack(std::string varName, std::string selName){
   float weight = getSampleNormalisation(sampleName);
   ///TEST
   //pair<float,float> dataToMCScale = getWNormalisation(WselType);
-
   pair<float,float> dataToMCScale = wselOSCorrection;
   /////
   float scale = weight*lumi*dataToMCScale.first;
@@ -1140,15 +1155,23 @@ std::pair<float,float> HTTHistograms::getQCDOStoSS(std::string selName,
   TH1F *hSoupOS = get1DHistogram((hName+"Data"+"qcdselOS").c_str());
   TH1F *hSoupOSb = get1DHistogram((hName+"Data"+"qcdselOS").c_str());
 
-  if(!hSoupSS){
-    std::cout<<"No data histograms for SS category!"<<std::endl;
+  if(!hSoupSS || !hSoupOS){
+    std::cout<<"No data histograms for SS or OS category!"<<std::endl;
     return  std::make_pair(1.0,0.0);
   }
   
   TH1F *hEmpty = (TH1F*)hSoupSS->Clone("hEmpty");
   hEmpty->Reset();
   
-  if(!hSoupSS || !hSoupOS) return std::make_pair(1.0,0.0);
+  if(!hTTSS) hTTSS = (TH1F*)hEmpty->Clone((hName+"TTbar"+"qcdselSS").c_str());
+  if(!hTTOS) hTTOS = (TH1F*)hEmpty->Clone((hName+"TTbar"+"qcdselOS").c_str());
+
+  if(!hWJetsOS) hWJetsOS = (TH1F*)hEmpty->Clone((hName+"WJets"+"qcdselOS").c_str());
+  if(!hWJetsSS) hWJetsSS = (TH1F*)hEmpty->Clone((hName+"WJets"+"qcdselSS").c_str());
+
+  if(!hDYJetsOS) hDYJetsOS = (TH1F*)hEmpty->Clone((hName+"DYJets"+"qcdselOS").c_str());
+  if(!hDYJetsSS) hDYJetsSS = (TH1F*)hEmpty->Clone((hName+"DYJets"+"qcdselSS").c_str());
+  
   if(!hDYJetsLowMSS) hDYJetsLowMSS = (TH1F*)hEmpty->Clone("hDYJetsLowMqcdselSS");
   if(!hDYJetsLowMOS) hDYJetsLowMOS = (TH1F*)hEmpty->Clone("hDYJetsLowMqcdselOS");
 

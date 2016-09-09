@@ -8,13 +8,15 @@
 HTTAnalyzer::HTTAnalyzer(const std::string & aName):Analyzer(aName){
 
   ///Load ROOT file with PU histograms.
-  std::string filePath = "Data_Pileup_2015D_Feb02.root";
+  std::string filePath = "Data_Pileup_2016_July22.root";
   puDataFile_ = new TFile(filePath.c_str());
 
-  filePath = "MC_Spring15_PU25_Startup.root";
+  filePath = "MC_Spring16_PU25ns_V1.root";
   puMCFile_ = new TFile(filePath.c_str());
 
   ntupleFile_ = 0;
+
+  hStatsFromFile = 0;
   
 }
 //////////////////////////////////////////////////////////////////////////////
@@ -182,6 +184,12 @@ bool HTTAnalyzer::analyze(const EventProxyBase& iEvent){
   myHistos_->fill1DHistogram("h1DStats"+sampleName,0,eventWeight);
   getPreselectionEff(myEventProxy);
 
+  /////TEST                                                                                                                                                                                
+  //myHistos_->fill1DHistogram("h1DNPV"+hNameSuffix,myEventProxy.event->getNPV(),eventWeight);
+  //myHistos_->fill1DHistogram("h1DNPartons"+hNameSuffix,myEventProxy.event->getLHEnOutPartons(),eventWeight);
+  //return true;
+  ////////////  
+
   if(!myEventProxy.pairs->size()) return true;
 
   setAnalysisObjects(myEventProxy);
@@ -193,7 +201,7 @@ bool HTTAnalyzer::analyze(const EventProxyBase& iEvent){
   if(goodGenDecayMode) fillGenDecayPlaneAngle(sampleName+"GenNoOfflineSel", eventWeight);
   
   ///This stands for core selection, that is common to all regions.
-  bool tauKinematics = aTau.getP4().Pt()>30 && fabs(aTau.getP4().Eta())<2.3;
+  bool tauKinematics = aTau.getP4().Pt()>20 && fabs(aTau.getP4().Eta())<2.3;
   int tauIDmask = 0;
   
   for(unsigned int iBit=0;iBit<aEvent.ntauIds;iBit++){
@@ -202,20 +210,27 @@ bool HTTAnalyzer::analyze(const EventProxyBase& iEvent){
     if(aEvent.tauIDStrings[iBit]=="againstElectronVLooseMVA6") tauIDmask |= (1<<iBit);
   }
 
-  //bool tauID = ( (int)aTau.getProperty(PropertyEnum::tauID) & tauIDmask) == tauIDmask;
-  bool tauID = true;
+  bool tauID = ( (int)aTau.getProperty(PropertyEnum::tauID) & tauIDmask) == tauIDmask;
+  bool muonKinematics = aMuon.getP4().Pt()>23 && fabs(aMuon.getP4().Eta())<2.1;
+  bool trigger = aMuon.hasTriggerMatch(TriggerEnum::HLT_IsoMu22);
+  if(sampleName=="Data") trigger = aMuon.hasTriggerMatch(TriggerEnum::HLT_IsoMu22);
+  trigger = true; //TEST
   
-  bool muonKinematics = aMuon.getP4().Pt()>19 && fabs(aMuon.getP4().Eta())<2.1;
-  bool trigger = aMuon.hasTriggerMatch(TriggerEnum::HLT_IsoMu18);
-  if(sampleName=="Data") trigger = aMuon.hasTriggerMatch(TriggerEnum::HLT_IsoMu22) || aMuon.hasTriggerMatch(TriggerEnum::HLT_IsoMu18);
   bool cpMuonSelection = aMuon.getPCARefitPV().Perp()>0.003;    
   bool cpTauSelection = (aTau.getProperty(PropertyEnum::decayMode)==tauDecay1ChargedPion0PiZero && aTau.getPCARefitPV().Mag()>0.003) ||
                         (aTau.getProperty(PropertyEnum::decayMode)!=tauDecay1ChargedPion0PiZero &&
 			 isOneProng(aTau.getProperty(PropertyEnum::decayMode))); 
   bool cpSelection = cpMuonSelection && cpTauSelection;
-
+  /*
+  std::cout<<" tauKinematics: "<<tauKinematics
+           <<" tauID: "<<tauID
+           <<" muonKinematics: "<<muonKinematics
+           <<" trigger: "<<trigger
+           <<" cpSelection: "<<cpSelection
+           <<std::endl;
+  */
   if(!tauKinematics || !tauID || !muonKinematics || !trigger) return true;
-  if(!cpSelection) return true;
+  //if(!cpSelection) return true;
 
   ///Note: parts of the signal/control region selection are applied in the following code.
   ///FIXME AK: this should be made in a more clear way.
@@ -227,7 +242,7 @@ bool HTTAnalyzer::analyze(const EventProxyBase& iEvent){
   bool qcdSelectionOS = OS;
   //bool ttSelection = aJet.getProperty(PropertyEnum::bDiscriminator)>0.5 && nJets30>1;
   bool ttSelection = nJets30>1;
-  bool mumuSelection =  aPair.getMTMuon()<40 &&  aMuon.getProperty(PropertyEnum::combreliso)<0.1 && aPair.getP4().M()>85 && aPair.getP4().M()<95;
+  bool mumuSelection =  aPair.getMTMuon()<40 &&  aMuon.getProperty(PropertyEnum::combreliso)<0.15 && aPair.getP4().M()>85 && aPair.getP4().M()<95;
 
   ///Histograms for the baseline selection  
   if(baselineSelection){

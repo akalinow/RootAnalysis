@@ -154,6 +154,9 @@ class HTTAnalyzer: public Analyzer{
 
   ///ROOT file containing current TTree
   TFile *ntupleFile_;
+
+  ///Histogram with event counts filled during preselection step.
+  TH1F *hStatsFromFile;
  
   ///Vector of PU histograms for MC samples
   std::vector<TH1F*> hPUVec_;
