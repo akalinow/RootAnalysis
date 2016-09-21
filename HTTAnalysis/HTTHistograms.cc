@@ -251,6 +251,7 @@ std::string HTTHistograms::getTemplateName(const std::string& name){
   if(name.find("hProf")!=std::string::npos && name.find("VsMag")!=std::string::npos) templateName = "hProfVsMagTemplate";
   if(name.find("hProf")!=std::string::npos && name.find("VsPt")!=std::string::npos) templateName = "hProfVsPtTemplate";
   if(name.find("hProf")!=std::string::npos && name.find("VsCos")!=std::string::npos) templateName = "hProfVsCosTemplate";
+  if(name.find("hProf")!=std::string::npos && name.find("VsMass")!=std::string::npos) templateName = "hProfVsMassTemplate";
 
   if(name.find("h1DNPV")!=std::string::npos) templateName = "h1DNPVTemplate";
   if(name.find("h1DMass")!=std::string::npos) templateName = "h1DMassTemplate";
@@ -303,6 +304,7 @@ void HTTHistograms::defineHistograms(){
    addProfile("hProfVsMagTemplate","",10,0,0.015,file_);
    addProfile("hProfVsPtTemplate","",20,15,55,file_);
    addProfile("hProfVsCosTemplate","",20,-1,1,file_);
+   addProfile("hProfVsMassTemplate","",20,-0.6,0.6,file_);
    
    histosInitialized_ = true;
  }
@@ -314,6 +316,7 @@ void HTTHistograms::finalizeHistograms(int nRuns, float weight){
   AnalysisHistograms::finalizeHistograms();
 
   //plotPhiDecayPlanes("Phi_nVectorsUnknown");
+  plotSingleProfile("hProfMuon_PtVsMass");
   return;
 
   muTauDYScale = 1.0;
@@ -1114,6 +1117,26 @@ void HTTHistograms::plotSingleHistogram(std::string hName){
     h1D->SetLineWidth(3);
     h1D->Scale(1.0/h1D->Integral(0,h1D->GetNbinsX()+1));
     h1D->SetYTitle("Events");
+    h1D->GetYaxis()->SetTitleOffset(1.4);
+    h1D->SetStats(kFALSE);
+    h1D->Draw();
+    c->Print(TString::Format("fig_png/%s.png",hName.c_str()).Data());
+  }
+}
+/////////////////////////////////////////////////////////
+/////////////////////////////////////////////////////////
+void HTTHistograms::plotSingleProfile(std::string hName){
+
+  TProfile* h1D = this->getProfile(hName.c_str());
+  if(!h1D) return;
+  
+  TCanvas* c = new TCanvas("AnyHistogram","AnyHistogram",			   
+			   460,500);
+   
+  if(h1D){
+    //h1D->SetLineWidth(3);
+    h1D->SetYTitle("Pt");
+    h1D->SetXTitle("Mass");
     h1D->GetYaxis()->SetTitleOffset(1.4);
     h1D->SetStats(kFALSE);
     h1D->Draw();

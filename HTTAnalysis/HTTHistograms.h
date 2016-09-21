@@ -95,6 +95,8 @@ class HTTHistograms: public AnalysisHistograms {
   //Plot a single histogram. One has to provide the full
   //histogram name, e.g. including h1D prefix.
   void plotSingleHistogram(std::string hName);
+  
+  void plotSingleProfile(std::string hName);
 
   float muTauDYScale, mumuDYScale;
 

@@ -196,7 +196,7 @@ bool HTTSynchNTuple::analyze(const EventProxyBase& iEvent){
 	i_++;
 	//muonPt = aMuon.getP4().Vect().Perp();
 	if(i_%1000==0){
-		std::cout<<i_<<std::endl;
+		//std::cout<<i_<<std::endl;
 		//std::cout<<muonPt<<std::endl;
 		}
 	
@@ -215,15 +215,24 @@ bool HTTSynchNTuple::analyze(const EventProxyBase& iEvent){
 	phi_1 = leg1.getP4().Phi();
 	eta_1 = leg1.getP4().Eta();
 	m_1 = leg1.getP4().M();
+/*
+//////////////////////////////////////////////////////////////////////////
+	if(m_1 < 0) {
+		std::cout<<"Masa: "<<m_1<<", nr przypadka: "<<evt<<std::endl<<"Px : "<<leg1.getP4().Px()<<" Py: "<<leg1.getP4().Py()<<" Pz: "<<leg1.getP4().Pz()<<" E: "<<leg1.getP4().E()<<"\n"; 
+		}
+		myHistos_->fillProfile("hProfMuon_PtVsMass",m_1,leg1.getP4().Pt());
+		
+//////////////////////////////////////////////////////////////////////////
+*/
 	q_1 = leg1.getCharge();
 	d0_1 = leg1.getProperty(PropertyEnum::dxy);
-	dZ_1 = leg1.getProperty(PropertyEnum::dz);/*
-	mt_1 = ;
+	dZ_1 = leg1.getProperty(PropertyEnum::dz);
+	mt_1 = aPair.getMTMuon();/*
 	pfmt_1;
 	puppimt_1;*/
 	iso_1 = leg1.getProperty(PropertyEnum::combreliso);/*
-	id_e_mva_nt_loose_1;*/
-	gen_match_1 = 4;		/*//according to: https://twiki.cern.ch/twiki/bin/view/CMS/HiggsToTauTauWorking2016#MC_Matching, pT is always > 8 GeV after baseline selection
+	id_e_mva_nt_loose_1;
+	gen_match_1;		
 	againstElectronLooseMVA6_1 = leg1.getProperty(PropertyEnum::againstElectronLooseMVA6);				//FIX: following 7 properites need to be added
 	againstElectronMediumMVA6_1 = leg1.getProperty(PropertyEnum::againstElectronMediumMVA6);
 	againstElectronTightMVA6_1 = leg1.getProperty(PropertyEnum::againstElectronTightMVA6);
@@ -250,8 +259,8 @@ bool HTTSynchNTuple::analyze(const EventProxyBase& iEvent){
 	m_2 = leg2.getP4().M();
 	q_2 = leg2.getCharge();
 	d0_2 = leg2.getProperty(PropertyEnum::dxy);
-	dZ_2 = leg2.getProperty(PropertyEnum::dz);/*
-	mt_2 = ;
+	dZ_2 = leg2.getProperty(PropertyEnum::dz);
+	mt_2 = abs(leg2.getPDGid())==15 ? aPair.getMTLeg2() : aPair.getMTLeg1();/*
 	pfmt_2;
 	puppimt_2;*/
 	iso_2 = leg2.getProperty(PropertyEnum::combreliso);/*
@@ -282,8 +291,10 @@ bool HTTSynchNTuple::analyze(const EventProxyBase& iEvent){
 	m_sv;
 	mt_sv;
 	//MET
-	met;
-	metphi;
+*/
+	met = aPair.getMET().Mod();
+/*
+	metphi = aPair.getProperty(PropertyEnum::metphi);
 	puppimet;
 	puppimetphi;
 	mvamet;
@@ -337,8 +348,8 @@ bool HTTSynchNTuple::analyze(const EventProxyBase& iEvent){
 	bmva_2;
 	bcsv_2;
 	//Extra lepton vetos
-	dilepton_veto;
-	extraelec_veto;
+	dilepton_veto = aEvent.checkSelectionBit(SelectionBitsEnum::diMuonVeto);
+/*	extraelec_veto;
 	extramuon_veto;
 	puweight;*/
 
