@@ -196,6 +196,7 @@ void  TreeAnalyzer::finalize(){
 int TreeAnalyzer::loop(){
 
   std::cout<<"Events total: "<<myProxy_->size()<<std::endl;
+  unsigned int printoutStep = myProxy_->size()*0.1;
   TH1::AddDirectory(kFALSE);
   nEventsAnalyzed_ = 0;
   nEventsSkipped_ = 0;
@@ -208,7 +209,7 @@ int TreeAnalyzer::loop(){
   
   #pragma omp parallel for schedule(dynamic)
     for(unsigned int aEvent=0;aEvent<nEventsToAnalyze_;++aEvent){      
-      if(aEvent< nEventsToPrint_ || aEvent%5000000==0)
+      if(aEvent< nEventsToPrint_ || aEvent%printoutStep==0)
 	std::cout<<"Events analyzed: "<<aEvent<<"/"<<nEventsToAnalyze_
 		 <<" ("<<(float)aEvent/nEventsToAnalyze_<<")"
 		 <<" thread: "<<omp_get_thread_num()<<std::endl;

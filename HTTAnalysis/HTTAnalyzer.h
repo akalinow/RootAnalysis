@@ -14,6 +14,7 @@
 //ROOT includes
 #include "TTree.h"
 #include "TList.h"
+#include "RooWorkspace.h"
 
 #include "Analyzer.h"
 
@@ -21,6 +22,7 @@ class HTTHistograms;
 
 class TH1F;
 class TLorentzVector;
+
 
 class HTTAnalyzer: public Analyzer{
 
@@ -132,6 +134,9 @@ class HTTAnalyzer: public Analyzer{
   ///Get jets separated by deltaR from tau an muon.
   std::vector<HTTParticle> getSeparatedJets(const EventProxyHTT & myEventProxy, 
 					    float deltaR);
+
+  ///Get lepton corrections
+  float getLeptonCorrection(float eta, float pt, hadronicTauDecayModes tauDecayMode);
   
  protected:
 
@@ -157,6 +162,9 @@ class HTTAnalyzer: public Analyzer{
 
   ///Histogram with event counts filled during preselection step.
   TH1F *hStatsFromFile;
+
+  ///RootWorskapce with lepton corrections
+  RooWorkspace *scaleWorkspace;
  
   ///Vector of PU histograms for MC samples
   std::vector<TH1F*> hPUVec_;
@@ -167,6 +175,7 @@ class HTTAnalyzer: public Analyzer{
   ///Reconstructed objects selected for given event.
   HTTEvent aEvent;
   HTTPair aPair;
+  std::string sampleName;
 
   HTTParticle aTau, aMuon;
   HTTParticle aGenHadTau, aGenMuonTau;

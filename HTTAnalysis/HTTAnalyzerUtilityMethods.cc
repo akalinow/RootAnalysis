@@ -1,13 +1,15 @@
 #include <sstream>
 #include <bitset>
 
+#include "RooRealVar.h"
+
 #include "HTTAnalyzer.h"
 #include "HTTHistograms.h"
 //////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////
 void HTTAnalyzer::getPreselectionEff(const EventProxyHTT & myEventProxy){
 
-  if(ntupleFile_!=myEventProxy.getTTree()->GetCurrentFile()){
+  if(true || ntupleFile_!=myEventProxy.getTTree()->GetCurrentFile()){
     ntupleFile_ = myEventProxy.getTTree()->GetCurrentFile();
     if(hStatsFromFile) delete hStatsFromFile;
     hStatsFromFile = (TH1F*)ntupleFile_->Get("hStats");
@@ -19,6 +21,9 @@ void HTTAnalyzer::getPreselectionEff(const EventProxyHTT & myEventProxy){
     
     hStats->SetBinContent(2,hStatsFromFile->GetBinContent(hStatsFromFile->FindBin(1))*genWeight);   
     hStats->SetBinContent(3,hStatsFromFile->GetBinContent(hStatsFromFile->FindBin(3))*genWeight);
+
+    //std::cout<<"Sample: "<<getSampleNameFromFileName(myEventProxy)<<std::endl;
+    //hStats->Print("all");
   }
 }
 //////////////////////////////////////////////////////////////////////////////
@@ -26,6 +31,7 @@ void HTTAnalyzer::getPreselectionEff(const EventProxyHTT & myEventProxy){
 std::string HTTAnalyzer::getSampleName(const EventProxyHTT & myEventProxy){
 
   if(myEventProxy.event->getSampleType()==-1) return getSampleNameFromFileName(myEventProxy);
+  
   if(myEventProxy.event->getSampleType()==0) return "Data";
   if(myEventProxy.event->getSampleType()==1){
     int decayModeBoson = myEventProxy.event->getDecayModeBoson();
@@ -66,8 +72,8 @@ std::string HTTAnalyzer::getSampleNameFromFileName(const EventProxyHTT & myEvent
 
   std::string fileName = myEventProxy.getTTree()->GetCurrentFile()->GetName();
   if(fileName.find("WJetsToLNu")!=std::string::npos && myEventProxy.event->getLHEnOutPartons()>=0) return "WJets";
-  //HACK if(fileName.find("WJetsToLNu")!=std::string::npos && myEventProxy.event->getLHEnOutPartons()>=0) return "W0Jets";
-  else if(fileName.find("WJetsToLNu")!=std::string::npos && myEventProxy.event->getLHEnOutPartons()>0) return "WAllJets";
+  //TEST if(fileName.find("WJetsToLNu")!=std::string::npos && myEventProxy.event->getLHEnOutPartons()==0) return "W0Jets";
+  //TEST else if(fileName.find("WJetsToLNu")!=std::string::npos && myEventProxy.event->getLHEnOutPartons()>0) return "WAllJets";
   else if(fileName.find("W1JetsToLNu")!=std::string::npos) return "W1Jets";
   else if(fileName.find("W2JetsToLNu")!=std::string::npos) return "W2Jets";
   else if(fileName.find("W3JetsToLNu")!=std::string::npos) return "W3Jets";
@@ -75,7 +81,8 @@ std::string HTTAnalyzer::getSampleNameFromFileName(const EventProxyHTT & myEvent
   else if(fileName.find("W5JetsToLNu")!=std::string::npos) return "W5Jets";
   else if(fileName.find("Run201")!=std::string::npos) return "Data";
   else if(fileName.find("SUSYGluGluToHToTauTau")!=std::string::npos) return "A";
-  else if(fileName.find("GluGluHToTauTau")!=std::string::npos) return "H";
+  else if(fileName.find("GluGluHToTauTau")!=std::string::npos) return "ggH";
+  else if(fileName.find("VBFHToTauTau")!=std::string::npos) return "VBFH";
   else if(fileName.find("TT")!=std::string::npos) return "TTbar";
   else if(fileName.find("DYJetsToLLM10to50")!=std::string::npos) return "DYJetsLowM";
   else if(fileName.find("DYJetsToLLM50")!=std::string::npos){      
@@ -96,13 +103,10 @@ float HTTAnalyzer::getPUWeight(const EventProxyHTT & myEventProxy){
   if(getSampleName(myEventProxy)=="Data") return 1.0;
 
   ///RunIIFall15MiniAODv2-PU25nsData2015v1_76X_mcRun2_asymptotic_v12-v1 MINIAOD
-  ///is produced with PU profile matching the Run2015 data. No nee to PU rescale.
+  ///is produced with PU profile matching the Run2015 data. No need to PU rescale.
   //return 1.0;
 
-  ///Load histogram only once,later fetch it from vector<TH1F*>
-  ///At the same time divide the histogram to get the weight.
-  ///First load Data PU
-  if(!hPUVec_.size())  hPUVec_.resize(64);
+  if(!hPUVec_.size())  hPUVec_.resize(1);
 
   if(!hPUVec_[0]){
     std::string hName = "pileup";
@@ -115,19 +119,12 @@ float HTTAnalyzer::getPUWeight(const EventProxyHTT & myEventProxy){
     hPUData->SetDirectory(0);
     hPUSample->SetDirectory(0);
     hPUData->Divide(hPUSample);
-    //hPUData->SetName(("h1DPUWeight"+getSampleName(myEventProxy)).c_str());
-    ///To get uniform treatment put weight=1.0 for under/overlow bins of
-    ///data PU, as nPU for data has a dummy value.
-    if(getSampleName(myEventProxy)=="Data"){
-      hPUData->SetBinContent(0,1.0);
-      hPUData->SetBinContent(hPUData->GetNbinsX()+1,1.0);
-    }
+    hPUData->SetName(("h1DPUWeight"+getSampleName(myEventProxy)).c_str());
     hPUVec_[0] =  hPUData;
   }
 
-  int iBinPU = hPUVec_[0]->FindBin(myEventProxy.event->getNPU());
-  
-  return  hPUVec_[0]->GetBinContent(iBinPU);
+  int iBinPU = hPUVec_[0]->FindBin(myEventProxy.event->getNPU());  
+  return hPUVec_[0]->GetBinContent(iBinPU);
 }
 //////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////
@@ -180,6 +177,33 @@ bool HTTAnalyzer::isOneProng(int decMode){
 bool HTTAnalyzer::isLepton(int decMode){
   if(decMode==tauDecaysElectron || decMode==tauDecayMuon) return true;
   else return false;
+}
+//////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////////
+float HTTAnalyzer::getLeptonCorrection(float eta, float pt, hadronicTauDecayModes tauDecayMode){
+
+  if(sampleName.find("Data")!=std::string::npos) return 1.0;
+  
+  if(tauDecayMode == tauDecayMuon){
+    scaleWorkspace->var("m_pt")->setVal(pt);
+    scaleWorkspace->var("m_eta")->setVal(eta);
+    float muon_id_scalefactor = scaleWorkspace->function("m_id_ratio")->getVal();
+    float muon_iso_scalefactor = scaleWorkspace->function("m_iso_ratio")->getVal();
+    float muon_trg_efficiency = scaleWorkspace->function("m_trgOR_data")->getVal();//OR of the HLT_IsoMu22 and HLT_IsoTkMu22
+    return  muon_id_scalefactor*muon_iso_scalefactor*muon_trg_efficiency;
+  }
+  else if(tauDecayMode == tauDecaysElectron) return 1.0;  
+  else{
+    if(sampleName.find("H")==std::string::npos &&
+       sampleName.find("MuTau")==std::string::npos
+       ) return 1.0;
+    scaleWorkspace->var("t_pt")->setVal(pt);
+    scaleWorkspace->var("t_eta")->setVal(eta);
+    scaleWorkspace->var("t_dm")->setVal(tauDecayMode);
+    float tau_id_scalefactor = scaleWorkspace->function("t_iso_mva_m_pt30_sf")->getVal();
+    return tau_id_scalefactor;
+  }
+  return 1.0;
 }
 //////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////

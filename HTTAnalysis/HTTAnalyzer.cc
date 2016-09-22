@@ -7,21 +7,37 @@
 //////////////////////////////////////////////////////////////////////////////
 HTTAnalyzer::HTTAnalyzer(const std::string & aName):Analyzer(aName){
 
+  //pileupCalc.py -i lumiSummary_Run2016BCDE_PromptReco_v12.json --inputLumiJSON /afs/cern.ch/cms/CAF/CMSCOMM/COMM_DQM/certification/Collisions16/13TeV/PileUp/pileup_latest.txt --calcMode true --minBiasXsec 69200 --maxPileupBin 60 --numPileupBins 600 Data_Pileup_Cert_271036-277148.root
+  
   ///Load ROOT file with PU histograms.
-  std::string filePath = "Data_Pileup_2016_July22.root";
+  std::string filePath = "Data_Pileup_Cert_271036-277148.root";
+  filePath = "Data_Pileup_2016_July21.root";
   puDataFile_ = new TFile(filePath.c_str());
 
   filePath = "MC_Spring16_PU25ns_V1.root";
   puMCFile_ = new TFile(filePath.c_str());
 
-  ntupleFile_ = 0;
-
-  hStatsFromFile = 0;
+#pragma omp critical
+  {
+    filePath = "htt_scalefactors_v4.root";
+    TFile aFile(filePath.c_str());
+    scaleWorkspace = (RooWorkspace*)aFile.Get("w")->Clone("w");
+    aFile.Close();
+  }
   
+  ntupleFile_ = 0;
+  hStatsFromFile = 0;
 }
 //////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////
-HTTAnalyzer::~HTTAnalyzer(){ if(myHistos_) delete myHistos_; }
+HTTAnalyzer::~HTTAnalyzer(){
+
+  if(myHistos_) delete myHistos_;
+  if(puDataFile_) delete puDataFile_;
+  if(puMCFile_) delete puMCFile_;
+  if(scaleWorkspace) delete scaleWorkspace;
+
+}
 //////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////
 Analyzer* HTTAnalyzer::clone() const{
@@ -53,7 +69,8 @@ std::vector<HTTParticle> HTTAnalyzer::getSeparatedJets(const EventProxyHTT & myE
   for(auto aJet: *myEventProxy.jets){
     float dRTau = aJet.getP4().DeltaR(aTau.getP4());
     float dRMu = aMuon.getP4().DeltaR(aTau.getP4());
-    if(dRTau>deltaR && dRMu>deltaR) separatedJets.push_back(aJet);
+    bool loosePFJetID = aJet.getProperty(PropertyEnum::PFjetID)>=1;
+    if(dRTau>deltaR && dRMu>deltaR && loosePFJetID) separatedJets.push_back(aJet);
   }
 
   return separatedJets;
@@ -143,7 +160,7 @@ void HTTAnalyzer::fillControlHistos(const std::string & hNameSuffix, float event
 
   fillDecayPlaneAngle(hNameSuffix, eventWeight);
 
-  if(aJet.getProperty(PropertyEnum::bDiscriminator)>0.8){
+  if(aJet.getProperty(PropertyEnum::bCSVscore)>0.8){
     myHistos_->fill1DHistogram("h1DPtLeadingBJet"+hNameSuffix,aJet.getP4().Pt(),eventWeight);
     myHistos_->fill1DHistogram("h1DEtaLeadingBJet"+hNameSuffix,aJet.getP4().Eta(),eventWeight);
   }   
@@ -173,7 +190,7 @@ bool HTTAnalyzer::analyze(const EventProxyBase& iEvent){
 
   const EventProxyHTT & myEventProxy = static_cast<const EventProxyHTT&>(iEvent);
 
-  std::string sampleName = getSampleName(myEventProxy);
+  sampleName = getSampleName(myEventProxy);
 
   std::string hNameSuffix = sampleName;
   float puWeight = getPUWeight(myEventProxy);
@@ -182,18 +199,23 @@ bool HTTAnalyzer::analyze(const EventProxyBase& iEvent){
 
   //Fill bookkeeping histogram. Bin 1 holds sum of weights.
   myHistos_->fill1DHistogram("h1DStats"+sampleName,0,eventWeight);
+  myHistos_->fill1DHistogram("h1DNPartons"+hNameSuffix,myEventProxy.event->getLHEnOutPartons(),eventWeight);
   getPreselectionEff(myEventProxy);
 
-  /////TEST                                                                                                                                                                                
+  /////TEST
+  //myHistos_->fill1DHistogram("h1DNPU"+hNameSuffix,myEventProxy.event->getNPU(),eventWeight);
   //myHistos_->fill1DHistogram("h1DNPV"+hNameSuffix,myEventProxy.event->getNPV(),eventWeight);
-  //myHistos_->fill1DHistogram("h1DNPartons"+hNameSuffix,myEventProxy.event->getLHEnOutPartons(),eventWeight);
   //return true;
   ////////////  
-
+   
   if(!myEventProxy.pairs->size()) return true;
 
   setAnalysisObjects(myEventProxy);
-
+  float muonScaleFactor = getLeptonCorrection(aMuon.getP4().Eta(), aMuon.getP4().Pt(), hadronicTauDecayModes::tauDecayMuon);
+  float tauScaleFactor = getLeptonCorrection(aTau.getP4().Eta(), aTau.getP4().Pt(),
+					     static_cast<hadronicTauDecayModes>(aTau.getProperty(PropertyEnum::decayMode)));
+  eventWeight*=muonScaleFactor*tauScaleFactor;
+  
   std::pair<bool, bool> goodDecayModes = checkTauDecayMode(myEventProxy);
   bool goodGenDecayMode = goodDecayModes.first;
   bool goodRecoDecayMode = goodDecayModes.second;
@@ -201,7 +223,7 @@ bool HTTAnalyzer::analyze(const EventProxyBase& iEvent){
   if(goodGenDecayMode) fillGenDecayPlaneAngle(sampleName+"GenNoOfflineSel", eventWeight);
   
   ///This stands for core selection, that is common to all regions.
-  bool tauKinematics = aTau.getP4().Pt()>20 && fabs(aTau.getP4().Eta())<2.3;
+  bool tauKinematics = aTau.getP4().Pt()>30 && fabs(aTau.getP4().Eta())<2.3;
   int tauIDmask = 0;
   
   for(unsigned int iBit=0;iBit<aEvent.ntauIds;iBit++){
@@ -211,11 +233,11 @@ bool HTTAnalyzer::analyze(const EventProxyBase& iEvent){
   }
 
   bool tauID = ( (int)aTau.getProperty(PropertyEnum::tauID) & tauIDmask) == tauIDmask;
-  bool muonKinematics = aMuon.getP4().Pt()>23 && fabs(aMuon.getP4().Eta())<2.1;
-  bool trigger = aMuon.hasTriggerMatch(TriggerEnum::HLT_IsoMu22);
-  if(sampleName=="Data") trigger = aMuon.hasTriggerMatch(TriggerEnum::HLT_IsoMu22);
-  trigger = true; //TEST
-  
+  bool muonKinematics = aMuon.getP4().Pt()>24 && fabs(aMuon.getP4().Eta())<2.1;
+  bool trigger = aMuon.hasTriggerMatch(TriggerEnum::HLT_IsoMu22) || aMuon.hasTriggerMatch(TriggerEnum::HLT_IsoTkMu22);
+  if(sampleName!="Data") trigger = true; //MC trigger included in muon SF
+  bool zeroJets = (nJets30==0);
+									   
   bool cpMuonSelection = aMuon.getPCARefitPV().Perp()>0.003;    
   bool cpTauSelection = (aTau.getProperty(PropertyEnum::decayMode)==tauDecay1ChargedPion0PiZero && aTau.getPCARefitPV().Mag()>0.003) ||
                         (aTau.getProperty(PropertyEnum::decayMode)!=tauDecay1ChargedPion0PiZero &&
@@ -231,19 +253,24 @@ bool HTTAnalyzer::analyze(const EventProxyBase& iEvent){
   */
   if(!tauKinematics || !tauID || !muonKinematics || !trigger) return true;
   //if(!cpSelection) return true;
-
+  
   ///Note: parts of the signal/control region selection are applied in the following code.
-  ///FIXME AK: this should be made in a more clear way.
   bool SS = aTau.getCharge()*aMuon.getCharge() == 1;
   bool OS = aTau.getCharge()*aMuon.getCharge() == -1;
-  bool baselineSelection = OS && aPair.getMTMuon()<40 && aMuon.getProperty(PropertyEnum::combreliso)<0.1;
-  bool wSelection = aPair.getMTMuon()>60 && aMuon.getProperty(PropertyEnum::combreliso)<0.1;
+  bool baselineSelection = OS && aPair.getMTMuon()<50 && aMuon.getProperty(PropertyEnum::combreliso)<0.15;
+  bool baselineSelectionNoMT = OS && aMuon.getProperty(PropertyEnum::combreliso)<0.15;
+  bool wSelection = aPair.getMTMuon()>80 && aMuon.getProperty(PropertyEnum::combreliso)<0.1;
   bool qcdSelectionSS = SS;
   bool qcdSelectionOS = OS;
   //bool ttSelection = aJet.getProperty(PropertyEnum::bDiscriminator)>0.5 && nJets30>1;
   bool ttSelection = nJets30>1;
   bool mumuSelection =  aPair.getMTMuon()<40 &&  aMuon.getProperty(PropertyEnum::combreliso)<0.15 && aPair.getP4().M()>85 && aPair.getP4().M()<95;
-
+  /*
+  bool postSynchMuon = aEvent.checkSelectionBit(SelectionBitsEnum::postSynchMuon);
+  if(postSynchMuon!=(aMuon.getProperty(PropertyEnum::combreliso)<0.15))
+    std::cout<<"postSynchMuon: "<<postSynchMuon
+	     <<" aMuon.getProperty(PropertyEnum::combreliso)<0.15: "<<(aMuon.getProperty(PropertyEnum::combreliso)<0.15)<<std::endl;
+  */
   ///Histograms for the baseline selection  
   if(baselineSelection){
     fillControlHistos(hNameSuffix, eventWeight);
@@ -254,18 +281,23 @@ bool HTTAnalyzer::analyze(const EventProxyBase& iEvent){
     fillVertices(hNameSuffix+"RefitPV");
     fillVertices(hNameSuffix+"AODPV");
   }
+  if(baselineSelectionNoMT){
+    hNameSuffix = sampleName+"fullMt";
+    myHistos_->fill1DHistogram("h1DMassTrans"+hNameSuffix,aPair.getMTMuon(),eventWeight); 
+  }
 
   ///Histograms for the QCD control region
   if(qcdSelectionSS){
     hNameSuffix = sampleName+"qcdselSS";
     ///SS ans OS isolation histograms are filled only for mT<40 to remove possible contamination
     //from TT in high mT region.
-    if(aPair.getMTMuon()<40) myHistos_->fill1DHistogram("h1DIso"+hNameSuffix,aMuon.getProperty(PropertyEnum::combreliso),eventWeight);
+    if(aPair.getMTMuon()<50) myHistos_->fill1DHistogram("h1DIso"+hNameSuffix,aMuon.getProperty(PropertyEnum::combreliso),eventWeight);
     ///Fill SS histos in signal mu isolation region. Those histograms
     ///provide shapes for QCD estimate in signal region and in various control regions.
     ///If control region has OS we still use SS QCD estimate.
-    if(aPair.getMTMuon()<40 && aMuon.getProperty(PropertyEnum::combreliso)<0.1) fillControlHistos(hNameSuffix, eventWeight);
-    if(aPair.getMTMuon()>60 && aMuon.getProperty(PropertyEnum::combreliso)<0.1){
+    if(aMuon.getProperty(PropertyEnum::combreliso)<0.15) myHistos_->fill1DHistogram("h1DMassTrans"+hNameSuffix+"fullMt",aPair.getMTMuon(),eventWeight); 
+    if(aPair.getMTMuon()<50 && aMuon.getProperty(PropertyEnum::combreliso)<0.15) fillControlHistos(hNameSuffix, eventWeight);
+    if(aPair.getMTMuon()>80 && aMuon.getProperty(PropertyEnum::combreliso)<0.15){
       myHistos_->fill1DHistogram("h1DMassTrans"+hNameSuffix+"wselSS",aPair.getMTMuon(),eventWeight);    
       myHistos_->fill1DHistogram("h1DMassTrans"+hNameSuffix+"wselOS",aPair.getMTMuon(),eventWeight);
       fillDecayPlaneAngle(hNameSuffix+"wselOS",eventWeight);
@@ -284,7 +316,7 @@ bool HTTAnalyzer::analyze(const EventProxyBase& iEvent){
   ///Using the same SS/OS scaling factor for now.    
   if(qcdSelectionOS){
     hNameSuffix = sampleName+"qcdselOS";
-    if(aPair.getMTMuon()<40) myHistos_->fill1DHistogram("h1DIso"+hNameSuffix,aMuon.getProperty(PropertyEnum::combreliso),eventWeight);
+    if(aPair.getMTMuon()<50) myHistos_->fill1DHistogram("h1DIso"+hNameSuffix,aMuon.getProperty(PropertyEnum::combreliso),eventWeight);
   }
 
   ///Histograms for the WJet control region. 
