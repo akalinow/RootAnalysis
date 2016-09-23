@@ -466,9 +466,10 @@ bool HTTSynchNTuple::analyze(const EventProxyBase& iEvent){
 		njetingap;
 		njetingap20;*/
 		jdphi = aLeadingJet.getP4().Phi()-aTrailingJet.getP4().Phi();
-		while (jdphi > TMath:Pi() ) jdphi -= 2.*TMath:Pi();
-	        while (jdphi <= -TMath:Pi() ) jdphi += 2.*TMath:Pi();
-		}/*
+		while(jdphi>TMath:Pi()) jdphi -= 2.*TMath:Pi();
+	        while(jdphi<=-TMath:Pi()) jdphi += 2.*TMath:Pi();
+	        jdphi = std::abs(jdphi);
+	}/*
 		
 	//additional jets
 	nbtag;
@@ -483,7 +484,7 @@ bool HTTSynchNTuple::analyze(const EventProxyBase& iEvent){
 		jphi_1 = aLeadingJet.getP4().Phi();
 //		jrawf_1;
 		jmva_1 = aLeadingJet.getProperty(PropertyEnum::PUJetID);
-		}
+	}
 		
 	//trailing jet sorted by pt
 	if(aJets->size()>1){
@@ -492,7 +493,7 @@ bool HTTSynchNTuple::analyze(const EventProxyBase& iEvent){
 		jphi_2 = aTrailingJet.getP4().Phi();
 		//jrawf_2;
 		jmva_2 = aTrailingJet.getProperty(PropertyEnum::PUJetID);
-		}/*
+	}/*
 	//leading b-jet sorted by pt
 	bpt_1;
 	beta_1;
