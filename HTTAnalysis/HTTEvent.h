@@ -3,19 +3,21 @@
 
 #include "TLorentzVector.h"
 #include "TVector3.h"
+#include "TBits.h"
 #include <map>
 #include <vector>
 #include <bitset> 
 
 #include "PropertyEnum.h"
 #include "TriggerEnum.h"
+#include "SelectionBitsEnum.h"
 ///////////////////////////////////////////////////
 ///////////////////////////////////////////////////
 class HTTEvent{
 
  public:
 
-  enum sampleTypeEnum {DUMMY = -1, DATA = 0, DY = 1, WJets=2, TTbar=3, h=3, H=4, A=5, QCD=6};
+  enum sampleTypeEnum {DUMMY = -1, DATA = 0, DY = 1, DYLowM = 2, WJets=3, TTbar=4, h=5, H=6, A=7};
 
   ///Copy from LLRHiggsTauTau/NtupleProducer/plugins/HTauTauNtuplizer.cc
   static const int ntauIds = 30;
@@ -61,7 +63,7 @@ class HTTEvent{
   
   void setEvent(unsigned long int x){eventId = x;}
   
-  void setNPU(unsigned int x){nPU = x;}
+  void setNPU(float x){nPU = x;}
   
   void setNPV(unsigned int x){nPV = x;}
   
@@ -90,6 +92,10 @@ class HTTEvent{
   void setIsRefit(bool aBit){isRefit = aBit;};
 
   void setNTracksInRefit(const int & nTracks) {nTracksInRefit = nTracks;};
+
+  void setSelectionBit(SelectionBitsEnum iBit, bool value = true) {selectionWord.SetBitNumber((int)iBit, value);}
+
+  void setMET(const TVector2 &aVector) {met = aVector;}
   ////////////////////////
 
   ///Reset class data members
@@ -100,7 +106,7 @@ class HTTEvent{
 
   unsigned long int getEventId() const {return eventId;}
     
-  unsigned int getNPU() const {return nPU;}
+  float getNPU() const {return nPU;}
   
   unsigned int getNPV() const {return nPV;}
   
@@ -119,6 +125,8 @@ class HTTEvent{
   int getDecayModePlus() const {return decayModePlus;}
   
   int getDecayModeBoson() const {return decayModeBoson;}
+
+  TVector2 getMET() const {return met;}
   
   const TVector3 & getGenPV() const {return genPV;}
 
@@ -129,6 +137,8 @@ class HTTEvent{
   bool getIsRefit() const {return isRefit;};
 
   int getNTracksInRefit() const {return nTracksInRefit;}
+
+  bool checkSelectionBit(SelectionBitsEnum iBit) const {return selectionWord.TestBitNumber((unsigned int)iBit);}
 
  private:
 
@@ -148,8 +158,8 @@ class HTTEvent{
   ///MCatNLO weight
   float aMCatNLOweight;
 
-  ///Number of PU vertices from MC
-  unsigned int nPU;
+  ///Number of true PU vertices from MC
+  float nPU;
 
   //Number of reocnstructed PV
   unsigned int nPV;
@@ -178,6 +188,12 @@ class HTTEvent{
 
   ///Number of tracks used in the refit
   int nTracksInRefit;
+
+  ///Bit word coding event selection result
+  TBits selectionWord;
+  
+  //MET vector
+  TVector2 met;
 
 };
 ///////////////////////////////////////////////////
@@ -292,7 +308,10 @@ class HTTPair{
 
   void setLeg2(const HTTParticle &aParticle){leg2 = aParticle;}
 
-
+  void setMuonTriggerSF(float aSF){muonTriggerSF = aSF;}
+  
+  void setMETMatrix(float m00, float m01, float m10, float m11) {metMatrix.push_back(m00); metMatrix.push_back(m01); metMatrix.push_back(m10); metMatrix.push_back(m11);}
+  
   ///Data member getters.
   TLorentzVector getP4() const {return p4;}
 
@@ -320,6 +339,10 @@ class HTTPair{
 
   float getMTMuon() const {return abs(leg1.getPDGid())==13 ? getMTLeg1() : getMTLeg2(); }
 
+  float getMuonTriggerSF() const {return muonTriggerSF;}
+  
+  std::vector<float> getMETMatrix() {return metMatrix;}
+
  private:
 
   ///Nominal pair p4 (sum of legs p4)
@@ -330,6 +353,9 @@ class HTTPair{
 
   ///MET vectors
   TVector2 met, metSVfit;
+  
+  //MVAMET covariance matrix in order 00,01,10,11
+  std::vector<float> metMatrix;
 
   ///MT calculated for (leg1,MET)
   float mtLeg1;
@@ -339,6 +365,10 @@ class HTTPair{
     
   ///Pair legs
   HTTParticle leg1, leg2;
+
+  ///Lepton selection scale factor
+  float muonTriggerSF;
+  ///Tau selection scale factor
 
 };
 

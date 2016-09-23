@@ -40,6 +40,8 @@ class HTTSynchNTuple: public Analyzer{
   virtual void clear(){;};
 
   virtual void addBranch(TTree *);
+  
+  void clearTTreeVariables();
 
   Analyzer* clone() const;
 
@@ -71,7 +73,8 @@ class HTTSynchNTuple: public Analyzer{
   HTTEvent aEvent;
   HTTPair aPair;
 
-  HTTParticle aTau, aMuon, leg1, leg2;
+  HTTParticle aTau, aMuon, leg1, leg2, aLeadingJet, aTrailingJet;
+  std::vector<HTTParticle>  *aJets;
 
 	///////////////////////////////////////////////////////////
 	///////////////////////////////////////////////////////////
