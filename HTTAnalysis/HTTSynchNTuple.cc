@@ -462,10 +462,12 @@ bool HTTSynchNTuple::analyze(const EventProxyBase& iEvent){
 	//VBF system
 	if(aJets->size()>=2){
 		mjj = (aLeadingJet.getP4()+aTrailingJet.getP4()).M();
-		jdeta = aLeadingJet.getP4().Eta()-aTrailingJet.getP4().Eta();/*
+		jdeta = std::abs(aLeadingJet.getP4().Eta()-aTrailingJet.getP4().Eta());/*
 		njetingap;
 		njetingap20;*/
 		jdphi = aLeadingJet.getP4().Phi()-aTrailingJet.getP4().Phi();
+		while (jdphi > TMath:Pi() ) jdphi -= 2.*TMath:Pi();
+	        while (jdphi <= -TMath:Pi() ) jdphi += 2.*TMath:Pi();
 		}/*
 		
 	//additional jets
