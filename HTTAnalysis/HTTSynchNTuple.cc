@@ -466,8 +466,8 @@ bool HTTSynchNTuple::analyze(const EventProxyBase& iEvent){
 		njetingap;
 		njetingap20;*/
 		jdphi = aLeadingJet.getP4().Phi()-aTrailingJet.getP4().Phi();
-		while(jdphi>TMath:Pi()) jdphi -= 2.*TMath:Pi();
-	        while(jdphi<=-TMath:Pi()) jdphi += 2.*TMath:Pi();
+		while(jdphi>TMath::Pi()) jdphi -= 2.*TMath::Pi();
+	        while(jdphi<=-TMath::Pi()) jdphi += 2.*TMath::Pi();
 	        jdphi = std::abs(jdphi);
 	}/*
 		
