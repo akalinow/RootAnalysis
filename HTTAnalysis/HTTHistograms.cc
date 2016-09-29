@@ -20,55 +20,18 @@
 float HTTHistograms::getLumi(){
 
   //./.local/bin/brilcalc lumi --normtag ~lumipro/public/normtag_file/OfflineNormtagV2.json -i lumiSummary_Run2015C_16Dec2015_v1.json
-  //+-------+------+------+------+-------------------+------------------+
-  //| nfill | nrun | nls  | ncms | totdelivered(/ub) | totrecorded(/ub) |
-  //+-------+------+------+------+-------------------+------------------+
-  //| 6     | 8    | 1099 | 1099 | 17767116.986      | 17225935.728     |
-  //+-------+------+------+------+-------------------+------------------+
-  //./.local/bin/brilcalc lumi --normtag ~lumipro/public/normtag_file/OfflineNormtagV2.json -i lumiSummary_Run2015D_16Dec2015_v1.json
-  //+-------+------+-------+-------+-------------------+------------------+
-  //| nfill | nrun | nls   | ncms  | totdelivered(/ub) | totrecorded(/ub) |
-  //+-------+------+-------+-------+-------------------+------------------+
-  //| 41    | 108  | 31592 | 31592 | 2185867468.728    | 2114239169.533   |
-  //+-------+------+-------+-------+-------------------+------------------+
-  /*
-  ./.local/bin/brilcalc lumi --normtag /afs/cern.ch/user/l/lumipro/public/normtag_file/normtag_DATACERT.json -i lumiSummary_Run2016B_PromptReco_v12.json
-    +-------+------+-------+-------+-------------------+------------------+
-    | nfill | nrun | nls   | ncms  | totdelivered(/ub) | totrecorded(/ub) |
-    +-------+------+-------+-------+-------------------+------------------+
-    | 34    | 102  | 52184 | 52179 | 6124431327.460    | 5879283691.513   |
-    +-------+------+-------+-------+-------------------+------------------+
-    ./.local/bin/brilcalc lumi --normtag /afs/cern.ch/user/l/lumipro/public/normtag_file/normtag_DATACERT.json -i lumiSummary_Run2016C_PromptReco_v12.json
-    +-------+------+-------+-------+-------------------+------------------+
-    | nfill | nrun | nls   | ncms  | totdelivered(/ub) | totrecorded(/ub) |
-    +-------+------+-------+-------+-------------------+------------------+
-    | 9     | 37   | 17377 | 17377 | 2761135761.229    | 2645968083.093   |
-    +-------+------+-------+-------+-------------------+------------------+
-    ./.local/bin/brilcalc lumi --normtag /afs/cern.ch/user/l/lumipro/public/normtag_file/normtag_DATACERT.json -i lumiSummary_Run2016D_PromptReco_v12.json
-    +-------+------+-------+-------+-------------------+------------------+
-    | nfill | nrun | nls   | ncms  | totdelivered(/ub) | totrecorded(/ub) |
-    +-------+------+-------+-------+-------------------+------------------+
-    | 10    | 37   | 29151 | 29151 | 4525903884.794    | 4353448810.554   |
-    +-------+------+-------+-------+-------------------+------------------+
-     ./.local/bin/brilcalc lumi --normtag /afs/cern.ch/user/l/lumipro/public/normtag_file/normtag_DATACERT.json -i lumiSummary_Run2016E_PromptReco_v12.json
-    +-------+------+-------+-------+-------------------+------------------+
-    | nfill | nrun | nls   | ncms  | totdelivered(/ub) | totrecorded(/ub) |
-    +-------+------+-------+-------+-------------------+------------------+
-    | 8     | 22   | 19180 | 19180 | 3198505763.662    | 3049848991.234   |
-    +-------+------+-------+-------+-------------------+------------------+
-
-  */
-  
   float run2015C = 17225935.728*1E-6;
   float run2015D = 2114239169.533*1E-6;
   
+  //./.local/bin/brilcalc lumi --normtag /afs/cern.ch/user/l/lumipro/public/normtag_file/normtag_DATACERT.json -i lumiSummary_Run2016B_PromptReco_v12.json     
   float run2016B = 5879283691.513*1E-6;
   float run2016C = 2645968083.093*1E-6;
   float run2016D = 4353448810.554*1E-6;
-  float run2016E = 3049848991.234*1E-6;
-
-  return run2016B+run2016C+run2016D+run2016E;//pb-1 data for NTUPLES_05_09_2016
-  //return run2015D;//pb-1 data for NTUPLES_04_07_2016
+  float run2016E = 4049732039.245*1E-6;
+  float run2016F = 3121200199.632*1E-6;
+  float run2016G = 6320078824.709*1E-6;
+  
+  return run2016B+run2016C+run2016D+run2016E+run2016F+run2016G;//pb-1 data for NTUPLES_28_09_2016
 }
 /////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////
@@ -113,7 +76,7 @@ float HTTHistograms::getSampleNormalisation(std::string sampleName){
   if(sampleName=="TTbar"){
     //https://twiki.cern.ch/twiki/bin/viewauth/CMS/KlubTwikiRun2
     //https://twiki.cern.ch/twiki/bin/viewauth/CMS/StandardModelCrossSectionsat13TeVInclusive
-    crossSection = 831.76; 
+    crossSection = 831.76*ttScale;
   }
   if(sampleName=="ggH"){
     ///mH = 125, gg fussion only
@@ -332,6 +295,8 @@ void HTTHistograms::finalizeHistograms(int nRuns, float weight){
 
   AnalysisHistograms::finalizeHistograms();
 
+  //return;
+
   ////Code below tests W+n jets normalisation
   ///Samples split into jet multiplicity are compared to
   ///inclusive sample.
@@ -352,8 +317,9 @@ void HTTHistograms::finalizeHistograms(int nRuns, float weight){
   //plotCPhistograms(nRuns, weight);
   //return;
 
-  muTauDYScale = 1.0;//TEST
+  muTauDYScale = 1.0;
   mumuDYScale = 1.1;
+  ttScale = 0.7;
 
   wselOSCorrection =  std::pair<float,float>(1,0);
   wselSSCorrection =  std::pair<float,float>(1,0);

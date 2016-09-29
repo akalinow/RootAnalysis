@@ -34,16 +34,9 @@ void EventProxyHTT::init(std::vector<std::string> const& iFileNames){
   fChain->SetBranchAddress("HTTJetCollection",&jets);
   fChain->SetBranchAddress("HTTGenLeptonCollection",&genLeptons);
   
-  fChain->SetBranchStatus("*",1);
+  fChain->SetBranchStatus("*",0);
   fChain->SetBranchStatus("HTTEvent.*",1);
   fChain->SetBranchStatus("HTTPairCollection.*",1);
-  fChain->SetBranchStatus("HTTPairCollection.p4",1);
-  fChain->SetBranchStatus("HTTPairCollection.leg1.p4",1);
-  fChain->SetBranchStatus("HTTPairCollection.leg1.properties",1);
-  fChain->SetBranchStatus("HTTPairCollection.leg2.p4",1);
-  fChain->SetBranchStatus("HTTPairCollection.leg2.properties",1);
-  fChain->SetBranchStatus("HTTPairCollection.mtLeg1",1);
-  fChain->SetBranchStatus("HTTPairCollection.mtLeg2",1);  
   fChain->SetBranchStatus("HTTJetCollection*",1);  
 }
 /////////////////////////////////////////////////////////

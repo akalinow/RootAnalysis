@@ -97,6 +97,7 @@ class HTTHistograms: public AnalysisHistograms {
   void plotSingleHistogram(std::string hName);
 
   float muTauDYScale, mumuDYScale;
+  float ttScale;
 
 };
 

@@ -152,9 +152,11 @@ void HTTAnalyzer::fillControlHistos(const std::string & hNameSuffix, float event
   myHistos_->fill1DHistogram("h1DPtTauLeadingTk"+hNameSuffix,aTau.getProperty(PropertyEnum::leadChargedParticlePt),eventWeight);
   ///Fill jets info           
   myHistos_->fill1DHistogram("h1DStatsNJets30"+hNameSuffix,nJets30,eventWeight);
-  myHistos_->fill1DHistogram("h1DPtLeadingJet"+hNameSuffix,aJet.getP4().Pt(),eventWeight);
-  myHistos_->fill1DHistogram("h1DEtaLeadingJet"+hNameSuffix,aJet.getP4().Eta(),eventWeight);
-  myHistos_->fill1DHistogram("h1DCSVBtagLeadingJet"+hNameSuffix,aJet.getProperty(PropertyEnum::bCSVscore),eventWeight);
+  if(nJets30>0){
+    myHistos_->fill1DHistogram("h1DPtLeadingJet"+hNameSuffix,aJet.getP4().Pt(),eventWeight);
+    myHistos_->fill1DHistogram("h1DEtaLeadingJet"+hNameSuffix,aJet.getP4().Eta(),eventWeight);
+    myHistos_->fill1DHistogram("h1DCSVBtagLeadingJet"+hNameSuffix,aJet.getProperty(PropertyEnum::bCSVscore),eventWeight);
+  }
   
   myHistos_->fill1DHistogram("h1DPtMET"+hNameSuffix,aPair.getMET().Mod(),eventWeight);
 
@@ -189,7 +191,6 @@ bool HTTAnalyzer::fillVertices(const std::string & sysType){
 bool HTTAnalyzer::analyze(const EventProxyBase& iEvent){
 
   const EventProxyHTT & myEventProxy = static_cast<const EventProxyHTT&>(iEvent);
-
   sampleName = getSampleName(myEventProxy);
 
   std::string hNameSuffix = sampleName;
@@ -201,6 +202,11 @@ bool HTTAnalyzer::analyze(const EventProxyBase& iEvent){
   myHistos_->fill1DHistogram("h1DStats"+sampleName,0,eventWeight);
   myHistos_->fill1DHistogram("h1DNPartons"+hNameSuffix,myEventProxy.event->getLHEnOutPartons(),eventWeight);
   getPreselectionEff(myEventProxy);
+
+  bool postSynchTau = myEventProxy.event->checkSelectionBit(SelectionBitsEnum::postSynchTau);
+  bool postSynchMuon = myEventProxy.event->checkSelectionBit(SelectionBitsEnum::postSynchMuon);
+  bool diMuonVeto = myEventProxy.event->checkSelectionBit(SelectionBitsEnum::diMuonVeto);
+  bool thirdLeptonVeto = myEventProxy.event->checkSelectionBit(SelectionBitsEnum::thirdLeptonVeto);
 
   /////TEST
   //myHistos_->fill1DHistogram("h1DNPU"+hNameSuffix,myEventProxy.event->getNPU(),eventWeight);
