@@ -268,7 +268,7 @@ void HTTHistograms::defineHistograms(){
    add1DHistogram("h1DStatsTemplate","",21,-0.5,20.5,file_);
    add1DHistogram("h1DNPVTemplate",";Number of PV; Events",61,-0.5,60.5,file_);
    add1DHistogram("h1DNPUTemplate",";Number of PV; Events",600,0,60,file_);
-   add1DHistogram("h1DMassTemplate",";SVFit mass [GeV/c^{2}]; Events",40,0,200,file_);   
+   add1DHistogram("h1DMassTemplate",";SVFit mass [GeV/c^{2}]; Events",35,0,350,file_);   
    add1DHistogram("h1DPtTemplate",";p_{T}; Events",20,0,100,file_);
    add1DHistogram("h1DEtaTemplate",";#eta; Events",24,-2.4,2.4,file_);
 
@@ -295,6 +295,7 @@ void HTTHistograms::finalizeHistograms(int nRuns, float weight){
 
   AnalysisHistograms::finalizeHistograms();
 
+  
   //return;
 
   ////Code below tests W+n jets normalisation
@@ -318,7 +319,7 @@ void HTTHistograms::finalizeHistograms(int nRuns, float weight){
   //return;
 
   muTauDYScale = 1.0;
-  mumuDYScale = 1.1;
+  mumuDYScale = 1.0;
   ttScale = 0.7;
 
   wselOSCorrection =  std::pair<float,float>(1,0);
@@ -813,18 +814,29 @@ THStack*  HTTHistograms::plotStack(std::string varName, std::string selName){
   TH1F *hDYJetsMuMu = get1DHistogram((hName+"DYJetsMuMu"+selName).c_str());
   TH1F *hDYJetsEE = get1DHistogram((hName+"DYJetsEE"+selName).c_str());
   TH1F *hDYJetsMuTau = get1DHistogram((hName+"DYJetsMuTau"+selName).c_str());  
-  TH1F *hSoup = get1DHistogram((hName+"Data"+selName).c_str());
+  TH1F *hSoup = get1DHistogram((hName+"Data"+selName).c_str(),true);
   pair<float,float> qcdOStoSS = getQCDOStoSS(selName, wselOSCorrection, wselSSCorrection);
   TH1F *hQCD = (TH1F*)getQCDbackground(varName,selName);
-  
+
   ///Protection against null pointers
   ///Null pointers happen when sample was not read, or there were no
   ///events passing particular selection.
-
   if(!hSoup) return 0;
   TH1F *hEmpty = (TH1F*)hSoup->Clone("hEmpty");
   hEmpty->Reset();
-  
+
+  ///Set histograms directory, so the histograms are saved
+  if(hQCD) hQCD->SetDirectory(hSoup->GetDirectory());
+  if(hWJets) hWJets->SetDirectory(hSoup->GetDirectory());
+  if(hDYJetsLowM) hDYJetsLowM->SetDirectory(hSoup->GetDirectory());
+  if(hDYJetsOther) hDYJetsOther->SetDirectory(hSoup->GetDirectory());
+  if(hDYJetsMuTau) hDYJetsMuTau->SetDirectory(hSoup->GetDirectory());
+  if(hDYJetsMuMu) hDYJetsMuMu->SetDirectory(hSoup->GetDirectory());
+  if(hDYJetsEE) hDYJetsEE->SetDirectory(hSoup->GetDirectory());
+  if(hTTbar) hTTbar->SetDirectory(hSoup->GetDirectory());
+  if(hggHiggs) hggHiggs->SetDirectory(hSoup->GetDirectory());
+  if(hVBFHiggs) hVBFHiggs->SetDirectory(hSoup->GetDirectory());
+
   if(!hQCD) hQCD = (TH1F*)hEmpty->Clone((hName+"QCD"+selName).c_str()); 
   if(!hWJets) hWJets = (TH1F*)hEmpty->Clone((hName+"WJets"+selName).c_str());  
   if(!hDYJetsLowM) hDYJetsLowM = (TH1F*)hEmpty->Clone((hName+"hDYJetsLowM"+selName).c_str());    
@@ -1025,7 +1037,8 @@ THStack*  HTTHistograms::plotStack(std::string varName, std::string selName){
   pad2->Draw();
   pad2->cd();
 
-  
+  hSoup = (TH1F*)hSoup->Clone("hDataMCRatio");
+  hSoup->SetDirectory(0);
   hSoup->GetXaxis()->SetRange(binLow,binHigh);
   hSoup->SetTitle("");
   hSoup->SetXTitle("");
@@ -1099,6 +1112,8 @@ std::pair<float,float> HTTHistograms::getQCDOStoSS(std::string selName,
 
   std::cout<<"Calling method: "<<__func__<<std::endl;
   if(selName.find("SS")!=std::string::npos) return std::make_pair(1.0,0.0);
+
+  return std::make_pair(1.06,0.0);//FIXED value
 
   std::string hName = "h1DIso";
 
@@ -1260,7 +1275,7 @@ TH1F* HTTHistograms::getQCDbackground(std::string varName, std::string selName,
   scale = weight*lumi;
   hTTbar->Scale(scale);
 
-  hSoup->SetName(("h1DQCDEstimate"+varName).c_str());
+  hSoup->SetName(("h1D"+varName+"QCDEstimate").c_str());
   hSoup->Add(hWJets,-1);
   hSoup->Add(hDYJetsLowM,-1);
   hSoup->Add(hDYJets,-1);
