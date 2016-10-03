@@ -430,7 +430,8 @@ bool HTTSynchNTuple::analyze(const EventProxyBase& iEvent){
 	//di-tau system
 	TLorentzVector metP4(aEvent.getMET().X(), aEvent.getMET().Y(), 0, aEvent.getMET().Mod());
 	TLorentzVector mvametP4(aPair.getMET().X(), aPair.getMET().Y(), 0, aPair.getMET().Mod());
-	pt_tt = (metP4 + aTau.getP4() + aMuon.getP4()).Perp();
+	
+	pt_tt = (mvametP4 + aTau.getP4() + aMuon.getP4()).Perp();
 	mt_tot = TMath::Sqrt( 2 * pt_1 * mvametP4.Perp() * ( 1 - TMath::Cos( phi_1 - mvametP4.Phi() ) ) + 2 * pt_2 * mvametP4.Perp() * (1 - TMath::Cos( phi_2 - mvametP4.Phi() )) + 2 * pt_1 * pt_2 * TMath::Cos(phi_1 - phi_2) );
 	m_vis = (aMuon.getP4() + aTau.getP4()).M();
 	m_sv = aPair.getP4SVFit().M();
