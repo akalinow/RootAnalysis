@@ -226,6 +226,8 @@ class HTTParticle{
   void setPCAGenPV(const TVector3 &aV3) {pcaGenPV = aV3;}
 
   void setProperties(const std::vector<float> & aProperties) { properties = aProperties;}
+  
+  void setMCMatch(int value) {gen_match = value;}
 
   ///Data member getters.
   TLorentzVector getP4() const {return p4;}
@@ -252,6 +254,8 @@ class HTTParticle{
 
   bool hasTriggerMatch(TriggerEnum index) const {return (unsigned int)getProperty(PropertyEnum::isGoodTriggerType)&(unsigned int)index &&
                                                         (unsigned int)getProperty(PropertyEnum::FilterFired)&(unsigned int)index;}
+  
+  int getMCMatch() {return gen_match;}
 
  private:
 
@@ -273,6 +277,9 @@ class HTTParticle{
   ///Index generated automatically during conversion from
   ///LLR ntuple format
   std::vector<float> properties;
+  
+  //MC matching
+  int gen_match;
 
 };
 ///////////////////////////////////////////////////
