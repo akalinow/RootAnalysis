@@ -405,7 +405,7 @@ bool HTTSynchNTuple::analyze(const EventProxyBase& iEvent){
 	mt_2 = abs(leg2.getPDGid())==15 ? aPair.getMTLeg2() : aPair.getMTLeg1();/*
 	pfmt_2;
 	puppimt_2;*/
-	iso_2 = leg2.getProperty(PropertyEnum::combreliso);/*
+	iso_2 = leg2.getProperty(PropertyEnum::byIsolationMVArun2v1DBoldDMwLTraw);/*
 	id_e_mva_nt_loose_2;*/
 	gen_match_2 = leg2.getProperty(PropertyEnum::mc_match);		/*//according to: https://twiki.cern.ch/twiki/bin/view/CMS/HiggsToTauTauWorking2016#MC_Matching
 	againstElectronLooseMVA6_2 = leg2.getProperty(PropertyEnum::againstElectronLooseMVA6);				//FIX: following 7 properites need to be added
