@@ -374,7 +374,7 @@ bool HTTSynchNTuple::analyze(const EventProxyBase& iEvent){
 	puppimt_1;*/
 	iso_1 = leg1.getProperty(PropertyEnum::combreliso);/*
 	id_e_mva_nt_loose_1;*/
-	gen_match_1 = leg2.getProperty(PropertyEnum::PDGId);	/*	
+	gen_match_1 = leg1.getProperty(PropertyEnum::mc_match);	/*	
 	againstElectronLooseMVA6_1 = leg1.getProperty(PropertyEnum::againstElectronLooseMVA6);				//FIX: following 7 properites need to be added
 	againstElectronMediumMVA6_1 = leg1.getProperty(PropertyEnum::againstElectronMediumMVA6);
 	againstElectronTightMVA6_1 = leg1.getProperty(PropertyEnum::againstElectronTightMVA6);
@@ -407,7 +407,7 @@ bool HTTSynchNTuple::analyze(const EventProxyBase& iEvent){
 	puppimt_2;*/
 	iso_2 = leg2.getProperty(PropertyEnum::combreliso);/*
 	id_e_mva_nt_loose_2;*/
-	gen_match_2 = leg2.getProperty(PropertyEnum::PDGId);		/*//according to: https://twiki.cern.ch/twiki/bin/view/CMS/HiggsToTauTauWorking2016#MC_Matching
+	gen_match_2 = leg2.getProperty(PropertyEnum::mc_match);		/*//according to: https://twiki.cern.ch/twiki/bin/view/CMS/HiggsToTauTauWorking2016#MC_Matching
 	againstElectronLooseMVA6_2 = leg2.getProperty(PropertyEnum::againstElectronLooseMVA6);				//FIX: following 7 properites need to be added
 	againstElectronMediumMVA6_2 = leg2.getProperty(PropertyEnum::againstElectronMediumMVA6);
 	againstElectronTightMVA6_2 = leg2.getProperty(PropertyEnum::againstElectronTightMVA6);
@@ -430,7 +430,8 @@ bool HTTSynchNTuple::analyze(const EventProxyBase& iEvent){
 	//di-tau system
 	TLorentzVector metP4(aEvent.getMET().X(), aEvent.getMET().Y(), 0, aEvent.getMET().Mod());
 	TLorentzVector mvametP4(aPair.getMET().X(), aPair.getMET().Y(), 0, aPair.getMET().Mod());
-	pt_tt = (metP4 + aTau.getP4() + aMuon.getP4()).Perp();
+	
+	pt_tt = (mvametP4 + aTau.getP4() + aMuon.getP4()).Perp();
 	mt_tot = TMath::Sqrt( 2 * pt_1 * mvametP4.Perp() * ( 1 - TMath::Cos( phi_1 - mvametP4.Phi() ) ) + 2 * pt_2 * mvametP4.Perp() * (1 - TMath::Cos( phi_2 - mvametP4.Phi() )) + 2 * pt_1 * pt_2 * TMath::Cos(phi_1 - phi_2) );
 	m_vis = (aMuon.getP4() + aTau.getP4()).M();
 	m_sv = aPair.getP4SVFit().M();
@@ -462,11 +463,14 @@ bool HTTSynchNTuple::analyze(const EventProxyBase& iEvent){
 	//VBF system
 	if(aJets->size()>=2){
 		mjj = (aLeadingJet.getP4()+aTrailingJet.getP4()).M();
-		jdeta = aLeadingJet.getP4().Eta()-aTrailingJet.getP4().Eta();/*
+		jdeta = std::abs(aLeadingJet.getP4().Eta()-aTrailingJet.getP4().Eta());/*
 		njetingap;
 		njetingap20;*/
 		jdphi = aLeadingJet.getP4().Phi()-aTrailingJet.getP4().Phi();
-		}/*
+		while(jdphi>TMath::Pi()) jdphi -= 2.*TMath::Pi();
+	        while(jdphi<=-TMath::Pi()) jdphi += 2.*TMath::Pi();
+	        jdphi = std::abs(jdphi);
+	}/*
 		
 	//additional jets
 	nbtag;
@@ -481,7 +485,7 @@ bool HTTSynchNTuple::analyze(const EventProxyBase& iEvent){
 		jphi_1 = aLeadingJet.getP4().Phi();
 //		jrawf_1;
 		jmva_1 = aLeadingJet.getProperty(PropertyEnum::PUJetID);
-		}
+	}
 		
 	//trailing jet sorted by pt
 	if(aJets->size()>1){
@@ -490,7 +494,7 @@ bool HTTSynchNTuple::analyze(const EventProxyBase& iEvent){
 		jphi_2 = aTrailingJet.getP4().Phi();
 		//jrawf_2;
 		jmva_2 = aTrailingJet.getProperty(PropertyEnum::PUJetID);
-		}/*
+	}/*
 	//leading b-jet sorted by pt
 	bpt_1;
 	beta_1;
@@ -504,12 +508,12 @@ bool HTTSynchNTuple::analyze(const EventProxyBase& iEvent){
 	bphi_2;
 	brawf_2;
 	bmva_2;
-	bcsv_2;
+	bcsv_2;*/
 	//Extra lepton vetos
 	dilepton_veto = aEvent.checkSelectionBit(SelectionBitsEnum::diMuonVeto);
-/*	extraelec_veto;
-	extramuon_veto;
-	puweight;*/
+	extraelec_veto = aEvent.checkSelectionBit(SelectionBitsEnum::extraElectronVeto);
+	extramuon_veto = aEvent.checkSelectionBit(SelectionBitsEnum::extraMuonVeto);
+	//puweight;
 
   return true;
 }
