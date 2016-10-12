@@ -374,7 +374,7 @@ bool HTTSynchNTuple::analyze(const EventProxyBase& iEvent){
 	puppimt_1;*/
 	iso_1 = leg1.getProperty(PropertyEnum::combreliso);/*
 	id_e_mva_nt_loose_1;*/
-	gen_match_1 = leg1.getMCMatch();	/*	
+	gen_match_1 = leg1.getProperty(PropertyEnum::mc_match);	/*	
 	againstElectronLooseMVA6_1 = leg1.getProperty(PropertyEnum::againstElectronLooseMVA6);				//FIX: following 7 properites need to be added
 	againstElectronMediumMVA6_1 = leg1.getProperty(PropertyEnum::againstElectronMediumMVA6);
 	againstElectronTightMVA6_1 = leg1.getProperty(PropertyEnum::againstElectronTightMVA6);
@@ -407,7 +407,7 @@ bool HTTSynchNTuple::analyze(const EventProxyBase& iEvent){
 	puppimt_2;*/
 	iso_2 = leg2.getProperty(PropertyEnum::combreliso);/*
 	id_e_mva_nt_loose_2;*/
-	gen_match_2 = leg2.getMCMatch();		/*//according to: https://twiki.cern.ch/twiki/bin/view/CMS/HiggsToTauTauWorking2016#MC_Matching
+	gen_match_2 = leg2.getProperty(PropertyEnum::mc_match);		/*//according to: https://twiki.cern.ch/twiki/bin/view/CMS/HiggsToTauTauWorking2016#MC_Matching
 	againstElectronLooseMVA6_2 = leg2.getProperty(PropertyEnum::againstElectronLooseMVA6);				//FIX: following 7 properites need to be added
 	againstElectronMediumMVA6_2 = leg2.getProperty(PropertyEnum::againstElectronMediumMVA6);
 	againstElectronTightMVA6_2 = leg2.getProperty(PropertyEnum::againstElectronTightMVA6);
