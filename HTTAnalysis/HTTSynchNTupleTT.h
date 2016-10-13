@@ -1,5 +1,5 @@
-#ifndef RootAnalysis_HTTSynchNTuple_H
-#define RootAnalysis_HTTSynchNTuple_H
+#ifndef RootAnalysis_HTTSynchNTupleTT_H
+#define RootAnalysis_HTTSynchNTupleTT_H
 
 #include <string>
 
@@ -19,11 +19,11 @@
 class EventProxyHTT;
 class HTTHistograms;
 
-class HTTSynchNTuple: public HTTSynchNTupleBase{
+class HTTSynchNTupleTT: public HTTSynchNTupleBase{
 
  public:
 
-  HTTSynchNTuple(const std::string & aName);
+  HTTSynchNTupleTT(const std::string & aName);
   
   Analyzer* clone() const;
 
