@@ -414,7 +414,7 @@ void HTTSynchNTupleBase::fillPair(const HTTEvent &event, HTTPair &pair){
   //MET
   TLorentzVector metP4(event.getMET().X(), event.getMET().Y(), 0, event.getMET().Mod());
   met = event.getMET().Mod();
-  metphi = event.getMET().Phi_mpi_pi(pair.getMET().Phi());
+  metphi = event.getMET().Phi_mpi_pi(event.getMET().Phi());
   pfmt_1 = TMath::Sqrt(2.*leg1P4.Pt()*metP4.Pt()*(1.-TMath::Cos(leg1P4.Phi()-metP4.Phi()))); 
   pfmt_2 = TMath::Sqrt(2.*leg2P4.Pt()*metP4.Pt()*(1.-TMath::Cos(leg2P4.Phi()-metP4.Phi()))); 
   TLorentzVector mvametP4(pair.getMET().X(), pair.getMET().Y(), 0, pair.getMET().Mod());

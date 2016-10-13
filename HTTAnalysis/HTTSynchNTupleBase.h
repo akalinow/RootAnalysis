@@ -43,12 +43,12 @@ class HTTSynchNTupleBase: public Analyzer{
   
   void clearTTreeVariables();
 
-  void fillEventID(const HTTEvent &event);
-  void fillLegs(const HTTParticle &leg1, const HTTParticle &leg2);
+  virtual void fillEventID(const HTTEvent &event);
+  virtual void fillLegs(const HTTParticle &leg1, const HTTParticle &leg2);
   virtual void fillLegsSpecific(const HTTParticle &leg1, const HTTParticle &leg2);
-  void fillPair(const HTTEvent &event, HTTPair &pair);
-  void fillJets(const std::vector<HTTParticle> &jets);
-  void fillVetoes(const HTTEvent &event);
+  virtual void fillPair(const HTTEvent &event, HTTPair &pair);
+  virtual void fillJets(const std::vector<HTTParticle> &jets);
+  virtual void fillVetoes(const HTTEvent &event);
 
   virtual Analyzer* clone() const;
 
