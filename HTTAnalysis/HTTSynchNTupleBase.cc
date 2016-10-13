@@ -473,7 +473,7 @@ void HTTSynchNTupleBase::fillJets(const std::vector<HTTParticle> &jets){
   //std::cout<<jpt_1 <<"\n";
   jeta_1 = aLeadingJet.getP4().Eta();
   jphi_1 = aLeadingJet.getP4().Phi();
-  //jrawf_1;
+  jrawf_1 =  aLeadingJet.getProperty(PropertyEnum::rawPt)/aLeadingJet.getP4().Pt();
   jmva_1 = aLeadingJet.getProperty(PropertyEnum::PUJetID);
 
   if(jets.size()>1){
@@ -483,7 +483,7 @@ void HTTSynchNTupleBase::fillJets(const std::vector<HTTParticle> &jets){
     jpt_2 = aTrailingJet.getP4().Pt();
     jeta_2 = aTrailingJet.getP4().Eta();
     jphi_2 = aTrailingJet.getP4().Phi();
-    //jrawf_2;
+    jrawf_2 = aTrailingJet.getProperty(PropertyEnum::rawPt)/aTrailingJet.getP4().Pt();
     jmva_2 = aTrailingJet.getProperty(PropertyEnum::PUJetID);
 
     //VBF system
@@ -509,7 +509,7 @@ void HTTSynchNTupleBase::fillJets(const std::vector<HTTParticle> &jets){
     bpt_1 = bjets.at(0).getP4().Pt();
     beta_1 = bjets.at(0).getP4().Eta();
     bphi_1 = bjets.at(0).getP4().Phi();
-    //brawf_1;
+    brawf_1 = bjets.at(0).getProperty(PropertyEnum::rawPt)/bjets.at(0).getP4().Pt();
     bmva_1 = bjets.at(0).getProperty(PropertyEnum::PUJetID);
     bcsv_1 = bjets.at(0).getProperty(PropertyEnum::bCSVscore);
     if(bjets.size()>1){
@@ -517,7 +517,7 @@ void HTTSynchNTupleBase::fillJets(const std::vector<HTTParticle> &jets){
       bpt_2 = bjets.at(1).getP4().Pt();
       beta_2 = bjets.at(1).getP4().Eta();
       bphi_2 = bjets.at(1).getP4().Phi();
-      //brawf_2;
+      brawf_2 = bjets.at(1).getProperty(PropertyEnum::rawPt)/bjets.at(1).getP4().Pt();
       bmva_2 = bjets.at(1).getProperty(PropertyEnum::PUJetID);
       bcsv_2 = bjets.at(1).getProperty(PropertyEnum::bCSVscore);
     }
