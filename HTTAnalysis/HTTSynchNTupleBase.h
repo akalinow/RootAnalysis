@@ -45,12 +45,12 @@ class HTTSynchNTupleBase: public Analyzer{
 
   void fillEventID(const HTTEvent &event);
   void fillLegs(const HTTParticle &leg1, const HTTParticle &leg2);
-  void fillLegsSpecific(const HTTParticle &leg1, const HTTParticle &leg2);
+  virtual void fillLegsSpecific(const HTTParticle &leg1, const HTTParticle &leg2);
   void fillPair(const HTTEvent &event, HTTPair &pair);
   void fillJets(const std::vector<HTTParticle> &jets);
   void fillVetoes(const HTTEvent &event);
 
-  Analyzer* clone() const;
+  virtual Analyzer* clone() const;
 
   bool filter() const{ return filterEvent_;};
 
