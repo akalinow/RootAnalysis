@@ -50,7 +50,7 @@ class HTTSynchNTupleBase: public Analyzer{
   virtual void fillJets(const std::vector<HTTParticle> &jets);
   virtual void fillVetoes(const HTTEvent &event);
 
-  virtual Analyzer* clone() const;
+  Analyzer* clone() const;
 
   bool filter() const{ return filterEvent_;};
 

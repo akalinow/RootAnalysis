@@ -27,7 +27,7 @@ class HTTSynchNTuple: public HTTSynchNTupleBase{
   
   Analyzer* clone() const;
 
-  void fillLegsSpecific(const HTTParticle &leg1, const HTTParticle &leg2);
+  virtual void fillLegsSpecific(const HTTParticle &leg1, const HTTParticle &leg2);
 
  protected:
 
