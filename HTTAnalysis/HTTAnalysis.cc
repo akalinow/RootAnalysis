@@ -15,6 +15,7 @@
 #include "HTTWeightsMaker.h"
 #include "HTTAnalyzer.h"
 #include "HTTSynchNTuple.h"
+#include "HTTSynchNTupleTT.h"
 
 #include "TFile.h"
 #include "TStopwatch.h"
@@ -61,6 +62,7 @@ int main(int argc, char ** argv) {
 	 if(processName=="Weights" || processName=="PU") myAnalyzers.push_back(new HTTWeightsMaker("HTTWeightsMaker"));
 	 else 
 	 if(processName=="SynchNTuple") myAnalyzers.push_back(new HTTSynchNTuple("HTTSynchNTuple"));
+	 if(processName=="SynchNTupleTT") myAnalyzers.push_back(new HTTSynchNTupleTT("HTTSynchNTupleTT"));
 	 else myAnalyzers.push_back(new HTTAnalyzer("HTTAnalyzer"));
 
 	 TreeAnalyzer *tree = new TreeAnalyzer("TreeAnalyzer",cfgFileName, myEvent);
