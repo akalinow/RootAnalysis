@@ -20,7 +20,7 @@ void HTTSynchNTuple::fillLegsSpecific(const HTTParticle &leg1, const HTTParticle
   //Specific implementation for the mu+tau decay channel
 
   //Leg1: muon
-  iso_1 =  leg2.getProperty(PropertyEnum::combreliso);
+  iso_1 =  leg1.getProperty(PropertyEnum::combreliso);
   /*
     trigweight_2;
     idisoweight_2;
