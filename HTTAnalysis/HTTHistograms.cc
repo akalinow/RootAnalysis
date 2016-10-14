@@ -435,13 +435,16 @@ void HTTHistograms::finalizeHistograms(int nRuns, float weight){
   //return;
 
   ///Control regions plots
-  ttScale = 1.0;
+  ttScale = 0.7;
 
   wselOSCorrection =  std::pair<float,float>(1,0);
   wselSSCorrection =  std::pair<float,float>(1,0);
   
   wselOSCorrection = getWNormalisation("wselOS");
   wselSSCorrection = getWNormalisation("wselSS");
+
+  plotStack("Iso","qcdselSS");
+  return;
 
   plotStack("Iso","qcdselOS");
   plotStack("Iso","qcdselSS");
@@ -458,9 +461,6 @@ void HTTHistograms::finalizeHistograms(int nRuns, float weight){
   plotStack("MassTrans","ttselSS");
   plotStack("IsoMuon","ttselOS");
 
-  plotStack("PtMET","mumuselOS");
-  plotStack("PtMET","mumuselSS");
-  
   ///Baseline selection plots
   plotStack("MassSV","");
   plotStack("MassVis","");  
@@ -1470,7 +1470,9 @@ TH1F* HTTHistograms::getQCDbackground(std::string varName, std::string selName,
   TH1F *hDYJets = get1D_DYJet_Histogram((hName+"DYJets"+"qcdselSS"+selName).c_str());
   TH1F *hTTbar = get1DHistogram((hName+"TTbar"+"qcdselSS"+selName).c_str());
   TH1F *hST = get1D_ST_Histogram((hName+"ST"+"qcdselSS"+selName).c_str());
-  TH1F *hVV = get1D_VV_Histogram((hName+"DiBoson"+"qcdselSS"+selName).c_str());  
+  TH1F *hVV = get1D_VV_Histogram((hName+"DiBoson"+"qcdselSS"+selName).c_str());
+  TH1F *hggH125 = get1DHistogram((hName+"ggH125"+selName).c_str());
+  TH1F *hqqH125 = get1DHistogram((hName+"qqH125"+selName).c_str());  
   TH1F *hSoup = get1DHistogram((hName+"Data"+"qcdselSS"+selName).c_str());
 
   ///Protection against null pointers
@@ -1487,6 +1489,8 @@ TH1F* HTTHistograms::getQCDbackground(std::string varName, std::string selName,
   if(!hTTbar) hTTbar = (TH1F*)hEmpty->Clone((hName+"hTTbar"+"qcdselSS").c_str());
   if(!hST) hST = (TH1F*)hEmpty->Clone((hName+"hST"+"qcdselSS").c_str());
   if(!hVV) hVV = (TH1F*)hEmpty->Clone((hName+"hDiBoson"+"qcdselSS").c_str());
+  if(!hqqH125) hqqH125 = (TH1F*)hEmpty->Clone((hName+"qqH125"+"qcdselSS").c_str());
+  if(!hggH125) hggH125 = (TH1F*)hEmpty->Clone((hName+"ggH125"+"qcdselSS").c_str());
   //////////////////////////////////////////////////////////////////////
   float lumi = getLumi();
   ///Normalise MC histograms according to cross sections
@@ -1509,6 +1513,16 @@ TH1F* HTTHistograms::getQCDbackground(std::string varName, std::string selName,
   scale = weight*lumi;
   hTTbar->Scale(scale);
 
+  sampleName = "qqH125";
+  weight = getSampleNormalisation(sampleName);
+  scale = weight*lumi;
+  hqqH125->Scale(scale);
+
+  sampleName = "ggH125";
+  weight = getSampleNormalisation(sampleName);
+  scale = weight*lumi;
+  hggH125->Scale(scale);
+
   sampleName = "ST";
   scale = lumi;
   hST->Scale(scale);
@@ -1524,6 +1538,8 @@ TH1F* HTTHistograms::getQCDbackground(std::string varName, std::string selName,
   hSoup->Add(hTTbar,-1);
   hSoup->Add(hST,-1);
   hSoup->Add(hVV,-1);
+  hSoup->Add(hqqH125,-1);
+  hSoup->Add(hggH125,-1);
 
   ///Clean up the QCD shape, and remove fluctuations around 0 counts.
   for(unsigned int iBinX=0;iBinX<=hSoup->GetNbinsX();++iBinX){

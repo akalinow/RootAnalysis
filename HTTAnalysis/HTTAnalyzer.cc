@@ -210,7 +210,7 @@ bool HTTAnalyzer::analyze(const EventProxyBase& iEvent){
   bool diMuonVeto = myEventProxy.event->checkSelectionBit(SelectionBitsEnum::diMuonVeto);
   bool thirdLeptonVeto = myEventProxy.event->checkSelectionBit(SelectionBitsEnum::thirdLeptonVeto);
   //if(diMuonVeto || thirdLeptonVeto) return true;  
-  //if(!myEventProxy.pairs->size()) return true;
+  if(!myEventProxy.pairs->size()) return true;
 
   setAnalysisObjects(myEventProxy);
   float muonScaleFactor = getLeptonCorrection(aMuon.getP4().Eta(), aMuon.getP4().Pt(), hadronicTauDecayModes::tauDecayMuon);
@@ -274,15 +274,8 @@ bool HTTAnalyzer::analyze(const EventProxyBase& iEvent){
   bool wSelection = aPair.getMTMuon()>80 && aMuon.getProperty(PropertyEnum::combreliso)<0.15;
   bool qcdSelectionSS = SS;
   bool qcdSelectionOS = OS;
-  //bool ttSelection = aJet.getProperty(PropertyEnum::bDiscriminator)>0.5 && nJets30>1;
-  bool ttSelection = nJets30>1;
-  bool mumuSelection =  aPair.getMTMuon()<40 &&  aMuon.getProperty(PropertyEnum::combreliso)<0.15 && aPair.getP4().M()>85 && aPair.getP4().M()<95;
-  /*
-  bool postSynchMuon = aEvent.checkSelectionBit(SelectionBitsEnum::postSynchMuon);
-  if(postSynchMuon!=(aMuon.getProperty(PropertyEnum::combreliso)<0.15))
-    std::cout<<"postSynchMuon: "<<postSynchMuon
-	     <<" aMuon.getProperty(PropertyEnum::combreliso)<0.15: "<<(aMuon.getProperty(PropertyEnum::combreliso)<0.15)<<std::endl;
-  */
+  bool ttSelection =  aPair.getMTMuon()>150;
+ 
   ///Histograms for the baseline selection  
   if(baselineSelection){
     fillControlHistos(hNameSuffix, eventWeight);
@@ -319,10 +312,6 @@ bool HTTAnalyzer::analyze(const EventProxyBase& iEvent){
       myHistos_->fill1DHistogram("h1DMassTrans"+hNameSuffix+"ttselSS",aPair.getMTMuon(),eventWeight);
       myHistos_->fill1DHistogram("h1DIsoMuon"+hNameSuffix+"ttselOS",aMuon.getProperty(PropertyEnum::combreliso),eventWeight);
     }
-    if(mumuSelection){
-      myHistos_->fill1DHistogram("h1DPtMET"+hNameSuffix+"mumuselSS",aPair.getMET().Mod(),eventWeight);
-      myHistos_->fill1DHistogram("h1DPtMET"+hNameSuffix+"mumuselOS",aPair.getMET().Mod(),eventWeight);
-    }
   }
   ///Make QCD shape histograms for specific selection.
   ///Using the same SS/OS scaling factor for now.    
@@ -349,13 +338,6 @@ bool HTTAnalyzer::analyze(const EventProxyBase& iEvent){
       myHistos_->fill1DHistogram("h1DIsoMuon"+hNameSuffix+"OS",aMuon.getProperty(PropertyEnum::combreliso),eventWeight);
     }
     if(SS) myHistos_->fill1DHistogram("h1DMassTrans"+hNameSuffix+"SS",aPair.getMTMuon(),eventWeight);    
-  }
-
-  ///Histograms for the DY->mu mu
-  if(mumuSelection){
-    hNameSuffix = sampleName+"mumusel";
-    if(OS) myHistos_->fill1DHistogram("h1DPtMET"+hNameSuffix+"OS",aPair.getMET().Mod(),eventWeight);
-    if(SS) myHistos_->fill1DHistogram("h1DPtMET"+hNameSuffix+"SS",aPair.getMET().Mod(),eventWeight);
   }
   
   return true;

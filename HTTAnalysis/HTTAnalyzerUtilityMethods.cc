@@ -163,8 +163,8 @@ float HTTAnalyzer::getPUWeight(const EventProxyHTT & myEventProxy){
 //////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////
 float HTTAnalyzer::getGenWeight(const EventProxyHTT & myEventProxy){
-
-  if(myEventProxy.event->getSampleType()==0) return 1.0;
+  
+  //if(myEventProxy.event->getSampleType()==0) return 1.0;
   //if(myEventProxy.event->getSampleType()==1) return myEventProxy->getMCWeight()/23443.423;  
   //if(myEventProxy.event->getSampleType()==2) return myEventProxy->getMCWeight()/225892.45;  
   //if(myEventProxy.event->getSampleType()==3) return myEventProxy->getMCWeight()/6383;
