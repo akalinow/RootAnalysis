@@ -7,10 +7,12 @@
 //////////////////////////////////////////////////////////////////////////////
 HTTAnalyzer::HTTAnalyzer(const std::string & aName):Analyzer(aName){
 
-  //pileupCalc.py -i lumiSummary_Run2016BCDE_PromptReco_v12.json --inputLumiJSON /afs/cern.ch/cms/CAF/CMSCOMM/COMM_DQM/certification/Collisions16/13TeV/PileUp/pileup_latest.txt --calcMode true --minBiasXsec 69200 --maxPileupBin 60 --numPileupBins 600 Data_Pileup_Cert_271036-277148.root
+  //pileupCalc.py -i lumiSummary_Run2016BCDE_PromptReco_v12.json
+  //--inputLumiJSON /afs/cern.ch/cms/CAF/CMSCOMM/COMM_DQM/certification/Collisions16/13TeV/PileUp/pileup_latest.txt
+  //--calcMode true --minBiasXsec 69200 --maxPileupBin 60 --numPileupBins 600 Data_Pileup_Cert_271036-277148.root
   
   ///Load ROOT file with PU histograms.
-  std::string filePath = "Data_Pileup_Cert_271036-277148.root";
+  std::string filePath = "Data_Pileup_2016_BCDEFG_v26.root";
   filePath = "Data_Pileup_2016_July21.root";
   puDataFile_ = new TFile(filePath.c_str());
 
@@ -100,7 +102,8 @@ void HTTAnalyzer::setAnalysisObjects(const EventProxyHTT & myEventProxy){
   
   aSeparatedJets = getSeparatedJets(myEventProxy, 0.5);
   aJet = aSeparatedJets.size() ? aSeparatedJets[0] : HTTParticle();
-  nJets30 = count_if(aSeparatedJets.begin(), aSeparatedJets.end(),[](const HTTParticle & aJet){return aJet.getP4().Pt()>30;});  
+  nJets30 = count_if(aSeparatedJets.begin(), aSeparatedJets.end(),[](const HTTParticle & aJet){return aJet.getP4().Pt()>30;});
+  
 }
 //////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////
@@ -144,14 +147,13 @@ void HTTAnalyzer::fillControlHistos(const std::string & hNameSuffix, float event
   myHistos_->fill1DHistogram("h1DPtTau"+hNameSuffix,aTau.getP4().Pt(),eventWeight);
   myHistos_->fill1DHistogram("h1DEtaTau"+hNameSuffix,aTau.getP4().Eta(),eventWeight);
   myHistos_->fill1DHistogram("h1DPhiTau"+hNameSuffix,aTau.getP4().Phi() ,eventWeight);
-  myHistos_->fill1DHistogram("h1DIDTau"+hNameSuffix,aTau.getProperty(PropertyEnum::byCombinedIsolationDeltaBetaCorrRaw3Hits) ,eventWeight);  
+  myHistos_->fill1DHistogram("h1DIDTau"+hNameSuffix,aTau.getProperty(PropertyEnum::byIsolationMVArun2v1DBoldDMwLTraw) ,eventWeight);  
   myHistos_->fill1DHistogram("h1DStatsDecayMode"+hNameSuffix, aTau.getProperty(PropertyEnum::decayMode), eventWeight);
   myHistos_->fill1DHistogram("h1DnPCATau"+hNameSuffix,aTau.getPCARefitPV().Mag(),eventWeight);
-
-  ///Fill leading tau track pt
   myHistos_->fill1DHistogram("h1DPtTauLeadingTk"+hNameSuffix,aTau.getProperty(PropertyEnum::leadChargedParticlePt),eventWeight);
+  
   ///Fill jets info           
-  myHistos_->fill1DHistogram("h1DStatsNJets30"+hNameSuffix,nJets30,eventWeight);
+  myHistos_->fill1DHistogram("h1DStatsNJ30"+hNameSuffix,nJets30,eventWeight);
   if(nJets30>0){
     myHistos_->fill1DHistogram("h1DPtLeadingJet"+hNameSuffix,aJet.getP4().Pt(),eventWeight);
     myHistos_->fill1DHistogram("h1DEtaLeadingJet"+hNameSuffix,aJet.getP4().Eta(),eventWeight);
@@ -207,20 +209,24 @@ bool HTTAnalyzer::analyze(const EventProxyBase& iEvent){
   bool postSynchMuon = myEventProxy.event->checkSelectionBit(SelectionBitsEnum::postSynchMuon);
   bool diMuonVeto = myEventProxy.event->checkSelectionBit(SelectionBitsEnum::diMuonVeto);
   bool thirdLeptonVeto = myEventProxy.event->checkSelectionBit(SelectionBitsEnum::thirdLeptonVeto);
-
-  /////TEST
-  //myHistos_->fill1DHistogram("h1DNPU"+hNameSuffix,myEventProxy.event->getNPU(),eventWeight);
-  //myHistos_->fill1DHistogram("h1DNPV"+hNameSuffix,myEventProxy.event->getNPV(),eventWeight);
-  //return true;
-  ////////////  
-   
-  if(!myEventProxy.pairs->size()) return true;
+  //if(diMuonVeto || thirdLeptonVeto) return true;  
+  //if(!myEventProxy.pairs->size()) return true;
 
   setAnalysisObjects(myEventProxy);
   float muonScaleFactor = getLeptonCorrection(aMuon.getP4().Eta(), aMuon.getP4().Pt(), hadronicTauDecayModes::tauDecayMuon);
   float tauScaleFactor = getLeptonCorrection(aTau.getP4().Eta(), aTau.getP4().Pt(),
 					     static_cast<hadronicTauDecayModes>(aTau.getProperty(PropertyEnum::decayMode)));
   eventWeight*=muonScaleFactor*tauScaleFactor;
+
+
+  /////TEST
+  /*
+    if(aTau.getProperty(PropertyEnum::decayMode)==tauDecay1ChargedPion0PiZero){
+    std::cout<<"Tau pt: "<<aTau.getP4().Perp()<<" mass: "<<aTau.getP4().M()
+    <<" leading tk: "<<aTau.getProperty(PropertyEnum::leadChargedParticlePt)
+    <<std::endl;
+    }
+  */
   
   std::pair<bool, bool> goodDecayModes = checkTauDecayMode(myEventProxy);
   bool goodGenDecayMode = goodDecayModes.first;
@@ -265,7 +271,7 @@ bool HTTAnalyzer::analyze(const EventProxyBase& iEvent){
   bool OS = aTau.getCharge()*aMuon.getCharge() == -1;
   bool baselineSelection = OS && aPair.getMTMuon()<50 && aMuon.getProperty(PropertyEnum::combreliso)<0.15;
   bool baselineSelectionNoMT = OS && aMuon.getProperty(PropertyEnum::combreliso)<0.15;
-  bool wSelection = aPair.getMTMuon()>80 && aMuon.getProperty(PropertyEnum::combreliso)<0.1;
+  bool wSelection = aPair.getMTMuon()>80 && aMuon.getProperty(PropertyEnum::combreliso)<0.15;
   bool qcdSelectionSS = SS;
   bool qcdSelectionOS = OS;
   //bool ttSelection = aJet.getProperty(PropertyEnum::bDiscriminator)>0.5 && nJets30>1;

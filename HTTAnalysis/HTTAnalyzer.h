@@ -89,6 +89,9 @@ class HTTAnalyzer: public Analyzer{
   ///In this case a ROOT file name is used to decode the sample type.
   static std::string getSampleNameFromFileName(const EventProxyHTT & myEventProxy);
 
+  ///Return sample name for DY. Name encoded jet bin, and decay mode.
+  static std::string getDYSampleName(const EventProxyHTT & myEventProxy);
+
   ///Return pileup reweighting weight.
   ///Weight is calculatedon fly using the ration of nPU 
   ///histograms for data and analyased sample.

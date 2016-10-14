@@ -81,16 +81,29 @@ class HTTHistograms: public AnalysisHistograms {
 
   void plotCPhistograms(int nRuns, float weight);
 
-  ///Return histogram for sum of all DY decay modes.
-  TH1F *get1D_DY_Histogram(const std::string& name);
+  ///Return histogram for sum of all DY decay modes, and jet bins
+  TH1F *get1D_DYJet_Histogram(const std::string& name);
 
-  ///Return histogram for sum of all WJet HT bins
+  ///Return histogram for sum of all jet bins
   TH1F *get1D_WJet_Histogram(const std::string& name);
 
-  ///Return histogram fro nJets sample normalised by
+  ///Return histogram for sum VV processes
+  TH1F *get1D_VV_Histogram(const std::string& name);
+
+  ///Return histogram for sum single top processes
+  TH1F *get1D_ST_Histogram(const std::string& name);
+
+  ///Return sum of DY histograms. Sum can run over
+  ///decay modes, jet bins, or both.
+  TH1F *get1D_DYSum(const std::string& name, bool sumDecayModes, bool sumJetBins);
+
+  ///Return histogram for sum of all W/Z jet bins
+  ///The results is scaled to 1/LO_xsection.
+  TH1F *get1D_VJetSum(const std::string& name);
+
+  ///Return histogram from nJets sample normalised by
   ///preselection/number of analysed events
-  TH1F *getNormalised_NJet_Histogram(const std::string& hName,
-				     const std::string& jetsName);
+  TH1F *getNormalised_NJet_Histogram(const std::string& hName);
 
   //Plot a single histogram. One has to provide the full
   //histogram name, e.g. including h1D prefix.

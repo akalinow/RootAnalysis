@@ -21,9 +21,6 @@ void HTTAnalyzer::getPreselectionEff(const EventProxyHTT & myEventProxy){
     
     hStats->SetBinContent(2,hStatsFromFile->GetBinContent(hStatsFromFile->FindBin(1))*genWeight);   
     hStats->SetBinContent(3,hStatsFromFile->GetBinContent(hStatsFromFile->FindBin(3))*genWeight);
-
-    //std::cout<<"Sample: "<<getSampleNameFromFileName(myEventProxy)<<std::endl;
-    //hStats->Print("all");
   }
 }
 //////////////////////////////////////////////////////////////////////////////
@@ -71,30 +68,67 @@ std::string HTTAnalyzer::getSampleName(const EventProxyHTT & myEventProxy){
 std::string HTTAnalyzer::getSampleNameFromFileName(const EventProxyHTT & myEventProxy){
 
   std::string fileName = myEventProxy.getTTree()->GetCurrentFile()->GetName();
-  if(fileName.find("WJetsToLNu")!=std::string::npos && myEventProxy.event->getLHEnOutPartons()>=0) return "WJets";
-  //TEST if(fileName.find("WJetsToLNu")!=std::string::npos && myEventProxy.event->getLHEnOutPartons()==0) return "W0Jets";
-  //TEST else if(fileName.find("WJetsToLNu")!=std::string::npos && myEventProxy.event->getLHEnOutPartons()>0) return "WAllJets";
-  else if(fileName.find("W1JetsToLNu")!=std::string::npos) return "W1Jets";
+
+  if(fileName.find("W1JetsToLNu")!=std::string::npos) return "W1Jets";
   else if(fileName.find("W2JetsToLNu")!=std::string::npos) return "W2Jets";
   else if(fileName.find("W3JetsToLNu")!=std::string::npos) return "W3Jets";
   else if(fileName.find("W4JetsToLNu")!=std::string::npos) return "W4Jets";
-  else if(fileName.find("W5JetsToLNu")!=std::string::npos) return "W5Jets";
+  //else if(fileName.find("WJetsToLNu")!=std::string::npos && myEventProxy.event->getLHEnOutPartons()==0) return "W0Jets";
+  //else if(fileName.find("WJetsToLNu")!=std::string::npos && myEventProxy.event->getLHEnOutPartons()>0) return "WAllJets";
+
+  else if(fileName.find("WJetsToLNu")!=std::string::npos) return "WJets";
+  
   else if(fileName.find("Run201")!=std::string::npos) return "Data";
   else if(fileName.find("SUSYGluGluToHToTauTau")!=std::string::npos) return "A";
-  else if(fileName.find("GluGluHToTauTau")!=std::string::npos) return "ggH";
-  else if(fileName.find("VBFHToTauTau")!=std::string::npos) return "VBFH";
+  else if(fileName.find("GluGluHToTauTauM120")!=std::string::npos) return "ggH120";
+  else if(fileName.find("VBFHToTauTauM120")!=std::string::npos) return "qqH120";  
+  else if(fileName.find("GluGluHToTauTauM125")!=std::string::npos) return "ggH125";
+  else if(fileName.find("VBFHToTauTauM125")!=std::string::npos) return "qqH125";
+  else if(fileName.find("GluGluHToTauTauM130")!=std::string::npos) return "ggH130";
+  else if(fileName.find("VBFHToTauTauM130")!=std::string::npos) return "qqH130";
+  else if(fileName.find("GluGluHToTauTauM135")!=std::string::npos) return "ggH135";
+  else if(fileName.find("VBFHToTauTauM135")!=std::string::npos) return "qqH135";
   else if(fileName.find("TT")!=std::string::npos) return "TTbar";
-  else if(fileName.find("DYJetsToLLM10to50")!=std::string::npos) return "DYJetsLowM";
-  else if(fileName.find("DYJetsToLLM50")!=std::string::npos){      
-    int decayModeBoson = myEventProxy.event->getDecayModeBoson();
-    std::string decayName;
-    if(decayModeBoson==7) decayName = "MuMu";
-    else if(decayModeBoson==6) decayName = "EE";
-    else if(decayModeBoson==0) decayName = "MuTau";
-    else decayName = "Other";
-    return "DYJets"+decayName;      
-  }
+  else if(fileName.find("STtWantitop")!=std::string::npos) return "Wantitop";
+  else if(fileName.find("STtWtop")!=std::string::npos) return "Wtop";
+  else if(fileName.find("STtchannel__antitop")!=std::string::npos) return "t-channel_antitop";
+  else if(fileName.find("STtchannel__top")!=std::string::npos) return "t-channel_top";   
+  else if(fileName.find("ZZTo2L2Q")!=std::string::npos) return "ZZTo2L2Q";
+  else if(fileName.find("ZZTo4L")!=std::string::npos) return "ZZTo4L";
+  else if(fileName.find("WZTo1L3Nu")!=std::string::npos) return "WZTo1L3Nu";
+  else if(fileName.find("WZJToLLLNu")!=std::string::npos) return "WZJToLLLNu";
+  else if(fileName.find("WWTo1L1Nu2Q")!=std::string::npos) return "WWTo1L1Nu2Q";
+  else if(fileName.find("WZTo1L1Nu2Q")!=std::string::npos) return "WZTo1L1Nu2Q";
+  else if(fileName.find("VVTo2L2Nu")!=std::string::npos) return "VVTo2L2Nu";
+  else if(fileName.find("WZTo2L2Q")!=std::string::npos) return "WZTo2L2Q";
+  else if(fileName.find("DY")!=std::string::npos) return getDYSampleName(myEventProxy);
+
   return "Unknown";
+}
+//////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////////
+std::string HTTAnalyzer::getDYSampleName(const EventProxyHTT & myEventProxy){
+
+  std::string fileName = myEventProxy.getTTree()->GetCurrentFile()->GetName();
+
+  std::string jetsName = "";    
+  if(fileName.find("DY1JetsToLL")!=std::string::npos) jetsName ="1Jets";
+  else if(fileName.find("DY2JetsToLL")!=std::string::npos) jetsName = "2Jets";
+  else if(fileName.find("DY3JetsToLL")!=std::string::npos) jetsName = "3Jets";
+  else if(fileName.find("DY4JetsToLL")!=std::string::npos) jetsName = "4Jets";
+  else if(fileName.find("DYJetsToLLM10to50")!=std::string::npos) jetsName =  "LowM";
+  else if(fileName.find("DYJetsToLLM50")!=std::string::npos) jetsName =  "Jets";  
+  //else if(fileName.find("DYJetsToLLM50")!=std::string::npos && myEventProxy.event->getLHEnOutPartons()==0) jetsName =  "0Jets";
+  //else if(fileName.find("DYJetsToLLM50")!=std::string::npos && myEventProxy.event->getLHEnOutPartons()>0) jetsName =  "AllJets";  
+  
+  int decayModeBoson = myEventProxy.event->getDecayModeBoson();
+  std::string decayName = "";
+  if(decayModeBoson==7) decayName = "MuMu";
+  else if(decayModeBoson==6) decayName = "EE";
+  else if(decayModeBoson==0) decayName = "MuTau";
+  else decayName = "Other";
+
+  return "DY"+decayName+jetsName;
 }
 //////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////
