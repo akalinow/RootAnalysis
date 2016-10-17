@@ -78,7 +78,7 @@ bool HTTWeightsMaker::analyze(const EventProxyBase& iEvent){
   std::string hName = "h1DNPV"+sampleName;
   
   ///Fill histograms with number of PV.
-  myHistos_->fill1DHistogram("h1DNPV"+sampleName,myEventProxy.wevent->npu(),eventWeight);
+  myHistos_->fill1DHistogram("h1DNPV"+sampleName,myEventProxy.event->getNPU(),eventWeight);
   
   return true;
 }

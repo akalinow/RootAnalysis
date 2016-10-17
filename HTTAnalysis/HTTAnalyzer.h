@@ -14,6 +14,7 @@
 //ROOT includes
 #include "TTree.h"
 #include "TList.h"
+#include "RooWorkspace.h"
 
 #include "Analyzer.h"
 
@@ -21,6 +22,7 @@ class HTTHistograms;
 
 class TH1F;
 class TLorentzVector;
+
 
 class HTTAnalyzer: public Analyzer{
 
@@ -81,6 +83,15 @@ class HTTAnalyzer: public Analyzer{
   ///Make the methos static, so other modules can use it
   static std::string getSampleName(const EventProxyHTT & myEventProxy);
 
+  ///Return human readable sample name (Data, WJets, etc).
+  ///Make the methos static, so other modules can use it.
+  ///Method used when sample coding in TTree is not present.
+  ///In this case a ROOT file name is used to decode the sample type.
+  static std::string getSampleNameFromFileName(const EventProxyHTT & myEventProxy);
+
+  ///Return sample name for DY. Name encoded jet bin, and decay mode.
+  static std::string getDYSampleName(const EventProxyHTT & myEventProxy);
+
   ///Return pileup reweighting weight.
   ///Weight is calculatedon fly using the ration of nPU 
   ///histograms for data and analyased sample.
@@ -122,10 +133,13 @@ class HTTAnalyzer: public Analyzer{
   
   ///Check if the decMode points to leptonic tau decay
   bool isLepton(int decMode);
-
+  
   ///Get jets separated by deltaR from tau an muon.
-  std::vector<Wjet> getSeparatedJets(const EventProxyHTT & myEventProxy, const Wtau & aTau,
-				     const Wmu & aMuon, float deltaR);
+  std::vector<HTTParticle> getSeparatedJets(const EventProxyHTT & myEventProxy, 
+					    float deltaR);
+
+  ///Get lepton corrections
+  float getLeptonCorrection(float eta, float pt, hadronicTauDecayModes tauDecayMode);
   
  protected:
 
@@ -148,6 +162,12 @@ class HTTAnalyzer: public Analyzer{
 
   ///ROOT file containing current TTree
   TFile *ntupleFile_;
+
+  ///Histogram with event counts filled during preselection step.
+  TH1F *hStatsFromFile;
+
+  ///RootWorskapce with lepton corrections
+  RooWorkspace *scaleWorkspace;
  
   ///Vector of PU histograms for MC samples
   std::vector<TH1F*> hPUVec_;
@@ -156,20 +176,16 @@ class HTTAnalyzer: public Analyzer{
   bool filterEvent_;
 
   ///Reconstructed objects selected for given event.
-  Wevent aEvent;
-  Wpair aPair;
-  Wtau aTau;
-  Wtau aGenNegativeTau;
-  Wtau aGenPositiveTau;
-  Wmu aMuon;
-  Wmet aMET;
-  std::vector<Wjet> aSeparatedJets;
-  Wjet aJet;
+  HTTEvent aEvent;
+  HTTPair aPair;
+  std::string sampleName;
+
+  HTTParticle aTau, aMuon;
+  HTTParticle aGenHadTau, aGenMuonTau;
+  HTTParticle aJet;
+  std::vector<HTTParticle> aSeparatedJets;
   int nJets30;
 
-  ///Variables stored in a TTree
-  Double_t muonPt;
- 
 };
 
 #endif
