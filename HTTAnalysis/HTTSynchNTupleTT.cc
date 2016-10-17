@@ -17,7 +17,7 @@ Analyzer* HTTSynchNTupleTT::clone() const{
 //////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////
 void HTTSynchNTupleTT::fillLegsSpecific(const HTTParticle &leg1, const HTTParticle &leg2){
-  //Specific implementation for the mu+tau decay channel
+  //Specific implementation for the tau+tau decay channel
 
   //Leg1: leading tau
   iso_1 = leg1.getProperty(PropertyEnum::byIsolationMVArun2v1DBoldDMwLTraw);
