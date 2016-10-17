@@ -207,10 +207,10 @@ bool HTTAnalyzer::passCategory(const HTTAnalyzer::muTauCategory & aCategory){
   float jetsMass = 0;
   float higgsPt =  (aTau.getP4() + aTau.getP4() + aMET.getP4()).Pt();
 
-  bool baselineSelection = aPair.getMTMuon()<50 && aMuon.getProperty(PropertyEnum::combreliso)<0.15;
-  bool baselineSelectionNoMT = aMuon.getProperty(PropertyEnum::combreliso)<0.15;
+  bool mtSelection = aPair.getMTMuon()<50;
 
   bool jet0_low =  aTau.getP4().Pt()>20  && aTau.getP4().Pt()<50 && nJets30==0;
+  jet0_low  =  aTau.getP4().Pt()>30; //TEST
   bool jet0_high = aTau.getP4().Pt()>50 && nJets30==0;
 
   bool jet1_low = (nJets30==1 || (nJets30==0 && jetsMass<500)) &&
@@ -230,14 +230,14 @@ bool HTTAnalyzer::passCategory(const HTTAnalyzer::muTauCategory & aCategory){
   bool wSelection = aPair.getMTMuon()>80 && aMuon.getProperty(PropertyEnum::combreliso)<0.15;
   bool ttSelection =  aPair.getMTMuon()>150;
 
-  categoryDecisions[(int)HTTAnalyzer::jet0_low] = baselineSelection && jet0_low;
-  categoryDecisions[(int)HTTAnalyzer::jet0_high] = baselineSelection && jet0_high;
+  categoryDecisions[(int)HTTAnalyzer::jet0_low] = mtSelection && jet0_low;
+  categoryDecisions[(int)HTTAnalyzer::jet0_high] = mtSelection && jet0_high;
   
-  categoryDecisions[(int)HTTAnalyzer::jet1_low] = baselineSelection && jet1_low;
-  categoryDecisions[(int)HTTAnalyzer::jet1_high] = baselineSelection && jet1_high;
+  categoryDecisions[(int)HTTAnalyzer::jet1_low] = mtSelection && jet1_low;
+  categoryDecisions[(int)HTTAnalyzer::jet1_high] = mtSelection && jet1_high;
 
-  categoryDecisions[(int)HTTAnalyzer::vbf_low] = baselineSelection && vbf_low;
-  categoryDecisions[(int)HTTAnalyzer::vbf_high] = baselineSelection && vbf_high;
+  categoryDecisions[(int)HTTAnalyzer::vbf_low] = mtSelection && vbf_low;
+  categoryDecisions[(int)HTTAnalyzer::vbf_high] = mtSelection && vbf_high;
 
   categoryDecisions[(int)HTTAnalyzer::W] = wSelection;
   categoryDecisions[(int)HTTAnalyzer::TT] = ttSelection;
@@ -320,28 +320,17 @@ bool HTTAnalyzer::analyze(const EventProxyBase& iEvent){
   bool OS = aTau.getCharge()*aMuon.getCharge() == -1;
   bool muonIso = aMuon.getProperty(PropertyEnum::combreliso)<0.15;
 
-  /*
-  if(OS && baselineSelectionNoMT){
-    hNameSuffix = sampleName+"fullMt";
-    myHistos_->fill1DHistogram("h1DMassTrans"+hNameSuffix,aPair.getMTMuon(),eventWeight); 
-  }
-  */
   std::string categorySuffix = "";
   for(unsigned int iCategory = HTTAnalyzer::jet0_low;
       iCategory<HTTAnalyzer::DUMMY;++iCategory){
 
     HTTAnalyzer::muTauCategory categoryType = static_cast<HTTAnalyzer::muTauCategory>(iCategory);
     
-    if(!passCategory(categoryType)) continue;
-    
+    if(!passCategory(categoryType)) continue;    
     categorySuffix = std::to_string(iCategory);
-    hNameSuffix = sampleName+"_"+categorySuffix;
-
-    std::cout<<"categorySuffix: "<<categorySuffix
-	     <<" hNameSuffix: "<<hNameSuffix
-	     <<std::endl;
 
     if(OS && muonIso){
+      hNameSuffix = sampleName+"_OS_"+categorySuffix;
       fillControlHistos(hNameSuffix, eventWeight);
       fillDecayPlaneAngle(hNameSuffix+"RefitPV", eventWeight);
       fillDecayPlaneAngle(hNameSuffix+"AODPV", eventWeight);
@@ -349,14 +338,19 @@ bool HTTAnalyzer::analyze(const EventProxyBase& iEvent){
       fillVertices(hNameSuffix+"RefitPV");
       fillVertices(hNameSuffix+"AODPV");
     }
+    if(SS && muonIso){
+      hNameSuffix = sampleName+"_SS_"+categorySuffix;
+      fillControlHistos(hNameSuffix, eventWeight);
+    }      
     if(OS){
-      hNameSuffix = sampleName+"qcdselOS"+"_"+categorySuffix;
+      hNameSuffix = sampleName+"_OSnoMuIso_"+categorySuffix;
       myHistos_->fill1DHistogram("h1DIso"+hNameSuffix,aMuon.getProperty(PropertyEnum::combreliso),eventWeight);
+      myHistos_->fill1DHistogram("h1DMassTrans"+hNameSuffix,aPair.getMTMuon(),eventWeight);
     }
     if(SS){
-      hNameSuffix = sampleName+"qcdselSS"+categorySuffix;
-      myHistos_->fill1DHistogram("h1DIso"+hNameSuffix,aMuon.getProperty(PropertyEnum::combreliso),eventWeight);     
-      if(muonIso) fillControlHistos(hNameSuffix, eventWeight);
+      hNameSuffix = sampleName+"_SSnoMuIso_"+categorySuffix;
+      myHistos_->fill1DHistogram("h1DIso"+hNameSuffix,aMuon.getProperty(PropertyEnum::combreliso),eventWeight);
+      myHistos_->fill1DHistogram("h1DMassTrans"+hNameSuffix,aPair.getMTMuon(),eventWeight);
     }
   }
   return true;

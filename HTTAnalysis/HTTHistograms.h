@@ -33,7 +33,7 @@ class HTTHistograms: public AnalysisHistograms {
   float getSampleNormalisation(std::string sampleName);
 
   ///Estimate QCD background using the SS/OS method.
-  TH1F* getQCDbackground(std::string varName, std::string selName,
+  TH1F* getQCDbackground(unsigned int iCategory, std::string varName,
 			 std::pair<float,float> wselOSCorrection =  std::pair<float,float>(1,0),
 			 std::pair<float,float> wselSSCorrection =  std::pair<float,float>(1,0));
 
@@ -41,10 +41,10 @@ class HTTHistograms: public AnalysisHistograms {
   ///SCaling factor is estimated in high Mt region.
   ///Other backgrounds are subtracted, basing on MC
   ///QCD contribution is neglected.
-  std::pair<float,float> getWNormalisation(std::string selName);
+  std::pair<float,float> getWNormalisation(unsigned int iCategory, std::string selName);
 
   ///Calculate QCD OS/SS ratiousing non isolated events.
-  std::pair<float,float> getQCDOStoSS(std::string selName,
+  std::pair<float,float> getQCDOStoSS(unsigned int iCategory,
 				      std::pair<float,float> wselOSCorrection =  std::pair<float,float>(1,0),
 				      std::pair<float,float> wselSSCorrection =  std::pair<float,float>(1,0));
 
@@ -60,9 +60,12 @@ class HTTHistograms: public AnalysisHistograms {
   std::vector<std::string> selectionFlavours_;
 
   //Plot stacked histograms for each contributing process.
+  ///iCategory - selection category to be plotted.
+  ///selName - secondary type of selection (OS/SS/mt) used for background estimation
   //varName - name of variable to be plotted,
-  //selName - selection type name. For baseline use empty string
-  THStack* plotStack(std::string varName, std::string selName);
+  THStack* plotStack(unsigned int iCategory,
+		     std::string varName, 
+		     std::string selName = "OS");
 
   void plotnPCA(const std::string & type);
 
