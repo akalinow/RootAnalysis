@@ -102,21 +102,22 @@ float HTTHistograms::getSampleNormalisation(std::string sampleName){
   if(sampleName=="VVTo2L2Nu") crossSection = 11.95;
   if(sampleName=="WZTo2L2Q") crossSection = 5.595;
 
-   ///https://twiki.cern.ch/twiki/bin/view/CMS/HiggsToTauTauWorking2016#MC_and_data_samples
+  ///https://twiki.cern.ch/twiki/bin/view/CMS/HiggsToTauTauWorking2016#MC_and_data_samples
   if(sampleName=="Wantitop") crossSection = 35.6;
   if(sampleName=="Wtop") crossSection = 35.6;
   if(sampleName=="t-channel_top") crossSection = 136.02;
   if(sampleName=="t-channel_antitop") crossSection = 80.95;
 
+  ///https://twiki.cern.ch/twiki/bin/view/CMS/HiggsToTauTauWorking2016#MC_and_data_samples
+  if(sampleName=="QCD_MC") crossSection = 720648000;
+  
   float weight = crossSection*presEff/nEventsAnalysed;
   if(presEff<0 || fabs(fabs(crossSection)-1.0)<1e-5) weight = 1.0;
 
   std::cout<<"Sample name: "<<sampleName<<" ";
   std::cout<<"Xsection: "<<crossSection<<" [pb] "<<" ";
   std::cout<<"Events analyzed: "<<nEventsAnalysed<<" ";
-  //std::cout<<"Gen preselection efficiency: "<<genPresEff<<" ";
   std::cout<<"Reco preselection efficiency: "<<recoPresEff<<" ";
-  //std::cout<<"External scaling: "<<kFactor<<" ";
   std::cout<<"Final weight: "<<weight<<std::endl;
 
   return weight;  
@@ -437,14 +438,11 @@ void HTTHistograms::finalizeHistograms(int nRuns, float weight){
   ///Control regions plots
   ttScale = 0.7;
 
-  wselOSCorrection =  std::pair<float,float>(1,0);
-  wselSSCorrection =  std::pair<float,float>(1,0);
+  wselOSCorrection =  std::pair<float,float>(1.0,0);
+  wselSSCorrection =  std::pair<float,float>(1.0,0);
   
   wselOSCorrection = getWNormalisation("wselOS");
   wselSSCorrection = getWNormalisation("wselSS");
-
-  plotStack("Iso","qcdselSS");
-  return;
 
   plotStack("Iso","qcdselOS");
   plotStack("Iso","qcdselSS");
@@ -940,7 +938,8 @@ THStack*  HTTHistograms::plotStack(std::string varName, std::string selName){
 
   TH1F *hSoup = get1DHistogram((hName+"Data"+selName).c_str(),true);
   pair<float,float> qcdOStoSS = getQCDOStoSS(selName, wselOSCorrection, wselSSCorrection);
-  TH1F *hQCD = (TH1F*)getQCDbackground(varName,selName);
+  TH1F *hQCD = (TH1F*)getQCDbackground(varName,selName, wselOSCorrection, wselSSCorrection);
+  TH1F *hQCD_MC =  get1DHistogram((hName+"QCD_MC"+selName).c_str());
 
   ///Protection against null pointers
   ///Null pointers happen when sample was not read, or there were no
@@ -970,7 +969,8 @@ THStack*  HTTHistograms::plotStack(std::string varName, std::string selName){
   if(hqqHiggs130) hqqHiggs130->SetDirectory(hSoup->GetDirectory());
   if(hggHiggs135) hggHiggs135->SetDirectory(hSoup->GetDirectory());
   if(hqqHiggs135) hqqHiggs135->SetDirectory(hSoup->GetDirectory());  
-  if(!hQCD) hQCD = (TH1F*)hEmpty->Clone((hName+"QCD"+selName).c_str()); 
+  if(!hQCD) hQCD = (TH1F*)hEmpty->Clone((hName+"QCD"+selName).c_str());
+  if(!hQCD_MC) hQCD_MC = (TH1F*)hEmpty->Clone((hName+"QCD_MC"+selName).c_str());  
   if(!hWJets) hWJets = (TH1F*)hEmpty->Clone((hName+"WJets"+selName).c_str());  
   if(!hDYJetsLowM) hDYJetsLowM = (TH1F*)hEmpty->Clone((hName+"hDYLowM"+selName).c_str());    
   if(!hDYJetsOther) hDYJetsOther = (TH1F*)hEmpty->Clone((hName+"hDYOtherJets"+selName).c_str());  
@@ -1026,6 +1026,11 @@ THStack*  HTTHistograms::plotStack(std::string varName, std::string selName){
   weight = getSampleNormalisation(sampleName);
   scale = weight*lumi;
   hTTbar->Scale(scale);
+
+  sampleName = "QCD_MC";
+  weight = getSampleNormalisation(sampleName);
+  scale = weight*lumi;
+  hQCD_MC->Scale(scale);
 
   //single top samples scaled for preselection during stiching step
   sampleName = "ST";
@@ -1162,7 +1167,8 @@ THStack*  HTTHistograms::plotStack(std::string varName, std::string selName){
   std::cout<<"MC Z->ll(m<50): "<<hDYJetsLowM->Integral(0,hDYJetsLowM->GetNbinsX()+1)<<std::endl;
   std::cout<<"MC Z->other: "<<hDYJetsOther->Integral(0,hDYJetsOther->GetNbinsX()+1)<<std::endl;
   std::cout<<"MC H(125)->tau tau: "<<hHiggs->Integral(0,hHiggs->GetNbinsX()+1)<<std::endl;  
-  std::cout<<"QCD: "<<hQCD->Integral(0,hQCD->GetNbinsX()+1)<<std::endl; 
+  std::cout<<"QCD: "<<hQCD->Integral(0,hQCD->GetNbinsX()+1)<<std::endl;
+  std::cout<<"QCD_MC: "<<hQCD_MC->Integral(0,hQCD_MC->GetNbinsX()+1)<<std::endl; 
   std::cout<<"Correction factors:"<<std::endl;
   std::cout<<"QCD SS to OS: "<<qcdOStoSS.first<<" +- "<<qcdOStoSS.second<<std::endl;
   std::cout<<"W MC to DATA: "<<dataToMCScale.first<<" +- "<<dataToMCScale.second<<std::endl;
@@ -1216,7 +1222,7 @@ THStack*  HTTHistograms::plotStack(std::string varName, std::string selName){
   hs->GetHistogram()->SetTitleOffset(1.0);
   hs->SetMaximum(1.1*max);
   hs->SetMinimum(0.1);
-
+  
   hSoup->DrawCopy("same");
 
   TLegend *leg = new TLegend(0.79,0.32,0.99,0.82,NULL,"brNDC");
@@ -1322,8 +1328,6 @@ std::pair<float,float> HTTHistograms::getQCDOStoSS(std::string selName,
 
   std::cout<<"Calling method: "<<__func__<<std::endl;
   if(selName.find("SS")!=std::string::npos) return std::make_pair(1.0,0.0);
-
-  //return std::make_pair(1.06,0.0);//FIXED value
 
   std::string hName = "h1DIso";
 
@@ -1443,7 +1447,10 @@ std::pair<float,float> HTTHistograms::getQCDOStoSS(std::string selName,
   param=line->GetParameter(0);
   dparam=line->GetParError(0);
 
+  
   std::cout<<"QCD OS/SS ratio: "<<param<<" +- "<<dparam<<std::endl;
+  std::cout<<"Returning default value 1.06"<<std::endl;
+  //return std::make_pair(1.06,0.0);//FIXED value
 
   return std::make_pair(param, dparam);
 }
@@ -1453,9 +1460,6 @@ TH1F* HTTHistograms::getQCDbackground(std::string varName, std::string selName,
 				      std::pair<float,float> wselOSCorrection,
 				      std::pair<float,float> wselSSCorrection){
 				      
-
-  std::cout<<"Calling method: "<<__func__<<std::endl;
-
   float qcdScale = getQCDOStoSS(selName, wselOSCorrection, wselSSCorrection).first;
   
   ///Not very clear and elegant. AK
@@ -1506,6 +1510,7 @@ TH1F* HTTHistograms::getQCDbackground(std::string varName, std::string selName,
 
   sampleName = "WJets";
   scale = getSampleNormalisation(sampleName)*lumi*wselSSCorrection.first;
+  std::cout<<__func__<<" wselSSCorrection.first: "<<wselSSCorrection.first<<std::endl;
   hWJets->Scale(scale);
 
   sampleName = "TTbar";
@@ -1538,8 +1543,8 @@ TH1F* HTTHistograms::getQCDbackground(std::string varName, std::string selName,
   hSoup->Add(hTTbar,-1);
   hSoup->Add(hST,-1);
   hSoup->Add(hVV,-1);
-  hSoup->Add(hqqH125,-1);
-  hSoup->Add(hggH125,-1);
+  //hSoup->Add(hqqH125,-1);
+  //hSoup->Add(hggH125,-1);
 
   ///Clean up the QCD shape, and remove fluctuations around 0 counts.
   for(unsigned int iBinX=0;iBinX<=hSoup->GetNbinsX();++iBinX){

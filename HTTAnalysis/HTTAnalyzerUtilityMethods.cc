@@ -101,6 +101,7 @@ std::string HTTAnalyzer::getSampleNameFromFileName(const EventProxyHTT & myEvent
   else if(fileName.find("WZTo1L1Nu2Q")!=std::string::npos) return "WZTo1L1Nu2Q";
   else if(fileName.find("VVTo2L2Nu")!=std::string::npos) return "VVTo2L2Nu";
   else if(fileName.find("WZTo2L2Q")!=std::string::npos) return "WZTo2L2Q";
+  else if(fileName.find("QCD")!=std::string::npos) return "QCD_MC";
   else if(fileName.find("DY")!=std::string::npos) return getDYSampleName(myEventProxy);
 
   return "Unknown";
