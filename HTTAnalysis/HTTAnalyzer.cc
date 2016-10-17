@@ -85,6 +85,14 @@ void HTTAnalyzer::setAnalysisObjects(const EventProxyHTT & myEventProxy){
   aPair = (*myEventProxy.pairs)[0];
   aTau = aPair.getTau();
   aMuon = aPair.getMuon();
+
+  TLorentzVector met4v(aPair.getMET().X(),
+		       aPair.getMET().Y(),
+		       0,
+		       aPair.getMET().Mod());
+  
+  aMET = HTTParticle();
+  aMET.setP4(met4v);
   
   aGenMuonTau = HTTParticle();
   aGenHadTau = HTTParticle();
@@ -160,7 +168,7 @@ void HTTAnalyzer::fillControlHistos(const std::string & hNameSuffix, float event
     myHistos_->fill1DHistogram("h1DCSVBtagLeadingJet"+hNameSuffix,aJet.getProperty(PropertyEnum::bCSVscore),eventWeight);
   }
   
-  myHistos_->fill1DHistogram("h1DPtMET"+hNameSuffix,aPair.getMET().Mod(),eventWeight);
+  myHistos_->fill1DHistogram("h1DPtMET"+hNameSuffix,aMET.getP4().Pt(),eventWeight);
 
   fillDecayPlaneAngle(hNameSuffix, eventWeight);
 
@@ -235,7 +243,7 @@ bool HTTAnalyzer::analyze(const EventProxyBase& iEvent){
   if(goodGenDecayMode) fillGenDecayPlaneAngle(sampleName+"GenNoOfflineSel", eventWeight);
   
   ///This stands for core selection, that is common to all regions.
-  bool tauKinematics = aTau.getP4().Pt()>30 && fabs(aTau.getP4().Eta())<2.3;
+  bool tauKinematics = aTau.getP4().Pt()>20 && fabs(aTau.getP4().Eta())<2.3;
   int tauIDmask = 0;
   
   for(unsigned int iBit=0;iBit<aEvent.ntauIds;iBit++){
@@ -248,27 +256,35 @@ bool HTTAnalyzer::analyze(const EventProxyBase& iEvent){
   bool muonKinematics = aMuon.getP4().Pt()>24 && fabs(aMuon.getP4().Eta())<2.1;
   bool trigger = aMuon.hasTriggerMatch(TriggerEnum::HLT_IsoMu22) || aMuon.hasTriggerMatch(TriggerEnum::HLT_IsoTkMu22);
   if(sampleName!="Data") trigger = true; //MC trigger included in muon SF
-  bool zeroJets = (nJets30==0);
 									   
   bool cpMuonSelection = aMuon.getPCARefitPV().Perp()>0.003;    
   bool cpTauSelection = (aTau.getProperty(PropertyEnum::decayMode)==tauDecay1ChargedPion0PiZero && aTau.getPCARefitPV().Mag()>0.003) ||
                         (aTau.getProperty(PropertyEnum::decayMode)!=tauDecay1ChargedPion0PiZero &&
 			 isOneProng(aTau.getProperty(PropertyEnum::decayMode))); 
   bool cpSelection = cpMuonSelection && cpTauSelection;
-  /*
-  std::cout<<" tauKinematics: "<<tauKinematics
-           <<" tauID: "<<tauID
-           <<" muonKinematics: "<<muonKinematics
-           <<" trigger: "<<trigger
-           <<" cpSelection: "<<cpSelection
-           <<std::endl;
-  */
+  
   if(!tauKinematics || !tauID || !muonKinematics || !trigger) return true;
   //if(!cpSelection) return true;
-  
+
+  float jetsMass = 0;
+  float higgsPt =  (aTau.getP4() + aTau.getP4() + aMET.getP4()).Pt();
   ///Note: parts of the signal/control region selection are applied in the following code.
   bool SS = aTau.getCharge()*aMuon.getCharge() == 1;
   bool OS = aTau.getCharge()*aMuon.getCharge() == -1;
+
+  bool jet0_low = aTau.getP4().Pt()>20  && aTau.getP4().Pt()<50 && nJets30==0;
+  bool jet0_high = aTau.getP4().Pt()>50 && nJets30==0;
+
+  bool jet1_low = (nJets30==1 || (nJets30==0 && jetsMass<500)) &&
+    (aTau.getP4().Pt()>30 && aTau.getP4().Pt()<40 ||
+     aTau.getP4().Pt()>40 && higgsPt<140);
+
+  bool jet1_high = (nJets30==1 || (nJets30==0 && jetsMass<500)) &&
+    (aTau.getP4().Pt()>40 && higgsPt>140);
+  
+										
+
+  
   bool baselineSelection = OS && aPair.getMTMuon()<50 && aMuon.getProperty(PropertyEnum::combreliso)<0.15;
   bool baselineSelectionNoMT = OS && aMuon.getProperty(PropertyEnum::combreliso)<0.15;
   bool wSelection = aPair.getMTMuon()>80 && aMuon.getProperty(PropertyEnum::combreliso)<0.15;
