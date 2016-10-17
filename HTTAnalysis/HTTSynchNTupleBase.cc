@@ -470,7 +470,6 @@ void HTTSynchNTupleBase::fillJets(const std::vector<HTTParticle> &jets){
   HTTParticle aLeadingJet = jets.at(0);
   //leading jet sorted by pt
   jpt_1 = aLeadingJet.getP4().Pt();
-  //std::cout<<jpt_1 <<"\n";
   jeta_1 = aLeadingJet.getP4().Eta();
   jphi_1 = aLeadingJet.getP4().Phi();
   jrawf_1 =  aLeadingJet.getProperty(PropertyEnum::rawPt)/aLeadingJet.getP4().Pt();
