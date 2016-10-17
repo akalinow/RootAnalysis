@@ -432,14 +432,15 @@ void HTTHistograms::finalizeHistograms(int nRuns, float weight){
   //getSampleNormalisation("DYJets");
   //return;
 
-  //plotCPhistograms(nRuns, weight);
-  //return;
-
   ///Control regions plots
   ttScale = 0.7;
 
   wselOSCorrection =  std::pair<float,float>(1.0,0);
   wselSSCorrection =  std::pair<float,float>(1.0,0);
+
+  return;
+
+  std::string
   
   wselOSCorrection = getWNormalisation("wselOS");
   wselSSCorrection = getWNormalisation("wselSS");

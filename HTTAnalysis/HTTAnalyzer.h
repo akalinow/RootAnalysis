@@ -50,6 +50,13 @@ class HTTAnalyzer: public Analyzer{
     tauDecayMuon,
     tauDecayOther                 // catch-all
   };
+
+  enum muTauCategory{jet0_low, jet0_high,
+		     jet1_low, jet1_high,
+		     vbf_low, vbf_high,
+		     W, TT,
+		     DUMMY //This must be the last one
+  };
   
   HTTAnalyzer(const std::string & aName);
 
@@ -74,6 +81,11 @@ class HTTAnalyzer: public Analyzer{
   bool filter() const{ return filterEvent_;};
 
   void setAnalysisObjects(const EventProxyHTT & myEventProxy);
+
+  ///Check it the event passes given category selections.
+  ///Selections common to all categories (mu pt, tau Id etc.)
+  ///are checked outside this method.
+  bool passCategory(const HTTAnalyzer::muTauCategory & aCategory);
 
   ///Check it tau decay modes (GEN and RECO) match selected (hardcoded)
   ///decay mode.
@@ -185,6 +197,7 @@ class HTTAnalyzer: public Analyzer{
   HTTParticle aJet;
   std::vector<HTTParticle> aSeparatedJets;
   int nJets30;
+  std::vector<bool> categoryDecisions;
 
 };
 

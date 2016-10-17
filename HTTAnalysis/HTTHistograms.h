@@ -9,10 +9,7 @@
 
 #include "AnalysisHistograms.h"
 
-
-
 class THStack;
-
 
 class HTTHistograms: public AnalysisHistograms {
    public:
