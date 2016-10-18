@@ -420,8 +420,8 @@ void HTTSynchNTupleBase::fillPair(const HTTEvent &event, HTTPair &pair){
   TLorentzVector mvametP4(pair.getMET().X(), pair.getMET().Y(), 0, pair.getMET().Mod());
   mvamet = pair.getMET().Mod();
   mvametphi = pair.getMET().Phi_mpi_pi(pair.getMET().Phi());
-  mt_1 = pair.getMTLeg1();
-  mt_2 = pair.getMTLeg2();
+  mt_1 = TMath::Sqrt(2.*leg1P4.Pt()*mvametP4.Pt()*(1.-TMath::Cos(leg1P4.Phi()-mvametP4.Phi())));
+  mt_2 = TMath::Sqrt(2.*leg2P4.Pt()*mvametP4.Pt()*(1.-TMath::Cos(leg2P4.Phi()-mvametP4.Phi())));
   /*
     puppimet;
     puppimetphi;
