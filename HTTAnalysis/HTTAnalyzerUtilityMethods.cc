@@ -73,10 +73,9 @@ std::string HTTAnalyzer::getSampleNameFromFileName(const EventProxyHTT & myEvent
   else if(fileName.find("W2JetsToLNu")!=std::string::npos) return "W2Jets";
   else if(fileName.find("W3JetsToLNu")!=std::string::npos) return "W3Jets";
   else if(fileName.find("W4JetsToLNu")!=std::string::npos) return "W4Jets";
-  //else if(fileName.find("WJetsToLNu")!=std::string::npos && myEventProxy.event->getLHEnOutPartons()==0) return "W0Jets";
-  //else if(fileName.find("WJetsToLNu")!=std::string::npos && myEventProxy.event->getLHEnOutPartons()>0) return "WAllJets";
-
-  else if(fileName.find("WJetsToLNu")!=std::string::npos) return "WJets";
+  else if(fileName.find("WJetsToLNu")!=std::string::npos && myEventProxy.event->getLHEnOutPartons()==0) return "W0Jets";
+  else if(fileName.find("WJetsToLNu")!=std::string::npos && myEventProxy.event->getLHEnOutPartons()>0) return "WAllJets";
+  //TEST else if(fileName.find("WJetsToLNu")!=std::string::npos) return "WJets";
   
   else if(fileName.find("Run201")!=std::string::npos) return "Data";
   else if(fileName.find("SUSYGluGluToHToTauTau")!=std::string::npos) return "A";
@@ -118,16 +117,25 @@ std::string HTTAnalyzer::getDYSampleName(const EventProxyHTT & myEventProxy){
   else if(fileName.find("DY3JetsToLL")!=std::string::npos) jetsName = "3Jets";
   else if(fileName.find("DY4JetsToLL")!=std::string::npos) jetsName = "4Jets";
   else if(fileName.find("DYJetsToLLM10to50")!=std::string::npos) jetsName =  "LowM";
-  else if(fileName.find("DYJetsToLLM50")!=std::string::npos) jetsName =  "Jets";  
-  //else if(fileName.find("DYJetsToLLM50")!=std::string::npos && myEventProxy.event->getLHEnOutPartons()==0) jetsName =  "0Jets";
-  //else if(fileName.find("DYJetsToLLM50")!=std::string::npos && myEventProxy.event->getLHEnOutPartons()>0) jetsName =  "AllJets";  
+  //TEST else if(fileName.find("DYJetsToLLM50")!=std::string::npos) jetsName =  "Jets";  
+  else if(fileName.find("DYJetsToLLM50")!=std::string::npos && myEventProxy.event->getLHEnOutPartons()==0) jetsName =  "0Jets";
+  else if(fileName.find("DYJetsToLLM50")!=std::string::npos && myEventProxy.event->getLHEnOutPartons()>0) jetsName =  "AllJets";  
   
   int decayModeBoson = myEventProxy.event->getDecayModeBoson();
-  std::string decayName = "";
-  if(decayModeBoson==7) decayName = "MuMu";
-  else if(decayModeBoson==6) decayName = "EE";
-  else if(decayModeBoson==0) decayName = "MuTau";
-  else decayName = "Other";
+  int tauMCMatch = 6;
+  if(myEventProxy.pairs->size()){
+    HTTPair aPair = (*myEventProxy.pairs)[0];
+    HTTParticle aTau = aPair.getTau();
+    tauMCMatch = aTau.getProperty(PropertyEnum::mc_match);
+  }    
+  std::string decayName = "Unknown";
+  if(tauMCMatch<5) decayName = "ZL";
+  else if(tauMCMatch==5) decayName = "ZTT";
+  else decayName = "ZJ";
+
+  //FIX ME HACK.
+  ///Something is wrong with matching. Maybe tau pt cut at 15 GeV
+  if(decayModeBoson==0) decayName = "ZTT";
 
   return "DY"+decayName+jetsName;
 }
@@ -230,7 +238,7 @@ float HTTAnalyzer::getLeptonCorrection(float eta, float pt, hadronicTauDecayMode
   else if(tauDecayMode == tauDecaysElectron) return 1.0;  
   else{
     if(sampleName.find("H")==std::string::npos &&
-       sampleName.find("MuTau")==std::string::npos
+       sampleName.find("ZTT")==std::string::npos
        ) return 1.0;
     scaleWorkspace->var("t_pt")->setVal(pt);
     scaleWorkspace->var("t_eta")->setVal(eta);

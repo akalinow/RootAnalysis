@@ -82,6 +82,18 @@ class HTTAnalyzer: public Analyzer{
 
   void setAnalysisObjects(const EventProxyHTT & myEventProxy);
 
+  static std::string categoryName(unsigned int iCategory){
+    if(iCategory==(int)HTTAnalyzer::jet0_low) return "jet0_low";
+    else if(iCategory==(int)HTTAnalyzer::jet0_high) return "jet0_high";
+    else if(iCategory==(int)HTTAnalyzer::jet1_low) return "jet1_low";
+    else if(iCategory==(int)HTTAnalyzer::jet1_high) return "jet1_high";
+    else if(iCategory==(int)HTTAnalyzer::vbf_low) return "vbf_low";
+    else if(iCategory==(int)HTTAnalyzer::vbf_high) return "vbf_high";
+    else if(iCategory==(int)HTTAnalyzer::W) return "W";
+    else if(iCategory==(int)HTTAnalyzer::TT) return "TT";
+    return "Unknown";
+  }
+
   ///Check it the event passes given category selections.
   ///Selections common to all categories (mu pt, tau Id etc.)
   ///are checked outside this method.
@@ -194,7 +206,7 @@ class HTTAnalyzer: public Analyzer{
 
   HTTParticle aTau, aMuon, aMET;
   HTTParticle aGenHadTau, aGenMuonTau;
-  HTTParticle aJet;
+  HTTParticle aJet1, aJet2;
   std::vector<HTTParticle> aSeparatedJets;
   int nJets30;
   std::vector<bool> categoryDecisions;

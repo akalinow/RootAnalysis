@@ -109,7 +109,8 @@ void HTTAnalyzer::setAnalysisObjects(const EventProxyHTT & myEventProxy){
   }
   
   aSeparatedJets = getSeparatedJets(myEventProxy, 0.5);
-  aJet = aSeparatedJets.size() ? aSeparatedJets[0] : HTTParticle();
+  aJet1 = aSeparatedJets.size() ? aSeparatedJets[0] : HTTParticle();
+  aJet2 = aSeparatedJets.size()>1 ? aSeparatedJets[1] : HTTParticle();
   nJets30 = count_if(aSeparatedJets.begin(), aSeparatedJets.end(),[](const HTTParticle & aJet){return aJet.getP4().Pt()>30;});
 
   categoryDecisions.clear();
@@ -160,23 +161,29 @@ void HTTAnalyzer::fillControlHistos(const std::string & hNameSuffix, float event
   myHistos_->fill1DHistogram("h1DStatsDecayMode"+hNameSuffix, aTau.getProperty(PropertyEnum::decayMode), eventWeight);
   myHistos_->fill1DHistogram("h1DnPCATau"+hNameSuffix,aTau.getPCARefitPV().Mag(),eventWeight);
   myHistos_->fill1DHistogram("h1DPtTauLeadingTk"+hNameSuffix,aTau.getProperty(PropertyEnum::leadChargedParticlePt),eventWeight);
+  float higgsPt =  (aTau.getP4() + aTau.getP4() + aMET.getP4()).Pt();
+  myHistos_->fill1DHistogram("h1DPtMuTauMET"+hNameSuffix,higgsPt,eventWeight);
   
   ///Fill jets info           
   myHistos_->fill1DHistogram("h1DStatsNJ30"+hNameSuffix,nJets30,eventWeight);
   if(nJets30>0){
-    myHistos_->fill1DHistogram("h1DPtLeadingJet"+hNameSuffix,aJet.getP4().Pt(),eventWeight);
-    myHistos_->fill1DHistogram("h1DEtaLeadingJet"+hNameSuffix,aJet.getP4().Eta(),eventWeight);
-    myHistos_->fill1DHistogram("h1DCSVBtagLeadingJet"+hNameSuffix,aJet.getProperty(PropertyEnum::bCSVscore),eventWeight);
+    myHistos_->fill1DHistogram("h1DPtLeadingJet"+hNameSuffix,aJet1.getP4().Pt(),eventWeight);
+    myHistos_->fill1DHistogram("h1DEtaLeadingJet"+hNameSuffix,aJet1.getP4().Eta(),eventWeight);
+    myHistos_->fill1DHistogram("h1DCSVBtagLeadingJet"+hNameSuffix,aJet1.getProperty(PropertyEnum::bCSVscore),eventWeight);
+  }
+  if(nJets30>1){  
+    float jetsMass = (aJet1.getP4()+aJet2.getP4()).M();
+    myHistos_->fill1DHistogram("h1DWideMass2J"+hNameSuffix,jetsMass,eventWeight);
   }
   
   myHistos_->fill1DHistogram("h1DPtMET"+hNameSuffix,aMET.getP4().Pt(),eventWeight);
 
   fillDecayPlaneAngle(hNameSuffix, eventWeight);
 
-  if(aJet.getProperty(PropertyEnum::bCSVscore)>0.8){
-    myHistos_->fill1DHistogram("h1DPtLeadingBJet"+hNameSuffix,aJet.getP4().Pt(),eventWeight);
-    myHistos_->fill1DHistogram("h1DEtaLeadingBJet"+hNameSuffix,aJet.getP4().Eta(),eventWeight);
-  }   
+  if(aJet1.getProperty(PropertyEnum::bCSVscore)>0.8){
+    myHistos_->fill1DHistogram("h1DPtLeadingBJet"+hNameSuffix,aJet1.getP4().Pt(),eventWeight);
+    myHistos_->fill1DHistogram("h1DEtaLeadingBJet"+hNameSuffix,aJet1.getP4().Eta(),eventWeight);
+  }  
 }
 //////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////
@@ -204,20 +211,19 @@ bool HTTAnalyzer::passCategory(const HTTAnalyzer::muTauCategory & aCategory){
   if(categoryDecisions.size()) return  categoryDecisions[(int)aCategory];
   else categoryDecisions = std::vector<bool>((int)HTTAnalyzer::DUMMY);
   
-  float jetsMass = 0;
+  float jetsMass = (aJet1.getP4()+aJet2.getP4()).M();
   float higgsPt =  (aTau.getP4() + aTau.getP4() + aMET.getP4()).Pt();
 
   bool mtSelection = aPair.getMTMuon()<50;
 
   bool jet0_low =  aTau.getP4().Pt()>20  && aTau.getP4().Pt()<50 && nJets30==0;
-  jet0_low  =  aTau.getP4().Pt()>30; //TEST
   bool jet0_high = aTau.getP4().Pt()>50 && nJets30==0;
 
-  bool jet1_low = (nJets30==1 || (nJets30==0 && jetsMass<500)) &&
+  bool jet1_low = (nJets30==1 || (nJets30==2 && jetsMass<500)) &&
     (aTau.getP4().Pt()>30 && aTau.getP4().Pt()<40 ||
      aTau.getP4().Pt()>40 && higgsPt<140);
 
-  bool jet1_high = (nJets30==1 || (nJets30==0 && jetsMass<500)) &&
+  bool jet1_high = (nJets30==1 || (nJets30==2 && jetsMass<500)) &&
     (aTau.getP4().Pt()>40 && higgsPt>140);
 
   bool vbf_low = aTau.getP4().Pt()>20 &&
