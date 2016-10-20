@@ -16,6 +16,7 @@
 #include "HTTAnalyzer.h"
 #include "HTTSynchNTuple.h"
 #include "HTTSynchNTupleTT.h"
+#include "HTTSynchNTupleMM.h"
 
 #include "TFile.h"
 #include "TStopwatch.h"
@@ -63,6 +64,7 @@ int main(int argc, char ** argv) {
 	 else 
 	 if(processName=="SynchNTuple") myAnalyzers.push_back(new HTTSynchNTuple("HTTSynchNTuple"));
 	 if(processName=="SynchNTupleTT") myAnalyzers.push_back(new HTTSynchNTupleTT("HTTSynchNTupleTT"));
+	 if(processName=="SynchNTupleMM") myAnalyzers.push_back(new HTTSynchNTupleMM("HTTSynchNTupleMM"));
 	 else myAnalyzers.push_back(new HTTAnalyzer("HTTAnalyzer"));
 
 	 TreeAnalyzer *tree = new TreeAnalyzer("TreeAnalyzer",cfgFileName, myEvent);
