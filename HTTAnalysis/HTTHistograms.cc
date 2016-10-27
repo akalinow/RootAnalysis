@@ -316,7 +316,7 @@ void HTTHistograms::finalizeHistograms(int nRuns, float weight){
   AnalysisHistograms::finalizeHistograms();
 
   //plotPhiDecayPlanes("Phi_nVectorsUnknown");
-  plotSingleProfile("hProfMuon_PtVsMass");
+  //plotSingleProfile("hProfMuon_PtVsMass");
   return;
 
   muTauDYScale = 1.0;

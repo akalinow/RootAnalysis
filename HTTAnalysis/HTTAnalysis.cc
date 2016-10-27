@@ -62,9 +62,9 @@ int main(int argc, char ** argv) {
 
 	 if(processName=="Weights" || processName=="PU") myAnalyzers.push_back(new HTTWeightsMaker("HTTWeightsMaker"));
 	 else 
-	 if(processName=="SynchNTuple") myAnalyzers.push_back(new HTTSynchNTuple("HTTSynchNTuple"));
-	 if(processName=="SynchNTupleTT") myAnalyzers.push_back(new HTTSynchNTupleTT("HTTSynchNTupleTT"));
-	 if(processName=="SynchNTupleMM") myAnalyzers.push_back(new HTTSynchNTupleMM("HTTSynchNTupleMM"));
+	 if(processName.find("SynchNTupleMT")!=std::string::npos) myAnalyzers.push_back(new HTTSynchNTuple("HTTSynchNTuple"));
+	 if(processName.find("SynchNTupleTT")!=std::string::npos) myAnalyzers.push_back(new HTTSynchNTupleTT("HTTSynchNTupleTT"));
+	 if(processName.find("SynchNTupleMM")!=std::string::npos) myAnalyzers.push_back(new HTTSynchNTupleMM("HTTSynchNTupleMM"));
 	 else myAnalyzers.push_back(new HTTAnalyzer("HTTAnalyzer"));
 
 	 TreeAnalyzer *tree = new TreeAnalyzer("TreeAnalyzer",cfgFileName, myEvent);
