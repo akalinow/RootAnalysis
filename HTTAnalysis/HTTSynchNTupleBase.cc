@@ -455,6 +455,7 @@ void HTTSynchNTupleBase::fillJets(const std::vector<HTTParticle> &jets){
   
   njetspt20 = jets.size();
   njets = 0;
+  nbtag = 0;
   std::vector<HTTParticle> bjets;
   for(unsigned int iJet=0; iJet<jets.size(); ++iJet){
     if(jets.at(iJet).getP4().Pt()>30)
