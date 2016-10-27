@@ -459,7 +459,7 @@ void HTTSynchNTupleBase::fillJets(const std::vector<HTTParticle> &jets){
   for(unsigned int iJet=0; iJet<jets.size(); ++iJet){
     if(jets.at(iJet).getP4().Pt()>30)
       njets++;
-    if(std::abs(jets.at(iJet).getP4().Eta())>2.4 && 
+    if(std::abs(jets.at(iJet).getP4().Eta())<2.4 && 
        jets.at(iJet).getProperty(PropertyEnum::bCSVscore)>0.8){//FIXME Correct??
       nbtag++;
       bjets.push_back(jets.at(iJet));
