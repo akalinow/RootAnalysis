@@ -379,6 +379,10 @@ void HTTSynchNTupleBase::fillLegs(const HTTParticle &leg1, const HTTParticle &le
   phi_1 = leg1.getP4().Phi();
   eta_1 = leg1.getP4().Eta();
   m_1 = leg1.getP4().M();
+  if(std::abs(leg1.getPDGid())==13)
+    m_1 = 0.1057; //muon mass
+  else if(std::abs(leg1.getPDGid())==15 && leg1.getProperty(PropertyEnum::decayMode)==0)
+    m_1 = 0.13957; //pi+/- mass
   q_1 = leg1.getCharge();
   d0_1 = leg1.getProperty(PropertyEnum::dxy);
   dZ_1 = leg1.getProperty(PropertyEnum::dz);
@@ -389,6 +393,10 @@ void HTTSynchNTupleBase::fillLegs(const HTTParticle &leg1, const HTTParticle &le
   phi_2 = leg2.getP4().Phi();
   eta_2 = leg2.getP4().Eta();
   m_2 = leg2.getP4().M();
+  if(std::abs(leg2.getPDGid())==13)
+    m_2 = 0.1057; //muon mass
+  else if(std::abs(leg2.getPDGid())==15 && leg2.getProperty(PropertyEnum::decayMode)==0)
+    m_2 = 0.13957; //pi+/- mass
   q_2 = leg2.getCharge();
   d0_2 = leg2.getProperty(PropertyEnum::dxy);
   dZ_2 = leg2.getProperty(PropertyEnum::dz);
