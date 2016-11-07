@@ -13,7 +13,6 @@ HTTAnalyzer::HTTAnalyzer(const std::string & aName):Analyzer(aName){
   
   ///Load ROOT file with PU histograms.
   std::string filePath = "Data_Pileup_2016_BCDEFG_v26.root";
-  filePath = "Data_Pileup_2016_July21.root";
   puDataFile_ = new TFile(filePath.c_str());
 
   filePath = "MC_Spring16_PU25ns_V1.root";
@@ -271,7 +270,6 @@ bool HTTAnalyzer::analyze(const EventProxyBase& iEvent){
   bool postSynchMuon = myEventProxy.event->checkSelectionBit(SelectionBitsEnum::postSynchMuon);
   bool diMuonVeto = myEventProxy.event->checkSelectionBit(SelectionBitsEnum::diMuonVeto);
   bool thirdLeptonVeto = myEventProxy.event->checkSelectionBit(SelectionBitsEnum::thirdLeptonVeto);
-  //if(diMuonVeto || thirdLeptonVeto) return true;  
   if(!myEventProxy.pairs->size()) return true;
 
   setAnalysisObjects(myEventProxy);
