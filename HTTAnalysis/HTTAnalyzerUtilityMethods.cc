@@ -147,7 +147,10 @@ float HTTAnalyzer::getPUWeight(const EventProxyHTT & myEventProxy){
 
   ///RunIIFall15MiniAODv2-PU25nsData2015v1_76X_mcRun2_asymptotic_v12-v1 MINIAOD
   ///is produced with PU profile matching the Run2015 data. No need to PU rescale.
-  //return 1.0;
+  if(!puDataFile_ || !puMCFile_ || puDataFile_->IsZombie() || puMCFile_->IsZombie()){
+    //std::cout<<"[HTTAnalyzer::getPUWeight]: One of PU files is invalid, return always weight = 1"<<std::endl;
+    return 1.0;
+  }
 
   if(!hPUVec_.size())  hPUVec_.resize(1);
 
