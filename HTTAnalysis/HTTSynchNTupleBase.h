@@ -188,9 +188,9 @@ class HTTSynchNTupleBase: public Analyzer{
   Float_t njetingap20;
   Float_t jdphi;
   //additional jets
-  Float_t nbtag;
-  Float_t njets;
-  Float_t njetspt20;
+  Int_t nbtag;
+  Int_t njets;
+  Int_t njetspt20;
   //leading jet sorted by pt
   Float_t jpt_1;
   Float_t jeta_1;
