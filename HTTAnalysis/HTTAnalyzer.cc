@@ -70,7 +70,7 @@ std::vector<HTTParticle> HTTAnalyzer::getSeparatedJets(const EventProxyHTT & myE
   
   for(auto aJet: *myEventProxy.jets){
     float dRTau = aJet.getP4().DeltaR(aTau.getP4());
-    float dRMu = aMuon.getP4().DeltaR(aTau.getP4());
+    float dRMu = aJet.getP4().DeltaR(aMuon.getP4());
     bool loosePFJetID = aJet.getProperty(PropertyEnum::PFjetID)>=1;
     if(dRTau>deltaR && dRMu>deltaR && loosePFJetID) separatedJets.push_back(aJet);
   }
@@ -112,6 +112,15 @@ void HTTAnalyzer::setAnalysisObjects(const EventProxyHTT & myEventProxy){
   aJet1 = aSeparatedJets.size() ? aSeparatedJets[0] : HTTParticle();
   aJet2 = aSeparatedJets.size()>1 ? aSeparatedJets[1] : HTTParticle();
   nJets30 = count_if(aSeparatedJets.begin(), aSeparatedJets.end(),[](const HTTParticle & aJet){return aJet.getP4().Pt()>30;});
+  nJetsInGap30 = 0;
+  if(nJets30>=2){
+    for(unsigned int iJet=2; iJet<aSeparatedJets.size(); ++iJet){
+      if( (aSeparatedJets.at(iJet).getP4().Eta()>aJet1.getP4().Eta()&&aSeparatedJets.at(iJet).getP4().Eta()<aJet2.getP4().Eta()) ||
+          (aSeparatedJets.at(iJet).getP4().Eta()<aJet1.getP4().Eta()&&aSeparatedJets.at(iJet).getP4().Eta()>aJet2.getP4().Eta()) ){
+        if(aSeparatedJets.at(iJet).getP4().Pt()>30) nJetsInGap30++;
+      }
+    }
+  }
 
   categoryDecisions.clear();
 }
