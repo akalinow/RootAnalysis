@@ -209,6 +209,7 @@ class HTTAnalyzer: public Analyzer{
   HTTParticle aJet1, aJet2;
   std::vector<HTTParticle> aSeparatedJets;
   int nJets30;
+  int nJetsInGap30;
   std::vector<bool> categoryDecisions;
 
 };
