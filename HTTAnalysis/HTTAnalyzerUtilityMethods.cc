@@ -100,10 +100,6 @@ std::string HTTAnalyzer::getDYSampleName(const EventProxyHTT & myEventProxy){
   else if(tauMCMatch==5) decayName = "ZTT";
   else decayName = "ZJ";
 
-  //FIX ME HACK.
-  ///Something is wrong with matching. Maybe tau pt cut at 15 GeV
-  //if(decayModeBoson==0) decayName = "ZTT";
-
   return "DY"+decayName+jetsName;
 }
 //////////////////////////////////////////////////////////////////////////////
