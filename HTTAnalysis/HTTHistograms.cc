@@ -1450,7 +1450,7 @@ TH1F* HTTHistograms::getQCDbackground(unsigned int iCategory,
 				      std::pair<float,float> wselOSCorrection,
 				      std::pair<float,float> wselSSCorrection){
 				      
-  //float qcdScale = getQCDOStoSS(selName, wselOSCorrection, wselSSCorrection).first;
+  //float qcdScale = getQCDOStoSS(iCategory, wselOSCorrection, wselSSCorrection).first;
   float qcdScale = 1.06;
   
   std::string hName = "h1D" + varName;
