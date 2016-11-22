@@ -112,12 +112,9 @@ float HTTAnalyzer::getPUWeight(const EventProxyHTT & myEventProxy){
 
   if(getSampleName(myEventProxy)=="Data") return 1.0;
 
-  ///RunIIFall15MiniAODv2-PU25nsData2015v1_76X_mcRun2_asymptotic_v12-v1 MINIAOD
-  ///is produced with PU profile matching the Run2015 data. No need to PU rescale.
-  if(!puDataFile_ || !puMCFile_ || puDataFile_->IsZombie() || puMCFile_->IsZombie()){
-    //std::cout<<"[HTTAnalyzer::getPUWeight]: One of PU files is invalid, return always weight = 1"<<std::endl;
-    return 1.0;
-  }
+  if(!puDataFile_ || !puMCFile_ ||
+     puDataFile_->IsZombie() ||
+     puMCFile_->IsZombie()) { return 1.0; }
 
   if(!hPUVec_.size())  hPUVec_.resize(1);
 
@@ -142,13 +139,10 @@ float HTTAnalyzer::getPUWeight(const EventProxyHTT & myEventProxy){
 //////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////
 float HTTAnalyzer::getGenWeight(const EventProxyHTT & myEventProxy){
-  
-  //if(myEventProxy.event->getSampleType()==0) return 1.0;
-  //if(myEventProxy.event->getSampleType()==1) return myEventProxy->getMCWeight()/23443.423;  
-  //if(myEventProxy.event->getSampleType()==2) return myEventProxy->getMCWeight()/225892.45;  
-  //if(myEventProxy.event->getSampleType()==3) return myEventProxy->getMCWeight()/6383;
 
-  return 1;
+  ///MC weights cab be quite large, but are always +-C.
+  ///to avoid counter overflow we keep only sign.
+  return myEventProxy->getMCWeight()/fabs(myEventProxy->getMCWeight());
 }
 //////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////
