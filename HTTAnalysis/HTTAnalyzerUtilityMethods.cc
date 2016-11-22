@@ -27,7 +27,7 @@ void HTTAnalyzer::getPreselectionEff(const EventProxyHTT & myEventProxy){
 //////////////////////////////////////////////////////////////////////////////
 std::string HTTAnalyzer::getSampleName(const EventProxyHTT & myEventProxy){
   
-  getSampleNameFromFileName(myEventProxy);  
+  return getSampleNameFromFileName(myEventProxy);  
   
 }
 //////////////////////////////////////////////////////////////////////////////
@@ -102,7 +102,7 @@ std::string HTTAnalyzer::getDYSampleName(const EventProxyHTT & myEventProxy){
 
   //FIX ME HACK.
   ///Something is wrong with matching. Maybe tau pt cut at 15 GeV
-  if(decayModeBoson==0) decayName = "ZTT";
+  //if(decayModeBoson==0) decayName = "ZTT";
 
   return "DY"+decayName+jetsName;
 }
@@ -142,7 +142,7 @@ float HTTAnalyzer::getGenWeight(const EventProxyHTT & myEventProxy){
 
   ///MC weights cab be quite large, but are always +-C.
   ///to avoid counter overflow we keep only sign.
-  return myEventProxy->getMCWeight()/fabs(myEventProxy->getMCWeight());
+  return myEventProxy.event->getMCWeight()/fabs(myEventProxy.event->getMCWeight());
 }
 //////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////
