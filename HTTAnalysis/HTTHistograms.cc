@@ -1410,8 +1410,8 @@ std::pair<float,float> HTTHistograms::getQCDOStoSS(unsigned int iCategory,
   hSoupOS->Add(hDYJetsLowMOS,-1);
   hSoupOS->Add(hDYJetsOS,-1);
   hSoupOS->Add(hTTOS,-1);
-  hSoupSS->Add(hSTOS,-1);
-  hSoupSS->Add(hVVOS,-1);
+  hSoupOS->Add(hSTOS,-1);
+  hSoupOS->Add(hVVOS,-1);
   
   hSoupOS->Divide(hSoupSS);
 
