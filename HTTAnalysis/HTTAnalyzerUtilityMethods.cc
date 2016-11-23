@@ -26,42 +26,9 @@ void HTTAnalyzer::getPreselectionEff(const EventProxyHTT & myEventProxy){
 //////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////
 std::string HTTAnalyzer::getSampleName(const EventProxyHTT & myEventProxy){
-
-  if(myEventProxy.event->getSampleType()==-1) return getSampleNameFromFileName(myEventProxy);
   
-  if(myEventProxy.event->getSampleType()==0) return "Data";
-  if(myEventProxy.event->getSampleType()==1){
-    int decayModeBoson = myEventProxy.event->getDecayModeBoson();
-    std::string decayName;
-    if(decayModeBoson==7) decayName = "MuMu";
-    else if(decayModeBoson==6) decayName = "EE";
-    else if(decayModeBoson==0) decayName = "MuTau";
-    else decayName = "Other";
-
-    std::string fileName = myEventProxy.getTTree()->GetCurrentFile()->GetName();
-    std::string jetsName = "";    
-    if(fileName.find("DY1JetsToLL")!=std::string::npos) jetsName ="DY1Jets";
-    else if(fileName.find("DY2JetsToLL")!=std::string::npos) jetsName = "DY2Jets";
-    else if(fileName.find("DY3JetsToLL")!=std::string::npos) jetsName = "DY3Jets";
-    else if(fileName.find("DY4JetsToLL")!=std::string::npos) jetsName = "DY4Jets";
-    else jetsName = "DYJets";   
-    return jetsName+decayName;    
-  }
-  if(myEventProxy.event->getSampleType()==11) return "DYJetsLowM";
-  if(myEventProxy.event->getSampleType()==2){ ///BUG in sample number for nJets
-    std::string fileName = myEventProxy.getTTree()->GetCurrentFile()->GetName();
-    if(fileName.find("WJetsToLNu")!=std::string::npos && myEventProxy.event->getLHEnOutPartons()==0) return "W0Jets";
-    else if(fileName.find("WJetsToLNu")!=std::string::npos && myEventProxy.event->getLHEnOutPartons()>0) return "WAllJets";
-    else if(fileName.find("W1JetsToLNu")!=std::string::npos) return "W1Jets";
-    else if(fileName.find("W2JetsToLNu")!=std::string::npos) return "W2Jets";
-    else if(fileName.find("W3JetsToLNu")!=std::string::npos) return "W3Jets";
-    else if(fileName.find("W4JetsToLNu")!=std::string::npos) return "W4Jets";
-  }
-  if(myEventProxy.event->getSampleType()==3) return "TTbar";
-  if(myEventProxy.event->getSampleType()==4) return "H";
-  if(myEventProxy.event->getSampleType()==5) return "A";
-
-  return "Unknown";
+  return getSampleNameFromFileName(myEventProxy);  
+  
 }
 //////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////
@@ -133,10 +100,6 @@ std::string HTTAnalyzer::getDYSampleName(const EventProxyHTT & myEventProxy){
   else if(tauMCMatch==5) decayName = "ZTT";
   else decayName = "ZJ";
 
-  //FIX ME HACK.
-  ///Something is wrong with matching. Maybe tau pt cut at 15 GeV
-  if(decayModeBoson==0) decayName = "ZTT";
-
   return "DY"+decayName+jetsName;
 }
 //////////////////////////////////////////////////////////////////////////////
@@ -145,12 +108,9 @@ float HTTAnalyzer::getPUWeight(const EventProxyHTT & myEventProxy){
 
   if(getSampleName(myEventProxy)=="Data") return 1.0;
 
-  ///RunIIFall15MiniAODv2-PU25nsData2015v1_76X_mcRun2_asymptotic_v12-v1 MINIAOD
-  ///is produced with PU profile matching the Run2015 data. No need to PU rescale.
-  if(!puDataFile_ || !puMCFile_ || puDataFile_->IsZombie() || puMCFile_->IsZombie()){
-    //std::cout<<"[HTTAnalyzer::getPUWeight]: One of PU files is invalid, return always weight = 1"<<std::endl;
-    return 1.0;
-  }
+  if(!puDataFile_ || !puMCFile_ ||
+     puDataFile_->IsZombie() ||
+     puMCFile_->IsZombie()) { return 1.0; }
 
   if(!hPUVec_.size())  hPUVec_.resize(1);
 
@@ -175,13 +135,10 @@ float HTTAnalyzer::getPUWeight(const EventProxyHTT & myEventProxy){
 //////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////
 float HTTAnalyzer::getGenWeight(const EventProxyHTT & myEventProxy){
-  
-  //if(myEventProxy.event->getSampleType()==0) return 1.0;
-  //if(myEventProxy.event->getSampleType()==1) return myEventProxy->getMCWeight()/23443.423;  
-  //if(myEventProxy.event->getSampleType()==2) return myEventProxy->getMCWeight()/225892.45;  
-  //if(myEventProxy.event->getSampleType()==3) return myEventProxy->getMCWeight()/6383;
 
-  return 1;
+  ///MC weights cab be quite large, but are always +-C.
+  ///to avoid counter overflow we keep only sign.
+  return myEventProxy.event->getMCWeight()/fabs(myEventProxy.event->getMCWeight());
 }
 //////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////
