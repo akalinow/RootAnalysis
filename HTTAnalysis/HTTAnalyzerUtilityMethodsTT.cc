@@ -67,7 +67,7 @@ std::string HTTAnalyzerTT::getSampleNameFromFileName(const EventProxyHTT & myEve
   else if(fileName.find("WZTo2L2Q")!=std::string::npos) return "WZTo2L2Q";
   else if(fileName.find("QCD")!=std::string::npos) return "QCD_MC";
   else if(fileName.find("DY")!=std::string::npos) return getDYSampleName(myEventProxy);
-  else if(fileName.find("TT")!=std::string::npos) return "TTbar";
+  else if(fileName.find("TTTune")!=std::string::npos) return "TTbar";
   
   return "Unknown";
 }
