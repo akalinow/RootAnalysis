@@ -336,8 +336,10 @@ bool HTTAnalyzerTT::analyze(const EventProxyBase& iEvent){
   
 
   bool trigger = aTau1.hasTriggerMatch(TriggerEnum::HLT_DoubleMediumIsoPFTau35_Trk1_eta2p1_Reg) &&
-  aTau2.hasTriggerMatch(TriggerEnum::HLT_DoubleMediumIsoPFTau35_Trk1_eta2p1_Reg); 
-  if(sampleName!="Data") trigger = true; //MC trigger included in muon SF
+    aTau2.hasTriggerMatch(TriggerEnum::HLT_DoubleMediumIsoPFTau35_Trk1_eta2p1_Reg); //FIXME: does not work, wrong numbering??
+
+  //if(sampleName!="Data") trigger = true; //MC trigger included in muon SF
+  if(true) trigger = true; //FIXME: problem with trigger matching??
 									   
   bool cpTau1Selection = (aTau1.getProperty(PropertyEnum::decayMode)==tauDecay1ChargedPion0PiZero && aTau1.getPCARefitPV().Mag()>0.003) ||
                         (aTau1.getProperty(PropertyEnum::decayMode)!=tauDecay1ChargedPion0PiZero &&
@@ -347,6 +349,19 @@ bool HTTAnalyzerTT::analyze(const EventProxyBase& iEvent){
 			 isOneProng(aTau2.getProperty(PropertyEnum::decayMode))); 
   bool cpSelection = cpTau1Selection && cpTau2Selection;
   
+  /*MB TEST
+  std::cout<<"Selection "
+    //<<" ,"<<tau1Kinematics
+    //<<" ,"<<tau1ID 
+    //<<" ,"<<tau2Kinematics
+    //<<" ,"<<tau2ID
+    //<<" ,"<<relaxedIso
+    	   <<" trigger: "<<trigger
+	   <<" loose: "<< (tau1Kinematics&&tau1ID&&tau2Kinematics&&tau2ID&&relaxedIso&&trigger)
+	   <<" full: "<< (tau1Kinematics&&tau1ID&&tau2Kinematics&&tau2ID&&fullIso&&trigger)
+	   <<" anti: "<< (tau1Kinematics&&tau1ID&&tau2Kinematics&&tau2ID&&antiIso&&trigger)
+	   <<std::endl;
+  */
   if(!tau1Kinematics || !tau1ID || !tau2Kinematics || !tau2ID || !relaxedIso || !trigger) return true;
   //if(!cpSelection) return true;
 
