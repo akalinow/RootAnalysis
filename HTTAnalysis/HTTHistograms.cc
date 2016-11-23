@@ -111,7 +111,8 @@ float HTTHistograms::getSampleNormalisation(std::string sampleName){
   if(sampleName=="t-channel_antitop") crossSection = 80.95;
 
   ///https://twiki.cern.ch/twiki/bin/view/CMS/HiggsToTauTauWorking2016#MC_and_data_samples
-  if(sampleName=="QCD_MC") crossSection = 720648000;
+  ///matching eff. = 0.00042
+  if(sampleName=="QCD_MC") crossSection = 720648000*0.00042; 
   
   float weight = crossSection*presEff/nEventsAnalysed;
   if(presEff<0 || fabs(fabs(crossSection)-1.0)<1e-5) weight = 1.0;
@@ -433,7 +434,8 @@ void HTTHistograms::finalizeHistograms(int nRuns, float weight){
   ttScale = 0.7;
 
   for(unsigned int iCategory = (int)HTTAnalyzer::jet0_low;
-                   iCategory<(int)HTTAnalyzer::DUMMY;++iCategory){
+      iCategory<(int)HTTAnalyzer::jet0_high;++iCategory){
+      //iCategory<(int)HTTAnalyzer::DUMMY;++iCategory){
     
     wselOSCorrection =  std::pair<float,float>(1.0,0);
     wselSSCorrection =  std::pair<float,float>(1.0,0);
@@ -889,11 +891,6 @@ THStack*  HTTHistograms::plotStack(unsigned int iCategory, std::string varName, 
   std::string hNameSuffix =  "_"+selName+"_"+std::to_string(iCategory);
   std::string categoryName = HTTAnalyzer::categoryName(iCategory);
   
-  //TH1F *hggHiggs115 = get1DHistogram((hName+"ggH115"+hNameSuffix).c_str());
-  //TH1F *hqqHiggs115 = get1DHistogram((hName+"qqH115"+hNameSuffix).c_str());
-  TH1F *hggHiggs115 = 0;
-  TH1F *hqqHiggs115 = 0;
-    
   TH1F *hggHiggs120 = get1DHistogram((hName+"ggH120"+hNameSuffix).c_str());
   TH1F *hqqHiggs120 = get1DHistogram((hName+"qqH120"+hNameSuffix).c_str());
   
@@ -902,11 +899,6 @@ THStack*  HTTHistograms::plotStack(unsigned int iCategory, std::string varName, 
 
   TH1F *hggHiggs130 = get1DHistogram((hName+"ggH130"+hNameSuffix).c_str());
   TH1F *hqqHiggs130 = get1DHistogram((hName+"qqH130"+hNameSuffix).c_str());
-
-  //TH1F *hggHiggs135 = get1DHistogram((hName+"ggH135"+hNameSuffix).c_str());
-  //TH1F *hqqHiggs135 = get1DHistogram((hName+"qqH135"+hNameSuffix).c_str());
-  TH1F *hggHiggs135 = 0;
-  TH1F *hqqHiggs135 = 0;
 
   TH1F *hWJets = get1D_WJet_Histogram((hName+"WJets"+hNameSuffix).c_str());
   TH1F *hTTbar = get1DHistogram((hName+"TTbar"+hNameSuffix).c_str());
@@ -942,19 +934,16 @@ THStack*  HTTHistograms::plotStack(unsigned int iCategory, std::string varName, 
   if(!hTTbar) hTTbar = (TH1F*)hEmpty->Clone((hName+"TTbar"+hNameSuffix).c_str());
   if(!hST) hST = (TH1F*)hEmpty->Clone((hName+"ST"+hNameSuffix).c_str());
   if(!hVV) hVV = (TH1F*)hEmpty->Clone((hName+"DiBoson"+hNameSuffix).c_str());  
-  if(!hggHiggs115) hggHiggs115 = (TH1F*)hEmpty->Clone((hName+"ggH115"+hNameSuffix).c_str());  
-  if(!hqqHiggs115) hqqHiggs115 = (TH1F*)hEmpty->Clone((hName+"qqH115"+hNameSuffix).c_str());
   if(!hggHiggs120) hggHiggs120 = (TH1F*)hEmpty->Clone((hName+"ggH120"+hNameSuffix).c_str());  
   if(!hqqHiggs120) hqqHiggs120 = (TH1F*)hEmpty->Clone((hName+"qqH120"+hNameSuffix).c_str());
   if(!hggHiggs125) hggHiggs125 = (TH1F*)hEmpty->Clone((hName+"ggH125"+hNameSuffix).c_str());  
   if(!hqqHiggs125) hqqHiggs125 = (TH1F*)hEmpty->Clone((hName+"qqH125"+hNameSuffix).c_str());
   if(!hggHiggs130) hggHiggs130 = (TH1F*)hEmpty->Clone((hName+"ggH130"+hNameSuffix).c_str());  
   if(!hqqHiggs130) hqqHiggs130 = (TH1F*)hEmpty->Clone((hName+"qqH130"+hNameSuffix).c_str());
-  if(!hggHiggs135) hggHiggs135 = (TH1F*)hEmpty->Clone((hName+"ggH135"+hNameSuffix).c_str());  
-  if(!hqqHiggs135) hqqHiggs135 = (TH1F*)hEmpty->Clone((hName+"qqH135"+hNameSuffix).c_str());
 
   ///Set histograms directory, so the histograms are saved
   if(hQCD) hQCD->SetDirectory(hSoup->GetDirectory());
+  if(hQCD_MC) hQCD_MC->SetDirectory(hSoup->GetDirectory());
   if(hWJets) hWJets->SetDirectory(hSoup->GetDirectory());
   if(hDYJetsLowM) hDYJetsLowM->SetDirectory(hSoup->GetDirectory());
   if(hDYJetsZJ) hDYJetsZJ->SetDirectory(hSoup->GetDirectory());
@@ -963,16 +952,13 @@ THStack*  HTTHistograms::plotStack(unsigned int iCategory, std::string varName, 
   if(hTTbar) hTTbar->SetDirectory(hSoup->GetDirectory());
   if(hST) hST->SetDirectory(hSoup->GetDirectory());
   if(hVV) hVV->SetDirectory(hSoup->GetDirectory());
-  if(hggHiggs115) hggHiggs115->SetDirectory(hSoup->GetDirectory());
-  if(hqqHiggs115) hqqHiggs115->SetDirectory(hSoup->GetDirectory());
   if(hggHiggs120) hggHiggs120->SetDirectory(hSoup->GetDirectory());
   if(hqqHiggs120) hqqHiggs120->SetDirectory(hSoup->GetDirectory());
   if(hggHiggs125) hggHiggs125->SetDirectory(hSoup->GetDirectory());
   if(hqqHiggs125) hqqHiggs125->SetDirectory(hSoup->GetDirectory());
   if(hggHiggs130) hggHiggs130->SetDirectory(hSoup->GetDirectory());
   if(hqqHiggs130) hqqHiggs130->SetDirectory(hSoup->GetDirectory());
-  if(hggHiggs135) hggHiggs135->SetDirectory(hSoup->GetDirectory());
-  if(hqqHiggs135) hqqHiggs135->SetDirectory(hSoup->GetDirectory());
+
 
   TH1F *hHiggs = (TH1F*)hggHiggs125->Clone("hHiggs");
   hHiggs->Reset();
@@ -1024,16 +1010,6 @@ THStack*  HTTHistograms::plotStack(unsigned int iCategory, std::string varName, 
   scale = lumi;
   hVV->Scale(scale);
 
-  sampleName = "ggH115";
-  weight = getSampleNormalisation(sampleName);
-  scale = weight*lumi;
-  hggHiggs115->Scale(scale);
-  
-  sampleName = "qqH115";
-  weight = getSampleNormalisation(sampleName);
-  scale = weight*lumi;
-  hqqHiggs115->Scale(scale);
-
   sampleName = "ggH120";
   weight = getSampleNormalisation(sampleName);
   scale = weight*lumi;
@@ -1063,17 +1039,7 @@ THStack*  HTTHistograms::plotStack(unsigned int iCategory, std::string varName, 
   weight = getSampleNormalisation(sampleName);
   scale = weight*lumi;
   hqqHiggs130->Scale(scale);
-
-  sampleName = "ggH135";
-  weight = getSampleNormalisation(sampleName);
-  scale = weight*lumi;
-  hggHiggs135->Scale(scale);
   
-  sampleName = "qqH135";
-  weight = getSampleNormalisation(sampleName);
-  scale = weight*lumi;
-  hqqHiggs135->Scale(scale);
-
   hHiggs->Add(hggHiggs125);
   hHiggs->Add(hqqHiggs125);
   //////////////////////////////////////////////////////
@@ -1438,8 +1404,6 @@ std::pair<float,float> HTTHistograms::getQCDOStoSS(unsigned int iCategory,
 
   
   std::cout<<"QCD OS/SS ratio: "<<param<<" +- "<<dparam<<std::endl;
-  //std::cout<<"Returning default value 1.06"<<std::endl;
-  //return std::make_pair(1.06,0.0);//FIXED value
 
   return std::make_pair(param, dparam);
 }
