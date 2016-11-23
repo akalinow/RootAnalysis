@@ -138,7 +138,7 @@ float HTTAnalyzerTT::getPUWeight(const EventProxyHTT & myEventProxy){
 //////////////////////////////////////////////////////////////////////////////
 float HTTAnalyzerTT::getGenWeight(const EventProxyHTT & myEventProxy){
 
-  ///MC weights cab be quite large, but are always +-C.
+  ///MC weights cab be quite large, but are always +-const.
   ///to avoid counter overflow we keep only sign.
   return myEventProxy.event->getMCWeight()/std::abs(myEventProxy.event->getMCWeight());
 }
@@ -210,7 +210,8 @@ float HTTAnalyzerTT::getLeptonCorrection(float eta, float pt, hadronicTauDecayMo
       tau_trg_efficiency = scaleWorkspace->function("t_trgTightIsoSS_data")->getVal();      
     }
     tau_id_scalefactor = scaleWorkspace->function("t_iso_mva_t_pt40_eta2p1_sf")->getVal();
-     tau_trg_efficiency = scaleWorkspace->function("t_trgTightIso_data")->getVal();
+    //tau_id_scalefactor = 0.9;//according to https://twiki.cern.ch/twiki/bin/view/CMS/SMTauTau2016#MC_corrections
+    tau_trg_efficiency = scaleWorkspace->function("t_trgTightIso_data")->getVal();
     return tau_id_scalefactor*tau_trg_efficiency;
   }
   return 1.0;
