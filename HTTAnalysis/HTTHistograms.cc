@@ -1404,8 +1404,6 @@ std::pair<float,float> HTTHistograms::getQCDOStoSS(unsigned int iCategory,
 
   
   std::cout<<"QCD OS/SS ratio: "<<param<<" +- "<<dparam<<std::endl;
-  //std::cout<<"Returning default value 1.06"<<std::endl;
-  //return std::make_pair(1.06,0.0);//FIXED value
 
   return std::make_pair(param, dparam);
 }

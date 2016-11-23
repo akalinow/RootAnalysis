@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 
 from ROOT import *
+import array
 
 
 WAW_fileName = "RootAnalysis_Analysis.root"
@@ -36,16 +37,32 @@ histogramsMap = {
     }
 
 
+binningMap = {
+    "muTau_0jet_low": range(0,310,10),
+    "muTau_0jet_high": range(0,310,10),
+    "muTau_1jet_low":  [0,40,60,70,80,90,100,110,120,130,150,200,250],
+    "muTau_1jet_high": [0,40,60,70,80,90,100,110,120,130,150,200,250],
+    "muTau_vbf_low":   [0,40,60,80,100,120,150,200,250],
+    "muTau_vbf_high":  [0,40,60,80,100,120,150,200,250]
+    }
+
+import array
+inclusiveBinning = array.array('d', [0,50,100,300,500,1000])
+
 hData = 0
 for iCategory in xrange(0,6):
-    categoryDir = SYNCH_file.mkdir(categoryNames[iCategory])
+    categoryName = categoryNames[iCategory]
+    categoryDir = SYNCH_file.mkdir(categoryName)
+
     for key,value in histogramsMap.items():
         hName = key+"_"+str(iCategory)
         histogram = WAW_file.Get(hName)
         if(histogram==None):
             print hName,"is missing"
+            continue
 
-        histogram.SetName(value)
-        histogram.SetDirectory(categoryDir)
+        officialBinning = array.array('d', binningMap[categoryName])
+        histogramRebin = histogram.Rebin(len(officialBinning)-1, value, officialBinning)
+        histogramRebin.SetDirectory(categoryDir)
 
 SYNCH_file.Write()
