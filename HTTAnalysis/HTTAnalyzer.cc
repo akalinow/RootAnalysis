@@ -21,7 +21,7 @@ HTTAnalyzer::HTTAnalyzer(const std::string & aName):Analyzer(aName){
 
 #pragma omp critical
   {
-    filePath = "htt_scalefactors_v4.root";
+    filePath = "htt_scalefactors_v5.root";
     TFile aFile(filePath.c_str());
     scaleWorkspace = (RooWorkspace*)aFile.Get("w")->Clone("w");
     aFile.Close();
