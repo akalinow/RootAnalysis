@@ -438,7 +438,8 @@ void HTTHistogramsTT::finalizeHistograms(int nRuns, float weight){
   */
   //////////////
   ///Control regions plots
-  ttScale = 0.7;
+  //ttScale = 0.7;
+  ttScale = 1.0;//MB
 
   for(unsigned int iCategory = (int)HTTAnalyzerTT::jet0;
       iCategory<(int)HTTAnalyzerTT::DUMMY;++iCategory){
@@ -1223,17 +1224,17 @@ THStack*  HTTHistogramsTT::plotStack(unsigned int iCategory, std::string varName
   TLegend *leg = new TLegend(0.79,0.32,0.99,0.82,NULL,"brNDC");
   setupLegend(leg);
   leg->AddEntry(hSoup,"Data","lep");
-  leg->AddEntry(hDYJetsZTT,"Z#rightarrow #mu #tau_{h}","f");
-  leg->AddEntry(hDYJetsZL,"Z#rightarrow #mu #mu","f");
-  leg->AddEntry(hDYJetsZJ,"ZJ","f");
-  leg->AddEntry(hDYJetsLowM,"Z#rightarrow ll(m<50)","f");
-  leg->AddEntry(hWJets,"W#rightarrow l #nu","f");
-  leg->AddEntry(hTTbar,"TTbar","f");
-  leg->AddEntry(hST,"single T","f");
-  leg->AddEntry(hVV,"DiBoson","f");
+  leg->AddEntry(hDYJetsZTT,"Z#rightarrow#tau_{h}#tau_{h}","f");
+  leg->AddEntry(hDYJetsZL,"Z, #it{l}#rightarrow#tau_{h}","f");
+  leg->AddEntry(hDYJetsZJ,"Z, j#rightarrow#tau_{h}","f");
+  leg->AddEntry(hDYJetsLowM,"Z#rightarrow#it{ll}(m<50)","f");
+  leg->AddEntry(hWJets,"W#rightarrow#it{l}#nu","f");
+  leg->AddEntry(hTTbar,"t#bar{t}","f");
+  leg->AddEntry(hST,"single-t","f");
+  leg->AddEntry(hVV,"VV","f");
   leg->AddEntry(hQCD,"QCD","f");
-  leg->AddEntry(hHiggs,"H(125)#rightarrow #tau #tau","f");
-  leg->SetHeader(Form("#int L = %.2f fb^{-1}",lumi/1000));
+  leg->AddEntry(hHiggs,"H(125)#rightarrow#tau#tau","f");
+  leg->SetHeader(Form("#int L = %.2f fb^{-1}",lumi/1000.));
   leg->Draw();
 
   float x = 0.6*(hs->GetXaxis()->GetXmax() - 
@@ -1464,7 +1465,7 @@ std::pair<float,float> HTTHistogramsTT::getQCDLooseToTight(unsigned int iCategor
 TH1F* HTTHistogramsTT::getQCDbackground(unsigned int iCategory,
 					std::string varName){
 				      
-  float qcdScale = getQCDLooseToTight(iCategory).first;
+  float qcdScale = 1./getQCDLooseToTight(iCategory).first;
   //float qcdScale = 1.06;
   
   std::string hName = "h1D" + varName;
