@@ -136,7 +136,7 @@ float HTTAnalyzer::getPUWeight(const EventProxyHTT & myEventProxy){
 //////////////////////////////////////////////////////////////////////////////
 float HTTAnalyzer::getGenWeight(const EventProxyHTT & myEventProxy){
 
-  ///MC weights cab be quite large, but are always +-C.
+  ///MC weights cab be quite large, but are always +-const.
   ///to avoid counter overflow we keep only sign.
   return myEventProxy.event->getMCWeight()/fabs(myEventProxy.event->getMCWeight());
 }
@@ -204,6 +204,7 @@ float HTTAnalyzer::getLeptonCorrection(float eta, float pt, hadronicTauDecayMode
     scaleWorkspace->var("t_eta")->setVal(eta);
     scaleWorkspace->var("t_dm")->setVal(tauDecayMode);
     float tau_id_scalefactor = scaleWorkspace->function("t_iso_mva_m_pt30_sf")->getVal();
+    //float tau_id_scalefactor = 0.9;//according to https://twiki.cern.ch/twiki/bin/view/CMS/SMTauTau2016#MC_corrections
     return tau_id_scalefactor;
   }
   return 1.0;
