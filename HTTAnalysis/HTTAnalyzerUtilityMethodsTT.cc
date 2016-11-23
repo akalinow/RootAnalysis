@@ -53,7 +53,6 @@ std::string HTTAnalyzerTT::getSampleNameFromFileName(const EventProxyHTT & myEve
   else if(fileName.find("VBFHToTauTauM130")!=std::string::npos) return "qqH130";
   else if(fileName.find("GluGluHToTauTauM135")!=std::string::npos) return "ggH135";
   else if(fileName.find("VBFHToTauTauM135")!=std::string::npos) return "qqH135";
-  else if(fileName.find("TT")!=std::string::npos) return "TTbar";
   else if(fileName.find("STtWantitop")!=std::string::npos) return "Wantitop";
   else if(fileName.find("STtWtop")!=std::string::npos) return "Wtop";
   else if(fileName.find("STtchannel__antitop")!=std::string::npos) return "t-channel_antitop";
@@ -68,7 +67,8 @@ std::string HTTAnalyzerTT::getSampleNameFromFileName(const EventProxyHTT & myEve
   else if(fileName.find("WZTo2L2Q")!=std::string::npos) return "WZTo2L2Q";
   else if(fileName.find("QCD")!=std::string::npos) return "QCD_MC";
   else if(fileName.find("DY")!=std::string::npos) return getDYSampleName(myEventProxy);
-
+  else if(fileName.find("TT")!=std::string::npos) return "TTbar";
+  
   return "Unknown";
 }
 //////////////////////////////////////////////////////////////////////////////

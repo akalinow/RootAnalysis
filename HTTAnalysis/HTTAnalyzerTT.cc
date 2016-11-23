@@ -379,7 +379,7 @@ bool HTTAnalyzerTT::analyze(const EventProxyBase& iEvent){
     if(!passCategory(categoryType)) continue;    
     categorySuffix = std::to_string(iCategory);
 
-    if(OS && fullIso){
+    if(OS && fullIso){      
       hNameSuffix = sampleName+"_OS_"+categorySuffix;
       fillControlHistos(hNameSuffix, eventWeight);
       fillDecayPlaneAngle(hNameSuffix+"RefitPV", eventWeight);
