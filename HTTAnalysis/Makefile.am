@@ -18,7 +18,8 @@ noinst_PROGRAMS=test
 # Sources for the a.out 
 test_SOURCES= HTTAnalysis.cc EventProxyHTT.cc HTTWeightsMaker.cc HTTWeightHistograms.cc \
 	      HTTAnalyzer.cc HTTAnalyzerCPmethods.cc HTTAnalyzerUtilityMethods.cc \
-              HTTHistograms.cc HTTEvent.cxx DictCint.cxx
+              HTTAnalyzerTT.cc HTTAnalyzerCPmethodsTT.cc HTTAnalyzerUtilityMethodsTT.cc \
+              HTTHistograms.cc HTTHistogramsTT.cc HTTEvent.cxx DictCint.cxx
 
 
 # Linker options for a.out
