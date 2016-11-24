@@ -443,7 +443,7 @@ void HTTHistogramsTT::finalizeHistograms(int nRuns, float weight){
   ttScale = 1.0;//MB
 
   for(unsigned int iCategory = (int)HTTAnalyzerTT::jet0;
-      iCategory<(int)(int)HTTAnalyzerTT::DUMMY;++iCategory){
+      iCategory<(int)HTTAnalyzerTT::DUMMY;++iCategory){
     
     wselOSCorrection =  std::pair<float,float>(1.0,0);
     wselSSCorrection =  std::pair<float,float>(1.0,0);
