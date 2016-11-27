@@ -346,10 +346,10 @@ TH1F* HTTHistograms::get1D_VV_Histogram(const std::string& name, std::string tau
     	TH1F *hJ = get1DHistogram(hNameJ.Data()), *hT = get1DHistogram(hNameT.Data());
     	if(hJ && hT){
 	    	float hJscale = 1.0, hTscale = 1.0;
-	    	histo = hJ;
-	    	histo->Scale(hJscale);
+	    	histo = (TH1F*)hJ->Clone(hNameTmp.Data());
+	    	histo->Reset();
+	    	histo->Add(hJ, hJscale);
 	    	histo->Add(hT, hTscale);
-	    	histo->SetName(hNameTmp.Data());
 	}
     }
     	
