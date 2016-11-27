@@ -71,6 +71,8 @@ class HTTEvent{
 
   void setMCWeight(float x){mcWeight = x;}
 
+  void setPtReWeight(float x){ptReWeight = x;}
+
   void setLHE_Ht(float x){lheHt = x;}
 
   void setLHEnOutPartons(int x){lheNOutPartons = x;}
@@ -112,6 +114,8 @@ class HTTEvent{
   
   float getMCatNLOWeight() const {return aMCatNLOweight;}
 
+  float setPtReWeight() const {return ptReWeight;}
+
   float getMCWeight() const {return mcWeight;}
 
   float getLHE_Ht() const {return lheHt;}
@@ -149,6 +153,9 @@ class HTTEvent{
   //Generator event weight
   float mcWeight;
 
+  ///Weight used to modify the pt shape.
+  float ptReWeight;
+  
   ///Ht value from LHE record.
   float lheHt;
 
@@ -250,9 +257,8 @@ class HTTParticle{
 
   float getProperty(PropertyEnum index) const {return (unsigned int)index<properties.size()?  properties[(unsigned int)index]: -999;}
 
-  bool hasTriggerMatch(TriggerEnum index) const {return (unsigned int)getProperty(PropertyEnum::isGoodTriggerType)&(unsigned int)index &&
-                                                        (unsigned int)getProperty(PropertyEnum::FilterFired)&(unsigned int)index;}
-
+  bool hasTriggerMatch(TriggerEnum index) const {return (unsigned int)getProperty(PropertyEnum::isGoodTriggerType)& (1<<(unsigned int)index) &&
+                                                        (unsigned int)getProperty(PropertyEnum::FilterFired)& (1<<(unsigned int)index);}
  private:
 
   ///Nominal particle four-momentum

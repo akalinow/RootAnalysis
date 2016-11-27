@@ -287,16 +287,6 @@ bool HTTAnalyzer::analyze(const EventProxyBase& iEvent){
   float tauScaleFactor = getLeptonCorrection(aTau.getP4().Eta(), aTau.getP4().Pt(),
 					     static_cast<hadronicTauDecayModes>(aTau.getProperty(PropertyEnum::decayMode)));
   eventWeight*=muonScaleFactor*tauScaleFactor;
-
-
-  /////TEST
-  /*
-    if(aTau.getProperty(PropertyEnum::decayMode)==tauDecay1ChargedPion0PiZero){
-    std::cout<<"Tau pt: "<<aTau.getP4().Perp()<<" mass: "<<aTau.getP4().M()
-    <<" leading tk: "<<aTau.getProperty(PropertyEnum::leadChargedParticlePt)
-    <<std::endl;
-    }
-  */
   
   std::pair<bool, bool> goodDecayModes = checkTauDecayMode(myEventProxy);
   bool goodGenDecayMode = goodDecayModes.first;
@@ -316,7 +306,9 @@ bool HTTAnalyzer::analyze(const EventProxyBase& iEvent){
 
   bool tauID = ( (int)aTau.getProperty(PropertyEnum::tauID) & tauIDmask) == tauIDmask;
   bool muonKinematics = aMuon.getP4().Pt()>24 && fabs(aMuon.getP4().Eta())<2.1;
-  bool trigger = aMuon.hasTriggerMatch(TriggerEnum::HLT_IsoMu22) || aMuon.hasTriggerMatch(TriggerEnum::HLT_IsoTkMu22);
+  bool trigger = aMuon.hasTriggerMatch(TriggerEnum::HLT_IsoMu22) || 
+		 aMuon.hasTriggerMatch(TriggerEnum::HLT_IsoTkMu22);
+  
   if(sampleName!="Data") trigger = true; //MC trigger included in muon SF
 									   
   bool cpMuonSelection = aMuon.getPCARefitPV().Perp()>0.003;    

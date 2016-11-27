@@ -12,7 +12,6 @@ SYNCH_file = TFile(SYNCH_fileName,"RECREATE")
 
 #WAW to SYNCH histograms names map
 histoPrefix = "HTTAnalyzer/h1DMassVis"
-#histoPrefix = "HTTAnalyzer/h1DPtMET"
 
 categoryNames = ["muTau_0jet_low", "muTau_0jet_high",
                  "muTau_1jet_low", "muTau_1jet_high",
