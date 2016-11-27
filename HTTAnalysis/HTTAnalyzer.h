@@ -115,6 +115,9 @@ class HTTAnalyzer: public Analyzer{
 
   ///Return sample name for DY. Name encoded jet bin, and decay mode.
   static std::string getDYSampleName(const EventProxyHTT & myEventProxy);
+  
+  //Return name sample name suffix for different particles matched to reconstructed tau
+  static std::string getMatchingName(const EventProxyHTT & myEventProxy);
 
   ///Return pileup reweighting weight.
   ///Weight is calculatedon fly using the ration of nPU 
