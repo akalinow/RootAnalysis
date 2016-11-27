@@ -327,7 +327,7 @@ TH1F *HTTHistograms::get1D_VJetSum(const std::string& name){
 }
 /////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////
-TH1F* HTTHistograms::get1D_VV_Histogram(const std::string& name){
+TH1F* HTTHistograms::get1D_VV_Histogram(const std::string& name, std::string tauMatchSuffix){
 
   std::vector<std::string> sampleNamesVV = {"ZZTo2L2Q", "ZZTo4L","WZTo1L3Nu", "WZJToLLLNu", "WWTo1L1Nu2Q", "WZTo1L1Nu2Q", "VVTo2L2Nu", "WZTo2L2Q"};
 
@@ -336,8 +336,23 @@ TH1F* HTTHistograms::get1D_VV_Histogram(const std::string& name){
   
   for(auto sampleNameVV:sampleNamesVV){
     TString hNameTmp = hName;
-    hNameTmp.ReplaceAll("DiBoson",sampleNameVV.c_str());
+    hNameTmp.ReplaceAll("DiBoson",(sampleNameVV+tauMatchSuffix).c_str());
     TH1F *histo = get1DHistogram(hNameTmp.Data());
+    
+    if(tauMatchSuffix == "" && !histo){
+    	TString hNameJ = hName, hNameT = hName;
+    	hNameJ.ReplaceAll("DiBoson",(sampleNameVV+"J").c_str());
+    	hNameT.ReplaceAll("DiBoson",(sampleNameVV+"T").c_str());
+    	TH1F *hJ = get1DHistogram(hNameJ.Data()), *hT = get1DHistogram(hNameT.Data());
+    	if(hJ && hT){
+	    	float hJscale = 1.0, hTscale = 1.0;
+	    	histo = hJ;
+	    	histo->Scale(hJscale);
+	    	histo->Add(hT, hTscale);
+	    	histo->SetName(hNameTmp.Data());
+	}
+    }
+    	
     if(!hSum && histo){
       hSum = (TH1F*)histo->Clone(name.c_str());
       hSum->Reset();
@@ -945,7 +960,8 @@ THStack*  HTTHistograms::plotStack(unsigned int iCategory, std::string varName, 
   TH1F *hWJets = get1D_WJet_Histogram((hName+"WJets"+hNameSuffix).c_str());
   TH1F *hTTbar = get1DHistogram((hName+"TTbar"+hNameSuffix).c_str());
   TH1F *hST = get1D_ST_Histogram((hName+"ST"+hNameSuffix).c_str());
-  TH1F *hVV = get1D_VV_Histogram((hName+"DiBoson"+hNameSuffix).c_str());
+  TH1F *hVVJ = get1D_VV_Histogram((hName+"DiBoson"+hNameSuffix).c_str(), "J");
+  TH1F *hVVT = get1D_VV_Histogram((hName+"DiBoson"+hNameSuffix).c_str(), "T");
   TH1F *hDYJetsLowM = get1D_DYJet_Histogram((hName+"DYLowM"+hNameSuffix).c_str());
 
   bool sumDecayModes = false;
@@ -977,7 +993,8 @@ THStack*  HTTHistograms::plotStack(unsigned int iCategory, std::string varName, 
   if(!hDYJetsZTT) hDYJetsZTT = (TH1F*)hEmpty->Clone((hName+"DYZTTJets"+hNameSuffix).c_str());  
   if(!hTTbar) hTTbar = (TH1F*)hEmpty->Clone((hName+"TTbar"+hNameSuffix).c_str());
   if(!hST) hST = (TH1F*)hEmpty->Clone((hName+"ST"+hNameSuffix).c_str());
-  if(!hVV) hVV = (TH1F*)hEmpty->Clone((hName+"DiBoson"+hNameSuffix).c_str());  
+  if(!hVVJ) hVVJ = (TH1F*)hEmpty->Clone((hName+"DiBosonJ"+hNameSuffix).c_str());  
+  if(!hVVT) hVVT = (TH1F*)hEmpty->Clone((hName+"DiBosonT"+hNameSuffix).c_str());  
   if(!hEWK2Jets) hEWK2Jets = (TH1F*)hEmpty->Clone((hName+"EWK2Jets"+hNameSuffix).c_str());  
   if(!hggHiggs120) hggHiggs120 = (TH1F*)hEmpty->Clone((hName+"ggH120"+hNameSuffix).c_str());  
   if(!hqqHiggs120) hqqHiggs120 = (TH1F*)hEmpty->Clone((hName+"qqH120"+hNameSuffix).c_str());
@@ -996,7 +1013,8 @@ THStack*  HTTHistograms::plotStack(unsigned int iCategory, std::string varName, 
   if(hDYJetsZTT) hDYJetsZTT->SetDirectory(hSoup->GetDirectory());
   if(hTTbar) hTTbar->SetDirectory(hSoup->GetDirectory());
   if(hST) hST->SetDirectory(hSoup->GetDirectory());
-  if(hVV) hVV->SetDirectory(hSoup->GetDirectory());
+  if(hVVJ) hVVJ->SetDirectory(hSoup->GetDirectory());
+  if(hVVT) hVVT->SetDirectory(hSoup->GetDirectory());
   if(hEWK2Jets) hEWK2Jets->SetDirectory(hSoup->GetDirectory());
   if(hggHiggs120) hggHiggs120->SetDirectory(hSoup->GetDirectory());
   if(hqqHiggs120) hqqHiggs120->SetDirectory(hSoup->GetDirectory());
@@ -1052,9 +1070,14 @@ THStack*  HTTHistograms::plotStack(unsigned int iCategory, std::string varName, 
   hST->Scale(scale);
 
   //VV samples scaled for preselection during stiching step
-  sampleName = "DiBoson";
+  sampleName = "DiBosonJ";
   scale = lumi;
-  hVV->Scale(scale);
+  hVVJ->Scale(scale);
+
+  //VV samples scaled for preselection during stiching step
+  sampleName = "DiBosonT";
+  scale = lumi;
+  hVVT->Scale(scale);
 
   ///EWK 2Jets scaled for preselection during stiching step
   sampleName = "EWK2Jets";
@@ -1101,7 +1124,8 @@ THStack*  HTTHistograms::plotStack(unsigned int iCategory, std::string varName, 
   hWJets->SetFillColor(kRed+2);
   hTTbar->SetFillColor(kBlue+2);
   hST->SetFillColor(kYellow-10);
-  hVV->SetFillColor(kRed-10);
+  hVVJ->SetFillColor(kRed-10);
+  hVVT->SetFillColor(kBlue-10);
   hDYJetsZL->SetFillColor(kOrange-3);
   hDYJetsZJ->SetFillColor(kOrange-6);
   hDYJetsZTT->SetFillColor(kOrange-9);
@@ -1119,7 +1143,8 @@ THStack*  HTTHistograms::plotStack(unsigned int iCategory, std::string varName, 
   hs->Add(hQCD,"hist");
   hs->Add(hTTbar,"hist");
   hs->Add(hST,"hist");
-  hs->Add(hVV,"hist");
+  hs->Add(hVVJ,"hist");
+  hs->Add(hVVT,"hist");
   hs->Add(hWJets,"hist");
   hs->Add(hDYJetsLowM,"hist");
   hs->Add(hDYJetsZJ,"hist");
@@ -1135,7 +1160,8 @@ THStack*  HTTHistograms::plotStack(unsigned int iCategory, std::string varName, 
   hMCSum->Add(hWJets);
   hMCSum->Add(hTTbar);
   hMCSum->Add(hST);
-  hMCSum->Add(hVV);
+  hMCSum->Add(hVVJ);
+  hMCSum->Add(hVVT);
   hMCSum->Add(hQCD);
   hMCSum->Add(hEWK2Jets);
   hMCSum->Add(hHiggs);
@@ -1151,7 +1177,8 @@ THStack*  HTTHistograms::plotStack(unsigned int iCategory, std::string varName, 
   outputStream<<"MC W->l: "<<hWJets->Integral(0,hWJets->GetNbinsX()+1)<<std::endl;
   outputStream<<"MC TTbar: "<<hTTbar->Integral(0,hTTbar->GetNbinsX()+1)<<std::endl;
   outputStream<<"MC single T: "<<hST->Integral(0,hST->GetNbinsX()+1)<<std::endl;
-  outputStream<<"MC DiBoson: "<<hVV->Integral(0,hVV->GetNbinsX()+1)<<std::endl;
+  outputStream<<"MC DiBosonJ: "<<hVVJ->Integral(0,hVVJ->GetNbinsX()+1)<<std::endl;
+  outputStream<<"MC DiBosonT: "<<hVVT->Integral(0,hVVT->GetNbinsX()+1)<<std::endl;
   outputStream<<"MC ZTT: "<<hDYJetsZTT->Integral(0,hDYJetsZTT->GetNbinsX()+1)<<std::endl;
   outputStream<<"MC ZL: "<<hDYJetsZL->Integral(0,hDYJetsZL->GetNbinsX()+1)<<std::endl;
   outputStream<<"MC ZJ: "<<hDYJetsZJ->Integral(0,hDYJetsZJ->GetNbinsX()+1)<<std::endl;
@@ -1232,7 +1259,8 @@ THStack*  HTTHistograms::plotStack(unsigned int iCategory, std::string varName, 
   leg->AddEntry(hWJets,"W#rightarrow l #nu","f");
   leg->AddEntry(hTTbar,"TTbar","f");
   leg->AddEntry(hST,"single T","f");
-  leg->AddEntry(hVV,"DiBoson","f");
+  leg->AddEntry(hVVJ,"DiBosonJ","f");
+  leg->AddEntry(hVVT,"DiBosonT","f");
   leg->AddEntry(hQCD,"QCD","f");
   leg->AddEntry(hEWK2Jets,"EWK","f");
   leg->AddEntry(hHiggs,"H(125)#rightarrow #tau #tau","f");

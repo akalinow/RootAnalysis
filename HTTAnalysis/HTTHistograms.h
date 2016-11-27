@@ -88,7 +88,7 @@ class HTTHistograms: public AnalysisHistograms {
   TH1F *get1D_WJet_Histogram(const std::string& name);
 
   ///Return histogram for sum VV processes
-  TH1F *get1D_VV_Histogram(const std::string& name);
+  TH1F *get1D_VV_Histogram(const std::string& name, std::string tauMatchSuffix = "");
 
   ///Return histogram for sum single top processes
   TH1F *get1D_ST_Histogram(const std::string& name);
