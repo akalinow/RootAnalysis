@@ -115,11 +115,11 @@ std::string HTTAnalyzer::getDYSampleName(const EventProxyHTT & myEventProxy){
     tauMCMatch = aTau.getProperty(PropertyEnum::mc_match);
   }    
   std::string decayName = "Unknown";
-  if(tauMCMatch<5) decayName = "ZL";
-  else if(tauMCMatch==5) decayName = "ZTT";
-  else decayName = "ZJ";
+  if(tauMCMatch<5) decayName = "L";
+  else if(tauMCMatch==5) decayName = "T";
+  else decayName = "J";
 
-  return "DY"+decayName+jetsName;
+  return "DY"+jetsName+"Match"+decayName;
 }
 //////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////
@@ -140,7 +140,7 @@ std::string HTTAnalyzer::getMatchingName(const EventProxyHTT & myEventProxy){
     HTTPair aPair = (*myEventProxy.pairs)[0];
     HTTParticle aTau = aPair.getTau();
     tauMCMatch_1 = aTau.getProperty(PropertyEnum::mc_match);
-    if(tauMCMatch_1 == 5) return "T"; else return "J";
+    if(tauMCMatch_1 == 5) return "MatchT"; else return "MatchJ";
   }
   
   if(myEventProxy.pairs->size() && fileName.find("TT_")!=std::string::npos){
@@ -148,7 +148,7 @@ std::string HTTAnalyzer::getMatchingName(const EventProxyHTT & myEventProxy){
     HTTParticle aTau_1 = aPair.getLeg1(), aTau_2 = aPair.getLeg2();
     tauMCMatch_1 = aTau_1.getProperty(PropertyEnum::mc_match);
     tauMCMatch_2 = aTau_2.getProperty(PropertyEnum::mc_match);
-    if(tauMCMatch_1 == 5 && tauMCMatch_2 == 5) return "T"; else return "J";
+    if(tauMCMatch_1 == 5 && tauMCMatch_2 == 5) return "MatchT"; else return "MatchJ";
   }
 
   return "";
