@@ -34,12 +34,20 @@ float HTTHistogramsTT::getLumi(){
   float run2016G = 6320078824.709*1E-6;
 
   //MB: Tau2016 ver1_noSV
-  run2016B = 5.835*1e3;
+  /*run2016B = 5.835*1e3;
   run2016C = 0.000*1e3;
-  run2016D = 4.350*1e3;
+  run2016D = 4.353*1e3;
   run2016E = 4.036*1e3;
   run2016F = 3.160*1e3;
-  run2016G = 7.339*1e3;
+  run2016G = 7.339*1e3;*/
+
+  //MB: Tau2016 ver1_noSV
+  run2016B = 5.882*1e3;
+  run2016C = 2.634*1e3;
+  run2016D = 4.353*1e3;
+  run2016E = 4.012*1e3;
+  run2016F = 3.160*1e3;
+  run2016G = 6.166*1e3;
 
   return run2016B+run2016C+run2016D+run2016E+run2016F+run2016G;//pb-1 data for NTUPLES_28_09_2016
 }
@@ -101,6 +109,19 @@ float HTTHistogramsTT::getSampleNormalisation(std::string sampleName){
   if(sampleName=="qqH120") crossSection = 1.676E+00*6.981E-02;//CERNYellowReportPageAt13TeV*CERNYellowReportPageBR
   if(sampleName=="qqH125") crossSection = 1.601E+00*6.272E-02;//CERNYellowReportPageAt13TeV*CERNYellowReportPageBR
   if(sampleName=="qqH130") crossSection = 1.531E+00*5.411E-02;//CERNYellowReportPageAt13TeV*CERNYellowReportPageBR
+
+  ///https://twiki.cern.ch/twiki/bin/view/CMS/HiggsToTauTauWorking2016#MC_and_data_samples
+  if(sampleName=="WplusHM120") crossSection = 1.565*0.0698*0.5;
+  if(sampleName=="WplusHM125") crossSection = 1.373*0.0627*0.5;
+  if(sampleName=="WplusHM130") crossSection = 1.209*0.0541*0.5;
+
+  if(sampleName=="WminusHM120") crossSection = 1.565*0.0698*0.5;
+  if(sampleName=="WminusHM125") crossSection = 1.373*0.0627*0.5;
+  if(sampleName=="WminusHM130") crossSection = 1.209*0.0541*0.5;
+
+  if(sampleName=="ZHM120") crossSection = 0.994*0.0698;
+  if(sampleName=="ZHM125") crossSection = 0.884*0.0627;
+  if(sampleName=="ZHM130") crossSection = 0.790*0.0541;
    
   ///https://twiki.cern.ch/twiki/bin/view/CMS/HiggsToTauTauWorking2016#MC_and_data_samples
   if(sampleName=="ZZTo2L2Q") crossSection = 3.22;
@@ -117,6 +138,10 @@ float HTTHistogramsTT::getSampleNormalisation(std::string sampleName){
   if(sampleName=="Wtop") crossSection = 35.6;
   if(sampleName=="t-channel_top") crossSection = 136.02;
   if(sampleName=="t-channel_antitop") crossSection = 80.95;
+  if(sampleName=="EWKWMinus") crossSection = 20.25;
+  if(sampleName=="EWKWPlus") crossSection = 25.62;
+  if(sampleName=="EWKZ2JetsZToLL") crossSection = 3.987;
+  if(sampleName=="EWKZ2JetsZToNuNu") crossSection = 10.01;
 
   ///https://twiki.cern.ch/twiki/bin/view/CMS/HiggsToTauTauWorking2016#MC_and_data_samples
   ///matching eff. = 0.00042
@@ -147,6 +172,28 @@ HTTHistogramsTT::HTTHistogramsTT(TDirectory *myDir, const std::vector<std::strin
 /////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////
 HTTHistogramsTT::~HTTHistogramsTT(){ }
+/////////////////////////////////////////////////////////
+/////////////////////////////////////////////////////////
+TH1F *HTTHistogramsTT::get1D_EWK2JetsSum(const std::string& name){
+
+  std::vector<std::string> ewkSamples = {"EWKWMinus", "EWKWPlus", "EWKZ2JetsZToLL", "EWKZ2JetsZToNuNu"};
+
+  TString hName = name;
+  TH1F *hSum = 0;
+
+  for(auto ewkSample:ewkSamples){
+    TString hNameTmp = hName;
+    hNameTmp.ReplaceAll("EWK2Jets",ewkSample.c_str());    
+    TH1F *hSample = get1DHistogram(ewkSample);
+    if(!hSum && hSample){
+      hSum = (TH1F*)hSample->Clone(name.c_str());
+      hSum->Reset();
+    }
+    if(hSample) hSum->Add(hSample);
+  }
+  if(hSum) hSum->SetName(name.c_str());
+  return hSum;
+}
 /////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////
 TH1F *HTTHistogramsTT::get1D_DYSum(const std::string& name, bool sumDecayModes, bool sumJetBins){
@@ -394,7 +441,7 @@ void HTTHistogramsTT::defineHistograms(){
    add1DHistogram("h1DCSVBtagTemplate",";CSV btag; Events",20,0,1,file_);
    add1DHistogram("h1DIsoTemplate",";Isolation; Events",20,0,0.3,file_);
    add1DHistogram("h1DIDTemplate",";ID; Events",20,0.8,1,file_);
-   add1DHistogram("h1DVxPullTemplate",";#phi^{*} [rad]; Events",11,-0.01,0.01,file_);
+   add1DHistogram("h1DVxPullTemplate",";#phi^{*} [rad]; Events",11,-0.01,0.01,file_);//MB, incorrect label of x-axis??
    add1DHistogram("h1DyTauTemplate",";yTau; Events",15,-1,1,file_);
    add1DHistogram("h1DnPCATemplate",";#hat{n}_{RECO}>; Events",10,0,0.015,file_);   
    addProfile("hProfVsMagTemplate","",10,0,0.015,file_);
@@ -920,6 +967,8 @@ THStack*  HTTHistogramsTT::plotStack(unsigned int iCategory, std::string varName
   TH1F *hDYJetsZL = get1D_DYSum((hName+"DYZLJets"+hNameSuffix).c_str(), sumDecayModes, sumJetBins);
   TH1F *hDYJetsZTT = get1D_DYSum((hName+"DYZTTJets"+hNameSuffix).c_str(), sumDecayModes, sumJetBins);
 
+  TH1F *hEWK2Jets = get1D_EWK2JetsSum(hName+"EWK2Jets"+hNameSuffix);
+
   TH1F *hSoup = get1DHistogram((hName+"Data"+hNameSuffix).c_str(),true);
   pair<float,float> qcdLooseToTight = getQCDLooseToTight(iCategory);
   TH1F *hQCD = (TH1F*)getQCDbackground(iCategory,varName);
@@ -942,6 +991,7 @@ THStack*  HTTHistogramsTT::plotStack(unsigned int iCategory, std::string varName
   if(!hTTbar) hTTbar = (TH1F*)hEmpty->Clone((hName+"TTbar"+hNameSuffix).c_str());
   if(!hST) hST = (TH1F*)hEmpty->Clone((hName+"ST"+hNameSuffix).c_str());
   if(!hVV) hVV = (TH1F*)hEmpty->Clone((hName+"DiBoson"+hNameSuffix).c_str());  
+  if(!hEWK2Jets) hEWK2Jets = (TH1F*)hEmpty->Clone((hName+"EWK2Jets"+hNameSuffix).c_str());
   if(!hggHiggs120) hggHiggs120 = (TH1F*)hEmpty->Clone((hName+"ggH120"+hNameSuffix).c_str());  
   if(!hqqHiggs120) hqqHiggs120 = (TH1F*)hEmpty->Clone((hName+"qqH120"+hNameSuffix).c_str());
   if(!hggHiggs125) hggHiggs125 = (TH1F*)hEmpty->Clone((hName+"ggH125"+hNameSuffix).c_str());  
@@ -960,6 +1010,7 @@ THStack*  HTTHistogramsTT::plotStack(unsigned int iCategory, std::string varName
   if(hTTbar) hTTbar->SetDirectory(hSoup->GetDirectory());
   if(hST) hST->SetDirectory(hSoup->GetDirectory());
   if(hVV) hVV->SetDirectory(hSoup->GetDirectory());
+  if(hEWK2Jets) hEWK2Jets->SetDirectory(hSoup->GetDirectory());
   if(hggHiggs120) hggHiggs120->SetDirectory(hSoup->GetDirectory());
   if(hqqHiggs120) hqqHiggs120->SetDirectory(hSoup->GetDirectory());
   if(hggHiggs125) hggHiggs125->SetDirectory(hSoup->GetDirectory());
@@ -1017,6 +1068,11 @@ THStack*  HTTHistogramsTT::plotStack(unsigned int iCategory, std::string varName
   scale = lumi;
   hVV->Scale(scale);
 
+  ///EWK 2Jets scaled for preselection during stiching step
+  sampleName = "EWK2Jets";
+  scale = lumi;
+  hEWK2Jets->Scale(scale);
+
   sampleName = "ggH120";
   weight = getSampleNormalisation(sampleName);
   scale = weight*lumi;
@@ -1050,6 +1106,7 @@ THStack*  HTTHistogramsTT::plotStack(unsigned int iCategory, std::string varName
   
   hHiggs->Add(hggHiggs125);
   hHiggs->Add(hqqHiggs125);
+  
   //////////////////////////////////////////////////////
   hSoup->SetLineColor(1);
   hSoup->SetFillColor(1);
@@ -1067,21 +1124,12 @@ THStack*  HTTHistogramsTT::plotStack(unsigned int iCategory, std::string varName
   hHiggs->SetFillColor(kCyan+4);
 
   hSoup->SetLineWidth(1);
-  int rebinFactor = 1;  
-  hSoup->Rebin(rebinFactor);
-  hWJets->Rebin(rebinFactor);
-  hTTbar->Rebin(rebinFactor);
-  hVV->Rebin(rebinFactor);
-  hST->Rebin(rebinFactor);
-  hDYJetsZJ->Rebin(rebinFactor);
-  hDYJetsZL->Rebin(rebinFactor);
-  hDYJetsZTT->Rebin(rebinFactor);
-  hDYJetsLowM->Rebin(rebinFactor);
-  hHiggs->Rebin(rebinFactor);
 
   THStack *hs = new THStack("hs","Stacked histograms");      
   /////////
-  hs->Add(hHiggs,"hist");    
+  hs->Add(hHiggs,"hist");
+
+  hs->Add(hEWK2Jets,"hist");    
   hs->Add(hQCD,"hist");
   hs->Add(hTTbar,"hist");
   hs->Add(hST,"hist");
@@ -1103,6 +1151,7 @@ THStack*  HTTHistogramsTT::plotStack(unsigned int iCategory, std::string varName
   hMCSum->Add(hST);
   hMCSum->Add(hVV);
   hMCSum->Add(hQCD);
+  hMCSum->Add(hEWK2Jets);
   hMCSum->Add(hHiggs);
 
   hNameSuffix =  "_"+selName+"_"+std::to_string(iCategory);
@@ -1124,6 +1173,7 @@ THStack*  HTTHistogramsTT::plotStack(unsigned int iCategory, std::string varName
   outputStream<<"MC H(125)->tau tau: "<<hHiggs->Integral(0,hHiggs->GetNbinsX()+1)<<std::endl;  
   outputStream<<"QCD: "<<hQCD->Integral(0,hQCD->GetNbinsX()+1)<<std::endl;
   outputStream<<"QCD_MC: "<<hQCD_MC->Integral(0,hQCD_MC->GetNbinsX()+1)<<std::endl; 
+  outputStream<<"EWK 2Jets: "<<hEWK2Jets->Integral(0,hEWK2Jets->GetNbinsX()+1)<<std::endl; 
   outputStream<<"Correction factors:"<<std::endl;
   outputStream<<"QCD Loose to Tight: "<<qcdLooseToTight.first<<" +- "<<qcdLooseToTight.second<<std::endl;
   outputStream<<"W MC to DATA: "<<dataToMCScale.first<<" +- "<<dataToMCScale.second<<std::endl;
@@ -1198,6 +1248,7 @@ THStack*  HTTHistogramsTT::plotStack(unsigned int iCategory, std::string varName
   leg->AddEntry(hST,"single-t","f");
   leg->AddEntry(hVV,"VV","f");
   leg->AddEntry(hQCD,"QCD","f");
+  leg->AddEntry(hEWK2Jets,"EWK","f");
   leg->AddEntry(hHiggs,"H(125)#rightarrow#tau#tau","f");
   leg->SetHeader(Form("#int L = %.2f fb^{-1}",lumi/1000.));
   leg->Draw();
@@ -1406,7 +1457,7 @@ std::pair<float,float> HTTHistogramsTT::getQCDLooseToTight(unsigned int iCategor
   gStyle->SetOptStat(11);
   gStyle->SetOptFit(11);
   hSoupLoose->Draw();
-  hSoupLoose->Fit("line","","",40,150);
+  hSoupLoose->Fit("line","","",100,250);
 
   std::string categoryName = HTTAnalyzerTT::categoryName(iCategory);
   c->Print(TString::Format("fig_png/%s_%s.png",hName.c_str(), categoryName.c_str()).Data());

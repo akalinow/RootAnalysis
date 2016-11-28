@@ -258,6 +258,19 @@ bool HTTAnalyzerTT::passCategory(const HTTAnalyzerTT::tauTauCategory & aCategory
   
   bool vbf_2d = nJets30>=2 && (jetsEta>2.5 && nJetsInGap30<1 && higgsPt>100);
 
+  //////////
+  // categories by tau decay modes for CP
+  bool isPi1 = (aTau1.getProperty(PropertyEnum::decayMode)==tauDecay1ChargedPion0PiZero && aTau1.getPCARefitPV().Mag()>0.003);
+  bool isPi2 = (aTau2.getProperty(PropertyEnum::decayMode)==tauDecay1ChargedPion0PiZero && aTau2.getPCARefitPV().Mag()>0.003);
+  bool isRho1 = (aTau1.getProperty(PropertyEnum::decayMode)!=tauDecay1ChargedPion0PiZero && isOneProng(aTau1.getProperty(PropertyEnum::decayMode)) );
+  bool isRho2 = (aTau2.getProperty(PropertyEnum::decayMode)!=tauDecay1ChargedPion0PiZero && isOneProng(aTau2.getProperty(PropertyEnum::decayMode)) );
+
+  bool piPi = isPi1 && isPi2;
+  bool piRho = (isPi1 && isRho2) || (isPi2 && isRho1);
+  bool rhoRho = isRho1 && isRho2;
+  
+  //////////
+
   categoryDecisions[(int)HTTAnalyzerTT::jet0] = jet0;
   
   categoryDecisions[(int)HTTAnalyzerTT::jet1_low] = jet1_low;
@@ -268,7 +281,11 @@ bool HTTAnalyzerTT::passCategory(const HTTAnalyzerTT::tauTauCategory & aCategory
 
   categoryDecisions[(int)HTTAnalyzerTT::boosted] = boosted;
   categoryDecisions[(int)HTTAnalyzerTT::vbf] = vbf_2d;
-  
+
+  categoryDecisions[(int)HTTAnalyzerTT::pipi] = piPi;
+  categoryDecisions[(int)HTTAnalyzerTT::pirho] = piRho;
+  categoryDecisions[(int)HTTAnalyzerTT::rhorho] = rhoRho;
+
   return categoryDecisions[(int)aCategory];
 }
 //////////////////////////////////////////////////////////////////////////////
