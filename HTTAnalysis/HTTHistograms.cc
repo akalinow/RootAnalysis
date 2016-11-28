@@ -164,7 +164,7 @@ HTTHistograms::~HTTHistograms(){ }
 TH1F *HTTHistograms::get1D_EWK2JetsSum(const std::string& name){
 
   std::vector<std::string> ewkSamples = {"EWKWMinus", "EWKWPlus", "EWKZ2JetsZToLL", "EWKZ2JetsZToNuNu"};
-  //return get1D_SumPattern_Histogram(name, "EWK2Jets", ewkSamples);//test
+  return get1D_SumPattern_Histogram(name, "EWK2Jets", ewkSamples);//test
 
   TString hName = name;
   TH1F *hSum = 0;
@@ -195,7 +195,7 @@ TH1F *HTTHistograms::get1D_TauMatchJetSum(const std::string& name, bool sumDecay
     for(auto decayName:decayNames){hName.ReplaceAll(decayName.c_str(), "");}
     for(auto decayName:decayNames){
       TString hNameTmp = hName;
-      hNameTmp.Replace(hNameTmp.First("_"),1,(decayName+"_").c_str());
+      if(hNameTmp.First("_")>0) hNameTmp.Replace(hNameTmp.First("_"),1,(decayName+"_").c_str()); else hNameTmp.Append(decayName.c_str());
       TH1F *hDecayMode = 0;
       if(sumJetBins) hDecayMode = get1D_VJetSum(hNameTmp.Data());
       else hDecayMode = get1DHistogram(hNameTmp.Data());      
@@ -378,10 +378,8 @@ TH1F* HTTHistograms::get1D_SumPattern_Histogram(const std::string& name, std::st
     if(histo && hSum){
       float scale = getSampleNormalisation(sampleName+tauMatchSuffix);      
       hSum->Add(histo, scale);
-      if(sampleName=="TTbar" || pattern=="DiBoson") {std::cout<<histo->GetEntries()<<" "<<scale<<" "<<hSum->GetEntries()<<std::endl;}//test
     }
   }
-    if(pattern=="TTbar") {std::cout<<hName; if(hSum) std::cout<<hSum->GetEntries()<<std::endl;}//test
     
   return hSum;
 }
@@ -390,7 +388,7 @@ TH1F* HTTHistograms::get1D_SumPattern_Histogram(const std::string& name, std::st
 TH1F* HTTHistograms::get1D_ST_Histogram(const std::string& name){
 
   std::vector<std::string> sampleNamesST = {"Wtop", "Wantitop","t-channel_top","t-channel_antitop"};
-  //return get1D_SumPattern_Histogram(name, "ST", sampleNamesST);//test
+  return get1D_SumPattern_Histogram(name, "ST", sampleNamesST);//test
 
   TString hName = name;
   TH1F *hSum = 0;
@@ -1008,15 +1006,22 @@ THStack*  HTTHistograms::plotStack(unsigned int iCategory, std::string varName, 
   TH1F *hTTbarJ = get1D_TT_Histogram((hName+"TTbar"+hNameSuffix).c_str(),"MatchJ");
   TH1F *hTTbarT = get1D_TT_Histogram((hName+"TTbar"+hNameSuffix).c_str(),"MatchT");
   TH1F *hST = get1D_ST_Histogram((hName+"ST"+hNameSuffix).c_str());
+  std::cout<<"dupa1"<<std::endl;//test
   TH1F *hVVJ = get1D_VV_Histogram((hName+"DiBoson"+hNameSuffix).c_str(), "MatchJ");
+  std::cout<<"dupa2"<<std::endl;//test
   TH1F *hVVT = get1D_VV_Histogram((hName+"DiBoson"+hNameSuffix).c_str(), "MatchT");
+  std::cout<<"dupa3"<<std::endl;//test
   TH1F *hDYJetsLowM = get1D_DYJet_Histogram((hName+"DYLowM"+hNameSuffix).c_str());
+  std::cout<<"dupa4"<<std::endl;//test
 
   bool sumDecayModes = false;
   bool sumJetBins = true;
   TH1F *hDYJetsZJ = get1D_TauMatchJetSum((hName+"DYJetsMatchJ"+hNameSuffix).c_str(), sumDecayModes, sumJetBins);
+  std::cout<<"dupa5"<<std::endl;//test
   TH1F *hDYJetsZL = get1D_TauMatchJetSum((hName+"DYJetsMatchL"+hNameSuffix).c_str(), sumDecayModes, sumJetBins);
+  std::cout<<"dupa6"<<std::endl;//test
   TH1F *hDYJetsZTT = get1D_TauMatchJetSum((hName+"DYJetsMatchT"+hNameSuffix).c_str(), sumDecayModes, sumJetBins);
+  std::cout<<"dupa7"<<std::endl;//test
 
   TH1F *hEWK2Jets = get1D_EWK2JetsSum(hName+"EWK2Jets"+hNameSuffix);
 
@@ -1097,17 +1102,29 @@ THStack*  HTTHistograms::plotStack(unsigned int iCategory, std::string varName, 
   scale = weight*lumi;
   hDYJetsLowM->Scale(scale);
   
-  sampleName = "DYJets";
+  sampleName = "DYJetsMatchJ";
   weight = getSampleNormalisation(sampleName);
   scale = weight*lumi;
   hDYJetsZJ->Scale(scale);
+  
+  sampleName = "DYJetsMatchL";
+  weight = getSampleNormalisation(sampleName);
+  scale = weight*lumi;
   hDYJetsZL->Scale(scale);
+  
+  sampleName = "DYJetsMatchT";
+  weight = getSampleNormalisation(sampleName);
+  scale = weight*lumi;
   hDYJetsZTT->Scale(scale);
   
-  sampleName = "TTbar";
+  sampleName = "TTbarMatchJ";
   weight = getSampleNormalisation(sampleName);
   scale = weight*lumi;
   hTTbarJ->Scale(scale);
+  
+  sampleName = "TTbarMatchT";
+  weight = getSampleNormalisation(sampleName);
+  scale = weight*lumi;
   hTTbarT->Scale(scale);
 
   sampleName = "QCD_MC";
@@ -1121,12 +1138,12 @@ THStack*  HTTHistograms::plotStack(unsigned int iCategory, std::string varName, 
   hST->Scale(scale);
 
   //VV samples scaled for preselection during stiching step
-  sampleName = "DiBosonJ";
+  sampleName = "DiBosonMatchJ";
   scale = lumi;
   hVVJ->Scale(scale);
 
   //VV samples scaled for preselection during stiching step
-  sampleName = "DiBosonT";
+  sampleName = "DiBosonMatchT";
   scale = lumi;
   hVVT->Scale(scale);
 
