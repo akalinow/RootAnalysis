@@ -46,15 +46,27 @@ std::string HTTAnalyzer::getSampleNameFromFileName(const EventProxyHTT & myEvent
   
   else if(fileName.find("Run201")!=std::string::npos) return "Data";
   else if(fileName.find("SUSYGluGluToHToTauTau")!=std::string::npos) return "A";
+
   else if(fileName.find("GluGluHToTauTauM120")!=std::string::npos) return "ggH120";
-  else if(fileName.find("VBFHToTauTauM120")!=std::string::npos) return "qqH120";  
   else if(fileName.find("GluGluHToTauTauM125")!=std::string::npos) return "ggH125";
-  else if(fileName.find("VBFHToTauTauM125")!=std::string::npos) return "qqH125";
   else if(fileName.find("GluGluHToTauTauM130")!=std::string::npos) return "ggH130";
+
+  else if(fileName.find("VBFHToTauTauM120")!=std::string::npos) return "qqH120";  
+  else if(fileName.find("VBFHToTauTauM125")!=std::string::npos) return "qqH125";
   else if(fileName.find("VBFHToTauTauM130")!=std::string::npos) return "qqH130";
-  else if(fileName.find("GluGluHToTauTauM135")!=std::string::npos) return "ggH135";
-  else if(fileName.find("VBFHToTauTauM135")!=std::string::npos) return "qqH135";
-  else if(fileName.find("TT")!=std::string::npos) return "TTbar";
+
+  else if(fileName.find("WplusHToTauTau_M120")!=std::string::npos) return "WplusHM120";  
+  else if(fileName.find("WplusHToTauTau_M125")!=std::string::npos) return "WplusHM125";  
+  else if(fileName.find("WplusHToTauTau_M130")!=std::string::npos) return "WplusHM130";  
+
+  else if(fileName.find("WminusHToTauTau_M120")!=std::string::npos) return "WminusHM120";  
+  else if(fileName.find("WminusHToTauTau_M125")!=std::string::npos) return "WminusHM125";  
+  else if(fileName.find("WminusHToTauTau_M130")!=std::string::npos) return "WminusHM130";  
+
+  else if(fileName.find("ZHM120")!=std::string::npos) return "ZHM120";  
+  else if(fileName.find("ZHM125")!=std::string::npos) return "ZHM125";  
+  else if(fileName.find("ZHM130")!=std::string::npos) return "ZHM130";  
+
   else if(fileName.find("STtWantitop")!=std::string::npos) return "Wantitop";
   else if(fileName.find("STtWtop")!=std::string::npos) return "Wtop";
   else if(fileName.find("STtchannel__antitop")!=std::string::npos) return "t-channel_antitop";
@@ -67,9 +79,14 @@ std::string HTTAnalyzer::getSampleNameFromFileName(const EventProxyHTT & myEvent
   else if(fileName.find("WZTo1L1Nu2Q")!=std::string::npos) return "WZTo1L1Nu2Q";
   else if(fileName.find("VVTo2L2Nu")!=std::string::npos) return "VVTo2L2Nu";
   else if(fileName.find("WZTo2L2Q")!=std::string::npos) return "WZTo2L2Q";
+  else if(fileName.find("EWKWMinus")!=std::string::npos) return "EWKWMinus";
+  else if(fileName.find("EWKWPlus")!=std::string::npos) return "EWKWPlus";
+  else if(fileName.find("EWKZ2JetsZToLL")!=std::string::npos) return "EWKZ2JetsZToLL";
+  else if(fileName.find("EWKZ2JetsZToNuNu")!=std::string::npos) return "EWKZ2JetsZToNuNu";
   else if(fileName.find("QCD")!=std::string::npos) return "QCD_MC";
   else if(fileName.find("DY")!=std::string::npos) return getDYSampleName(myEventProxy);
-
+  else if(fileName.find("TTTune")!=std::string::npos) return "TTbar";
+  
   return "Unknown";
 }
 //////////////////////////////////////////////////////////////////////////////
