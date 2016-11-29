@@ -46,6 +46,28 @@ void AnalysisHistograms::addProfile(const std::string& name,
   else cout<<"ERROR Substituting existing profile!"<<endl;    
 }
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////
+void AnalysisHistograms::addRollHistogram(const std::string& name, const std::string& title,
+					  const std::vector<double> & binsX,
+					  const std::vector<double> & binsY,
+					  TDirectory* myDir){
+
+
+  int nBinsX = binsX.size()-1;
+  int nBinsY = binsY.size()-1;
+  ///Include only overflow bins in unrolled histogram.
+  int nUnrolledBins = (nBinsX+1)*(nBinsY+1);
+
+  TString rolledName(name.c_str());
+  rolledName.ReplaceAll("UnRoll","Roll");
+  rolledName.ReplaceAll("1D","2D");
+
+  add2DHistogram(rolledName.Data(),title,
+		 nBinsX, binsX.data(),
+		 nBinsY, binsY.data(), 
+		 file_);
+  add1DHistogram(name,title,nUnrolledBins, 0.5, nUnrolledBins+0.5,file_);
+}
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////
 void  AnalysisHistograms::add1DHistogram(const std::string& name, const std::string& title,
 					 int nBinsX, float xlow, float xhigh,
 					 TDirectory* myDir){
@@ -62,7 +84,8 @@ void  AnalysisHistograms::add1DHistogram(const std::string& name, const std::str
   else cout<<"ERROR Substituting existing histogram!"<<endl;  
 }
 //////////////////////////////////////////////////////////////////////////////
-void  AnalysisHistograms::add1DHistogram(const std::string& name, const std::string& title, int nBinsX, float* bins,
+void  AnalysisHistograms::add1DHistogram(const std::string& name, const std::string& title, 
+					 int nBinsX, const double* bins,
 					 TDirectory* myDir){
 
   using namespace std;
@@ -97,8 +120,8 @@ void  AnalysisHistograms::add2DHistogram(const std::string& name, const std::str
 }
 //////////////////////////////////////////////////////////////////////////////
 void  AnalysisHistograms::add2DHistogram(const std::string& name, const std::string& title,
-					 int nBinsX, float* binsX,
-					 int nBinsY, float* binsY, 					 
+					 int nBinsX, const double* binsX,
+					 int nBinsY, const double* binsY, 					 
 					 TDirectory* myDir){
   using namespace std;
   unsigned int iThread = omp_get_thread_num();
@@ -115,7 +138,7 @@ void  AnalysisHistograms::add2DHistogram(const std::string& name, const std::str
 //////////////////////////////////////////////////////////////////////////////
 void  AnalysisHistograms::add2DHistogram(const std::string& name, const std::string& title,
 					 int nBinsX, float xlow, float xhigh,
-					 int nBinsY, double* binsY, 					 
+					 int nBinsY, const double* binsY, 					 
 					 TDirectory* myDir){
 
   using namespace std;
@@ -150,9 +173,9 @@ void  AnalysisHistograms::add3DHistogram(const std::string& name, const std::str
 }
 //////////////////////////////////////////////////////////////////////////////
 void  AnalysisHistograms::add3DHistogram(const std::string& name, const std::string& title,
-					 int nBinsX, double* binsX,
-					 int nBinsY, double* binsY,
-					 int nBinsZ, double* binsZ,
+					 int nBinsX, const double* binsX,
+					 int nBinsY, const double* binsY,
+					 int nBinsZ, const double* binsZ,
 					 TDirectory* myDir){
 
   using namespace std;
@@ -206,25 +229,21 @@ bool  AnalysisHistograms::fill1DHistogram(const std::string& name, float val, fl
    std::string templateName = getTemplateName(name);
    TH1F *hTemplate = get1DHistogram(templateName,true);
    if(!hTemplate) return false;
-   
    if(hTemplate->GetXaxis()->IsVariableBinSize()){
-      Float_t* binsArray = new Float_t[hTemplate->GetNbinsX()+1];
-      for(unsigned int iBin=0;iBin<=hTemplate->GetNbinsX();++iBin){
-	binsArray[iBin] = hTemplate->GetXaxis()->GetXbins()->At(iBin);
-      }
-      add1DHistogram(name,"",hTemplate->GetNbinsX(),binsArray, file_);
-      delete binsArray;      
-    }
-    else{
-      add1DHistogram(name,"",
-		     hTemplate->GetNbinsX(),
-		     hTemplate->GetXaxis()->GetXmin(),
-		     hTemplate->GetXaxis()->GetXmax(),
-		     file_);
-    }
-   my1Dhistograms_[iThread].find(name)->second->Fill(val,weight);
+     add1DHistogram(name,"",
+		    hTemplate->GetNbinsX(),
+		    hTemplate->GetXaxis()->GetXbins()->GetArray(),
+		    file_);
+   }
+   else{
+     add1DHistogram(name,"",
+		    hTemplate->GetNbinsX(),
+		    hTemplate->GetXaxis()->GetXmin(),
+		    hTemplate->GetXaxis()->GetXmax(),
+		    file_);
+   }
+     my1Dhistograms_[iThread].find(name)->second->Fill(val,weight);
  }
- 
  return true;
 }
 //////////////////////////////////////////////////////////////////////////////
@@ -240,17 +259,28 @@ bool AnalysisHistograms::fill2DHistogram(const std::string& name, float val1, fl
    std::string templateName = getTemplateName(name);
    TH2F *hTemplate = get2DHistogram(templateName,true);
    if(!hTemplate) return false;
-   add2DHistogram(name,"",
-		  hTemplate->GetNbinsX(),
-		  hTemplate->GetXaxis()->GetXmin(),
-		  hTemplate->GetXaxis()->GetXmax(),
-		  hTemplate->GetNbinsY(),
-		  hTemplate->GetYaxis()->GetXmin(),
-		  hTemplate->GetYaxis()->GetXmax(),
-		  file_);
+   if(hTemplate->GetXaxis()->IsVariableBinSize() &&
+      hTemplate->GetYaxis()->IsVariableBinSize()){
+     add2DHistogram(name,"",
+		    hTemplate->GetNbinsX(),
+		    hTemplate->GetXaxis()->GetXbins()->GetArray(),
+		    hTemplate->GetNbinsY(),
+		    hTemplate->GetYaxis()->GetXbins()->GetArray(),
+		    file_);
+   }
+   else{
+     add2DHistogram(name,"",
+		    hTemplate->GetNbinsX(),
+		    hTemplate->GetXaxis()->GetXmin(),
+		    hTemplate->GetXaxis()->GetXmax(),
+		    hTemplate->GetNbinsY(),
+		    hTemplate->GetYaxis()->GetXmin(),
+		    hTemplate->GetYaxis()->GetXmax(),
+		    file_);
+   }
    my2Dhistograms_[iThread].find(name)->second->Fill(val1,val2,weight);
  }
-  
+ 
  return true;
 }
 //////////////////////////////////////////////////////////////////////////////
@@ -267,17 +297,29 @@ bool  AnalysisHistograms::fill3DHistogram(const std::string& name, float val1, f
    std::string templateName = getTemplateName(name);
    TH3F *hTemplate = get3DHistogram(templateName,true);
    if(!hTemplate) return false;
-   add3DHistogram(name,"",
-		  hTemplate->GetNbinsX(),
-		  hTemplate->GetXaxis()->GetXmin(),
-		  hTemplate->GetXaxis()->GetXmax(),
-		  hTemplate->GetNbinsY(),
-		  hTemplate->GetYaxis()->GetXmin(),
-		  hTemplate->GetYaxis()->GetXmax(),
-		  hTemplate->GetNbinsZ(),
-		  hTemplate->GetZaxis()->GetXmin(),
-		  hTemplate->GetZaxis()->GetXmax(),
-		  file_);
+   if(hTemplate->GetXaxis()->IsVariableBinSize()){
+     add3DHistogram(name,"",
+		    hTemplate->GetNbinsX(),
+		    hTemplate->GetXaxis()->GetXbins()->GetArray(),
+		    hTemplate->GetNbinsY(),
+		    hTemplate->GetYaxis()->GetXbins()->GetArray(),
+		    hTemplate->GetNbinsZ(),
+		    hTemplate->GetZaxis()->GetXbins()->GetArray(),
+		    file_);
+   }
+   else{
+     add3DHistogram(name,"",
+		    hTemplate->GetNbinsX(),
+		    hTemplate->GetXaxis()->GetXmin(),
+		    hTemplate->GetXaxis()->GetXmax(),
+		    hTemplate->GetNbinsY(),
+		    hTemplate->GetYaxis()->GetXmin(),
+		    hTemplate->GetYaxis()->GetXmax(),
+		    hTemplate->GetNbinsZ(),
+		    hTemplate->GetZaxis()->GetXmin(),
+		    hTemplate->GetZaxis()->GetXmax(),
+		    file_);
+   }
    my3Dhistograms_[iThread].find(name)->second->Fill(val1,val2,val3,weight);  
  }
    
@@ -285,10 +327,29 @@ bool  AnalysisHistograms::fill3DHistogram(const std::string& name, float val1, f
 }
 //////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////
+bool AnalysisHistograms::fill2DUnrolledHistogram(const std::string &name, float val1, float val2, float weight){
+
+  bool noClone = true;
+  TString rolledName(name.c_str());
+  rolledName.ReplaceAll("UnRoll","Roll");
+  rolledName.ReplaceAll("1D","2D");
+  fill2DHistogram(rolledName.Data(), val1, val2, weight);    
+  TH2F *hRolled = get2DHistogram(rolledName.Data(), noClone);
+
+  if(!hRolled) return false;
+  int nBinsX = hRolled->GetNbinsX();
+  int iUnrolledBinX = hRolled->GetXaxis()->FindBin(val1);  
+  int iUnrolledBinY = hRolled->GetYaxis()->FindBin(val2);  
+  int iUnrolledBin = iUnrolledBinX + (iUnrolledBinY-1)*(nBinsX+1);
+  
+
+  return fill1DHistogram(name, iUnrolledBin, weight);    
+}
+//////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////////
 TProfile* AnalysisHistograms::getProfile(const std::string& name, bool noClone) {
 
  using namespace std;
-
 
  unsigned int iThread = omp_get_thread_num();
  if(name.find("Template")!=std::string::npos) iThread = 0;

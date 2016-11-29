@@ -180,12 +180,19 @@ void HTTAnalyzer::fillControlHistos(const std::string & hNameSuffix, float event
     myHistos_->fill1DHistogram("h1DEtaLeadingJet"+hNameSuffix,aJet1.getP4().Eta(),eventWeight);
     myHistos_->fill1DHistogram("h1DCSVBtagLeadingJet"+hNameSuffix,aJet1.getProperty(PropertyEnum::bCSVscore),eventWeight);
   }
+  float jetsMass = 0;
   if(nJets30>1){  
-    float jetsMass = (aJet1.getP4()+aJet2.getP4()).M();
+    jetsMass = (aJet1.getP4()+aJet2.getP4()).M();
     myHistos_->fill1DHistogram("h1DWideMass2J"+hNameSuffix,jetsMass,eventWeight);
   }
   
   myHistos_->fill1DHistogram("h1DPtMET"+hNameSuffix,aMET.getP4().Pt(),eventWeight);
+
+  ///Unrolled distributions for 2D fit
+  myHistos_->fill2DUnrolledHistogram("h1DUnRollTauPtMassVis"+hNameSuffix, aPair.getP4().M(), aTau.getP4().Pt(),eventWeight);
+  myHistos_->fill2DUnrolledHistogram("h1DUnRollHiggsPtMassSV"+hNameSuffix, aPair.getP4SVFit().M(), higgsPt, eventWeight);
+  myHistos_->fill2DUnrolledHistogram("h1DUnRollMjjMassSV"+hNameSuffix, aPair.getP4SVFit().M(), jetsMass, eventWeight);
+
 
   fillDecayPlaneAngle(hNameSuffix, eventWeight);
 
@@ -241,6 +248,11 @@ bool HTTAnalyzer::passCategory(const HTTAnalyzer::muTauCategory & aCategory){
 
   bool vbf_high = aTau.getP4().Pt()>20 &&
     nJets30==2 && jetsMass>800 && higgsPt>100;
+
+  //2D categories
+  bool jet0 = aTau.getP4().Perp()>30 && nJets30 == 0;
+  bool boosted = aTau.getP4().Perp()>30 && (nJets30==1 || (nJets30==2 && jetsMass < 300) || nJets30 > 2);
+  bool vbf = aTau.getP4().Perp()>30 && nJets30==2 && jetsMass>300;
   
   bool wSelection = aPair.getMTMuon()>80 && aMuon.getProperty(PropertyEnum::combreliso)<0.15;
   bool ttSelection =  aPair.getMTMuon()>150;
@@ -254,13 +266,17 @@ bool HTTAnalyzer::passCategory(const HTTAnalyzer::muTauCategory & aCategory){
   categoryDecisions[(int)HTTAnalyzer::vbf_low] = mtSelection && vbf_low;
   categoryDecisions[(int)HTTAnalyzer::vbf_high] = mtSelection && vbf_high;
 
+  categoryDecisions[(int)HTTAnalyzer::jet0] = mtSelection && jet0;  
+  categoryDecisions[(int)HTTAnalyzer::boosted] = mtSelection && boosted;
+  categoryDecisions[(int)HTTAnalyzer::vbf] = mtSelection && vbf;
+
   categoryDecisions[(int)HTTAnalyzer::W] = wSelection;
   categoryDecisions[(int)HTTAnalyzer::TT] = ttSelection;
   
   return categoryDecisions[(int)aCategory];
 }
 //////////////////////////////////////////////////////////////////////////////
-//////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////////                                                                                               
 bool HTTAnalyzer::analyze(const EventProxyBase& iEvent){
 
   const EventProxyHTT & myEventProxy = static_cast<const EventProxyHTT&>(iEvent);
@@ -283,10 +299,6 @@ bool HTTAnalyzer::analyze(const EventProxyBase& iEvent){
   if(!myEventProxy.pairs->size()) return true;
 
   setAnalysisObjects(myEventProxy);
-  float muonScaleFactor = getLeptonCorrection(aMuon.getP4().Eta(), aMuon.getP4().Pt(), hadronicTauDecayModes::tauDecayMuon);
-  float tauScaleFactor = getLeptonCorrection(aTau.getP4().Eta(), aTau.getP4().Pt(),
-					     static_cast<hadronicTauDecayModes>(aTau.getProperty(PropertyEnum::decayMode)));
-  eventWeight*=muonScaleFactor*tauScaleFactor;
   
   std::pair<bool, bool> goodDecayModes = checkTauDecayMode(myEventProxy);
   bool goodGenDecayMode = goodDecayModes.first;
@@ -309,7 +321,14 @@ bool HTTAnalyzer::analyze(const EventProxyBase& iEvent){
   bool trigger = aMuon.hasTriggerMatch(TriggerEnum::HLT_IsoMu22) || 
 		 aMuon.hasTriggerMatch(TriggerEnum::HLT_IsoTkMu22);
   
-  if(sampleName!="Data") trigger = true; //MC trigger included in muon SF
+  if(sampleName!="Data"){
+    float muonScaleFactor = getLeptonCorrection(aMuon.getP4().Eta(), aMuon.getP4().Pt(), hadronicTauDecayModes::tauDecayMuon);
+    float tauScaleFactor = getLeptonCorrection(aTau.getP4().Eta(), aTau.getP4().Pt(),
+					       static_cast<hadronicTauDecayModes>(aTau.getProperty(PropertyEnum::decayMode)));
+    eventWeight*=muonScaleFactor*tauScaleFactor;
+    trigger = true; //MC trigger included in muon SF
+  }
+
 									   
   bool cpMuonSelection = aMuon.getPCARefitPV().Perp()>0.003;    
   bool cpTauSelection = (aTau.getProperty(PropertyEnum::decayMode)==tauDecay1ChargedPion0PiZero && aTau.getPCARefitPV().Mag()>0.003) ||
@@ -319,7 +338,6 @@ bool HTTAnalyzer::analyze(const EventProxyBase& iEvent){
   
   if(!tauKinematics || !tauID || !muonKinematics || !trigger) return true;
   //if(!cpSelection) return true;
-
  
   ///Note: parts of the signal/control region selection are applied in the following code.
   bool SS = aTau.getCharge()*aMuon.getCharge() == 1;
