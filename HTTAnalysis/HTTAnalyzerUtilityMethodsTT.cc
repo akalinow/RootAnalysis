@@ -51,15 +51,15 @@ std::string HTTAnalyzerTT::getSampleNameFromFileName(const EventProxyHTT & myEve
   else if(fileName.find("VBFHToTauTauM120")!=std::string::npos) return "qqH120";  
   else if(fileName.find("VBFHToTauTauM125")!=std::string::npos) return "qqH125";
   else if(fileName.find("VBFHToTauTauM130")!=std::string::npos) return "qqH130";
-  else if(fileName.find("WplusHToTauTau_M120")!=std::string::npos) return "WplusHM120";
-  else if(fileName.find("WplusHToTauTau_M125")!=std::string::npos) return "WplusHM125";
-  else if(fileName.find("WplusHToTauTau_M130")!=std::string::npos) return "WplusHM130";
-  else if(fileName.find("WminusHToTauTau_M120")!=std::string::npos) return "WminusHM120";
-  else if(fileName.find("WminusHToTauTau_M125")!=std::string::npos) return "WminusHM125";
-  else if(fileName.find("WminusHToTauTau_M130")!=std::string::npos) return "WminusHM130";
-  else if(fileName.find("ZHM120")!=std::string::npos) return "ZHM120";
-  else if(fileName.find("ZHM125")!=std::string::npos) return "ZHM125";
-  else if(fileName.find("ZHM130")!=std::string::npos) return "ZHM130";
+  else if(fileName.find("WplusHToTauTau_M120")!=std::string::npos) return "WplusH120";
+  else if(fileName.find("WplusHToTauTau_M125")!=std::string::npos) return "WplusH125";
+  else if(fileName.find("WplusHToTauTau_M130")!=std::string::npos) return "WplusH130";
+  else if(fileName.find("WminusHToTauTau_M120")!=std::string::npos) return "WminusH120";
+  else if(fileName.find("WminusHToTauTau_M125")!=std::string::npos) return "WminusH125";
+  else if(fileName.find("WminusHToTauTau_M130")!=std::string::npos) return "WminusH130";
+  else if(fileName.find("ZHM120")!=std::string::npos) return "ZH120";
+  else if(fileName.find("ZHM125")!=std::string::npos) return "ZH125";
+  else if(fileName.find("ZHM130")!=std::string::npos) return "ZH130";
   else if(fileName.find("STtWantitop")!=std::string::npos) return "Wantitop";
   else if(fileName.find("STtWtop")!=std::string::npos) return "Wtop";
   else if(fileName.find("STtchannel__antitop")!=std::string::npos) return "t-channel_antitop";
@@ -221,8 +221,8 @@ float HTTAnalyzerTT::getLeptonCorrection(float eta, float pt, hadronicTauDecayMo
       tau_trg_efficiency = scaleWorkspace->function("t_trgTightIsoSS_data")->getVal();      
     }
     else{
-      tau_id_scalefactor = scaleWorkspace->function("t_iso_mva_t_pt40_eta2p1_sf")->getVal();
-      //tau_id_scalefactor = 0.9;//according to https://twiki.cern.ch/twiki/bin/view/CMS/SMTauTau2016#MC_corrections
+      //tau_id_scalefactor = scaleWorkspace->function("t_iso_mva_t_pt40_eta2p1_sf")->getVal();
+      tau_id_scalefactor = 0.9;//according to https://twiki.cern.ch/twiki/bin/view/CMS/SMTauTau2016#MC_corrections
       tau_trg_efficiency = scaleWorkspace->function("t_trgTightIso_data")->getVal();
     }
     return tau_id_scalefactor*tau_trg_efficiency;

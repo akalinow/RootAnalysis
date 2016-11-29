@@ -179,9 +179,10 @@ void HTTAnalyzerTT::fillControlHistos(const std::string & hNameSuffix, float eve
   myHistos_->fill1DHistogram("h1DStatsDecayMode"+hNameSuffix,aTau2.getProperty(PropertyEnum::decayMode), eventWeight);
   myHistos_->fill1DHistogram("h1DnPCATrailingTau"+hNameSuffix,aTau2.getPCARefitPV().Mag(),eventWeight);
   myHistos_->fill1DHistogram("h1DPtTrailingTauLeadingTk"+hNameSuffix,aTau2.getProperty(PropertyEnum::leadChargedParticlePt),eventWeight);
+
   float higgsPt =  (aTau1.getP4() + aTau2.getP4() + aMET.getP4()).Pt();
   myHistos_->fill1DHistogram("h1DPtTauTauMET"+hNameSuffix,higgsPt,eventWeight);
-  
+
   ///Fill jets info           
   myHistos_->fill1DHistogram("h1DStatsNJ30"+hNameSuffix,nJets30,eventWeight);
   if(nJets30>0){
@@ -189,12 +190,13 @@ void HTTAnalyzerTT::fillControlHistos(const std::string & hNameSuffix, float eve
     myHistos_->fill1DHistogram("h1DEtaLeadingJet"+hNameSuffix,aJet1.getP4().Eta(),eventWeight);
     myHistos_->fill1DHistogram("h1DCSVBtagLeadingJet"+hNameSuffix,aJet1.getProperty(PropertyEnum::bCSVscore),eventWeight);
   }
+  float jetsMass = 0 ;
   if(nJets30>1){  
     myHistos_->fill1DHistogram("h1DStatsNJGap30"+hNameSuffix,nJetsInGap30,eventWeight);
-    float jetsMass = (aJet1.getP4() + aJet2.getP4()).M();
+    jetsMass = (aJet1.getP4() + aJet2.getP4()).M();
     float jetsEta = std::abs(aJet1.getP4().Eta() - aJet2.getP4().Eta());
     myHistos_->fill1DHistogram("h1DWideMass2J"+hNameSuffix,jetsMass,eventWeight);
-    myHistos_->fill1DHistogram("h1DEta2J"+hNameSuffix,jetsMass,eventWeight);
+    myHistos_->fill1DHistogram("h1DDeltaEta2J"+hNameSuffix,jetsEta,eventWeight);
     myHistos_->fill1DHistogram("h1DPtTrailingJet"+hNameSuffix,aJet2.getP4().Pt(),eventWeight);
     myHistos_->fill1DHistogram("h1DEtaTrailingJet"+hNameSuffix,aJet2.getP4().Eta(),eventWeight);
     myHistos_->fill1DHistogram("h1DCSVBtagTrailingJet"+hNameSuffix,aJet2.getProperty(PropertyEnum::bCSVscore),eventWeight);
@@ -202,6 +204,11 @@ void HTTAnalyzerTT::fillControlHistos(const std::string & hNameSuffix, float eve
   
   myHistos_->fill1DHistogram("h1DPtMET"+hNameSuffix,aMET.getP4().Pt(),eventWeight);
   myHistos_->fill1DHistogram("h1DPhiMET"+hNameSuffix,aMET.getP4().Phi(),eventWeight);
+
+  ///Unrolled distributions for 2D fit
+  myHistos_->fill2DUnrolledHistogram("h1DUnRollHiggsPtMassSV"+hNameSuffix, aPair.getP4SVFit().M(), higgsPt, eventWeight);
+  myHistos_->fill2DUnrolledHistogram("h1DUnRollMjjMassSV"+hNameSuffix, aPair.getP4SVFit().M(), jetsMass, eventWeight);
+
 
   fillDecayPlaneAngle(hNameSuffix, eventWeight);
 
@@ -311,12 +318,6 @@ bool HTTAnalyzerTT::analyze(const EventProxyBase& iEvent){
   if(!myEventProxy.pairs->size()) return true;
 
   setAnalysisObjects(myEventProxy);
-  float tau1ScaleFactor = getLeptonCorrection(aTau1.getP4().Eta(), aTau1.getP4().Pt(),
-					      static_cast<hadronicTauDecayModes>(aTau1.getProperty(PropertyEnum::decayMode)));
-  float tau2ScaleFactor = getLeptonCorrection(aTau2.getP4().Eta(), aTau2.getP4().Pt(),
-					      static_cast<hadronicTauDecayModes>(aTau2.getProperty(PropertyEnum::decayMode)));
-  eventWeight*=tau1ScaleFactor*tau2ScaleFactor;
-
 
   std::pair<bool, bool> goodDecayModes = checkTauDecayMode(myEventProxy);
   bool goodGenDecayMode = goodDecayModes.first;
@@ -355,9 +356,14 @@ bool HTTAnalyzerTT::analyze(const EventProxyBase& iEvent){
   bool trigger = aTau1.hasTriggerMatch(TriggerEnum::HLT_DoubleMediumIsoPFTau35_Trk1_eta2p1_Reg) &&
     aTau2.hasTriggerMatch(TriggerEnum::HLT_DoubleMediumIsoPFTau35_Trk1_eta2p1_Reg); //FIXME: does not work, wrong numbering??
 
-  //if(sampleName!="Data") trigger = true; //MC trigger included in muon SF
-  if(true) trigger = true; //FIXME: problem with trigger matching??
-									   
+  if(sampleName!="Data") {
+    float tau1ScaleFactor = getLeptonCorrection(aTau1.getP4().Eta(), aTau1.getP4().Pt(),
+						static_cast<hadronicTauDecayModes>(aTau1.getProperty(PropertyEnum::decayMode)));
+    float tau2ScaleFactor = getLeptonCorrection(aTau2.getP4().Eta(), aTau2.getP4().Pt(),
+						static_cast<hadronicTauDecayModes>(aTau2.getProperty(PropertyEnum::decayMode)));
+    eventWeight*=tau1ScaleFactor*tau2ScaleFactor;
+    trigger = true; //MC trigger included in tau SF
+  }									   
   bool cpTau1Selection = (aTau1.getProperty(PropertyEnum::decayMode)==tauDecay1ChargedPion0PiZero && aTau1.getPCARefitPV().Mag()>0.003) ||
                         (aTau1.getProperty(PropertyEnum::decayMode)!=tauDecay1ChargedPion0PiZero &&
 			 isOneProng(aTau1.getProperty(PropertyEnum::decayMode))); 
