@@ -48,7 +48,7 @@ float HTTHistograms::getSampleNormalisation(std::string sampleName){
   hStats->SetBinContent(3,1);
 
   if(sampleName.find("DYJetsMatch")!=std::string::npos) {/*DYJets50 are normalised for analysed events and preselection for each nJets sample*/}
-  else if(sampleName.find("WJetsMatch")!=std::string::npos) {/*WJets are normalised for analysed events and preselection for each nJets sample*/ }
+  else if(sampleName.find("WJets")!=std::string::npos) {/*WJets are normalised for analysed events and preselection for each nJets sample*/ }
   else if(sampleName=="ST") {/*WJets are normalised for analysed events and preselection for each nJets sample*/ }
   else hStats = get1DHistogram(hName.c_str());
 
@@ -72,7 +72,7 @@ float HTTHistograms::getSampleNormalisation(std::string sampleName){
     //xsection for 3xZ->mu mu M50 in [pb]  
     crossSection = 3*1921.8;
   }
-  if(sampleName.find("WJetsMatch")!=std::string::npos){
+  if(sampleName.find("WJets")!=std::string::npos){
     //xsection for 3xW->mu nu in [pb]
     //https://twiki.cern.ch/twiki/bin/viewauth/CMS/StandardModelCrossSectionsat13TeVInclusive
     crossSection = 3*20508.9;
@@ -376,7 +376,7 @@ TH1F* HTTHistograms::get1D_SumPattern_Histogram(const std::string& name, std::st
       hSum->Reset();
     }
     if(histo && hSum){
-      float scale = getSampleNormalisation(sampleName+tauMatchSuffix);      
+      float scale = getSampleNormalisation(sampleName+tauMatchSuffix);
       hSum->Add(histo, scale);
     }
   }
@@ -1004,24 +1004,21 @@ THStack*  HTTHistograms::plotStack(unsigned int iCategory, std::string varName, 
 
   TH1F *hWJets = get1D_WJet_Histogram((hName+"WJets"+hNameSuffix).c_str());
   TH1F *hTTbarJ = get1D_TT_Histogram((hName+"TTbar"+hNameSuffix).c_str(),"MatchJ");
+  std::cout<<"TTJ entries: "<<hTTbarJ->GetEntries()<<std::endl;//test
   TH1F *hTTbarT = get1D_TT_Histogram((hName+"TTbar"+hNameSuffix).c_str(),"MatchT");
+  std::cout<<"TTT entries: "<<hTTbarT->GetEntries()<<std::endl;//test
   TH1F *hST = get1D_ST_Histogram((hName+"ST"+hNameSuffix).c_str());
-  std::cout<<"dupa1"<<std::endl;//test
   TH1F *hVVJ = get1D_VV_Histogram((hName+"DiBoson"+hNameSuffix).c_str(), "MatchJ");
-  std::cout<<"dupa2"<<std::endl;//test
+  std::cout<<"VVJ entries: "<<hVVJ->GetEntries()<<std::endl;//test
   TH1F *hVVT = get1D_VV_Histogram((hName+"DiBoson"+hNameSuffix).c_str(), "MatchT");
-  std::cout<<"dupa3"<<std::endl;//test
+  std::cout<<"VVT entries: "<<hVVJ->GetEntries()<<std::endl;//test
   TH1F *hDYJetsLowM = get1D_DYJet_Histogram((hName+"DYLowM"+hNameSuffix).c_str());
-  std::cout<<"dupa4"<<std::endl;//test
 
   bool sumDecayModes = false;
   bool sumJetBins = true;
   TH1F *hDYJetsZJ = get1D_TauMatchJetSum((hName+"DYJetsMatchJ"+hNameSuffix).c_str(), sumDecayModes, sumJetBins);
-  std::cout<<"dupa5"<<std::endl;//test
   TH1F *hDYJetsZL = get1D_TauMatchJetSum((hName+"DYJetsMatchL"+hNameSuffix).c_str(), sumDecayModes, sumJetBins);
-  std::cout<<"dupa6"<<std::endl;//test
   TH1F *hDYJetsZTT = get1D_TauMatchJetSum((hName+"DYJetsMatchT"+hNameSuffix).c_str(), sumDecayModes, sumJetBins);
-  std::cout<<"dupa7"<<std::endl;//test
 
   TH1F *hEWK2Jets = get1D_EWK2JetsSum(hName+"EWK2Jets"+hNameSuffix);
 
@@ -1117,14 +1114,16 @@ THStack*  HTTHistograms::plotStack(unsigned int iCategory, std::string varName, 
   scale = weight*lumi;
   hDYJetsZTT->Scale(scale);
   
+  //TT samples scaled for preselection during stiching step
   sampleName = "TTbarMatchJ";
-  weight = getSampleNormalisation(sampleName);
-  scale = weight*lumi;
+  //weight = getSampleNormalisation(sampleName);
+  scale=lumi;//test
   hTTbarJ->Scale(scale);
   
+  //TT samples scaled for preselection during stiching step
   sampleName = "TTbarMatchT";
-  weight = getSampleNormalisation(sampleName);
-  scale = weight*lumi;
+  //weight = getSampleNormalisation(sampleName);
+  scale=lumi;//test
   hTTbarT->Scale(scale);
 
   sampleName = "QCD_MC";
@@ -1141,11 +1140,13 @@ THStack*  HTTHistograms::plotStack(unsigned int iCategory, std::string varName, 
   sampleName = "DiBosonMatchJ";
   scale = lumi;
   hVVJ->Scale(scale);
+  std::cout<<"VVJ: "<<weight<<" "<<scale<<std::endl;//test
 
   //VV samples scaled for preselection during stiching step
   sampleName = "DiBosonMatchT";
   scale = lumi;
   hVVT->Scale(scale);
+  std::cout<<"VVT: "<<weight<<" "<<scale<<std::endl;//test
 
   ///EWK 2Jets scaled for preselection during stiching step
   sampleName = "EWK2Jets";
@@ -1497,6 +1498,7 @@ std::pair<float,float> HTTHistograms::getQCDOStoSS(unsigned int iCategory,
   sampleName = "TTbar";
   weight = getSampleNormalisation(sampleName);
   scale = weight*lumi;
+  scale = lumi;//test
   hTTOS->Scale(scale);
   hTTSS->Scale(scale);
 
@@ -1612,6 +1614,7 @@ TH1F* HTTHistograms::getQCDbackground(unsigned int iCategory,
   sampleName = "TTbar";
   weight = getSampleNormalisation(sampleName);
   scale = weight*lumi;
+  scale = lumi;//test
   hTTbar->Scale(scale);
 
   sampleName = "qqH125";
@@ -1698,6 +1701,7 @@ std::pair<float,float> HTTHistograms::getWNormalisation(unsigned int iCategory, 
   sampleName = "TTbar";
   weight = getSampleNormalisation(sampleName);
   scale = weight*lumi;
+  scale = lumi;//test
   hTT->Scale(scale);
   
   sampleName = "ST";
