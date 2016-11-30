@@ -41,6 +41,10 @@ class AnalysisHistograms {
   virtual bool fill1DHistogram(const std::string &name, float val, float weight=1.0);
   virtual bool fill2DHistogram(const std::string &name, float val1, float val2, float weight=1.0);
   virtual bool fill3DHistogram(const std::string &name, float val1, float val2, float val3, float weight=1.0);
+
+  ///Fill 1D histogram with unrolled Y direction.
+  ///Bins from each row in Y are set side by side in 1D.
+  virtual bool fill2DUnrolledHistogram(const std::string &name, float val1, float val2, float weight=1.0);
   
   TProfile* getProfile(const std::string& name, bool noClone = false);
   TH1F* get1DHistogram(const std::string& name, bool noClone = false);
@@ -79,12 +83,17 @@ class AnalysisHistograms {
 		  int nBinsX, float xlow, float xhigh, 
 		  TDirectory* myDir);
 
+  void addRollHistogram(const std::string& name, const std::string& title,
+			const std::vector<double> & binsX,
+			const std::vector<double> & binsY,
+			TDirectory* myDir);
+  
   void add1DHistogram(const std::string& name, const std::string& title,
 		      int nBinsX, float xlow, float xhigh, 
 		      TDirectory* myDir);
 
   void add1DHistogram(const std::string& name, const std::string& title,
-		      int nBinsX, float* bins, 
+		      int nBinsX, const double* bins, 
 		      TDirectory* myDir);
 
   void add2DHistogram(const std::string& name, const std::string& title,
@@ -93,13 +102,13 @@ class AnalysisHistograms {
 		      TDirectory* myDir);
   
   void add2DHistogram(const std::string& name, const std::string& title,
-		      int nBinsX, float* binsX,
-		      int nBinsY, float* binsY,
+		      int nBinsX, const double* binsX,
+		      int nBinsY, const double* binsY,
 		      TDirectory* myDir);
 
   void add2DHistogram(const std::string& name, const std::string& title,
 		      int nBinsX, float xlow, float xhigh,
-		      int nBinsY, double* binsY,
+		      int nBinsY, const double* binsY,
 		      TDirectory* myDir);
 
   void add3DHistogram(const std::string& name, const std::string& title,
@@ -109,9 +118,9 @@ class AnalysisHistograms {
 		      TDirectory* myDir);
 
   void add3DHistogram(const std::string& name, const std::string& title,
-		      int nBinsX, double* binsX,		                                           
-		      int nBinsY, double* binsY,
-		      int nBinsZ, double* binsZ, 
+		      int nBinsX, const double* binsX,		                                           
+		      int nBinsY, const double* binsY,
+		      int nBinsZ, const double* binsZ, 
 		      TDirectory* myDir);
     
   static void resetHistos(std::pair<const std::string, TH1*> aPair);

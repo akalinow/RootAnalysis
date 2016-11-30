@@ -1,12 +1,12 @@
 #include <sstream>
 #include <bitset>
 
-#include "HTTAnalyzer.h"
-#include "HTTHistograms.h"
+#include "HTTAnalyzerTT.h"
+#include "HTTHistogramsTT.h"
 
 //////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////
-void HTTAnalyzer::fillDecayPlaneAngle(const std::string & hNameSuffix, float eventWeight){
+void HTTAnalyzerTT::fillDecayPlaneAngle(const std::string & hNameSuffix, float eventWeight){
 
   ///Method from http://arxiv.org/abs/1108.0670 (S. Berge)
   ///take impact parameters instead of tau momentum.
@@ -15,49 +15,57 @@ void HTTAnalyzer::fillDecayPlaneAngle(const std::string & hNameSuffix, float eve
 
   ///Method from http://arxiv.org/abs/hep-ph/0204292 (Was)
   ///Angle between rho decay planes in the rho-rho.
-  ///Here we take rho on one side, mu on the other
+  std::pair<float,float>  anglesRhoRho;  
+  ///Here we take rho on one side, pi+/- on the other
   std::pair<float,float>  anglesIPRho;  
 
-  TLorentzVector muonTk = aMuon.getChargedP4();
-  TLorentzVector tauLeadingTk = aTau.getChargedP4();
-  TLorentzVector muonPCA(aMuon.getPCA(),0);
-  TLorentzVector tauPCA(aTau.getPCA(),0);
+  TLorentzVector tau1LeadingTk = aTau1.getChargedP4();
+  TLorentzVector tau2LeadingTk = aTau2.getChargedP4();
+  TLorentzVector tau1PCA(aTau1.getPCA(),0);
+  TLorentzVector tau2PCA(aTau2.getPCA(),0);
 
   if(hNameSuffix.find("AODPV")!=std::string::npos){
-    muonPCA = TLorentzVector(aMuon.getPCA(),0);
-    tauPCA = TLorentzVector(aTau.getPCA(),0);
+    tau1PCA = TLorentzVector(aTau1.getPCA(),0);
+    tau2PCA = TLorentzVector(aTau2.getPCA(),0);
   }    
   if(hNameSuffix.find("RefitPV")!=std::string::npos){
-    muonPCA = TLorentzVector(aMuon.getPCARefitPV(),0);
-    tauPCA = TLorentzVector(aTau.getPCARefitPV(),0);
+    tau1PCA = TLorentzVector(aTau1.getPCARefitPV(),0);
+    tau2PCA = TLorentzVector(aTau2.getPCARefitPV(),0);
   }
   if(hNameSuffix.find("GenPV")!=std::string::npos){
-    muonPCA = TLorentzVector(aMuon.getPCAGenPV(),0);
-    tauPCA = TLorentzVector(aTau.getPCAGenPV(),0);
+    tau1PCA = TLorentzVector(aTau1.getPCAGenPV(),0);
+    tau2PCA = TLorentzVector(aTau2.getPCAGenPV(),0);
   }
 
-  if(aMuon.getCharge()>0) {
-    angles = angleBetweenPlanes(muonTk, muonPCA, tauLeadingTk, tauPCA);
-    anglesIPRho = angleBetweenPlanes(muonTk, muonPCA, tauLeadingTk, aTau.getNeutralP4());				     
+  if(aTau1.getCharge()>0) {
+    angles = angleBetweenPlanes(tau1LeadingTk, tau1PCA, tau2LeadingTk, tau2PCA);
+    anglesIPRho = angleBetweenPlanes(tau1LeadingTk, tau1PCA, tau2LeadingTk, aTau2.getNeutralP4());
+    anglesRhoRho = angleBetweenPlanes(tau1LeadingTk, aTau1.getNeutralP4(), tau2LeadingTk, aTau2.getNeutralP4());
   }
   else{
-    angles = angleBetweenPlanes(tauLeadingTk, tauPCA, muonTk, muonPCA);
-    anglesIPRho = angleBetweenPlanes(tauLeadingTk, aTau.getNeutralP4(), muonTk, muonPCA);
+    angles = angleBetweenPlanes(tau2LeadingTk, tau2PCA, tau1LeadingTk, tau1PCA);
+    anglesIPRho = angleBetweenPlanes(tau2LeadingTk, tau2PCA, tau1LeadingTk, aTau1.getNeutralP4());
+    anglesRhoRho = angleBetweenPlanes(tau2LeadingTk, aTau2.getNeutralP4(), tau1LeadingTk, aTau1.getNeutralP4());
   }
 
   myHistos_->fillProfile("hProfRecoVsMagGen_"+hNameSuffix,
-			 aGenHadTau.getPCA().Mag(),
-			 tauPCA.Vect().Mag(),
+			 aGenTau1.getPCA().Mag(),
+			 tau1PCA.Vect().Mag(),
+			 eventWeight);
+  myHistos_->fillProfile("hProfRecoVsMagGen_"+hNameSuffix,
+			 aGenTau2.getPCA().Mag(),
+			 tau2PCA.Vect().Mag(),
 			 eventWeight);
  
   ///////////////////////////////////////////////////////////
-  float yTau =  2.*tauLeadingTk.Pt()/aTau.getP4().Pt() - 1.;
+  float yTau1 =  2.*tau1LeadingTk.Pt()/aTau1.getP4().Pt() - 1.;
+  float yTau2 =  2.*tau2LeadingTk.Pt()/aTau2.getP4().Pt() - 1.;
+  float yTau = aTau1.getCharge()>0 ? yTau2 : yTau1; //FIXME: correct?
   float shiftedIPrho = anglesIPRho.first +(yTau<0)*(1-2*(anglesIPRho.first>M_PI))*M_PI;
  
-  if(aTau.getProperty(PropertyEnum::decayMode)!=tauDecay1ChargedPion0PiZero && isOneProng(aTau.getProperty(PropertyEnum::decayMode))){
+  if(aTau2.getProperty(PropertyEnum::decayMode)!=tauDecay1ChargedPion0PiZero && isOneProng(aTau2.getProperty(PropertyEnum::decayMode))){
      myHistos_->fill1DHistogram("h1DyTau"+hNameSuffix,yTau,eventWeight);
      myHistos_->fill1DHistogram("h1DPhi_nVecIP_"+hNameSuffix,shiftedIPrho,eventWeight);
-     myHistos_->fill2DUnrolledHistogram("h1DUnRollMassSVYCP"+hNameSuffix, shiftedIPrho, aPair.getP4().M(),eventWeight);
      if(yTau>0){
        myHistos_->fill1DHistogram("h1DPhi_nVecIP_yTauPos"+hNameSuffix,anglesIPRho.first,eventWeight);
      }
@@ -66,23 +74,22 @@ void HTTAnalyzer::fillDecayPlaneAngle(const std::string & hNameSuffix, float eve
      }
   }
 
-  if(aTau.getProperty(PropertyEnum::decayMode)==tauDecay1ChargedPion0PiZero){
-    float cosPhiNN =  tauPCA.Vect().Unit().Dot(muonPCA.Vect().Unit());
+  if(aTau2.getProperty(PropertyEnum::decayMode)==tauDecay1ChargedPion0PiZero){
+    float cosPhiNN =  tau1PCA.Vect().Unit().Dot(tau2PCA.Vect().Unit());
 
     myHistos_->fill1DHistogram("h1DPhi_nVectors"+hNameSuffix,angles.first,eventWeight);
-    myHistos_->fill2DUnrolledHistogram("h1DUnRollMassSVPhiCP"+hNameSuffix,angles.first, aPair.getP4().M(),eventWeight);
     myHistos_->fill1DHistogram("h1DCosPhiNN_"+hNameSuffix,cosPhiNN);
-  
-    float cosMuon =  muonPCA.Vect().Unit()*aGenMuonTau.getPCA().Unit();
-    float cosTau = tauPCA.Vect().Unit()*aGenHadTau.getPCA().Unit();
     
-    myHistos_->fillProfile("hProfPhiVsMag_"+hNameSuffix,aGenMuonTau.getPCA().Mag(),cosMuon);
-    myHistos_->fillProfile("hProfPhiVsMag_"+hNameSuffix,aGenHadTau.getPCA().Mag(),cosTau);       
+    float cosTau1 = tau1PCA.Vect().Unit()*aGenTau1.getPCA().Unit();
+    float cosTau2 = tau2PCA.Vect().Unit()*aGenTau2.getPCA().Unit();
+    
+    myHistos_->fillProfile("hProfPhiVsMag_"+hNameSuffix,aGenTau1.getPCA().Mag(),cosTau1);
+    myHistos_->fillProfile("hProfPhiVsMag_"+hNameSuffix,aGenTau2.getPCA().Mag(),cosTau2);       
     }  
 }
 //////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////
-void HTTAnalyzer::fillGenDecayPlaneAngle(const std::string & hNameSuffix, float eventWeight){
+void HTTAnalyzerTT::fillGenDecayPlaneAngle(const std::string & hNameSuffix, float eventWeight){
   
   ///Method from http://arxiv.org/abs/1108.0670 (Berger)
   ///take impact parameters instead of tau momentum.
@@ -91,52 +98,52 @@ void HTTAnalyzer::fillGenDecayPlaneAngle(const std::string & hNameSuffix, float 
 
   //Method from http://arxiv.org/abs/hep-ph/0204292 (Was)
   //Angle between rho decay planes in the rho-rho.
-  ///Here we take rho on one side, mu on the other
+  std::pair<float,float>  anglesRhoRho;  
+  ///Here we take rho on one side, pi+- on the other
   std::pair<float,float>  anglesIPRho;
 
-  TLorentzVector muonTk = aGenMuonTau.getChargedP4();
-  TLorentzVector tauLeadingTk = aGenHadTau.getChargedP4();
-  TLorentzVector muonPCA(aGenMuonTau.getPCA(),0);
-  TLorentzVector tauPCA(aGenHadTau.getPCA(),0);
+  TLorentzVector tau1LeadingTk = aGenTau1.getChargedP4();
+  TLorentzVector tau2LeadingTk = aGenTau2.getChargedP4();
+  TLorentzVector tau1PCA(aGenTau1.getPCA(),0);
+  TLorentzVector tau2PCA(aGenTau2.getPCA(),0);
 
-  if(aMuon.getCharge()>0) {
-    angles = angleBetweenPlanes(muonTk, muonPCA, tauLeadingTk, tauPCA);
-    anglesIPRho = angleBetweenPlanes(muonTk, muonPCA, tauLeadingTk, aGenHadTau.getNeutralP4());				     
+  if(aTau1.getCharge()>0) {
+    angles = angleBetweenPlanes(tau1LeadingTk, tau1PCA, tau2LeadingTk, tau2PCA);
+    anglesIPRho = angleBetweenPlanes(tau1LeadingTk, tau1PCA, tau2LeadingTk, aGenTau2.getNeutralP4());
+    anglesRhoRho = angleBetweenPlanes(tau1LeadingTk, aGenTau1.getNeutralP4(), tau2LeadingTk, aGenTau2.getNeutralP4());
   }
   else{
-    angles = angleBetweenPlanes(tauLeadingTk, tauPCA, muonTk, muonPCA);
-    anglesIPRho = angleBetweenPlanes(tauLeadingTk, aGenHadTau.getNeutralP4(), muonTk, muonPCA);
+    angles = angleBetweenPlanes(tau2LeadingTk, tau2PCA, tau1LeadingTk, tau1PCA);
+    anglesIPRho = angleBetweenPlanes(tau2LeadingTk, tau2PCA, tau1LeadingTk, aGenTau1.getNeutralP4());
+    anglesRhoRho = angleBetweenPlanes(tau2LeadingTk, aGenTau2.getNeutralP4(), tau1LeadingTk, aGenTau1.getNeutralP4());
   }
 
-  if(aGenHadTau.getProperty(PropertyEnum::decayMode)==tauDecay1ChargedPion0PiZero){
-    float cosPhiNN =  muonPCA.Vect().Unit().Dot(tauPCA.Vect().Unit());
+  if(aGenTau2.getProperty(PropertyEnum::decayMode)==tauDecay1ChargedPion0PiZero){
+    float cosPhiNN =  tau1PCA.Vect().Unit().Dot(tau2PCA.Vect().Unit());
     myHistos_->fill1DHistogram("h1DCosPhiNN_"+hNameSuffix,cosPhiNN);
     myHistos_->fill1DHistogram("h1DPhi_nVectors"+hNameSuffix,angles.first,eventWeight);
-    myHistos_->fill2DUnrolledHistogram("h1DUnRollMassSVPhiCP"+hNameSuffix,angles.first, aPair.getP4().M(),eventWeight);
   }
   //Method from http://arxiv.org/abs/hep-ph/0204292 (Was)
   //Angle between rho decay planes in the rho-rho.
   ///Here we take rho on one side, mu on the other
-  if(aGenHadTau.getProperty(PropertyEnum::decayMode)!=tauDecay1ChargedPion0PiZero && isOneProng(aGenHadTau.getProperty(PropertyEnum::decayMode))){
+  if(aGenTau2.getProperty(PropertyEnum::decayMode)!=tauDecay1ChargedPion0PiZero && isOneProng(aTau2.getProperty(PropertyEnum::decayMode))){
     
-    float yTau =  2.*tauLeadingTk.Pt()/(aGenHadTau.getChargedP4()+aGenHadTau.getNeutralP4()).Pt() - 1.;
+    float yTau =  2.*tau2LeadingTk.Pt()/(aGenTau2.getChargedP4()+aGenTau2.getNeutralP4()).Pt() - 1.;
     float shiftedIPrho = anglesIPRho.first +(yTau<0)*(1-2*(anglesIPRho.first>M_PI))*M_PI;
    
     myHistos_->fill1DHistogram("h1DyTau"+hNameSuffix,yTau,eventWeight);
     myHistos_->fill1DHistogram("h1DPhi_nVecIP_"+hNameSuffix,shiftedIPrho,eventWeight);
-    myHistos_->fill2DUnrolledHistogram("h1DUnRollMassSVYCP"+hNameSuffix, shiftedIPrho, aPair.getP4().M(),eventWeight);
-
     if(yTau>0) myHistos_->fill1DHistogram("h1DPhi_nVecIP_yTauPos"+hNameSuffix,anglesIPRho.first,eventWeight);
     else myHistos_->fill1DHistogram("h1DPhi_nVecIP_yTauNeg"+hNameSuffix,anglesIPRho.first,eventWeight);
   }
 }
 //////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////
-std::pair<float,float> HTTAnalyzer::angleBetweenPlanes(const TLorentzVector &tau1, 
-						       const TLorentzVector &tau1Daughter,
-						       const TLorentzVector &tau2, 
-						       const TLorentzVector &tau2Daughter,
-						       bool sgn){
+std::pair<float,float> HTTAnalyzerTT::angleBetweenPlanes(const TLorentzVector &tau1, 
+							 const TLorentzVector &tau1Daughter,
+							 const TLorentzVector &tau2, 
+							 const TLorentzVector &tau2Daughter,
+							 bool sgn){
   //Boost all 4v to (tau1+tau2) rest frame
   TVector3 boost = (tau1+tau2).BoostVector();
 

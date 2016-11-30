@@ -1,8 +1,8 @@
-#ifndef HTTHistograms_h
-#define HTTHistograms_h
+#ifndef HTTHistogramsTT_h
+#define HTTHistogramsTT_h
 
-// Original Author:  Artur Kalinowski
-//         Created:  wto, 29 wrz 2015, 22:03:48 CEST
+// Original Author:  Michal Bluj
+//         Created:  pon, 21 lis 2016, 13:33:31 CEST
 //
 //
 #include <string>
@@ -11,14 +11,14 @@
 
 class THStack;
 
-class HTTHistograms: public AnalysisHistograms {
-   public:
+class HTTHistogramsTT: public AnalysisHistograms {
+ public:
 
-  HTTHistograms(TDirectory *myDir);
+  HTTHistogramsTT(TDirectory *myDir);
 
-  HTTHistograms(TDirectory *myDir, const std::vector<std::string> & flavours);
+  HTTHistogramsTT(TDirectory *myDir, const std::vector<std::string> & flavours);
 
-  virtual ~HTTHistograms();
+  virtual ~HTTHistogramsTT();
 
   void finalizeHistograms(int nRuns, float weight=1.0);
 
@@ -32,24 +32,13 @@ class HTTHistograms: public AnalysisHistograms {
   ///on top of this normalisation.
   float getSampleNormalisation(std::string sampleName);
 
-  ///Estimate QCD background using the SS/OS method.
-  TH1F* getQCDbackground(unsigned int iCategory, std::string varName,
-			 std::pair<float,float> wselOSCorrection =  std::pair<float,float>(1,0),
-			 std::pair<float,float> wselSSCorrection =  std::pair<float,float>(1,0));
+  ///Estimate QCD background using the Loose/Tight method.
+  TH1F* getQCDbackground(unsigned int iCategory, std::string varName);
 
-  ///Calculate scaling factor for the WJets MC
-  ///SCaling factor is estimated in high Mt region.
-  ///Other backgrounds are subtracted, basing on MC
-  ///QCD contribution is neglected.
-  std::pair<float,float> getWNormalisation(unsigned int iCategory, std::string selName);
+  ///Calculate QCD OS/SS ratio using non isolated events.
+  std::pair<float,float> getQCDLooseToTight(unsigned int iCategory);
 
-  ///Calculate QCD OS/SS ratiousing non isolated events.
-  std::pair<float,float> getQCDOStoSS(unsigned int iCategory,
-				      std::pair<float,float> wselOSCorrection =  std::pair<float,float>(1,0),
-				      std::pair<float,float> wselSSCorrection =  std::pair<float,float>(1,0));
-
-
-   private:
+ private:
 
   std::pair<float,float> wselOSCorrection;
   std::pair<float,float> wselSSCorrection;
@@ -101,9 +90,6 @@ class HTTHistograms: public AnalysisHistograms {
   ///The results is scaled to 1/LO_xsection.
   TH1F *get1D_VJetSum(const std::string& name);
 
-  ///Return histogram for sum of the EWK + 2jets samples
-  TH1F *get1D_EWK2JetsSum(const std::string& name);
-
   ///Return histogram from nJets sample normalised by
   ///preselection/number of analysed events
   TH1F *getNormalised_NJet_Histogram(const std::string& hName);
@@ -112,7 +98,7 @@ class HTTHistograms: public AnalysisHistograms {
   //histogram name, e.g. including h1D prefix.
   void plotSingleHistogram(std::string hName);
 
-  float muTauDYScale, mumuDYScale;
+  //float tauTauDYScale, lepTauDYScale, jetTauDYScale;//MB not used
   float ttScale;
 
 };

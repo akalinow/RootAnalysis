@@ -13,7 +13,7 @@ HTTAnalyzer::HTTAnalyzer(const std::string & aName):Analyzer(aName){
   
   ///Load ROOT file with PU histograms.
   std::string filePath = "Data_Pileup_2016_BCDEFG_v26.root";
-  filePath = "Data_Pileup_2016_July21.root";
+  //filePath = "Data_Pileup_2016_July22.root";
   puDataFile_ = new TFile(filePath.c_str());
 
   filePath = "MC_Spring16_PU25ns_V1.root";
@@ -21,7 +21,7 @@ HTTAnalyzer::HTTAnalyzer(const std::string & aName):Analyzer(aName){
 
 #pragma omp critical
   {
-    filePath = "htt_scalefactors_v4.root";
+    filePath = "htt_scalefactors_v5.root";
     TFile aFile(filePath.c_str());
     scaleWorkspace = (RooWorkspace*)aFile.Get("w")->Clone("w");
     aFile.Close();
@@ -70,7 +70,7 @@ std::vector<HTTParticle> HTTAnalyzer::getSeparatedJets(const EventProxyHTT & myE
   
   for(auto aJet: *myEventProxy.jets){
     float dRTau = aJet.getP4().DeltaR(aTau.getP4());
-    float dRMu = aMuon.getP4().DeltaR(aTau.getP4());
+    float dRMu = aJet.getP4().DeltaR(aMuon.getP4());
     bool loosePFJetID = aJet.getProperty(PropertyEnum::PFjetID)>=1;
     if(dRTau>deltaR && dRMu>deltaR && loosePFJetID) separatedJets.push_back(aJet);
   }
@@ -85,6 +85,14 @@ void HTTAnalyzer::setAnalysisObjects(const EventProxyHTT & myEventProxy){
   aPair = (*myEventProxy.pairs)[0];
   aTau = aPair.getTau();
   aMuon = aPair.getMuon();
+
+  TLorentzVector met4v(aPair.getMET().X(),
+		       aPair.getMET().Y(),
+		       0,
+		       aPair.getMET().Mod());
+  
+  aMET = HTTParticle();
+  aMET.setP4(met4v);
   
   aGenMuonTau = HTTParticle();
   aGenHadTau = HTTParticle();
@@ -101,9 +109,20 @@ void HTTAnalyzer::setAnalysisObjects(const EventProxyHTT & myEventProxy){
   }
   
   aSeparatedJets = getSeparatedJets(myEventProxy, 0.5);
-  aJet = aSeparatedJets.size() ? aSeparatedJets[0] : HTTParticle();
+  aJet1 = aSeparatedJets.size() ? aSeparatedJets[0] : HTTParticle();
+  aJet2 = aSeparatedJets.size()>1 ? aSeparatedJets[1] : HTTParticle();
   nJets30 = count_if(aSeparatedJets.begin(), aSeparatedJets.end(),[](const HTTParticle & aJet){return aJet.getP4().Pt()>30;});
-  
+  nJetsInGap30 = 0;
+  if(nJets30>=2){
+    for(unsigned int iJet=2; iJet<aSeparatedJets.size(); ++iJet){
+      if( (aSeparatedJets.at(iJet).getP4().Eta()>aJet1.getP4().Eta()&&aSeparatedJets.at(iJet).getP4().Eta()<aJet2.getP4().Eta()) ||
+          (aSeparatedJets.at(iJet).getP4().Eta()<aJet1.getP4().Eta()&&aSeparatedJets.at(iJet).getP4().Eta()>aJet2.getP4().Eta()) ){
+        if(aSeparatedJets.at(iJet).getP4().Pt()>30) nJetsInGap30++;
+      }
+    }
+  }
+
+  categoryDecisions.clear();
 }
 //////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////
@@ -151,23 +170,36 @@ void HTTAnalyzer::fillControlHistos(const std::string & hNameSuffix, float event
   myHistos_->fill1DHistogram("h1DStatsDecayMode"+hNameSuffix, aTau.getProperty(PropertyEnum::decayMode), eventWeight);
   myHistos_->fill1DHistogram("h1DnPCATau"+hNameSuffix,aTau.getPCARefitPV().Mag(),eventWeight);
   myHistos_->fill1DHistogram("h1DPtTauLeadingTk"+hNameSuffix,aTau.getProperty(PropertyEnum::leadChargedParticlePt),eventWeight);
+  float higgsPt =  (aTau.getP4() + aTau.getP4() + aMET.getP4()).Pt();
+  myHistos_->fill1DHistogram("h1DPtMuTauMET"+hNameSuffix,higgsPt,eventWeight);
   
   ///Fill jets info           
   myHistos_->fill1DHistogram("h1DStatsNJ30"+hNameSuffix,nJets30,eventWeight);
   if(nJets30>0){
-    myHistos_->fill1DHistogram("h1DPtLeadingJet"+hNameSuffix,aJet.getP4().Pt(),eventWeight);
-    myHistos_->fill1DHistogram("h1DEtaLeadingJet"+hNameSuffix,aJet.getP4().Eta(),eventWeight);
-    myHistos_->fill1DHistogram("h1DCSVBtagLeadingJet"+hNameSuffix,aJet.getProperty(PropertyEnum::bCSVscore),eventWeight);
+    myHistos_->fill1DHistogram("h1DPtLeadingJet"+hNameSuffix,aJet1.getP4().Pt(),eventWeight);
+    myHistos_->fill1DHistogram("h1DEtaLeadingJet"+hNameSuffix,aJet1.getP4().Eta(),eventWeight);
+    myHistos_->fill1DHistogram("h1DCSVBtagLeadingJet"+hNameSuffix,aJet1.getProperty(PropertyEnum::bCSVscore),eventWeight);
+  }
+  float jetsMass = 0;
+  if(nJets30>1){  
+    jetsMass = (aJet1.getP4()+aJet2.getP4()).M();
+    myHistos_->fill1DHistogram("h1DWideMass2J"+hNameSuffix,jetsMass,eventWeight);
   }
   
-  myHistos_->fill1DHistogram("h1DPtMET"+hNameSuffix,aPair.getMET().Mod(),eventWeight);
+  myHistos_->fill1DHistogram("h1DPtMET"+hNameSuffix,aMET.getP4().Pt(),eventWeight);
+
+  ///Unrolled distributions for 2D fit
+  myHistos_->fill2DUnrolledHistogram("h1DUnRollTauPtMassVis"+hNameSuffix, aPair.getP4().M(), aTau.getP4().Pt(),eventWeight);
+  myHistos_->fill2DUnrolledHistogram("h1DUnRollHiggsPtMassSV"+hNameSuffix, aPair.getP4SVFit().M(), higgsPt, eventWeight);
+  myHistos_->fill2DUnrolledHistogram("h1DUnRollMjjMassSV"+hNameSuffix, aPair.getP4SVFit().M(), jetsMass, eventWeight);
+
 
   fillDecayPlaneAngle(hNameSuffix, eventWeight);
 
-  if(aJet.getProperty(PropertyEnum::bCSVscore)>0.8){
-    myHistos_->fill1DHistogram("h1DPtLeadingBJet"+hNameSuffix,aJet.getP4().Pt(),eventWeight);
-    myHistos_->fill1DHistogram("h1DEtaLeadingBJet"+hNameSuffix,aJet.getP4().Eta(),eventWeight);
-  }   
+  if(aJet1.getProperty(PropertyEnum::bCSVscore)>0.8){
+    myHistos_->fill1DHistogram("h1DPtLeadingBJet"+hNameSuffix,aJet1.getP4().Pt(),eventWeight);
+    myHistos_->fill1DHistogram("h1DEtaLeadingBJet"+hNameSuffix,aJet1.getP4().Eta(),eventWeight);
+  }  
 }
 //////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////
@@ -190,6 +222,61 @@ bool HTTAnalyzer::fillVertices(const std::string & sysType){
 }
 //////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////
+bool HTTAnalyzer::passCategory(const HTTAnalyzer::muTauCategory & aCategory){
+
+  if(categoryDecisions.size()) return  categoryDecisions[(int)aCategory];
+  else categoryDecisions = std::vector<bool>((int)HTTAnalyzer::DUMMY);
+  
+  float jetsMass = (aJet1.getP4()+aJet2.getP4()).M();
+  float higgsPt =  (aTau.getP4() + aTau.getP4() + aMET.getP4()).Pt();
+
+  bool mtSelection = aPair.getMTMuon()<50;
+
+  bool jet0_low =  aTau.getP4().Pt()>20  && aTau.getP4().Pt()<50 && nJets30==0;
+  bool jet0_high = aTau.getP4().Pt()>50 && nJets30==0;
+
+  bool jet1_low = (nJets30==1 || (nJets30==2 && jetsMass<500)) &&
+    (aTau.getP4().Pt()>30 && aTau.getP4().Pt()<40 ||
+     aTau.getP4().Pt()>40 && higgsPt<140);
+
+  bool jet1_high = (nJets30==1 || (nJets30==2 && jetsMass<500)) &&
+    (aTau.getP4().Pt()>40 && higgsPt>140);
+
+  bool vbf_low = aTau.getP4().Pt()>20 &&
+    nJets30==2 && jetsMass>500 &&
+                 (jetsMass<800 || higgsPt<100);
+
+  bool vbf_high = aTau.getP4().Pt()>20 &&
+    nJets30==2 && jetsMass>800 && higgsPt>100;
+
+  //2D categories
+  bool jet0 = aTau.getP4().Perp()>30 && nJets30 == 0;
+  bool boosted = aTau.getP4().Perp()>30 && (nJets30==1 || (nJets30==2 && jetsMass < 300) || nJets30 > 2);
+  bool vbf = aTau.getP4().Perp()>30 && nJets30==2 && jetsMass>300;
+  
+  bool wSelection = aPair.getMTMuon()>80 && aMuon.getProperty(PropertyEnum::combreliso)<0.15;
+  bool ttSelection =  aPair.getMTMuon()>150;
+
+  categoryDecisions[(int)HTTAnalyzer::jet0_low] = mtSelection && jet0_low;
+  categoryDecisions[(int)HTTAnalyzer::jet0_high] = mtSelection && jet0_high;
+  
+  categoryDecisions[(int)HTTAnalyzer::jet1_low] = mtSelection && jet1_low;
+  categoryDecisions[(int)HTTAnalyzer::jet1_high] = mtSelection && jet1_high;
+
+  categoryDecisions[(int)HTTAnalyzer::vbf_low] = mtSelection && vbf_low;
+  categoryDecisions[(int)HTTAnalyzer::vbf_high] = mtSelection && vbf_high;
+
+  categoryDecisions[(int)HTTAnalyzer::jet0] = mtSelection && jet0;  
+  categoryDecisions[(int)HTTAnalyzer::boosted] = mtSelection && boosted;
+  categoryDecisions[(int)HTTAnalyzer::vbf] = mtSelection && vbf;
+
+  categoryDecisions[(int)HTTAnalyzer::W] = wSelection;
+  categoryDecisions[(int)HTTAnalyzer::TT] = ttSelection;
+  
+  return categoryDecisions[(int)aCategory];
+}
+//////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////////                                                                                               
 bool HTTAnalyzer::analyze(const EventProxyBase& iEvent){
 
   const EventProxyHTT & myEventProxy = static_cast<const EventProxyHTT&>(iEvent);
@@ -209,24 +296,9 @@ bool HTTAnalyzer::analyze(const EventProxyBase& iEvent){
   bool postSynchMuon = myEventProxy.event->checkSelectionBit(SelectionBitsEnum::postSynchMuon);
   bool diMuonVeto = myEventProxy.event->checkSelectionBit(SelectionBitsEnum::diMuonVeto);
   bool thirdLeptonVeto = myEventProxy.event->checkSelectionBit(SelectionBitsEnum::thirdLeptonVeto);
-  //if(diMuonVeto || thirdLeptonVeto) return true;  
   if(!myEventProxy.pairs->size()) return true;
 
   setAnalysisObjects(myEventProxy);
-  float muonScaleFactor = getLeptonCorrection(aMuon.getP4().Eta(), aMuon.getP4().Pt(), hadronicTauDecayModes::tauDecayMuon);
-  float tauScaleFactor = getLeptonCorrection(aTau.getP4().Eta(), aTau.getP4().Pt(),
-					     static_cast<hadronicTauDecayModes>(aTau.getProperty(PropertyEnum::decayMode)));
-  eventWeight*=muonScaleFactor*tauScaleFactor;
-
-
-  /////TEST
-  /*
-    if(aTau.getProperty(PropertyEnum::decayMode)==tauDecay1ChargedPion0PiZero){
-    std::cout<<"Tau pt: "<<aTau.getP4().Perp()<<" mass: "<<aTau.getP4().M()
-    <<" leading tk: "<<aTau.getProperty(PropertyEnum::leadChargedParticlePt)
-    <<std::endl;
-    }
-  */
   
   std::pair<bool, bool> goodDecayModes = checkTauDecayMode(myEventProxy);
   bool goodGenDecayMode = goodDecayModes.first;
@@ -235,7 +307,7 @@ bool HTTAnalyzer::analyze(const EventProxyBase& iEvent){
   if(goodGenDecayMode) fillGenDecayPlaneAngle(sampleName+"GenNoOfflineSel", eventWeight);
   
   ///This stands for core selection, that is common to all regions.
-  bool tauKinematics = aTau.getP4().Pt()>30 && fabs(aTau.getP4().Eta())<2.3;
+  bool tauKinematics = aTau.getP4().Pt()>20 && fabs(aTau.getP4().Eta())<2.3;
   int tauIDmask = 0;
   
   for(unsigned int iBit=0;iBit<aEvent.ntauIds;iBit++){
@@ -246,100 +318,65 @@ bool HTTAnalyzer::analyze(const EventProxyBase& iEvent){
 
   bool tauID = ( (int)aTau.getProperty(PropertyEnum::tauID) & tauIDmask) == tauIDmask;
   bool muonKinematics = aMuon.getP4().Pt()>24 && fabs(aMuon.getP4().Eta())<2.1;
-  bool trigger = aMuon.hasTriggerMatch(TriggerEnum::HLT_IsoMu22) || aMuon.hasTriggerMatch(TriggerEnum::HLT_IsoTkMu22);
-  if(sampleName!="Data") trigger = true; //MC trigger included in muon SF
-  bool zeroJets = (nJets30==0);
+  bool trigger = aMuon.hasTriggerMatch(TriggerEnum::HLT_IsoMu22) || 
+		 aMuon.hasTriggerMatch(TriggerEnum::HLT_IsoTkMu22);
+  
+  if(sampleName!="Data"){
+    float muonScaleFactor = getLeptonCorrection(aMuon.getP4().Eta(), aMuon.getP4().Pt(), hadronicTauDecayModes::tauDecayMuon);
+    float tauScaleFactor = getLeptonCorrection(aTau.getP4().Eta(), aTau.getP4().Pt(),
+					       static_cast<hadronicTauDecayModes>(aTau.getProperty(PropertyEnum::decayMode)));
+    eventWeight*=muonScaleFactor*tauScaleFactor;
+    trigger = true; //MC trigger included in muon SF
+  }
+
 									   
   bool cpMuonSelection = aMuon.getPCARefitPV().Perp()>0.003;    
   bool cpTauSelection = (aTau.getProperty(PropertyEnum::decayMode)==tauDecay1ChargedPion0PiZero && aTau.getPCARefitPV().Mag()>0.003) ||
                         (aTau.getProperty(PropertyEnum::decayMode)!=tauDecay1ChargedPion0PiZero &&
 			 isOneProng(aTau.getProperty(PropertyEnum::decayMode))); 
   bool cpSelection = cpMuonSelection && cpTauSelection;
-  /*
-  std::cout<<" tauKinematics: "<<tauKinematics
-           <<" tauID: "<<tauID
-           <<" muonKinematics: "<<muonKinematics
-           <<" trigger: "<<trigger
-           <<" cpSelection: "<<cpSelection
-           <<std::endl;
-  */
+  
   if(!tauKinematics || !tauID || !muonKinematics || !trigger) return true;
   //if(!cpSelection) return true;
-  
+ 
   ///Note: parts of the signal/control region selection are applied in the following code.
   bool SS = aTau.getCharge()*aMuon.getCharge() == 1;
   bool OS = aTau.getCharge()*aMuon.getCharge() == -1;
-  bool baselineSelection = OS && aPair.getMTMuon()<50 && aMuon.getProperty(PropertyEnum::combreliso)<0.15;
-  bool baselineSelectionNoMT = OS && aMuon.getProperty(PropertyEnum::combreliso)<0.15;
-  bool wSelection = aPair.getMTMuon()>80 && aMuon.getProperty(PropertyEnum::combreliso)<0.15;
-  bool qcdSelectionSS = SS;
-  bool qcdSelectionOS = OS;
-  bool ttSelection =  aPair.getMTMuon()>150;
- 
-  ///Histograms for the baseline selection  
-  if(baselineSelection){
-    fillControlHistos(hNameSuffix, eventWeight);
-    fillDecayPlaneAngle(hNameSuffix+"RefitPV", eventWeight);
-    fillDecayPlaneAngle(hNameSuffix+"AODPV", eventWeight);
-    fillDecayPlaneAngle(hNameSuffix+"GenPV", eventWeight);
+  bool muonIso = aMuon.getProperty(PropertyEnum::combreliso)<0.15;
 
-    fillVertices(hNameSuffix+"RefitPV");
-    fillVertices(hNameSuffix+"AODPV");
-  }
-  if(baselineSelectionNoMT){
-    hNameSuffix = sampleName+"fullMt";
-    myHistos_->fill1DHistogram("h1DMassTrans"+hNameSuffix,aPair.getMTMuon(),eventWeight); 
-  }
+  std::string categorySuffix = "";
+  for(unsigned int iCategory = HTTAnalyzer::jet0_low;
+      iCategory<HTTAnalyzer::DUMMY;++iCategory){
 
-  ///Histograms for the QCD control region
-  if(qcdSelectionSS){
-    hNameSuffix = sampleName+"qcdselSS";
-    ///SS ans OS isolation histograms are filled only for mT<40 to remove possible contamination
-    //from TT in high mT region.
-    if(aPair.getMTMuon()<50) myHistos_->fill1DHistogram("h1DIso"+hNameSuffix,aMuon.getProperty(PropertyEnum::combreliso),eventWeight);
-    ///Fill SS histos in signal mu isolation region. Those histograms
-    ///provide shapes for QCD estimate in signal region and in various control regions.
-    ///If control region has OS we still use SS QCD estimate.
-    if(aMuon.getProperty(PropertyEnum::combreliso)<0.15) myHistos_->fill1DHistogram("h1DMassTrans"+hNameSuffix+"fullMt",aPair.getMTMuon(),eventWeight); 
-    if(aPair.getMTMuon()<50 && aMuon.getProperty(PropertyEnum::combreliso)<0.15) fillControlHistos(hNameSuffix, eventWeight);
-    if(aPair.getMTMuon()>80 && aMuon.getProperty(PropertyEnum::combreliso)<0.15){
-      myHistos_->fill1DHistogram("h1DMassTrans"+hNameSuffix+"wselSS",aPair.getMTMuon(),eventWeight);    
-      myHistos_->fill1DHistogram("h1DMassTrans"+hNameSuffix+"wselOS",aPair.getMTMuon(),eventWeight);
-      fillDecayPlaneAngle(hNameSuffix+"wselOS",eventWeight);
+    HTTAnalyzer::muTauCategory categoryType = static_cast<HTTAnalyzer::muTauCategory>(iCategory);
+    
+    if(!passCategory(categoryType)) continue;    
+    categorySuffix = std::to_string(iCategory);
+
+    if(OS && muonIso){
+      hNameSuffix = sampleName+"_OS_"+categorySuffix;
+      fillControlHistos(hNameSuffix, eventWeight);
+      fillDecayPlaneAngle(hNameSuffix+"RefitPV", eventWeight);
+      fillDecayPlaneAngle(hNameSuffix+"AODPV", eventWeight);
+      fillDecayPlaneAngle(hNameSuffix+"GenPV", eventWeight);
+      fillVertices(hNameSuffix+"RefitPV");
+      fillVertices(hNameSuffix+"AODPV");
     }
-    if(ttSelection){
-      myHistos_->fill1DHistogram("h1DMassTrans"+hNameSuffix+"ttselOS",aPair.getMTMuon(),eventWeight);
-      myHistos_->fill1DHistogram("h1DMassTrans"+hNameSuffix+"ttselSS",aPair.getMTMuon(),eventWeight);
-      myHistos_->fill1DHistogram("h1DIsoMuon"+hNameSuffix+"ttselOS",aMuon.getProperty(PropertyEnum::combreliso),eventWeight);
-    }
-  }
-  ///Make QCD shape histograms for specific selection.
-  ///Using the same SS/OS scaling factor for now.    
-  if(qcdSelectionOS){
-    hNameSuffix = sampleName+"qcdselOS";
-    if(aPair.getMTMuon()<50) myHistos_->fill1DHistogram("h1DIso"+hNameSuffix,aMuon.getProperty(PropertyEnum::combreliso),eventWeight);
-  }
-
-  ///Histograms for the WJet control region. 
-  if(wSelection){
-    hNameSuffix = sampleName+"wsel";
+    if(SS && muonIso){
+      hNameSuffix = sampleName+"_SS_"+categorySuffix;
+      fillControlHistos(hNameSuffix, eventWeight);
+    }      
     if(OS){
-      myHistos_->fill1DHistogram("h1DMassTrans"+hNameSuffix+"OS",aPair.getMTMuon(),eventWeight);
-      fillDecayPlaneAngle(hNameSuffix+"OS",eventWeight);
+      hNameSuffix = sampleName+"_OSnoMuIso_"+categorySuffix;
+      myHistos_->fill1DHistogram("h1DIso"+hNameSuffix,aMuon.getProperty(PropertyEnum::combreliso),eventWeight);
+      myHistos_->fill1DHistogram("h1DMassTrans"+hNameSuffix,aPair.getMTMuon(),eventWeight);
     }
-    if(SS) myHistos_->fill1DHistogram("h1DMassTrans"+hNameSuffix+"SS",aPair.getMTMuon(),eventWeight);
-  }
-
-  ///Histograms for the tt control region
-  if(ttSelection){
-    hNameSuffix = sampleName+"ttsel";
-    if(OS){
-      myHistos_->fill1DHistogram("h1DMassTrans"+hNameSuffix+"OS",aPair.getMTMuon(),eventWeight);
-      myHistos_->fill1DHistogram("h1DIsoMuon"+hNameSuffix+"OS",aMuon.getProperty(PropertyEnum::combreliso),eventWeight);
+    if(SS){
+      hNameSuffix = sampleName+"_SSnoMuIso_"+categorySuffix;
+      myHistos_->fill1DHistogram("h1DIso"+hNameSuffix,aMuon.getProperty(PropertyEnum::combreliso),eventWeight);
+      myHistos_->fill1DHistogram("h1DMassTrans"+hNameSuffix,aPair.getMTMuon(),eventWeight);
     }
-    if(SS) myHistos_->fill1DHistogram("h1DMassTrans"+hNameSuffix+"SS",aPair.getMTMuon(),eventWeight);    
   }
-  
   return true;
 }
 //////////////////////////////////////////////////////////////////////////////

@@ -3,11 +3,11 @@
 
 #include "RooRealVar.h"
 
-#include "HTTAnalyzer.h"
-#include "HTTHistograms.h"
+#include "HTTAnalyzerTT.h"
+#include "HTTHistogramsTT.h"
 //////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////
-void HTTAnalyzer::getPreselectionEff(const EventProxyHTT & myEventProxy){
+void HTTAnalyzerTT::getPreselectionEff(const EventProxyHTT & myEventProxy){
 
   if(true || ntupleFile_!=myEventProxy.getTTree()->GetCurrentFile()){
     ntupleFile_ = myEventProxy.getTTree()->GetCurrentFile();
@@ -25,14 +25,13 @@ void HTTAnalyzer::getPreselectionEff(const EventProxyHTT & myEventProxy){
 }
 //////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////
-std::string HTTAnalyzer::getSampleName(const EventProxyHTT & myEventProxy){
-  
-  return getSampleNameFromFileName(myEventProxy);  
-  
+std::string HTTAnalyzerTT::getSampleName(const EventProxyHTT & myEventProxy){
+
+  return getSampleNameFromFileName(myEventProxy);
 }
 //////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////
-std::string HTTAnalyzer::getSampleNameFromFileName(const EventProxyHTT & myEventProxy){
+std::string HTTAnalyzerTT::getSampleNameFromFileName(const EventProxyHTT & myEventProxy){
 
   std::string fileName = myEventProxy.getTTree()->GetCurrentFile()->GetName();
 
@@ -46,27 +45,14 @@ std::string HTTAnalyzer::getSampleNameFromFileName(const EventProxyHTT & myEvent
   
   else if(fileName.find("Run201")!=std::string::npos) return "Data";
   else if(fileName.find("SUSYGluGluToHToTauTau")!=std::string::npos) return "A";
-
   else if(fileName.find("GluGluHToTauTauM120")!=std::string::npos) return "ggH120";
-  else if(fileName.find("GluGluHToTauTauM125")!=std::string::npos) return "ggH125";
-  else if(fileName.find("GluGluHToTauTauM130")!=std::string::npos) return "ggH130";
-
   else if(fileName.find("VBFHToTauTauM120")!=std::string::npos) return "qqH120";  
+  else if(fileName.find("GluGluHToTauTauM125")!=std::string::npos) return "ggH125";
   else if(fileName.find("VBFHToTauTauM125")!=std::string::npos) return "qqH125";
+  else if(fileName.find("GluGluHToTauTauM130")!=std::string::npos) return "ggH130";
   else if(fileName.find("VBFHToTauTauM130")!=std::string::npos) return "qqH130";
-
-  else if(fileName.find("WplusHToTauTau_M120")!=std::string::npos) return "WplusH120";  
-  else if(fileName.find("WplusHToTauTau_M125")!=std::string::npos) return "WplusH125";  
-  else if(fileName.find("WplusHToTauTau_M130")!=std::string::npos) return "WplusH130";  
-
-  else if(fileName.find("WminusHToTauTau_M120")!=std::string::npos) return "WminusH120";  
-  else if(fileName.find("WminusHToTauTau_M125")!=std::string::npos) return "WminusH125";  
-  else if(fileName.find("WminusHToTauTau_M130")!=std::string::npos) return "WminusH130";  
-
-  else if(fileName.find("ZHM120")!=std::string::npos) return "ZH120";  
-  else if(fileName.find("ZHM125")!=std::string::npos) return "ZH125";  
-  else if(fileName.find("ZHM130")!=std::string::npos) return "ZH130";  
-
+  else if(fileName.find("GluGluHToTauTauM135")!=std::string::npos) return "ggH135";
+  else if(fileName.find("VBFHToTauTauM135")!=std::string::npos) return "qqH135";
   else if(fileName.find("STtWantitop")!=std::string::npos) return "Wantitop";
   else if(fileName.find("STtWtop")!=std::string::npos) return "Wtop";
   else if(fileName.find("STtchannel__antitop")!=std::string::npos) return "t-channel_antitop";
@@ -79,10 +65,6 @@ std::string HTTAnalyzer::getSampleNameFromFileName(const EventProxyHTT & myEvent
   else if(fileName.find("WZTo1L1Nu2Q")!=std::string::npos) return "WZTo1L1Nu2Q";
   else if(fileName.find("VVTo2L2Nu")!=std::string::npos) return "VVTo2L2Nu";
   else if(fileName.find("WZTo2L2Q")!=std::string::npos) return "WZTo2L2Q";
-  else if(fileName.find("EWKWMinus")!=std::string::npos) return "EWKWMinus";
-  else if(fileName.find("EWKWPlus")!=std::string::npos) return "EWKWPlus";
-  else if(fileName.find("EWKZ2JetsZToLL")!=std::string::npos) return "EWKZ2JetsZToLL";
-  else if(fileName.find("EWKZ2JetsZToNuNu")!=std::string::npos) return "EWKZ2JetsZToNuNu";
   else if(fileName.find("QCD")!=std::string::npos) return "QCD_MC";
   else if(fileName.find("DY")!=std::string::npos) return getDYSampleName(myEventProxy);
   else if(fileName.find("TTTune")!=std::string::npos) return "TTbar";
@@ -91,7 +73,7 @@ std::string HTTAnalyzer::getSampleNameFromFileName(const EventProxyHTT & myEvent
 }
 //////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////
-std::string HTTAnalyzer::getDYSampleName(const EventProxyHTT & myEventProxy){
+std::string HTTAnalyzerTT::getDYSampleName(const EventProxyHTT & myEventProxy){
 
   std::string fileName = myEventProxy.getTTree()->GetCurrentFile()->GetName();
 
@@ -106,28 +88,31 @@ std::string HTTAnalyzer::getDYSampleName(const EventProxyHTT & myEventProxy){
   else if(fileName.find("DYJetsToLLM50")!=std::string::npos && myEventProxy.event->getLHEnOutPartons()>0) jetsName =  "AllJets";  
   
   int decayModeBoson = myEventProxy.event->getDecayModeBoson();
-  int tauMCMatch = 6;
+  int tauMCMatch1 = 6;
+  int tauMCMatch2 = 6;
   if(myEventProxy.pairs->size()){
     HTTPair aPair = (*myEventProxy.pairs)[0];
-    HTTParticle aTau = aPair.getTau();
-    tauMCMatch = aTau.getProperty(PropertyEnum::mc_match);
+    HTTParticle aTau1 = aPair.getLeg1();
+    HTTParticle aTau2 = aPair.getLeg2();
+    tauMCMatch1 = aTau1.getProperty(PropertyEnum::mc_match);
+    tauMCMatch2 = aTau1.getProperty(PropertyEnum::mc_match);
   }    
   std::string decayName = "Unknown";
-  if(tauMCMatch<5) decayName = "ZL";
-  else if(tauMCMatch==5) decayName = "ZTT";
+  if(tauMCMatch1==5 && tauMCMatch2==5) decayName = "ZTT";
+  else if(tauMCMatch1<6 && tauMCMatch2<6) decayName = "ZL";
   else decayName = "ZJ";
 
   return "DY"+decayName+jetsName;
 }
 //////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////
-float HTTAnalyzer::getPUWeight(const EventProxyHTT & myEventProxy){
+float HTTAnalyzerTT::getPUWeight(const EventProxyHTT & myEventProxy){
 
   if(getSampleName(myEventProxy)=="Data") return 1.0;
 
-  if(!puDataFile_ || !puMCFile_ ||
-     puDataFile_->IsZombie() ||
-     puMCFile_->IsZombie()) { return 1.0; }
+  if(!puDataFile_ || !puMCFile_ || 
+     puDataFile_->IsZombie() || 
+     puMCFile_->IsZombie()){ return 1.0; }
 
   if(!hPUVec_.size())  hPUVec_.resize(1);
 
@@ -151,15 +136,15 @@ float HTTAnalyzer::getPUWeight(const EventProxyHTT & myEventProxy){
 }
 //////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////
-float HTTAnalyzer::getGenWeight(const EventProxyHTT & myEventProxy){
+float HTTAnalyzerTT::getGenWeight(const EventProxyHTT & myEventProxy){
 
   ///MC weights cab be quite large, but are always +-const.
   ///to avoid counter overflow we keep only sign.
-  return myEventProxy.event->getMCWeight()/fabs(myEventProxy.event->getMCWeight());
+  return myEventProxy.event->getMCWeight()/std::abs(myEventProxy.event->getMCWeight());
 }
 //////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////
-std::vector<std::string> HTTAnalyzer::getTauDecayName(int decModeMinus, int decModePlus){
+std::vector<std::string> HTTAnalyzerTT::getTauDecayName(int decModeMinus, int decModePlus){
 
   std::vector<std::string> types;
 
@@ -185,7 +170,7 @@ std::vector<std::string> HTTAnalyzer::getTauDecayName(int decModeMinus, int decM
 }
 //////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////
-bool HTTAnalyzer::isOneProng(int decMode){
+bool HTTAnalyzerTT::isOneProng(int decMode){
   if(decMode==tauDecay1ChargedPion0PiZero ||
      decMode==tauDecay1ChargedPion1PiZero ||
      decMode==tauDecay1ChargedPion2PiZero ||
@@ -194,13 +179,13 @@ bool HTTAnalyzer::isOneProng(int decMode){
 }
 //////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////
-bool HTTAnalyzer::isLepton(int decMode){
+bool HTTAnalyzerTT::isLepton(int decMode){
   if(decMode==tauDecaysElectron || decMode==tauDecayMuon) return true;
   else return false;
 }
 //////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////
-float HTTAnalyzer::getLeptonCorrection(float eta, float pt, hadronicTauDecayModes tauDecayMode){
+float HTTAnalyzerTT::getLeptonCorrection(float eta, float pt, hadronicTauDecayModes tauDecayMode){
 
   if(sampleName.find("Data")!=std::string::npos) return 1.0;
   
@@ -214,15 +199,22 @@ float HTTAnalyzer::getLeptonCorrection(float eta, float pt, hadronicTauDecayMode
   }
   else if(tauDecayMode == tauDecaysElectron) return 1.0;  
   else{
-    if(sampleName.find("H")==std::string::npos &&
-       sampleName.find("ZTT")==std::string::npos
-       ) return 1.0;
+    float tau_id_scalefactor = 1.0;
+    float tau_trg_efficiency = 1.0;
     scaleWorkspace->var("t_pt")->setVal(pt);
     scaleWorkspace->var("t_eta")->setVal(eta);
     scaleWorkspace->var("t_dm")->setVal(tauDecayMode);
-    float tau_id_scalefactor = scaleWorkspace->function("t_iso_mva_m_pt30_sf")->getVal();
-    //float tau_id_scalefactor = 0.9;//according to https://twiki.cern.ch/twiki/bin/view/CMS/SMTauTau2016#MC_corrections
-    return tau_id_scalefactor;
+    if(sampleName.find("H")==std::string::npos &&
+       sampleName.find("ZTT")==std::string::npos
+       ) {
+      tau_trg_efficiency = scaleWorkspace->function("t_trgTightIsoSS_data")->getVal();      
+    }
+    else{
+      tau_id_scalefactor = scaleWorkspace->function("t_iso_mva_t_pt40_eta2p1_sf")->getVal();
+      //tau_id_scalefactor = 0.9;//according to https://twiki.cern.ch/twiki/bin/view/CMS/SMTauTau2016#MC_corrections
+      tau_trg_efficiency = scaleWorkspace->function("t_trgTightIso_data")->getVal();
+    }
+    return tau_id_scalefactor*tau_trg_efficiency;
   }
   return 1.0;
 }
