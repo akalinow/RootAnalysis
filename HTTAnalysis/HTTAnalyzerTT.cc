@@ -176,7 +176,7 @@ void HTTAnalyzerTT::fillControlHistos(const std::string & hNameSuffix, float eve
   myHistos_->fill1DHistogram("h1DEtaTrailingTau"+hNameSuffix,aTau2.getP4().Eta(),eventWeight);
   myHistos_->fill1DHistogram("h1DPhiTrailingTau"+hNameSuffix,aTau2.getP4().Phi() ,eventWeight);
   myHistos_->fill1DHistogram("h1DIDTrailingTau"+hNameSuffix,aTau2.getProperty(PropertyEnum::byIsolationMVArun2v1DBoldDMwLTraw) ,eventWeight);  
-  myHistos_->fill1DHistogram("h1DStatsDecayMode"+hNameSuffix,aTau2.getProperty(PropertyEnum::decayMode), eventWeight);
+  myHistos_->fill1DHistogram("h1DStatsDecayModeTrailingTau"+hNameSuffix,aTau2.getProperty(PropertyEnum::decayMode), eventWeight);
   myHistos_->fill1DHistogram("h1DnPCATrailingTau"+hNameSuffix,aTau2.getPCARefitPV().Mag(),eventWeight);
   myHistos_->fill1DHistogram("h1DPtTrailingTauLeadingTk"+hNameSuffix,aTau2.getProperty(PropertyEnum::leadChargedParticlePt),eventWeight);
 
@@ -188,6 +188,7 @@ void HTTAnalyzerTT::fillControlHistos(const std::string & hNameSuffix, float eve
   if(nJets30>0){
     myHistos_->fill1DHistogram("h1DPtLeadingJet"+hNameSuffix,aJet1.getP4().Pt(),eventWeight);
     myHistos_->fill1DHistogram("h1DEtaLeadingJet"+hNameSuffix,aJet1.getP4().Eta(),eventWeight);
+    myHistos_->fill1DHistogram("h1DPhiLeadingJet"+hNameSuffix,aJet1.getP4().Phi(),eventWeight);
     myHistos_->fill1DHistogram("h1DCSVBtagLeadingJet"+hNameSuffix,aJet1.getProperty(PropertyEnum::bCSVscore),eventWeight);
   }
   float jetsMass = 0 ;
@@ -199,6 +200,7 @@ void HTTAnalyzerTT::fillControlHistos(const std::string & hNameSuffix, float eve
     myHistos_->fill1DHistogram("h1DDeltaEta2J"+hNameSuffix,jetsEta,eventWeight);
     myHistos_->fill1DHistogram("h1DPtTrailingJet"+hNameSuffix,aJet2.getP4().Pt(),eventWeight);
     myHistos_->fill1DHistogram("h1DEtaTrailingJet"+hNameSuffix,aJet2.getP4().Eta(),eventWeight);
+    myHistos_->fill1DHistogram("h1DPhiTrailingJet"+hNameSuffix,aJet2.getP4().Phi(),eventWeight);
     myHistos_->fill1DHistogram("h1DCSVBtagTrailingJet"+hNameSuffix,aJet2.getProperty(PropertyEnum::bCSVscore),eventWeight);
   }
   
@@ -206,15 +208,17 @@ void HTTAnalyzerTT::fillControlHistos(const std::string & hNameSuffix, float eve
   myHistos_->fill1DHistogram("h1DPhiMET"+hNameSuffix,aMET.getP4().Phi(),eventWeight);
 
   ///Unrolled distributions for 2D fit
-  myHistos_->fill2DUnrolledHistogram("h1DUnRollHiggsPtMassSV"+hNameSuffix, aPair.getP4SVFit().M(), higgsPt, eventWeight);
-  myHistos_->fill2DUnrolledHistogram("h1DUnRollMjjMassSV"+hNameSuffix, aPair.getP4SVFit().M(), jetsMass, eventWeight);
-
+  //FIXMEmyHistos_->fill2DUnrolledHistogram("h1DUnRollHiggsPtMassSV"+hNameSuffix, aPair.getP4SVFit().M(), higgsPt, eventWeight);
+  myHistos_->fill2DUnrolledHistogram("h1DUnRollHiggsPtMassSV"+hNameSuffix, aPair.getP4().M(), higgsPt, eventWeight);
+  //FIXMEmyHistos_->fill2DUnrolledHistogram("h1DUnRollMjjMassSV"+hNameSuffix, aPair.getP4SVFit().M(), jetsMass, eventWeight);
+  myHistos_->fill2DUnrolledHistogram("h1DUnRollMjjMassSV"+hNameSuffix, aPair.getP4().M(), jetsMass, eventWeight);
 
   fillDecayPlaneAngle(hNameSuffix, eventWeight);
 
   if(aJet1.getProperty(PropertyEnum::bCSVscore)>0.8){
     myHistos_->fill1DHistogram("h1DPtLeadingBJet"+hNameSuffix,aJet1.getP4().Pt(),eventWeight);
     myHistos_->fill1DHistogram("h1DEtaLeadingBJet"+hNameSuffix,aJet1.getP4().Eta(),eventWeight);
+    myHistos_->fill1DHistogram("h1DPhiLeadingBJet"+hNameSuffix,aJet1.getP4().Phi(),eventWeight);
   }  
 }
 //////////////////////////////////////////////////////////////////////////////

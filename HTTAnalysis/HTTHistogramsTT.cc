@@ -500,15 +500,15 @@ void HTTHistogramsTT::finalizeHistograms(int nRuns, float weight){
   return;
   */
   /*
-  TH1F *hDY = get1D_VJetSum("h1DNPartonsDYMuTauJets");
-  TH1F *hDYAllJets = get1D_VJetSum("h1DNPartonsDYMuTauAllJets");
+  TH1F *hDY = get1D_VJetSum("h1DNPartonsDYTauTauJets");
+  TH1F *hDYAllJets = get1D_VJetSum("h1DNPartonsDYTauTauAllJets");
   hDYAllJets->Print("all");
   hDY->Print("all");
   hDYAllJets->Divide(hDY);
   hDYAllJets->Print("all");
   */
-  //TH1F *hDY =  get1D_VJetSum("h1DMassVisDYMuTauAllJets");
-  //hDY->Add(get1D_VJetSum("h1DMassVisDYMuTau0Jets"));
+  //TH1F *hDY =  get1D_VJetSum("h1DMassVisDYTauTauAllJets");
+  //hDY->Add(get1D_VJetSum("h1DMassVisDYTauTau0Jets"));
   /*
   TH1F *hDYSum = get1D_DYJet_Histogram("h1DMassVisDYJets");
   hDYSum->Print("all");  
@@ -581,7 +581,7 @@ void HTTHistogramsTT::plotCPhistograms(int nRuns, float weight){
 
   plotPhiDecayPlanes("Phi_nVectorsggH125");
   plotPhiDecayPlanes("Phi_nVectorsA");
-  plotPhiDecayPlanes("Phi_nVectorsDYMuTauJets");
+  plotPhiDecayPlanes("Phi_nVectorsDYTauTauJets");
   plotPhiDecayPlanes("Phi_nVecIP_");
 
   plot_HAZ_Histograms("Phi_nVecIP_yTauNeg","GenNoOfflineSel");
@@ -598,11 +598,11 @@ void HTTHistogramsTT::plotCPhistograms(int nRuns, float weight){
   
   plotProfiles("hProfRecoVsMagGen_","ggH125");
   plotProfiles("hProfRecoVsMagGen_","A");
-  plotProfiles("hProfRecoVsMagGen_","DYMuTauJets");
+  plotProfiles("hProfRecoVsMagGen_","DYTauTauJets");
 
   plotProfiles("hProfPhiVsMag_","ggH125");
   plotProfiles("hProfPhiVsMag_","A");
-  plotProfiles("hProfPhiVsMag_","DYMuTauJets");
+  plotProfiles("hProfPhiVsMag_","DYTauTauJets");
 
   plotVerticesPulls("h1DVxPullX_ggH125");
   plotVerticesPulls("h1DVxPullY_ggH125");
@@ -611,7 +611,7 @@ void HTTHistogramsTT::plotCPhistograms(int nRuns, float weight){
   plotPhiDecayPlanes("Phi_nVectorsData");
   plotPhiDecayPlanes("Phi_nVectorsggH125");
   plotPhiDecayPlanes("Phi_nVectorsA");  
-  plotPhiDecayPlanes("Phi_nVectorsDYMuTauJets");
+  plotPhiDecayPlanes("Phi_nVectorsDYTauTauJets");
   plotPhiDecayPlanes("Phi_nVectorsWJets");
 
   plotPhiDecayPlanes("Phi_nVecIP_yTauPosData");
@@ -620,24 +620,24 @@ void HTTHistogramsTT::plotCPhistograms(int nRuns, float weight){
   plotPhiDecayPlanes("Phi_nVecIP_yTauNegggH125");
   plotPhiDecayPlanes("Phi_nVecIP_yTauPosA");
   plotPhiDecayPlanes("Phi_nVecIP_yTauNegA");
-  plotPhiDecayPlanes("Phi_nVecIP_yTauPosDYMuTauJets");
-  plotPhiDecayPlanes("Phi_nVecIP_yTauNegDYMuTauJets");
+  plotPhiDecayPlanes("Phi_nVecIP_yTauPosDYTauTauJets");
+  plotPhiDecayPlanes("Phi_nVecIP_yTauNegDYTauTauJets");
   plotPhiDecayPlanes("Phi_nVecIP_yTauPosWJets");
   plotPhiDecayPlanes("Phi_nVecIP_yTauNegWJets");
  
   plotSingleHistogram("h1DyTauggH125");
   plotSingleHistogram("h1DyTauA");
-  plotSingleHistogram("h1DyTauDYMuTauJets");
+  plotSingleHistogram("h1DyTauDYTauTauJets");
   plotSingleHistogram("h1DyTauWJets");
  
   plotPhiDecayPlanes("CosPhiNN_ggH125");
   plotPhiDecayPlanes("CosPhiNN_A");
-  plotPhiDecayPlanes("CosPhiNN_DYMuTauJets");
+  plotPhiDecayPlanes("CosPhiNN_DYTauTauJets");
   plotPhiDecayPlanes("CosPhiNN_WJets");
 
   plotnPCA("ggH125");
   plotnPCA("A");
-  plotnPCA("DYMuTauJets");
+  plotnPCA("DYTauTauJets");
   plotnPCA("WJets");
   
 }
@@ -646,8 +646,7 @@ void HTTHistogramsTT::plotCPhistograms(int nRuns, float weight){
 void HTTHistogramsTT::plotnPCA(const std::string & type){
 
   TH1F* h1DTau = get1DHistogram("h1DnPCATau"+type);
-  TH1F* h1DMuon = get1DHistogram("h1DnPCAMuon"+type);
-  if(!h1DTau || !h1DMuon) return;
+  if(!h1DTau) return;
   
   TCanvas* c = new TCanvas("AnyHistogram","AnyHistogram",			   
 			   460,500);
@@ -661,19 +660,14 @@ void HTTHistogramsTT::plotnPCA(const std::string & type){
   h1DTau->SetLineWidth(3);
   h1DTau->Scale(1.0/h1DTau->Integral(0,h1DTau->GetNbinsX()+1));
 
-  h1DMuon->SetLineWidth(3);
-  h1DMuon->SetLineColor(2);
-  h1DMuon->Scale(1.0/h1DMuon->Integral(0,h1DMuon->GetNbinsX()+1));
-  h1DMuon->GetYaxis()->SetTitleOffset(1.5);
-  h1DMuon->SetStats(kFALSE);
-  h1DMuon->SetYTitle("Events");
-  h1DMuon->SetXTitle("|n_{RECO}|");
+  h1DTau->GetYaxis()->SetTitleOffset(1.5);
+  h1DTau->SetStats(kFALSE);
+  h1DTau->SetYTitle("Events");
+  h1DTau->SetXTitle("|n_{RECO}|");
 
-  h1DMuon->Draw();
-  h1DTau->Draw("same");
+  h1DTau->Draw();
 
   l.AddEntry(h1DTau,"hadronic tau");
-  l.AddEntry(h1DMuon,"leptonic tau");
   l.Draw();
   
   c->Print(TString::Format("fig_png/nPCA_length_%s.png",type.c_str()).Data());
@@ -932,7 +926,7 @@ void HTTHistogramsTT::plot_HAZ_Histograms(const std::string & hName,
   TH1F* h_h = this->get1DHistogram(name.Data());
   name = "h1D"+hName+"A"+sysType;
   TH1F* h_A = this->get1DHistogram(name.Data());
-  name = "h1D"+hName+"DYMuTauJets"+sysType;
+  name = "h1D"+hName+"DYTauTauJets"+sysType;
   TH1F* h_Z = this->get1DHistogram(name.Data());
 
   if(!h_h || !h_A || !h_Z) return;
@@ -1091,17 +1085,8 @@ THStack*  HTTHistogramsTT::plotStack(unsigned int iCategory, std::string varName
   
   float lumi = getLumi(); 
   std::string sampleName = "WJets";
-  std::string WselType = "wselOS";
-  pair<float,float> dataToMCScale = wselOSCorrection;
-  
-  if(hNameSuffix.find("SS")!=std::string::npos){
-    WselType = "wselSS";
-    dataToMCScale = wselSSCorrection;
-  }
   float weight = getSampleNormalisation(sampleName);
-
-  /////
-  float scale = weight*lumi*dataToMCScale.first;
+  float scale = weight*lumi;
   hWJets->Scale(scale);
 
   sampleName = "DYLowM";
@@ -1296,7 +1281,6 @@ THStack*  HTTHistogramsTT::plotStack(unsigned int iCategory, std::string varName
   outputStream<<"EWK 2Jets: "<<hEWK2Jets->Integral(0,hEWK2Jets->GetNbinsX()+1)<<std::endl; 
   outputStream<<"Correction factors:"<<std::endl;
   outputStream<<"QCD Loose to Tight: "<<qcdLooseToTight.first<<" +- "<<qcdLooseToTight.second<<std::endl;
-  outputStream<<"W MC to DATA: "<<dataToMCScale.first<<" +- "<<dataToMCScale.second<<std::endl;
   outputStream<<"----------------------------------------"<<std::endl;
 
   std::cout<<outputStream.str();
@@ -1588,8 +1572,8 @@ std::pair<float,float> HTTHistogramsTT::getQCDLooseToTight(unsigned int iCategor
   dparam=line->GetParError(0);
 
   std::cout<<"QCD Loose/Tight ratio: "<<std::endl
-	   <<"\tRatio"<<sumLoose/sumTight<<" +- "<<dparam<<std::endl
-	   <<"\tFit"<<param<<" +- "<<dparam<<std::endl;
+	   <<"\tRatio: "<<sumLoose/sumTight<<" +- "<<ratioErr<<std::endl
+	   <<"\tFit: "<<param<<" +- "<<dparam<<std::endl;
   //std::cout<<"Returning default value 1.06"<<std::endl;
   //return std::make_pair(1.06,0.0);//FIXED value
 
