@@ -397,6 +397,7 @@ std::string HTTHistogramsTT::getTemplateName(const std::string& name){
   if(name.find("hProf")!=std::string::npos && name.find("VsMag")!=std::string::npos) templateName = "hProfVsMagTemplate";
   if(name.find("hProf")!=std::string::npos && name.find("VsPt")!=std::string::npos) templateName = "hProfVsPtTemplate";
   if(name.find("hProf")!=std::string::npos && name.find("VsCos")!=std::string::npos) templateName = "hProfVsCosTemplate";
+  if(name.find("hProf")!=std::string::npos && name.find("VsNeu")!=std::string::npos) templateName = "hProfVsNeuTemplate";
 
   if(name.find("h1DNPV")!=std::string::npos) templateName = "h1DNPVTemplate";
   if(name.find("h1DNPU")!=std::string::npos) templateName = "h1DNPUTemplate";
@@ -477,6 +478,7 @@ void HTTHistogramsTT::defineHistograms(){
    addProfile("hProfVsMagTemplate","",10,0,0.015,file_);
    addProfile("hProfVsPtTemplate","",20,15,55,file_);
    addProfile("hProfVsCosTemplate","",20,-1,1,file_);
+   addProfile("hProfVsNeuTemplate","",50,0,100,file_);
    
    histosInitialized_ = true;
  }
@@ -565,6 +567,20 @@ void HTTHistogramsTT::finalizeHistograms(int nRuns, float weight){
     plotStack(iCategory, "nPCATrailingTau");
     plotStack(iCategory, "Phi_nVectors");
     plotStack(iCategory, "Phi_nVecIP_");
+    plotStack(iCategory, "yTauNeg");
+    plotStack(iCategory, "yTauPos");
+    plotStack(iCategory, "Phi_IPRhoPos_");
+    plotStack(iCategory, "Phi_IPRhoPos_yTauPos");
+    plotStack(iCategory, "Phi_IPRhoPos_yTauNeg");
+    plotStack(iCategory, "Phi_IPRhoNeg_");
+    plotStack(iCategory, "Phi_IPRhoNeg_yTauPos");
+    plotStack(iCategory, "Phi_IPRhoNeg_yTauNeg");
+    plotStack(iCategory, "yTau1");
+    plotStack(iCategory, "yTau2");
+    plotStack(iCategory, "yTau12");
+    plotStack(iCategory, "Phi_RhoRho_");
+    plotStack(iCategory, "Phi_RhoRho_yTauPos");
+    plotStack(iCategory, "Phi_RhoRho_yTauNeg");
     plotStack(iCategory, "NPV");
 
     plotStack(iCategory, "UnRollMassSVPhiCP");
@@ -603,6 +619,10 @@ void HTTHistogramsTT::plotCPhistograms(int nRuns, float weight){
   plotProfiles("hProfPhiVsMag_","ggH125");
   plotProfiles("hProfPhiVsMag_","A");
   plotProfiles("hProfPhiVsMag_","DYTauTauJets");
+
+  plotProfiles("hProfRecoVsNeuGen_","ggH125");
+  plotProfiles("hProfRecoVsNeuGen_","A");
+  plotProfiles("hProfRecoVsNeuGen_","DYTauTauJets");
 
   plotVerticesPulls("h1DVxPullX_ggH125");
   plotVerticesPulls("h1DVxPullY_ggH125");
@@ -756,7 +776,7 @@ void HTTHistogramsTT::plotVerticesPulls(const std::string & hName){
 /////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////
 void HTTHistogramsTT::plotProfiles(const std::string & hName,
-				 const std::string & sysType){
+				   const std::string & sysType){
 
   TProfile* h1DAOD = this->getProfile(hName+sysType+"AODPV");
   //TProfile* h1DGen = this->getProfile(hName+sysType+"GenNoOfflineSel");

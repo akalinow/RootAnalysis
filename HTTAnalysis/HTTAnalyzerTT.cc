@@ -5,7 +5,7 @@
 #include "HTTHistogramsTT.h"
 //////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////
-HTTAnalyzerTT::HTTAnalyzerTT(const std::string & aName):Analyzer(aName){
+HTTAnalyzerTT::HTTAnalyzerTT(const std::string & aName):Analyzer(aName),nPCAMin_(0.003){
 
   //pileupCalc.py -i lumiSummary_Run2016BCDE_PromptReco_v12.json
   //--inputLumiJSON /afs/cern.ch/cms/CAF/CMSCOMM/COMM_DQM/certification/Collisions16/13TeV/PileUp/pileup_latest.txt
@@ -271,8 +271,8 @@ bool HTTAnalyzerTT::passCategory(const HTTAnalyzerTT::tauTauCategory & aCategory
 
   //////////
   // categories by tau decay modes for CP
-  bool isPi1 = (aTau1.getProperty(PropertyEnum::decayMode)==tauDecay1ChargedPion0PiZero && aTau1.getPCARefitPV().Mag()>0.003);
-  bool isPi2 = (aTau2.getProperty(PropertyEnum::decayMode)==tauDecay1ChargedPion0PiZero && aTau2.getPCARefitPV().Mag()>0.003);
+  bool isPi1 = (aTau1.getProperty(PropertyEnum::decayMode)==tauDecay1ChargedPion0PiZero && aTau1.getPCARefitPV().Mag()>nPCAMin_);
+  bool isPi2 = (aTau2.getProperty(PropertyEnum::decayMode)==tauDecay1ChargedPion0PiZero && aTau2.getPCARefitPV().Mag()>nPCAMin_);
   bool isRho1 = (aTau1.getProperty(PropertyEnum::decayMode)!=tauDecay1ChargedPion0PiZero && isOneProng(aTau1.getProperty(PropertyEnum::decayMode)) );
   bool isRho2 = (aTau2.getProperty(PropertyEnum::decayMode)!=tauDecay1ChargedPion0PiZero && isOneProng(aTau2.getProperty(PropertyEnum::decayMode)) );
 
@@ -368,10 +368,10 @@ bool HTTAnalyzerTT::analyze(const EventProxyBase& iEvent){
     eventWeight*=tau1ScaleFactor*tau2ScaleFactor;
     trigger = true; //MC trigger included in tau SF
   }									   
-  bool cpTau1Selection = (aTau1.getProperty(PropertyEnum::decayMode)==tauDecay1ChargedPion0PiZero && aTau1.getPCARefitPV().Mag()>0.003) ||
+  bool cpTau1Selection = (aTau1.getProperty(PropertyEnum::decayMode)==tauDecay1ChargedPion0PiZero && aTau1.getPCARefitPV().Mag()>nPCAMin_) ||
                         (aTau1.getProperty(PropertyEnum::decayMode)!=tauDecay1ChargedPion0PiZero &&
 			 isOneProng(aTau1.getProperty(PropertyEnum::decayMode))); 
-  bool cpTau2Selection = (aTau2.getProperty(PropertyEnum::decayMode)==tauDecay1ChargedPion0PiZero && aTau2.getPCARefitPV().Mag()>0.003) ||
+  bool cpTau2Selection = (aTau2.getProperty(PropertyEnum::decayMode)==tauDecay1ChargedPion0PiZero && aTau2.getPCARefitPV().Mag()>nPCAMin_) ||
                         (aTau2.getProperty(PropertyEnum::decayMode)!=tauDecay1ChargedPion0PiZero &&
 			 isOneProng(aTau2.getProperty(PropertyEnum::decayMode))); 
   bool cpSelection = cpTau1Selection && cpTau2Selection;
