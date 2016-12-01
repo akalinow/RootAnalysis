@@ -204,6 +204,14 @@ class HTTEvent{
 
 };
 ///////////////////////////////////////////////////
+namespace sysEffects{
+
+enum sysEffectsEnum{NOMINAL, NOMINAL_SVFIT,
+		    TESUp, TESDown, 
+		    M2TUp, M2TDown,
+		    E2TUp, E2TDown,
+		    DUMMY}; 
+}
 ///////////////////////////////////////////////////
 class HTTParticle{
 
@@ -222,28 +230,20 @@ class HTTParticle{
   
   void setNeutralP4(const TLorentzVector &aP4) { neutralP4 = aP4;}
 
-  void setP4ScaleUp(const TLorentzVector &aP4) { p4ScaleUp = aP4;}
-
-  void setP4ScaleDown(const TLorentzVector &aP4) { p4ScaleDown = aP4;}
-
   void setPCA(const TVector3 &aV3) {pca = aV3;}
 
   void setPCARefitPV(const TVector3 &aV3) {pcaRefitPV = aV3;}
   
   void setPCAGenPV(const TVector3 &aV3) {pcaGenPV = aV3;}
 
-  void setProperties(const std::vector<float> & aProperties) { properties = aProperties;}
+  void setProperties(const std::vector<Double_t> & aProperties) { properties = aProperties;}
 
   ///Data member getters.
-  TLorentzVector getP4() const {return p4;}
+  TLorentzVector getP4(sysEffects::sysEffectsEnum type=sysEffects::NOMINAL) const {return getSystScaleP4(type);}
 
   TLorentzVector getChargedP4() const {return chargedP4;}
 
   TLorentzVector getNeutralP4() const {return neutralP4;}
-
-  TLorentzVector getP4ScaleUp() const {return p4ScaleUp;}
-
-  TLorentzVector getP4ScaleDown() const {return p4ScaleDown;}
 
   TVector3 getPCA() const {return pca;}
 
@@ -255,21 +255,26 @@ class HTTParticle{
 
   int getCharge() const {return getProperty(PropertyEnum::charge);}
 
-  float getProperty(PropertyEnum index) const {return (unsigned int)index<properties.size()?  properties[(unsigned int)index]: -999;}
+  Double_t getProperty(PropertyEnum index) const {return (unsigned int)index<properties.size()?  properties[(unsigned int)index]: -999;}
 
   bool hasTriggerMatch(TriggerEnum index) const {return (unsigned int)getProperty(PropertyEnum::isGoodTriggerType)& (1<<(unsigned int)index) &&
                                                         (unsigned int)getProperty(PropertyEnum::FilterFired)& (1<<(unsigned int)index);}
  private:
 
-  ///Nominal particle four-momentum
+  ///Return four-momentum modified according to given systematic effect.
+  ///The method recognises particle type, e.g. muons are not affected by
+  ///TES variations etc.
+  TLorentzVector getSystScaleP4(sysEffects::sysEffectsEnum type=sysEffects::NOMINAL) const;
+
+  ///Return four-momentum shifted with scale.
+  ///Shift modifies three-momentum transverse part only, leaving mass constant.
+  TLorentzVector getShiftedP4(float scale) const;
+
+  ///Nominal (as recontructed) four-momentum
   TLorentzVector p4;
-
-  ///Charged and neuttral components four-momentum
+ 
+  ///Charged and neutral components four-momentum
   TLorentzVector chargedP4, neutralP4;
-
-  ///Particle four-momentum after scaling up/down.
-  ///Variated scale depends on the particle type (mu, tau, e)
-  TLorentzVector p4ScaleUp, p4ScaleDown;
 
   ///Vectors from primary vertex to point of closest approach (PCA)
   ///calculated with respect to AOD vertex, refitted and generated vertex.
@@ -278,7 +283,7 @@ class HTTParticle{
   ///Vector of vaious particle properties.
   ///Index generated automatically during conversion from
   ///LLR ntuple format
-  std::vector<float> properties;
+  std::vector<Double_t> properties;
 
 };
 ///////////////////////////////////////////////////
@@ -294,46 +299,32 @@ class HTTPair{
   void clear();
 
   ///Data member setters.
-  void setP4(const TLorentzVector &aP4) {p4 = aP4;}
-
-  void setP4SVFit(const TLorentzVector &aP4) {p4SVFit = aP4;}
-
-  void setP4SVFitScaleUp(const TLorentzVector &aP4) {p4SVFitScaleUp = aP4;}
-
-  void setP4SVFitScaleDown(const TLorentzVector &aP4) {p4SVFitScaleDown = aP4;}
+  void setP4(const TLorentzVector &aP4, sysEffects::sysEffectsEnum type = sysEffects::NOMINAL) {p4Vector[(unsigned int)type] = aP4;}
 
   void setMET(const TVector2 &aVector) {met = aVector;}
+
+  void setSVMET(const TVector2 &aVector, sysEffects::sysEffectsEnum type = sysEffects::NOMINAL) {svMetVector[(unsigned int)type] = aVector;}
 
   void setMTLeg1(const float & aMT) {mtLeg1 = aMT;}
 
   void setMTLeg2(const float & aMT) {mtLeg2 = aMT;}
 
-  void setMETSVfit(const TVector2 &aVector) {metSVfit = aVector;}
-  
   void setLeg1(const HTTParticle &aParticle){leg1 = aParticle;}
 
   void setLeg2(const HTTParticle &aParticle){leg2 = aParticle;}
 
-  void setMuonTriggerSF(float aSF){muonTriggerSF = aSF;}
-  
   void setMETMatrix(float m00, float m01, float m10, float m11) {metMatrix.push_back(m00); metMatrix.push_back(m01); metMatrix.push_back(m10); metMatrix.push_back(m11);}
   
   ///Data member getters.
-  TLorentzVector getP4() const {return p4;}
+  TLorentzVector getP4(sysEffects::sysEffectsEnum type = sysEffects::NOMINAL) const {return p4Vector[(unsigned int)type];}
 
-  TLorentzVector getP4SVFit() const {return p4SVFit;}
+  TVector2 getMET(sysEffects::sysEffectsEnum type = sysEffects::NOMINAL) const {return getSystScaleMET(type);}
 
-  TVector2 getMET() const {return met;}
-
-  TVector2 getMETSVfit() const {return metSVfit;}
+  TVector2 getSVMET(sysEffects::sysEffectsEnum type = sysEffects::NOMINAL) const {return svMetVector[(unsigned int)type];}
 
   float getMTLeg1() const {return mtLeg1;}
 
   float getMTLeg2() const {return mtLeg2;}
-
-  TLorentzVector getP4SVFitScaleUp() {return p4SVFitScaleUp;}
-
-  TLorentzVector getP4SVFitScaleDown() {return p4SVFitScaleDown;}
 
   HTTParticle getLeg1() const {return leg1;}
 
@@ -345,36 +336,32 @@ class HTTPair{
 
   float getMTMuon() const {return abs(leg1.getPDGid())==13 ? getMTLeg1() : getMTLeg2(); }
 
-  float getMuonTriggerSF() const {return muonTriggerSF;}
-  
-  std::vector<float> getMETMatrix() {return metMatrix;}
+  std::vector<float> getMETMatrix() const {return metMatrix;}
 
  private:
 
-  ///Nominal pair p4 (sum of legs p4)
-  TLorentzVector p4;
+  ///Return MET modified according to given systematic effect.                                                                                    
+  ///The MET is corrected for accorging leptons corrections.
+  ///The recoil correctino is not updated.                                                                                                
+  TVector2 getSystScaleMET(sysEffects::sysEffectsEnum type=sysEffects::NOMINAL) const;
 
-  ///P4 calculated with SV fit. Nominal, and with scale up/down
-  TLorentzVector p4SVFit, p4SVFitScaleUp, p4SVFitScaleDown;
+  ///Nominal met as calculated from PF.
+  ///Includes recoil corrections.
+  TVector2 met;
 
-  ///MET vectors
-  TVector2 met, metSVfit;
-  
+  ///Vectors holding p4 and MET for 
+  ///for various scale variances.
+  std::vector<TLorentzVector> p4Vector;
+  std::vector<TVector2> svMetVector;
+
   //MVAMET covariance matrix in order 00,01,10,11
   std::vector<float> metMatrix;
 
-  ///MT calculated for (leg1,MET)
-  float mtLeg1;
+  ///MT calculated for (leg1,MET) and (leg2,MET)
+  float mtLeg1, mtLeg2;
 
-  ///MT calculated for (leg2,MET)
-  float mtLeg2;
-    
   ///Pair legs
   HTTParticle leg1, leg2;
-
-  ///Lepton selection scale factor
-  float muonTriggerSF;
-  ///Tau selection scale factor
 
 };
 

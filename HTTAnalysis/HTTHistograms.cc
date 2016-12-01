@@ -507,7 +507,7 @@ void HTTHistograms::finalizeHistograms(int nRuns, float weight){
   ttScale = 0.7;
 
   for(unsigned int iCategory = (int)HTTAnalyzer::jet0;
-      iCategory<(int)HTTAnalyzer::DUMMY;++iCategory){
+      iCategory<(int)HTTAnalyzer::boosted;++iCategory){
     
     wselOSCorrection =  std::pair<float,float>(1.0,0);
     wselSSCorrection =  std::pair<float,float>(1.0,0);
@@ -518,6 +518,7 @@ void HTTHistograms::finalizeHistograms(int nRuns, float weight){
     plotStack(iCategory, "MassSV");    
     plotStack(iCategory, "MassVis");
     plotStack(iCategory, "UnRollTauPtMassVis");
+    return;
     plotStack(iCategory, "UnRollHiggsPtMassSV");
     plotStack(iCategory, "UnRollMjjMassSV");
     plotStack(iCategory, "UnRollMassSVPhiCP");

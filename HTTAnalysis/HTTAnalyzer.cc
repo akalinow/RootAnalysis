@@ -151,7 +151,8 @@ void HTTAnalyzer::fillControlHistos(const std::string & hNameSuffix, float event
   myHistos_->fill1DHistogram("h1DNPV"+hNameSuffix,aEvent.getNPV(),eventWeight);
 
   ///Fill SVfit and visible masses
-  myHistos_->fill1DHistogram("h1DMassSV"+hNameSuffix,aPair.getP4SVFit().M(),eventWeight);
+  sysEffects::sysEffectsEnum sysType = sysEffects::NOMINAL_SVFIT;
+  myHistos_->fill1DHistogram("h1DMassSV"+hNameSuffix,aPair.getP4(sysType).M(),eventWeight);
   myHistos_->fill1DHistogram("h1DMassVis"+hNameSuffix,aPair.getP4().M(),eventWeight);
   
   ///Fill muon
@@ -190,8 +191,8 @@ void HTTAnalyzer::fillControlHistos(const std::string & hNameSuffix, float event
 
   ///Unrolled distributions for 2D fit
   myHistos_->fill2DUnrolledHistogram("h1DUnRollTauPtMassVis"+hNameSuffix, aPair.getP4().M(), aTau.getP4().Pt(),eventWeight);
-  myHistos_->fill2DUnrolledHistogram("h1DUnRollHiggsPtMassSV"+hNameSuffix, aPair.getP4SVFit().M(), higgsPt, eventWeight);
-  myHistos_->fill2DUnrolledHistogram("h1DUnRollMjjMassSV"+hNameSuffix, aPair.getP4SVFit().M(), jetsMass, eventWeight);
+  myHistos_->fill2DUnrolledHistogram("h1DUnRollHiggsPtMassSV"+hNameSuffix, aPair.getP4(sysType).M(), higgsPt, eventWeight);
+  myHistos_->fill2DUnrolledHistogram("h1DUnRollMjjMassSV"+hNameSuffix, aPair.getP4(sysType).M(), jetsMass, eventWeight);
 
 
   fillDecayPlaneAngle(hNameSuffix, eventWeight);
@@ -299,6 +300,28 @@ bool HTTAnalyzer::analyze(const EventProxyBase& iEvent){
   if(!myEventProxy.pairs->size()) return true;
 
   setAnalysisObjects(myEventProxy);
+  ////TEST
+  /*
+  for(unsigned int sysType = (unsigned int)sysEffects::TESUp;
+      sysType<(unsigned int)sysEffects::M2TUp;++sysType){
+    sysEffects::sysEffectsEnum type = static_cast<sysEffects::sysEffectsEnum>(sysType);
+    TLorentzVector p4 = aPair.getP4(type);
+    TLorentzVector p4Tau = aTau.getP4(type);
+    TLorentzVector p4Muon = aMuon.getP4(type);
+    std::cout<<"type: "<<type
+	     <<" Mass: "<<p4.M()
+	     <<" Tau pt: "<<p4Tau.Perp()
+	     <<" Muon: "<<p4Muon.Perp()
+	     <<" Tau match: "<<aTau.getProperty(PropertyEnum::mc_match)
+	     <<" Tau pdg: "<<aTau.getPDGid()
+	     <<" Muon match: "<<aMuon.getProperty(PropertyEnum::mc_match)
+	     <<" index: "<<(int)(PropertyEnum::mc_match)
+	     <<std::endl;
+    
+  }
+  return true;
+  */
+  ////////////////////////
   
   std::pair<bool, bool> goodDecayModes = checkTauDecayMode(myEventProxy);
   bool goodGenDecayMode = goodDecayModes.first;
