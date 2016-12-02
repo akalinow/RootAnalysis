@@ -19,8 +19,8 @@ void HTTAnalyzer::getPreselectionEff(const EventProxyHTT & myEventProxy){
     
     float genWeight = getGenWeight(myEventProxy);
     
-    hStats->SetBinContent(2,hStatsFromFile->GetBinContent(hStatsFromFile->FindBin(1))*genWeight);   
-    hStats->SetBinContent(3,hStatsFromFile->GetBinContent(hStatsFromFile->FindBin(3))*genWeight);
+    hStats->SetBinContent(2,std::abs(hStatsFromFile->GetBinContent(hStatsFromFile->FindBin(1))*genWeight)); //test!!  
+    hStats->SetBinContent(3,std::abs(hStatsFromFile->GetBinContent(hStatsFromFile->FindBin(3))*genWeight)); //test!!
   }
 }
 //////////////////////////////////////////////////////////////////////////////

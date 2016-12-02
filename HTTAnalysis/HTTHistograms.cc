@@ -61,6 +61,13 @@ float HTTHistograms::getSampleNormalisation(std::string sampleName){
 
   float crossSection = 1.0;
   int nEventsAnalysed = hStats->GetBinContent(1);
+  
+  //test HACK fixme!!!
+  std::vector<std::string> sampleNames = {"TTbar", "ZZTo2L2Q", "ZZTo4L","WZTo1L3Nu", "WZJToLLLNu", "WWTo1L1Nu2Q", "WZTo1L1Nu2Q", "VVTo2L2Nu", "WZTo2L2Q"};
+  for(auto sampleNameTmp:sampleNames){
+        if(sampleName.find(sampleNameTmp+"Match")!=std::string::npos) {hStats = get1D_TauMatchJetSum(hName, true, false);nEventsAnalysed=hStats->GetBinContent(1);}
+        }
+  //test
 
   ///Cross sections taken from
   if(sampleName=="DYJetsLowM"){
@@ -235,15 +242,13 @@ TH1F *HTTHistograms::getNormalised_NJet_Histogram(const std::string& hName){
   TH1F *hNJetsStats = 0;
   if(hName.find("W")!=std::string::npos){
     sampleName = hName.substr(hName.find("W"));
-    //std::string selName = sampleName.substr(sampleName.find("Jets")+4);
-    std::string selName = sampleName.substr(sampleName.find("_"));//test: instead of searching for "jets" I search for "_" and take it as selName
+    std::string selName = sampleName.substr(sampleName.find("_"));
     sampleName = sampleName.substr(0,sampleName.size()-selName.size());    
     hNJetsStats = get1DHistogram("h1DStats"+sampleName);
   }
   if(hName.find("DY")!=std::string::npos){
     sampleName = hName.substr(hName.find("DY"));
-    //std::string selName = sampleName.substr(sampleName.find("Jets")+4);
-    std::string selName = sampleName.substr(sampleName.find("_"));//test: instead of searching for "jets" I search for "_" and take it as selName
+    std::string selName = sampleName.substr(sampleName.find("_"));
     sampleName = sampleName.substr(0,sampleName.size()-selName.size());
     bool sumDecayModes = true;
     bool sumJetBins = false;
@@ -567,7 +572,7 @@ void HTTHistograms::finalizeHistograms(int nRuns, float weight){
   ttScale = 0.7;
 
   for(unsigned int iCategory = (int)HTTAnalyzer::jet0;
-      iCategory<(int)HTTAnalyzer::DUMMY;++iCategory){
+      iCategory<(int)HTTAnalyzer::boosted;++iCategory){
     
     wselOSCorrection =  std::pair<float,float>(1.0,0);
     wselSSCorrection =  std::pair<float,float>(1.0,0);
@@ -1051,14 +1056,14 @@ THStack*  HTTHistograms::plotStack(unsigned int iCategory, std::string varName, 
 
   TH1F *hWJets = get1D_WJet_Histogram((hName+"WJets"+hNameSuffix).c_str());
   TH1F *hTTbarJ = get1D_TT_Histogram((hName+"TTbar"+hNameSuffix).c_str(),"MatchJ");
-  std::cout<<"TTJ entries: "<<hTTbarJ->GetEntries()<<std::endl;//test
   TH1F *hTTbarT = get1D_TT_Histogram((hName+"TTbar"+hNameSuffix).c_str(),"MatchT");
-  std::cout<<"TTT entries: "<<hTTbarT->GetEntries()<<std::endl;//test
   TH1F *hST = get1D_ST_Histogram((hName+"ST"+hNameSuffix).c_str());
   TH1F *hVVJ = get1D_VV_Histogram((hName+"DiBoson"+hNameSuffix).c_str(), "MatchJ");
   std::cout<<"VVJ entries: "<<hVVJ->GetEntries()<<std::endl;//test
   TH1F *hVVT = get1D_VV_Histogram((hName+"DiBoson"+hNameSuffix).c_str(), "MatchT");
-  std::cout<<"VVT entries: "<<hVVJ->GetEntries()<<std::endl;//test
+  std::cout<<"VVT entries: "<<hVVT->GetEntries()<<std::endl;//test
+  TH1F *hVV = get1D_VV_Histogram((hName+"DiBoson"+hNameSuffix).c_str());//test
+  if(hVV) std::cout<<"VV entries: "<<hVV->GetEntries()<<std::endl;//test
   TH1F *hDYJetsLowM = get1D_DYJet_Histogram((hName+"DYLowM"+hNameSuffix).c_str());
 
   bool sumDecayModes = false;
@@ -1088,11 +1093,11 @@ THStack*  HTTHistograms::plotStack(unsigned int iCategory, std::string varName, 
   if(!hDYJetsZJ) hDYJetsZJ = (TH1F*)hEmpty->Clone((hName+"DYJetsMatchJ"+hNameSuffix).c_str());
   if(!hDYJetsZL) hDYJetsZL = (TH1F*)hEmpty->Clone((hName+"DYJetsMatchL"+hNameSuffix).c_str());  
   if(!hDYJetsZTT) hDYJetsZTT = (TH1F*)hEmpty->Clone((hName+"DYJetsMatchT"+hNameSuffix).c_str());  
-  if(!hTTbarJ) hTTbarJ = (TH1F*)hEmpty->Clone((hName+"TTbarJ"+hNameSuffix).c_str()); 
-  if(!hTTbarT) hTTbarT = (TH1F*)hEmpty->Clone((hName+"TTbarT"+hNameSuffix).c_str());
+  if(!hTTbarJ) hTTbarJ = (TH1F*)hEmpty->Clone((hName+"TTbarMatchJ"+hNameSuffix).c_str()); 
+  if(!hTTbarT) hTTbarT = (TH1F*)hEmpty->Clone((hName+"TTbarMatchT"+hNameSuffix).c_str());
   if(!hST) hST = (TH1F*)hEmpty->Clone((hName+"ST"+hNameSuffix).c_str());
-  if(!hVVJ) hVVJ = (TH1F*)hEmpty->Clone((hName+"DiBosonJ"+hNameSuffix).c_str());  
-  if(!hVVT) hVVT = (TH1F*)hEmpty->Clone((hName+"DiBosonT"+hNameSuffix).c_str());  
+  if(!hVVJ) hVVJ = (TH1F*)hEmpty->Clone((hName+"DiBosonMatchJ"+hNameSuffix).c_str());  
+  if(!hVVT) hVVT = (TH1F*)hEmpty->Clone((hName+"DiBosonMatchT"+hNameSuffix).c_str());  
   if(!hEWK2Jets) hEWK2Jets = (TH1F*)hEmpty->Clone((hName+"EWK2Jets"+hNameSuffix).c_str());  
 
   if(!hggHiggs120) hggHiggs120 = (TH1F*)hEmpty->Clone((hName+"ggH120"+hNameSuffix).c_str());  
@@ -1217,13 +1222,13 @@ THStack*  HTTHistograms::plotStack(unsigned int iCategory, std::string varName, 
   sampleName = "DiBosonMatchJ";
   scale = lumi;
   hVVJ->Scale(scale);
-  std::cout<<"VVJ: "<<weight<<" "<<scale<<std::endl;//test
+  //std::cout<<"VVJ: "<<weight<<" "<<scale<<std::endl;//test
 
   //VV samples scaled for preselection during stiching step
   sampleName = "DiBosonMatchT";
   scale = lumi;
   hVVT->Scale(scale);
-  std::cout<<"VVT: "<<weight<<" "<<scale<<std::endl;//test
+  //std::cout<<"VVT: "<<weight<<" "<<scale<<std::endl;//test
 
   ///EWK 2Jets scaled for preselection during stiching step
   sampleName = "EWK2Jets";
