@@ -19,8 +19,8 @@ void HTTAnalyzer::getPreselectionEff(const EventProxyHTT & myEventProxy){
     
     float genWeight = getGenWeight(myEventProxy);
     
-    hStats->SetBinContent(2,std::abs(hStatsFromFile->GetBinContent(hStatsFromFile->FindBin(1))*genWeight)); //test!!  
-    hStats->SetBinContent(3,std::abs(hStatsFromFile->GetBinContent(hStatsFromFile->FindBin(3))*genWeight)); //test!!
+    hStats->SetBinContent(2,std::abs(hStatsFromFile->GetBinContent(hStatsFromFile->FindBin(1))*genWeight)); 
+    hStats->SetBinContent(3,std::abs(hStatsFromFile->GetBinContent(hStatsFromFile->FindBin(3))*genWeight));
   }
 }
 //////////////////////////////////////////////////////////////////////////////
@@ -249,7 +249,7 @@ float HTTAnalyzer::getLeptonCorrection(float eta, float pt, hadronicTauDecayMode
   else if(tauDecayMode == tauDecaysElectron) return 1.0;  
   else{
     if(sampleName.find("H")==std::string::npos &&
-       sampleName.find("ZTT")==std::string::npos
+       !(sampleName.find("DY")!=std::string::npos && sampleName.find("MatchT")!=std::string::npos) //test: works fine
        ) return 1.0;
     scaleWorkspace->var("t_pt")->setVal(pt);
     scaleWorkspace->var("t_eta")->setVal(eta);
