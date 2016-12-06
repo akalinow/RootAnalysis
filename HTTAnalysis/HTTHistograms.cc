@@ -25,16 +25,7 @@ float HTTHistograms::getLumi(){
   float run2015C = 17225935.728*1E-6;
   float run2015D = 2114239169.533*1E-6;
   
-  //./.local/bin/brilcalc lumi --normtag /afs/cern.ch/user/l/lumipro/public/normtag_file/normtag_DATACERT.json -i lumiSummary_Run2016B_PromptReco_v12.json     
-  float run2016B = 5879283691.513*1E-6;
-  float run2016C = 2645968083.093*1E-6;
-  float run2016D = 4353448810.554*1E-6;
-  float run2016E = 4049732039.245*1E-6;
-  float run2016F = 3121200199.632*1E-6;
-  float run2016G = 6320078824.709*1E-6;
-
-  //return run2016B+run2016C+run2016D+run2016E+run2016F+run2016G;//pb-1 data for NTUPLES_28_09_2016
-
+  //./.local/bin/brilcalc lumi --normtag /afs/cern.ch/user/l/lumipro/public/normtag_file/normtag_DATACERT.json -i processedLumis_26.11.2016.json     
   return 36419099223.791*1E-6;//pb-1 data for NTUPLES_26_11_2016
 }
 /////////////////////////////////////////////////////////
@@ -63,7 +54,7 @@ float HTTHistograms::getSampleNormalisation(std::string sampleName){
   int nEventsAnalysed = hStats->GetBinContent(1);
 
   ///Cross sections taken from
-  if(sampleName=="DYJetsLowM"){
+  if(sampleName=="DYLowM"){
     //https://cmsweb.cern.ch/das/request?input=mcm%20prepid=SMP-RunIISpring15MiniAODv2-00016
     crossSection = 71600;
   }
