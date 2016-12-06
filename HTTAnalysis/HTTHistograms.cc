@@ -506,7 +506,7 @@ void HTTHistograms::finalizeHistograms(int nRuns, float weight){
   ttScale = 0.7;
 
   for(unsigned int iCategory = (int)HTTAnalyzer::jet0_low;
-      iCategory<(int)HTTAnalyzer::jet0_high;++iCategory){
+      iCategory<(int)HTTAnalyzer::DUMMY;++iCategory){
     
     wselOSCorrection =  std::pair<float,float>(1.0,0);
     wselSSCorrection =  std::pair<float,float>(1.0,0);
@@ -516,7 +516,6 @@ void HTTHistograms::finalizeHistograms(int nRuns, float weight){
 
     //plotStack(iCategory, "MassSV"); 
     plotStack(iCategory, "MassVis");
-    return;
     plotStack(iCategory, "UnRollTauPtMassVis");
     plotStack(iCategory, "UnRollHiggsPtMassSV");
     plotStack(iCategory, "UnRollMjjMassSV");
@@ -995,8 +994,6 @@ THStack*  HTTHistograms::plotStack(unsigned int iCategory, std::string varName, 
   TH1F *hVVJ = get1D_VV_Histogram((hName+"DiBoson"+hNameSuffix).c_str(), "MatchJ");
   TH1F *hVVT = get1D_VV_Histogram((hName+"DiBoson"+hNameSuffix).c_str(), "MatchT");
   TH1F *hDYJetsLowM = get1D_DYJet_Histogram((hName+"DYLowM"+hNameSuffix).c_str());
-  if(hDYJetsLowM) std::cout<<hDYJetsLowM->GetName()<<"\n\n\n "<<hDYJetsLowM->Integral()<<std::endl;//test
-  std::cout<<"\n\n\n"<<hDYJetsLowM<<std::endl;//test
 
   bool sumDecayModes = false;
   bool sumJetBins = true;
@@ -1110,7 +1107,6 @@ THStack*  HTTHistograms::plotStack(unsigned int iCategory, std::string varName, 
 
   sampleName = "DYLowM";
   weight = getSampleNormalisation(sampleName);
-  std::cout<<"Waga DYLowM:\n\n\n"<<weight<<std::endl;//test
   scale = weight*lumi;
   hDYJetsLowM->Scale(scale);
   
