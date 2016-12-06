@@ -117,6 +117,7 @@ std::string HTTAnalyzer::getDYSampleName(const EventProxyHTT & myEventProxy){
   else if(tauMCMatch==5) decayName = "ZTT";
   else decayName = "ZJ";
 
+  if(fileName.find("DYJetsToLLM10to50")!=std::string::npos) decayName = "";
   return "DY"+decayName+jetsName;
 }
 //////////////////////////////////////////////////////////////////////////////

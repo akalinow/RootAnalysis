@@ -25,7 +25,7 @@ float HTTHistograms::getLumi(){
   float run2015C = 17225935.728*1E-6;
   float run2015D = 2114239169.533*1E-6;
   
-  //./.local/bin/brilcalc lumi --normtag /afs/cern.ch/user/l/lumipro/public/normtag_file/normtag_DATACERT.json -i processedLumis_26.11.2016.json     
+  //./.local/bin/brilcalc lumi --normtag /afs/cern.ch/user/l/lumipro/public/normtag_file/normtag_DATACERT.json -i processedLumis_26_11_2016.json
   return 36419099223.791*1E-6;//pb-1 data for NTUPLES_26_11_2016
 }
 /////////////////////////////////////////////////////////
@@ -172,7 +172,8 @@ TH1F *HTTHistograms::get1D_EWK2JetsSum(const std::string& name){
   if(hSum) hSum->SetName(name.c_str());
   return hSum;
 }
-/////////////////////////////////////////////////////////                                                                                                          /////////////////////////////////////////////////////////  
+/////////////////////////////////////////////////////////
+/////////////////////////////////////////////////////////  
 TH1F *HTTHistograms::get1D_DYSum(const std::string& name, bool sumDecayModes, bool sumJetBins){
 
   std::vector<std::string> decayNames = {"DYZTT", "DYZL", "DYZJ"};
@@ -498,7 +499,9 @@ void HTTHistograms::finalizeHistograms(int nRuns, float weight){
   ttScale = 0.7;
 
   for(unsigned int iCategory = (int)HTTAnalyzer::jet0;
-      iCategory<(int)HTTAnalyzer::DUMMY;++iCategory){
+      iCategory<(int)HTTAnalyzer::W;++iCategory){
+
+    plotCPhistograms(iCategory);
     
     wselOSCorrection =  std::pair<float,float>(1.0,0);
     wselSSCorrection =  std::pair<float,float>(1.0,0);
@@ -549,72 +552,46 @@ void HTTHistograms::finalizeHistograms(int nRuns, float weight){
 }
 /////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////
-void HTTHistograms::plotCPhistograms(int nRuns, float weight){
+void HTTHistograms::plotCPhistograms(unsigned int iCategory){
 
-  plot_HAZ_Histograms("Phi_nVectors","RefitPV");
-  plot_HAZ_Histograms("Phi_nVecIP_","RefitPV");
+  std::string hNameSuffix = "";
+  plot_HAZ_Histograms("Phi_nVecIP_yTauNeg",hNameSuffix+"GenNoOfflineSel");
+  plot_HAZ_Histograms("Phi_nVecIP_yTauPos",hNameSuffix+"GenNoOfflineSel");
+  plot_HAZ_Histograms("Phi_nVecIP",hNameSuffix+"GenNoOfflineSel");
+  plot_HAZ_Histograms("Phi_nVectors",hNameSuffix+"GenNoOfflineSel");
 
-  plotPhiDecayPlanes("Phi_nVectorsggH125");
-  plotPhiDecayPlanes("Phi_nVectorsA");
-  plotPhiDecayPlanes("Phi_nVectorsDYMuTauJets");
-  plotPhiDecayPlanes("Phi_nVecIP_");
-
-  plot_HAZ_Histograms("Phi_nVecIP_yTauNeg","GenNoOfflineSel");
-  plot_HAZ_Histograms("Phi_nVecIP_yTauPos","GenNoOfflineSel");
-  plot_HAZ_Histograms("Phi_nVecIP_","GenNoOfflineSel");
-
-  plot_HAZ_Histograms("Phi_nVectors","GenNoOfflineSel");
-
-  plot_HAZ_Histograms("Phi_nVectors","AODPV");
-  plot_HAZ_Histograms("Phi_nVecIP_","AODPV");
-
-  plot_HAZ_Histograms("Phi_nVectors","RefitPV");
-  plot_HAZ_Histograms("Phi_nVecIP_","RefitPV");
+  hNameSuffix =  "_OS_"+std::to_string(iCategory);
+  plot_HAZ_Histograms("Phi_nVecIP_yTauNeg",hNameSuffix+"_Gen");
+  plot_HAZ_Histograms("Phi_nVecIP_yTauPos",hNameSuffix+"_Gen");
+  plot_HAZ_Histograms("Phi_nVecIP",hNameSuffix+"_Gen");
+  plot_HAZ_Histograms("Phi_nVectors",hNameSuffix+"_Gen");
   
-  plotProfiles("hProfRecoVsMagGen_","ggH125");
-  plotProfiles("hProfRecoVsMagGen_","A");
-  plotProfiles("hProfRecoVsMagGen_","DYMuTauJets");
+  plot_HAZ_Histograms("Phi_nVectors",hNameSuffix+"_RefitPV");
+  plot_HAZ_Histograms("Phi_nVecIP",hNameSuffix+"_RefitPV");
 
-  plotProfiles("hProfPhiVsMag_","ggH125");
-  plotProfiles("hProfPhiVsMag_","A");
-  plotProfiles("hProfPhiVsMag_","DYMuTauJets");
+  plotnPCA("ggH125"+hNameSuffix);
+  plotnPCA("A"+hNameSuffix);
+  plotnPCA("DYJets"+hNameSuffix);
+  plotnPCA("WJets"+hNameSuffix);
 
-  plotVerticesPulls("h1DVxPullX_ggH125");
-  plotVerticesPulls("h1DVxPullY_ggH125");
-  plotVerticesPulls("h1DVxPullZ_ggH125");
+  plotPhiDecayPlanes("Phi_nVectorsggH125"+hNameSuffix);
+  plotPhiDecayPlanes("Phi_nVectorsA"+hNameSuffix);
+  plotPhiDecayPlanes("Phi_nVectorsDYJets"+hNameSuffix);
+
+  plotPhiDecayPlanes("Phi_nVecIPggH125"+hNameSuffix);
+  plotPhiDecayPlanes("Phi_nVecIPA"+hNameSuffix);
+  plotPhiDecayPlanes("Phi_nVecIPDYJets"+hNameSuffix);
+
+  plotProfiles("hProfRecoVsMagGen_","ggH125"+hNameSuffix);
+  plotProfiles("hProfPhiVsMag_","ggH125"+hNameSuffix);
+
+  plotVerticesPulls("h1DVxPullX_ggH125"+hNameSuffix);
+  plotVerticesPulls("h1DVxPullY_ggH125"+hNameSuffix);
+  plotVerticesPulls("h1DVxPullZ_ggH125"+hNameSuffix);
   
-  plotPhiDecayPlanes("Phi_nVectorsData");
-  plotPhiDecayPlanes("Phi_nVectorsggH125");
-  plotPhiDecayPlanes("Phi_nVectorsA");  
-  plotPhiDecayPlanes("Phi_nVectorsDYMuTauJets");
-  plotPhiDecayPlanes("Phi_nVectorsWJets");
-
-  plotPhiDecayPlanes("Phi_nVecIP_yTauPosData");
-  plotPhiDecayPlanes("Phi_nVecIP_yTauNegData");
-  plotPhiDecayPlanes("Phi_nVecIP_yTauPosggH125");
-  plotPhiDecayPlanes("Phi_nVecIP_yTauNegggH125");
-  plotPhiDecayPlanes("Phi_nVecIP_yTauPosA");
-  plotPhiDecayPlanes("Phi_nVecIP_yTauNegA");
-  plotPhiDecayPlanes("Phi_nVecIP_yTauPosDYMuTauJets");
-  plotPhiDecayPlanes("Phi_nVecIP_yTauNegDYMuTauJets");
-  plotPhiDecayPlanes("Phi_nVecIP_yTauPosWJets");
-  plotPhiDecayPlanes("Phi_nVecIP_yTauNegWJets");
+  plotPhiDecayPlanes("Phi_nVecIP_yTauPosggH125"+hNameSuffix);
+  plotPhiDecayPlanes("Phi_nVecIP_yTauNegggH125"+hNameSuffix);
  
-  plotSingleHistogram("h1DyTauggH125");
-  plotSingleHistogram("h1DyTauA");
-  plotSingleHistogram("h1DyTauDYMuTauJets");
-  plotSingleHistogram("h1DyTauWJets");
- 
-  plotPhiDecayPlanes("CosPhiNN_ggH125");
-  plotPhiDecayPlanes("CosPhiNN_A");
-  plotPhiDecayPlanes("CosPhiNN_DYMuTauJets");
-  plotPhiDecayPlanes("CosPhiNN_WJets");
-
-  plotnPCA("ggH125");
-  plotnPCA("A");
-  plotnPCA("DYMuTauJets");
-  plotnPCA("WJets");
-  
 }
 /////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////
@@ -622,6 +599,16 @@ void HTTHistograms::plotnPCA(const std::string & type){
 
   TH1F* h1DTau = get1DHistogram("h1DnPCATau"+type);
   TH1F* h1DMuon = get1DHistogram("h1DnPCAMuon"+type);
+
+  if(type.find("DYJets")!=std::string::npos){
+    h1DTau = get1D_DYJet_Histogram("h1DnPCATau"+type);
+    h1DMuon = get1D_DYJet_Histogram("h1DnPCAMuon"+type);
+  }
+  if(type.find("WJets")!=std::string::npos){
+    h1DTau = get1D_WJet_Histogram("h1DnPCATau"+type);
+    h1DMuon = get1D_WJet_Histogram("h1DnPCAMuon"+type);
+  }
+  
   if(!h1DTau || !h1DMuon) return;
   
   TCanvas* c = new TCanvas("AnyHistogram","AnyHistogram",			   
@@ -668,8 +655,8 @@ void HTTHistograms::plotVerticesPulls(const std::string & hName){
   l.SetFillColor(10);
 
   if(hName.find("2D")!=std::string::npos){
-    TProfile* hProfile_AOD = this->get2DHistogram((hName+"AODPV").c_str())->ProfileX();
-    TProfile* hProfile_Refit = this->get2DHistogram((hName+"RefitPV").c_str())->ProfileX();
+    TProfile* hProfile_AOD = this->get2DHistogram((hName+"_AODPV").c_str())->ProfileX();
+    TProfile* hProfile_Refit = this->get2DHistogram((hName+"_RefitPV").c_str())->ProfileX();
 
     if(!hProfile_AOD || !hProfile_Refit) return;
 
@@ -698,8 +685,8 @@ void HTTHistograms::plotVerticesPulls(const std::string & hName){
     return;
   }
 
-  TH1F* h1D_AOD = this->get1DHistogram((hName+"AODPV").c_str());
-  TH1F* h1D_Refit = this->get1DHistogram((hName+"RefitPV").c_str());
+  TH1F* h1D_AOD = this->get1DHistogram((hName+"_AODPV").c_str());
+  TH1F* h1D_Refit = this->get1DHistogram((hName+"_RefitPV").c_str());
   
   if(h1D_AOD && h1D_Refit){
     
@@ -739,10 +726,10 @@ void HTTHistograms::plotVerticesPulls(const std::string & hName){
 void HTTHistograms::plotProfiles(const std::string & hName,
 				 const std::string & sysType){
 
-  TProfile* h1DAOD = this->getProfile(hName+sysType+"AODPV");
+  TProfile* h1DAOD = this->getProfile(hName+sysType+"_AODPV");
   //TProfile* h1DGen = this->getProfile(hName+sysType+"GenNoOfflineSel");
-  TProfile* h1DGen = this->getProfile(hName+sysType+"GenPV");  
-  TProfile* h1DRefit = this->getProfile(hName+sysType+"RefitPV");
+  TProfile* h1DGen = this->getProfile(hName+sysType+"_GenPV");  
+  TProfile* h1DRefit = this->getProfile(hName+sysType+"_RefitPV");
 
   if(!h1DGen || !h1DRefit || !h1DAOD) return;
 
@@ -821,17 +808,21 @@ void HTTHistograms::plotPhiDecayPlanes(const std::string & name){
   l.SetBorderSize(0);
   l.SetFillColor(10);
 
-  TString hName = "h1D"+name+"RefitPV";
+  TString hName = "h1D"+name+"_RefitPV";
   TH1F* h1DRefitPV = get1DHistogram(hName.Data());
+  if(name.find("DYJets")!=std::string::npos) h1DRefitPV = get1D_DYJet_Histogram(hName.Data());
 
-  hName = "h1D"+name+"AODPV";
+  hName = "h1D"+name+"_AODPV";
   TH1F* h1DAODPV = get1DHistogram(hName.Data());
+  if(name.find("DYJets")!=std::string::npos) h1DAODPV = get1D_DYJet_Histogram(hName.Data());
   
-  hName = "h1D"+name+"GenPV";
+  hName = "h1D"+name+"_GenPV";
   TH1F* h1DGenPV = get1DHistogram(hName.Data());
+  if(name.find("DYJets")!=std::string::npos) h1DGenPV = get1D_DYJet_Histogram(hName.Data());
 
-  hName = "h1D"+name+"GenNoOfflineSel";
+  hName = "h1D"+name+"_GenNoOfflineSel";
   TH1F* h1DGen = get1DHistogram(hName.Data());
+  if(name.find("DYJets")!=std::string::npos) h1DGen = get1D_DYJet_Histogram(hName.Data());
 
   if(h1DGen){
     h1DGen->SetLineWidth(4);
@@ -907,8 +898,8 @@ void HTTHistograms::plot_HAZ_Histograms(const std::string & hName,
   TH1F* h_h = this->get1DHistogram(name.Data());
   name = "h1D"+hName+"A"+sysType;
   TH1F* h_A = this->get1DHistogram(name.Data());
-  name = "h1D"+hName+"DYMuTauJets"+sysType;
-  TH1F* h_Z = this->get1DHistogram(name.Data());
+  name = "h1D"+hName+"DYJets"+sysType;
+  TH1F* h_Z = get1D_DYJet_Histogram(name.Data());
 
   if(!h_h || !h_A || !h_Z) return;
 
@@ -984,7 +975,6 @@ THStack*  HTTHistograms::plotStack(unsigned int iCategory, std::string varName, 
   TH1F *hTTbar = get1DHistogram((hName+"TTbar"+hNameSuffix).c_str());
   TH1F *hST = get1D_ST_Histogram((hName+"ST"+hNameSuffix).c_str());
   TH1F *hVV = get1D_VV_Histogram((hName+"DiBoson"+hNameSuffix).c_str());
-  TH1F *hDYJetsLowM = get1D_DYJet_Histogram((hName+"DYLowM"+hNameSuffix).c_str());
 
   bool sumDecayModes = false;
   bool sumJetBins = true;
@@ -992,6 +982,8 @@ THStack*  HTTHistograms::plotStack(unsigned int iCategory, std::string varName, 
   TH1F *hDYJetsZL = get1D_DYSum((hName+"DYZLJets"+hNameSuffix).c_str(), sumDecayModes, sumJetBins);
   TH1F *hDYJetsZTT = get1D_DYSum((hName+"DYZTTJets"+hNameSuffix).c_str(), sumDecayModes, sumJetBins);
 
+  TH1F *hDYJetsLowM = get1DHistogram((hName+"DYLowM"+hNameSuffix).c_str());
+  
   TH1F *hEWK2Jets = get1D_EWK2JetsSum(hName+"EWK2Jets"+hNameSuffix);
 
   TH1F *hSoup = get1DHistogram((hName+"Data"+hNameSuffix).c_str(),true);
