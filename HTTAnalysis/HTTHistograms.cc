@@ -462,16 +462,17 @@ void HTTHistograms::defineHistograms(){
 /////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////
 void HTTHistograms::finalizeHistograms(int nRuns, float weight){
+   
+  AnalysisHistograms::finalizeHistograms();
   /*
   int iCategory = 6;
   std::string hName = "h1DMassSV";
   std::string hNameSuffix =  "_OS_"+std::to_string(iCategory);
   std::string categoryName = HTTAnalyzer::categoryName(iCategory);  
-  get1DHistogram((hName+"Data"+hNameSuffix).c_str(),true)->Print();
+  TH1F *h = get1DHistogram((hName+"TTbar"+hNameSuffix).c_str(),true);
+  h->Print();
   return;
   */
-  AnalysisHistograms::finalizeHistograms();
-
   ////Code below tests W+n jets normalisation
   ///Samples split into jet multiplicity are compared to
   ///inclusive sample.
@@ -506,7 +507,7 @@ void HTTHistograms::finalizeHistograms(int nRuns, float weight){
   //plot_HAZ_Histograms("Phi_nVectors","_OS_6_RefitPV");
 
   for(unsigned int iCategory = (int)HTTAnalyzer::jet0;
-      iCategory<(int)HTTAnalyzer::boosted;++iCategory){
+      iCategory<(int)HTTAnalyzer::DUMMY;++iCategory){
 
     plotCPhistograms(iCategory);
     
@@ -517,7 +518,6 @@ void HTTHistograms::finalizeHistograms(int nRuns, float weight){
     wselSSCorrection = getWNormalisation(iCategory, "SS");
 
     plotStack(iCategory, "MassSV");
-    return;
     plotStack(iCategory, "MassVis");
     plotStack(iCategory, "UnRollTauPtMassVis");
     plotStack(iCategory, "UnRollHiggsPtMassSV");
