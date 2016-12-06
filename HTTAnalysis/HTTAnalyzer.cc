@@ -373,6 +373,7 @@ bool HTTAnalyzer::analyze(const EventProxyBase& iEvent){
     HTTAnalyzer::muTauCategory categoryType = static_cast<HTTAnalyzer::muTauCategory>(iCategory);
     
     if(!passCategory(categoryType)) continue;    
+    
     categorySuffix = std::to_string(iCategory);
 
     if(OS && muonIso){

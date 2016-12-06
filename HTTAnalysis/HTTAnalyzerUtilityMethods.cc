@@ -19,8 +19,8 @@ void HTTAnalyzer::getPreselectionEff(const EventProxyHTT & myEventProxy){
     
     float genWeight = getGenWeight(myEventProxy);
     
-    hStats->SetBinContent(2,hStatsFromFile->GetBinContent(hStatsFromFile->FindBin(1))*genWeight);   
-    hStats->SetBinContent(3,hStatsFromFile->GetBinContent(hStatsFromFile->FindBin(3))*genWeight);
+    hStats->SetBinContent(2,std::abs(hStatsFromFile->GetBinContent(hStatsFromFile->FindBin(1))*genWeight)); 
+    hStats->SetBinContent(3,std::abs(hStatsFromFile->GetBinContent(hStatsFromFile->FindBin(3))*genWeight));
   }
 }
 //////////////////////////////////////////////////////////////////////////////
@@ -35,59 +35,60 @@ std::string HTTAnalyzer::getSampleName(const EventProxyHTT & myEventProxy){
 std::string HTTAnalyzer::getSampleNameFromFileName(const EventProxyHTT & myEventProxy){
 
   std::string fileName = myEventProxy.getTTree()->GetCurrentFile()->GetName();
+  std::string sampleName = "Unknown";
 
-  if(fileName.find("W1JetsToLNu")!=std::string::npos) return "W1Jets";
-  else if(fileName.find("W2JetsToLNu")!=std::string::npos) return "W2Jets";
-  else if(fileName.find("W3JetsToLNu")!=std::string::npos) return "W3Jets";
-  else if(fileName.find("W4JetsToLNu")!=std::string::npos) return "W4Jets";
-  else if(fileName.find("WJetsToLNu")!=std::string::npos && myEventProxy.event->getLHEnOutPartons()==0) return "W0Jets";
-  else if(fileName.find("WJetsToLNu")!=std::string::npos && myEventProxy.event->getLHEnOutPartons()>0) return "WAllJets";
-  //TEST else if(fileName.find("WJetsToLNu")!=std::string::npos) return "WJets";
+  if(fileName.find("W1JetsToLNu")!=std::string::npos) sampleName = "W1Jets";
+  else if(fileName.find("W2JetsToLNu")!=std::string::npos) sampleName = "W2Jets";
+  else if(fileName.find("W3JetsToLNu")!=std::string::npos) sampleName = "W3Jets";
+  else if(fileName.find("W4JetsToLNu")!=std::string::npos) sampleName = "W4Jets";
+  else if(fileName.find("WJetsToLNu")!=std::string::npos && myEventProxy.event->getLHEnOutPartons()==0) sampleName = "W0Jets";
+  else if(fileName.find("WJetsToLNu")!=std::string::npos && myEventProxy.event->getLHEnOutPartons()>0) sampleName = "WAllJets";
+  //TEST else if(fileName.find("WJetsToLNu")!=std::string::npos) sampleName = "WJets";
   
-  else if(fileName.find("Run201")!=std::string::npos) return "Data";
-  else if(fileName.find("SUSYGluGluToHToTauTau")!=std::string::npos) return "A";
+  else if(fileName.find("Run201")!=std::string::npos) sampleName =  "Data";
+  else if(fileName.find("SUSYGluGluToHToTauTau")!=std::string::npos) sampleName =  "A";
 
-  else if(fileName.find("GluGluHToTauTauM120")!=std::string::npos) return "ggH120";
-  else if(fileName.find("GluGluHToTauTauM125")!=std::string::npos) return "ggH125";
-  else if(fileName.find("GluGluHToTauTauM130")!=std::string::npos) return "ggH130";
+  else if(fileName.find("GluGluHToTauTauM120")!=std::string::npos) sampleName =  "ggH120";
+  else if(fileName.find("GluGluHToTauTauM125")!=std::string::npos) sampleName =  "ggH125";
+  else if(fileName.find("GluGluHToTauTauM130")!=std::string::npos) sampleName =  "ggH130";
 
-  else if(fileName.find("VBFHToTauTauM120")!=std::string::npos) return "qqH120";  
-  else if(fileName.find("VBFHToTauTauM125")!=std::string::npos) return "qqH125";
-  else if(fileName.find("VBFHToTauTauM130")!=std::string::npos) return "qqH130";
+  else if(fileName.find("VBFHToTauTauM120")!=std::string::npos) sampleName =  "qqH120";  
+  else if(fileName.find("VBFHToTauTauM125")!=std::string::npos) sampleName =  "qqH125";
+  else if(fileName.find("VBFHToTauTauM130")!=std::string::npos) sampleName =  "qqH130";
 
-  else if(fileName.find("WplusHToTauTauM120")!=std::string::npos) return "WplusH120";  
-  else if(fileName.find("WplusHToTauTauM125")!=std::string::npos) return "WplusH125";  
-  else if(fileName.find("WplusHToTauTauM130")!=std::string::npos) return "WplusH130";  
+  else if(fileName.find("WplusHToTauTauM120")!=std::string::npos) sampleName =  "WplusH120";  
+  else if(fileName.find("WplusHToTauTauM125")!=std::string::npos) sampleName =  "WplusH125";  
+  else if(fileName.find("WplusHToTauTauM130")!=std::string::npos) sampleName =  "WplusH130";  
   
-  else if(fileName.find("WminusHToTauTauM120")!=std::string::npos) return "WminusH120";  
-  else if(fileName.find("WminusHToTauTauM125")!=std::string::npos) return "WminusH125";  
-  else if(fileName.find("WminusHToTauTauM130")!=std::string::npos) return "WminusH130";  
+  else if(fileName.find("WminusHToTauTauM120")!=std::string::npos) sampleName =  "WminusH120";  
+  else if(fileName.find("WminusHToTauTauM125")!=std::string::npos) sampleName =  "WminusH125";  
+  else if(fileName.find("WminusHToTauTauM130")!=std::string::npos) sampleName =  "WminusH130";  
 
-  else if(fileName.find("ZHM120")!=std::string::npos) return "ZH120";  
-  else if(fileName.find("ZHM125")!=std::string::npos) return "ZH125";  
-  else if(fileName.find("ZHM130")!=std::string::npos) return "ZH130";  
+  else if(fileName.find("ZHM120")!=std::string::npos) sampleName =  "ZH120";  
+  else if(fileName.find("ZHM125")!=std::string::npos) sampleName =  "ZH125";  
+  else if(fileName.find("ZHM130")!=std::string::npos) sampleName =  "ZH130";  
 
-  else if(fileName.find("STtWantitop")!=std::string::npos) return "Wantitop";
-  else if(fileName.find("STtWtop")!=std::string::npos) return "Wtop";
-  else if(fileName.find("STtchannel__antitop")!=std::string::npos) return "t-channel_antitop";
-  else if(fileName.find("STtchannel__top")!=std::string::npos) return "t-channel_top";   
-  else if(fileName.find("ZZTo2L2Q")!=std::string::npos) return "ZZTo2L2Q";
-  else if(fileName.find("ZZTo4L")!=std::string::npos) return "ZZTo4L";
-  else if(fileName.find("WZTo1L3Nu")!=std::string::npos) return "WZTo1L3Nu";
-  else if(fileName.find("WZJToLLLNu")!=std::string::npos) return "WZJToLLLNu";
-  else if(fileName.find("WWTo1L1Nu2Q")!=std::string::npos) return "WWTo1L1Nu2Q";
-  else if(fileName.find("WZTo1L1Nu2Q")!=std::string::npos) return "WZTo1L1Nu2Q";
-  else if(fileName.find("VVTo2L2Nu")!=std::string::npos) return "VVTo2L2Nu";
-  else if(fileName.find("WZTo2L2Q")!=std::string::npos) return "WZTo2L2Q";
-  else if(fileName.find("EWKWMinus")!=std::string::npos) return "EWKWMinus";
-  else if(fileName.find("EWKWPlus")!=std::string::npos) return "EWKWPlus";
-  else if(fileName.find("EWKZ2JetsZToLL")!=std::string::npos) return "EWKZ2JetsZToLL";
-  else if(fileName.find("EWKZ2JetsZToNuNu")!=std::string::npos) return "EWKZ2JetsZToNuNu";
-  else if(fileName.find("QCD")!=std::string::npos) return "QCD_MC";
-  else if(fileName.find("DY")!=std::string::npos) return getDYSampleName(myEventProxy);
-  else if(fileName.find("TTTune")!=std::string::npos) return "TTbar";
-  
-  return "Unknown";
+  else if(fileName.find("STtWantitop")!=std::string::npos) sampleName =  "Wantitop";
+  else if(fileName.find("STtWtop")!=std::string::npos) sampleName =  "Wtop";
+  else if(fileName.find("STtchannel__antitop")!=std::string::npos) sampleName =  "t-channel_antitop";
+  else if(fileName.find("STtchannel__top")!=std::string::npos) sampleName =  "t-channel_top";   
+  else if(fileName.find("ZZTo2L2Q")!=std::string::npos) sampleName =  "ZZTo2L2Q";
+  else if(fileName.find("ZZTo4L")!=std::string::npos) sampleName =  "ZZTo4L";
+  else if(fileName.find("WZTo1L3Nu")!=std::string::npos) sampleName =  "WZTo1L3Nu";
+  else if(fileName.find("WZJToLLLNu")!=std::string::npos) sampleName =  "WZJToLLLNu";
+  else if(fileName.find("WWTo1L1Nu2Q")!=std::string::npos) sampleName =  "WWTo1L1Nu2Q";
+  else if(fileName.find("WZTo1L1Nu2Q")!=std::string::npos) sampleName =  "WZTo1L1Nu2Q";
+  else if(fileName.find("VVTo2L2Nu")!=std::string::npos) sampleName =  "VVTo2L2Nu";
+  else if(fileName.find("WZTo2L2Q")!=std::string::npos) sampleName =  "WZTo2L2Q";
+  else if(fileName.find("EWKWMinus")!=std::string::npos) sampleName =  "EWKWMinus";
+  else if(fileName.find("EWKWPlus")!=std::string::npos) sampleName =  "EWKWPlus";
+  else if(fileName.find("EWKZ2JetsZToLL")!=std::string::npos) sampleName =  "EWKZ2JetsZToLL";
+  else if(fileName.find("EWKZ2JetsZToNuNu")!=std::string::npos) sampleName =  "EWKZ2JetsZToNuNu";
+  else if(fileName.find("QCD")!=std::string::npos) sampleName =  "QCD_MC";
+  else if(fileName.find("DY")!=std::string::npos) sampleName =  getDYSampleName(myEventProxy);
+  else if(fileName.find("TTTune")!=std::string::npos) sampleName =  "TTbar";
+  std::string matchingMode = getMatchingName(myEventProxy);
+  return sampleName + matchingMode;
 }
 //////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////
@@ -113,11 +114,43 @@ std::string HTTAnalyzer::getDYSampleName(const EventProxyHTT & myEventProxy){
     tauMCMatch = aTau.getProperty(PropertyEnum::mc_match);
   }    
   std::string decayName = "Unknown";
-  if(tauMCMatch<5) decayName = "ZL";
-  else if(tauMCMatch==5) decayName = "ZTT";
-  else decayName = "ZJ";
+  if(tauMCMatch<5) decayName = "L";
+  else if(tauMCMatch==5) decayName = "T";
+  else decayName = "J";
 
-  return "DY"+decayName+jetsName;
+  return "DY"+jetsName+"Match"+decayName;
+}
+//////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////////
+std::string HTTAnalyzer::getMatchingName(const EventProxyHTT & myEventProxy){
+
+  std::string fileName = myEventProxy.getTTree()->GetCurrentFile()->GetName();
+  std::vector<std::string> sampleNames = {"TTTune", "ZZTo2L2Q", "ZZTo4L","WZTo1L3Nu", "WZJToLLLNu", "WWTo1L1Nu2Q", "WZTo1L1Nu2Q", "VVTo2L2Nu", "WZTo2L2Q"};
+
+  bool sampleToAnalyze = false;
+  for(auto sampleName:sampleNames){
+  	if(fileName.find(sampleName)!=std::string::npos) sampleToAnalyze = true;
+  	}
+  if(!sampleToAnalyze) return "";
+  if(!(fileName.find("TT_")!=std::string::npos || fileName.find("MT_")!=std::string::npos)) return "";
+  
+  int tauMCMatch_1 = 6, tauMCMatch_2 = 6;
+  if(myEventProxy.pairs->size() && fileName.find("MT_")!=std::string::npos){
+    HTTPair aPair = (*myEventProxy.pairs)[0];
+    HTTParticle aTau = aPair.getTau();
+    tauMCMatch_1 = aTau.getProperty(PropertyEnum::mc_match);
+    if(tauMCMatch_1 == 5) return "MatchT"; else return "MatchJ";
+  }
+  
+  if(myEventProxy.pairs->size() && fileName.find("TT_")!=std::string::npos){
+    HTTPair aPair = (*myEventProxy.pairs)[0];
+    HTTParticle aTau_1 = aPair.getLeg1(), aTau_2 = aPair.getLeg2();
+    tauMCMatch_1 = aTau_1.getProperty(PropertyEnum::mc_match);
+    tauMCMatch_2 = aTau_2.getProperty(PropertyEnum::mc_match);
+    if(tauMCMatch_1 == 5 && tauMCMatch_2 == 5) return "MatchT"; else return "MatchJ";
+  }
+
+  return "";
 }
 //////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////
@@ -215,7 +248,7 @@ float HTTAnalyzer::getLeptonCorrection(float eta, float pt, hadronicTauDecayMode
   else if(tauDecayMode == tauDecaysElectron) return 1.0;  
   else{
     if(sampleName.find("H")==std::string::npos &&
-       sampleName.find("ZTT")==std::string::npos
+       !(sampleName.find("DY")!=std::string::npos && sampleName.find("MatchT")!=std::string::npos) //test: works fine
        ) return 1.0;
     scaleWorkspace->var("t_pt")->setVal(pt);
     scaleWorkspace->var("t_eta")->setVal(eta);
