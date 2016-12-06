@@ -36,6 +36,7 @@ float HTTHistograms::getLumi(){
   //return run2016B+run2016C+run2016D+run2016E+run2016F+run2016G;//pb-1 data for NTUPLES_28_09_2016
 
   return 36419099223.791*1E-6;//pb-1 data for NTUPLES_26_11_2016
+  return 36446609816.686*1E-6;//pb-1 data for NTUPLES_05_12_2016  
 }
 /////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////
