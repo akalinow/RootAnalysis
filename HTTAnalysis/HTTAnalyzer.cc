@@ -111,7 +111,7 @@ void HTTAnalyzer::setAnalysisObjects(const EventProxyHTT & myEventProxy){
   aSeparatedJets = getSeparatedJets(myEventProxy, 0.5);
   aJet1 = aSeparatedJets.size() ? aSeparatedJets[0] : HTTParticle();
   aJet2 = aSeparatedJets.size()>1 ? aSeparatedJets[1] : HTTParticle();
-  nJets30 = count_if(aSeparatedJets.begin(), aSeparatedJets.end(),[](const HTTParticle & aJet){return aJet.getP4().Pt()>30;});
+  nJets30 = count_if(aSeparatedJets.begin(), aSeparatedJets.end(),[](const HTTParticle & aJet){return aJet.getP4().Pt()>30;});  
   nJetsInGap30 = 0;
   if(nJets30>=2){
     for(unsigned int iJet=2; iJet<aSeparatedJets.size(); ++iJet){
@@ -303,7 +303,10 @@ bool HTTAnalyzer::analyze(const EventProxyBase& iEvent){
   bool postSynchTau = myEventProxy.event->checkSelectionBit(SelectionBitsEnum::postSynchTau);
   bool postSynchMuon = myEventProxy.event->checkSelectionBit(SelectionBitsEnum::postSynchMuon);
   bool diMuonVeto = myEventProxy.event->checkSelectionBit(SelectionBitsEnum::diMuonVeto);
-  bool thirdLeptonVeto = myEventProxy.event->checkSelectionBit(SelectionBitsEnum::thirdLeptonVeto);
+  bool extraMuonVeto = myEventProxy.event->checkSelectionBit(SelectionBitsEnum::extraMuonVeto);
+  bool extraElectronVeto = myEventProxy.event->checkSelectionBit(SelectionBitsEnum::extraMuonVeto);
+  bool postSynch = postSynchTau && !postSynchMuon && !diMuonVeto && !extraMuonVeto && !extraElectronVeto;
+  
   if(!myEventProxy.pairs->size()) return true;
 
   setAnalysisObjects(myEventProxy);
@@ -351,8 +354,7 @@ bool HTTAnalyzer::analyze(const EventProxyBase& iEvent){
   bool trigger = aMuon.hasTriggerMatch(TriggerEnum::HLT_IsoMu22) || 
 		 aMuon.hasTriggerMatch(TriggerEnum::HLT_IsoTkMu22);  
   if(sampleName!="Data") trigger = true; //MC trigger included in muon SF
-
-  if(!tauKinematics || !tauID || !muonKinematics || !trigger) return true;
+  if(!tauKinematics || !tauID || !muonKinematics || !trigger || !postSynch) return true;
   
   float muonScaleFactor = getLeptonCorrection(aMuon.getP4().Eta(), aMuon.getP4().Pt(), hadronicTauDecayModes::tauDecayMuon);
   float tauScaleFactor = getLeptonCorrection(aTau.getP4().Eta(), aTau.getP4().Pt(),
