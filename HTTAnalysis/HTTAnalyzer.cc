@@ -349,17 +349,15 @@ bool HTTAnalyzer::analyze(const EventProxyBase& iEvent){
   bool tauID = ( (int)aTau.getProperty(PropertyEnum::tauID) & tauIDmask) == tauIDmask;
   bool muonKinematics = aMuon.getP4().Pt()>24 && fabs(aMuon.getP4().Eta())<2.1;
   bool trigger = aMuon.hasTriggerMatch(TriggerEnum::HLT_IsoMu22) || 
-		 aMuon.hasTriggerMatch(TriggerEnum::HLT_IsoTkMu22);
-  
-  if(sampleName!="Data"){
-    float muonScaleFactor = getLeptonCorrection(aMuon.getP4().Eta(), aMuon.getP4().Pt(), hadronicTauDecayModes::tauDecayMuon);
-    float tauScaleFactor = getLeptonCorrection(aTau.getP4().Eta(), aTau.getP4().Pt(),
-					       static_cast<hadronicTauDecayModes>(aTau.getProperty(PropertyEnum::decayMode)));
-    eventWeight*=muonScaleFactor*tauScaleFactor;
-    trigger = true; //MC trigger included in muon SF
-  }
+		 aMuon.hasTriggerMatch(TriggerEnum::HLT_IsoTkMu22);  
+  if(sampleName!="Data") trigger = true; //MC trigger included in muon SF
 
   if(!tauKinematics || !tauID || !muonKinematics || !trigger) return true;
+  
+  float muonScaleFactor = getLeptonCorrection(aMuon.getP4().Eta(), aMuon.getP4().Pt(), hadronicTauDecayModes::tauDecayMuon);
+  float tauScaleFactor = getLeptonCorrection(aTau.getP4().Eta(), aTau.getP4().Pt(),
+					       static_cast<hadronicTauDecayModes>(aTau.getProperty(PropertyEnum::decayMode)));
+  eventWeight*=muonScaleFactor*tauScaleFactor;
  
   ///Note: parts of the signal/control region selection are applied in the following code.
   bool SS = aTau.getCharge()*aMuon.getCharge() == 1;
