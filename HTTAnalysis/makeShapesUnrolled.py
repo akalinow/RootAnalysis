@@ -21,13 +21,15 @@ categoryNames = [
 
 histogramsMap = {
     histoPrefix+"Data_OS":"data_obs",
-    histoPrefix+"DYZTTJets_OS":"ZTT",
-    histoPrefix+"DYZLJets_OS":"ZL",
-    histoPrefix+"DYZJJets_OS":"ZJ",
+    histoPrefix+"DYJetsMatchT_OS":"ZTT",
+    histoPrefix+"DYJetsMatchL_OS":"ZL",
+    histoPrefix+"DYJetsMatchJ_OS":"ZJ",
     histoPrefix+"WJets_OS":"W",
-    histoPrefix+"TTbar_OS":"TT",
+    histoPrefix+"TTbarMatchJ_OS":"TTJ",
+    histoPrefix+"TTbarMatchT_OS":"TTT",
     histoPrefix+"ST_OS":"T",
-    histoPrefix+"DiBoson_OS":"VV",
+    histoPrefix+"DiBosonMatchT_OS":"VVT",
+    histoPrefix+"DiBosonMatchJ_OS":"VVJ",
     histoPrefix+"QCDEstimate":"QCD",
     histoPrefix+"ggH120_OS":"ggH120",
     histoPrefix+"qqH120_OS":"qqH120",
@@ -36,22 +38,12 @@ histogramsMap = {
     histoPrefix+"ggH130_OS":"ggH130",
     histoPrefix+"qqH130_OS":"qqH130",
     histoPrefix+"ZH120_OS":"ZH120",
-    histoPrefix+"WH120_OS":"WH120",
+    histoPrefix+"WplusH120_OS":"WH120",
     histoPrefix+"ZH125_OS":"ZH125",
-    histoPrefix+"WH125_OS":"WH125",
+    histoPrefix+"WplusH125_OS":"WH125",
     histoPrefix+"ZH130_OS":"ZH130",
-    histoPrefix+"WH130_OS":"WH130",
-    histoPrefix+"EWK2Jets":"EWKZ"
-    }
-
-
-binningMap = {
-    "muTau_0jet_low": range(0,310,10),
-    "muTau_0jet_high": range(0,310,10),
-    "muTau_1jet_low":  [0,40,60,70,80,90,100,110,120,130,150,200,250],
-    "muTau_1jet_high": [0,40,60,70,80,90,100,110,120,130,150,200,250],
-    "muTau_vbf_low":   [0,40,60,80,100,120,150,200,250],
-    "muTau_vbf_high":  [0,40,60,80,100,120,150,200,250]
+    histoPrefix+"WplusH130_OS":"WH130",
+    histoPrefix+"EWK2Jets_OS":"EWKZ"
     }
     
 #according to https://twiki.cern.ch/twiki/bin/view/CMS/SMTauTau2016#Systematic_uncertainties
@@ -70,31 +62,9 @@ nuisanceParams = {
     "CMS_htt_zmumuShape_13TeV":(("",""),("vbf_","boosted_","VBF_")),
     }
 
-'''
-nuisanceParams = {
-    "CMS_shape_t_mt_13TeV",
-    "CMS_shape_t_tt_13TeV",
-    "CMS_scale_j_13TeV",
-    "CMS_htt_jetToTauFake_13TeV",
-    "CMS_htt_ZLShape_mt_13TeV",
-    "CMS_htt_dyShape_13TeV",
-    "CMS_htt_ttbarShape_13TeV",
-    "QCDSFUncert_mt_0jet_13TeV",
-    "QCDSFUncert_mt_boosted_13TeV",
-    "QCDSFUncert_mt_vbf_13TeV",
-    "WSFUncert_mt_0jet_13TeV",
-    "WSFUncert_mt_boosted_13TeV",
-    "WSFUncert_mt_vbf_13TeV",
-    "CMS_scale_gg_13Tev",
-    "CMS_htt_zmumuShape_VBF_13TeV",
-    "CMS_htt_zmumuShape_boosted_13TeV"
-    }
-'''
-
 channel="mt_"
 
 import array
-inclusiveBinning = array.array('d', [0,50,100,300,500,1000])
 
 hData = 0
 for iCategory in xrange(6,9):
@@ -128,14 +98,14 @@ for iCategory in xrange(6,9):
                     histogramUp = WAW_file.Get(hNameUp)
                     if(histogramUp==None):
                         histogramUp = histogram.Clone()
-                        histogramUp.Reset()
+                        #histogramUp.Reset()
                     histogramUp.SetName(value+"_"+nuisanceParam+"Up")
                     
                     hNameDown = key+"_"+str(iCategory)+nuisanceParam+"Down"
                     histogramDown = WAW_file.Get(hNameDown)
                     if(histogramDown==None):
                         histogramDown = histogram.Clone()
-                        histogramDown.Reset()
+                        #histogramDown.Reset()
                     histogramDown.SetName(value+"_"+nuisanceParam+"Down")
                     
                     histogramUp.SetDirectory(categoryDir)
@@ -145,9 +115,6 @@ for iCategory in xrange(6,9):
                     if cat=="": break
                 if (chn=="" or done1): break
         
-        #officialBinning = array.array('d', binningMap[categoryName])
-        #histogramRebin = histogram.Rebin(len(officialBinning)-1, value, officialBinning)
-        #histogramRebin.SetDirectory(categoryDir)
         #SYNCH_file.Write()
 
 #SYNCH_file.Write()

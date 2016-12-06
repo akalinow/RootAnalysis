@@ -35,6 +35,7 @@ float HTTHistograms::getLumi(){
 
   //return run2016B+run2016C+run2016D+run2016E+run2016F+run2016G;//pb-1 data for NTUPLES_28_09_2016
 
+  return 12878700585.159*1E-6;//pb-1 data for ICHEP dataset (B, C, D promptReco) NTUPLES_26_11_2016
   return 36419099223.791*1E-6;//pb-1 data for NTUPLES_26_11_2016
 }
 /////////////////////////////////////////////////////////
@@ -72,7 +73,7 @@ float HTTHistograms::getSampleNormalisation(std::string sampleName){
   //test
 
   ///Cross sections taken from
-  if(sampleName=="DYJetsLowM"){
+  if(sampleName=="DYLowM"){
     //https://cmsweb.cern.ch/das/request?input=mcm%20prepid=SMP-RunIISpring15MiniAODv2-00016
     crossSection = 71600;
   }
@@ -351,6 +352,9 @@ TH1F* HTTHistograms::get1D_SumPattern_Histogram(const std::string& name, std::st
       hSum->Add(histo, scale);
     }
   }
+  
+  hName.ReplaceAll(pattern, (pattern+tauMatchSuffix).c_str());
+  if(hSum) hSum->SetName(hName.Data());
     
   return hSum;
 }
@@ -501,8 +505,8 @@ void HTTHistograms::finalizeHistograms(int nRuns, float weight){
   ///Control regions plots
   ttScale = 0.7;
 
-  for(unsigned int iCategory = (int)HTTAnalyzer::jet0;
-      iCategory<(int)HTTAnalyzer::boosted;++iCategory){
+  for(unsigned int iCategory = (int)HTTAnalyzer::jet0_low;
+      iCategory<(int)HTTAnalyzer::DUMMY;++iCategory){
     
     wselOSCorrection =  std::pair<float,float>(1.0,0);
     wselSSCorrection =  std::pair<float,float>(1.0,0);
@@ -512,7 +516,6 @@ void HTTHistograms::finalizeHistograms(int nRuns, float weight){
 
     //plotStack(iCategory, "MassSV"); 
     plotStack(iCategory, "MassVis");
-    return;   
     plotStack(iCategory, "UnRollTauPtMassVis");
     plotStack(iCategory, "UnRollHiggsPtMassSV");
     plotStack(iCategory, "UnRollMjjMassSV");
