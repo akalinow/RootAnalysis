@@ -284,7 +284,7 @@ bool HTTAnalyzer::passCategory(const HTTAnalyzer::muTauCategory & aCategory){
   return categoryDecisions[(int)aCategory];
 }
 //////////////////////////////////////////////////////////////////////////////
-//////////////////////////////////////////////////////////////////////////////                                                                                               
+//////////////////////////////////////////////////////////////////////////////
 bool HTTAnalyzer::analyze(const EventProxyBase& iEvent){
 
   const EventProxyHTT & myEventProxy = static_cast<const EventProxyHTT&>(iEvent);
@@ -300,16 +300,25 @@ bool HTTAnalyzer::analyze(const EventProxyBase& iEvent){
   myHistos_->fill1DHistogram("h1DNPartons"+hNameSuffix,myEventProxy.event->getLHEnOutPartons(),eventWeight);
   getPreselectionEff(myEventProxy);
 
-  bool postSynchTau = myEventProxy.event->checkSelectionBit(SelectionBitsEnum::postSynchTau);
-  bool postSynchMuon = myEventProxy.event->checkSelectionBit(SelectionBitsEnum::postSynchMuon);
-  bool diMuonVeto = myEventProxy.event->checkSelectionBit(SelectionBitsEnum::diMuonVeto);
-  bool extraMuonVeto = myEventProxy.event->checkSelectionBit(SelectionBitsEnum::extraMuonVeto);
-  bool extraElectronVeto = myEventProxy.event->checkSelectionBit(SelectionBitsEnum::extraMuonVeto);
-  bool postSynch = postSynchTau && !postSynchMuon && !diMuonVeto && !extraMuonVeto && !extraElectronVeto;
-  
+  bool postSynchTau = aEvent.checkSelectionBit(SelectionBitsEnum::postSynchTau);
+  bool postSynchMuon = aEvent.checkSelectionBit(SelectionBitsEnum::postSynchMuon);
+  bool diMuonVeto = aEvent.checkSelectionBit(SelectionBitsEnum::diMuonVeto);
+  bool extraMuonVeto = aEvent.checkSelectionBit(SelectionBitsEnum::extraMuonVeto);
+  bool extraElectronVeto = aEvent.checkSelectionBit(SelectionBitsEnum::extraMuonVeto);  
+  bool postSynch = postSynchTau && postSynchMuon && !diMuonVeto && !extraMuonVeto && !extraElectronVeto;  
   if(!myEventProxy.pairs->size()) return true;
 
   setAnalysisObjects(myEventProxy);
+  /*
+  if(!postSynch) std::cout<<"postSynchTau: "<<postSynchTau
+			  <<" postSynchMuon: "<<postSynchMuon
+			  <<" !diMuonVeto: "<<!diMuonVeto
+			  <<" !extraMuonVeto: "<<!extraMuonVeto
+			  <<" !extraElectronVeto: "<<!extraElectronVeto
+			  <<" aMuon.getProperty(PropertyEnum::combreliso): "<<aMuon.getProperty(PropertyEnum::combreliso)
+			  <<std::endl;
+
+  */
   ////TEST
   /*
   for(unsigned int sysType = (unsigned int)sysEffects::TESUp;

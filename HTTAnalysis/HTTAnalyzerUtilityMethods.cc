@@ -64,10 +64,10 @@ std::string HTTAnalyzer::getSampleNameFromFileName(const EventProxyHTT & myEvent
   else if(fileName.find("WminusHToTauTauM125")!=std::string::npos) sampleName =  "WminusH125";  
   else if(fileName.find("WminusHToTauTauM130")!=std::string::npos) sampleName =  "WminusH130";  
 
-  else if(fileName.find("ZHM120")!=std::string::npos) sampleName =  "ZH120";  
-  else if(fileName.find("ZHM125")!=std::string::npos) sampleName =  "ZH125";  
-  else if(fileName.find("ZHM130")!=std::string::npos) sampleName =  "ZH130";  
-
+  else if(fileName.find("ZHToTauTauM120")!=std::string::npos) sampleName =  "ZH120";  
+  else if(fileName.find("ZHToTauTauM125")!=std::string::npos) sampleName =  "ZH125";  
+  else if(fileName.find("ZHToTauTauM130")!=std::string::npos) sampleName =  "ZH130";  
+  
   else if(fileName.find("STtWantitop")!=std::string::npos) sampleName =  "Wantitop";
   else if(fileName.find("STtWtop")!=std::string::npos) sampleName =  "Wtop";
   else if(fileName.find("STtchannel__antitop")!=std::string::npos) sampleName =  "t-channel_antitop";
@@ -88,6 +88,9 @@ std::string HTTAnalyzer::getSampleNameFromFileName(const EventProxyHTT & myEvent
   else if(fileName.find("DY")!=std::string::npos) sampleName =  getDYSampleName(myEventProxy);
   else if(fileName.find("TTTune")!=std::string::npos) sampleName =  "TTbar";
   std::string matchingMode = getMatchingName(myEventProxy);
+
+  if(sampleName=="Unknown") std::cout<<"Unkwown sample type. "<<fileName<<std::endl;
+  
   return sampleName + matchingMode;
 }
 //////////////////////////////////////////////////////////////////////////////

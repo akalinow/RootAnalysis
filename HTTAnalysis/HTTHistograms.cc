@@ -462,7 +462,14 @@ void HTTHistograms::defineHistograms(){
 /////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////
 void HTTHistograms::finalizeHistograms(int nRuns, float weight){
-
+  /*
+  int iCategory = 6;
+  std::string hName = "h1DMassSV";
+  std::string hNameSuffix =  "_OS_"+std::to_string(iCategory);
+  std::string categoryName = HTTAnalyzer::categoryName(iCategory);  
+  get1DHistogram((hName+"Data"+hNameSuffix).c_str(),true)->Print();
+  return;
+  */
   AnalysisHistograms::finalizeHistograms();
 
   ////Code below tests W+n jets normalisation
@@ -509,7 +516,8 @@ void HTTHistograms::finalizeHistograms(int nRuns, float weight){
     wselOSCorrection = getWNormalisation(iCategory, "OS");
     wselSSCorrection = getWNormalisation(iCategory, "SS");
 
-    //plotStack(iCategory, "MassSV"); 
+    plotStack(iCategory, "MassSV");
+    return;
     plotStack(iCategory, "MassVis");
     plotStack(iCategory, "UnRollTauPtMassVis");
     plotStack(iCategory, "UnRollHiggsPtMassSV");

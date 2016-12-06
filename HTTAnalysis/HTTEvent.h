@@ -6,7 +6,8 @@
 #include "TBits.h"
 #include <map>
 #include <vector>
-#include <bitset> 
+#include <bitset>
+#include <iostream>
 
 #include "PropertyEnum.h"
 #include "TriggerEnum.h"
