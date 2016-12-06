@@ -35,7 +35,7 @@ float HTTHistograms::getLumi(){
 
   //return run2016B+run2016C+run2016D+run2016E+run2016F+run2016G;//pb-1 data for NTUPLES_28_09_2016
 
-  return 12878700585.159*1E-6;//pb-1 data for ICHEP dataset (B, C, D promptReco) NTUPLES_26_11_2016
+  //return 12878700585.159*1E-6;//pb-1 data for ICHEP dataset (B, C, D promptReco) NTUPLES_26_11_2016
   return 36419099223.791*1E-6;//pb-1 data for NTUPLES_26_11_2016
 }
 /////////////////////////////////////////////////////////
@@ -53,7 +53,7 @@ float HTTHistograms::getSampleNormalisation(std::string sampleName){
   else if(sampleName=="ST") {/*WJets are normalised for analysed events and preselection for each nJets sample*/ }
   else hStats = get1DHistogram(hName.c_str());
   
-  if(!hStats && sampleName!="DYLowM") hStats = get1D_TauMatchJetSum(hName,true,false);
+  if(!hStats) hStats = get1D_TauMatchJetSum(hName,true,false);
 
   if(!hStats) return 0;
 
@@ -506,7 +506,7 @@ void HTTHistograms::finalizeHistograms(int nRuns, float weight){
   ttScale = 0.7;
 
   for(unsigned int iCategory = (int)HTTAnalyzer::jet0_low;
-      iCategory<(int)HTTAnalyzer::DUMMY;++iCategory){
+      iCategory<(int)HTTAnalyzer::jet0_high;++iCategory){
     
     wselOSCorrection =  std::pair<float,float>(1.0,0);
     wselSSCorrection =  std::pair<float,float>(1.0,0);
@@ -516,6 +516,7 @@ void HTTHistograms::finalizeHistograms(int nRuns, float weight){
 
     //plotStack(iCategory, "MassSV"); 
     plotStack(iCategory, "MassVis");
+    return;
     plotStack(iCategory, "UnRollTauPtMassVis");
     plotStack(iCategory, "UnRollHiggsPtMassSV");
     plotStack(iCategory, "UnRollMjjMassSV");
@@ -994,6 +995,8 @@ THStack*  HTTHistograms::plotStack(unsigned int iCategory, std::string varName, 
   TH1F *hVVJ = get1D_VV_Histogram((hName+"DiBoson"+hNameSuffix).c_str(), "MatchJ");
   TH1F *hVVT = get1D_VV_Histogram((hName+"DiBoson"+hNameSuffix).c_str(), "MatchT");
   TH1F *hDYJetsLowM = get1D_DYJet_Histogram((hName+"DYLowM"+hNameSuffix).c_str());
+  if(hDYJetsLowM) std::cout<<hDYJetsLowM->GetName()<<"\n\n\n "<<hDYJetsLowM->Integral()<<std::endl;//test
+  std::cout<<"\n\n\n"<<hDYJetsLowM<<std::endl;//test
 
   bool sumDecayModes = false;
   bool sumJetBins = true;
@@ -1107,6 +1110,7 @@ THStack*  HTTHistograms::plotStack(unsigned int iCategory, std::string varName, 
 
   sampleName = "DYLowM";
   weight = getSampleNormalisation(sampleName);
+  std::cout<<"Waga DYLowM:\n\n\n"<<weight<<std::endl;//test
   scale = weight*lumi;
   hDYJetsLowM->Scale(scale);
   
