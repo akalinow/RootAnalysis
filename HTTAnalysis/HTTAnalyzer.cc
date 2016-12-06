@@ -250,6 +250,12 @@ bool HTTAnalyzer::passCategory(const HTTAnalyzer::muTauCategory & aCategory){
   bool vbf_high = aTau.getP4().Pt()>20 &&
     nJets30==2 && jetsMass>800 && higgsPt>100;
 
+  bool cpMuonSelection = aMuon.getPCARefitPV().Perp()>0.003;    
+  bool cpTauSelection = (aTau.getProperty(PropertyEnum::decayMode)==tauDecay1ChargedPion0PiZero && aTau.getPCARefitPV().Mag()>0.003) ||
+    (aTau.getProperty(PropertyEnum::decayMode)!=tauDecay1ChargedPion0PiZero &&
+     isOneProng(aTau.getProperty(PropertyEnum::decayMode))); 
+  bool cpSelection = cpMuonSelection && cpTauSelection;
+  
   //2D categories
   bool jet0 = aTau.getP4().Perp()>30 && nJets30 == 0;
   bool boosted = aTau.getP4().Perp()>30 && (nJets30==1 || (nJets30==2 && jetsMass < 300) || nJets30 > 2);
@@ -267,7 +273,8 @@ bool HTTAnalyzer::passCategory(const HTTAnalyzer::muTauCategory & aCategory){
   categoryDecisions[(int)HTTAnalyzer::vbf_low] = mtSelection && vbf_low;
   categoryDecisions[(int)HTTAnalyzer::vbf_high] = mtSelection && vbf_high;
 
-  categoryDecisions[(int)HTTAnalyzer::jet0] = mtSelection && jet0;  
+  categoryDecisions[(int)HTTAnalyzer::jet0] = mtSelection && jet0;
+  categoryDecisions[(int)HTTAnalyzer::jet0_CP] = mtSelection && jet0 && cpSelection;  
   categoryDecisions[(int)HTTAnalyzer::boosted] = mtSelection && boosted;
   categoryDecisions[(int)HTTAnalyzer::vbf] = mtSelection && vbf;
 
@@ -352,15 +359,7 @@ bool HTTAnalyzer::analyze(const EventProxyBase& iEvent){
     trigger = true; //MC trigger included in muon SF
   }
 
-									   
-  bool cpMuonSelection = aMuon.getPCARefitPV().Perp()>0.003;    
-  bool cpTauSelection = (aTau.getProperty(PropertyEnum::decayMode)==tauDecay1ChargedPion0PiZero && aTau.getPCARefitPV().Mag()>0.003) ||
-                        (aTau.getProperty(PropertyEnum::decayMode)!=tauDecay1ChargedPion0PiZero &&
-			 isOneProng(aTau.getProperty(PropertyEnum::decayMode))); 
-  bool cpSelection = cpMuonSelection && cpTauSelection;
-  
   if(!tauKinematics || !tauID || !muonKinematics || !trigger) return true;
-  //if(!cpSelection) return true;
  
   ///Note: parts of the signal/control region selection are applied in the following code.
   bool SS = aTau.getCharge()*aMuon.getCharge() == 1;

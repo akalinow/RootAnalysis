@@ -25,17 +25,7 @@ float HTTHistograms::getLumi(){
   float run2015C = 17225935.728*1E-6;
   float run2015D = 2114239169.533*1E-6;
   
-  //./.local/bin/brilcalc lumi --normtag /afs/cern.ch/user/l/lumipro/public/normtag_file/normtag_DATACERT.json -i lumiSummary_Run2016B_PromptReco_v12.json     
-  float run2016B = 5879283691.513*1E-6;
-  float run2016C = 2645968083.093*1E-6;
-  float run2016D = 4353448810.554*1E-6;
-  float run2016E = 4049732039.245*1E-6;
-  float run2016F = 3121200199.632*1E-6;
-  float run2016G = 6320078824.709*1E-6;
-
-  //return run2016B+run2016C+run2016D+run2016E+run2016F+run2016G;//pb-1 data for NTUPLES_28_09_2016
-
-  return 36419099223.791*1E-6;//pb-1 data for NTUPLES_26_11_2016
+  //./.local/bin/brilcalc lumi --normtag /afs/cern.ch/user/l/lumipro/public/normtag_file/normtag_DATACERT.json -i processedLumis_SingleMuon.json     
   return 36446609816.686*1E-6;//pb-1 data for NTUPLES_05_12_2016  
 }
 /////////////////////////////////////////////////////////
@@ -513,9 +503,7 @@ void HTTHistograms::finalizeHistograms(int nRuns, float weight){
   for(unsigned int iCategory = (int)HTTAnalyzer::jet0;
       iCategory<(int)HTTAnalyzer::boosted;++iCategory){
 
-
     plotCPhistograms(iCategory);
-    return;
     
     wselOSCorrection =  std::pair<float,float>(1.0,0);
     wselSSCorrection =  std::pair<float,float>(1.0,0);
