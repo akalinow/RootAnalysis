@@ -79,7 +79,7 @@ class HTTHistograms: public AnalysisHistograms {
   void plot_HAZ_Histograms(const std::string & hName,
 			   const std::string & sysType);
 
-  void plotCPhistograms(int nRuns, float weight);
+  void plotCPhistograms(unsigned int iCategory);
 
   ///Return histogram for sum of all DY decay modes, and jet bins
   TH1F *get1D_DYJet_Histogram(const std::string& name);

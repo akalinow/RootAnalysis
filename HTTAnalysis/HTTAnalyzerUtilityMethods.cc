@@ -104,7 +104,7 @@ std::string HTTAnalyzer::getDYSampleName(const EventProxyHTT & myEventProxy){
   //TEST else if(fileName.find("DYJetsToLLM50")!=std::string::npos) jetsName =  "Jets";  
   else if(fileName.find("DYJetsToLLM50")!=std::string::npos && myEventProxy.event->getLHEnOutPartons()==0) jetsName =  "0Jets";
   else if(fileName.find("DYJetsToLLM50")!=std::string::npos && myEventProxy.event->getLHEnOutPartons()>0) jetsName =  "AllJets";  
-  
+
   int decayModeBoson = myEventProxy.event->getDecayModeBoson();
   int tauMCMatch = 6;
   if(myEventProxy.pairs->size()){

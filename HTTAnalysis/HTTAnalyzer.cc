@@ -379,11 +379,12 @@ bool HTTAnalyzer::analyze(const EventProxyBase& iEvent){
     if(OS && muonIso){
       hNameSuffix = sampleName+"_OS_"+categorySuffix;
       fillControlHistos(hNameSuffix, eventWeight);
-      fillDecayPlaneAngle(hNameSuffix+"RefitPV", eventWeight);
-      fillDecayPlaneAngle(hNameSuffix+"AODPV", eventWeight);
-      fillDecayPlaneAngle(hNameSuffix+"GenPV", eventWeight);
-      fillVertices(hNameSuffix+"RefitPV");
-      fillVertices(hNameSuffix+"AODPV");
+      fillGenDecayPlaneAngle(hNameSuffix+"_Gen", eventWeight);
+      fillDecayPlaneAngle(hNameSuffix+"_RefitPV", eventWeight);
+      fillDecayPlaneAngle(hNameSuffix+"_AODPV", eventWeight);
+      fillDecayPlaneAngle(hNameSuffix+"_GenPV", eventWeight);
+      fillVertices(hNameSuffix+"_RefitPV");
+      fillVertices(hNameSuffix+"_AODPV");
     }
     if(SS && muonIso){
       hNameSuffix = sampleName+"_SS_"+categorySuffix;
