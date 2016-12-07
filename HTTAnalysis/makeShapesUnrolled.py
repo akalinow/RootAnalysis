@@ -11,16 +11,31 @@ WAW_file = TFile(WAW_fileName)
 SYNCH_file = TFile(SYNCH_fileName,"RECREATE")
 
 #WAW to SYNCH histograms names map
-histoPrefix = ("HTTAnalyzer/h1DUnRollTauPtMassVis", "HTTAnalyzer/h1DUnRollHiggsPtMassSV", "HTTAnalyzer/h1DUnRollMjjMassSV")
+histoPrefix = {
+         "mt_0jet":"HTTAnalyzer/h1DUnRollTauPtMassVis",
+         "mt_boosted":"HTTAnalyzer/h1DUnRollHiggsPtMassSV",
+         "mt_vbf":"HTTAnalyzer/h1DUnRollMjjMassSV"
+         }
 
 #define number of bins in each category (nbinsX, nbinsY)
-nbins = ((13,7),(11,7),(6,5))
+nbins = {
+         "mt_0jet":(13,7),
+         "mt_boosted":(11,7),
+         "mt_vbf":(6,5)
+         }
 
 categoryNames = [
                  "muTau_0jet_low", "muTau_0jet_high",
                  "muTau_1jet_low", "muTau_1jet_high",
                  "muTau_vbf_low",  "muTau_vbf_high",
-                 "mt_0jet", "mt_boosted", "mt_vbf" ]
+                 "mt_0jet", "mt_0jetCP", 
+                 "mt_boosted", "mt_vbf" 
+                 ]
+
+relevantCategories = [
+                "mt_0jet", 
+                 "mt_boosted", "mt_vbf" 
+                 ]
 
 histogramsMap = {
     "Data_OS":"data_obs",
@@ -70,20 +85,22 @@ channel="mt_"
 import array
 
 hData = 0
-for iCategory in xrange(6,9):
+for iCategory in xrange(0,len(categoryNames)):
     categoryName = categoryNames[iCategory]
+    if categoryName not in relevantCategories: continue
     categoryDir = SYNCH_file.mkdir(categoryName)
 
     for key,value in histogramsMap.iteritems():
-        hName = histoPrefix[iCategory - 6] + key+"_"+str(iCategory)
+        hName = histoPrefix[categoryName] + key+"_"+str(iCategory)
         histogram = WAW_file.Get(hName)
         if(histogram==None):
             print hName,"is missing"
-            histogram = TH1F(value,"",nbins[iCategory - 6][0]*nbins[iCategory - 6][1],0.5,nbins[iCategory - 6][0]*nbins[iCategory - 6][1] + 0.5)
+            histogram = TH1F(value,"",nbins[categoryName][0]*nbins[categoryName][1],0.5,nbins[categoryName][0]*nbins[categoryName][1] + 0.5)
             #continue
         histogram.SetName(value)
         
         histogram.SetDirectory(categoryDir)
+        if value=="data_obs": continue
         
         for key1, value1 in nuisanceParams.items():
             index = key1.find("13TeV")
@@ -97,14 +114,14 @@ for iCategory in xrange(6,9):
                     nuisanceParam = name[:index]+cat+name[index:]
                     #print categoryNames[iCategory]+": " + value+"_"+nuisanceParam
                     
-                    hNameUp = histoPrefix[iCategory - 6] + key+"_"+str(iCategory)+nuisanceParam+"Up"
+                    hNameUp = histoPrefix[categoryName] + key+"_"+str(iCategory)+nuisanceParam+"Up"
                     histogramUp = WAW_file.Get(hNameUp)
                     if(histogramUp==None):
                         histogramUp = histogram.Clone()
                         #histogramUp.Reset()
                     histogramUp.SetName(value+"_"+nuisanceParam+"Up")
                     
-                    hNameDown = histoPrefix[iCategory - 6] + key+"_"+str(iCategory)+nuisanceParam+"Down"
+                    hNameDown = histoPrefix[categoryName] + key+"_"+str(iCategory)+nuisanceParam+"Down"
                     histogramDown = WAW_file.Get(hNameDown)
                     if(histogramDown==None):
                         histogramDown = histogram.Clone()
