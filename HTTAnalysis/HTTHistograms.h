@@ -79,7 +79,7 @@ class HTTHistograms: public AnalysisHistograms {
   void plot_HAZ_Histograms(const std::string & hName,
 			   const std::string & sysType);
 
-  void plotCPhistograms(int nRuns, float weight);
+  void plotCPhistograms(unsigned int iCategory);
 
   ///Return histogram for sum of all DY decay modes, and jet bins
   TH1F *get1D_DYJet_Histogram(const std::string& name);
@@ -88,14 +88,21 @@ class HTTHistograms: public AnalysisHistograms {
   TH1F *get1D_WJet_Histogram(const std::string& name);
 
   ///Return histogram for sum VV processes
-  TH1F *get1D_VV_Histogram(const std::string& name);
+  TH1F *get1D_VV_Histogram(const std::string& name, std::string tauMatchSuffix = "");
+
+  ///Return histogram for sum TT processes
+  TH1F *get1D_TT_Histogram(const std::string& name, std::string tauMatchSuffix = "");
 
   ///Return histogram for sum single top processes
   TH1F *get1D_ST_Histogram(const std::string& name);
 
   ///Return sum of DY histograms. Sum can run over
   ///decay modes, jet bins, or both.
-  TH1F *get1D_DYSum(const std::string& name, bool sumDecayModes, bool sumJetBins);
+  TH1F *get1D_TauMatchJetSum(const std::string& name, bool sumDecayModes, bool sumJetBins = false);
+  
+  //Return sum of histograms where you substitute pattern with all sample names.
+  //If tauMatchSuffix is specified, you will have sum of histos that match the suffix
+  TH1F* get1D_SumPattern_Histogram(const std::string& name, std::string pattern, std::vector<std::string> sampleNames, std::string tauMatchSuffix = "");
 
   ///Return histogram for sum of all W/Z jet bins
   ///The results is scaled to 1/LO_xsection.

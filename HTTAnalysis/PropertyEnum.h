@@ -21,8 +21,9 @@ mc_match = 19,
 rawPt = 20, 
 area = 21, 
 PUJetID = 22, 
-bDiscriminator = 23, 
-bCSVscore = 24, 
-PFjetID = 25, 
-NONE = 26
+jecUnc = 23, 
+bDiscriminator = 24, 
+bCSVscore = 25, 
+PFjetID = 26, 
+NONE = 27
 };

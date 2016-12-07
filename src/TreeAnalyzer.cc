@@ -197,6 +197,7 @@ int TreeAnalyzer::loop(){
 
   std::cout<<"Events total: "<<myProxy_->size()<<std::endl;
   unsigned int printoutStep = myProxy_->size()*0.1;
+  if(!printoutStep) printoutStep = 1;
   TH1::AddDirectory(kFALSE);
   nEventsAnalyzed_ = 0;
   nEventsSkipped_ = 0;

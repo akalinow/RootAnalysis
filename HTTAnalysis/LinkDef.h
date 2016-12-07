@@ -11,4 +11,8 @@
 #pragma link C++ class vector<HTTParticle>;
 #pragma link C++ class vector<HTTPair>;
 
+#pragma link C++ class vector<TLorentzVector>;
+#pragma link C++ class vector<TVector2>;
+#pragma link C++ class vector<LongDouble_t>;
+
 #endif

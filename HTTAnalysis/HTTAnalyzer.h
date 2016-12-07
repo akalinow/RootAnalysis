@@ -54,7 +54,8 @@ class HTTAnalyzer: public Analyzer{
   enum muTauCategory{jet0_low, jet0_high,
 		     jet1_low, jet1_high,
 		     vbf_low, vbf_high,
-		     jet0, boosted, vbf,		     
+		     jet0, jet0_CP,
+		     boosted, vbf,
 		     W, TT,
 		     DUMMY //This must be the last one
   };
@@ -93,6 +94,7 @@ class HTTAnalyzer: public Analyzer{
     else if(iCategory==(int)HTTAnalyzer::W) return "W";
     else if(iCategory==(int)HTTAnalyzer::TT) return "TT";
     else if(iCategory==(int)HTTAnalyzer::jet0) return "jet0";
+    else if(iCategory==(int)HTTAnalyzer::jet0_CP) return "jet0_CP";
     else if(iCategory==(int)HTTAnalyzer::boosted) return "boosted";
     else if(iCategory==(int)HTTAnalyzer::vbf) return "vbf";
     return "Unknown";
@@ -119,6 +121,9 @@ class HTTAnalyzer: public Analyzer{
 
   ///Return sample name for DY. Name encoded jet bin, and decay mode.
   static std::string getDYSampleName(const EventProxyHTT & myEventProxy);
+  
+  //Return name sample name suffix for different particles matched to reconstructed tau
+  static std::string getMatchingName(const EventProxyHTT & myEventProxy);
 
   ///Return pileup reweighting weight.
   ///Weight is calculatedon fly using the ration of nPU 

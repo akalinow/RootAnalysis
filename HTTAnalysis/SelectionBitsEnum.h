@@ -6,5 +6,7 @@ enum class SelectionBitsEnum {
    postSynchTau=4,
    diMuonVeto=5,
    thirdLeptonVeto=6,
+   extraMuonVeto=7,
+   extraElectronVeto=8,
    NONE = 999
 };

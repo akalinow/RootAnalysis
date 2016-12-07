@@ -159,7 +159,7 @@ void HTTAnalyzerTT::fillControlHistos(const std::string & hNameSuffix, float eve
   myHistos_->fill1DHistogram("h1DNPV"+hNameSuffix,aEvent.getNPV(),eventWeight);
 
   ///Fill SVfit and visible masses
-  myHistos_->fill1DHistogram("h1DMassSV"+hNameSuffix,aPair.getP4SVFit().M(),eventWeight);
+  //myHistos_->fill1DHistogram("h1DMassSV"+hNameSuffix,aPair.getP4SVFit().M(),eventWeight);
   myHistos_->fill1DHistogram("h1DMassVis"+hNameSuffix,aPair.getP4().M(),eventWeight);
   
   ///Fill leading tau
