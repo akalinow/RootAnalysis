@@ -1370,7 +1370,7 @@ THStack*  HTTHistograms::plotStack(unsigned int iCategory, std::string varName, 
   
   hSoup->DrawCopy("same");
 
-  TLegend *leg = new TLegend(0.79,0.32,0.99,0.82,NULL,"brNDC");
+  TLegend *leg = new TLegend(0.79,0.22,0.99,0.82,NULL,"brNDC");
   setupLegend(leg);
   leg->AddEntry(hSoup,"Data","lep");
   leg->AddEntry(hDYJetsZTT,"Z#rightarrow #mu #tau_{h}","f");
