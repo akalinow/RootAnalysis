@@ -1157,7 +1157,7 @@ THStack*  HTTHistograms::plotStack(unsigned int iCategory, std::string varName, 
   scale = weight*lumi;
   hZHiggs120->Scale(scale);
 
-  sampleName = "ZH135";
+  sampleName = "ZH125";
   weight = getSampleNormalisation(sampleName);
   scale = weight*lumi;
   hZHiggs125->Scale(scale);
@@ -1172,7 +1172,7 @@ THStack*  HTTHistograms::plotStack(unsigned int iCategory, std::string varName, 
   scale = weight*lumi;
   hWminusHiggs120->Scale(scale);
 
-  sampleName = "WminusH135";
+  sampleName = "WminusH125";
   weight = getSampleNormalisation(sampleName);
   scale = weight*lumi;
   hWminusHiggs125->Scale(scale);
@@ -1187,7 +1187,7 @@ THStack*  HTTHistograms::plotStack(unsigned int iCategory, std::string varName, 
   scale = weight*lumi;
   hWplusHiggs120->Scale(scale);
 
-  sampleName = "WplusH135";
+  sampleName = "WplusH125";
   weight = getSampleNormalisation(sampleName);
   scale = weight*lumi;
   hWplusHiggs125->Scale(scale);
