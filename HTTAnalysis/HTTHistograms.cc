@@ -462,7 +462,9 @@ void HTTHistograms::defineHistograms(){
 /////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////
 void HTTHistograms::finalizeHistograms(int nRuns, float weight){
-   
+
+  return;
+  
   AnalysisHistograms::finalizeHistograms();
   /*
   int iCategory = 6;

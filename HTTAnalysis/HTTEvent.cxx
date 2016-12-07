@@ -131,13 +131,27 @@ TVector2 HTTPair::getSystScaleMET(sysEffects::sysEffectsEnum type) const{
   TLorentzVector metShiftedP4(met.X(), met.Y(), 0, met.Mod());
 
   metShiftedP4+=leg1.getP4(sysEffects::NOMINAL);
-  metShiftedP4+=leg1.getP4(sysEffects::NOMINAL);
+  metShiftedP4+=leg2.getP4(sysEffects::NOMINAL);
 
   metShiftedP4-=leg1.getP4(type);
-  metShiftedP4-=leg1.getP4(type);
+  metShiftedP4-=leg2.getP4(type);
 
   TVector2 metShifted(metShiftedP4.X(), metShiftedP4.Y());
   return metShifted;
+}
+////////////////////////////////////////////////
+////////////////////////////////////////////////
+float HTTPair::getSystScaleMT(const HTTParticle &aParticle,
+			      sysEffects::sysEffectsEnum type) const{
+
+  TVector2 metScaled = getSystScaleMET(type);
+  TLorentzVector metP4(metScaled.X(), metScaled.Y(),0, metScaled.Mod());
+  TLorentzVector legP4 = aParticle.getP4(type);
+  legP4.SetZ(0);
+  legP4.SetE(legP4.Perp());
+  
+  float mT = (metP4+legP4).M();
+  return mT;  
 }
 ////////////////////////////////////////////////
 ////////////////////////////////////////////////

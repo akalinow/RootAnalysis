@@ -211,7 +211,14 @@ enum sysEffectsEnum{NOMINAL, NOMINAL_SVFIT,
 		    TESUp, TESDown, 
 		    M2TUp, M2TDown,
 		    E2TUp, E2TDown,
-		    DUMMY}; 
+		    DUMMY};
+/*
+ std::string sysEffectName(unsigned int iSysType){
+   if(iSysType==(int)sysEffects::NOMINAL) return "";
+   else if(iSysType==(int)sysEffects::NOMINAL_SVFIT) return "";
+   return "Unknown";
+ }
+*/ 
 }
 ///////////////////////////////////////////////////
 class HTTParticle{
@@ -323,9 +330,9 @@ class HTTPair{
 
   TVector2 getSVMET(sysEffects::sysEffectsEnum type = sysEffects::NOMINAL) const {return svMetVector[(unsigned int)type];}
 
-  float getMTLeg1() const {return mtLeg1;}
+  float getMTLeg1(sysEffects::sysEffectsEnum type = sysEffects::NOMINAL) const {return getSystScaleMT(leg1, type);}
 
-  float getMTLeg2() const {return mtLeg2;}
+  float getMTLeg2(sysEffects::sysEffectsEnum type = sysEffects::NOMINAL) const {return getSystScaleMT(leg2, type);}
 
   HTTParticle getLeg1() const {return leg1;}
 
@@ -335,7 +342,7 @@ class HTTPair{
 
   HTTParticle getTau() const {return abs(leg1.getPDGid())==15 ? leg1 : leg2; }
 
-  float getMTMuon() const {return abs(leg1.getPDGid())==13 ? getMTLeg1() : getMTLeg2(); }
+  float getMTMuon(sysEffects::sysEffectsEnum type = sysEffects::NOMINAL) const {return abs(leg1.getPDGid())==13 ? getMTLeg1(type) : getMTLeg2(type); }
 
   std::vector<float> getMETMatrix() const {return metMatrix;}
 
@@ -345,6 +352,10 @@ class HTTPair{
   ///The MET is corrected for accorging leptons corrections.
   ///The recoil correctino is not updated.                                                                                                
   TVector2 getSystScaleMET(sysEffects::sysEffectsEnum type=sysEffects::NOMINAL) const;
+
+  ///Return transverse mass caluculated according to the scale shifts.
+  float getSystScaleMT(const HTTParticle &aPerticle,
+		       sysEffects::sysEffectsEnum type=sysEffects::NOMINAL) const;
 
   ///Nominal met as calculated from PF.
   ///Includes recoil corrections.
