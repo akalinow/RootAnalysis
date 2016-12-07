@@ -55,6 +55,7 @@ class HTTAnalyzerTT: public Analyzer{
 		      jet1_low, jet1_high,
 		      vbf_low, vbf_high,
 		      boosted, vbf, 
+		      pipi,pirho,rhorho,
 		      DUMMY //This must be the last one
   };
   
@@ -90,6 +91,9 @@ class HTTAnalyzerTT: public Analyzer{
     else if(iCategory==(int)HTTAnalyzerTT::vbf_high) return "vbf_high";
     else if(iCategory==(int)HTTAnalyzerTT::boosted) return "boosted";
     else if(iCategory==(int)HTTAnalyzerTT::vbf) return "vbf";
+    else if(iCategory==(int)HTTAnalyzerTT::pipi) return "pipi";
+    else if(iCategory==(int)HTTAnalyzerTT::pirho) return "pirho";
+    else if(iCategory==(int)HTTAnalyzerTT::rhorho) return "rhorho";
     return "Unknown";
   }
 
@@ -210,6 +214,9 @@ class HTTAnalyzerTT: public Analyzer{
   int nJets30;
   int nJetsInGap30;
   std::vector<bool> categoryDecisions;
+
+  //cut on nPCA
+  const float nPCAMin_;
 
 };
 

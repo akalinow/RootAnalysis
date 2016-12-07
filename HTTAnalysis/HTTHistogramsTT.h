@@ -90,6 +90,9 @@ class HTTHistogramsTT: public AnalysisHistograms {
   ///The results is scaled to 1/LO_xsection.
   TH1F *get1D_VJetSum(const std::string& name);
 
+  ///Return histogram for sum of the EWK + 2jets samples
+  TH1F *get1D_EWK2JetsSum(const std::string& name);
+  
   ///Return histogram from nJets sample normalised by
   ///preselection/number of analysed events
   TH1F *getNormalised_NJet_Histogram(const std::string& hName);

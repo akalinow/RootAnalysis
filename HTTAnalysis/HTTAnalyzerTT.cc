@@ -5,7 +5,7 @@
 #include "HTTHistogramsTT.h"
 //////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////
-HTTAnalyzerTT::HTTAnalyzerTT(const std::string & aName):Analyzer(aName){
+HTTAnalyzerTT::HTTAnalyzerTT(const std::string & aName):Analyzer(aName),nPCAMin_(0.003){
 
   //pileupCalc.py -i lumiSummary_Run2016BCDE_PromptReco_v12.json
   //--inputLumiJSON /afs/cern.ch/cms/CAF/CMSCOMM/COMM_DQM/certification/Collisions16/13TeV/PileUp/pileup_latest.txt
@@ -176,38 +176,49 @@ void HTTAnalyzerTT::fillControlHistos(const std::string & hNameSuffix, float eve
   myHistos_->fill1DHistogram("h1DEtaTrailingTau"+hNameSuffix,aTau2.getP4().Eta(),eventWeight);
   myHistos_->fill1DHistogram("h1DPhiTrailingTau"+hNameSuffix,aTau2.getP4().Phi() ,eventWeight);
   myHistos_->fill1DHistogram("h1DIDTrailingTau"+hNameSuffix,aTau2.getProperty(PropertyEnum::byIsolationMVArun2v1DBoldDMwLTraw) ,eventWeight);  
-  myHistos_->fill1DHistogram("h1DStatsDecayMode"+hNameSuffix,aTau2.getProperty(PropertyEnum::decayMode), eventWeight);
+  myHistos_->fill1DHistogram("h1DStatsDecayModeTrailingTau"+hNameSuffix,aTau2.getProperty(PropertyEnum::decayMode), eventWeight);
   myHistos_->fill1DHistogram("h1DnPCATrailingTau"+hNameSuffix,aTau2.getPCARefitPV().Mag(),eventWeight);
   myHistos_->fill1DHistogram("h1DPtTrailingTauLeadingTk"+hNameSuffix,aTau2.getProperty(PropertyEnum::leadChargedParticlePt),eventWeight);
+
   float higgsPt =  (aTau1.getP4() + aTau2.getP4() + aMET.getP4()).Pt();
   myHistos_->fill1DHistogram("h1DPtTauTauMET"+hNameSuffix,higgsPt,eventWeight);
-  
+
   ///Fill jets info           
   myHistos_->fill1DHistogram("h1DStatsNJ30"+hNameSuffix,nJets30,eventWeight);
   if(nJets30>0){
     myHistos_->fill1DHistogram("h1DPtLeadingJet"+hNameSuffix,aJet1.getP4().Pt(),eventWeight);
     myHistos_->fill1DHistogram("h1DEtaLeadingJet"+hNameSuffix,aJet1.getP4().Eta(),eventWeight);
+    myHistos_->fill1DHistogram("h1DPhiLeadingJet"+hNameSuffix,aJet1.getP4().Phi(),eventWeight);
     myHistos_->fill1DHistogram("h1DCSVBtagLeadingJet"+hNameSuffix,aJet1.getProperty(PropertyEnum::bCSVscore),eventWeight);
   }
+  float jetsMass = 0 ;
   if(nJets30>1){  
     myHistos_->fill1DHistogram("h1DStatsNJGap30"+hNameSuffix,nJetsInGap30,eventWeight);
-    float jetsMass = (aJet1.getP4() + aJet2.getP4()).M();
+    jetsMass = (aJet1.getP4() + aJet2.getP4()).M();
     float jetsEta = std::abs(aJet1.getP4().Eta() - aJet2.getP4().Eta());
     myHistos_->fill1DHistogram("h1DWideMass2J"+hNameSuffix,jetsMass,eventWeight);
-    myHistos_->fill1DHistogram("h1DEta2J"+hNameSuffix,jetsMass,eventWeight);
+    myHistos_->fill1DHistogram("h1DDeltaEta2J"+hNameSuffix,jetsEta,eventWeight);
     myHistos_->fill1DHistogram("h1DPtTrailingJet"+hNameSuffix,aJet2.getP4().Pt(),eventWeight);
     myHistos_->fill1DHistogram("h1DEtaTrailingJet"+hNameSuffix,aJet2.getP4().Eta(),eventWeight);
+    myHistos_->fill1DHistogram("h1DPhiTrailingJet"+hNameSuffix,aJet2.getP4().Phi(),eventWeight);
     myHistos_->fill1DHistogram("h1DCSVBtagTrailingJet"+hNameSuffix,aJet2.getProperty(PropertyEnum::bCSVscore),eventWeight);
   }
   
   myHistos_->fill1DHistogram("h1DPtMET"+hNameSuffix,aMET.getP4().Pt(),eventWeight);
   myHistos_->fill1DHistogram("h1DPhiMET"+hNameSuffix,aMET.getP4().Phi(),eventWeight);
 
+  ///Unrolled distributions for 2D fit
+  //FIXMEmyHistos_->fill2DUnrolledHistogram("h1DUnRollHiggsPtMassSV"+hNameSuffix, aPair.getP4SVFit().M(), higgsPt, eventWeight);
+  myHistos_->fill2DUnrolledHistogram("h1DUnRollHiggsPtMassSV"+hNameSuffix, aPair.getP4().M(), higgsPt, eventWeight);
+  //FIXMEmyHistos_->fill2DUnrolledHistogram("h1DUnRollMjjMassSV"+hNameSuffix, aPair.getP4SVFit().M(), jetsMass, eventWeight);
+  myHistos_->fill2DUnrolledHistogram("h1DUnRollMjjMassSV"+hNameSuffix, aPair.getP4().M(), jetsMass, eventWeight);
+
   fillDecayPlaneAngle(hNameSuffix, eventWeight);
 
   if(aJet1.getProperty(PropertyEnum::bCSVscore)>0.8){
     myHistos_->fill1DHistogram("h1DPtLeadingBJet"+hNameSuffix,aJet1.getP4().Pt(),eventWeight);
     myHistos_->fill1DHistogram("h1DEtaLeadingBJet"+hNameSuffix,aJet1.getP4().Eta(),eventWeight);
+    myHistos_->fill1DHistogram("h1DPhiLeadingBJet"+hNameSuffix,aJet1.getP4().Phi(),eventWeight);
   }  
 }
 //////////////////////////////////////////////////////////////////////////////
@@ -258,6 +269,19 @@ bool HTTAnalyzerTT::passCategory(const HTTAnalyzerTT::tauTauCategory & aCategory
   
   bool vbf_2d = nJets30>=2 && (jetsEta>2.5 && nJetsInGap30<1 && higgsPt>100);
 
+  //////////
+  // categories by tau decay modes for CP
+  bool isPi1 = (aTau1.getProperty(PropertyEnum::decayMode)==tauDecay1ChargedPion0PiZero && aTau1.getPCARefitPV().Mag()>nPCAMin_);
+  bool isPi2 = (aTau2.getProperty(PropertyEnum::decayMode)==tauDecay1ChargedPion0PiZero && aTau2.getPCARefitPV().Mag()>nPCAMin_);
+  bool isRho1 = (aTau1.getProperty(PropertyEnum::decayMode)!=tauDecay1ChargedPion0PiZero && isOneProng(aTau1.getProperty(PropertyEnum::decayMode)) );
+  bool isRho2 = (aTau2.getProperty(PropertyEnum::decayMode)!=tauDecay1ChargedPion0PiZero && isOneProng(aTau2.getProperty(PropertyEnum::decayMode)) );
+
+  bool piPi = isPi1 && isPi2;
+  bool piRho = (isPi1 && isRho2) || (isPi2 && isRho1);
+  bool rhoRho = isRho1 && isRho2;
+  
+  //////////
+
   categoryDecisions[(int)HTTAnalyzerTT::jet0] = jet0;
   
   categoryDecisions[(int)HTTAnalyzerTT::jet1_low] = jet1_low;
@@ -268,7 +292,11 @@ bool HTTAnalyzerTT::passCategory(const HTTAnalyzerTT::tauTauCategory & aCategory
 
   categoryDecisions[(int)HTTAnalyzerTT::boosted] = boosted;
   categoryDecisions[(int)HTTAnalyzerTT::vbf] = vbf_2d;
-  
+
+  categoryDecisions[(int)HTTAnalyzerTT::pipi] = piPi;
+  categoryDecisions[(int)HTTAnalyzerTT::pirho] = piRho;
+  categoryDecisions[(int)HTTAnalyzerTT::rhorho] = rhoRho;
+
   return categoryDecisions[(int)aCategory];
 }
 //////////////////////////////////////////////////////////////////////////////
@@ -294,12 +322,6 @@ bool HTTAnalyzerTT::analyze(const EventProxyBase& iEvent){
   if(!myEventProxy.pairs->size()) return true;
 
   setAnalysisObjects(myEventProxy);
-  float tau1ScaleFactor = getLeptonCorrection(aTau1.getP4().Eta(), aTau1.getP4().Pt(),
-					      static_cast<hadronicTauDecayModes>(aTau1.getProperty(PropertyEnum::decayMode)));
-  float tau2ScaleFactor = getLeptonCorrection(aTau2.getP4().Eta(), aTau2.getP4().Pt(),
-					      static_cast<hadronicTauDecayModes>(aTau2.getProperty(PropertyEnum::decayMode)));
-  eventWeight*=tau1ScaleFactor*tau2ScaleFactor;
-
 
   std::pair<bool, bool> goodDecayModes = checkTauDecayMode(myEventProxy);
   bool goodGenDecayMode = goodDecayModes.first;
@@ -338,13 +360,18 @@ bool HTTAnalyzerTT::analyze(const EventProxyBase& iEvent){
   bool trigger = aTau1.hasTriggerMatch(TriggerEnum::HLT_DoubleMediumIsoPFTau35_Trk1_eta2p1_Reg) &&
     aTau2.hasTriggerMatch(TriggerEnum::HLT_DoubleMediumIsoPFTau35_Trk1_eta2p1_Reg); //FIXME: does not work, wrong numbering??
 
-  //if(sampleName!="Data") trigger = true; //MC trigger included in muon SF
-  if(true) trigger = true; //FIXME: problem with trigger matching??
-									   
-  bool cpTau1Selection = (aTau1.getProperty(PropertyEnum::decayMode)==tauDecay1ChargedPion0PiZero && aTau1.getPCARefitPV().Mag()>0.003) ||
+  if(sampleName!="Data") {
+    float tau1ScaleFactor = getLeptonCorrection(aTau1.getP4().Eta(), aTau1.getP4().Pt(),
+						static_cast<hadronicTauDecayModes>(aTau1.getProperty(PropertyEnum::decayMode)));
+    float tau2ScaleFactor = getLeptonCorrection(aTau2.getP4().Eta(), aTau2.getP4().Pt(),
+						static_cast<hadronicTauDecayModes>(aTau2.getProperty(PropertyEnum::decayMode)));
+    eventWeight*=tau1ScaleFactor*tau2ScaleFactor;
+    trigger = true; //MC trigger included in tau SF
+  }									   
+  bool cpTau1Selection = (aTau1.getProperty(PropertyEnum::decayMode)==tauDecay1ChargedPion0PiZero && aTau1.getPCARefitPV().Mag()>nPCAMin_) ||
                         (aTau1.getProperty(PropertyEnum::decayMode)!=tauDecay1ChargedPion0PiZero &&
 			 isOneProng(aTau1.getProperty(PropertyEnum::decayMode))); 
-  bool cpTau2Selection = (aTau2.getProperty(PropertyEnum::decayMode)==tauDecay1ChargedPion0PiZero && aTau2.getPCARefitPV().Mag()>0.003) ||
+  bool cpTau2Selection = (aTau2.getProperty(PropertyEnum::decayMode)==tauDecay1ChargedPion0PiZero && aTau2.getPCARefitPV().Mag()>nPCAMin_) ||
                         (aTau2.getProperty(PropertyEnum::decayMode)!=tauDecay1ChargedPion0PiZero &&
 			 isOneProng(aTau2.getProperty(PropertyEnum::decayMode))); 
   bool cpSelection = cpTau1Selection && cpTau2Selection;
