@@ -98,13 +98,13 @@ float HTTHistograms::getSampleNormalisation(std::string sampleName){
   if(sampleName=="qqH130") crossSection = 1.531E+00*5.411E-02;//CERNYellowReportPageAt13TeV*CERNYellowReportPageBR
 
   ///https://twiki.cern.ch/twiki/bin/view/CMS/HiggsToTauTauWorking2016#MC_and_data_samples
-  if(sampleName=="WplusHM120") crossSection = 1.565*0.0698*0.5;
-  if(sampleName=="WplusHM125") crossSection = 1.373*0.0627*0.5;
-  if(sampleName=="WplusHM130") crossSection = 1.209*0.0541*0.5;
+  if(sampleName=="WplusH120") crossSection = 1.565*0.0698*0.5;
+  if(sampleName=="WplusH125") crossSection = 1.373*0.0627*0.5;
+  if(sampleName=="WplusH130") crossSection = 1.209*0.0541*0.5;
 
-  if(sampleName=="WminusHM120") crossSection = 1.565*0.0698*0.5;
-  if(sampleName=="WminusHM125") crossSection = 1.373*0.0627*0.5;
-  if(sampleName=="WminusHM130") crossSection = 1.209*0.0541*0.5;
+  if(sampleName=="WminusH120") crossSection = 1.565*0.0698*0.5;
+  if(sampleName=="WminusH125") crossSection = 1.373*0.0627*0.5;
+  if(sampleName=="WminusH130") crossSection = 1.209*0.0541*0.5;
 
   if(sampleName=="ZHM120") crossSection = 0.994*0.0698;
   if(sampleName=="ZHM125") crossSection = 0.884*0.0627; 
