@@ -251,10 +251,10 @@ bool HTTAnalyzer::passCategory(const HTTAnalyzer::muTauCategory & aCategory){
     nJets30==2 && jetsMass>800 && higgsPt>100;
 
   bool cpMuonSelection = aMuon.getPCARefitPV().Perp()>0.003;    
-  bool cpTauSelection = (aTau.getProperty(PropertyEnum::decayMode)==tauDecay1ChargedPion0PiZero && aTau.getPCARefitPV().Mag()>0.003) ||
-    (aTau.getProperty(PropertyEnum::decayMode)!=tauDecay1ChargedPion0PiZero &&
-     isOneProng(aTau.getProperty(PropertyEnum::decayMode))); 
-  bool cpSelection = cpMuonSelection && cpTauSelection;
+  bool cpTauSelection =  aTau.getPCARefitPV().Mag()>0.003;
+  bool cpPi = cpMuonSelection && cpTauSelection && aTau.getProperty(PropertyEnum::decayMode)==tauDecay1ChargedPion0PiZero;
+  bool cpRho = cpMuonSelection && aTau.getProperty(PropertyEnum::decayMode)!=tauDecay1ChargedPion0PiZero &&
+    isOneProng(aTau.getProperty(PropertyEnum::decayMode));
   
   //2D categories
   bool jet0 = aTau.getP4().Perp()>30 && nJets30 == 0;
@@ -274,7 +274,8 @@ bool HTTAnalyzer::passCategory(const HTTAnalyzer::muTauCategory & aCategory){
   categoryDecisions[(int)HTTAnalyzer::vbf_high] = mtSelection && vbf_high;
 
   categoryDecisions[(int)HTTAnalyzer::jet0] = mtSelection && jet0;
-  categoryDecisions[(int)HTTAnalyzer::jet0_CP] = mtSelection && jet0 && cpSelection;  
+  categoryDecisions[(int)HTTAnalyzer::CP_Pi] = mtSelection && cpPi;
+  categoryDecisions[(int)HTTAnalyzer::CP_Rho] = mtSelection && cpRho;  
   categoryDecisions[(int)HTTAnalyzer::boosted] = mtSelection && boosted;
   categoryDecisions[(int)HTTAnalyzer::vbf] = mtSelection && vbf;
 

@@ -54,8 +54,8 @@ class HTTAnalyzer: public Analyzer{
   enum muTauCategory{jet0_low, jet0_high,
 		     jet1_low, jet1_high,
 		     vbf_low, vbf_high,
-		     jet0, jet0_CP,
-		     boosted, vbf,
+		     jet0, boosted, vbf,
+		     CP_Pi, CP_Rho,
 		     W, TT,
 		     DUMMY //This must be the last one
   };
@@ -94,9 +94,10 @@ class HTTAnalyzer: public Analyzer{
     else if(iCategory==(int)HTTAnalyzer::W) return "W";
     else if(iCategory==(int)HTTAnalyzer::TT) return "TT";
     else if(iCategory==(int)HTTAnalyzer::jet0) return "jet0";
-    else if(iCategory==(int)HTTAnalyzer::jet0_CP) return "jet0_CP";
     else if(iCategory==(int)HTTAnalyzer::boosted) return "boosted";
     else if(iCategory==(int)HTTAnalyzer::vbf) return "vbf";
+    else if(iCategory==(int)HTTAnalyzer::CP_Pi) return "CP_Pi";
+    else if(iCategory==(int)HTTAnalyzer::CP_Rho) return "CP_Rho";
     return "Unknown";
   }
 

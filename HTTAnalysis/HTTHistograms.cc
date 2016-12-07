@@ -502,9 +502,7 @@ void HTTHistograms::finalizeHistograms(int nRuns, float weight){
   */
   //////////////
   ///Control regions plots
-  ttScale = 0.7;
-
-  //plot_HAZ_Histograms("Phi_nVectors","_OS_6_RefitPV");
+  ttScale = 1.0;
 
   for(unsigned int iCategory = (int)HTTAnalyzer::jet0;
       iCategory<(int)HTTAnalyzer::DUMMY;++iCategory){
@@ -1186,7 +1184,7 @@ THStack*  HTTHistograms::plotStack(unsigned int iCategory, std::string varName, 
   scale = weight*lumi;
   hZHiggs120->Scale(scale);
 
-  sampleName = "ZH135";
+  sampleName = "ZH125";
   weight = getSampleNormalisation(sampleName);
   scale = weight*lumi;
   hZHiggs125->Scale(scale);
@@ -1201,7 +1199,7 @@ THStack*  HTTHistograms::plotStack(unsigned int iCategory, std::string varName, 
   scale = weight*lumi;
   hWminusHiggs120->Scale(scale);
 
-  sampleName = "WminusH135";
+  sampleName = "WminusH125";
   weight = getSampleNormalisation(sampleName);
   scale = weight*lumi;
   hWminusHiggs125->Scale(scale);
@@ -1216,7 +1214,7 @@ THStack*  HTTHistograms::plotStack(unsigned int iCategory, std::string varName, 
   scale = weight*lumi;
   hWplusHiggs120->Scale(scale);
 
-  sampleName = "WplusH135";
+  sampleName = "WplusH125";
   weight = getSampleNormalisation(sampleName);
   scale = weight*lumi;
   hWplusHiggs125->Scale(scale);
