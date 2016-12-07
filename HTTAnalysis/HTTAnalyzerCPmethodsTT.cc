@@ -200,8 +200,7 @@ void HTTAnalyzerTT::fillGenDecayPlaneAngle(const std::string & hNameSuffix, floa
   bool isPi2 = aGenTau2.getProperty(PropertyEnum::decayMode)==tauDecay1ChargedPion0PiZero;
   bool isRho1 = (aGenTau1.getProperty(PropertyEnum::decayMode)!=tauDecay1ChargedPion0PiZero &&
                  isOneProng(aGenTau1.getProperty(PropertyEnum::decayMode)) );
-  bool isRho2 = (aGenTau2.getProperty(PropertyEnum::decayMode)!=tauDecay1ChargedPi\
-on0PiZero &&
+  bool isRho2 = (aGenTau2.getProperty(PropertyEnum::decayMode)!=tauDecay1ChargedPion0PiZero &&
                  isOneProng(aGenTau2.getProperty(PropertyEnum::decayMode)) );
   /* definitions a la Reco */
   bool isIP1 = (isOneProng(aGenTau1.getProperty(PropertyEnum::decayMode)) &&
@@ -214,14 +213,14 @@ on0PiZero &&
     float cosPhiNN =  tau1PCA.Vect().Unit().Dot(tau2PCA.Vect().Unit());
 
     myHistos_->fill1DHistogram("h1DPhi_nVectors"+hNameSuffix,angles.first,eventWeight);
-    myHistos_->fill1DHistogram("h1DCosPhiNN_"+hNameSuffix,cosPhiNN);
+    myHistos_->fill1DHistogram("h1DCosPhiNN"+hNameSuffix,cosPhiNN);
   }  
   //IP+IP
   if(isIP1 && isIP2){
     float cosPhiNN =  tau1PCA.Vect().Unit().Dot(tau2PCA.Vect().Unit());
 
     myHistos_->fill1DHistogram("h1DPhi_nVectors_IPIP"+hNameSuffix,angles.first,eventWeight);
-    myHistos_->fill1DHistogram("h1DCosPhiNN_IPIP_"+hNameSuffix,cosPhiNN);
+    myHistos_->fill1DHistogram("h1DCosPhiNN_IPIP"+hNameSuffix,cosPhiNN);
   }  
   //Pi+Rho
   //1
