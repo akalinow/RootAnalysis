@@ -251,7 +251,7 @@ float HTTAnalyzer::getLeptonCorrection(float eta, float pt, hadronicTauDecayMode
   else if(tauDecayMode == tauDecaysElectron) return 1.0;  
   else{
     if(sampleName.find("H")==std::string::npos &&
-       !(sampleName.find("DY")!=std::string::npos && sampleName.find("MatchT")!=std::string::npos) //test: works fine
+       sampleName.find("MatchT")==std::string::npos
        ) return 1.0;
     scaleWorkspace->var("t_pt")->setVal(pt);
     scaleWorkspace->var("t_eta")->setVal(eta);

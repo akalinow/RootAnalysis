@@ -502,9 +502,7 @@ void HTTHistograms::finalizeHistograms(int nRuns, float weight){
   */
   //////////////
   ///Control regions plots
-  ttScale = 0.7;
-
-  //plot_HAZ_Histograms("Phi_nVectors","_OS_6_RefitPV");
+  ttScale = 1.0;
 
   for(unsigned int iCategory = (int)HTTAnalyzer::jet0;
       iCategory<(int)HTTAnalyzer::DUMMY;++iCategory){
@@ -1372,7 +1370,7 @@ THStack*  HTTHistograms::plotStack(unsigned int iCategory, std::string varName, 
   
   hSoup->DrawCopy("same");
 
-  TLegend *leg = new TLegend(0.79,0.32,0.99,0.82,NULL,"brNDC");
+  TLegend *leg = new TLegend(0.79,0.22,0.99,0.82,NULL,"brNDC");
   setupLegend(leg);
   leg->AddEntry(hSoup,"Data","lep");
   leg->AddEntry(hDYJetsZTT,"Z#rightarrow #mu #tau_{h}","f");
