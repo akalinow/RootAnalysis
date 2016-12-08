@@ -254,7 +254,7 @@ float HTTAnalyzerTT::getLeptonCorrection(float eta, float pt, hadronicTauDecayMo
     scaleWorkspace->var("t_dm")->setVal(tauDecayMode);
     if(sampleName.find("H")==std::string::npos &&
        !(sampleName.find("A")!=std::string::npos && sampleName.find("All")==std::string::npos) && //pseudoscalar
-       !(sampleName.find("DY")!=std::string::npos && sampleName.find("MatchT")!=std::string::npos)
+       sampleName.find("MatchT")==std::string::npos
        ) {
       tau_trg_efficiency = scaleWorkspace->function("t_trgTightIsoSS_data")->getVal();      
     }
