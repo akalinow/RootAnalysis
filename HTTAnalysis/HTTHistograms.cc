@@ -98,17 +98,17 @@ float HTTHistograms::getSampleNormalisation(std::string sampleName){
   if(sampleName=="qqH130") crossSection = 1.531E+00*5.411E-02;//CERNYellowReportPageAt13TeV*CERNYellowReportPageBR
 
   ///https://twiki.cern.ch/twiki/bin/view/CMS/HiggsToTauTauWorking2016#MC_and_data_samples
-  if(sampleName=="WplusHM120") crossSection = 1.565*0.0698*0.5;
-  if(sampleName=="WplusHM125") crossSection = 1.373*0.0627*0.5;
-  if(sampleName=="WplusHM130") crossSection = 1.209*0.0541*0.5;
+  if(sampleName=="WplusH120") crossSection = 1.565*0.0698*0.5;
+  if(sampleName=="WplusH125") crossSection = 1.373*0.0627*0.5;
+  if(sampleName=="WplusH130") crossSection = 1.209*0.0541*0.5;
 
-  if(sampleName=="WminusHM120") crossSection = 1.565*0.0698*0.5;
-  if(sampleName=="WminusHM125") crossSection = 1.373*0.0627*0.5;
-  if(sampleName=="WminusHM130") crossSection = 1.209*0.0541*0.5;
+  if(sampleName=="WminusH120") crossSection = 1.565*0.0698*0.5;
+  if(sampleName=="WminusH125") crossSection = 1.373*0.0627*0.5;
+  if(sampleName=="WminusH130") crossSection = 1.209*0.0541*0.5;
 
-  if(sampleName=="ZHM120") crossSection = 0.994*0.0698;
-  if(sampleName=="ZHM125") crossSection = 0.884*0.0627; 
-  if(sampleName=="ZHM130") crossSection = 0.790*0.0541;
+  if(sampleName=="ZH120") crossSection = 0.994*0.0698;
+  if(sampleName=="ZH125") crossSection = 0.884*0.0627; 
+  if(sampleName=="ZH130") crossSection = 0.790*0.0541;
 
   ///https://twiki.cern.ch/twiki/bin/view/CMS/HiggsToTauTauWorking2016#MC_and_data_samples
   if(sampleName.find("ZZTo2L2Q")!=std::string::npos) crossSection = 3.22;
@@ -1370,22 +1370,22 @@ THStack*  HTTHistograms::plotStack(unsigned int iCategory, std::string varName, 
   
   hSoup->DrawCopy("same");
 
-  TLegend *leg = new TLegend(0.79,0.22,0.99,0.82,NULL,"brNDC");
+  TLegend *leg = new TLegend(0.79,0.12,0.99,0.82,NULL,"brNDC");
   setupLegend(leg);
   leg->AddEntry(hSoup,"Data","lep");
-  leg->AddEntry(hDYJetsZTT,"Z#rightarrow #mu #tau_{h}","f");
-  leg->AddEntry(hDYJetsZL,"Z#rightarrow #mu #mu","f");
-  leg->AddEntry(hDYJetsZJ,"ZJ","f");
-  leg->AddEntry(hDYJetsLowM,"Z#rightarrow ll(m<50)","f");
-  leg->AddEntry(hWJets,"W#rightarrow l #nu","f");
-  leg->AddEntry(hTTbarJ,"TTbarJ","f");
-  leg->AddEntry(hTTbarT,"TTbarT","f");
-  leg->AddEntry(hST,"single T","f");
-  leg->AddEntry(hVVJ,"DiBosonJ","f");
-  leg->AddEntry(hVVT,"DiBosonT","f");
+  leg->AddEntry(hDYJetsZTT,"Z#rightarrow#mu#tau_{h}","f");
+  leg->AddEntry(hDYJetsZL,"Z#rightarrow#mu#mu","f");
+  leg->AddEntry(hDYJetsZJ,"Z, j#rightarrow#tau_{h}","f");
+  leg->AddEntry(hDYJetsLowM,"Z#rightarrow#it{ll}(m<50)","f");
+  leg->AddEntry(hWJets,"W#rightarrow#it{l}#nu","f");
+  leg->AddEntry(hTTbarJ,"t#bar{t}, j#rightarrow#tau_{h}","f");
+  leg->AddEntry(hTTbarT,"t#bar{t}, #tau_{h}","f");
+  leg->AddEntry(hST,"single-t","f");
+  leg->AddEntry(hVVJ,"VV, j#rightarrow#tau_{h}","f");
+  leg->AddEntry(hVVT,"VV, tau_{h}","f");
   leg->AddEntry(hQCD,"QCD","f");
   leg->AddEntry(hEWK2Jets,"EWK","f");
-  leg->AddEntry(hHiggs,"H(125)#rightarrow #tau #tau","f");
+  leg->AddEntry(hHiggs,"H(125)#rightarrow#tau#tau","f");
   leg->SetHeader(Form("#int L = %.2f fb^{-1}",lumi/1000));
   leg->Draw();
 

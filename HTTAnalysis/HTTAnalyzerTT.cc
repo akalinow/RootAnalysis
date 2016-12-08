@@ -159,7 +159,8 @@ void HTTAnalyzerTT::fillControlHistos(const std::string & hNameSuffix, float eve
   myHistos_->fill1DHistogram("h1DNPV"+hNameSuffix,aEvent.getNPV(),eventWeight);
 
   ///Fill SVfit and visible masses
-  //myHistos_->fill1DHistogram("h1DMassSV"+hNameSuffix,aPair.getP4SVFit().M(),eventWeight);
+  sysEffects::sysEffectsEnum sysType = sysEffects::NOMINAL_SVFIT;
+  myHistos_->fill1DHistogram("h1DMassSV"+hNameSuffix,aPair.getP4(sysType).M(),eventWeight);
   myHistos_->fill1DHistogram("h1DMassVis"+hNameSuffix,aPair.getP4().M(),eventWeight);
   
   ///Fill leading tau
@@ -208,10 +209,8 @@ void HTTAnalyzerTT::fillControlHistos(const std::string & hNameSuffix, float eve
   myHistos_->fill1DHistogram("h1DPhiMET"+hNameSuffix,aMET.getP4().Phi(),eventWeight);
 
   ///Unrolled distributions for 2D fit
-  //FIXMEmyHistos_->fill2DUnrolledHistogram("h1DUnRollHiggsPtMassSV"+hNameSuffix, aPair.getP4SVFit().M(), higgsPt, eventWeight);
-  myHistos_->fill2DUnrolledHistogram("h1DUnRollHiggsPtMassSV"+hNameSuffix, aPair.getP4().M(), higgsPt, eventWeight);
-  //FIXMEmyHistos_->fill2DUnrolledHistogram("h1DUnRollMjjMassSV"+hNameSuffix, aPair.getP4SVFit().M(), jetsMass, eventWeight);
-  myHistos_->fill2DUnrolledHistogram("h1DUnRollMjjMassSV"+hNameSuffix, aPair.getP4().M(), jetsMass, eventWeight);
+  myHistos_->fill2DUnrolledHistogram("h1DUnRollHiggsPtMassSV"+hNameSuffix, aPair.getP4(sysType).M(), higgsPt, eventWeight);
+  myHistos_->fill2DUnrolledHistogram("h1DUnRollMjjMassSV"+hNameSuffix, aPair.getP4(sysType).M(), jetsMass, eventWeight);
 
   fillDecayPlaneAngle(hNameSuffix, eventWeight);
 
@@ -316,9 +315,11 @@ bool HTTAnalyzerTT::analyze(const EventProxyBase& iEvent){
   myHistos_->fill1DHistogram("h1DNPartons"+hNameSuffix,myEventProxy.event->getLHEnOutPartons(),eventWeight);
   getPreselectionEff(myEventProxy);
 
-  bool postSynchTau1 = myEventProxy.event->checkSelectionBit(SelectionBitsEnum::postSynchMuon);
-  bool postSynchTau2 = myEventProxy.event->checkSelectionBit(SelectionBitsEnum::postSynchTau);
-  bool thirdLeptonVeto = myEventProxy.event->checkSelectionBit(SelectionBitsEnum::thirdLeptonVeto);
+  bool postSynchTau1 = aEvent.checkSelectionBit(SelectionBitsEnum::postSynchMuon);
+  bool postSynchTau2 = aEvent.checkSelectionBit(SelectionBitsEnum::postSynchTau);
+  bool extraMuonVeto = aEvent.checkSelectionBit(SelectionBitsEnum::extraMuonVeto);
+  bool extraElectronVeto = aEvent.checkSelectionBit(SelectionBitsEnum::extraMuonVeto);
+  bool postSynch = postSynchTau1 && postSynchTau2 && !extraMuonVeto && !extraElectronVeto;
   if(!myEventProxy.pairs->size()) return true;
 
   setAnalysisObjects(myEventProxy);
@@ -357,8 +358,10 @@ bool HTTAnalyzerTT::analyze(const EventProxyBase& iEvent){
   bool antiIso = (tau1IsoM && tau2IsoL && !tau2IsoT) || (tau2IsoM && tau1IsoL && !tau1IsoT);
   
 
-  bool trigger = aTau1.hasTriggerMatch(TriggerEnum::HLT_DoubleMediumIsoPFTau35_Trk1_eta2p1_Reg) &&
-    aTau2.hasTriggerMatch(TriggerEnum::HLT_DoubleMediumIsoPFTau35_Trk1_eta2p1_Reg); //FIXME: does not work, wrong numbering??
+  bool trigger = ( (aTau1.hasTriggerMatch(TriggerEnum::HLT_DoubleMediumIsoPFTau35_Trk1_eta2p1_Reg) &&
+		    aTau2.hasTriggerMatch(TriggerEnum::HLT_DoubleMediumIsoPFTau35_Trk1_eta2p1_Reg)) ||
+		   (aTau1.hasTriggerMatch(TriggerEnum::HLT_DoubleMediumCombinedIsoPFTau35_Trk1_eta2p1_Reg) &&
+		    aTau2.hasTriggerMatch(TriggerEnum::HLT_DoubleMediumCombinedIsoPFTau35_Trk1_eta2p1_Reg)) );
 
   if(sampleName!="Data") {
     float tau1ScaleFactor = getLeptonCorrection(aTau1.getP4().Eta(), aTau1.getP4().Pt(),
@@ -409,20 +412,22 @@ bool HTTAnalyzerTT::analyze(const EventProxyBase& iEvent){
     if(OS && fullIso){      
       hNameSuffix = sampleName+"_OS_"+categorySuffix;
       fillControlHistos(hNameSuffix, eventWeight);
-      fillDecayPlaneAngle(hNameSuffix+"RefitPV", eventWeight);
-      fillDecayPlaneAngle(hNameSuffix+"AODPV", eventWeight);
-      fillDecayPlaneAngle(hNameSuffix+"GenPV", eventWeight);
-      fillVertices(hNameSuffix+"RefitPV");
-      fillVertices(hNameSuffix+"AODPV");
+      fillGenDecayPlaneAngle(hNameSuffix+"_Gen", eventWeight);
+      fillDecayPlaneAngle(hNameSuffix+"_RefitPV", eventWeight);
+      fillDecayPlaneAngle(hNameSuffix+"_AODPV", eventWeight);
+      fillDecayPlaneAngle(hNameSuffix+"_GenPV", eventWeight);
+      fillVertices(hNameSuffix+"_RefitPV");
+      fillVertices(hNameSuffix+"_AODPV");
     }
     if(OS && antiIso){
       hNameSuffix = sampleName+"_OSantiIso_"+categorySuffix;
       fillControlHistos(hNameSuffix, eventWeight);
-      fillDecayPlaneAngle(hNameSuffix+"RefitPV", eventWeight);
-      fillDecayPlaneAngle(hNameSuffix+"AODPV", eventWeight);
-      fillDecayPlaneAngle(hNameSuffix+"GenPV", eventWeight);
-      fillVertices(hNameSuffix+"RefitPV");
-      fillVertices(hNameSuffix+"AODPV");
+      //fillGenDecayPlaneAngle(hNameSuffix+"_Gen", eventWeight);//MB?
+      //fillDecayPlaneAngle(hNameSuffix+"_RefitPV", eventWeight);//MB?
+      //fillDecayPlaneAngle(hNameSuffix+"_AODPV", eventWeight);//MB?
+      //fillDecayPlaneAngle(hNameSuffix+"_GenPV", eventWeight);//MB?
+      //fillVertices(hNameSuffix+"_RefitPV");//MB?
+      //fillVertices(hNameSuffix+"_AODPV");//MB?
     }
     if(SS && fullIso){
       hNameSuffix = sampleName+"_SS_"+categorySuffix;
