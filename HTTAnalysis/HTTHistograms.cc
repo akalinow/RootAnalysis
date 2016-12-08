@@ -502,9 +502,7 @@ void HTTHistograms::finalizeHistograms(int nRuns, float weight){
   */
   //////////////
   ///Control regions plots
-  ttScale = 0.7;
-
-  //plot_HAZ_Histograms("Phi_nVectors","_OS_6_RefitPV");
+  ttScale = 1.0;
 
   for(unsigned int iCategory = (int)HTTAnalyzer::jet0;
       iCategory<(int)HTTAnalyzer::DUMMY;++iCategory){
