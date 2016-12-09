@@ -85,17 +85,17 @@ nuisanceParams = {
 import array
 
 #basic categories
-categoryMade = False
+categoryDirMade = False
 
 hData = 0
 
 for iCategory in xrange(0,len(categoryNames)):
     categoryName = categoryNames[iCategory]
     if categoryName not in histoPrefix.keys(): continue
-    if categoryMade: gDirectory.cd("..")
+    if categoryDirMade: gDirectory.cd("..")
     gDirectory.mkdir(categoryName)
     gDirectory.cd(categoryName)
-    categoryMade=True
+    categoryDirMade=True
 
     for key,value in histogramsMap.iteritems():
         hName = histoPrefix[categoryName] + key+"_"+str(iCategory)
@@ -106,7 +106,6 @@ for iCategory in xrange(0,len(categoryNames)):
         histogram.SetName(value)
         histogram.Write()
         
-        #histogram.SetDirectory(categoryDir)
         if value=="data_obs": continue
         
         for key1, value1 in nuisanceParams.items():
@@ -144,12 +143,12 @@ for iCategory in xrange(0,len(categoryNames)):
 ##################################################
 
 histoPrefix = {
-         "mt_wjets_0jet_cr":"HTTAnalyzer/h1DUnRollTauPtMassVis",
-         "mt_wjets_boosted_cr":"HTTAnalyzer/h1DUnRollHiggsPtMassSV",
-         "mt_wjets_vbf_cr":"HTTAnalyzer/h1DUnRollMjjMassSV",
-         "mt_antiiso_0jet_cr":"HTTAnalyzer/h1DUnRollTauPtMassVis",
-         "mt_antiiso_boosted_cr":"HTTAnalyzer/h1DUnRollHiggsPtMassSV",
-         "mt_antiiso_vbf_cr":"HTTAnalyzer/h1DUnRollMjjMassSV"
+         "mt_wjets_0jet_cr":"HTTAnalyzer/h1DMassTrans",
+         "mt_wjets_boosted_cr":"HTTAnalyzer/h1DMassTrans",
+         "mt_wjets_vbf_cr":"HTTAnalyzer/h1DMassTrans",
+         "mt_antiiso_0jet_cr":"HTTAnalyzer/h1DMassVis",
+         "mt_antiiso_boosted_cr":"HTTAnalyzer/h1DMassSV",
+         "mt_antiiso_vbf_cr":"HTTAnalyzer/h1DMassSV"
          }
 
 histogramsMap = {
@@ -222,12 +221,12 @@ nuisanceParams = {
     "CMS_scale_gg_13TeV":(("",""),("ggH120","ggH125","ggH130"))
     }
 
-nbins = {"mt_wjets_0jet_cr":(1,1), 
-         "mt_wjets_boosted_cr":(1,1), 
-         "mt_wjets_vbf_cr":(1,1),
-         "mt_antiiso_0jet_cr":(1,1), 
-         "mt_antiiso_boosted_cr":(1,1), 
-         "mt_antiiso_vbf_cr":(1,1)   
+nbins = {"mt_wjets_0jet_cr":(1,80,200), 
+         "mt_wjets_boosted_cr":(1,80,200), 
+         "mt_wjets_vbf_cr":(1,80,200),
+         "mt_antiiso_0jet_cr":(4,40,200), 
+         "mt_antiiso_boosted_cr":(4,40,200), 
+         "mt_antiiso_vbf_cr":(4,40,200)   
          }
 
 def getSingleNPHistos(prefix, np, histo):
@@ -268,32 +267,29 @@ def getDoubleNPHistos(prefix, np1, np2, histo):
     
     return (hUpUp, hUpDown, hDownUp, hDownDown)
     
+
     
-    
-categoryMade = True    
+categoryDirMade = True    
 
 for iCategory in xrange(0,len(categoryNames)):
     categoryName = categoryNames[iCategory]
     if categoryName not in histoPrefix.keys(): continue    
-    if categoryMade: gDirectory.cd("..")
+    if categoryDirMade: gDirectory.cd("..")
     gDirectory.mkdir(categoryName)
     gDirectory.cd(categoryName)
-    categoryMade=True
+    categoryDirMade=True
     
     for key,value in histogramsMap.iteritems():
         hName = histoPrefix[categoryName] + key+"_"+str(iCategory)
         histogram = WAW_file.Get(hName)
         if(histogram==None):
             #print hName,"is missing"
-            histogram = TH1F(value,"",nbins[categoryName][0]*nbins[categoryName][1],0.5,nbins[categoryName][0]*nbins[categoryName][1] + 0.5)
+            histogram = TH1F(value,"",nbins[categoryName][0],nbins[categoryName][1],nbins[categoryName][2])
         histogram.SetName(value)
         histogram.Write()
         if value=="data_obs": continue
         
-        for np in ("CMS_scale_j_13TeV", "CMS_scale_t_mt_13TeV"):#, "CMS_htt_dyShape_13TeV", "CMS_htt_ttbarShape_13TeV", "CMS_htt_jetToTauFake_13TeV"):
-            #if ((value!= "ZTT" and value != "ZL" and value!="ZJ") and np=="CMS_htt_dyShape_13TeV"): continue
-            #if value.find("TT")<0 and np=="CMS_htt_ttbarShape_13TeV": continue
-            #if value!="W" and np=="CMS_htt_jetToTauFake_13TeV": continue
+        for np in ("CMS_scale_j_13TeV", "CMS_scale_t_mt_13TeV"):
             histos = getSingleNPHistos(hName, np ,histogram)
             hUp = histos[0]
             hDown = histos[1]
