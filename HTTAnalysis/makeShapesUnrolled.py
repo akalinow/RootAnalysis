@@ -58,11 +58,11 @@ histogramsMap = {
     "ggH130_OS":"ggH130",
     "qqH130_OS":"qqH130",
     "ZH120_OS":"ZH120",
-    "WplusH120_OS":"WH120",
+    "WH120_OS":"WH120",
     "ZH125_OS":"ZH125",
-    "WplusH125_OS":"WH125",
+    "WH125_OS":"WH125",
     "ZH130_OS":"ZH130",
-    "WplusH130_OS":"WH130",
+    "WH130_OS":"WH130",
     "EWK2Jets_OS":"EWKZ"
     }
     
@@ -82,12 +82,52 @@ nuisanceParams = {
     "CMS_htt_zmumuShape_13TeV":(("",""),("vbf_","boosted_","VBF_")),
     }
 
+def getSingleNPHistos(prefix, np, histo):
+    
+    hUp = WAW_file.Get(prefix+np+"Up")
+    if hUp==None :
+        print prefix+np+"Up/Down"
+        hUp = histo.Clone()
+        
+    hDown = WAW_file.Get(prefix+np+"Down")
+    if hDown==None :
+        #almost always where there is no Up histo, there is no down histo, so there is no need to print its name again
+        #print prefix+np
+        hDown = histo.Clone()
+    
+    return (hUp, hDown)
+    
+    
+    
+def getDoubleNPHistos(prefix, np1, np2, histo):
+
+    hUpUp = WAW_file.Get(prefix+np1+"Up"+np2+"Up")
+    if hUpUp==None :
+        print prefix+np1+"Up/Down"+np2+"Up/Down"
+        hUpUp = histo.Clone()
+        
+    hUpDown = WAW_file.Get(prefix+np1+"Up"+np2+"Down")
+    if hUpDown==None :
+        hUpDown = histo.Clone()
+        
+    hDownUp = WAW_file.Get(prefix+np1+"Down"+np2+"Up")
+    if hDownUp==None :
+        hDownUp = histo.Clone()
+        
+    hDownDown = WAW_file.Get(prefix+np1+"Down"+np2+"Down")
+    if hDownDown==None :
+        hDownDown = histo.Clone()
+    
+    return (hUpUp, hUpDown, hDownUp, hDownDown)
+
 import array
 
 #basic categories
 categoryDirMade = False
 
 hData = 0
+
+print "MAIN REGION\n\n\n\n\n"
 
 for iCategory in xrange(0,len(categoryNames)):
     categoryName = categoryNames[iCategory]
@@ -118,25 +158,20 @@ for iCategory in xrange(0,len(categoryNames)):
                   for cat in value1[1]:
                     index = name.find("13TeV")
                     nuisanceParam = name[:index]+cat+name[index:]
-                    #print categoryNames[iCategory]+": " + value+"_"+nuisanceParam
                     
-                    hNameUp = histoPrefix[categoryName] + key+"_"+str(iCategory)+nuisanceParam+"Up"
-                    histogramUp = WAW_file.Get(hNameUp)
-                    if(histogramUp==None):
-                        histogramUp = histogram.Clone()
+                    histos = getSingleNPHistos(histoPrefix[categoryName] + key+"_"+str(iCategory), nuisanceParam, histogram)
+                    histogramUp = histos[0]
                     histogramUp.SetName(value+"_"+nuisanceParam+"Up")
                     histogramUp.Write()
                     
-                    hNameDown = histoPrefix[categoryName] + key+"_"+str(iCategory)+nuisanceParam+"Down"
-                    histogramDown = WAW_file.Get(hNameDown)
-                    if(histogramDown==None):
-                        histogramDown = histogram.Clone()
+                    histogramDown = histos[1]
                     histogramDown.SetName(value+"_"+nuisanceParam+"Down")
                     histogramDown.Write()
                     
                     if cat=="": break
                 if (chn=="" or done1): break
                 
+print "\n\n\n\n\nCONTROL REGIONS\n\n\n\n\n"
 
 ##################################################
 #control regions
@@ -194,12 +229,12 @@ histogramsMap = {
     "ZH120_OS":"ZH120",
     "ZH125_OS":"ZH125",
     "ZH130_OS":"ZH130",
-    "WplusH120_OS":"WH120",
-    "WplusH125_OS":"WH125",
-    "WplusH130_OS":"WH130",
-    "WplusmH120_OS":"WmH120",
-    "WplusmH125_OS":"WmH125",
-    "WplusmH130_OS":"WmH130",
+    "WH120_OS":"WH120",
+    "WH125_OS":"WH125",
+    "WH130_OS":"WH130",
+    #"WplusmH120_OS":"WmH120",
+    #"WplusmH125_OS":"WmH125",
+    #"WplusmH130_OS":"WmH130",
     "EWK2Jets_OS":"EWKZ",
     "BkgErr":"BKGErr"
     }
@@ -208,10 +243,6 @@ histogramsMap = {
 #CMS_scale_t_13TeV and CMS_scale_j_13TeV are applied to all processes
 #when another nuisance parameter is considered in the process, also histos Nuisance1_Nuisance2 should be added
 nuisanceParams = {
-    #"CMS_shape_t_13TeV":(("mt_","tt_","et_","em_"),("","")),
-    #"CMS_scale_t_13TeV":(("mt_","tt_","et_","em_"),("ggH120","")),
-    #"CMS_scale_e_13TeV":(("em_",""),("","")),
-    #"CMS_scale_j_13TeV":(("",""),("ggH120","")),
     "CMS_htt_jetToTauFake_13TeV":(("",""),("ZJ","W","TTJ")),
     "CMS_htt_ZLShape_13TeV":(("mt_",""),("ZL","")),
     "CMS_htt_dyShape_13TeV":(("",""),("ZL","ZJ","ZTT")),
@@ -228,44 +259,6 @@ nbins = {"mt_wjets_0jet_cr":(1,80,200),
          "mt_antiiso_boosted_cr":(4,40,200), 
          "mt_antiiso_vbf_cr":(4,40,200)   
          }
-
-def getSingleNPHistos(prefix, np, histo):
-    
-    hUp = WAW_file.Get(prefix+np+"Up")
-    if hUp==None :
-        #print prefix+np
-        hUp = histo.Clone()
-        
-    hDown = WAW_file.Get(prefix+np+"Down")
-    if hDown==None :
-        #almost always where there is no Up histo, there is no down histo, so there is no need to print its name again
-        #print prefix+np
-        hDown = histo.Clone()
-    
-    return (hUp, hDown)
-    
-    
-    
-def getDoubleNPHistos(prefix, np1, np2, histo):
-
-    hUpUp = WAW_file.Get(prefix+np1+"Up"+np2+"Up")
-    if hUpUp==None :
-        #print prefix+np1+np2
-        hUpUp = histo.Clone()
-        
-    hUpDown = WAW_file.Get(prefix+np1+"Up"+np2+"Down")
-    if hUpDown==None :
-        hUpDown = histo.Clone()
-        
-    hDownUp = WAW_file.Get(prefix+np1+"Down"+np2+"Up")
-    if hDownUp==None :
-        hDownUp = histo.Clone()
-        
-    hDownDown = WAW_file.Get(prefix+np1+"Down"+np2+"Down")
-    if hDownDown==None :
-        hDownDown = histo.Clone()
-    
-    return (hUpUp, hUpDown, hDownUp, hDownDown)
     
 
     
@@ -283,7 +276,7 @@ for iCategory in xrange(0,len(categoryNames)):
         hName = histoPrefix[categoryName] + key+"_"+str(iCategory)
         histogram = WAW_file.Get(hName)
         if(histogram==None):
-            #print hName,"is missing"
+            print hName#,"is missing"
             histogram = TH1F(value,"",nbins[categoryName][0],nbins[categoryName][1],nbins[categoryName][2])
         histogram.SetName(value)
         histogram.Write()
