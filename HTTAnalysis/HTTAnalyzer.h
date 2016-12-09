@@ -56,6 +56,10 @@ class HTTAnalyzer: public Analyzer{
 		     vbf_low, vbf_high,
 		     jet0, jet0_CP,
 		     boosted, vbf,
+		     wjets_jet0,
+		     wjets_boosted, wjets_vbf,
+		     antiiso_jet0,
+		     antiiso_boosted, antiiso_vbf,
 		     W, TT,
 		     DUMMY //This must be the last one
   };

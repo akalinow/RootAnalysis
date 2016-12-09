@@ -232,6 +232,7 @@ bool HTTAnalyzer::passCategory(const HTTAnalyzer::muTauCategory & aCategory){
   float higgsPt =  (aTau.getP4() + aTau.getP4() + aMET.getP4()).Pt();
 
   bool mtSelection = aPair.getMTMuon()<50;
+  bool mtSelectionInv = aPair.getMTMuon()>50;
 
   bool jet0_low =  aTau.getP4().Pt()>20  && aTau.getP4().Pt()<50 && nJets30==0;
   bool jet0_high = aTau.getP4().Pt()>50 && nJets30==0;
@@ -263,6 +264,7 @@ bool HTTAnalyzer::passCategory(const HTTAnalyzer::muTauCategory & aCategory){
   
   bool wSelection = aPair.getMTMuon()>80 && aMuon.getProperty(PropertyEnum::combreliso)<0.15;
   bool ttSelection =  aPair.getMTMuon()>150;
+  bool antiiso = aMuon.getProperty(PropertyEnum::combreliso)>0.15 && aMuon.getProperty(PropertyEnum::combreliso)<0.30;
 
   categoryDecisions[(int)HTTAnalyzer::jet0_low] = mtSelection && jet0_low;
   categoryDecisions[(int)HTTAnalyzer::jet0_high] = mtSelection && jet0_high;
@@ -277,6 +279,14 @@ bool HTTAnalyzer::passCategory(const HTTAnalyzer::muTauCategory & aCategory){
   categoryDecisions[(int)HTTAnalyzer::jet0_CP] = mtSelection && jet0 && cpSelection;  
   categoryDecisions[(int)HTTAnalyzer::boosted] = mtSelection && boosted;
   categoryDecisions[(int)HTTAnalyzer::vbf] = mtSelection && vbf;
+  
+  categoryDecisions[(int)HTTAnalyzer::wjets_jet0] = mtSelectionInv && jet0; 
+  categoryDecisions[(int)HTTAnalyzer::wjets_boosted] = mtSelectionInv && boosted;
+  categoryDecisions[(int)HTTAnalyzer::wjets_vbf] = mtSelectionInv && vbf;
+  
+  categoryDecisions[(int)HTTAnalyzer::antiiso_jet0] = antiiso && mtSelection && jet0; 
+  categoryDecisions[(int)HTTAnalyzer::antiiso_boosted] = antiiso && mtSelection && boosted;
+  categoryDecisions[(int)HTTAnalyzer::antiiso_vbf] = antiiso && mtSelection && vbf;
 
   categoryDecisions[(int)HTTAnalyzer::W] = wSelection;
   categoryDecisions[(int)HTTAnalyzer::TT] = ttSelection;
