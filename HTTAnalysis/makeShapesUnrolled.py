@@ -191,34 +191,34 @@ histogramsMap = {
     "DYJetsMatchT_OS":"ZTT",
     "DYJetsMatchL_OS":"ZL",
     "DYJetsMatchJ_OS":"ZJ",
-    "DYJetsSDB_OS":"Z_SDB",
-    "DYJetsQCD_OS":"ZQCD",
-    "DYJetsHMTSDB_SS":"Z_SS_HMT_SDB",
+    #"DYJetsSDB_OS":"Z_SDB",
+    #"DYJetsQCD_OS":"ZQCD",
+    #"DYJetsHMTSDB_SS":"Z_SS_HMT_SDB",
     "WJets_OS":"W",
-    "WJetsQCD_OS":"WQCD",
-    "WJetsQCDUp_OS":"WQCDUp",
-    "WJetsQCDDown_OS":"WQCDDown",
-    "WJetsQCDYield_OS":"WQCDYield",
-    "WJetsQCDYieldUp_OS":"WQCDYieldUp",
-    "WJetsQCDYieldDown_OS":"WQCDYieldDown",
-    "WJetsHigh_OS":"W_High",
-    "WJetsLow_OS":"W_Low",
-    "WJetsHMTSDB_SS":"W_SS_HMT_SDB",
+    #"WJetsQCD_OS":"WQCD",
+    #"WJetsQCDUp_OS":"WQCDUp",
+    #"WJetsQCDDown_OS":"WQCDDown",
+    #"WJetsQCDYield_OS":"WQCDYield",
+    #"WJetsQCDYieldUp_OS":"WQCDYieldUp",
+    #"WJetsQCDYieldDown_OS":"WQCDYieldDown",
+    #"WJetsHigh_OS":"W_High",
+    #"WJetsLow_OS":"W_Low",
+    #"WJetsHMTSDB_SS":"W_SS_HMT_SDB",
     "TTbarMatchJ_OS":"TTJ",
     "TTbarMatchT_OS":"TTT",
-    "TTbar_OS":"TT",
-    "TTbarSDB_OS":"TT_SDB",
-    "TTbarHMTSDB_SS":"TT_SS_HMT_SDB",
-    "TTbarYield_OS":"TTYield",
+    #"TTbar_OS":"TT",
+    #"TTbarSDB_OS":"TT_SDB",
+    #"TTbarHMTSDB_SS":"TT_SS_HMT_SDB",
+    #"TTbarYield_OS":"TTYield",
     "ST_OS":"T",
-    "STQCD_OS":"TopQCD",
+    #"STQCD_OS":"TopQCD",
     "DiBosonMatchT_OS":"VVT",
     "DiBosonMatchJ_OS":"VVJ",
-    "DiBoson_OS":"VV",
-    "DiBosonQCD_OS":"VV_QCD",
-    "DiBosonSDB_OS":"VV_SDB",
-    "DiBosonHMTSDB_SS":"VV_SS_HMT_SDB",
-    "QCDEstimateHMTSDB_SS":"QCD_SS_HMT_SDB",
+    #"DiBoson_OS":"VV",
+    #"DiBosonQCD_OS":"VV_QCD",
+    #"DiBosonSDB_OS":"VV_SDB",
+    #"DiBosonHMTSDB_SS":"VV_SS_HMT_SDB",
+    #"QCDEstimateHMTSDB_SS":"QCD_SS_HMT_SDB",
     "QCDEstimate":"QCD",
     "ggH120_OS":"ggH120",
     "qqH120_OS":"qqH120",
@@ -232,11 +232,8 @@ histogramsMap = {
     "WH120_OS":"WH120",
     "WH125_OS":"WH125",
     "WH130_OS":"WH130",
-    #"WplusmH120_OS":"WmH120",
-    #"WplusmH125_OS":"WmH125",
-    #"WplusmH130_OS":"WmH130",
     "EWK2Jets_OS":"EWKZ",
-    "BkgErr":"BKGErr"
+    #"BkgErr":"BKGErr"
     }
 
 #MT channel specific
@@ -312,7 +309,7 @@ for iCategory in xrange(0,len(categoryNames)):
                   hUp.Write()
                   hDown.SetName(value+"_"+name+"Down")
                   hDown.Write()
-                  
+                  '''
                   for np in ("CMS_scale_j_13TeV", "CMS_scale_t_mt_13TeV"):
                     histos = getDoubleNPHistos(hName, name, np ,histogram)
                     hUpUp = histos[0]
@@ -327,7 +324,7 @@ for iCategory in xrange(0,len(categoryNames)):
                     hDownUp.Write()
                     hDownDown.SetName(value+"_"+name+"Down_"+np+"Down")
                     hDownDown.Write()
-                  
+                  '''
                   if proc=="": break
                 if (chn=="" or done1): break
 

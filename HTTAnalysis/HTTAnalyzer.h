@@ -101,6 +101,12 @@ class HTTAnalyzer: public Analyzer{
     else if(iCategory==(int)HTTAnalyzer::jet0_CP) return "jet0_CP";
     else if(iCategory==(int)HTTAnalyzer::boosted) return "boosted";
     else if(iCategory==(int)HTTAnalyzer::vbf) return "vbf";
+    else if(iCategory==(int)HTTAnalyzer::wjets_jet0) return "wjets_jet0";
+    else if(iCategory==(int)HTTAnalyzer::wjets_boosted) return "wjets_boosted";
+    else if(iCategory==(int)HTTAnalyzer::wjets_vbf) return "wjets_vbf";
+    else if(iCategory==(int)HTTAnalyzer::antiiso_jet0) return "antiiso_jet0";
+    else if(iCategory==(int)HTTAnalyzer::antiiso_boosted) return "antiiso_boosted";
+    else if(iCategory==(int)HTTAnalyzer::antiiso_vbf) return "antiiso_vbf";
     return "Unknown";
   }
 
