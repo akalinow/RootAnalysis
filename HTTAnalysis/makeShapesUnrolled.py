@@ -270,7 +270,9 @@ for iCategory in xrange(0,len(categoryNames)):
     categoryDirMade=True
     
     for key,value in histogramsMap.iteritems():
-        hName = histoPrefix[categoryName] + key+"_"+str(iCategory)
+        hName = histoPrefix[categoryName] + key
+        if categoryName.count("antiiso")>0: hName = hName+"noMuIso"
+        hName = hName +"_"+str(iCategory)
         histogram = WAW_file.Get(hName)
         if(histogram==None):
             print hName#,"is missing"
