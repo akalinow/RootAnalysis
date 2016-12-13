@@ -168,7 +168,8 @@ TH1F *HTTHistograms::get1D_EWK2JetsSum(const std::string& name){
   return get1D_SumPattern_Histogram(name, "EWK2Jets", ewkSamples);
   
 }
-/////////////////////////////////////////////////////////                                                                                                          /////////////////////////////////////////////////////////  
+/////////////////////////////////////////////////////////
+/////////////////////////////////////////////////////////
 TH1F *HTTHistograms::get1D_TauMatchJetSum(const std::string& name, bool sumDecayModes, bool sumJetBins){
 
   std::vector<std::string> decayNames = {"MatchL", "MatchJ", "MatchT"};
@@ -449,8 +450,8 @@ void HTTHistograms::defineHistograms(){
    ///2D CP histograms 
    vector<double> phiBins;
    for(unsigned int iBin=0;iBin<=12;++iBin) phiBins.push_back(iBin*2.0*M_PI/12);
-   addRollHistogram("h1DUnRollMassSVPhiCPTemplate","Phi CP vs SV Mass; Events",phiBins, svMassBins, file_);
-   addRollHistogram("h1DUnRollMassSVYCPTemplate","Phi_Y CP vs SV Mass; Events", phiBins, svMassBins, file_);
+   addRollHistogram("h1DUnRollMassSVPhiCPTemplate","#phi_{IP,IP} CP vs SV Mass; Events;#phi_{IP,IP} CP",phiBins, svMassBins, file_);
+   addRollHistogram("h1DUnRollMassSVYCPTemplate","#phi_{IP,#rho} CP vs SV Mass; Events;#phi_{IP,#rho} CP", phiBins, svMassBins, file_);
 
    addProfile("hProfVsMagTemplate","",10,0,0.015,file_);
    addProfile("hProfVsPtTemplate","",20,15,55,file_);
@@ -550,8 +551,8 @@ void HTTHistograms::finalizeHistograms(int nRuns, float weight){
     
     plotStack(iCategory, "nPCAMuon");
     plotStack(iCategory, "nPCATau");
-    plotStack(iCategory, "Phi_nVectors");
-    plotStack(iCategory, "Phi_nVecIP_");
+    plotStack(iCategory, "Phi-nVectors");
+    plotStack(iCategory, "Phi-nVecIP");
     plotStack(iCategory, "NPV");
   }
 }
@@ -560,32 +561,32 @@ void HTTHistograms::finalizeHistograms(int nRuns, float weight){
 void HTTHistograms::plotCPhistograms(unsigned int iCategory){
 
   std::string hNameSuffix = "";
-  plot_HAZ_Histograms("Phi_nVecIP_yTauNeg",hNameSuffix+"GenNoOfflineSel");
-  plot_HAZ_Histograms("Phi_nVecIP_yTauPos",hNameSuffix+"GenNoOfflineSel");
-  plot_HAZ_Histograms("Phi_nVecIP",hNameSuffix+"GenNoOfflineSel");
-  plot_HAZ_Histograms("Phi_nVectors",hNameSuffix+"GenNoOfflineSel");
+  plot_HAZ_Histograms("Phi-nVecIP-yTauNeg",hNameSuffix+"_GenNoOfflineSel");
+  plot_HAZ_Histograms("Phi-nVecIP-yTauPos",hNameSuffix+"_GenNoOfflineSel");
+  plot_HAZ_Histograms("Phi-nVecIP",hNameSuffix+"_GenNoOfflineSel");
+  plot_HAZ_Histograms("Phi-nVectors",hNameSuffix+"_GenNoOfflineSel");
 
   hNameSuffix =  "_OS_"+std::to_string(iCategory);
-  plot_HAZ_Histograms("Phi_nVecIP_yTauNeg",hNameSuffix+"_Gen");
-  plot_HAZ_Histograms("Phi_nVecIP_yTauPos",hNameSuffix+"_Gen");
-  plot_HAZ_Histograms("Phi_nVecIP",hNameSuffix+"_Gen");
-  plot_HAZ_Histograms("Phi_nVectors",hNameSuffix+"_Gen");
+  plot_HAZ_Histograms("Phi-nVecIP-yTauNeg",hNameSuffix+"_Gen");
+  plot_HAZ_Histograms("Phi-nVecIP-yTauPos",hNameSuffix+"_Gen");
+  plot_HAZ_Histograms("Phi-nVecIP",hNameSuffix+"_Gen");
+  plot_HAZ_Histograms("Phi-nVectors",hNameSuffix+"_Gen");
   
-  plot_HAZ_Histograms("Phi_nVectors",hNameSuffix+"_RefitPV");
-  plot_HAZ_Histograms("Phi_nVecIP",hNameSuffix+"_RefitPV");
+  plot_HAZ_Histograms("Phi-nVectors",hNameSuffix+"_RefitPV");
+  plot_HAZ_Histograms("Phi-nVecIP",hNameSuffix+"_RefitPV");
 
   plotnPCA("ggH125"+hNameSuffix);
   plotnPCA("A"+hNameSuffix);
   plotnPCA("DYJets"+hNameSuffix);
   plotnPCA("WJets"+hNameSuffix);
 
-  plotPhiDecayPlanes("Phi_nVectorsggH125"+hNameSuffix);
-  plotPhiDecayPlanes("Phi_nVectorsA"+hNameSuffix);
-  plotPhiDecayPlanes("Phi_nVectorsDYJets"+hNameSuffix);
+  plotPhiDecayPlanes("Phi-nVectorsggH125"+hNameSuffix);
+  plotPhiDecayPlanes("Phi-nVectorsA"+hNameSuffix);
+  plotPhiDecayPlanes("Phi-nVectorsDYJets"+hNameSuffix);
 
-  plotPhiDecayPlanes("Phi_nVecIPggH125"+hNameSuffix);
-  plotPhiDecayPlanes("Phi_nVecIPA"+hNameSuffix);
-  plotPhiDecayPlanes("Phi_nVecIPDYJets"+hNameSuffix);
+  plotPhiDecayPlanes("Phi-nVecIPggH125"+hNameSuffix);
+  plotPhiDecayPlanes("Phi-nVecIPA"+hNameSuffix);
+  plotPhiDecayPlanes("Phi-nVecIPDYJets"+hNameSuffix);
 
   plotProfiles("hProfRecoVsMagGen_","ggH125"+hNameSuffix);
   plotProfiles("hProfPhiVsMag_","ggH125"+hNameSuffix);
@@ -594,8 +595,8 @@ void HTTHistograms::plotCPhistograms(unsigned int iCategory){
   plotVerticesPulls("h1DVxPullY_ggH125"+hNameSuffix);
   plotVerticesPulls("h1DVxPullZ_ggH125"+hNameSuffix);
   
-  plotPhiDecayPlanes("Phi_nVecIP_yTauPosggH125"+hNameSuffix);
-  plotPhiDecayPlanes("Phi_nVecIP_yTauNegggH125"+hNameSuffix);
+  plotPhiDecayPlanes("Phi-nVecIP-yTauPosggH125"+hNameSuffix);
+  plotPhiDecayPlanes("Phi-nVecIP-yTauNegggH125"+hNameSuffix);
  
 }
 /////////////////////////////////////////////////////////
@@ -606,8 +607,9 @@ void HTTHistograms::plotnPCA(const std::string & type){
   TH1F* h1DMuon = get1DHistogram("h1DnPCAMuon"+type);
 
   if(type.find("DYJets")!=std::string::npos){
-    h1DTau = get1D_DYJet_Histogram("h1DnPCATau"+type);
-    h1DMuon = get1D_DYJet_Histogram("h1DnPCAMuon"+type);
+    std::string typeztt="DYJetsMatchT"+type.substr(type.find("DYJets")+6);
+    h1DTau = get1D_TauMatchJetSum(("h1DnPCATau"+typeztt).c_str(),false,true);
+    h1DMuon = get1D_TauMatchJetSum(("h1DnPCAMuon"+typeztt).c_str(),false,true);
   }
   if(type.find("WJets")!=std::string::npos){
     h1DTau = get1D_WJet_Histogram("h1DnPCATau"+type);
@@ -732,7 +734,7 @@ void HTTHistograms::plotProfiles(const std::string & hName,
 				 const std::string & sysType){
 
   TProfile* h1DAOD = this->getProfile(hName+sysType+"_AODPV");
-  //TProfile* h1DGen = this->getProfile(hName+sysType+"GenNoOfflineSel");
+  //TProfile* h1DGen = this->getProfile(hName+sysType+"_GenNoOfflineSel");
   TProfile* h1DGen = this->getProfile(hName+sysType+"_GenPV");  
   TProfile* h1DRefit = this->getProfile(hName+sysType+"_RefitPV");
 
@@ -815,19 +817,39 @@ void HTTHistograms::plotPhiDecayPlanes(const std::string & name){
 
   TString hName = "h1D"+name+"_RefitPV";
   TH1F* h1DRefitPV = get1DHistogram(hName.Data());
-  if(name.find("DYJets")!=std::string::npos) h1DRefitPV = get1D_DYJet_Histogram(hName.Data());
+  if(name.find("DYJets")!=std::string::npos) {
+    std::string n2=name;
+    n2.insert(n2.find("DYJets")+6,"MatchT");
+    hName = "h1D"+n2+"_RefitPV";
+    h1DRefitPV = get1D_TauMatchJetSum(hName.Data(),false,true);
+  }
 
   hName = "h1D"+name+"_AODPV";
   TH1F* h1DAODPV = get1DHistogram(hName.Data());
-  if(name.find("DYJets")!=std::string::npos) h1DAODPV = get1D_DYJet_Histogram(hName.Data());
+  if(name.find("DYJets")!=std::string::npos) {
+    std::string n2=name;
+    n2.insert(n2.find("DYJets")+6,"MatchT");
+    hName = "h1D"+n2+"_AODPV";
+    h1DAODPV = get1D_TauMatchJetSum(hName.Data(),false,true);
+  }
   
   hName = "h1D"+name+"_GenPV";
   TH1F* h1DGenPV = get1DHistogram(hName.Data());
-  if(name.find("DYJets")!=std::string::npos) h1DGenPV = get1D_DYJet_Histogram(hName.Data());
+  if(name.find("DYJets")!=std::string::npos) {
+    std::string n2=name;
+    n2.insert(n2.find("DYJets")+6,"MatchT");
+    hName = "h1D"+n2+"_GenPV";
+    h1DGenPV = get1D_TauMatchJetSum(hName.Data(),false,true);
+  }
 
   hName = "h1D"+name+"_GenNoOfflineSel";
   TH1F* h1DGen = get1DHistogram(hName.Data());
-  if(name.find("DYJets")!=std::string::npos) h1DGen = get1D_DYJet_Histogram(hName.Data());
+  if(name.find("DYJets")!=std::string::npos) {
+    std::string n2=name;
+    n2.insert(n2.find("DYJets")+6,"MatchT");
+    hName = "h1D"+n2+"_GenNoOfflineSel";
+    h1DGen = get1D_TauMatchJetSum(hName.Data(),false,true);
+  }
 
   if(h1DGen){
     h1DGen->SetLineWidth(4);
@@ -903,9 +925,9 @@ void HTTHistograms::plot_HAZ_Histograms(const std::string & hName,
   TH1F* h_h = this->get1DHistogram(name.Data());
   name = "h1D"+hName+"A"+sysType;
   TH1F* h_A = this->get1DHistogram(name.Data());
-  name = "h1D"+hName+"DYJets"+sysType;
-  TH1F* h_Z = get1D_DYJet_Histogram(name.Data());
-
+  name = "h1D"+hName+"DYJetsMatchT"+sysType;
+  TH1F* h_Z = get1D_TauMatchJetSum(name.Data(),false,true);
+  
   if(!h_h || !h_A || !h_Z) return;
 
   h_h->SetLineWidth(3);
@@ -1346,7 +1368,7 @@ THStack*  HTTHistograms::plotStack(unsigned int iCategory, std::string varName, 
   float highEnd = 170;
   float lowEnd = -150;
 
-  if(varName.find("Phi_")!=std::string::npos) lowEnd = 0;
+  if(varName.find("Phi-")!=std::string::npos) lowEnd = 0;
     
   int binHigh = hs->GetXaxis()->FindBin(highEnd);  
   int binLow = hs->GetXaxis()->FindBin(lowEnd);
