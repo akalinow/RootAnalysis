@@ -553,6 +553,8 @@ void HTTHistograms::finalizeHistograms(int nRuns, float weight){
     plotStack(iCategory, "Phi-nVectors");
     plotStack(iCategory, "Phi-nVecIP_");
     plotStack(iCategory, "NPV");
+    
+    prepareOutputHistos(iCategory);
   }
 }
 /////////////////////////////////////////////////////////
@@ -1232,7 +1234,7 @@ THStack*  HTTHistograms::plotStack(unsigned int iCategory, std::string varName, 
   hWplusHiggs130->Scale(scale);
 
   //////////Sum of WH histos needed for further analysis in combine
-  TH1F *hWHiggs120 = hWplusHiggs120;
+ /* TH1F *hWHiggs120 = hWplusHiggs120;
   hWHiggs120->Add(hWminusHiggs120);
   hWHiggs120->SetName((hName+"WH120"+hNameSuffix).c_str());
   TH1F *hWHiggs125 = hWplusHiggs125;
@@ -1243,7 +1245,7 @@ THStack*  HTTHistograms::plotStack(unsigned int iCategory, std::string varName, 
   hWHiggs130->SetName((hName+"WH130"+hNameSuffix).c_str());
   hWHiggs120->SetDirectory(hSoup->GetDirectory());
   hWHiggs125->SetDirectory(hSoup->GetDirectory());
-  hWHiggs130->SetDirectory(hSoup->GetDirectory());
+  hWHiggs130->SetDirectory(hSoup->GetDirectory());*/
   /////////
 
   hHiggs->Add(hggHiggs125);
@@ -1635,6 +1637,7 @@ TH1F* HTTHistograms::getQCDbackground(unsigned int iCategory,
 
   std::string hName = "h1D" + varName;
   std::string hNameSuffix =  "_SS_"+std::to_string(iCategory);
+  if(HTTAnalyzer::categoryName(iCategory).find("antiiso")!=std::string::npos) hNameSuffix.replace(hNameSuffix.find("_SS_"),4,"_SSnoMuIso_");
   // SS selection
   TH1F *hWJets = get1D_WJet_Histogram((hName+"WJets"+hNameSuffix).c_str());
   TH1F *hDYJetsLowM = get1D_DYJet_Histogram((hName+"DYLowM"+hNameSuffix).c_str());
@@ -1816,6 +1819,309 @@ std::pair<float,float> HTTHistograms::getWNormalisation(unsigned int iCategory, 
       <<" QCD:               "<<inthQCD<<endl;
   cout<<"WJets scale:"<<weight<<" dweight "<<dweight<<endl;
   return std::make_pair(weight, dweight);
+}
+/////////////////////////////////////////////////////////
+/////////////////////////////////////////////////////////
+void HTTHistograms::prepareOutputHistos(unsigned int iCategory){
+
+  std::unordered_map<std::string, std::string> varName({
+                                                        {"wjets_jet0","MassTrans"},
+                                                        {"wjets_boosted","MassTrans"},
+                                                        {"wjets_vbf","MassTrans"},
+                                                        {"antiiso_jet0","MassVis"},
+                                                        {"antiiso_boosted","MassSV"},
+                                                        {"antiiso_vbf","MassSV"} });
+                                                        
+  std::string selName = "OS";
+  std::string categoryName = HTTAnalyzer::categoryName(iCategory);
+  if(categoryName.find("antiiso")!=std::string::npos) selName += "noMuIso";
+  if(varName.count(categoryName)==0) return;
+  std::string hName = "h1D"+varName[categoryName];
+  std::string hNameSuffix =  "_"+selName+"_"+std::to_string(iCategory);
+
+  TH1F *hSoup = get1DHistogram((hName+"Data"+hNameSuffix).c_str(),true);
+  if(!hSoup) return;
+
+  float lumi = getLumi();
+  TH1F *hWplusHiggs120 = get1DHistogram((hName+"WplusH120"+hNameSuffix).c_str());
+  TH1F *hWplusHiggs125 = get1DHistogram((hName+"WplusH125"+hNameSuffix).c_str());
+  TH1F *hWplusHiggs130 = get1DHistogram((hName+"WplusH130"+hNameSuffix).c_str());
+
+  TH1F *hWminusHiggs120 = get1DHistogram((hName+"WminusH120"+hNameSuffix).c_str());
+  TH1F *hWminusHiggs125 = get1DHistogram((hName+"WminusH125"+hNameSuffix).c_str());
+  TH1F *hWminusHiggs130 = get1DHistogram((hName+"WminusH130"+hNameSuffix).c_str());
+  
+  TH1F *hEmpty = (TH1F*)hSoup->Clone("hEmpty");
+  hEmpty->Reset();
+
+  if(!hWplusHiggs120) hWplusHiggs120 = (TH1F*)hEmpty->Clone((hName+"WplusH120"+hNameSuffix).c_str());
+  if(!hWplusHiggs125) hWplusHiggs125 = (TH1F*)hEmpty->Clone((hName+"WplusH125"+hNameSuffix).c_str());
+  if(!hWplusHiggs130) hWplusHiggs130 = (TH1F*)hEmpty->Clone((hName+"WplusH130"+hNameSuffix).c_str());
+
+  if(!hWminusHiggs120) hWminusHiggs120 = (TH1F*)hEmpty->Clone((hName+"WminusH120"+hNameSuffix).c_str());
+  if(!hWminusHiggs125) hWminusHiggs125 = (TH1F*)hEmpty->Clone((hName+"WminusH125"+hNameSuffix).c_str());
+  if(!hWminusHiggs130) hWminusHiggs130 = (TH1F*)hEmpty->Clone((hName+"WminusH130"+hNameSuffix).c_str());
+
+  std::string sampleName = "WminusH120";
+  float weight = getSampleNormalisation(sampleName);
+  float scale = weight*lumi;
+  hWminusHiggs120->Scale(scale);
+
+  sampleName = "WminusH125";
+  weight = getSampleNormalisation(sampleName);
+  scale = weight*lumi;
+  hWminusHiggs125->Scale(scale);
+
+  sampleName = "WminusH130";
+  weight = getSampleNormalisation(sampleName);
+  scale = weight*lumi;
+  hWminusHiggs130->Scale(scale);
+
+  sampleName = "WplusH120";
+  weight = getSampleNormalisation(sampleName);
+  scale = weight*lumi;
+  hWplusHiggs120->Scale(scale);
+
+  sampleName = "WplusH125";
+  weight = getSampleNormalisation(sampleName);
+  scale = weight*lumi;
+  hWplusHiggs125->Scale(scale);
+
+  sampleName = "WplusH130";
+  weight = getSampleNormalisation(sampleName);
+  scale = weight*lumi;
+  hWplusHiggs130->Scale(scale);
+
+  TH1F *hWHiggs120 = hWplusHiggs120;
+  hWHiggs120->Add(hWminusHiggs120);
+  hWHiggs120->SetName((hName+"WH120"+hNameSuffix).c_str());
+  TH1F *hWHiggs125 = hWplusHiggs125;
+  hWHiggs125->Add(hWminusHiggs125);
+  hWHiggs125->SetName((hName+"WH125"+hNameSuffix).c_str());
+  TH1F *hWHiggs130 = hWplusHiggs130;
+  hWHiggs130->Add(hWminusHiggs130);
+  hWHiggs130->SetName((hName+"WH130"+hNameSuffix).c_str());
+  hWHiggs120->SetDirectory(hSoup->GetDirectory());
+  hWHiggs125->SetDirectory(hSoup->GetDirectory());
+  hWHiggs130->SetDirectory(hSoup->GetDirectory());
+  
+  if(categoryName.find("antiiso")==std::string::npos) return;
+
+  TH1F *hggHiggs120 = get1DHistogram((hName+"ggH120"+hNameSuffix).c_str());
+  TH1F *hggHiggs125 = get1DHistogram((hName+"ggH125"+hNameSuffix).c_str());
+  TH1F *hggHiggs130 = get1DHistogram((hName+"ggH130"+hNameSuffix).c_str());
+
+  TH1F *hqqHiggs120 = get1DHistogram((hName+"qqH120"+hNameSuffix).c_str());
+  TH1F *hqqHiggs125 = get1DHistogram((hName+"qqH125"+hNameSuffix).c_str());
+  TH1F *hqqHiggs130 = get1DHistogram((hName+"qqH130"+hNameSuffix).c_str());
+
+  TH1F *hZHiggs120 = get1DHistogram((hName+"ZH120"+hNameSuffix).c_str());
+  TH1F *hZHiggs125 = get1DHistogram((hName+"ZH125"+hNameSuffix).c_str());
+  TH1F *hZHiggs130 = get1DHistogram((hName+"ZH130"+hNameSuffix).c_str());
+
+  TH1F *hWJets = get1D_WJet_Histogram((hName+"WJets"+hNameSuffix).c_str());
+  TH1F *hTTbarJ = get1D_TT_Histogram((hName+"TTbar"+hNameSuffix).c_str(),"MatchJ");
+  TH1F *hTTbarT = get1D_TT_Histogram((hName+"TTbar"+hNameSuffix).c_str(),"MatchT");
+  TH1F *hST = get1D_ST_Histogram((hName+"ST"+hNameSuffix).c_str());
+  TH1F *hVVJ = get1D_VV_Histogram((hName+"DiBoson"+hNameSuffix).c_str(), "MatchJ");
+  TH1F *hVVT = get1D_VV_Histogram((hName+"DiBoson"+hNameSuffix).c_str(), "MatchT");
+  TH1F *hDYJetsLowM = get1D_DYJet_Histogram((hName+"DYLowM"+hNameSuffix).c_str());
+
+  bool sumDecayModes = false;
+  bool sumJetBins = true;
+  TH1F *hDYJetsZJ = get1D_TauMatchJetSum((hName+"DYJetsMatchJ"+hNameSuffix).c_str(), sumDecayModes, sumJetBins);
+  TH1F *hDYJetsZL = get1D_TauMatchJetSum((hName+"DYJetsMatchL"+hNameSuffix).c_str(), sumDecayModes, sumJetBins);
+  TH1F *hDYJetsZTT = get1D_TauMatchJetSum((hName+"DYJetsMatchT"+hNameSuffix).c_str(), sumDecayModes, sumJetBins);
+
+  TH1F *hEWK2Jets = get1D_EWK2JetsSum(hName+"EWK2Jets"+hNameSuffix);
+  pair<float,float> qcdOStoSS = getQCDOStoSS(iCategory, wselOSCorrection, wselSSCorrection);
+  TH1F *hQCD = (TH1F*)getQCDbackground(iCategory,varName[categoryName],wselOSCorrection, wselSSCorrection);
+  if(hQCD) hQCD->SetName((hName+"QCDEstimatenoMuIso_"+std::to_string(iCategory)).c_str());
+  TH1F *hQCD_MC =  get1DHistogram((hName+"QCD_MC"+hNameSuffix).c_str());
+
+  ///Protection against null pointers
+  ///Null pointers happen when sample was not read, or there were no
+  ///events passing particular selection.
+
+  if(!hQCD) hQCD = (TH1F*)hEmpty->Clone((hName+"QCDEstimate_"+std::to_string(iCategory)).c_str());
+  if(!hQCD_MC) hQCD_MC = (TH1F*)hEmpty->Clone((hName+"QCD_MC"+hNameSuffix).c_str());
+  if(!hWJets) hWJets = (TH1F*)hEmpty->Clone((hName+"WJets"+hNameSuffix).c_str());
+  if(!hDYJetsLowM) hDYJetsLowM = (TH1F*)hEmpty->Clone((hName+"DYLowM"+hNameSuffix).c_str());
+  if(!hDYJetsZJ) hDYJetsZJ = (TH1F*)hEmpty->Clone((hName+"DYJetsMatchJ"+hNameSuffix).c_str());
+  if(!hDYJetsZL) hDYJetsZL = (TH1F*)hEmpty->Clone((hName+"DYJetsMatchL"+hNameSuffix).c_str());
+  if(!hDYJetsZTT) hDYJetsZTT = (TH1F*)hEmpty->Clone((hName+"DYJetsMatchT"+hNameSuffix).c_str());
+  if(!hTTbarJ) hTTbarJ = (TH1F*)hEmpty->Clone((hName+"TTbarMatchJ"+hNameSuffix).c_str());
+  if(!hTTbarT) hTTbarT = (TH1F*)hEmpty->Clone((hName+"TTbarMatchT"+hNameSuffix).c_str());
+  if(!hST) hST = (TH1F*)hEmpty->Clone((hName+"ST"+hNameSuffix).c_str());
+  if(!hVVJ) hVVJ = (TH1F*)hEmpty->Clone((hName+"DiBosonMatchJ"+hNameSuffix).c_str());
+  if(!hVVT) hVVT = (TH1F*)hEmpty->Clone((hName+"DiBosonMatchT"+hNameSuffix).c_str());
+  if(!hEWK2Jets) hEWK2Jets = (TH1F*)hEmpty->Clone((hName+"EWK2Jets"+hNameSuffix).c_str());
+
+  if(!hggHiggs120) hggHiggs120 = (TH1F*)hEmpty->Clone((hName+"ggH120"+hNameSuffix).c_str());
+  if(!hggHiggs125) hggHiggs125 = (TH1F*)hEmpty->Clone((hName+"ggH125"+hNameSuffix).c_str());
+  if(!hggHiggs130) hggHiggs130 = (TH1F*)hEmpty->Clone((hName+"ggH130"+hNameSuffix).c_str());
+
+  if(!hqqHiggs120) hqqHiggs120 = (TH1F*)hEmpty->Clone((hName+"qqH120"+hNameSuffix).c_str());
+  if(!hqqHiggs125) hqqHiggs125 = (TH1F*)hEmpty->Clone((hName+"qqH125"+hNameSuffix).c_str());
+  if(!hqqHiggs130) hqqHiggs130 = (TH1F*)hEmpty->Clone((hName+"qqH130"+hNameSuffix).c_str());
+
+  if(!hZHiggs120) hZHiggs120 = (TH1F*)hEmpty->Clone((hName+"ZH120"+hNameSuffix).c_str());
+  if(!hZHiggs125) hZHiggs125 = (TH1F*)hEmpty->Clone((hName+"ZH125"+hNameSuffix).c_str());
+  if(!hZHiggs130) hZHiggs130 = (TH1F*)hEmpty->Clone((hName+"ZH130"+hNameSuffix).c_str());
+
+  ///Set histograms directory, so the histograms are saved
+  if(hQCD) hQCD->SetDirectory(hSoup->GetDirectory());
+  if(hQCD_MC) hQCD_MC->SetDirectory(hSoup->GetDirectory());
+  if(hWJets) hWJets->SetDirectory(hSoup->GetDirectory());
+  if(hDYJetsLowM) hDYJetsLowM->SetDirectory(hSoup->GetDirectory());
+  if(hDYJetsZJ) hDYJetsZJ->SetDirectory(hSoup->GetDirectory());
+  if(hDYJetsZL) hDYJetsZL->SetDirectory(hSoup->GetDirectory());
+  if(hDYJetsZTT) hDYJetsZTT->SetDirectory(hSoup->GetDirectory());
+  if(hTTbarJ) hTTbarJ->SetDirectory(hSoup->GetDirectory());
+  if(hTTbarT) hTTbarT->SetDirectory(hSoup->GetDirectory());
+  if(hST) hST->SetDirectory(hSoup->GetDirectory());
+  if(hVVJ) hVVJ->SetDirectory(hSoup->GetDirectory());
+  if(hVVT) hVVT->SetDirectory(hSoup->GetDirectory());
+  if(hEWK2Jets) hEWK2Jets->SetDirectory(hSoup->GetDirectory());
+
+  if(hggHiggs120) hggHiggs120->SetDirectory(hSoup->GetDirectory());
+  if(hggHiggs125) hggHiggs125->SetDirectory(hSoup->GetDirectory());
+  if(hggHiggs130) hggHiggs130->SetDirectory(hSoup->GetDirectory());
+
+  if(hqqHiggs120) hqqHiggs120->SetDirectory(hSoup->GetDirectory());
+  if(hqqHiggs125) hqqHiggs125->SetDirectory(hSoup->GetDirectory());
+  if(hqqHiggs130) hqqHiggs130->SetDirectory(hSoup->GetDirectory());
+
+  if(hZHiggs120) hZHiggs120->SetDirectory(hSoup->GetDirectory());
+  if(hZHiggs125) hZHiggs125->SetDirectory(hSoup->GetDirectory());
+  if(hZHiggs130) hZHiggs130->SetDirectory(hSoup->GetDirectory());
+
+  if(hWplusHiggs120) hWplusHiggs120->SetDirectory(hSoup->GetDirectory());
+  if(hWplusHiggs125) hWplusHiggs125->SetDirectory(hSoup->GetDirectory());
+  if(hWplusHiggs130) hWplusHiggs130->SetDirectory(hSoup->GetDirectory());
+
+  if(hWminusHiggs120) hWminusHiggs120->SetDirectory(hSoup->GetDirectory());
+  if(hWminusHiggs125) hWminusHiggs125->SetDirectory(hSoup->GetDirectory());
+  if(hWminusHiggs130) hWminusHiggs130->SetDirectory(hSoup->GetDirectory());
+
+
+  TH1F *hHiggs = (TH1F*)hggHiggs125->Clone("hHiggs");
+  hHiggs->Reset();
+
+  sampleName = "WJets";
+  std::string WselType = "wselOS";
+  pair<float,float> dataToMCScale = wselOSCorrection;
+
+  if(hNameSuffix.find("SS")!=std::string::npos){
+    WselType = "wselSS";
+    dataToMCScale = wselSSCorrection;
+  }
+  weight = getSampleNormalisation(sampleName);
+
+  /////
+  scale = weight*lumi*dataToMCScale.first;
+  hWJets->Scale(scale);
+
+  sampleName = "DYLowM";
+  weight = getSampleNormalisation(sampleName);
+  scale = weight*lumi;
+  hDYJetsLowM->Scale(scale);
+
+  sampleName = "DYJetsMatchJ";
+  weight = getSampleNormalisation(sampleName);
+  scale = weight*lumi;
+  hDYJetsZJ->Scale(scale);
+
+  sampleName = "DYJetsMatchL";
+  weight = getSampleNormalisation(sampleName);
+  scale = weight*lumi;
+  hDYJetsZL->Scale(scale);
+
+  sampleName = "DYJetsMatchT";
+  weight = getSampleNormalisation(sampleName);
+  scale = weight*lumi;
+  hDYJetsZTT->Scale(scale);
+
+  //TT samples scaled for preselection during stiching step
+  sampleName = "TTbarMatchJ";
+  scale=lumi;
+  hTTbarJ->Scale(scale);
+
+  //TT samples scaled for preselection during stiching step
+  sampleName = "TTbarMatchT";
+  scale=lumi;
+  hTTbarT->Scale(scale);
+
+  sampleName = "QCD_MC";
+  weight = getSampleNormalisation(sampleName);
+  scale = weight*lumi;
+  hQCD_MC->Scale(scale);
+
+  //single top samples scaled for preselection during stiching step
+  sampleName = "ST";
+  scale = lumi;
+  hST->Scale(scale);
+
+  //VV samples scaled for preselection during stiching step
+  sampleName = "DiBosonMatchJ";
+  scale = lumi;
+  hVVJ->Scale(scale);
+
+  //VV samples scaled for preselection during stiching step
+  sampleName = "DiBosonMatchT";
+  scale = lumi;
+  hVVT->Scale(scale);
+
+  ///EWK 2Jets scaled for preselection during stiching step
+  sampleName = "EWK2Jets";
+  scale = lumi;
+  hEWK2Jets->Scale(scale);
+
+  sampleName = "ggH120";
+  weight = getSampleNormalisation(sampleName);
+  scale = weight*lumi;
+  hggHiggs120->Scale(scale);
+
+  sampleName = "qqH120";
+  weight = getSampleNormalisation(sampleName);
+  scale = weight*lumi;
+  hqqHiggs120->Scale(scale);
+
+  sampleName = "ggH125";
+  weight = getSampleNormalisation(sampleName);
+  scale = weight*lumi;
+  hggHiggs125->Scale(scale);
+
+  sampleName = "qqH125";
+  weight = getSampleNormalisation(sampleName);
+  scale = weight*lumi;
+  hqqHiggs125->Scale(scale);
+
+  sampleName = "ggH130";
+  weight = getSampleNormalisation(sampleName);
+  scale = weight*lumi;
+  hggHiggs130->Scale(scale);
+
+  sampleName = "qqH130";
+  weight = getSampleNormalisation(sampleName);
+  scale = weight*lumi;
+  hqqHiggs130->Scale(scale);
+
+  sampleName = "ZH120";
+  weight = getSampleNormalisation(sampleName);
+  scale = weight*lumi;
+  hZHiggs120->Scale(scale);
+
+  sampleName = "ZH125";
+  weight = getSampleNormalisation(sampleName);
+  scale = weight*lumi;
+  hZHiggs125->Scale(scale);
+
+  sampleName = "ZH130";
+  weight = getSampleNormalisation(sampleName);
+  scale = weight*lumi;
+  hZHiggs130->Scale(scale);
+
 }
 /////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////

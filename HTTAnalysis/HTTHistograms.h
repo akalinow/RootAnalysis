@@ -118,6 +118,9 @@ class HTTHistograms: public AnalysisHistograms {
   //Plot a single histogram. One has to provide the full
   //histogram name, e.g. including h1D prefix.
   void plotSingleHistogram(std::string hName);
+  
+  //Prepare histograms needed for limits calculations
+  void prepareOutputHistos(unsigned int iCategory);
 
   float muTauDYScale, mumuDYScale;
   float ttScale;

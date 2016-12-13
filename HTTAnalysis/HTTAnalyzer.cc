@@ -423,6 +423,10 @@ bool HTTAnalyzer::analyze(const EventProxyBase& iEvent){
       hNameSuffix = sampleName+"_SSnoMuIso_"+categorySuffix;
       myHistos_->fill1DHistogram("h1DIso"+hNameSuffix,aMuon.getProperty(PropertyEnum::combreliso),eventWeight);
       myHistos_->fill1DHistogram("h1DMassTrans"+hNameSuffix,aPair.getMTMuon(),eventWeight);
+      //needed for antiiso control region//
+      myHistos_->fill1DHistogram("h1DMassSV"+hNameSuffix,aPair.getP4(sysEffects::NOMINAL_SVFIT).M(),eventWeight);
+      myHistos_->fill1DHistogram("h1DMassVis"+hNameSuffix,aPair.getP4().M(),eventWeight);
+      /////////////////////////////////////
     }
   }
   return true;
