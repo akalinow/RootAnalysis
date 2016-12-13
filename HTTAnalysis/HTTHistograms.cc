@@ -1223,6 +1223,21 @@ THStack*  HTTHistograms::plotStack(unsigned int iCategory, std::string varName, 
   weight = getSampleNormalisation(sampleName);
   scale = weight*lumi;
   hWplusHiggs130->Scale(scale);
+  
+  //////////Sum of WH histos needed for further analysis in combine
+  TH1F *hWHiggs120 = hWplusHiggs120;
+  hWHiggs120->Add(hWminusHiggs120);
+  hWHiggs120->SetName((hName+"WH120"+hNameSuffix).c_str());
+  TH1F *hWHiggs125 = hWplusHiggs125;
+  hWHiggs125->Add(hWminusHiggs125);
+  hWHiggs125->SetName((hName+"WH125"+hNameSuffix).c_str());
+  TH1F *hWHiggs130 = hWplusHiggs130;
+  hWHiggs130->Add(hWminusHiggs130);
+  hWHiggs130->SetName((hName+"WH130"+hNameSuffix).c_str());
+  hWHiggs120->SetDirectory(hSoup->GetDirectory());
+  hWHiggs125->SetDirectory(hSoup->GetDirectory());
+  hWHiggs130->SetDirectory(hSoup->GetDirectory());
+  /////////
 
   hHiggs->Add(hggHiggs125);
   hHiggs->Add(hqqHiggs125);
@@ -1288,7 +1303,7 @@ THStack*  HTTHistograms::plotStack(unsigned int iCategory, std::string varName, 
   
   outputStream<<"Event count summary for selecion name: "<<hNameSuffix<<std::endl;
   outputStream<<"Data: "<<hSoup->Integral(0,hSoup->GetNbinsX()+1)<<std::endl;
-  outputStream<<"MC (ho Higgs): "<<hMCSum->Integral(0,hMCSum->GetNbinsX()+1)<<std::endl;  
+  outputStream<<"MC (no Higgs): "<<hMCSum->Integral(0,hMCSum->GetNbinsX()+1)<<std::endl;  
   outputStream<<"MC W->l: "<<hWJets->Integral(0,hWJets->GetNbinsX()+1)<<std::endl;
   outputStream<<"MC TTbarJ: "<<hTTbarJ->Integral(0,hTTbarJ->GetNbinsX()+1)<<std::endl;
   outputStream<<"MC TTbarT: "<<hTTbarT->Integral(0,hTTbarT->GetNbinsX()+1)<<std::endl;
