@@ -5,7 +5,7 @@
 #include "HTTHistograms.h"
 //////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////
-HTTAnalyzer::HTTAnalyzer(const std::string & aName):Analyzer(aName){
+HTTAnalyzer::HTTAnalyzer(const std::string & aName):Analyzer(aName),nPCAMin_(0.003){
 
   //pileupCalc.py -i lumiSummary_Run2016BCDE_PromptReco_v12.json
   //--inputLumiJSON /afs/cern.ch/cms/CAF/CMSCOMM/COMM_DQM/certification/Collisions16/13TeV/PileUp/pileup_latest.txt
@@ -250,8 +250,8 @@ bool HTTAnalyzer::passCategory(const HTTAnalyzer::muTauCategory & aCategory){
   bool vbf_high = aTau.getP4().Pt()>20 &&
     nJets30==2 && jetsMass>800 && higgsPt>100;
 
-  bool cpMuonSelection = aMuon.getPCARefitPV().Perp()>0.003;
-  bool cpTauSelection =  aTau.getPCARefitPV().Mag()>0.003;
+  bool cpMuonSelection = aMuon.getPCARefitPV().Perp()>nPCAMin_;
+  bool cpTauSelection =  aTau.getPCARefitPV().Mag()>nPCAMin_;
   bool cpPi = cpMuonSelection && cpTauSelection && aTau.getProperty(PropertyEnum::decayMode)==tauDecay1ChargedPion0PiZero;
   bool cpRho = cpMuonSelection && aTau.getProperty(PropertyEnum::decayMode)!=tauDecay1ChargedPion0PiZero &&
     isOneProng(aTau.getProperty(PropertyEnum::decayMode));
