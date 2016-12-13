@@ -1724,7 +1724,11 @@ TH1F* HTTHistograms::getQCDbackground(unsigned int iCategory,
 /////////////////////////////////////////////////////////
 std::pair<float,float> HTTHistograms::getWNormalisation(unsigned int iCategory, std::string selName){
 
-  iCategory = HTTAnalyzer::W;
+  if(iCategory==(unsigned int)(HTTAnalyzer::jet0)) iCategory = HTTAnalyzer::wjets_jet0;
+  else if(iCategory==(unsigned int)(HTTAnalyzer::boosted)) iCategory = HTTAnalyzer::wjets_boosted;
+  else if(iCategory==(unsigned int)(HTTAnalyzer::vbf)) iCategory = HTTAnalyzer::wjets_vbf;
+  else iCategory = HTTAnalyzer::W;
+
   std::string hNameSuffix =  "_"+selName+"_"+std::to_string(iCategory);
 
   std::string hName = "h1DMassTrans";
