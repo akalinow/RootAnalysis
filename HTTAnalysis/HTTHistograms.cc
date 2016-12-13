@@ -26,8 +26,30 @@ float HTTHistograms::getLumi(){
   float run2015D = 2114239169.533*1E-6;
 
   //./.local/bin/brilcalc lumi --normtag /afs/cern.ch/user/l/lumipro/public/normtag_file/normtag_DATACERT.json -i processedLumis_SingleMuon.json
-  return 36446609816.686*1E-6;//pb-1 data for NTUPLES_05_12_2016
 
+  float run2016BPromptReco = 5923961370.727;
+  float run2016BReReco = 5933308579.501;
+
+  float run2016CPromptReco = 2645968083.093;
+  float run2016CReReco = 2645968083.093;
+
+  float run2016DPromptReco = 4353448810.554;
+  float run2016DReReco = 4353448810.554;
+
+  float run2016EReReco = 4049255306.406;
+  float run2016FReReco = 3160088401.247;
+  float run2016GReReco = 7554453635.136;
+
+  float run2016HPromptReco_v2 = 8545039541.475;
+  float run2016HPromptReco_v3 = 216782873.203;
+  
+  float run2016 = run2016BReReco + run2016CReReco +
+    run2016DReReco + run2016EReReco +
+    run2016FReReco + run2016GReReco +
+    run2016HPromptReco_v2 + run2016HPromptReco_v3;
+  
+  return run2016*1E-6;//pb-1 data for NTUPLES_05_12_2016  
+  //return 36446609816.686*1E-6;//pb-1 data for NTUPLES_05_12_2016
 }
 /////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////
@@ -464,15 +486,7 @@ void HTTHistograms::defineHistograms(){
 void HTTHistograms::finalizeHistograms(int nRuns, float weight){
 
   AnalysisHistograms::finalizeHistograms();
-  /*
-  int iCategory = 6;
-  std::string hName = "h1DMassSV";
-  std::string hNameSuffix =  "_OS_"+std::to_string(iCategory);
-  std::string categoryName = HTTAnalyzer::categoryName(iCategory);
-  TH1F *h = get1DHistogram((hName+"TTbar"+hNameSuffix).c_str(),true);
-  h->Print();
-  return;
-  */
+
   ////Code below tests W+n jets normalisation
   ///Samples split into jet multiplicity are compared to
   ///inclusive sample.

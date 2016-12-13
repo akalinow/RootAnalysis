@@ -371,9 +371,11 @@ bool HTTAnalyzer::analyze(const EventProxyBase& iEvent){
   bool tauID = ( (int)aTau.getProperty(PropertyEnum::tauID) & tauIDmask) == tauIDmask;
   bool muonKinematics = aMuon.getP4().Pt()>24 && fabs(aMuon.getP4().Eta())<2.1;
   bool trigger = aMuon.hasTriggerMatch(TriggerEnum::HLT_IsoMu22) ||
-		 aMuon.hasTriggerMatch(TriggerEnum::HLT_IsoTkMu22);
+		 aMuon.hasTriggerMatch(TriggerEnum::HLT_IsoTkMu22) ||
+		 aMuon.hasTriggerMatch(TriggerEnum::HLT_IsoMu22_eta2p1) ||
+		 aMuon.hasTriggerMatch(TriggerEnum::HLT_IsoTkMu22_eta2p1);
+  
   if(sampleName!="Data") trigger = true; //MC trigger included in muon SF
-
   if(!tauKinematics || !tauID || !muonKinematics || !trigger) return true;
 
   float muonScaleFactor = getLeptonCorrection(aMuon.getP4().Eta(), aMuon.getP4().Pt(), hadronicTauDecayModes::tauDecayMuon);
