@@ -581,10 +581,12 @@ void HTTHistograms::plotCPhistograms(unsigned int iCategory){
   plot_HAZ_Histograms("Phi-nVectors",hNameSuffix+"_GenNoOfflineSel");
 
   hNameSuffix =  "_OS_"+std::to_string(iCategory);
+
   //plot_HAZ_Histograms("Phi-nVecIP-yTauNeg",hNameSuffix+"_Gen");
   //plot_HAZ_Histograms("Phi-nVecIP-yTauPos",hNameSuffix+"_Gen");
   plot_HAZ_Histograms("Phi-nVecIP",hNameSuffix+"_Gen");
   plot_HAZ_Histograms("Phi-nVectors",hNameSuffix+"_Gen");
+
   plot_HAZ_Histograms("Phi-nVectors",hNameSuffix+"_RefitPV");
   plot_HAZ_Histograms("Phi-nVecIP",hNameSuffix+"_RefitPV");
 
@@ -862,15 +864,15 @@ void HTTHistograms::plotPhiDecayPlanes(const std::string & name){
   }
   else h1DGenPV = get1DHistogram(hName.Data());
 
-  hName = "h1D"+name+"_GenNoOfflineSel";
+  //hName = "h1D"+name+"_GenNoOfflineSel";
   TH1F* h1DGen = 0;
-  if(name.find("DYJets")!=std::string::npos) {
-    std::string n2=name;
-    n2.insert(n2.find("DYJets")+6,"MatchT");
-    hName = "h1D"+n2+"_GenNoOfflineSel";
-    h1DGen = get1D_TauMatchJetSum(hName.Data(),false,true);
-  }
-  else h1DGen = get1DHistogram(hName.Data());
+  //if(name.find("DYJets")!=std::string::npos) {
+  //  std::string n2=name;
+  //  n2.insert(n2.find("DYJets")+6,"MatchT");
+  //  hName = "h1D"+n2+"_GenNoOfflineSel";
+  //  h1DGen = get1D_TauMatchJetSum(hName.Data(),false,true);
+  //}
+  //else h1DGen = get1DHistogram(hName.Data());
 
   if(h1DGen){
     h1DGen->SetLineWidth(4);
@@ -948,7 +950,7 @@ void HTTHistograms::plot_HAZ_Histograms(const std::string & hName,
   TH1F* h_A = this->get1DHistogram(name.Data());
   name = "h1D"+hName+"DYJetsMatchT"+sysType;
   TH1F* h_Z = get1D_TauMatchJetSum(name.Data(),false,true);
-  
+
   if(!h_h || !h_A || !h_Z) return;
 
   h_h->SetLineWidth(3);
@@ -1405,7 +1407,7 @@ THStack*  HTTHistograms::plotStack(unsigned int iCategory, std::string varName, 
   float lowEnd = -150;
 
   if(varName.find("Phi-")!=std::string::npos) lowEnd = 0;
-    
+
   int binHigh = hs->GetXaxis()->FindBin(highEnd);
   int binLow = hs->GetXaxis()->FindBin(lowEnd);
 
