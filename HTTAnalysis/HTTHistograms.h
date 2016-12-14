@@ -7,6 +7,7 @@
 //
 #include <string>
 
+#include "HTTEvent.h"
 #include "AnalysisHistograms.h"
 
 class THStack;
@@ -23,7 +24,7 @@ class HTTHistograms: public AnalysisHistograms {
   void finalizeHistograms(int nRuns, float weight=1.0);
 
   std::string getTemplateName(const std::string& name);
-  
+
   float getLumi();
 
   ///Return sample normalisation based only on
@@ -35,25 +36,26 @@ class HTTHistograms: public AnalysisHistograms {
   ///Estimate QCD background using the SS/OS method.
   TH1F* getQCDbackground(unsigned int iCategory, std::string varName,
 			 std::pair<float,float> wselOSCorrection =  std::pair<float,float>(1,0),
-			 std::pair<float,float> wselSSCorrection =  std::pair<float,float>(1,0));
+			 std::pair<float,float> wselSSCorrection =  std::pair<float,float>(1,0),
+       unsigned int iSystEffect = (unsigned int)sysEffects::NOMINAL_SVFIT);
 
   ///Calculate scaling factor for the WJets MC
-  ///SCaling factor is estimated in high Mt region.
+  ///Scaling factor is estimated in high Mt region.
   ///Other backgrounds are subtracted, basing on MC
   ///QCD contribution is neglected.
-  std::pair<float,float> getWNormalisation(unsigned int iCategory, std::string selName);
+  std::pair<float,float> getWNormalisation(unsigned int iCategory, std::string selName, unsigned int iSystEffect);
 
   ///Calculate QCD OS/SS ratiousing non isolated events.
   std::pair<float,float> getQCDOStoSS(unsigned int iCategory,
 				      std::pair<float,float> wselOSCorrection =  std::pair<float,float>(1,0),
-				      std::pair<float,float> wselSSCorrection =  std::pair<float,float>(1,0));
-
+				      std::pair<float,float> wselSSCorrection =  std::pair<float,float>(1,0),
+              unsigned int iSystEffect = (unsigned int)sysEffects::NOMINAL_SVFIT);
 
    private:
 
   std::pair<float,float> wselOSCorrection;
   std::pair<float,float> wselSSCorrection;
-  
+
   virtual void defineHistograms();
 
   ///Types of the selection flow
@@ -61,11 +63,13 @@ class HTTHistograms: public AnalysisHistograms {
 
   //Plot stacked histograms for each contributing process.
   ///iCategory - selection category to be plotted.
+  ///iSystEffect - systematic effect type to be plotted
   ///selName - secondary type of selection (OS/SS/mt) used for background estimation
   //varName - name of variable to be plotted,
   THStack* plotStack(unsigned int iCategory,
-		     std::string varName, 
-		     std::string selName = "OS");
+		     std::string varName,
+		     std::string selName = "OS",
+		     unsigned int iSystEffect = (unsigned int)sysEffects::NOMINAL);
 
   void plotnPCA(const std::string & type);
 
@@ -73,7 +77,7 @@ class HTTHistograms: public AnalysisHistograms {
 
   void plotProfiles(const std::string & hName,
 		    const std::string & sysType);
-  
+
   void plotPhiDecayPlanes(const std::string& name);
 
   void plot_HAZ_Histograms(const std::string & hName,
@@ -99,7 +103,7 @@ class HTTHistograms: public AnalysisHistograms {
   ///Return sum of DY histograms. Sum can run over
   ///decay modes, jet bins, or both.
   TH1F *get1D_TauMatchJetSum(const std::string& name, bool sumDecayModes, bool sumJetBins = false);
-  
+
   //Return sum of histograms where you substitute pattern with all sample names.
   //If tauMatchSuffix is specified, you will have sum of histos that match the suffix
   TH1F* get1D_SumPattern_Histogram(const std::string& name, std::string pattern, std::vector<std::string> sampleNames, std::string tauMatchSuffix = "");

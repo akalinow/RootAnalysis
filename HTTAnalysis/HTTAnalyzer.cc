@@ -148,16 +148,29 @@ void HTTAnalyzer::addBranch(TTree *tree){/*tree->Branch("muonPt",&muonPt);*/}
 void HTTAnalyzer::fillControlHistos(const std::string & hNameSuffix, float eventWeight,
 				    const sysEffects::sysEffectsEnum & aSysEffect){
 
-  ///Fill histograms with number of PV.
-  myHistos_->fill1DHistogram("h1DNPV"+hNameSuffix,aEvent.getNPV(),eventWeight);
-
+  ///Histograms filled for each systematic effect
   ///Fill SVfit and visible masses
-  float visMass = (aMuon.getP4(aSysEffect)+aTau.getP4(aSysEffect)).M();
+  TLorentzVector aVisSum = aMuon.getP4(aSysEffect) + aTau.getP4(aSysEffect);
+  float visMass = aVisSum.M();
+  float higgsPt =  (aVisSum + aMET.getP4(aSysEffect)).Pt();
+  float jetsMass = 0;
+  if(nJets30>1) jetsMass = (aJet1.getP4(aSysEffect)+aJet2.getP4(aSysEffect)).M();
+
+  myHistos_->fill1DHistogram("h1DMassTrans"+hNameSuffix,aPair.getMTMuon(aSysEffect),eventWeight);
   myHistos_->fill1DHistogram("h1DMassSV"+hNameSuffix,aPair.getP4(aSysEffect).M(),eventWeight);
   myHistos_->fill1DHistogram("h1DMassVis"+hNameSuffix, visMass, eventWeight);
 
+  ///Unrolled distributions for 2D fit
+  myHistos_->fill2DUnrolledHistogram("h1DUnRollTauPtMassVis"+hNameSuffix, visMass, aTau.getP4(aSysEffect).Pt(),eventWeight);
+  myHistos_->fill2DUnrolledHistogram("h1DUnRollHiggsPtMassSV"+hNameSuffix, aPair.getP4(aSysEffect).M(), higgsPt, eventWeight);
+  myHistos_->fill2DUnrolledHistogram("h1DUnRollMjjMassSV"+hNameSuffix, aPair.getP4(aSysEffect).M(), jetsMass, eventWeight);
+
+  if(aSysEffect!=sysEffects::NOMINAL_SVFIT) return;
+
+  ///Fill histograms with number of PV.
+  myHistos_->fill1DHistogram("h1DNPV"+hNameSuffix,aEvent.getNPV(),eventWeight);
+
   ///Fill muon
-  myHistos_->fill1DHistogram("h1DMassTrans"+hNameSuffix,aPair.getMTMuon(aSysEffect),eventWeight);
   myHistos_->fill1DHistogram("h1DPtMuon"+hNameSuffix,aMuon.getP4(aSysEffect).Pt(),eventWeight);
   myHistos_->fill1DHistogram("h1DEtaMuon"+hNameSuffix,aMuon.getP4(aSysEffect).Eta(),eventWeight);
   myHistos_->fill1DHistogram("h1DPhiMuon"+hNameSuffix,aMuon.getP4(aSysEffect).Phi(),eventWeight);
@@ -172,7 +185,6 @@ void HTTAnalyzer::fillControlHistos(const std::string & hNameSuffix, float event
   myHistos_->fill1DHistogram("h1DStatsDecayMode"+hNameSuffix, aTau.getProperty(PropertyEnum::decayMode), eventWeight);
   myHistos_->fill1DHistogram("h1DnPCATau"+hNameSuffix,aTau.getPCARefitPV().Mag(),eventWeight);
   myHistos_->fill1DHistogram("h1DPtTauLeadingTk"+hNameSuffix,aTau.getProperty(PropertyEnum::leadChargedParticlePt),eventWeight);
-  float higgsPt =  (aTau.getP4(aSysEffect) + aTau.getP4(aSysEffect) + aMET.getP4()).Pt();
   myHistos_->fill1DHistogram("h1DPtMuTauMET"+hNameSuffix,higgsPt,eventWeight);
 
   ///Fill jets info
@@ -182,25 +194,14 @@ void HTTAnalyzer::fillControlHistos(const std::string & hNameSuffix, float event
     myHistos_->fill1DHistogram("h1DEtaLeadingJet"+hNameSuffix,aJet1.getP4(aSysEffect).Eta(),eventWeight);
     myHistos_->fill1DHistogram("h1DCSVBtagLeadingJet"+hNameSuffix,aJet1.getProperty(PropertyEnum::bCSVscore),eventWeight);
   }
-  float jetsMass = 0;
-  if(nJets30>1){
-    jetsMass = (aJet1.getP4(aSysEffect)+aJet2.getP4(aSysEffect)).M();
-    myHistos_->fill1DHistogram("h1DWideMass2J"+hNameSuffix,jetsMass,eventWeight);
-  }
-
-  myHistos_->fill1DHistogram("h1DPtMET"+hNameSuffix,aMET.getP4().Pt(),eventWeight);
-
-  ///Unrolled distributions for 2D fit
-  myHistos_->fill2DUnrolledHistogram("h1DUnRollTauPtMassVis"+hNameSuffix, visMass, aTau.getP4(aSysEffect).Pt(),eventWeight);
-  myHistos_->fill2DUnrolledHistogram("h1DUnRollHiggsPtMassSV"+hNameSuffix, aPair.getP4(aSysEffect).M(), higgsPt, eventWeight);
-  myHistos_->fill2DUnrolledHistogram("h1DUnRollMjjMassSV"+hNameSuffix, aPair.getP4(aSysEffect).M(), jetsMass, eventWeight);
-
-  fillDecayPlaneAngle(hNameSuffix, eventWeight);
+  if(nJets30>1) myHistos_->fill1DHistogram("h1DWideMass2J"+hNameSuffix,jetsMass,eventWeight);
+  myHistos_->fill1DHistogram("h1DPtMET"+hNameSuffix,aMET.getP4(aSysEffect).Pt(),eventWeight);
 
   if(aJet1.getProperty(PropertyEnum::bCSVscore)>0.8){
     myHistos_->fill1DHistogram("h1DPtLeadingBJet"+hNameSuffix,aJet1.getP4(aSysEffect).Pt(),eventWeight);
     myHistos_->fill1DHistogram("h1DEtaLeadingBJet"+hNameSuffix,aJet1.getP4(aSysEffect).Eta(),eventWeight);
   }
+  fillDecayPlaneAngle(hNameSuffix, eventWeight);
 }
 //////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////
@@ -215,9 +216,9 @@ bool HTTAnalyzer::fillVertices(const std::string & sysType){
   float pullY = aVertexGen.Y() - aVertex.Y();
   float pullZ = aVertexGen.Z() - aVertex.Z();
 
-  myHistos_->fill1DHistogram("h1DVxPullX_"+sysType,pullX);
-  myHistos_->fill1DHistogram("h1DVxPullY_"+sysType,pullY);
-  myHistos_->fill1DHistogram("h1DVxPullZ_"+sysType,pullZ);
+  myHistos_->fill1DHistogram("h1DVxPullX"+sysType,pullX);
+  myHistos_->fill1DHistogram("h1DVxPullY"+sysType,pullY);
+  myHistos_->fill1DHistogram("h1DVxPullZ"+sysType,pullZ);
 
   return true;
 }
@@ -226,7 +227,7 @@ bool HTTAnalyzer::fillVertices(const std::string & sysType){
 bool HTTAnalyzer::passCategory(const HTTAnalyzer::muTauCategory & aCategory,
 			       const sysEffects::sysEffectsEnum & aSysEffect){
 
-  if(categoryDecisions.size()) return  categoryDecisions[(int)aCategory];
+  if(categoryDecisions.size()) categoryDecisions.clear();
   else categoryDecisions = std::vector<bool>((int)HTTAnalyzer::DUMMY);
 
   float jetsMass = (aJet1.getP4(aSysEffect)+aJet2.getP4(aSysEffect)).M();
@@ -262,8 +263,9 @@ bool HTTAnalyzer::passCategory(const HTTAnalyzer::muTauCategory & aCategory,
   bool boosted = aTau.getP4(aSysEffect).Perp()>30 && (nJets30==1 || (nJets30==2 && jetsMass < 300) || nJets30 > 2);
   bool vbf = aTau.getP4(aSysEffect).Perp()>30 && nJets30==2 && jetsMass>300;
 
-  bool wSelection = aPair.getMTMuon()>80 && aMuon.getProperty(PropertyEnum::combreliso)<0.15;
-  bool ttSelection =  aPair.getMTMuon()>150;
+  bool wSelection = aPair.getMTMuon(aSysEffect)>80 && aMuon.getProperty(PropertyEnum::combreliso)<0.15;
+  bool ttSelection =  aPair.getMTMuon(aSysEffect)>150;
+  bool antiiso = aMuon.getProperty(PropertyEnum::combreliso)>0.15 && aMuon.getProperty(PropertyEnum::combreliso)<0.30;
 
   categoryDecisions[(int)HTTAnalyzer::jet0_low] = mtSelection && jet0_low;
   categoryDecisions[(int)HTTAnalyzer::jet0_high] = mtSelection && jet0_high;
@@ -280,6 +282,14 @@ bool HTTAnalyzer::passCategory(const HTTAnalyzer::muTauCategory & aCategory,
   categoryDecisions[(int)HTTAnalyzer::boosted] = mtSelection && boosted;
   categoryDecisions[(int)HTTAnalyzer::vbf] = mtSelection && vbf;
 
+  categoryDecisions[(int)HTTAnalyzer::wjets_jet0] = wSelection && jet0;
+  categoryDecisions[(int)HTTAnalyzer::wjets_boosted] = wSelection && boosted;
+  categoryDecisions[(int)HTTAnalyzer::wjets_vbf] = wSelection && vbf;
+
+  categoryDecisions[(int)HTTAnalyzer::antiiso_jet0] = antiiso && mtSelection && jet0;
+  categoryDecisions[(int)HTTAnalyzer::antiiso_boosted] = antiiso && mtSelection && boosted;
+  categoryDecisions[(int)HTTAnalyzer::antiiso_vbf] = antiiso && mtSelection && vbf;
+
   categoryDecisions[(int)HTTAnalyzer::W] = wSelection;
   categoryDecisions[(int)HTTAnalyzer::TT] = ttSelection;
 
@@ -295,7 +305,11 @@ bool HTTAnalyzer::analyze(const EventProxyBase& iEvent){
   std::string hNameSuffix = sampleName;
   float puWeight = getPUWeight(myEventProxy);
   float genWeight = getGenWeight(myEventProxy);
-  float eventWeight = puWeight*genWeight;
+  float ptReweight = 1.0;
+  if(sampleName.find("DYJets")!=std::string::npos ||
+     sampleName.find("TTbar")!=std::string::npos)
+    ptReweight = myEventProxy.event->getPtReWeight();
+  float eventWeight = puWeight*genWeight*ptReweight;
 
   //Fill bookkeeping histogram. Bin 1 holds sum of weights.
   myHistos_->fill1DHistogram("h1DStats"+sampleName,0,eventWeight);
@@ -324,12 +338,15 @@ bool HTTAnalyzer::analyze(const EventProxyBase& iEvent){
     if(aEvent.tauIDStrings[iBit]=="againstMuonTight3") tauIDmask |= (1<<iBit);
     if(aEvent.tauIDStrings[iBit]=="againstElectronVLooseMVA6") tauIDmask |= (1<<iBit);
   }
-
   bool tauID = ( (int)aTau.getProperty(PropertyEnum::tauID) & tauIDmask) == tauIDmask;
+  bool muonKinematics = aMuon.getP4().Pt()>24 && fabs(aMuon.getP4().Eta())<2.1;
   bool trigger = aMuon.hasTriggerMatch(TriggerEnum::HLT_IsoMu22) ||
-		 aMuon.hasTriggerMatch(TriggerEnum::HLT_IsoTkMu22);
+		 aMuon.hasTriggerMatch(TriggerEnum::HLT_IsoTkMu22) ||
+		 aMuon.hasTriggerMatch(TriggerEnum::HLT_IsoMu22_eta2p1) ||
+		 aMuon.hasTriggerMatch(TriggerEnum::HLT_IsoTkMu22_eta2p1);
+
   if(sampleName!="Data") trigger = true; //MC trigger included in muon SF
-  if(!tauID || !trigger) return true;
+  if(!muonKinematics || !tauID || !trigger) return true;
 
   ///Note: parts of the signal/control region selection are applied in the following code.
   bool SS = aTau.getCharge()*aMuon.getCharge() == 1;
@@ -337,50 +354,60 @@ bool HTTAnalyzer::analyze(const EventProxyBase& iEvent){
   bool muonIso = aMuon.getProperty(PropertyEnum::combreliso)<0.15;
 
   std::string categorySuffix = "";
-  std::string sysEffectSuffix = "";
-  
-  for(unsigned int iSysType = (unsigned int)sysEffects::NOMINAL_SVFIT;
-      iSysType<(unsigned int)sysEffects::DUMMY;++iSysType){
-    sysEffects::sysEffectsEnum aSysEffect = static_cast<sysEffects::sysEffectsEnum>(iSysType);
-  
-    bool muonKinematics = aMuon.getP4(aSysEffect).Pt()>24 && fabs(aMuon.getP4(aSysEffect).Eta())<2.1;
-    bool tauKinematics = aTau.getP4(aSysEffect).Pt()>20 && fabs(aTau.getP4(aSysEffect).Eta())<2.3;
-  
-    float muonScaleFactor = getLeptonCorrection(aMuon.getP4(aSysEffect).Eta(), aMuon.getP4(aSysEffect).Pt(), hadronicTauDecayModes::tauDecayMuon);
-    float tauScaleFactor = getLeptonCorrection(aTau.getP4(aSysEffect).Eta(), aTau.getP4(aSysEffect).Pt(),
-					       static_cast<hadronicTauDecayModes>(aTau.getProperty(PropertyEnum::decayMode)));
-    float eventWeightWithSyst=eventWeight*muonScaleFactor*tauScaleFactor;
-    
-    for(unsigned int iCategory = HTTAnalyzer::jet0_low;iCategory<HTTAnalyzer::DUMMY;++iCategory){
+  std::string systEffectName = "";
+  for(unsigned int iSystEffect = (unsigned int)sysEffects::NOMINAL_SVFIT;
+    iSystEffect<(unsigned int)sysEffects::DUMMY;++iSystEffect){
+
+    sysEffects::sysEffectsEnum aSystEffect = static_cast<sysEffects::sysEffectsEnum>(iSystEffect);
+
+    //float muonScaleFactor = getLeptonCorrection(aMuon.getP4(aSystEffect).Eta(), aMuon.getP4(aSystEffect).Pt(), hadronicTauDecayModes::tauDecayMuon);
+    //float tauScaleFactor = getLeptonCorrection(aTau.getP4(aSystEffect).Eta(), aTau.getP4(aSystEffect).Pt(),
+    //					       static_cast<hadronicTauDecayModes>(aTau.getProperty(PropertyEnum::decayMode)));
+    float weightSyst = getSystWeight(aSystEffect);
+    float muonScaleFactor = 1.0;
+    float tauScaleFactor = 1.0;
+    float eventWeightWithSyst=eventWeight*weightSyst*muonScaleFactor*tauScaleFactor;
+
+      TLorentzVector met4v(aPair.getMET(aSystEffect).X(),
+			   aPair.getMET(aSystEffect).Y(), 0 ,
+			   aPair.getMET(aSystEffect).Mod());
+    aMET.setP4(met4v);
+
+
+    for(unsigned int iCategory = HTTAnalyzer::jet0;iCategory<HTTAnalyzer::DUMMY;++iCategory){
       HTTAnalyzer::muTauCategory categoryType = static_cast<HTTAnalyzer::muTauCategory>(iCategory);
-      if(!passCategory(categoryType)) continue;
+
+      if(!passCategory(categoryType, aSystEffect)) continue;
 
       categorySuffix = std::to_string(iCategory);
-      sysEffectSuffix = std::to_string(iSysType);
+      systEffectName = HTTAnalyzer::systEffectName(iSystEffect);
 
       if(OS && muonIso){
-	hNameSuffix = sampleName+"_OS_"+categorySuffix+"_SYST_"+sysEffectSuffix;
-	fillControlHistos(hNameSuffix, eventWeightWithSyst, aSysEffect);
-	fillGenDecayPlaneAngle(hNameSuffix+"_Gen", eventWeightWithSyst);
-	fillDecayPlaneAngle(hNameSuffix+"_RefitPV", eventWeightWithSyst);
-	fillDecayPlaneAngle(hNameSuffix+"_AODPV", eventWeightWithSyst);
-	fillDecayPlaneAngle(hNameSuffix+"_GenPV", eventWeightWithSyst);
-	fillVertices(hNameSuffix+"_RefitPV");
-	fillVertices(hNameSuffix+"_AODPV");
+	hNameSuffix = sampleName+"_OS_"+categorySuffix+systEffectName;
+
+	fillControlHistos(hNameSuffix, eventWeightWithSyst, aSystEffect);
+	if(aSystEffect==sysEffects::NOMINAL_SVFIT){
+	  fillGenDecayPlaneAngle(hNameSuffix+"_Gen", eventWeightWithSyst);
+	  fillDecayPlaneAngle(hNameSuffix+"_RefitPV", eventWeightWithSyst);
+	  fillDecayPlaneAngle(hNameSuffix+"_AODPV", eventWeightWithSyst);
+	  fillDecayPlaneAngle(hNameSuffix+"_GenPV", eventWeightWithSyst);
+	  fillVertices(hNameSuffix+"_RefitPV");
+	  fillVertices(hNameSuffix+"_AODPV");
+	}
       }
       if(SS && muonIso){
-	hNameSuffix = sampleName+"_SS_"+categorySuffix+"_SYST_"+sysEffectSuffix;
+	hNameSuffix = sampleName+"_SS_"+categorySuffix+systEffectName;
 	fillControlHistos(hNameSuffix, eventWeightWithSyst);
       }
       if(OS){
-	hNameSuffix = sampleName+"_OSnoMuIso_"+categorySuffix+"_SYST_"+sysEffectSuffix;
+	hNameSuffix = sampleName+"_OSnoMuIso_"+categorySuffix+systEffectName;
 	myHistos_->fill1DHistogram("h1DIso"+hNameSuffix,aMuon.getProperty(PropertyEnum::combreliso),eventWeightWithSyst);
-	myHistos_->fill1DHistogram("h1DMassTrans"+hNameSuffix,aPair.getMTMuon(aSysEffect),eventWeightWithSyst);
+	myHistos_->fill1DHistogram("h1DMassTrans"+hNameSuffix,aPair.getMTMuon(aSystEffect),eventWeightWithSyst);
       }
       if(SS){
-	hNameSuffix = sampleName+"_SSnoMuIso_"+categorySuffix+"_SYST_"+sysEffectSuffix;
+	hNameSuffix = sampleName+"_SSnoMuIso_"+categorySuffix+systEffectName;
 	myHistos_->fill1DHistogram("h1DIso"+hNameSuffix,aMuon.getProperty(PropertyEnum::combreliso),eventWeightWithSyst);
-	myHistos_->fill1DHistogram("h1DMassTrans"+hNameSuffix,aPair.getMTMuon(aSysEffect),eventWeightWithSyst);
+	myHistos_->fill1DHistogram("h1DMassTrans"+hNameSuffix,aPair.getMTMuon(aSystEffect),eventWeightWithSyst);
       }
     }
   }

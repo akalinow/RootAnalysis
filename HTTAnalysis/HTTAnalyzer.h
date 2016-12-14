@@ -23,13 +23,12 @@ class HTTHistograms;
 class TH1F;
 class TLorentzVector;
 
-
 class HTTAnalyzer: public Analyzer{
 
  public:
 
   ///Copy from DataFormats/TauReco/interface/PFTauDecayMode.h
-  enum hadronicTauDecayModes 
+  enum hadronicTauDecayModes
   {
     tauDecay1ChargedPion0PiZero,
     tauDecay1ChargedPion1PiZero,  // rho (770 MeV) mediated)
@@ -56,14 +55,18 @@ class HTTAnalyzer: public Analyzer{
 		     vbf_low, vbf_high,
 		     jet0, boosted, vbf,
 		     CP_Pi, CP_Rho,
+		     wjets_jet0,
+		     wjets_boosted, wjets_vbf,
+		     antiiso_jet0,
+		     antiiso_boosted, antiiso_vbf,
 		     W, TT,
 		     DUMMY //This must be the last one
   };
-  
+
   HTTAnalyzer(const std::string & aName);
 
   virtual ~HTTAnalyzer();
-  
+
   ///Initialize the analyzer
   virtual void initialize(TDirectory* aDir,
 			  pat::strbitset *aSelections);
@@ -98,8 +101,36 @@ class HTTAnalyzer: public Analyzer{
     else if(iCategory==(int)HTTAnalyzer::vbf) return "vbf";
     else if(iCategory==(int)HTTAnalyzer::CP_Pi) return "CP_Pi";
     else if(iCategory==(int)HTTAnalyzer::CP_Rho) return "CP_Rho";
+    else if(iCategory==(int)HTTAnalyzer::wjets_jet0) return "wjets_jet0";
+    else if(iCategory==(int)HTTAnalyzer::wjets_boosted) return "wjets_boosted";
+    else if(iCategory==(int)HTTAnalyzer::wjets_vbf) return "wjets_vbf";
+    else if(iCategory==(int)HTTAnalyzer::antiiso_jet0) return "antiiso_jet0";
+    else if(iCategory==(int)HTTAnalyzer::antiiso_boosted) return "antiiso_boosted";
+    else if(iCategory==(int)HTTAnalyzer::antiiso_vbf) return "antiiso_vbf";
     return "Unknown";
   }
+
+  static std::string systEffectName(unsigned int iSystEffect){
+   if(iSystEffect==(int)sysEffects::NOMINAL) return "";
+   else if(iSystEffect==(int)sysEffects::NOMINAL_SVFIT) return "";
+   else if(iSystEffect==(int)sysEffects::TESUp) return "_CMS_shape_t_mt_13TeVUp";
+   else if(iSystEffect==(int)sysEffects::TESDown) return "_CMS_shape_t_mt_13TeVDown";
+   else if(iSystEffect==(int)sysEffects::M2TUp) return "_CMS_htt_ZLShape_mt_13TeVUp";
+   else if(iSystEffect==(int)sysEffects::M2TDown) return "_CMS_htt_ZLShape_mt_13TeVDown";
+   else if(iSystEffect==(int)sysEffects::E2TUp) return "_CMS_htt_ZLShape_et_13TeVUp";
+   else if(iSystEffect==(int)sysEffects::E2TDown) return "_CMS_htt_ZLShape_et_13TeVDown";
+   else if(iSystEffect==(int)sysEffects::J2TUp) return "_CMS_htt_jetToTauFake_13TeVUp";
+   else if(iSystEffect==(int)sysEffects::J2TDown) return "_CMS_htt_jetToTauFake_13TeVDown";
+   else if(iSystEffect==(int)sysEffects::ZPtUp) return "_CMS_htt_dyShape_13TeVUp";
+   else if(iSystEffect==(int)sysEffects::ZPtDown) return "_CMS_htt_dyShape_13TeVDown";
+   else if(iSystEffect==(int)sysEffects::TTUp) return "_CMS_htt_ttbarShape_13TeVUp";
+   else if(iSystEffect==(int)sysEffects::TTDown) return "_CMS_htt_ttbarShape_13TeVDown";
+   else if(iSystEffect==(int)sysEffects::QCDSFUp) return "_QCDSFUncert_mt_CAT_13TeVUp";
+   else if(iSystEffect==(int)sysEffects::QCDSFDown) return "_QCDSFUncert_mt_CAT_13TeVDown";
+   else if(iSystEffect==(int)sysEffects::WSFUp) return "_WSFUncert_mt_CAT_13TeVUp";
+   else if(iSystEffect==(int)sysEffects::WSFDown) return "_WSFUncert_mt_CAT_13TeVDown";   
+   return "_Unknown";
+ }
 
   ///Check it the event passes given category selections.
   ///Selections common to all categories (mu pt, tau Id etc.)
@@ -123,18 +154,22 @@ class HTTAnalyzer: public Analyzer{
 
   ///Return sample name for DY. Name encoded jet bin, and decay mode.
   static std::string getDYSampleName(const EventProxyHTT & myEventProxy);
-  
+
   //Return name sample name suffix for different particles matched to reconstructed tau
   static std::string getMatchingName(const EventProxyHTT & myEventProxy);
 
   ///Return pileup reweighting weight.
-  ///Weight is calculatedon fly using the ration of nPU 
+  ///Weight is calculatedon fly using the ration of nPU
   ///histograms for data and analyased sample.
   float getPUWeight(const EventProxyHTT & myEventProxy);
 
+  ///Return event weight for systematic effects
+  ///implemented by a global event weight.
+  float getSystWeight(const sysEffects::sysEffectsEnum & aSystEffect=sysEffects::NOMINAL);
+
   ///Fill pulls between generator and various reco vertices.
   bool fillVertices(const std::string & sysType);
-  
+
   ///Return generator weight. Most samples have large values of weights
   ///which are constant up to + or - sign. We normalise those weights to +-1.
   float getGenWeight(const EventProxyHTT & myEventProxy);
@@ -143,17 +178,18 @@ class HTTAnalyzer: public Analyzer{
   ///Histogram names will end with hNameSuffix
   void fillControlHistos(const std::string & hNameSuffix, float eventWeight,
 			 const sysEffects::sysEffectsEnum & aSysEffect=sysEffects::NOMINAL);
-  
-  ///Fill histograms with cos(phi), where phi is the decay 
+
+
+  ///Fill histograms with cos(phi), where phi is the decay
   ///between tau decay planes. Method used for reconstructed
   ///mu+tau_h mode
   void fillDecayPlaneAngle(const std::string & hNameSuffix, float eventWeight);
 
-  ///Fill histograms with cos(phi), where phi is the decay 
-  ///between tau decay planes. Method used for 
+  ///Fill histograms with cos(phi), where phi is the decay
+  ///between tau decay planes. Method used for
   ///generator level taus for all decay modes.
   void fillGenDecayPlaneAngle(const std::string & hNameSuffix, float eventWeight);
-  
+
   ///Calculate angle between tau decay planes (first element of pair)
   //and angle betwee decay products (second element of pair)
   std::pair<float,float> angleBetweenPlanes(const TLorentzVector& tau1, const TLorentzVector& tau1Daughter,
@@ -166,17 +202,17 @@ class HTTAnalyzer: public Analyzer{
 
   ///Check if the decMode points to single prong hadronic tau decay
   bool isOneProng(int decMode);
-  
+
   ///Check if the decMode points to leptonic tau decay
   bool isLepton(int decMode);
-  
+
   ///Get jets separated by deltaR from tau an muon.
-  std::vector<HTTParticle> getSeparatedJets(const EventProxyHTT & myEventProxy, 
+  std::vector<HTTParticle> getSeparatedJets(const EventProxyHTT & myEventProxy,
 					    float deltaR);
 
   ///Get lepton corrections
   float getLeptonCorrection(float eta, float pt, hadronicTauDecayModes tauDecayMode);
-  
+
  protected:
 
   pat::strbitset *mySelections_;
@@ -204,10 +240,10 @@ class HTTAnalyzer: public Analyzer{
 
   ///RootWorskapce with lepton corrections
   RooWorkspace *scaleWorkspace;
- 
+
   ///Vector of PU histograms for MC samples
   std::vector<TH1F*> hPUVec_;
- 
+
   //should this HTTAnalyzer be able to filter events
   bool filterEvent_;
 

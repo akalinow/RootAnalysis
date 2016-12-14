@@ -176,8 +176,7 @@ void  TreeAnalyzer::init(std::vector<Analyzer*> myAnalyzers){
     }
   }
 
- ///Tree making not used at the moment.
- ///does not work with multithread.
+ ///Tree making does not work with multithread.
  if(nThreads_==1){
    unsigned int iThread = 0;
    for(unsigned int i=0;i<myAnalyzers_.size();++i){
