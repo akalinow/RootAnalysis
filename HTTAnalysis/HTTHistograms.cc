@@ -571,7 +571,7 @@ void HTTHistograms::finalizeHistograms(int nRuns, float weight){
     ///Make the ststematic effect histos.
 
     for(unsigned int iSystEffect = (unsigned int)sysEffects::NOMINAL_SVFIT;
-	iSystEffect<(unsigned int)sysEffects::M2TUp;++iSystEffect){
+	iSystEffect<(unsigned int)sysEffects::DUMMY;++iSystEffect){
 
       for(unsigned int iCategory = (int)HTTAnalyzer::jet0;
 	  iCategory<(int)HTTAnalyzer::boosted;++iCategory){
@@ -583,8 +583,6 @@ void HTTHistograms::finalizeHistograms(int nRuns, float weight){
 	wselSSCorrection = getWNormalisation(iCategory, "SS", iSystEffect);
 
 	plotStack(iCategory, "MassSV", "OS", iSystEffect);
-	continue;
-
 	plotStack(iCategory, "UnRollTauPtMassVis", "OS", iSystEffect);
 	plotStack(iCategory, "UnRollHiggsPtMassSV", "OS", iSystEffect);
 	plotStack(iCategory, "UnRollMjjMassSV", "OS", iSystEffect);

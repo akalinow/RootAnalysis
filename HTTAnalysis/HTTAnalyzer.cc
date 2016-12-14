@@ -360,12 +360,10 @@ bool HTTAnalyzer::analyze(const EventProxyBase& iEvent){
 
     sysEffects::sysEffectsEnum aSystEffect = static_cast<sysEffects::sysEffectsEnum>(iSystEffect);
 
-    //float muonScaleFactor = getLeptonCorrection(aMuon.getP4(aSystEffect).Eta(), aMuon.getP4(aSystEffect).Pt(), hadronicTauDecayModes::tauDecayMuon);
-    //float tauScaleFactor = getLeptonCorrection(aTau.getP4(aSystEffect).Eta(), aTau.getP4(aSystEffect).Pt(),
-    //					       static_cast<hadronicTauDecayModes>(aTau.getProperty(PropertyEnum::decayMode)));
+    float muonScaleFactor = getLeptonCorrection(aMuon.getP4(aSystEffect).Eta(), aMuon.getP4(aSystEffect).Pt(), hadronicTauDecayModes::tauDecayMuon);
+    float tauScaleFactor = getLeptonCorrection(aTau.getP4(aSystEffect).Eta(), aTau.getP4(aSystEffect).Pt(),
+    					       static_cast<hadronicTauDecayModes>(aTau.getProperty(PropertyEnum::decayMode)));
     float weightSyst = getSystWeight(aSystEffect);
-    float muonScaleFactor = 1.0;
-    float tauScaleFactor = 1.0;
     float eventWeightWithSyst=eventWeight*weightSyst*muonScaleFactor*tauScaleFactor;
 
       TLorentzVector met4v(aPair.getMET(aSystEffect).X(),
