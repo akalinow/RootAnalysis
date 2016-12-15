@@ -1,6 +1,9 @@
 #include <sstream>
 #include <bitset>
 
+#include "RooAbsReal.h"
+#include "RooRealVar.h"
+
 #include "HTTAnalyzer.h"
 #include "HTTHistograms.h"
 //////////////////////////////////////////////////////////////////////////////
@@ -24,6 +27,7 @@ HTTAnalyzer::HTTAnalyzer(const std::string & aName):Analyzer(aName){
     filePath = "htt_scalefactors_v5.root";
     TFile aFile(filePath.c_str());
     scaleWorkspace = (RooWorkspace*)aFile.Get("w")->Clone("w");
+    initializeCorrections();
     aFile.Close();
   }
 
@@ -57,6 +61,28 @@ void HTTAnalyzer::initialize(TDirectory* aDir,
   mySelections_ = aSelections;
 
   myHistos_ = new HTTHistograms(aDir, selectionFlavours_);
+}
+//////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////////
+void HTTAnalyzer::initializeCorrections(){
+
+  RooAbsReal *muon_id_scalefactor = scaleWorkspace->function("m_id_ratio");
+  RooAbsReal *muon_iso_scalefactor = scaleWorkspace->function("m_iso_ratio");
+  RooAbsReal *muon_trg_efficiency = scaleWorkspace->function("m_trgOR_data");//OR of the HLT_IsoMu22 and HLT_IsoTkMu22
+  //RooAbsReal *tau_id_scalefactor = scaleWorkspace->function("t_iso_mva_m_pt30_sf");
+
+  h2DMuonIdCorrections = (TH2F*)muon_id_scalefactor->createHistogram("h2DMuonIdCorrections",
+  *scaleWorkspace->var("m_pt"),RooFit::Binning(0,300,5),
+  RooFit::YVar(*scaleWorkspace->var("m_eta"),RooFit::Binning(-2.1,2.1,10)));
+
+  h2DMuonIsoCorrections = (TH2F*)muon_iso_scalefactor->createHistogram("h2DMuonIdCorrections",
+  *scaleWorkspace->var("m_pt"),RooFit::Binning(0,300,5),
+  RooFit::YVar(*scaleWorkspace->var("m_eta"),RooFit::Binning(-2.1,2.1,10)));
+
+  h2DMuonTrgCorrections = (TH2F*)muon_trg_efficiency->createHistogram("h2DMuonIdCorrections",
+  *scaleWorkspace->var("m_pt"),RooFit::Binning(0,300,5),
+  RooFit::YVar(*scaleWorkspace->var("m_eta"),RooFit::Binning(-2.1,2.1,10)));
+
 }
 //////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////

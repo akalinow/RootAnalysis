@@ -21,6 +21,8 @@
 class HTTHistograms;
 
 class TH1F;
+class TH2F;
+class TH3F;
 class TLorentzVector;
 
 class HTTAnalyzer: public Analyzer{
@@ -128,7 +130,7 @@ class HTTAnalyzer: public Analyzer{
    else if(iSystEffect==(int)sysEffects::QCDSFUp) return "_QCDSFUncert_mt_CAT_13TeVUp";
    else if(iSystEffect==(int)sysEffects::QCDSFDown) return "_QCDSFUncert_mt_CAT_13TeVDown";
    else if(iSystEffect==(int)sysEffects::WSFUp) return "_WSFUncert_mt_CAT_13TeVUp";
-   else if(iSystEffect==(int)sysEffects::WSFDown) return "_WSFUncert_mt_CAT_13TeVDown";   
+   else if(iSystEffect==(int)sysEffects::WSFDown) return "_WSFUncert_mt_CAT_13TeVDown";
    return "_Unknown";
  }
 
@@ -226,6 +228,9 @@ class HTTAnalyzer: public Analyzer{
 
   void setHistos(HTTHistograms *histos) { myHistos_ = histos;};
 
+  ///Convert RooRealVar functions to histograms
+  void initializeCorrections();
+
   ///Histograms storage.
   HTTHistograms *myHistos_;
 
@@ -237,6 +242,10 @@ class HTTAnalyzer: public Analyzer{
 
   ///Histogram with event counts filled during preselection step.
   TH1F *hStatsFromFile;
+
+  ///Histograms with lepton corrections
+  TH2F *h2DMuonIdCorrections, *h2DMuonIsoCorrections, *h2DMuonTrgCorrections;
+  TH3F *h3DTauCorrections;
 
   ///RootWorskapce with lepton corrections
   RooWorkspace *scaleWorkspace;

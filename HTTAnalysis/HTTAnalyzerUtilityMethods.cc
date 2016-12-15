@@ -260,11 +260,27 @@ float HTTAnalyzer::getLeptonCorrection(float eta, float pt, hadronicTauDecayMode
   if(sampleName.find("Data")!=std::string::npos) return 1.0;
 
   if(tauDecayMode == tauDecayMuon){
+
+    int iPtBin = h2DMuonIdCorrections->GetXaxis()->FindBin(pt);
+    int iEtaBin = h2DMuonIdCorrections->GetYaxis()->FindBin(eta);
+    float muon_id_scalefactor = h2DMuonIdCorrections->GetBinContent(iPtBin, iEtaBin);
+    float muon_iso_scalefactor = h2DMuonIsoCorrections->GetBinContent(iPtBin, iEtaBin);
+    float muon_trg_efficiency = h2DMuonTrgCorrections->GetBinContent(iPtBin, iEtaBin);
+
+    std::cout<<"HISTO muon_id_scalefactor*muon_iso_scalefactor*muon_trg_efficiency: "
+    << muon_id_scalefactor*muon_iso_scalefactor*muon_trg_efficiency
+    <<std::endl;
+
     scaleWorkspace->var("m_pt")->setVal(pt);
     scaleWorkspace->var("m_eta")->setVal(eta);
-    float muon_id_scalefactor = scaleWorkspace->function("m_id_ratio")->getVal();
-    float muon_iso_scalefactor = scaleWorkspace->function("m_iso_ratio")->getVal();
-    float muon_trg_efficiency = scaleWorkspace->function("m_trgOR_data")->getVal();//OR of the HLT_IsoMu22 and HLT_IsoTkMu22
+    muon_id_scalefactor = scaleWorkspace->function("m_id_ratio")->getVal();
+    muon_iso_scalefactor = scaleWorkspace->function("m_iso_ratio")->getVal();
+    muon_trg_efficiency = scaleWorkspace->function("m_trgOR_data")->getVal();
+
+std::cout<<"FUNC muon_id_scalefactor*muon_iso_scalefactor*muon_trg_efficiency: "
+    << muon_id_scalefactor*muon_iso_scalefactor*muon_trg_efficiency
+    <<std::endl;
+
     return  muon_id_scalefactor*muon_iso_scalefactor*muon_trg_efficiency;
   }
   else if(tauDecayMode == tauDecaysElectron) return 1.0;
@@ -273,11 +289,7 @@ float HTTAnalyzer::getLeptonCorrection(float eta, float pt, hadronicTauDecayMode
        !(sampleName.find("A")!=std::string::npos && sampleName.find("All")==std::string::npos) && //pseudoscalar
        sampleName.find("MatchT")==std::string::npos
        ) return 1.0;
-    scaleWorkspace->var("t_pt")->setVal(pt);
-    scaleWorkspace->var("t_eta")->setVal(eta);
-    scaleWorkspace->var("t_dm")->setVal(tauDecayMode);
-    float tau_id_scalefactor = scaleWorkspace->function("t_iso_mva_m_pt30_sf")->getVal();
-    //float tau_id_scalefactor = 0.9;//according to https://twiki.cern.ch/twiki/bin/view/CMS/SMTauTau2016#MC_corrections
+    float tau_id_scalefactor = 0.9;//according to https://twiki.cern.ch/twiki/bin/view/CMS/SMTauTau2016#MC_corrections
     return tau_id_scalefactor;
   }
   return 1.0;
