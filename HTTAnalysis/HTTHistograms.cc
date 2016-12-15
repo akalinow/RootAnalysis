@@ -439,7 +439,6 @@ void HTTHistograms::defineHistograms(){
  using namespace std;
 
  if(!histosInitialized_){
-
    add1DHistogram("h1DStatsTemplate","",21,-0.5,20.5,file_);
    add1DHistogram("h1DNPVTemplate",";Number of PV; Events",61,-0.5,60.5,file_);
    add1DHistogram("h1DNPUTemplate",";Number of PV; Events",600,0,60,file_);
@@ -478,7 +477,7 @@ void HTTHistograms::defineHistograms(){
    addProfile("hProfVsPtTemplate","",20,15,55,file_);
    addProfile("hProfVsCosTemplate","",20,-1,1,file_);
 
-   histosInitialized_ = true;
+
  }
 }
 /////////////////////////////////////////////////////////
@@ -574,7 +573,7 @@ void HTTHistograms::finalizeHistograms(int nRuns, float weight){
 	iSystEffect<(unsigned int)sysEffects::DUMMY;++iSystEffect){
 
       for(unsigned int iCategory = (int)HTTAnalyzer::jet0;
-	  iCategory<(int)HTTAnalyzer::boosted;++iCategory){
+	  iCategory<(int)HTTAnalyzer::DUMMY;++iCategory){
 
 	wselOSCorrection =  std::pair<float,float>(1.0,0);
 	wselSSCorrection =  std::pair<float,float>(1.0,0);

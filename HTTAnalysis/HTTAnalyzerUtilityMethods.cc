@@ -259,28 +259,13 @@ float HTTAnalyzer::getLeptonCorrection(float eta, float pt, hadronicTauDecayMode
 
   if(sampleName.find("Data")!=std::string::npos) return 1.0;
 
+   if(!h2DMuonIdCorrections) initializeCorrections();
+
   if(tauDecayMode == tauDecayMuon){
-
-    int iPtBin = h2DMuonIdCorrections->GetXaxis()->FindBin(pt);
-    int iEtaBin = h2DMuonIdCorrections->GetYaxis()->FindBin(eta);
-    float muon_id_scalefactor = h2DMuonIdCorrections->GetBinContent(iPtBin, iEtaBin);
-    float muon_iso_scalefactor = h2DMuonIsoCorrections->GetBinContent(iPtBin, iEtaBin);
-    float muon_trg_efficiency = h2DMuonTrgCorrections->GetBinContent(iPtBin, iEtaBin);
-
-    std::cout<<"HISTO muon_id_scalefactor*muon_iso_scalefactor*muon_trg_efficiency: "
-    << muon_id_scalefactor*muon_iso_scalefactor*muon_trg_efficiency
-    <<std::endl;
-
-    scaleWorkspace->var("m_pt")->setVal(pt);
-    scaleWorkspace->var("m_eta")->setVal(eta);
-    muon_id_scalefactor = scaleWorkspace->function("m_id_ratio")->getVal();
-    muon_iso_scalefactor = scaleWorkspace->function("m_iso_ratio")->getVal();
-    muon_trg_efficiency = scaleWorkspace->function("m_trgOR_data")->getVal();
-
-std::cout<<"FUNC muon_id_scalefactor*muon_iso_scalefactor*muon_trg_efficiency: "
-    << muon_id_scalefactor*muon_iso_scalefactor*muon_trg_efficiency
-    <<std::endl;
-
+    int iBin = h2DMuonIdCorrections->FindBin(pt, eta);
+    float muon_id_scalefactor = h2DMuonIdCorrections->GetBinContent(iBin);
+    float muon_iso_scalefactor = h2DMuonIsoCorrections->GetBinContent(iBin);
+    float muon_trg_efficiency = h2DMuonTrgCorrections->GetBinContent(iBin);
     return  muon_id_scalefactor*muon_iso_scalefactor*muon_trg_efficiency;
   }
   else if(tauDecayMode == tauDecaysElectron) return 1.0;

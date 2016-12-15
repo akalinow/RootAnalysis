@@ -35,11 +35,11 @@ TreeAnalyzer::TreeAnalyzer(const std::string & aName,
 
   parseCfg(cfgFileName_);
 
-  if(proofFile){   
+  if(proofFile){
     proofFile->SetOutputFileName((filePath_+"/RootAnalysis_"+sampleName_+".root").c_str());
     store_ = proofFile->OpenFile("RECREATE");
   }
-  else{ 
+  else{
     // Create histogram store
     std::string fullPath = filePath_+"/RootAnalysis_"+sampleName_+".root";
     store_ = new TFile(fullPath.c_str(),"RECREATE");
@@ -60,7 +60,7 @@ TreeAnalyzer::TreeAnalyzer(const std::string & aName,
   TDirectory *aDir = store_->mkdir("Statistics");
   hStats_->SetDirectory(aDir);
 
-  myStrSelections_ = new pat::strbitset(); 
+  myStrSelections_ = new pat::strbitset();
 
   myObjMessenger_ = new ObjectMessenger("ObjMessenger");
 
@@ -89,7 +89,7 @@ void TreeAnalyzer::scaleHistograms(){
   float weight = 1.0;
 
   for(unsigned int i=0;i<myAnalyzers_.size();++i){
-    std::string name = myAnalyzers_[i]->name();  
+    std::string name = myAnalyzers_[i]->name();
     TDirectory* summary = (TDirectory*)store_->Get(name.c_str());
     if(!summary){
       std::cout<<"Histogram directory for analyzer: "<<name.c_str()
@@ -100,17 +100,17 @@ void TreeAnalyzer::scaleHistograms(){
     TIter next(list);
     TObject *obj = 0;
     while ((obj = next())){
-      if(obj->IsA()->InheritsFrom("TH1")){ 
+      if(obj->IsA()->InheritsFrom("TH1")){
 	TH1 *h = (TH1*)summary->Get(obj->GetName());
 	if(h) h->Scale(weight);
       }
-      if(obj->IsA()->InheritsFrom("TDirectory")){ 
+      if(obj->IsA()->InheritsFrom("TDirectory")){
 	TDirectory* aDir = (TDirectory*)summary->Get(obj->GetName());
 	TList *listSubDir = aDir->GetList();
 	TIter next2(listSubDir);
 	TObject *obj2 = 0;
 	while ((obj2 = next2())){
-	  if(obj2->IsA()->InheritsFrom("TH1")){ 
+	  if(obj2->IsA()->InheritsFrom("TH1")){
 	    TH1 *h1 = (TH1*)aDir->Get(obj2->GetName());
 	    if(h1) h1->Scale(weight);
 	  }
@@ -137,16 +137,21 @@ void TreeAnalyzer::parseCfg(const std::string & cfgFileName){
     std::cout<<it<<std::endl;
     fileNames_.push_back(it);
   }
-  
+
   filePath_ = pt.get<std::string>("TreeAnalyzer.outputPath");
   sampleName_ = pt.get<std::string>("TreeAnalyzer.processName","Test");
-  
+
   nEventsToAnalyze_ = pt.get("TreeAnalyzer.eventsToAnalyze",-1);
   nEventsToPrint_ = pt.get("TreeAnalyzer.eventsToPrint",100);
   nThreads_ = pt.get("TreeAnalyzer.threads",1);
-  omp_set_num_threads(nThreads_);  
-  
-  
+
+  if(nThreads_>AnalysisHistograms::maxThreads-1){
+		std::cout<<"Number of threads exceeds maximum value of "
+		<< AnalysisHistograms::maxThreads-1
+		<<" will use the maximum value"<<std::endl;
+		nThreads_ = AnalysisHistograms::maxThreads-1;
+	}
+  omp_set_num_threads(nThreads_);
 }
 //////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////
@@ -159,28 +164,27 @@ void  TreeAnalyzer::init(std::vector<Analyzer*> myAnalyzers){
     mySummary_ = new SummaryAnalyzer("Summary");
     myAnalyzers_.push_back(mySummary_);
   }
-    
+
   for(unsigned int i=0;i<myAnalyzers_.size();++i){
     std::string analyzerName = myAnalyzers_[i]->name();
     TDirectory *analyzerDir = store_->mkdir(analyzerName.c_str());
     myAnalyzers_[i]->initialize(analyzerDir, myStrSelections_);
   }
 
-  
+
  for(unsigned int iThread=0;iThread<omp_get_max_threads();++iThread){
    myProxiesThread_[iThread] = myProxy_->clone();
    myProxiesThread_[iThread]->init(fileNames_);
     for(unsigned int iAnalyzer=0;iAnalyzer<myAnalyzers_.size();++iAnalyzer){
-      if(nThreads_==1 || iThread==0) myAnalyzersThreads_[iThread].push_back(myAnalyzers_[iAnalyzer]);
+      if(iThread==0) myAnalyzersThreads_[iThread].push_back(myAnalyzers_[iAnalyzer]);
       else myAnalyzersThreads_[iThread].push_back(myAnalyzers_[iAnalyzer]->clone());
     }
   }
 
  ///Tree making does not work with multithread.
  if(nThreads_==1){
-   unsigned int iThread = 0;
    for(unsigned int i=0;i<myAnalyzers_.size();++i){
-     myAnalyzers_[i]->addBranch(mySummary_->getTree());  
+     myAnalyzers_[i]->addBranch(mySummary_->getTree());
      myAnalyzers_[i]->addCutHistos(mySummary_->getHistoList());
    }
  }
@@ -203,12 +207,12 @@ int TreeAnalyzer::loop(){
   if(nEventsToAnalyze_<0 || nEventsToAnalyze_>myProxy_->size()) nEventsToAnalyze_ = myProxy_->size();
   int eventPreviouslyPrinted=-1;
 
-  myProxiesThread_[0]->toBegin();  
+  myProxiesThread_[0]->toBegin();
 
   unsigned int eventCount[nThreads_]{0};
-  
+
   #pragma omp parallel for schedule(dynamic)
-    for(unsigned int aEvent=0;aEvent<nEventsToAnalyze_;++aEvent){      
+    for(unsigned int aEvent=0;aEvent<nEventsToAnalyze_;++aEvent){
       if(aEvent< nEventsToPrint_ || aEvent%printoutStep==0)
 	std::cout<<"Events analyzed: "<<aEvent<<"/"<<nEventsToAnalyze_
 		 <<" ("<<(float)aEvent/nEventsToAnalyze_<<")"
@@ -218,13 +222,13 @@ int TreeAnalyzer::loop(){
     }
 
     for(auto it: eventCount) nEventsAnalyzed_+=it;
-    
-    return nEventsAnalyzed_;   
+
+    return nEventsAnalyzed_;
 }
 //////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////
 bool TreeAnalyzer::analyze(const EventProxyBase& iEvent){
-  
+
   for(unsigned int i=0;i<myAnalyzers_.size();++i){
     myAnalyzersThreads_[omp_get_thread_num()][i]->analyze(iEvent,myObjMessenger_);
   }

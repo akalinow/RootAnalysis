@@ -3,6 +3,7 @@
 
 #include "RooAbsReal.h"
 #include "RooRealVar.h"
+#include "RooFormulaVar.h"
 
 #include "HTTAnalyzer.h"
 #include "HTTHistograms.h"
@@ -22,17 +23,13 @@ HTTAnalyzer::HTTAnalyzer(const std::string & aName):Analyzer(aName){
   filePath = "MC_Spring16_PU25ns_V1.root";
   puMCFile_ = new TFile(filePath.c_str());
 
-#pragma omp critical
-  {
-    filePath = "htt_scalefactors_v5.root";
-    TFile aFile(filePath.c_str());
-    scaleWorkspace = (RooWorkspace*)aFile.Get("w")->Clone("w");
-    initializeCorrections();
-    aFile.Close();
-  }
-
   ntupleFile_ = 0;
   hStatsFromFile = 0;
+
+  h2DMuonIdCorrections = 0;
+  h2DMuonIsoCorrections = 0;
+  h2DMuonTrgCorrections = 0;
+  h3DTauCorrections = 0;
 }
 //////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////
@@ -41,7 +38,11 @@ HTTAnalyzer::~HTTAnalyzer(){
   if(myHistos_) delete myHistos_;
   if(puDataFile_) delete puDataFile_;
   if(puMCFile_) delete puMCFile_;
-  if(scaleWorkspace) delete scaleWorkspace;
+
+if(h2DMuonIdCorrections) delete h2DMuonIdCorrections;
+if(h2DMuonIsoCorrections) delete h2DMuonIsoCorrections;
+if(h2DMuonTrgCorrections) delete h2DMuonTrgCorrections;
+if(h3DTauCorrections) delete h3DTauCorrections;
 
 }
 //////////////////////////////////////////////////////////////////////////////
@@ -66,23 +67,32 @@ void HTTAnalyzer::initialize(TDirectory* aDir,
 //////////////////////////////////////////////////////////////////////////////
 void HTTAnalyzer::initializeCorrections(){
 
+#pragma omp critical
+{
+  std::string filePath = "htt_scalefactors_v5.root";
+  TFile aFile(filePath.c_str());
+  RooWorkspace *scaleWorkspace = (RooWorkspace*)aFile.Get("w");
+
   RooAbsReal *muon_id_scalefactor = scaleWorkspace->function("m_id_ratio");
   RooAbsReal *muon_iso_scalefactor = scaleWorkspace->function("m_iso_ratio");
   RooAbsReal *muon_trg_efficiency = scaleWorkspace->function("m_trgOR_data");//OR of the HLT_IsoMu22 and HLT_IsoTkMu22
   //RooAbsReal *tau_id_scalefactor = scaleWorkspace->function("t_iso_mva_m_pt30_sf");
 
   h2DMuonIdCorrections = (TH2F*)muon_id_scalefactor->createHistogram("h2DMuonIdCorrections",
-  *scaleWorkspace->var("m_pt"),RooFit::Binning(0,300,5),
-  RooFit::YVar(*scaleWorkspace->var("m_eta"),RooFit::Binning(-2.1,2.1,10)));
+  *scaleWorkspace->var("m_pt"),RooFit::Binning(300,0,300),
+  RooFit::YVar(*scaleWorkspace->var("m_eta"),RooFit::Binning(10,-2.1,2.1)),
+  RooFit::Scaling(kFALSE));
 
-  h2DMuonIsoCorrections = (TH2F*)muon_iso_scalefactor->createHistogram("h2DMuonIdCorrections",
-  *scaleWorkspace->var("m_pt"),RooFit::Binning(0,300,5),
-  RooFit::YVar(*scaleWorkspace->var("m_eta"),RooFit::Binning(-2.1,2.1,10)));
+  h2DMuonIsoCorrections = (TH2F*)muon_iso_scalefactor->createHistogram("h2DMuonIsoCorrections",
+  *scaleWorkspace->var("m_pt"),RooFit::Binning(300,0,300),
+  RooFit::YVar(*scaleWorkspace->var("m_eta"),RooFit::Binning(10,-2.1,2.1)),
+  RooFit::Scaling(kFALSE));
 
-  h2DMuonTrgCorrections = (TH2F*)muon_trg_efficiency->createHistogram("h2DMuonIdCorrections",
-  *scaleWorkspace->var("m_pt"),RooFit::Binning(0,300,5),
-  RooFit::YVar(*scaleWorkspace->var("m_eta"),RooFit::Binning(-2.1,2.1,10)));
-
+  h2DMuonTrgCorrections = (TH2F*)muon_trg_efficiency->createHistogram("h2DMuonTrgCorrections",
+  *scaleWorkspace->var("m_pt"),RooFit::Binning(300,0,300),
+  RooFit::YVar(*scaleWorkspace->var("m_eta"),RooFit::Binning(10,-2.1,2.1)),
+  RooFit::Scaling(kFALSE));
+}
 }
 //////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////

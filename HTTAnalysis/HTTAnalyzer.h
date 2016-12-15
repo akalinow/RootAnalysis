@@ -98,15 +98,15 @@ class HTTAnalyzer: public Analyzer{
     else if(iCategory==(int)HTTAnalyzer::vbf_high) return "vbf_high";
     else if(iCategory==(int)HTTAnalyzer::W) return "W";
     else if(iCategory==(int)HTTAnalyzer::TT) return "TT";
-    else if(iCategory==(int)HTTAnalyzer::jet0) return "jet0";
+    else if(iCategory==(int)HTTAnalyzer::jet0) return "0jet";
     else if(iCategory==(int)HTTAnalyzer::boosted) return "boosted";
     else if(iCategory==(int)HTTAnalyzer::vbf) return "vbf";
     else if(iCategory==(int)HTTAnalyzer::CP_Pi) return "CP_Pi";
     else if(iCategory==(int)HTTAnalyzer::CP_Rho) return "CP_Rho";
-    else if(iCategory==(int)HTTAnalyzer::wjets_jet0) return "wjets_jet0";
+    else if(iCategory==(int)HTTAnalyzer::wjets_jet0) return "wjets_0jet";
     else if(iCategory==(int)HTTAnalyzer::wjets_boosted) return "wjets_boosted";
     else if(iCategory==(int)HTTAnalyzer::wjets_vbf) return "wjets_vbf";
-    else if(iCategory==(int)HTTAnalyzer::antiiso_jet0) return "antiiso_jet0";
+    else if(iCategory==(int)HTTAnalyzer::antiiso_jet0) return "antiiso_0jet";
     else if(iCategory==(int)HTTAnalyzer::antiiso_boosted) return "antiiso_boosted";
     else if(iCategory==(int)HTTAnalyzer::antiiso_vbf) return "antiiso_vbf";
     return "Unknown";
@@ -246,9 +246,6 @@ class HTTAnalyzer: public Analyzer{
   ///Histograms with lepton corrections
   TH2F *h2DMuonIdCorrections, *h2DMuonIsoCorrections, *h2DMuonTrgCorrections;
   TH3F *h3DTauCorrections;
-
-  ///RootWorskapce with lepton corrections
-  RooWorkspace *scaleWorkspace;
 
   ///Vector of PU histograms for MC samples
   std::vector<TH1F*> hPUVec_;
