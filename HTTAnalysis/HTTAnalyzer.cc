@@ -165,6 +165,7 @@ void HTTAnalyzer::fillControlHistos(const std::string & hNameSuffix, float event
   myHistos_->fill2DUnrolledHistogram("h1DUnRollHiggsPtMassSV"+hNameSuffix, aPair.getP4(aSysEffect).M(), higgsPt, eventWeight);
   myHistos_->fill2DUnrolledHistogram("h1DUnRollMjjMassSV"+hNameSuffix, aPair.getP4(aSysEffect).M(), jetsMass, eventWeight);
 
+  fillDecayPlaneAngle(hNameSuffix, eventWeight);
   if(aSysEffect!=sysEffects::NOMINAL_SVFIT) return;
 
   ///Fill histograms with number of PV.
@@ -201,7 +202,6 @@ void HTTAnalyzer::fillControlHistos(const std::string & hNameSuffix, float event
     myHistos_->fill1DHistogram("h1DPtLeadingBJet"+hNameSuffix,aJet1.getP4(aSysEffect).Pt(),eventWeight);
     myHistos_->fill1DHistogram("h1DEtaLeadingBJet"+hNameSuffix,aJet1.getP4(aSysEffect).Eta(),eventWeight);
   }
-  fillDecayPlaneAngle(hNameSuffix, eventWeight);
 }
 //////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////
@@ -379,6 +379,10 @@ bool HTTAnalyzer::analyze(const EventProxyBase& iEvent){
 
       categorySuffix = std::to_string(iCategory);
       systEffectName = HTTAnalyzer::systEffectName(iSystEffect);
+      if(systEffectName.find("CAT")!=std::string::npos){
+        std::string categoryName = HTTAnalyzer::categoryName(iCategory);
+        systEffectName.replace(systEffectName.find("CAT"),3,categoryName);
+      }
 
       if(OS && muonIso){
 	hNameSuffix = sampleName+"_OS_"+categorySuffix+systEffectName;

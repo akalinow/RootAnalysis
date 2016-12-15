@@ -1001,6 +1001,10 @@ THStack*  HTTHistograms::plotStack(unsigned int iCategory,
   std::string categoryName = HTTAnalyzer::categoryName(iCategory);
   std::string systEffectName = HTTAnalyzer::systEffectName(iSystEffect);
 
+  if(systEffectName.find("CAT")!=std::string::npos){
+    systEffectName.replace(systEffectName.find("CAT"),3,categoryName);
+  }
+
   std::string hNameSuffix =  "_"+selName+"_"+std::to_string(iCategory);
   hNameSuffix+=systEffectName;
 
