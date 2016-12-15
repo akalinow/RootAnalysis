@@ -26,8 +26,30 @@ float HTTHistograms::getLumi(){
   float run2015D = 2114239169.533*1E-6;
 
   //./.local/bin/brilcalc lumi --normtag /afs/cern.ch/user/l/lumipro/public/normtag_file/normtag_DATACERT.json -i processedLumis_SingleMuon.json
-  return 36446609816.686*1E-6;//pb-1 data for NTUPLES_05_12_2016
 
+  float run2016BPromptReco = 5923961370.727;
+  float run2016BReReco = 5933308579.501;
+
+  float run2016CPromptReco = 2645968083.093;
+  float run2016CReReco = 2645968083.093;
+
+  float run2016DPromptReco = 4353448810.554;
+  float run2016DReReco = 4353448810.554;
+
+  float run2016EReReco = 4049255306.406;
+  float run2016FReReco = 3160088401.247;
+  float run2016GReReco = 7554453635.136;
+
+  float run2016HPromptReco_v2 = 8545039541.475;
+  float run2016HPromptReco_v3 = 216782873.203;
+  
+  float run2016 = run2016BReReco + run2016CReReco +
+    run2016DReReco + run2016EReReco +
+    run2016FReReco + run2016GReReco +
+    run2016HPromptReco_v2 + run2016HPromptReco_v3;
+  
+  return run2016*1E-6;//pb-1 data for NTUPLES_05_12_2016  
+  //return 36446609816.686*1E-6;//pb-1 data for NTUPLES_05_12_2016
 }
 /////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////
@@ -168,7 +190,8 @@ TH1F *HTTHistograms::get1D_EWK2JetsSum(const std::string& name){
   return get1D_SumPattern_Histogram(name, "EWK2Jets", ewkSamples);
 
 }
-/////////////////////////////////////////////////////////                                                                                                          /////////////////////////////////////////////////////////
+/////////////////////////////////////////////////////////
+/////////////////////////////////////////////////////////
 TH1F *HTTHistograms::get1D_TauMatchJetSum(const std::string& name, bool sumDecayModes, bool sumJetBins){
 
   std::vector<std::string> decayNames = {"MatchL", "MatchJ", "MatchT"};
@@ -449,8 +472,8 @@ void HTTHistograms::defineHistograms(){
    ///2D CP histograms
    vector<double> phiBins;
    for(unsigned int iBin=0;iBin<=12;++iBin) phiBins.push_back(iBin*2.0*M_PI/12);
-   addRollHistogram("h1DUnRollMassSVPhiCPTemplate","Phi CP vs SV Mass; Events",phiBins, svMassBins, file_);
-   addRollHistogram("h1DUnRollMassSVYCPTemplate","Phi_Y CP vs SV Mass; Events", phiBins, svMassBins, file_);
+   addRollHistogram("h1DUnRollMassSVPhiCPTemplate","#phi_{IP,IP} CP vs SV Mass; Events;#phi_{IP,IP} CP",phiBins, svMassBins, file_);
+   addRollHistogram("h1DUnRollMassSVYCPTemplate","#phi_{IP,#rho} CP vs SV Mass; Events;#phi_{IP,#rho} CP", phiBins, svMassBins, file_);
 
    addProfile("hProfVsMagTemplate","",10,0,0.015,file_);
    addProfile("hProfVsPtTemplate","",20,15,55,file_);
@@ -464,15 +487,7 @@ void HTTHistograms::defineHistograms(){
 void HTTHistograms::finalizeHistograms(int nRuns, float weight){
 
   AnalysisHistograms::finalizeHistograms();
-  /*
-  int iCategory = 6;
-  std::string hName = "h1DMassSV";
-  std::string hNameSuffix =  "_OS_"+std::to_string(iCategory);
-  std::string categoryName = HTTAnalyzer::categoryName(iCategory);
-  TH1F *h = get1DHistogram((hName+"TTbar"+hNameSuffix).c_str(),true);
-  h->Print();
-  return;
-  */
+
   ////Code below tests W+n jets normalisation
   ///Samples split into jet multiplicity are compared to
   ///inclusive sample.
@@ -551,7 +566,7 @@ void HTTHistograms::finalizeHistograms(int nRuns, float weight){
     plotStack(iCategory, "nPCAMuon");
     plotStack(iCategory, "nPCATau");
     plotStack(iCategory, "Phi-nVectors");
-    plotStack(iCategory, "Phi-nVecIP_");
+    plotStack(iCategory, "Phi-nVecIP");
     plotStack(iCategory, "NPV");
     
     prepareOutputHistos(iCategory);
@@ -569,6 +584,8 @@ void HTTHistograms::plotCPhistograms(unsigned int iCategory){
 
   hNameSuffix =  "_OS_"+std::to_string(iCategory);
 
+  //plot_HAZ_Histograms("Phi-nVecIP-yTauNeg",hNameSuffix+"_Gen");
+  //plot_HAZ_Histograms("Phi-nVecIP-yTauPos",hNameSuffix+"_Gen");
   plot_HAZ_Histograms("Phi-nVecIP",hNameSuffix+"_Gen");
   plot_HAZ_Histograms("Phi-nVectors",hNameSuffix+"_Gen");
 
@@ -607,8 +624,9 @@ void HTTHistograms::plotnPCA(const std::string & type){
   TH1F* h1DMuon = 0;
 
   if(type.find("DYJets")!=std::string::npos){
-    h1DTau = get1D_DYJet_Histogram("h1DnPCATau"+type);
-    h1DMuon = get1D_DYJet_Histogram("h1DnPCAMuon"+type);
+    std::string typeztt="DYJetsMatchT"+type.substr(type.find("DYJets")+6);
+    h1DTau = get1D_TauMatchJetSum(("h1DnPCATau"+typeztt).c_str(),false,true);
+    h1DMuon = get1D_TauMatchJetSum(("h1DnPCAMuon"+typeztt).c_str(),false,true);
   }
   else if(type.find("WJets")!=std::string::npos){
     h1DTau = get1D_WJet_Histogram("h1DnPCATau"+type);
@@ -737,7 +755,7 @@ void HTTHistograms::plotProfiles(const std::string & hName,
 				 const std::string & sysType){
 
   TProfile* h1DAOD = this->getProfile(hName+sysType+"_AODPV");
-  //TProfile* h1DGen = this->getProfile(hName+sysType+"GenNoOfflineSel");
+  //TProfile* h1DGen = this->getProfile(hName+sysType+"_GenNoOfflineSel");
   TProfile* h1DGen = this->getProfile(hName+sysType+"_GenPV");
   TProfile* h1DRefit = this->getProfile(hName+sysType+"_RefitPV");
 
@@ -820,23 +838,43 @@ void HTTHistograms::plotPhiDecayPlanes(const std::string & name){
 
   TString hName = "h1D"+name+"_RefitPV";
   TH1F* h1DRefitPV = 0;
-  if(name.find("DYJets")!=std::string::npos) h1DRefitPV = get1D_DYJet_Histogram(hName.Data());
+  if(name.find("DYJets")!=std::string::npos) {
+    std::string n2=name;
+    n2.insert(n2.find("DYJets")+6,"MatchT");
+    hName = "h1D"+n2+"_RefitPV";
+    h1DRefitPV = get1D_TauMatchJetSum(hName.Data(),false,true);
+  }
   else h1DRefitPV = get1DHistogram(hName.Data());
 
   hName = "h1D"+name+"_AODPV";
   TH1F* h1DAODPV = 0;
-  if(name.find("DYJets")!=std::string::npos) h1DAODPV = get1D_DYJet_Histogram(hName.Data());
+  if(name.find("DYJets")!=std::string::npos) {
+    std::string n2=name;
+    n2.insert(n2.find("DYJets")+6,"MatchT");
+    hName = "h1D"+n2+"_AODPV";
+    h1DAODPV = get1D_TauMatchJetSum(hName.Data(),false,true);
+  }
   else h1DAODPV = get1DHistogram(hName.Data());
 
   hName = "h1D"+name+"_GenPV";
   TH1F* h1DGenPV = 0;
-  if(name.find("DYJets")!=std::string::npos) h1DGenPV = get1D_DYJet_Histogram(hName.Data());
+  if(name.find("DYJets")!=std::string::npos) {
+    std::string n2=name;
+    n2.insert(n2.find("DYJets")+6,"MatchT");
+    hName = "h1D"+n2+"_GenPV";
+    h1DGenPV = get1D_TauMatchJetSum(hName.Data(),false,true);
+  }
   else h1DGenPV = get1DHistogram(hName.Data());
 
   //hName = "h1D"+name+"_GenNoOfflineSel";
   TH1F* h1DGen = 0;
-  //TH1F* h1DGen = get1DHistogram(hName.Data());
-  //if(name.find("DYJets")!=std::string::npos) h1DGen = get1D_DYJet_Histogram(hName.Data());
+  //if(name.find("DYJets")!=std::string::npos) {
+  //  std::string n2=name;
+  //  n2.insert(n2.find("DYJets")+6,"MatchT");
+  //  hName = "h1D"+n2+"_GenNoOfflineSel";
+  //  h1DGen = get1D_TauMatchJetSum(hName.Data(),false,true);
+  //}
+  //else h1DGen = get1DHistogram(hName.Data());
 
   if(h1DGen){
     h1DGen->SetLineWidth(4);
@@ -912,8 +950,8 @@ void HTTHistograms::plot_HAZ_Histograms(const std::string & hName,
   TH1F* h_h = this->get1DHistogram(name.Data());
   name = "h1D"+hName+"A"+sysType;
   TH1F* h_A = this->get1DHistogram(name.Data());
-  name = "h1D"+hName+"DYJets"+sysType;
-  TH1F* h_Z = get1D_DYJet_Histogram(name.Data());
+  name = "h1D"+hName+"DYJetsMatchT"+sysType;
+  TH1F* h_Z = get1D_TauMatchJetSum(name.Data(),false,true);
 
   if(!h_h || !h_A || !h_Z) return;
 
@@ -1370,7 +1408,7 @@ THStack*  HTTHistograms::plotStack(unsigned int iCategory, std::string varName, 
   float highEnd = 170;
   float lowEnd = -150;
 
-  if(varName.find("Phi_")!=std::string::npos) lowEnd = 0;
+  if(varName.find("Phi-")!=std::string::npos) lowEnd = 0;
 
   int binHigh = hs->GetXaxis()->FindBin(highEnd);
   int binLow = hs->GetXaxis()->FindBin(lowEnd);

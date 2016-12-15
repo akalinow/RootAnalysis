@@ -232,6 +232,9 @@ class HTTAnalyzer: public Analyzer{
   int nJetsInGap30;
   std::vector<bool> categoryDecisions;
 
+  //cut on nPCA
+  const float nPCAMin_;
+
 };
 
 #endif
