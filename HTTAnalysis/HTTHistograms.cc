@@ -518,7 +518,7 @@ void HTTHistograms::finalizeHistograms(int nRuns, float weight){
   //////////////
   ///Control regions plots
   ttScale = 1.0;
-
+//TEST
   for(unsigned int iCategory = (int)HTTAnalyzer::jet0;
       iCategory<(int)HTTAnalyzer::DUMMY;++iCategory){
 
@@ -538,7 +538,12 @@ void HTTHistograms::finalizeHistograms(int nRuns, float weight){
     plotStack(iCategory, "UnRollMassSVPhiCP");
     plotStack(iCategory, "UnRollMassSVYCP");
     plotStack(iCategory, "MassTrans");
-
+    
+    if(HTTAnalyzer::categoryName(iCategory).find("antiiso")!=std::string::npos){
+        plotStack(iCategory, "MassVis", "OSnoMuIso");
+        plotStack(iCategory, "MassSV", "OSnoMuIso");
+        }
+        
     plotStack(iCategory, "PtMuon");
     plotStack(iCategory, "EtaMuon");
     plotStack(iCategory, "IsoMuon");
@@ -1268,8 +1273,8 @@ THStack*  HTTHistograms::plotStack(unsigned int iCategory, std::string varName, 
   weight = getSampleNormalisation(sampleName);
   scale = weight*lumi;
   hWplusHiggs130->Scale(scale);
-
-  //////////Sum of WH histos needed for further analysis in combine
+  
+  //join Wplus and Wminus processes////////////////////
   TH1F *hWHiggs120 = hWplusHiggs120;
   hWHiggs120->Add(hWminusHiggs120);
   hWHiggs120->SetName((hName+"WH120"+hNameSuffix).c_str());
@@ -1282,7 +1287,7 @@ THStack*  HTTHistograms::plotStack(unsigned int iCategory, std::string varName, 
   hWHiggs120->SetDirectory(hSoup->GetDirectory());
   hWHiggs125->SetDirectory(hSoup->GetDirectory());
   hWHiggs130->SetDirectory(hSoup->GetDirectory());
-  /////////
+  /////////////////////////////////////////////////////
 
   hHiggs->Add(hggHiggs125);
   hHiggs->Add(hqqHiggs125);
@@ -1673,6 +1678,7 @@ TH1F* HTTHistograms::getQCDbackground(unsigned int iCategory,
 
   std::string hName = "h1D" + varName;
   std::string hNameSuffix =  "_SS_"+std::to_string(iCategory);
+  if(HTTAnalyzer::categoryName(iCategory).find("antiiso")!=std::string::npos) hNameSuffix.replace(hNameSuffix.find("_SS_"),4,"_SSnoMuIso_");
   // SS selection
   TH1F *hWJets = get1D_WJet_Histogram((hName+"WJets"+hNameSuffix).c_str());
   TH1F *hDYJetsLowM = get1D_DYJet_Histogram((hName+"DYLowM"+hNameSuffix).c_str());

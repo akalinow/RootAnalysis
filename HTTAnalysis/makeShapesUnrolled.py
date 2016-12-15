@@ -31,8 +31,9 @@ categoryNames = [
                  "muTau_0jet_low", "muTau_0jet_high",
                  "muTau_1jet_low", "muTau_1jet_high",
                  "muTau_vbf_low",  "muTau_vbf_high",
-                 "mt_0jet", "mt_0jetCP", 
+                 "mt_0jet", 
                  "mt_boosted", "mt_vbf",
+                 "mt_CP_Phi", "mt_CP_Rho",
                  "mt_wjets_0jet_cr", 
                  "mt_wjets_boosted_cr", "mt_wjets_vbf_cr",
                  "mt_antiiso_0jet_cr", 
@@ -86,7 +87,7 @@ def getSingleNPHistos(prefix, np, histo):
     
     hUp = WAW_file.Get(prefix+np+"Up")
     if hUp==None :
-        print prefix+np+"Up/Down"
+        print prefix+np+"Up/Down are missing"
         hUp = histo.Clone()
         
     hDown = WAW_file.Get(prefix+np+"Down")
@@ -103,7 +104,7 @@ def getDoubleNPHistos(prefix, np1, np2, histo):
 
     hUpUp = WAW_file.Get(prefix+np1+"Up"+np2+"Up")
     if hUpUp==None :
-        print prefix+np1+"Up/Down"+np2+"Up/Down"
+        #print prefix+np1+"Up/Down"+np2+"Up/Down"
         hUpUp = histo.Clone()
         
     hUpDown = WAW_file.Get(prefix+np1+"Up"+np2+"Down")
@@ -270,10 +271,13 @@ for iCategory in xrange(0,len(categoryNames)):
     categoryDirMade=True
     
     for key,value in histogramsMap.iteritems():
-        hName = histoPrefix[categoryName] + key+"_"+str(iCategory)
+        hName = histoPrefix[categoryName] + key
+        if categoryName.count("antiiso")>0 and value!="QCD": 
+            hName = hName+"noMuIso"
+        hName = hName +"_"+str(iCategory)
         histogram = WAW_file.Get(hName)
         if(histogram==None):
-            print hName#,"is missing"
+            print hName, " is missing"
             histogram = TH1F(value,"",nbins[categoryName][0],nbins[categoryName][1],nbins[categoryName][2])
         histogram.SetName(value)
         histogram.Write()
