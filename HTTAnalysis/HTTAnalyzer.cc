@@ -147,18 +147,6 @@ void HTTAnalyzer::setAnalysisObjects(const EventProxyHTT & myEventProxy){
   aSeparatedJets = getSeparatedJets(myEventProxy, 0.5);
   aJet1 = aSeparatedJets.size() ? aSeparatedJets[0] : HTTParticle();
   aJet2 = aSeparatedJets.size()>1 ? aSeparatedJets[1] : HTTParticle();
-  nJets30 = count_if(aSeparatedJets.begin(), aSeparatedJets.end(),[](const HTTParticle & aJet){return aJet.getP4().Pt()>30;});
-  nJetsInGap30 = 0;
-  if(nJets30>=2){
-    for(unsigned int iJet=2; iJet<aSeparatedJets.size(); ++iJet){
-      if( (aSeparatedJets.at(iJet).getP4().Eta()>aJet1.getP4().Eta()&&aSeparatedJets.at(iJet).getP4().Eta()<aJet2.getP4().Eta()) ||
-          (aSeparatedJets.at(iJet).getP4().Eta()<aJet1.getP4().Eta()&&aSeparatedJets.at(iJet).getP4().Eta()>aJet2.getP4().Eta()) ){
-        if(aSeparatedJets.at(iJet).getP4().Pt()>30) nJetsInGap30++;
-      }
-    }
-  }
-
-  categoryDecisions.clear();
 }
 //////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////
@@ -266,9 +254,23 @@ bool HTTAnalyzer::passCategory(const HTTAnalyzer::muTauCategory & aCategory,
   if(categoryDecisions.size()) categoryDecisions.clear();
   else categoryDecisions = std::vector<bool>((int)HTTAnalyzer::DUMMY);
 
+  nJets30 = 0;
+  for(auto itJet:aSeparatedJets){
+    if(itJet.getP4(aSysEffect).Pt()>30) ++nJets30;
+  }
+
+  nJetsInGap30 = 0;
+  if(nJets30>=2){
+    for(unsigned int iJet=2; iJet<aSeparatedJets.size(); ++iJet){
+      if( (aSeparatedJets.at(iJet).getP4().Eta()>aJet1.getP4().Eta()&&aSeparatedJets.at(iJet).getP4().Eta()<aJet2.getP4().Eta()) ||
+          (aSeparatedJets.at(iJet).getP4().Eta()<aJet1.getP4().Eta()&&aSeparatedJets.at(iJet).getP4().Eta()>aJet2.getP4().Eta()) ){
+        if(aSeparatedJets.at(iJet).getP4(aSysEffect).Pt()>30) nJetsInGap30++;
+      }
+    }
+  }
+
   float jetsMass = (aJet1.getP4(aSysEffect)+aJet2.getP4(aSysEffect)).M();
   float higgsPt =  (aTau.getP4(aSysEffect) + aTau.getP4(aSysEffect) + aMET.getP4(aSysEffect)).Pt();
-
   bool mtSelection = aPair.getMTMuon(aSysEffect)<50;
 
   bool jet0_low =  aTau.getP4(aSysEffect).Pt()>20  && aTau.getP4(aSysEffect).Pt()<50 && nJets30==0;
@@ -408,7 +410,7 @@ bool HTTAnalyzer::analyze(const EventProxyBase& iEvent){
     aMET.setP4(met4v);
 
 
-    for(unsigned int iCategory = HTTAnalyzer::jet0;iCategory<HTTAnalyzer::DUMMY;++iCategory){
+    for(unsigned int iCategory = HTTAnalyzer::jet0;iCategory<HTTAnalyzer::CP_Pi;++iCategory){
       HTTAnalyzer::muTauCategory categoryType = static_cast<HTTAnalyzer::muTauCategory>(iCategory);
 
       if(!passCategory(categoryType, aSystEffect)) continue;

@@ -209,6 +209,7 @@ namespace sysEffects{
 
 enum sysEffectsEnum{NOMINAL, NOMINAL_SVFIT,
 		    TESUp, TESDown,
+        JESUp, JESDown,
 		    M2TUp, M2TDown,
 		    E2TUp, E2TDown,
 		    J2TUp, J2TDown,

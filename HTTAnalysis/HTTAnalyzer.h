@@ -117,6 +117,8 @@ class HTTAnalyzer: public Analyzer{
    else if(iSystEffect==(int)sysEffects::NOMINAL_SVFIT) return "";
    else if(iSystEffect==(int)sysEffects::TESUp) return "_CMS_shape_t_mt_13TeVUp";
    else if(iSystEffect==(int)sysEffects::TESDown) return "_CMS_shape_t_mt_13TeVDown";
+   else if(iSystEffect==(int)sysEffects::JESUp) return "_CMS_scale_j_13TeVUp";
+   else if(iSystEffect==(int)sysEffects::JESDown) return "_CMS_scale_j_13TeVDown";
    else if(iSystEffect==(int)sysEffects::M2TUp) return "_CMS_htt_ZLShape_mt_13TeVUp";
    else if(iSystEffect==(int)sysEffects::M2TDown) return "_CMS_htt_ZLShape_mt_13TeVDown";
    else if(iSystEffect==(int)sysEffects::E2TUp) return "_CMS_htt_ZLShape_et_13TeVUp";

@@ -88,6 +88,12 @@ TLorentzVector HTTParticle::getSystScaleP4(sysEffects::sysEffectsEnum type) cons
     if(type==sysEffects::M2TDown) MES*=-1;
     return getShiftedP4(1+MES);
   }
+  if(abs(getPDGid())==98){
+    if(type!=sysEffects::JESUp && type!=sysEffects::JESDown) return p4;
+    float JES = getProperty(PropertyEnum::jecUnc);
+    if(type==sysEffects::JESDown) JES*=-1;
+    return getShiftedP4(1+JES); 
+  }
   return p4;
 }
 ////////////////////////////////////////////////

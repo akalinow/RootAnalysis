@@ -79,7 +79,7 @@ nuisanceParams = {
     "QCDSFUncert_13TeV":(("mt_",""),("0jet_","vbf_","boosted_")),
     "WSFUncert_13TeV":(("mt_",""),("0jet_","vbf_","boosted_")),
     "CMS_scale_gg_13TeV":(("",""),("","")),
-    "CMS_htt_zmumuShape_13TeV":(("",""),("vbf_","boosted_","VBF_")),
+    "CMS_htt_zmumuShape_13TeV":(("",""),("0jet_","vbf_","boosted_")),
     }
 
 def getSingleNPHistos(prefix, np, histo):

@@ -467,6 +467,31 @@ void AnalysisHistograms::init(TDirectory *myDir,
 //////////////////////////////////////////////////////////////////////////////
 void AnalysisHistograms::finalizeHistograms(){
 
+///Add histograms missing in thread 0 map.
+  for(unsigned int iThread = 1;iThread<omp_get_max_threads();++iThread){
+    for(auto it:my1Dhistograms_[iThread]){
+      if(my1Dhistograms_[0].find(it.first)==my1Dhistograms_[0].end()){
+        TH1F *hEmpty = (TH1F*)it.second->Clone();
+        hEmpty->Clear();
+        my1Dhistograms_[0][it.first] = hEmpty;
+      }
+    }
+    for(auto it:my2Dhistograms_[iThread]){
+      if(my2Dhistograms_[0].find(it.first)==my2Dhistograms_[0].end()){
+        TH2F *hEmpty = (TH2F*)it.second->Clone();
+        hEmpty->Clear();
+        my2Dhistograms_[0][it.first] = hEmpty;
+      }
+    }
+    for(auto it:my3Dhistograms_[iThread]){
+        if(my3Dhistograms_[0].find(it.first)==my3Dhistograms_[0].end()){
+          TH3F *hEmpty = (TH3F*)it.second->Clone();
+          hEmpty->Clear();
+          my3Dhistograms_[0][it.first] = hEmpty;
+        }
+      }
+    }
+
   for(unsigned int iThread = 1;iThread<omp_get_max_threads();++iThread){
     if(my1Dhistograms_[0].size()!=my1Dhistograms_[iThread].size()){
       std::cout<<"1D histogram size mismatch. "
@@ -513,11 +538,7 @@ void AnalysisHistograms::clear(){
 }
 //////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////
-void AnalysisHistograms::write(){
-
-  finalizeHistograms();
-
-}
+void AnalysisHistograms::write(){ }
 //////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////
 double* AnalysisHistograms::equalRanges(int nSteps, double min, double max, double *ranges){
