@@ -266,6 +266,7 @@ float HTTAnalyzer::getLeptonCorrection(float eta, float pt, hadronicTauDecayMode
     float muon_id_scalefactor = h2DMuonIdCorrections->GetBinContent(iBin);
     float muon_iso_scalefactor = h2DMuonIsoCorrections->GetBinContent(iBin);
     float muon_trg_efficiency = h2DMuonTrgCorrections->GetBinContent(iBin);
+
     return  muon_id_scalefactor*muon_iso_scalefactor*muon_trg_efficiency;
   }
   else if(tauDecayMode == tauDecaysElectron) return 1.0;

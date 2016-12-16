@@ -6,7 +6,8 @@
 
 //////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////
-void HTTAnalyzer::fillDecayPlaneAngle(const std::string & hNameSuffix, float eventWeight){
+void HTTAnalyzer::fillDecayPlaneAngle(const std::string & hNameSuffix, float eventWeight,
+                                      const sysEffects::sysEffectsEnum & aSystEffect){
 
   ///Method from http://arxiv.org/abs/1108.0670 (S. Berge)
   ///take impact parameters instead of tau momentum.
@@ -50,16 +51,13 @@ void HTTAnalyzer::fillDecayPlaneAngle(const std::string & hNameSuffix, float eve
 			 tauPCA.Vect().Mag(),
 			 eventWeight);
 
-  ///////////////////////////////////////////////////////////
-  sysEffects::sysEffectsEnum sysType = sysEffects::NOMINAL_SVFIT;
-
   float yTau =  2.*tauLeadingTk.Pt()/aTau.getP4().Pt() - 1.;
   float shiftedIPrho = anglesIPRho.first +(yTau<0)*(1-2*(anglesIPRho.first>M_PI))*M_PI;
 
   if(aTau.getProperty(PropertyEnum::decayMode)!=tauDecay1ChargedPion0PiZero && isOneProng(aTau.getProperty(PropertyEnum::decayMode))){
      myHistos_->fill1DHistogram("h1DyTau"+hNameSuffix,yTau,eventWeight);
      myHistos_->fill1DHistogram("h1DPhi-nVecIP"+hNameSuffix,shiftedIPrho,eventWeight);
-     myHistos_->fill2DUnrolledHistogram("h1DUnRollMassSVYCP"+hNameSuffix, shiftedIPrho, aPair.getP4(sysType).M(),eventWeight);
+     myHistos_->fill2DUnrolledHistogram("h1DUnRollMassSVYCP"+hNameSuffix, shiftedIPrho, aPair.getP4(aSystEffect).M(),eventWeight);
      if(yTau>0){
        myHistos_->fill1DHistogram("h1DPhi-nVecIP-yTauPos"+hNameSuffix,anglesIPRho.first,eventWeight);
      }
@@ -72,7 +70,7 @@ void HTTAnalyzer::fillDecayPlaneAngle(const std::string & hNameSuffix, float eve
     float cosPhiNN =  tauPCA.Vect().Unit().Dot(muonPCA.Vect().Unit());
 
     myHistos_->fill1DHistogram("h1DPhi-nVectors"+hNameSuffix,angles.first,eventWeight);
-    myHistos_->fill2DUnrolledHistogram("h1DUnRollMassSVPhiCP"+hNameSuffix,angles.first, aPair.getP4(sysType).M(),eventWeight);
+    myHistos_->fill2DUnrolledHistogram("h1DUnRollMassSVPhiCP"+hNameSuffix,angles.first, aPair.getP4(aSystEffect).M(),eventWeight);
     myHistos_->fill1DHistogram("h1DCosPhiNN"+hNameSuffix,cosPhiNN);
 
     float cosMuon =  muonPCA.Vect().Unit()*aGenMuonTau.getPCA().Unit();

@@ -140,7 +140,7 @@ class HTTAnalyzer: public Analyzer{
   ///Selections common to all categories (mu pt, tau Id etc.)
   ///are checked outside this method.
   bool passCategory(const HTTAnalyzer::muTauCategory & aCategory,
-		    const sysEffects::sysEffectsEnum & aSysEffect=sysEffects::NOMINAL);
+		    const sysEffects::sysEffectsEnum & aSystEffect=sysEffects::NOMINAL);
 
   ///Check it tau decay modes (GEN and RECO) match selected (hardcoded)
   ///decay mode.
@@ -181,13 +181,14 @@ class HTTAnalyzer: public Analyzer{
   ///Fill histograms for all control plots.
   ///Histogram names will end with hNameSuffix
   void fillControlHistos(const std::string & hNameSuffix, float eventWeight,
-			 const sysEffects::sysEffectsEnum & aSysEffect=sysEffects::NOMINAL);
+			 const sysEffects::sysEffectsEnum & aSystEffect=sysEffects::NOMINAL);
 
 
   ///Fill histograms with cos(phi), where phi is the decay
   ///between tau decay planes. Method used for reconstructed
   ///mu+tau_h mode
-  void fillDecayPlaneAngle(const std::string & hNameSuffix, float eventWeight);
+  void fillDecayPlaneAngle(const std::string & hNameSuffix, float eventWeight,
+  const sysEffects::sysEffectsEnum & aSystEffect=sysEffects::NOMINAL);
 
   ///Fill histograms with cos(phi), where phi is the decay
   ///between tau decay planes. Method used for
