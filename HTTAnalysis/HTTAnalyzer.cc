@@ -443,11 +443,17 @@ bool HTTAnalyzer::analyze(const EventProxyBase& iEvent){
 	hNameSuffix = sampleName+"_OSnoMuIso_"+categorySuffix+systEffectName;
 	myHistos_->fill1DHistogram("h1DIso"+hNameSuffix,aMuon.getProperty(PropertyEnum::combreliso),eventWeightWithSyst);
 	myHistos_->fill1DHistogram("h1DMassTrans"+hNameSuffix,aPair.getMTMuon(aSystEffect),eventWeightWithSyst);
+  //needed for antiiso control region//
+  myHistos_->fill1DHistogram("h1DMassSV"+hNameSuffix,aPair.getP4(sysEffects::NOMINAL_SVFIT).M(),eventWeight);
+  myHistos_->fill1DHistogram("h1DMassVis"+hNameSuffix,aPair.getP4(sysEffects::NOMINAL_SVFIT).M(),eventWeight);
       }
       if(SS){
 	hNameSuffix = sampleName+"_SSnoMuIso_"+categorySuffix+systEffectName;
 	myHistos_->fill1DHistogram("h1DIso"+hNameSuffix,aMuon.getProperty(PropertyEnum::combreliso),eventWeightWithSyst);
 	myHistos_->fill1DHistogram("h1DMassTrans"+hNameSuffix,aPair.getMTMuon(aSystEffect),eventWeightWithSyst);
+  //needed for antiiso control region//
+  myHistos_->fill1DHistogram("h1DMassSV"+hNameSuffix,aPair.getP4(sysEffects::NOMINAL_SVFIT).M(),eventWeight);
+  myHistos_->fill1DHistogram("h1DMassVis"+hNameSuffix,aPair.getP4(sysEffects::NOMINAL_SVFIT).M(),eventWeight);
       }
     }
   }
