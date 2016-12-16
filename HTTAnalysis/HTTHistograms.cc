@@ -516,7 +516,7 @@ void HTTHistograms::finalizeHistograms(int nRuns, float weight){
   //////////////
   ///Control regions plots
   ttScale = 1.0;
-  /*
+
   for(unsigned int iCategory = (int)HTTAnalyzer::jet0;
       iCategory<(int)HTTAnalyzer::boosted;++iCategory){
 
@@ -535,6 +535,8 @@ void HTTHistograms::finalizeHistograms(int nRuns, float weight){
     plotStack(iCategory, "UnRollMassSVPhiCP");
     plotStack(iCategory, "UnRollMassSVYCP");
     plotStack(iCategory, "MassTrans");
+
+    continue;
 
     plotStack(iCategory, "PtMuon");
     plotStack(iCategory, "EtaMuon");
@@ -566,14 +568,14 @@ void HTTHistograms::finalizeHistograms(int nRuns, float weight){
     plotStack(iCategory, "Phi-nVecIP_");
     plotStack(iCategory, "NPV");
     }
-  */
+
     ///Make the ststematic effect histos.
 
     for(unsigned int iSystEffect = (unsigned int)sysEffects::NOMINAL_SVFIT;
 	iSystEffect<(unsigned int)sysEffects::DUMMY;++iSystEffect){
 
       for(unsigned int iCategory = (int)HTTAnalyzer::jet0;
-	  iCategory<(int)HTTAnalyzer::DUMMY;++iCategory){
+	  iCategory<(int)HTTAnalyzer::vbf;++iCategory){
 
 	wselOSCorrection =  std::pair<float,float>(1.0,0);
 	wselSSCorrection =  std::pair<float,float>(1.0,0);

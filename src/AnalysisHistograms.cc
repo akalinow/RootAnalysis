@@ -470,22 +470,22 @@ void AnalysisHistograms::finalizeHistograms(){
   for(unsigned int iThread = 1;iThread<omp_get_max_threads();++iThread){
     if(my1Dhistograms_[0].size()!=my1Dhistograms_[iThread].size()){
       std::cout<<"1D histogram size mismatch. "
-      <<" thread 0: "<<my1Dhistograms_[0].my1Dhistograms_[0].size()
-      <<" thread "<<iThread<<" "<<my1Dhistograms_[0].my1Dhistograms_[iThread].size()
+      <<" thread 0: "<<my1Dhistograms_[0].size()
+      <<" thread "<<iThread<<" "<<my1Dhistograms_[iThread].size()
       <<std::endl;
     }
 
     if(my2Dhistograms_[0].size()!=my2Dhistograms_[iThread].size()){
       std::cout<<"2D histogram size mismatch. "
-      <<" thread 0: "<<my1Dhistograms_[0].my2Dhistograms_[0].size()
-      <<" thread "<<iThread<<" "<<my2Dhistograms_[0].my2Dhistograms_[iThread].size()
+      <<" thread 0: "<<my2Dhistograms_[0].size()
+      <<" thread "<<iThread<<" "<<my2Dhistograms_[iThread].size()
       <<std::endl;
     }
 
     if(my3Dhistograms_[0].size()!=my3Dhistograms_[iThread].size()){
       std::cout<<"3D histogram size mismatch. "
-      <<" thread 0: "<<my1Dhistograms_[0].my3Dhistograms_[0].size()
-      <<" thread "<<iThread<<" "<<my1Dhistograms_[0].my3Dhistograms_[iThread].size()
+      <<" thread 0: "<<my3Dhistograms_[0].size()
+      <<" thread "<<iThread<<" "<<my3Dhistograms_[iThread].size()
       <<std::endl;
     }
 

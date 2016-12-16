@@ -43,7 +43,8 @@ class HTTHistograms: public AnalysisHistograms {
   ///Scaling factor is estimated in high Mt region.
   ///Other backgrounds are subtracted, basing on MC
   ///QCD contribution is neglected.
-  std::pair<float,float> getWNormalisation(unsigned int iCategory, std::string selName, unsigned int iSystEffect);
+  std::pair<float,float> getWNormalisation(unsigned int iCategory, std::string selName,
+    unsigned int iSystEffect = (unsigned int)sysEffects::NOMINAL_SVFIT);
 
   ///Calculate QCD OS/SS ratiousing non isolated events.
   std::pair<float,float> getQCDOStoSS(unsigned int iCategory,
