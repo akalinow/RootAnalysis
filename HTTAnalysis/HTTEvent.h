@@ -246,7 +246,7 @@ class HTTParticle{
   void setProperties(const std::vector<Double_t> & aProperties) { properties = aProperties;}
 
   ///Data member getters.
-  TLorentzVector getP4(sysEffects::sysEffectsEnum type=sysEffects::NOMINAL) const {return getSystScaleP4(type);}
+  const TLorentzVector& getP4(sysEffects::sysEffectsEnum type=sysEffects::NOMINAL) const {return getSystScaleP4(type);}
 
   TLorentzVector getChargedP4() const {return chargedP4;}
 
@@ -271,14 +271,17 @@ class HTTParticle{
   ///Return four-momentum modified according to given systematic effect.
   ///The method recognises particle type, e.g. muons are not affected by
   ///TES variations etc.
-  TLorentzVector getSystScaleP4(sysEffects::sysEffectsEnum type=sysEffects::NOMINAL) const;
+  const TLorentzVector & getSystScaleP4(sysEffects::sysEffectsEnum type=sysEffects::NOMINAL) const;
 
   ///Return four-momentum shifted with scale.
   ///Shift modifies three-momentum transverse part only, leaving mass constant.
-  TLorentzVector getShiftedP4(float scale) const;
+  const TLorentzVector & getShiftedP4(float scale) const;
 
   ///Nominal (as recontructed) four-momentum
   TLorentzVector p4;
+
+  ///Scaled four-momentum cache;
+  mutable TLorentzVector p4Cache;
 
   ///Charged and neutral components four-momentum
   TLorentzVector chargedP4, neutralP4;
@@ -291,6 +294,9 @@ class HTTParticle{
   ///Index generated automatically during conversion from
   ///LLR ntuple format
   std::vector<Double_t> properties;
+
+  ///Cache with momentum shifted by given scale.
+
 
 };
 ///////////////////////////////////////////////////

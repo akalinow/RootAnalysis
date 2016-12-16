@@ -63,7 +63,7 @@ void HTTParticle::clear(){
 }
 ////////////////////////////////////////////////
 ////////////////////////////////////////////////
-TLorentzVector HTTParticle::getSystScaleP4(sysEffects::sysEffectsEnum type) const{
+const TLorentzVector & HTTParticle::getSystScaleP4(sysEffects::sysEffectsEnum type) const{
 
   if(type==sysEffects::NOMINAL || type==sysEffects::NOMINAL_SVFIT) return p4;
 
@@ -92,23 +92,23 @@ TLorentzVector HTTParticle::getSystScaleP4(sysEffects::sysEffectsEnum type) cons
     if(type!=sysEffects::JESUp && type!=sysEffects::JESDown) return p4;
     float JES = getProperty(PropertyEnum::jecUnc);
     if(type==sysEffects::JESDown) JES*=-1;
-    return getShiftedP4(1+JES); 
+    return getShiftedP4(1+JES);
   }
   return p4;
 }
 ////////////////////////////////////////////////
 ////////////////////////////////////////////////
-TLorentzVector HTTParticle::getShiftedP4(float scale) const{
+const TLorentzVector & HTTParticle::getShiftedP4(float scale) const{
 
-  TVector3 momentum = p4.Vect();
-  float pt = momentum.Perp();
-  float energy =  p4.E();
+  double pt = p4.Perp();
+  double energy =  p4.E();
   pt*=scale;
-  float shiftedMomentum = pt/sin(momentum.Theta());
-  momentum = shiftedMomentum*momentum.Unit();
-  energy = sqrt(momentum.Mag() + p4.M2());
-  TLorentzVector scaled(momentum,energy);
-  return scaled;
+  double shiftedMomentum = pt/sin(p4.Theta());
+  energy = sqrt(p4.M2() + pow(shiftedMomentum,2));
+  p4Cache = p4;
+  p4Cache.SetRho(shiftedMomentum);
+  p4Cache.SetE(energy);
+  return p4Cache;
 }
 ////////////////////////////////////////////////
 ////////////////////////////////////////////////
@@ -136,13 +136,19 @@ TVector2 HTTPair::getSystScaleMET(sysEffects::sysEffectsEnum type) const{
 
   TLorentzVector metShiftedP4(met.X(), met.Y(), 0, met.Mod());
 
-  metShiftedP4+=leg1.getP4(sysEffects::NOMINAL);
-  metShiftedP4+=leg2.getP4(sysEffects::NOMINAL);
+  double metX = met.X();
+  metX+=leg1.getP4(sysEffects::NOMINAL).X();
+  metX+=leg2.getP4(sysEffects::NOMINAL).X();
+  metX-=leg1.getP4(type).X();
+  metX-=leg2.getP4(type).X();
 
-  metShiftedP4-=leg1.getP4(type);
-  metShiftedP4-=leg2.getP4(type);
+  double metY = met.Y();
+  metY+=leg1.getP4(sysEffects::NOMINAL).Y();
+  metY+=leg2.getP4(sysEffects::NOMINAL).Y();
+  metY-=leg1.getP4(type).Y();
+  metY-=leg2.getP4(type).Y();
 
-  TVector2 metShifted(metShiftedP4.X(), metShiftedP4.Y());
+  TVector2 metShifted(met.X(), met.Y());
   return metShifted;
 }
 ////////////////////////////////////////////////
