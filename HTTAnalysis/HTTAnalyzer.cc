@@ -119,6 +119,7 @@ void HTTAnalyzer::setAnalysisObjects(const EventProxyHTT & myEventProxy){
 
   aEvent = *myEventProxy.event;
   aPair = (*myEventProxy.pairs)[0];
+
   aTau = aPair.getTau();
   aMuon = aPair.getMuon();
 

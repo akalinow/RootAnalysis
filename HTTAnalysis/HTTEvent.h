@@ -246,17 +246,17 @@ class HTTParticle{
   void setProperties(const std::vector<Double_t> & aProperties) { properties = aProperties;}
 
   ///Data member getters.
-  const TLorentzVector& getP4(sysEffects::sysEffectsEnum type=sysEffects::NOMINAL) const {return getSystScaleP4(type);}
+  const TLorentzVector & getP4(sysEffects::sysEffectsEnum type=sysEffects::NOMINAL) const {return getSystScaleP4(type);}
 
-  TLorentzVector getChargedP4() const {return chargedP4;}
+  const TLorentzVector & getChargedP4() const {return chargedP4;}
 
-  TLorentzVector getNeutralP4() const {return neutralP4;}
+  const TLorentzVector getNeutralP4() const {return neutralP4;}
 
-  TVector3 getPCA() const {return pca;}
+  const TVector3 & getPCA() const {return pca;}
 
-  TVector3 getPCARefitPV() const {return pcaRefitPV;}
+  const TVector3 & getPCARefitPV() const {return pcaRefitPV;}
 
-  TVector3 getPCAGenPV() const {return pcaGenPV;}
+  const TVector3 & getPCAGenPV() const {return pcaGenPV;}
 
   int getPDGid() const {return getProperty(PropertyEnum::PDGId);}
 
@@ -282,6 +282,7 @@ class HTTParticle{
 
   ///Scaled four-momentum cache;
   mutable TLorentzVector p4Cache;
+  mutable sysEffects::sysEffectsEnum lastSystEffect;
 
   ///Charged and neutral components four-momentum
   TLorentzVector chargedP4, neutralP4;
@@ -294,9 +295,6 @@ class HTTParticle{
   ///Index generated automatically during conversion from
   ///LLR ntuple format
   std::vector<Double_t> properties;
-
-  ///Cache with momentum shifted by given scale.
-
 
 };
 ///////////////////////////////////////////////////
@@ -329,23 +327,23 @@ class HTTPair{
   void setMETMatrix(float m00, float m01, float m10, float m11) {metMatrix.push_back(m00); metMatrix.push_back(m01); metMatrix.push_back(m10); metMatrix.push_back(m11);}
 
   ///Data member getters.
-  TLorentzVector getP4(sysEffects::sysEffectsEnum type = sysEffects::NOMINAL) const {return p4Vector[(unsigned int)type];}
+  const TLorentzVector & getP4(sysEffects::sysEffectsEnum type = sysEffects::NOMINAL) const {return p4Vector[(unsigned int)type];}
 
-  TVector2 getMET(sysEffects::sysEffectsEnum type = sysEffects::NOMINAL) const {return getSystScaleMET(type);}
+  const TVector2 & getMET(sysEffects::sysEffectsEnum type = sysEffects::NOMINAL) const {return getSystScaleMET(type);}
 
-  TVector2 getSVMET(sysEffects::sysEffectsEnum type = sysEffects::NOMINAL) const {return svMetVector[(unsigned int)type];}
+  const TVector2 & getSVMET(sysEffects::sysEffectsEnum type = sysEffects::NOMINAL) const {return svMetVector[(unsigned int)type];}
 
   float getMTLeg1(sysEffects::sysEffectsEnum type = sysEffects::NOMINAL) const {return getSystScaleMT(leg1, type);}
 
   float getMTLeg2(sysEffects::sysEffectsEnum type = sysEffects::NOMINAL) const {return getSystScaleMT(leg2, type);}
 
-  HTTParticle getLeg1() const {return leg1;}
+  const HTTParticle & getLeg1() const {return leg1;}
 
-  HTTParticle getLeg2() const {return leg2;}
+  const HTTParticle & getLeg2() const {return leg2;}
 
-  HTTParticle getMuon() const {return abs(leg1.getPDGid())==13 ? leg1 : leg2; }
+  const HTTParticle & getMuon() const {return abs(leg1.getPDGid())==13 ? leg1 : leg2; }
 
-  HTTParticle getTau() const {return abs(leg1.getPDGid())==15 ? leg1 : leg2; }
+  const HTTParticle & getTau() const {return abs(leg1.getPDGid())==15 ? leg1 : leg2; }
 
   float getMTMuon(sysEffects::sysEffectsEnum type = sysEffects::NOMINAL) const {return abs(leg1.getPDGid())==13 ? getMTLeg1(type) : getMTLeg2(type); }
 
@@ -356,7 +354,7 @@ class HTTPair{
   ///Return MET modified according to given systematic effect.
   ///The MET is corrected for accorging leptons corrections.
   ///The recoil correctino is not updated.
-  TVector2 getSystScaleMET(sysEffects::sysEffectsEnum type=sysEffects::NOMINAL) const;
+  const TVector2 & getSystScaleMET(sysEffects::sysEffectsEnum type=sysEffects::NOMINAL) const;
 
   ///Return transverse mass caluculated according to the scale shifts.
   float getSystScaleMT(const HTTParticle &aPerticle,
@@ -365,6 +363,10 @@ class HTTPair{
   ///Nominal met as calculated from PF.
   ///Includes recoil corrections.
   TVector2 met;
+
+  ///Scaled four-momentum cache;
+  mutable TVector2 metCache;
+  mutable sysEffects::sysEffectsEnum lastSystEffect;
 
   ///Vectors holding p4 and MET for
   ///for various scale variances.

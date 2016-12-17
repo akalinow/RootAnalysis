@@ -60,12 +60,20 @@ void HTTParticle::clear(){
   pcaGenPV = TVector3();
 
   properties.clear();
+
+  lastSystEffect = sysEffects::NOMINAL;
 }
 ////////////////////////////////////////////////
 ////////////////////////////////////////////////
 const TLorentzVector & HTTParticle::getSystScaleP4(sysEffects::sysEffectsEnum type) const{
 
-  if(type==sysEffects::NOMINAL || type==sysEffects::NOMINAL_SVFIT) return p4;
+  if(type==sysEffects::NOMINAL || type==sysEffects::NOMINAL_SVFIT) {
+    lastSystEffect = type;
+    return p4;
+  }
+  else if(lastSystEffect==type) return p4Cache;
+
+  lastSystEffect = type;
 
   if(abs(getPDGid())==15 && getProperty(PropertyEnum::mc_match)==5){
     ///True taus
@@ -125,16 +133,20 @@ void HTTPair::clear(){
   mtLeg1= -999;
   mtLeg2 = -999;
 
-  leg1 = HTTParticle();
-  leg2 = HTTParticle();
+  leg1.clear();
+  leg2.clear();
+
+  lastSystEffect = sysEffects::NOMINAL_SVFIT;
 }
 ////////////////////////////////////////////////
 ////////////////////////////////////////////////
-TVector2 HTTPair::getSystScaleMET(sysEffects::sysEffectsEnum type) const{
+const TVector2 & HTTPair::getSystScaleMET(sysEffects::sysEffectsEnum type) const{
 
-  if(type==sysEffects::NOMINAL) return met;
-
-  TLorentzVector metShiftedP4(met.X(), met.Y(), 0, met.Mod());
+  if(type==sysEffects::NOMINAL || type==sysEffects::NOMINAL_SVFIT) {
+    lastSystEffect = type;
+    return met;
+  }
+  else if(lastSystEffect==type) return metCache;
 
   double metX = met.X();
   metX+=leg1.getP4(sysEffects::NOMINAL).X();
@@ -148,15 +160,16 @@ TVector2 HTTPair::getSystScaleMET(sysEffects::sysEffectsEnum type) const{
   metY-=leg1.getP4(type).Y();
   metY-=leg2.getP4(type).Y();
 
-  TVector2 metShifted(met.X(), met.Y());
-  return metShifted;
+  metCache.SetX(met.X());
+  metCache.SetY(met.Y());
+  return metCache;
 }
 ////////////////////////////////////////////////
 ////////////////////////////////////////////////
 float HTTPair::getSystScaleMT(const HTTParticle &aParticle,
 			      sysEffects::sysEffectsEnum type) const{
 
-  TVector2 metScaled = getSystScaleMET(type);
+  const TVector2 & metScaled = getSystScaleMET(type);
   TLorentzVector metP4(metScaled.X(), metScaled.Y(),0, metScaled.Mod());
   TLorentzVector legP4 = aParticle.getP4(type);
   legP4.SetZ(0);
