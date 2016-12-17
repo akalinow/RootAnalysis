@@ -170,12 +170,11 @@ float HTTPair::getSystScaleMT(const HTTParticle &aParticle,
 			      sysEffects::sysEffectsEnum type) const{
 
   const TVector2 & metScaled = getSystScaleMET(type);
-  TLorentzVector metP4(metScaled.X(), metScaled.Y(),0, metScaled.Mod());
-  TLorentzVector legP4 = aParticle.getP4(type);
-  legP4.SetZ(0);
-  legP4.SetE(legP4.Perp());
-
-  float mT = (metP4+legP4).M();
+  const TLorentzVector & legP4 = aParticle.getP4(type);
+  float sumP2 = pow(metScaled.X() + legP4.X(),2) +
+                pow(metScaled.Y() + legP4.Y(),2);
+  float sumE2 = pow(metScaled.Mod() + legP4.Perp(),2);
+  float mT = sqrt(sumE2 - sumP2);
   return mT;
 }
 ////////////////////////////////////////////////

@@ -367,6 +367,7 @@ class HTTPair{
   ///Scaled four-momentum cache;
   mutable TVector2 metCache;
   mutable sysEffects::sysEffectsEnum lastSystEffect;
+  mutable float mtCache;
 
   ///Vectors holding p4 and MET for
   ///for various scale variances.
