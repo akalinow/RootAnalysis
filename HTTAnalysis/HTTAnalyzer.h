@@ -3,6 +3,7 @@
 
 #include <string>
 #include <vector>
+#include <map>
 
 #include "ObjectMessenger.h"
 #include "EventProxyBase.h"
@@ -147,20 +148,19 @@ class HTTAnalyzer: public Analyzer{
   std::pair<bool, bool> checkTauDecayMode(const EventProxyHTT & myEventProxy);
 
   ///Return human readable sample name (Data, WJets, etc).
-  ///Make the methos static, so other modules can use it
-  static std::string getSampleName(const EventProxyHTT & myEventProxy);
+  std::string getSampleName(const EventProxyHTT & myEventProxy);
 
   ///Return human readable sample name (Data, WJets, etc).
   ///Make the methos static, so other modules can use it.
   ///Method used when sample coding in TTree is not present.
   ///In this case a ROOT file name is used to decode the sample type.
-  static std::string getSampleNameFromFileName(const EventProxyHTT & myEventProxy);
+  std::string getSampleNameFromFileName(const EventProxyHTT & myEventProxy);
 
   ///Return sample name for DY. Name encoded jet bin, and decay mode.
-  static std::string getDYSampleName(const EventProxyHTT & myEventProxy);
+  std::string getDYSampleName(const EventProxyHTT & myEventProxy);
 
   //Return name sample name suffix for different particles matched to reconstructed tau
-  static std::string getMatchingName(const EventProxyHTT & myEventProxy);
+  std::string getMatchingName(const EventProxyHTT & myEventProxy);
 
   ///Return pileup reweighting weight.
   ///Weight is calculatedon fly using the ration of nPU
@@ -255,6 +255,9 @@ class HTTAnalyzer: public Analyzer{
 
   //should this HTTAnalyzer be able to filter events
   bool filterEvent_;
+
+  ///Map from file name to sample name.
+  std::map<std::string, std::string> fileName2sampleName;
 
   ///Reconstructed objects selected for given event.
   HTTEvent aEvent;

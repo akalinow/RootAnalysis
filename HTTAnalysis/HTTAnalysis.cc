@@ -12,9 +12,8 @@
 #include "TreeAnalyzer.h"
 
 #include "EventProxyHTT.h"
-#include "HTTWeightsMaker.h"
 #include "HTTAnalyzer.h"
-#include "HTTAnalyzerTT.h"//MB
+#include "HTTAnalyzerTT.h"
 
 #include "TFile.h"
 #include "TStopwatch.h"
@@ -45,7 +44,7 @@ int main(int argc, char ** argv) {
 
 	boost::property_tree::ptree pt;
 	boost::property_tree::ini_parser::read_ini(cfgFileName, pt);
-	
+
 	typedef boost::tokenizer<boost::char_separator<char> > tokenizer;
 	std::string processName = pt.get<std::string>("TreeAnalyzer.processName","Test");
 
@@ -53,14 +52,13 @@ int main(int argc, char ** argv) {
 	ROOT::EnableThreadSafety();
 	//When threading, also have to keep ROOT from logging all TObjects into a list
 	TObject::SetObjectStat(false);
-	
+
 	//----------------------------------------------------------
 	 std::vector<Analyzer*> myAnalyzers;
 	 EventProxyHTT *myEvent = new EventProxyHTT();
 
-	 if(processName=="Weights" || processName=="PU") myAnalyzers.push_back(new HTTWeightsMaker("HTTWeightsMaker"));
-	 else if(processName=="Analysis") myAnalyzers.push_back(new HTTAnalyzer("HTTAnalyzer"));
-	 else if(processName=="AnalysisTT") myAnalyzers.push_back(new HTTAnalyzerTT("HTTAnalyzerTT")); 
+	 if(processName=="Analysis") myAnalyzers.push_back(new HTTAnalyzer("HTTAnalyzer"));
+	 else if(processName=="AnalysisTT") myAnalyzers.push_back(new HTTAnalyzerTT("HTTAnalyzerTT"));
 	 else {
 	   std::cout<<"Incorrect process name: "<<processName<<std::endl;
 	   return 1;
@@ -78,12 +76,12 @@ int main(int argc, char ** argv) {
 	 printf("RealTime=%f seconds, CpuTime=%f seconds\n",rtime,ctime);
 	 printf("%4.2f events / RealTime second .\n", nEventsAnalysed/rtime);
 	 printf("%4.2f events / CpuTime second .\n", nEventsAnalysed/ctime);
-	 
+
 	 tree->scaleHistograms();
 	 for(unsigned int i=0;i<myAnalyzers.size();++i) delete myAnalyzers[i];
 	 delete tree;
 	 delete myEvent;
-	 
+
 	 std::cout<<"Done"<<std::endl;
 	 return 0;
 }

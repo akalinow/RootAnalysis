@@ -38,9 +38,9 @@ void HTTEvent::clear(){
   decayModeBoson = -1;
 #endif
 
-  genPV =  TVector3();
-  AODPV =  TVector3();
-  refittedPV =  TVector3();
+  genPV*=0;
+  AODPV*=0;
+  refittedPV*=0;
 
   isRefit = false;
 
@@ -51,13 +51,13 @@ void HTTEvent::clear(){
 ////////////////////////////////////////////////
 void HTTParticle::clear(){
 
-  p4 = TLorentzVector();
-  chargedP4 = TLorentzVector();
-  neutralP4 = TLorentzVector();
+  p4*=0;
+  chargedP4*=0;
+  neutralP4*=0;
 
-  pca = TVector3();
-  pcaRefitPV = TVector3();
-  pcaGenPV = TVector3();
+  pca*=0;
+  pcaRefitPV*=0;
+  pcaGenPV*=0;
 
   properties.clear();
 
@@ -122,11 +122,13 @@ const TLorentzVector & HTTParticle::getShiftedP4(float scale) const{
 ////////////////////////////////////////////////
 void HTTPair::clear(){
 
+  std::cout<<"Here"<<std::endl;
+
   p4Vector.clear();
   svMetVector.clear();
 
-  p4Vector.resize((unsigned int)sysEffects::DUMMY);
-  svMetVector.resize((unsigned int)sysEffects::DUMMY);
+  for(auto &it:p4Vector) it*=0;
+  for(auto &it:svMetVector) it*=0;
 
   metMatrix.clear();
 

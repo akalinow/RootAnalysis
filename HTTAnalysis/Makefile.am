@@ -15,9 +15,9 @@ noinst_PROGRAMS=test
 # replaced by '_'. So a.out becomes a_out and the appropriate suffex added.
 # '_SOURCES' for example.
 
-# Sources for the a.out 
-test_SOURCES= HTTAnalysis.cc EventProxyHTT.cc HTTWeightsMaker.cc HTTWeightHistograms.cc \
-	      HTTAnalyzer.cc HTTAnalyzerCPmethods.cc HTTAnalyzerUtilityMethods.cc \
+# Sources for the a.out
+test_SOURCES= HTTAnalysis.cc EventProxyHTT.cc \
+	            HTTAnalyzer.cc HTTAnalyzerCPmethods.cc HTTAnalyzerUtilityMethods.cc \
               HTTAnalyzerTT.cc HTTAnalyzerCPmethodsTT.cc HTTAnalyzerUtilityMethodsTT.cc \
               HTTHistograms.cc HTTHistogramsTT.cc HTTEvent.cxx DictCint.cxx
 

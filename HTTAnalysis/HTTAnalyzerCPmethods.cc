@@ -19,22 +19,22 @@ void HTTAnalyzer::fillDecayPlaneAngle(const std::string & hNameSuffix, float eve
   ///Here we take rho on one side, mu on the other
   std::pair<float,float>  anglesIPRho;
 
-  TLorentzVector muonTk = aMuon.getChargedP4();
-  TLorentzVector tauLeadingTk = aTau.getChargedP4();
+  const TLorentzVector & muonTk = aMuon.getChargedP4();
+  const TLorentzVector & tauLeadingTk = aTau.getChargedP4();
   TLorentzVector muonPCA(aMuon.getPCA(),0);
   TLorentzVector tauPCA(aTau.getPCA(),0);
 
   if(hNameSuffix.find("AODPV")!=std::string::npos){
-    muonPCA = TLorentzVector(aMuon.getPCA(),0);
-    tauPCA = TLorentzVector(aTau.getPCA(),0);
+    muonPCA.SetVect(aMuon.getPCA());
+    tauPCA.SetVect(aTau.getPCA());
   }
   if(hNameSuffix.find("RefitPV")!=std::string::npos){
-    muonPCA = TLorentzVector(aMuon.getPCARefitPV(),0);
-    tauPCA = TLorentzVector(aTau.getPCARefitPV(),0);
+    muonPCA.SetVect(aMuon.getPCARefitPV());
+    tauPCA.SetVect(aTau.getPCARefitPV());
   }
   if(hNameSuffix.find("GenPV")!=std::string::npos){
-    muonPCA = TLorentzVector(aMuon.getPCAGenPV(),0);
-    tauPCA = TLorentzVector(aTau.getPCAGenPV(),0);
+    muonPCA.SetVect(aMuon.getPCAGenPV());
+    tauPCA.SetVect(aTau.getPCAGenPV());
   }
 
   if(aMuon.getCharge()>0) {
