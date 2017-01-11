@@ -487,43 +487,14 @@ void HTTHistograms::finalizeHistograms(int nRuns, float weight){
 
   AnalysisHistograms::finalizeHistograms();
 
-  ////Code below tests W+n jets normalisation
-  ///Samples split into jet multiplicity are compared to
-  ///inclusive sample.
-  /*
-  TH1F *hW = get1D_WJet_Histogram("h1DNPartonsWJets");
-  TH1F *hWAllJets = get1D_WJet_Histogram("h1DNPartonsWAllJets");
-  hWAllJets->Print("all");
-  hW->Print("all");
-  hWAllJets->Divide(hW);
-  hWAllJets->Print("all");
-  return;
-  */
-  /*
-  TH1F *hDY = get1D_VJetSum("h1DNPartonsDYMuTauJets");
-  TH1F *hDYAllJets = get1D_VJetSum("h1DNPartonsDYMuTauAllJets");
-  hDYAllJets->Print("all");
-  hDY->Print("all");
-  hDYAllJets->Divide(hDY);
-  hDYAllJets->Print("all");
-  */
-  //TH1F *hDY =  get1D_VJetSum("h1DMassVisDYMuTauAllJets");
-  //hDY->Add(get1D_VJetSum("h1DMassVisDYMuTau0Jets"));
-  /*
-  TH1F *hDYSum = get1D_DYJet_Histogram("h1DMassVisDYJets");
-  hDYSum->Print("all");
-  return;
-  */
   //////////////
   ///Control regions plots
   ttScale = 1.0;
 
-return;
-
   for(unsigned int iCategory = (int)HTTAnalyzer::jet0;
       iCategory<(int)HTTAnalyzer::boosted;++iCategory){
 
-    plotCPhistograms(iCategory);
+    //plotCPhistograms(iCategory);
 
     wselOSCorrection =  std::pair<float,float>(1.0,0);
     wselSSCorrection =  std::pair<float,float>(1.0,0);
@@ -531,15 +502,14 @@ return;
     wselOSCorrection = getWNormalisation(iCategory, "OS");
     wselSSCorrection = getWNormalisation(iCategory, "SS");
 
-    //plotStack(iCategory, "MassVis");
+    plotStack(iCategory, "MassVis");
+    plotStack(iCategory, "MassSV");
+    plotStack(iCategory, "MassTrans");
     plotStack(iCategory, "UnRollTauPtMassVis");
-    //plotStack(iCategory, "UnRollHiggsPtMassSV");
-    //plotStack(iCategory, "UnRollMjjMassSV");
-    //plotStack(iCategory, "UnRollMassSVPhiCP");
-    //plotStack(iCategory, "UnRollMassSVYCP");
-    //plotStack(iCategory, "MassTrans");
-
-    continue;
+    plotStack(iCategory, "UnRollHiggsPtMassSV");
+    plotStack(iCategory, "UnRollMjjMassSV");
+    plotStack(iCategory, "UnRollMassSVPhiCP");
+    plotStack(iCategory, "UnRollMassSVYCP");
 
     plotStack(iCategory, "PtMuon");
     plotStack(iCategory, "EtaMuon");
@@ -572,8 +542,8 @@ return;
     plotStack(iCategory, "NPV");
     }
 
+    return;
     ///Make the ststematic effect histos.
-
     for(unsigned int iSystEffect = (unsigned int)sysEffects::NOMINAL_SVFIT;
 	iSystEffect<(unsigned int)sysEffects::DUMMY;++iSystEffect){
 
@@ -1302,7 +1272,7 @@ THStack*  HTTHistograms::plotStack(unsigned int iCategory,
   weight = getSampleNormalisation(sampleName);
   scale = weight*lumi;
   hWplusHiggs130->Scale(scale);
-  
+
   //join Wplus and Wminus processes////////////////////
   TH1F *hWHiggs120 = hWplusHiggs120;
   hWHiggs120->Add(hWminusHiggs120);
@@ -1569,19 +1539,19 @@ std::pair<float,float> HTTHistograms::getQCDOStoSS(unsigned int iCategory,
 						   std::pair<float,float> wselSSCorrection,
                unsigned int iSystEffect){
 
-                 ///Return fixed values according to SMH2016 TWiki:
-                 ///https://twiki.cern.ch/twiki/bin/viewauth/CMS/SMTauTau2016#QCD_background_estimation_in_Lta
-std::pair<float,float> result(1,0);
-if(iCategory == (unsigned int)HTTAnalyzer::jet0) result = std::pair<float,float>(1.0,0.15);
-else if(iCategory == (unsigned int)HTTAnalyzer::boosted) result = std::pair<float,float>(1.15,0.15*1.15);
-else if(iCategory == (unsigned int)HTTAnalyzer::vbf) result = std::pair<float,float>(1.2,0.30*1.2);
-else result = std::pair<float,float>(1.0,0.15);
-
-if(iSystEffect==(unsigned int)sysEffects::QCDSFUp) result.first+=result.second;
-if(iSystEffect==(unsigned int)sysEffects::QCDSFDown) result.first-=result.second;
-
-return result;
-
+  ///Return fixed values according to SMH2016 TWiki:
+  ///https://twiki.cern.ch/twiki/bin/viewauth/CMS/SMTauTau2016#QCD_background_estimation_in_Lta
+  std::pair<float,float> result(1,0);
+  if(iCategory == (unsigned int)HTTAnalyzer::jet0) result = std::pair<float,float>(1.0,0.15);
+  else if(iCategory == (unsigned int)HTTAnalyzer::boosted) result = std::pair<float,float>(1.15,0.15*1.15);
+  else if(iCategory == (unsigned int)HTTAnalyzer::vbf) result = std::pair<float,float>(1.2,0.30*1.2);
+  else result = std::pair<float,float>(1.0,0.15);
+  
+  if(iSystEffect==(unsigned int)sysEffects::QCDSFUp) result.first+=result.second;
+  if(iSystEffect==(unsigned int)sysEffects::QCDSFDown) result.first-=result.second;
+  
+  return result;
+  
   std::string hName = "h1DIso";
   std::string hNameSuffix;
 
@@ -1729,8 +1699,6 @@ TH1F* HTTHistograms::getQCDbackground(unsigned int iCategory,
   TH1F *hTTbar = get1D_TT_Histogram((hName+"TTbar"+hNameSuffix).c_str());
   TH1F *hST = get1D_ST_Histogram((hName+"ST"+hNameSuffix).c_str());
   TH1F *hVV = get1D_VV_Histogram((hName+"DiBoson"+hNameSuffix).c_str());
-  TH1F *hggH125 = get1DHistogram((hName+"ggH125"+hNameSuffix).c_str());
-  TH1F *hqqH125 = get1DHistogram((hName+"qqH125"+hNameSuffix).c_str());
   TH1F *hSoup = get1DHistogram((hName+"Data"+hNameSuffix).c_str());
 
   ///Protection against null pointers
@@ -1747,8 +1715,6 @@ TH1F* HTTHistograms::getQCDbackground(unsigned int iCategory,
   if(!hTTbar) hTTbar = (TH1F*)hEmpty->Clone((hName+"hTTbar"+hNameSuffix).c_str());
   if(!hST) hST = (TH1F*)hEmpty->Clone((hName+"hST"+hNameSuffix).c_str());
   if(!hVV) hVV = (TH1F*)hEmpty->Clone((hName+"hDiBoson"+hNameSuffix).c_str());
-  if(!hqqH125) hqqH125 = (TH1F*)hEmpty->Clone((hName+"qqH125"+hNameSuffix).c_str());
-  if(!hggH125) hggH125 = (TH1F*)hEmpty->Clone((hName+"ggH125"+hNameSuffix).c_str());
   //////////////////////////////////////////////////////////////////////
   float lumi = getLumi();
   ///Normalise MC histograms according to cross sections
@@ -1770,16 +1736,6 @@ TH1F* HTTHistograms::getQCDbackground(unsigned int iCategory,
   scale = lumi;
   hTTbar->Scale(scale);
 
-  sampleName = "qqH125";
-  weight = getSampleNormalisation(sampleName);
-  scale = weight*lumi;
-  hqqH125->Scale(scale);
-
-  sampleName = "ggH125";
-  weight = getSampleNormalisation(sampleName);
-  scale = weight*lumi;
-  hggH125->Scale(scale);
-
   sampleName = "ST";
   scale = lumi;
   hST->Scale(scale);
@@ -1795,8 +1751,6 @@ TH1F* HTTHistograms::getQCDbackground(unsigned int iCategory,
   hSoup->Add(hTTbar,-1);
   hSoup->Add(hST,-1);
   hSoup->Add(hVV,-1);
-  //hSoup->Add(hqqH125,-1);
-  //hSoup->Add(hggH125,-1);
 
   ///Clean up the QCD shape, and remove fluctuations around 0 counts.
   for(unsigned int iBinX=0;iBinX<=hSoup->GetNbinsX();++iBinX){

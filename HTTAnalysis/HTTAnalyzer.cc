@@ -175,7 +175,7 @@ void HTTAnalyzer::fillControlHistos(const std::string & hNameSuffix, float event
 
   ///Histograms filled for each systematic effect
   ///Fill SVfit and visible masses
-  TLorentzVector aVisSum = aMuon.getP4(aSystEffect) + aTau.getP4(aSystEffect);
+  const TLorentzVector & aVisSum = aMuon.getP4(aSystEffect) + aTau.getP4(aSystEffect);
   float visMass = aVisSum.M();
   float higgsPt =  (aVisSum + aMET.getP4(aSystEffect)).Pt();
   float jetsMass = 0;
@@ -190,8 +190,9 @@ void HTTAnalyzer::fillControlHistos(const std::string & hNameSuffix, float event
   myHistos_->fill2DUnrolledHistogram("h1DUnRollHiggsPtMassSV"+hNameSuffix, aPair.getP4(aSystEffect).M(), higgsPt, eventWeight);
   myHistos_->fill2DUnrolledHistogram("h1DUnRollMjjMassSV"+hNameSuffix, aPair.getP4(aSystEffect).M(), jetsMass, eventWeight);
 
-  fillDecayPlaneAngle(hNameSuffix, eventWeight, aSystEffect);
   if(aSystEffect!=sysEffects::NOMINAL_SVFIT) return;
+
+  fillDecayPlaneAngle(hNameSuffix, eventWeight, aSystEffect);
 
   ///Fill histograms with number of PV.
   myHistos_->fill1DHistogram("h1DNPV"+hNameSuffix,aEvent.getNPV(),eventWeight);
@@ -249,11 +250,17 @@ bool HTTAnalyzer::fillVertices(const std::string & sysType){
 }
 //////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////
-bool HTTAnalyzer::passCategory(const HTTAnalyzer::muTauCategory & aCategory,
-			       const sysEffects::sysEffectsEnum & aSystEffect){
+void HTTAnalyzer::testAllCategories(const sysEffects::sysEffectsEnum & aSystEffect){
 
-  if(categoryDecisions.size()) categoryDecisions.clear();
-  else categoryDecisions = std::vector<bool>((int)HTTAnalyzer::DUMMY);
+if(categoryDecisions.size()) categoryDecisions.clear();
+else categoryDecisions = std::vector<bool>((int)HTTAnalyzer::DUMMY);
+
+///Check if given dataset needs given category.
+if( (aSystEffect==sysEffects::sysEffectsEnum::TTUp || aSystEffect==sysEffects::sysEffectsEnum::TTDown) &&
+      sampleName.find("TTbar")==std::string::npos) return;
+
+if( (aSystEffect==sysEffects::sysEffectsEnum::ZPtUp || aSystEffect==sysEffects::sysEffectsEnum::ZPtDown) &&
+      sampleName.find("DY")==std::string::npos) return;
 
   nJets30 = 0;
   for(auto itJet:aSeparatedJets){
@@ -304,35 +311,44 @@ bool HTTAnalyzer::passCategory(const HTTAnalyzer::muTauCategory & aCategory,
 
   bool wSelection = aPair.getMTMuon(aSystEffect)>80 && aMuon.getProperty(PropertyEnum::combreliso)<0.15;
   bool ttSelection =  aPair.getMTMuon(aSystEffect)>150;
-  bool antiiso = aMuon.getProperty(PropertyEnum::combreliso)>0.15 && aMuon.getProperty(PropertyEnum::combreliso)<0.30;
+  bool muonAntiIso = aMuon.getProperty(PropertyEnum::combreliso)>0.15 && aMuon.getProperty(PropertyEnum::combreliso)<0.30;
+  bool muonIso = aMuon.getProperty(PropertyEnum::combreliso)<0.15;
+  muonIso = true;
 
-  categoryDecisions[(int)HTTAnalyzer::jet0_low] = mtSelection && jet0_low;
-  categoryDecisions[(int)HTTAnalyzer::jet0_high] = mtSelection && jet0_high;
+  categoryDecisions[(int)HTTAnalyzer::jet0_low] = muonIso && mtSelection && jet0_low;
+  categoryDecisions[(int)HTTAnalyzer::jet0_high] = muonIso && mtSelection && jet0_high;
 
-  categoryDecisions[(int)HTTAnalyzer::jet1_low] = mtSelection && jet1_low;
-  categoryDecisions[(int)HTTAnalyzer::jet1_high] = mtSelection && jet1_high;
+  categoryDecisions[(int)HTTAnalyzer::jet1_low] = muonIso && mtSelection && jet1_low;
+  categoryDecisions[(int)HTTAnalyzer::jet1_high] = muonIso && mtSelection && jet1_high;
 
-  categoryDecisions[(int)HTTAnalyzer::vbf_low] = mtSelection && vbf_low;
-  categoryDecisions[(int)HTTAnalyzer::vbf_high] = mtSelection && vbf_high;
+  categoryDecisions[(int)HTTAnalyzer::vbf_low] = muonIso && mtSelection && vbf_low;
+  categoryDecisions[(int)HTTAnalyzer::vbf_high] = muonIso && mtSelection && vbf_high;
 
-  categoryDecisions[(int)HTTAnalyzer::jet0] = mtSelection && jet0;
-  categoryDecisions[(int)HTTAnalyzer::CP_Pi] = mtSelection && cpPi;
-  categoryDecisions[(int)HTTAnalyzer::CP_Rho] = mtSelection && cpRho;
-  categoryDecisions[(int)HTTAnalyzer::boosted] = mtSelection && boosted;
-  categoryDecisions[(int)HTTAnalyzer::vbf] = mtSelection && vbf;
+  categoryDecisions[(int)HTTAnalyzer::jet0] = muonIso && mtSelection && jet0;
+  categoryDecisions[(int)HTTAnalyzer::CP_Pi] = muonIso && mtSelection && cpPi;
+  categoryDecisions[(int)HTTAnalyzer::CP_Rho] = muonIso && mtSelection && cpRho;
+  categoryDecisions[(int)HTTAnalyzer::boosted] = muonIso && mtSelection && boosted;
+  categoryDecisions[(int)HTTAnalyzer::vbf] = muonIso && mtSelection && vbf;
 
-  categoryDecisions[(int)HTTAnalyzer::wjets_jet0] = wSelection && jet0;
-  categoryDecisions[(int)HTTAnalyzer::wjets_boosted] = wSelection && boosted;
-  categoryDecisions[(int)HTTAnalyzer::wjets_vbf] = wSelection && vbf;
+  categoryDecisions[(int)HTTAnalyzer::wjets_jet0] = muonIso && wSelection && jet0;
+  categoryDecisions[(int)HTTAnalyzer::wjets_boosted] = muonIso && wSelection && boosted;
+  categoryDecisions[(int)HTTAnalyzer::wjets_vbf] = muonIso && wSelection && vbf;
 
-  categoryDecisions[(int)HTTAnalyzer::antiiso_jet0] = antiiso && mtSelection && jet0;
-  categoryDecisions[(int)HTTAnalyzer::antiiso_boosted] = antiiso && mtSelection && boosted;
-  categoryDecisions[(int)HTTAnalyzer::antiiso_vbf] = antiiso && mtSelection && vbf;
+  categoryDecisions[(int)HTTAnalyzer::antiiso_jet0] = muonAntiIso && mtSelection && jet0;
+  categoryDecisions[(int)HTTAnalyzer::antiiso_boosted] = muonAntiIso && mtSelection && boosted;
+  categoryDecisions[(int)HTTAnalyzer::antiiso_vbf] = muonAntiIso && mtSelection && vbf;
 
-  categoryDecisions[(int)HTTAnalyzer::W] = wSelection;
-  categoryDecisions[(int)HTTAnalyzer::TT] = ttSelection;
+  categoryDecisions[(int)HTTAnalyzer::W] = muonIso && wSelection;
+  categoryDecisions[(int)HTTAnalyzer::TT] = muonIso && ttSelection;
+}
+//////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////////
+bool HTTAnalyzer::passCategory(const HTTAnalyzer::muTauCategory & aCategory){
 
-  return categoryDecisions[(int)aCategory];
+  if(!categoryDecisions.size()) return false;
+  else return categoryDecisions[(int)aCategory];
+  
+  return false;
 }
 //////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////
@@ -387,7 +403,6 @@ bool HTTAnalyzer::analyze(const EventProxyBase& iEvent){
   if(sampleName!="Data") trigger = true; //MC trigger included in muon SF
   if(!muonKinematics || !tauID || !trigger) return true;
 
-  ///Note: parts of the signal/control region selection are applied in the following code.
   bool SS = aTau.getCharge()*aMuon.getCharge() == 1;
   bool OS = aTau.getCharge()*aMuon.getCharge() == -1;
   bool muonIso = aMuon.getProperty(PropertyEnum::combreliso)<0.15;
@@ -410,13 +425,16 @@ bool HTTAnalyzer::analyze(const EventProxyBase& iEvent){
 			   aPair.getMET(aSystEffect).Mod());
     aMET.setP4(met4v);
 
-    for(unsigned int iCategory = HTTAnalyzer::jet0;iCategory<HTTAnalyzer::DUMMY;++iCategory){
+    testAllCategories(aSystEffect);
+
+    for(unsigned int iCategory = HTTAnalyzer::jet0;iCategory<HTTAnalyzer::W;++iCategory){
       HTTAnalyzer::muTauCategory categoryType = static_cast<HTTAnalyzer::muTauCategory>(iCategory);
 
-      if(!passCategory(categoryType, aSystEffect)) continue;
+      if(!passCategory(categoryType)) continue;
 
       categorySuffix = std::to_string(iCategory);
       systEffectName = HTTAnalyzer::systEffectName(iSystEffect);
+
       if(systEffectName.find("CAT")!=std::string::npos){
         std::string categoryName = HTTAnalyzer::categoryName(iCategory);
         systEffectName.replace(systEffectName.find("CAT"),3,categoryName);
@@ -426,6 +444,7 @@ bool HTTAnalyzer::analyze(const EventProxyBase& iEvent){
 	hNameSuffix = sampleName+"_OS_"+categorySuffix+systEffectName;
 
 	fillControlHistos(hNameSuffix, eventWeightWithSyst, aSystEffect);
+
 	if(aSystEffect==sysEffects::NOMINAL_SVFIT){
 	  fillGenDecayPlaneAngle(hNameSuffix+"_Gen", eventWeightWithSyst);
 	  fillDecayPlaneAngle(hNameSuffix+"_RefitPV", eventWeightWithSyst);
@@ -435,25 +454,26 @@ bool HTTAnalyzer::analyze(const EventProxyBase& iEvent){
 	  fillVertices(hNameSuffix+"_AODPV");
 	}
       }
+
       if(SS && muonIso){
 	hNameSuffix = sampleName+"_SS_"+categorySuffix+systEffectName;
-	fillControlHistos(hNameSuffix, eventWeightWithSyst);
+	fillControlHistos(hNameSuffix, eventWeightWithSyst, aSystEffect);
       }
       if(OS){
 	hNameSuffix = sampleName+"_OSnoMuIso_"+categorySuffix+systEffectName;
 	myHistos_->fill1DHistogram("h1DIso"+hNameSuffix,aMuon.getProperty(PropertyEnum::combreliso),eventWeightWithSyst);
 	myHistos_->fill1DHistogram("h1DMassTrans"+hNameSuffix,aPair.getMTMuon(aSystEffect),eventWeightWithSyst);
-  //needed for antiiso control region//
-  myHistos_->fill1DHistogram("h1DMassSV"+hNameSuffix,aPair.getP4(sysEffects::NOMINAL_SVFIT).M(),eventWeight);
-  myHistos_->fill1DHistogram("h1DMassVis"+hNameSuffix,aPair.getP4(sysEffects::NOMINAL_SVFIT).M(),eventWeight);
+	//needed for antiiso control region//
+	myHistos_->fill1DHistogram("h1DMassSV"+hNameSuffix,aPair.getP4(aSystEffect).M(),eventWeight);
+	myHistos_->fill1DHistogram("h1DMassVis"+hNameSuffix,aPair.getP4(aSystEffect).M(),eventWeight);
       }
       if(SS){
 	hNameSuffix = sampleName+"_SSnoMuIso_"+categorySuffix+systEffectName;
 	myHistos_->fill1DHistogram("h1DIso"+hNameSuffix,aMuon.getProperty(PropertyEnum::combreliso),eventWeightWithSyst);
 	myHistos_->fill1DHistogram("h1DMassTrans"+hNameSuffix,aPair.getMTMuon(aSystEffect),eventWeightWithSyst);
-  //needed for antiiso control region//
-  myHistos_->fill1DHistogram("h1DMassSV"+hNameSuffix,aPair.getP4(sysEffects::NOMINAL_SVFIT).M(),eventWeight);
-  myHistos_->fill1DHistogram("h1DMassVis"+hNameSuffix,aPair.getP4(sysEffects::NOMINAL_SVFIT).M(),eventWeight);
+	//needed for antiiso control region//
+	myHistos_->fill1DHistogram("h1DMassSV"+hNameSuffix,aPair.getP4(aSystEffect).M(),eventWeight);
+	myHistos_->fill1DHistogram("h1DMassVis"+hNameSuffix,aPair.getP4(aSystEffect).M(),eventWeight);
       }
     }
   }

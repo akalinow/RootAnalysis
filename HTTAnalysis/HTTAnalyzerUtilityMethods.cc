@@ -55,8 +55,8 @@ std::string HTTAnalyzer::getSampleNameFromFileName(const EventProxyHTT & myEvent
 
   std::string fileName = myEventProxy.getTTree()->GetCurrentFile()->GetName();
 
-  std::map<std::string, std::string>::const_iterator sampleNameIt = fileName2sampleName.find(fileName);
-  if(sampleNameIt!=fileName2sampleName.end()) return sampleNameIt->second;
+  //std::map<std::string, std::string>::const_iterator sampleNameIt = fileName2sampleName.find(fileName);
+  //if(sampleNameIt!=fileName2sampleName.end()) return sampleNameIt->second;
 
   std::string sampleName = "Unknown";
 
@@ -66,7 +66,6 @@ std::string HTTAnalyzer::getSampleNameFromFileName(const EventProxyHTT & myEvent
   else if(fileName.find("W4JetsToLNu")!=std::string::npos) sampleName = "W4Jets";
   else if(fileName.find("WJetsToLNu")!=std::string::npos && myEventProxy.event->getLHEnOutPartons()==0) sampleName = "W0Jets";
   else if(fileName.find("WJetsToLNu")!=std::string::npos && myEventProxy.event->getLHEnOutPartons()>0) sampleName = "WAllJets";
-  //TEST else if(fileName.find("WJetsToLNu")!=std::string::npos) sampleName = "WJets";
 
   else if(fileName.find("Run201")!=std::string::npos) sampleName =  "Data";
   else if(fileName.find("SUSYGluGluToHToTauTau")!=std::string::npos) sampleName =  "A";
@@ -131,7 +130,6 @@ std::string HTTAnalyzer::getDYSampleName(const EventProxyHTT & myEventProxy){
   else if(fileName.find("DY3JetsToLL")!=std::string::npos) jetsName = "3Jets";
   else if(fileName.find("DY4JetsToLL")!=std::string::npos) jetsName = "4Jets";
   else if(fileName.find("DYJetsToLLM10to50")!=std::string::npos) jetsName =  "LowM";
-  //TEST else if(fileName.find("DYJetsToLLM50")!=std::string::npos) jetsName =  "Jets";
   else if(fileName.find("DYJetsToLLM50")!=std::string::npos && myEventProxy.event->getLHEnOutPartons()==0) jetsName =  "0Jets";
   else if(fileName.find("DYJetsToLLM50")!=std::string::npos && myEventProxy.event->getLHEnOutPartons()>0) jetsName =  "AllJets";
 

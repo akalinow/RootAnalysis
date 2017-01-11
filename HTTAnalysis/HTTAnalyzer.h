@@ -137,11 +137,11 @@ class HTTAnalyzer: public Analyzer{
    return "_Unknown";
  }
 
+  ///Check it the event passes category selections with given systematic effect.
+  void testAllCategories(const sysEffects::sysEffectsEnum & aSystEffect=sysEffects::NOMINAL);
+
   ///Check it the event passes given category selections.
-  ///Selections common to all categories (mu pt, tau Id etc.)
-  ///are checked outside this method.
-  bool passCategory(const HTTAnalyzer::muTauCategory & aCategory,
-		    const sysEffects::sysEffectsEnum & aSystEffect=sysEffects::NOMINAL);
+  bool passCategory(const HTTAnalyzer::muTauCategory & aCategory);
 
   ///Check it tau decay modes (GEN and RECO) match selected (hardcoded)
   ///decay mode.
