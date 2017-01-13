@@ -1546,12 +1546,12 @@ std::pair<float,float> HTTHistograms::getQCDOStoSS(unsigned int iCategory,
   else if(iCategory == (unsigned int)HTTAnalyzer::boosted) result = std::pair<float,float>(1.15,0.15*1.15);
   else if(iCategory == (unsigned int)HTTAnalyzer::vbf) result = std::pair<float,float>(1.2,0.30*1.2);
   else result = std::pair<float,float>(1.0,0.15);
-  
+
   if(iSystEffect==(unsigned int)sysEffects::QCDSFUp) result.first+=result.second;
   if(iSystEffect==(unsigned int)sysEffects::QCDSFDown) result.first-=result.second;
-  
+
   return result;
-  
+
   std::string hName = "h1DIso";
   std::string hNameSuffix;
 

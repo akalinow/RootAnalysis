@@ -23,6 +23,8 @@ HTTAnalyzer::HTTAnalyzer(const std::string & aName):Analyzer(aName),nPCAMin_(0.0
   filePath = "MC_Spring16_PU25ns_V1.root";
   puMCFile_ = new TFile(filePath.c_str());
 
+  categoryDecisions.resize((int)HTTAnalyzer::DUMMY);
+
   ntupleFile_ = 0;
   hStatsFromFile = 0;
 
@@ -252,8 +254,7 @@ bool HTTAnalyzer::fillVertices(const std::string & sysType){
 //////////////////////////////////////////////////////////////////////////////
 void HTTAnalyzer::testAllCategories(const sysEffects::sysEffectsEnum & aSystEffect){
 
-if(categoryDecisions.size()) categoryDecisions.clear();
-else categoryDecisions = std::vector<bool>((int)HTTAnalyzer::DUMMY);
+for(auto && it: categoryDecisions) it = false;
 
 ///Check if given dataset needs given category.
 if( (aSystEffect==sysEffects::sysEffectsEnum::TTUp || aSystEffect==sysEffects::sysEffectsEnum::TTDown) &&
@@ -345,9 +346,9 @@ if( (aSystEffect==sysEffects::sysEffectsEnum::ZPtUp || aSystEffect==sysEffects::
 //////////////////////////////////////////////////////////////////////////////
 bool HTTAnalyzer::passCategory(const HTTAnalyzer::muTauCategory & aCategory){
 
-  if(!categoryDecisions.size()) return false;
+  if(categoryDecisions.size()==0) return false;
   else return categoryDecisions[(int)aCategory];
-  
+
   return false;
 }
 //////////////////////////////////////////////////////////////////////////////
@@ -427,7 +428,7 @@ bool HTTAnalyzer::analyze(const EventProxyBase& iEvent){
 
     testAllCategories(aSystEffect);
 
-    for(unsigned int iCategory = HTTAnalyzer::jet0;iCategory<HTTAnalyzer::W;++iCategory){
+    for(unsigned int iCategory = HTTAnalyzer::jet0;iCategory<HTTAnalyzer::boosted;++iCategory){
       HTTAnalyzer::muTauCategory categoryType = static_cast<HTTAnalyzer::muTauCategory>(iCategory);
 
       if(!passCategory(categoryType)) continue;
