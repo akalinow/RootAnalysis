@@ -183,9 +183,9 @@ void HTTAnalyzer::fillControlHistos(const std::string & hNameSuffix, float event
   float jetsMass = 0;
   if(nJets30>1) jetsMass = (aJet1.getP4(aSystEffect)+aJet2.getP4(aSystEffect)).M();
 
-  myHistos_->fill1DHistogram("h1DMassTrans"+hNameSuffix,aPair.getMTMuon(aSystEffect),eventWeight);
   myHistos_->fill1DHistogram("h1DMassSV"+hNameSuffix,aPair.getP4(aSystEffect).M(),eventWeight);
   myHistos_->fill1DHistogram("h1DMassVis"+hNameSuffix, visMass, eventWeight);
+  myHistos_->fill1DHistogram("h1DMassTrans"+hNameSuffix,aPair.getMTMuon(aSystEffect),eventWeight);
 
   ///Unrolled distributions for 2D fit
   myHistos_->fill2DUnrolledHistogram("h1DUnRollTauPtMassVis"+hNameSuffix, visMass, aTau.getP4(aSystEffect).Pt(),eventWeight);
@@ -256,13 +256,6 @@ void HTTAnalyzer::testAllCategories(const sysEffects::sysEffectsEnum & aSystEffe
 
 for(auto && it: categoryDecisions) it = false;
 
-///Check if given dataset needs given category.
-if( (aSystEffect==sysEffects::sysEffectsEnum::TTUp || aSystEffect==sysEffects::sysEffectsEnum::TTDown) &&
-      sampleName.find("TTbar")==std::string::npos) return;
-
-if( (aSystEffect==sysEffects::sysEffectsEnum::ZPtUp || aSystEffect==sysEffects::sysEffectsEnum::ZPtDown) &&
-      sampleName.find("DY")==std::string::npos) return;
-
   nJets30 = 0;
   for(auto itJet:aSeparatedJets){
     if(itJet.getP4(aSystEffect).Pt()>30) ++nJets30;
@@ -313,8 +306,9 @@ if( (aSystEffect==sysEffects::sysEffectsEnum::ZPtUp || aSystEffect==sysEffects::
   bool wSelection = aPair.getMTMuon(aSystEffect)>80 && aMuon.getProperty(PropertyEnum::combreliso)<0.15;
   bool ttSelection =  aPair.getMTMuon(aSystEffect)>150;
   bool muonAntiIso = aMuon.getProperty(PropertyEnum::combreliso)>0.15 && aMuon.getProperty(PropertyEnum::combreliso)<0.30;
-  bool muonIso = aMuon.getProperty(PropertyEnum::combreliso)<0.15;
-  muonIso = true;
+  ///Later add muon iso to this selection. Now this is required in the analyze method()
+  ///and QCD OStoSS scale factor estimation depends on it.
+  bool muonIso = true;//aMuon.getProperty(PropertyEnum::combreliso)<0.15;
 
   categoryDecisions[(int)HTTAnalyzer::jet0_low] = muonIso && mtSelection && jet0_low;
   categoryDecisions[(int)HTTAnalyzer::jet0_high] = muonIso && mtSelection && jet0_high;
@@ -411,7 +405,7 @@ bool HTTAnalyzer::analyze(const EventProxyBase& iEvent){
   std::string categorySuffix = "";
   std::string systEffectName = "";
   for(unsigned int iSystEffect = (unsigned int)sysEffects::NOMINAL_SVFIT;
-    iSystEffect<(unsigned int)sysEffects::TESUp;++iSystEffect){
+    iSystEffect<(unsigned int)sysEffects::DUMMY;++iSystEffect){
 
     sysEffects::sysEffectsEnum aSystEffect = static_cast<sysEffects::sysEffectsEnum>(iSystEffect);
 
@@ -428,7 +422,7 @@ bool HTTAnalyzer::analyze(const EventProxyBase& iEvent){
 
     testAllCategories(aSystEffect);
 
-    for(unsigned int iCategory = HTTAnalyzer::jet0;iCategory<HTTAnalyzer::boosted;++iCategory){
+    for(unsigned int iCategory = HTTAnalyzer::jet0;iCategory<HTTAnalyzer::W;++iCategory){
       HTTAnalyzer::muTauCategory categoryType = static_cast<HTTAnalyzer::muTauCategory>(iCategory);
 
       if(!passCategory(categoryType)) continue;

@@ -102,6 +102,8 @@ const TLorentzVector & HTTParticle::getSystScaleP4(sysEffects::sysEffectsEnum ty
     if(type==sysEffects::JESDown) JES*=-1;
     return getShiftedP4(1+JES);
   }
+
+  p4Cache = p4;
   return p4;
 }
 ////////////////////////////////////////////////
