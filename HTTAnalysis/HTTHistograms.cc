@@ -492,6 +492,7 @@ void HTTHistograms::finalizeHistograms(int nRuns, float weight){
   ttScale = 1.0;
 
   for(unsigned int iCategory = (int)HTTAnalyzer::jet0;
+
       iCategory<(int)HTTAnalyzer::boosted;++iCategory){
 
     plotCPhistograms(iCategory);
@@ -606,7 +607,6 @@ void HTTHistograms::plotCPhistograms(unsigned int iCategory){
 
   plotPhiDecayPlanes("Phi-nVecIP-yTauPosggH125"+hNameSuffix);
   plotPhiDecayPlanes("Phi-nVecIP-yTauNegggH125"+hNameSuffix);
-
 }
 /////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////
@@ -829,6 +829,7 @@ void HTTHistograms::plotPhiDecayPlanes(const std::string & name){
   l.SetFillColor(10);
 
   TString hName = "h1D"+name+"_RefitPV";
+
   TH1F* h1DRefitPV = 0;
   if(name.find("DYJets")!=std::string::npos) {
     std::string n2=name;
@@ -942,6 +943,7 @@ void HTTHistograms::plot_HAZ_Histograms(const std::string & hName,
   TH1F* h_h = this->get1DHistogram(name.Data());
   name = "h1D"+hName+"A"+sysType;
   TH1F* h_A = this->get1DHistogram(name.Data());
+
   name = "h1D"+hName+"DYJetsMatchT"+sysType;
   TH1F* h_Z = get1D_TauMatchJetSum(name.Data(),false,true);
 
@@ -1035,6 +1037,8 @@ THStack*  HTTHistograms::plotStack(unsigned int iCategory,
   TH1F *hDYJetsZL = get1D_TauMatchJetSum((hName+"DYJetsMatchL"+hNameSuffix).c_str(), sumDecayModes, sumJetBins);
   TH1F *hDYJetsZTT = get1D_TauMatchJetSum((hName+"DYJetsMatchT"+hNameSuffix).c_str(), sumDecayModes, sumJetBins);
 
+  TH1F *hDYJetsLowM = get1DHistogram((hName+"DYLowM"+hNameSuffix).c_str());
+  
   TH1F *hEWK2Jets = get1D_EWK2JetsSum(hName+"EWK2Jets"+hNameSuffix);
 
   TH1F *hSoup = get1DHistogram((hName+"Data"+hNameSuffix).c_str(),true);

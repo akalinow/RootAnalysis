@@ -101,6 +101,7 @@ class HTTAnalyzer: public Analyzer{
     else if(iCategory==(int)HTTAnalyzer::TT) return "TT";
     else if(iCategory==(int)HTTAnalyzer::jet0) return "0jet";
     else if(iCategory==(int)HTTAnalyzer::boosted) return "boosted";
+    else if(iCategory==(int)HTTAnalyzer::boosted_CP) return "boosted_CP";
     else if(iCategory==(int)HTTAnalyzer::vbf) return "vbf";
     else if(iCategory==(int)HTTAnalyzer::CP_Pi) return "CP_Pi";
     else if(iCategory==(int)HTTAnalyzer::CP_Rho) return "CP_Rho";

@@ -335,6 +335,7 @@ for(auto && it: categoryDecisions) it = false;
 
   categoryDecisions[(int)HTTAnalyzer::W] = muonIso && wSelection;
   categoryDecisions[(int)HTTAnalyzer::TT] = muonIso && ttSelection;
+
 }
 //////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////
@@ -390,6 +391,7 @@ bool HTTAnalyzer::analyze(const EventProxyBase& iEvent){
   }
   bool tauID = ( (int)aTau.getProperty(PropertyEnum::tauID) & tauIDmask) == tauIDmask;
   bool muonKinematics = aMuon.getP4().Pt()>24 && fabs(aMuon.getP4().Eta())<2.1;
+
   bool trigger = aMuon.hasTriggerMatch(TriggerEnum::HLT_IsoMu22) ||
 		 aMuon.hasTriggerMatch(TriggerEnum::HLT_IsoTkMu22) ||
 		 aMuon.hasTriggerMatch(TriggerEnum::HLT_IsoMu22_eta2p1) ||
@@ -397,6 +399,7 @@ bool HTTAnalyzer::analyze(const EventProxyBase& iEvent){
 
   if(sampleName!="Data") trigger = true; //MC trigger included in muon SF
   if(!muonKinematics || !tauID || !trigger) return true;
+
 
   bool SS = aTau.getCharge()*aMuon.getCharge() == 1;
   bool OS = aTau.getCharge()*aMuon.getCharge() == -1;

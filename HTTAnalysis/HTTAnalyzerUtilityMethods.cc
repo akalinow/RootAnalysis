@@ -144,7 +144,6 @@ std::string HTTAnalyzer::getDYSampleName(const EventProxyHTT & myEventProxy){
   if(tauMCMatch<5) decayName = "L";
   else if(tauMCMatch==5) decayName = "T";
   else decayName = "J";
-
   return "DY"+jetsName+"Match"+decayName;
 }
 //////////////////////////////////////////////////////////////////////////////
