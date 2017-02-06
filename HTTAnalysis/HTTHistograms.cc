@@ -490,10 +490,8 @@ void HTTHistograms::finalizeHistograms(int nRuns, float weight){
   //////////////
   ///Control regions plots
   ttScale = 1.0;
-
   for(unsigned int iCategory = (int)HTTAnalyzer::jet0;
-
-      iCategory<(int)HTTAnalyzer::boosted;++iCategory){
+      iCategory<(int)HTTAnalyzer::CP_Pi;++iCategory){
 
     plotCPhistograms(iCategory);
 
@@ -541,29 +539,28 @@ void HTTHistograms::finalizeHistograms(int nRuns, float weight){
     plotStack(iCategory, "Phi-nVectors");
     plotStack(iCategory, "Phi-nVecIP");
     plotStack(iCategory, "NPV");
+  }
+  ///Make systematic effect histos.
+  for(unsigned int iSystEffect = (unsigned int)sysEffects::NOMINAL_SVFIT;
+      iSystEffect<(unsigned int)sysEffects::DUMMY;++iSystEffect){
+    
+    for(unsigned int iCategory = (int)HTTAnalyzer::jet0;
+	iCategory<(int)HTTAnalyzer::CP_Pi;++iCategory){
+      
+      wselOSCorrection =  std::pair<float,float>(1.0,0);
+      wselSSCorrection =  std::pair<float,float>(1.0,0);
+      
+      wselOSCorrection = getWNormalisation(iCategory, "OS", iSystEffect);
+      wselSSCorrection = getWNormalisation(iCategory, "SS", iSystEffect);
+      
+      plotStack(iCategory, "MassSV", "OS", iSystEffect);
+      plotStack(iCategory, "UnRollTauPtMassVis", "OS", iSystEffect);
+      plotStack(iCategory, "UnRollHiggsPtMassSV", "OS", iSystEffect);
+      plotStack(iCategory, "UnRollMjjMassSV", "OS", iSystEffect);
+      plotStack(iCategory, "UnRollMassSVPhiCP", "OS", iSystEffect);
+      plotStack(iCategory, "UnRollMassSVYCP", "OS", iSystEffect);
     }
-
-    ///Make systematic effect histos.
-    for(unsigned int iSystEffect = (unsigned int)sysEffects::NOMINAL_SVFIT;
-	   iSystEffect<(unsigned int)sysEffects::DUMMY;++iSystEffect){
-
-      for(unsigned int iCategory = (int)HTTAnalyzer::jet0;
-	                     iCategory<(int)HTTAnalyzer::boosted;++iCategory){
-
-	wselOSCorrection =  std::pair<float,float>(1.0,0);
-	wselSSCorrection =  std::pair<float,float>(1.0,0);
-
-	wselOSCorrection = getWNormalisation(iCategory, "OS", iSystEffect);
-	wselSSCorrection = getWNormalisation(iCategory, "SS", iSystEffect);
-
-	plotStack(iCategory, "MassSV", "OS", iSystEffect);
-	plotStack(iCategory, "UnRollTauPtMassVis", "OS", iSystEffect);
-	plotStack(iCategory, "UnRollHiggsPtMassSV", "OS", iSystEffect);
-	plotStack(iCategory, "UnRollMjjMassSV", "OS", iSystEffect);
-	plotStack(iCategory, "UnRollMassSVPhiCP", "OS", iSystEffect);
-	plotStack(iCategory, "UnRollMassSVYCP", "OS", iSystEffect);
-      }
-    }
+  }
 }
 /////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////
@@ -1036,8 +1033,6 @@ THStack*  HTTHistograms::plotStack(unsigned int iCategory,
   TH1F *hDYJetsZJ = get1D_TauMatchJetSum((hName+"DYJetsMatchJ"+hNameSuffix).c_str(), sumDecayModes, sumJetBins);
   TH1F *hDYJetsZL = get1D_TauMatchJetSum((hName+"DYJetsMatchL"+hNameSuffix).c_str(), sumDecayModes, sumJetBins);
   TH1F *hDYJetsZTT = get1D_TauMatchJetSum((hName+"DYJetsMatchT"+hNameSuffix).c_str(), sumDecayModes, sumJetBins);
-
-  TH1F *hDYJetsLowM = get1DHistogram((hName+"DYLowM"+hNameSuffix).c_str());
   
   TH1F *hEWK2Jets = get1D_EWK2JetsSum(hName+"EWK2Jets"+hNameSuffix);
 

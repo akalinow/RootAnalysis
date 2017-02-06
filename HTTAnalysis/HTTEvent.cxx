@@ -138,7 +138,7 @@ void HTTPair::clear(){
   leg1.clear();
   leg2.clear();
 
-  lastSystEffect = sysEffects::NOMINAL_SVFIT;
+  lastSystEffect = sysEffects::NOMINAL;
 }
 ////////////////////////////////////////////////
 ////////////////////////////////////////////////

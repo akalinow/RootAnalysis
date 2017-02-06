@@ -101,7 +101,6 @@ class HTTAnalyzer: public Analyzer{
     else if(iCategory==(int)HTTAnalyzer::TT) return "TT";
     else if(iCategory==(int)HTTAnalyzer::jet0) return "0jet";
     else if(iCategory==(int)HTTAnalyzer::boosted) return "boosted";
-    else if(iCategory==(int)HTTAnalyzer::boosted_CP) return "boosted_CP";
     else if(iCategory==(int)HTTAnalyzer::vbf) return "vbf";
     else if(iCategory==(int)HTTAnalyzer::CP_Pi) return "CP_Pi";
     else if(iCategory==(int)HTTAnalyzer::CP_Rho) return "CP_Rho";
@@ -123,8 +122,8 @@ class HTTAnalyzer: public Analyzer{
    else if(iSystEffect==(int)sysEffects::JESDown) return "_CMS_scale_j_13TeVDown";
    else if(iSystEffect==(int)sysEffects::M2TUp) return "_CMS_htt_ZLShape_mt_13TeVUp";
    else if(iSystEffect==(int)sysEffects::M2TDown) return "_CMS_htt_ZLShape_mt_13TeVDown";
-   else if(iSystEffect==(int)sysEffects::E2TUp) return "_CMS_htt_ZLShape_et_13TeVUp";
-   else if(iSystEffect==(int)sysEffects::E2TDown) return "_CMS_htt_ZLShape_et_13TeVDown";
+   else if(iSystEffect==(int)sysEffects::E2TUp) return "_CMS_htt_ZEShape_et_13TeVUp";
+   else if(iSystEffect==(int)sysEffects::E2TDown) return "_CMS_htt_ZEShape_et_13TeVDown";
    else if(iSystEffect==(int)sysEffects::J2TUp) return "_CMS_htt_jetToTauFake_13TeVUp";
    else if(iSystEffect==(int)sysEffects::J2TDown) return "_CMS_htt_jetToTauFake_13TeVDown";
    else if(iSystEffect==(int)sysEffects::ZPtUp) return "_CMS_htt_dyShape_13TeVUp";
