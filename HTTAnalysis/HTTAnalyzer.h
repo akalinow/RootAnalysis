@@ -264,7 +264,7 @@ class HTTAnalyzer: public Analyzer{
   HTTPair aPair;
   std::string sampleName;
 
-  HTTParticle aTau, aMuon, aMET;
+  HTTParticle aLeg2, aLeg1, aMET;
   HTTParticle aGenHadTau, aGenMuonTau;
   HTTParticle aJet1, aJet2;
   std::vector<HTTParticle> aSeparatedJets;

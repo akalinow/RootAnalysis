@@ -41,9 +41,9 @@ float HTTAnalyzer::getSystWeight(const sysEffects::sysEffectsEnum & aSystEffect)
   else if(aSystEffect==sysEffects::TTUp && sampleName.find("TTbar")!=std::string::npos) return aEvent.getPtReWeight();
   else if(aSystEffect==sysEffects::TTDown && sampleName.find("TTbar")!=std::string::npos) return 1.0/aEvent.getPtReWeight();
   else if((aSystEffect==sysEffects::J2TUp || aSystEffect==sysEffects::J2TDown)
-            && aTau.getProperty(PropertyEnum::mc_match)==6){
-  float delta = 0.2*aTau.getP4().Perp()/100.0;
-  if(aTau.getP4().Perp()>200) delta = 0.4;
+            && aLeg2.getProperty(PropertyEnum::mc_match)==6){
+  float delta = 0.2*aLeg2.getP4().Perp()/100.0;
+  if(aLeg2.getP4().Perp()>200) delta = 0.4;
   if(aSystEffect==sysEffects::J2TDown) delta*=-1;
     return 1-delta;
   }
@@ -137,8 +137,8 @@ std::string HTTAnalyzer::getDYSampleName(const EventProxyHTT & myEventProxy){
   int tauMCMatch = 6;
   if(myEventProxy.pairs->size()){
     HTTPair aPair = (*myEventProxy.pairs)[0];
-    HTTParticle aTau = aPair.getTau();
-    tauMCMatch = aTau.getProperty(PropertyEnum::mc_match);
+    HTTParticle aLeg2 = aPair.getTau();
+    tauMCMatch = aLeg2.getProperty(PropertyEnum::mc_match);
   }
   std::string decayName = "Unknown";
   if(tauMCMatch<5) decayName = "L";
@@ -163,16 +163,16 @@ std::string HTTAnalyzer::getMatchingName(const EventProxyHTT & myEventProxy){
   int tauMCMatch_1 = 6, tauMCMatch_2 = 6;
   if(myEventProxy.pairs->size() && fileName.find("MT_")!=std::string::npos){
     HTTPair aPair = (*myEventProxy.pairs)[0];
-    HTTParticle aTau = aPair.getTau();
-    tauMCMatch_1 = aTau.getProperty(PropertyEnum::mc_match);
+    HTTParticle aLeg2 = aPair.getTau();
+    tauMCMatch_1 = aLeg2.getProperty(PropertyEnum::mc_match);
     if(tauMCMatch_1 == 5) return "MatchT"; else return "MatchJ";
   }
 
   if(myEventProxy.pairs->size() && fileName.find("TT_")!=std::string::npos){
     HTTPair aPair = (*myEventProxy.pairs)[0];
-    HTTParticle aTau_1 = aPair.getLeg1(), aTau_2 = aPair.getLeg2();
-    tauMCMatch_1 = aTau_1.getProperty(PropertyEnum::mc_match);
-    tauMCMatch_2 = aTau_2.getProperty(PropertyEnum::mc_match);
+    HTTParticle aLeg2_1 = aPair.getLeg1(), aLeg2_2 = aPair.getLeg2();
+    tauMCMatch_1 = aLeg2_1.getProperty(PropertyEnum::mc_match);
+    tauMCMatch_2 = aLeg2_2.getProperty(PropertyEnum::mc_match);
     if(tauMCMatch_1 == 5 && tauMCMatch_2 == 5) return "MatchT"; else return "MatchJ";
   }
 
