@@ -192,9 +192,16 @@ void HTTAnalyzer::fillControlHistos(const std::string & hNameSuffix, float event
   myHistos_->fill2DUnrolledHistogram("h1DUnRollHiggsPtMassSV"+hNameSuffix, aPair.getP4(aSystEffect).M(), higgsPt, eventWeight);
   myHistos_->fill2DUnrolledHistogram("h1DUnRollMjjMassSV"+hNameSuffix, aPair.getP4(aSystEffect).M(), jetsMass, eventWeight);
 
+  myHistos_->fill1DHistogram("h1DIso"+hNameSuffix,aMuon.getProperty(PropertyEnum::combreliso),eventWeight);
   if(aSystEffect!=sysEffects::NOMINAL_SVFIT) return;
 
   fillDecayPlaneAngle(hNameSuffix, eventWeight, aSystEffect);
+  fillGenDecayPlaneAngle(hNameSuffix+"_Gen", eventWeight);
+  fillDecayPlaneAngle(hNameSuffix+"_RefitPV", eventWeight);
+  fillDecayPlaneAngle(hNameSuffix+"_AODPV", eventWeight);
+  fillDecayPlaneAngle(hNameSuffix+"_GenPV", eventWeight);
+  fillVertices(hNameSuffix+"_RefitPV", eventWeight);
+  fillVertices(hNameSuffix+"_AODPV", eventWeight);
 
   ///Fill histograms with number of PV.
   myHistos_->fill1DHistogram("h1DNPV"+hNameSuffix,aEvent.getNPV(),eventWeight);
@@ -233,7 +240,7 @@ void HTTAnalyzer::fillControlHistos(const std::string & hNameSuffix, float event
 }
 //////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////
-bool HTTAnalyzer::fillVertices(const std::string & sysType){
+bool HTTAnalyzer::fillVertices(const std::string & sysType, float eventWeight){
 
   TVector3 aVertexGen = aEvent.getGenPV();
   TVector3 aVertex = aEvent.getRefittedPV();
@@ -244,9 +251,9 @@ bool HTTAnalyzer::fillVertices(const std::string & sysType){
   float pullY = aVertexGen.Y() - aVertex.Y();
   float pullZ = aVertexGen.Z() - aVertex.Z();
 
-  myHistos_->fill1DHistogram("h1DVxPullX"+sysType,pullX);
-  myHistos_->fill1DHistogram("h1DVxPullY"+sysType,pullY);
-  myHistos_->fill1DHistogram("h1DVxPullZ"+sysType,pullZ);
+  myHistos_->fill1DHistogram("h1DVxPullX"+sysType,pullX, eventWeight);
+  myHistos_->fill1DHistogram("h1DVxPullY"+sysType,pullY, eventWeight);
+  myHistos_->fill1DHistogram("h1DVxPullZ"+sysType,pullZ, eventWeight);
 
   return true;
 }
@@ -306,9 +313,7 @@ for(auto && it: categoryDecisions) it = false;
   bool wSelection = aPair.getMTMuon(aSystEffect)>80 && aMuon.getProperty(PropertyEnum::combreliso)<0.15;
   bool ttSelection =  aPair.getMTMuon(aSystEffect)>150;
   bool muonAntiIso = aMuon.getProperty(PropertyEnum::combreliso)>0.15 && aMuon.getProperty(PropertyEnum::combreliso)<0.30;
-  ///Later add muon iso to this selection. Now this is required in the analyze method()
-  ///and QCD OStoSS scale factor estimation depends on it.
-  bool muonIso = true;//aMuon.getProperty(PropertyEnum::combreliso)<0.15;
+  bool muonIso = aMuon.getProperty(PropertyEnum::combreliso)<0.15;
 
   categoryDecisions[(int)HTTAnalyzer::jet0_low] = muonIso && mtSelection && jet0_low;
   categoryDecisions[(int)HTTAnalyzer::jet0_high] = muonIso && mtSelection && jet0_high;
@@ -400,7 +405,6 @@ bool HTTAnalyzer::analyze(const EventProxyBase& iEvent){
   if(sampleName!="Data") trigger = true; //MC trigger included in muon SF
   if(!muonKinematics || !tauID || !trigger) return true;
 
-
   bool SS = aTau.getCharge()*aMuon.getCharge() == 1;
   bool OS = aTau.getCharge()*aMuon.getCharge() == -1;
   bool muonIso = aMuon.getProperty(PropertyEnum::combreliso)<0.15;
@@ -438,41 +442,10 @@ bool HTTAnalyzer::analyze(const EventProxyBase& iEvent){
         systEffectName.replace(systEffectName.find("CAT"),3,categoryName);
       }
 
-      if(OS && muonIso){
-	hNameSuffix = sampleName+"_OS_"+categorySuffix+systEffectName;
+      if(OS) hNameSuffix = sampleName+"_OS_"+categorySuffix+systEffectName;
+      else if(SS) hNameSuffix = sampleName+"_SS_"+categorySuffix+systEffectName;
 
-	fillControlHistos(hNameSuffix, eventWeightWithSyst, aSystEffect);
-
-	if(aSystEffect==sysEffects::NOMINAL_SVFIT){
-	  fillGenDecayPlaneAngle(hNameSuffix+"_Gen", eventWeightWithSyst);
-	  fillDecayPlaneAngle(hNameSuffix+"_RefitPV", eventWeightWithSyst);
-	  fillDecayPlaneAngle(hNameSuffix+"_AODPV", eventWeightWithSyst);
-	  fillDecayPlaneAngle(hNameSuffix+"_GenPV", eventWeightWithSyst);
-	  fillVertices(hNameSuffix+"_RefitPV");
-	  fillVertices(hNameSuffix+"_AODPV");
-	}
-      }
-
-      if(SS && muonIso){
-	hNameSuffix = sampleName+"_SS_"+categorySuffix+systEffectName;
-	fillControlHistos(hNameSuffix, eventWeightWithSyst, aSystEffect);
-      }
-      if(OS){
-	hNameSuffix = sampleName+"_OSnoMuIso_"+categorySuffix+systEffectName;
-	myHistos_->fill1DHistogram("h1DIso"+hNameSuffix,aMuon.getProperty(PropertyEnum::combreliso),eventWeightWithSyst);
-	myHistos_->fill1DHistogram("h1DMassTrans"+hNameSuffix,aPair.getMTMuon(aSystEffect),eventWeightWithSyst);
-	//needed for antiiso control region//
-	myHistos_->fill1DHistogram("h1DMassSV"+hNameSuffix,aPair.getP4(aSystEffect).M(),eventWeight);
-	myHistos_->fill1DHistogram("h1DMassVis"+hNameSuffix,aPair.getP4(aSystEffect).M(),eventWeight);
-      }
-      if(SS){
-	hNameSuffix = sampleName+"_SSnoMuIso_"+categorySuffix+systEffectName;
-	myHistos_->fill1DHistogram("h1DIso"+hNameSuffix,aMuon.getProperty(PropertyEnum::combreliso),eventWeightWithSyst);
-	myHistos_->fill1DHistogram("h1DMassTrans"+hNameSuffix,aPair.getMTMuon(aSystEffect),eventWeightWithSyst);
-	//needed for antiiso control region//
-	myHistos_->fill1DHistogram("h1DMassSV"+hNameSuffix,aPair.getP4(aSystEffect).M(),eventWeight);
-	myHistos_->fill1DHistogram("h1DMassVis"+hNameSuffix,aPair.getP4(aSystEffect).M(),eventWeight);
-      }
+      fillControlHistos(hNameSuffix, eventWeightWithSyst, aSystEffect);
     }
   }
   return true;

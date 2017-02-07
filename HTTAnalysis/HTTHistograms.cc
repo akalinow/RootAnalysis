@@ -1694,7 +1694,6 @@ TH1F* HTTHistograms::getQCDbackground(unsigned int iCategory,
 
   hNameSuffix+=systEffectName;
 
-  if(categoryName.find("antiiso")!=std::string::npos) hNameSuffix.replace(hNameSuffix.find("_SS_"),4,"_SSnoMuIso_");
   // SS selection
   TH1F *hWJets = get1D_WJet_Histogram((hName+"WJets"+hNameSuffix).c_str());
   TH1F *hDYJetsLowM = get1D_DYJet_Histogram((hName+"DYLowM"+hNameSuffix).c_str());

@@ -172,7 +172,7 @@ class HTTAnalyzer: public Analyzer{
   float getSystWeight(const sysEffects::sysEffectsEnum & aSystEffect=sysEffects::NOMINAL);
 
   ///Fill pulls between generator and various reco vertices.
-  bool fillVertices(const std::string & sysType);
+  bool fillVertices(const std::string & sysType, float eventWeight);
 
   ///Return generator weight. Most samples have large values of weights
   ///which are constant up to + or - sign. We normalise those weights to +-1.
