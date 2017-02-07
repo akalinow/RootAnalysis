@@ -2,12 +2,12 @@
 # The list of executables we are building seperated by spaces
 # the 'bin_' indicates that these build products will be installed
 # in the $(bindir) directory. For example /usr/bin
-#bin_PROGRAMS=exampleProgram
+bin_PROGRAMS=hTTAnalysis
 
 # Because a.out is only a sample program we don't want it to be installed.
 # The 'noinst_' prefix indicates that the following targets are not to be
 # installed.
-noinst_PROGRAMS=test
+#noinst_PROGRAMS=hTTAnalysis
 
 #######################################
 # Build information for each executable. The variable name is derived
@@ -16,18 +16,19 @@ noinst_PROGRAMS=test
 # '_SOURCES' for example.
 
 # Sources for the a.out
-test_SOURCES= HTTAnalysis.cc EventProxyHTT.cc \
+hTTAnalysis_SOURCES= HTTAnalysis.cc EventProxyHTT.cc \
 	            HTTAnalyzer.cc HTTAnalyzerCPmethods.cc HTTAnalyzerUtilityMethods.cc \
               HTTAnalyzerTT.cc HTTAnalyzerCPmethodsTT.cc HTTAnalyzerUtilityMethodsTT.cc \
+							MuTauSpecifics.cc \
               HTTHistograms.cc HTTHistogramsTT.cc HTTEvent.cxx DictCint.cxx
 
 
 # Linker options for a.out
-test_LDFLAGS = $(top_srcdir)/src/libRootAnalysis.la -R @ROOTLIBDIR@ -L@ROOTLIBDIR@ $(BOOST_REGEX_LDFLAGS)
-test_LDADD   = @ROOTLIBS@ -lProof -lRooFitCore -lRooFit @ROOTAUXLIBS@ -lgomp $(BOOST_REGEX_LIBS)
+hTTAnalysis_LDFLAGS = $(top_srcdir)/src/libRootAnalysis.la -R @ROOTLIBDIR@ -L@ROOTLIBDIR@ $(BOOST_REGEX_LDFLAGS)
+hTTAnalysis_LDADD   = @ROOTLIBS@ -lProof -lRooFitCore -lRooFit @ROOTAUXLIBS@ -lgomp $(BOOST_REGEX_LIBS)
 
 # Compiler options for a.out
-test_CPPFLAGS = -I./ -I$(top_srcdir)/include -I@ROOTINCDIR@ $(BOOST_CPPFLAGS)
+hTTAnalysis_CPPFLAGS = -I./ -I$(top_srcdir)/include -I@ROOTINCDIR@ $(BOOST_CPPFLAGS)
 
 BUILT_SOURCES = DictCint.cxx
 

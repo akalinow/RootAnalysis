@@ -57,7 +57,7 @@ int main(int argc, char ** argv) {
 	 std::vector<Analyzer*> myAnalyzers;
 	 EventProxyHTT *myEvent = new EventProxyHTT();
 
-	 if(processName=="Analysis") myAnalyzers.push_back(new HTTAnalyzer("HTTAnalyzer"));
+	 if(processName=="AnalysisMuTau") myAnalyzers.push_back(new HTTAnalyzer("HTTAnalyzer","MuTau"));
 	 else if(processName=="AnalysisTT") myAnalyzers.push_back(new HTTAnalyzerTT("HTTAnalyzerTT"));
 	 else {
 	   std::cout<<"Incorrect process name: "<<processName<<std::endl;

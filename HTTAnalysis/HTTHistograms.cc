@@ -392,7 +392,7 @@ TH1F* HTTHistograms::get1D_TT_Histogram(const std::string& name, std::string tau
 /////////////////////////////////////////////////////////
 std::string HTTHistograms::getTemplateName(const std::string& name){
 
-  std::string templateName = "";
+  std::string templateName = "TemplateNotFound: "+name;
   if(name.find("hProf")!=std::string::npos && name.find("VsMag")!=std::string::npos) templateName = "hProfVsMagTemplate";
   if(name.find("hProf")!=std::string::npos && name.find("VsPt")!=std::string::npos) templateName = "hProfVsPtTemplate";
   if(name.find("hProf")!=std::string::npos && name.find("VsCos")!=std::string::npos) templateName = "hProfVsCosTemplate";
@@ -493,7 +493,7 @@ void HTTHistograms::finalizeHistograms(int nRuns, float weight){
   for(unsigned int iCategory = (int)HTTAnalyzer::jet0;
       iCategory<(int)HTTAnalyzer::CP_Pi;++iCategory){
 
-    plotCPhistograms(iCategory);
+    //TEST plotCPhistograms(iCategory);
 
     wselOSCorrection =  std::pair<float,float>(1.0,0);
     wselSSCorrection =  std::pair<float,float>(1.0,0);
@@ -503,6 +503,7 @@ void HTTHistograms::finalizeHistograms(int nRuns, float weight){
 
     plotStack(iCategory, "MassVis");
     plotStack(iCategory, "MassSV");
+    return; //TEST
     plotStack(iCategory, "MassTrans");
     plotStack(iCategory, "UnRollTauPtMassVis");
     plotStack(iCategory, "UnRollHiggsPtMassSV");
@@ -510,21 +511,21 @@ void HTTHistograms::finalizeHistograms(int nRuns, float weight){
     plotStack(iCategory, "UnRollMassSVPhiCP");
     plotStack(iCategory, "UnRollMassSVYCP");
 
-    plotStack(iCategory, "PtMuon");
-    plotStack(iCategory, "EtaMuon");
-    plotStack(iCategory, "IsoMuon");
+    plotStack(iCategory, "PtLeg1");
+    plotStack(iCategory, "EtaLeg1");
+    plotStack(iCategory, "IsoLeg1");
 
-    plotStack(iCategory, "PtTau");
-    plotStack(iCategory, "EtaTau");
-    plotStack(iCategory, "IDTau");
-    plotStack(iCategory, "StatsDecayMode");
-    plotStack(iCategory, "PtTauLeadingTk");
+    plotStack(iCategory, "PtLeg2");
+    plotStack(iCategory, "EtaLeg2");
+    plotStack(iCategory, "IDLeg2");
+    plotStack(iCategory, "StatsLeg2DecayMode");
+    plotStack(iCategory, "PtLeg2LeadingTk");
 
-    plotStack(iCategory, "PhiMuon");
-    plotStack(iCategory, "PhiTau");
+    plotStack(iCategory, "PhiLeg1");
+    plotStack(iCategory, "PhiLeg2");
 
     plotStack(iCategory, "PtMET");
-    plotStack(iCategory, "PtMuTauMET");
+    plotStack(iCategory, "PtMuLeg2MET");
 
     plotStack(iCategory, "StatsNJ30");
     plotStack(iCategory, "PtLeadingJet");
@@ -534,8 +535,8 @@ void HTTHistograms::finalizeHistograms(int nRuns, float weight){
     plotStack(iCategory, "EtaLeadingBJet");
     plotStack(iCategory, "WideMass2J");
 
-    plotStack(iCategory, "nPCAMuon");
-    plotStack(iCategory, "nPCATau");
+    plotStack(iCategory, "nPCALeg1");
+    plotStack(iCategory, "nPCALeg2");
     plotStack(iCategory, "Phi-nVectors");
     plotStack(iCategory, "Phi-nVecIP");
     plotStack(iCategory, "NPV");

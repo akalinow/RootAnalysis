@@ -18,6 +18,7 @@
 #include "RooWorkspace.h"
 
 #include "Analyzer.h"
+#include "ChannelSpecifics.h"
 
 class HTTHistograms;
 
@@ -27,6 +28,11 @@ class TH3F;
 class TLorentzVector;
 
 class HTTAnalyzer: public Analyzer{
+
+  friend class ChannelSpecifics;
+  friend class MuTauSpecifics;
+  friend class TauTauSpecifics;
+  friend class MuMuSpecifics;
 
  public:
 
@@ -66,7 +72,7 @@ class HTTAnalyzer: public Analyzer{
 		     DUMMY //This must be the last one
   };
 
-  HTTAnalyzer(const std::string & aName);
+  HTTAnalyzer(const std::string & aName, const std::string & aDecayMode = "None");
 
   virtual ~HTTAnalyzer();
 
@@ -137,15 +143,8 @@ class HTTAnalyzer: public Analyzer{
    return "_Unknown";
  }
 
-  ///Check it the event passes category selections with given systematic effect.
-  void testAllCategories(const sysEffects::sysEffectsEnum & aSystEffect=sysEffects::NOMINAL);
-
   ///Check it the event passes given category selections.
   bool passCategory(const HTTAnalyzer::muTauCategory & aCategory);
-
-  ///Check it tau decay modes (GEN and RECO) match selected (hardcoded)
-  ///decay mode.
-  std::pair<bool, bool> checkTauDecayMode(const EventProxyHTT & myEventProxy);
 
   ///Return human readable sample name (Data, WJets, etc).
   std::string getSampleName(const EventProxyHTT & myEventProxy);
@@ -234,6 +233,10 @@ class HTTAnalyzer: public Analyzer{
   ///Convert RooRealVar functions to histograms
   void initializeCorrections();
 
+  ///Parts of code specific to give decay channel.
+  ///In particular category and object selection.
+  ChannelSpecifics *myChannelSpecifics;
+
   ///Histograms storage.
   HTTHistograms *myHistos_;
 
@@ -265,7 +268,7 @@ class HTTAnalyzer: public Analyzer{
   std::string sampleName;
 
   HTTParticle aLeg2, aLeg1, aMET;
-  HTTParticle aGenHadTau, aGenMuonTau;
+  HTTParticle aGenLeg1, aGenLeg2;
   HTTParticle aJet1, aJet2;
   std::vector<HTTParticle> aSeparatedJets;
   int nJets30;
@@ -273,7 +276,7 @@ class HTTAnalyzer: public Analyzer{
   std::vector<bool> categoryDecisions;
 
   //cut on nPCA
-  const float nPCAMin_;
+  float nPCAMin_;
 
 };
 
