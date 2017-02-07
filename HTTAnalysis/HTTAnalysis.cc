@@ -13,7 +13,6 @@
 
 #include "EventProxyHTT.h"
 #include "HTTAnalyzer.h"
-#include "HTTAnalyzerTT.h"
 
 #include "TFile.h"
 #include "TStopwatch.h"
@@ -58,7 +57,7 @@ int main(int argc, char ** argv) {
 	 EventProxyHTT *myEvent = new EventProxyHTT();
 
 	 if(processName=="AnalysisMuTau") myAnalyzers.push_back(new HTTAnalyzer("HTTAnalyzer","MuTau"));
-	 else if(processName=="AnalysisTT") myAnalyzers.push_back(new HTTAnalyzerTT("HTTAnalyzerTT"));
+	 //else if(processName=="AnalysisTT") myAnalyzers.push_back(new HTTAnalyzerTT("HTTAnalyzerTT"));
 	 else {
 	   std::cout<<"Incorrect process name: "<<processName<<std::endl;
 	   return 1;

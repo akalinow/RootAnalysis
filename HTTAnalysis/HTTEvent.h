@@ -12,6 +12,7 @@
 #include "PropertyEnum.h"
 #include "TriggerEnum.h"
 #include "SelectionBitsEnum.h"
+#include "AnalysisEnums.h"
 ///////////////////////////////////////////////////
 ///////////////////////////////////////////////////
 class HTTEvent{
@@ -204,22 +205,7 @@ class HTTEvent{
   TVector2 met;
 
 };
-///////////////////////////////////////////////////
-namespace sysEffects{
 
-enum sysEffectsEnum{NOMINAL, NOMINAL_SVFIT,
-		    TESUp, TESDown,
-		    JESUp, JESDown,
-		    M2TUp, M2TDown,
-		    E2TUp, E2TDown,
-		    J2TUp, J2TDown,
-		    ZPtUp, ZPtDown,
-		    TTUp, TTDown,
-		    QCDSFUp, QCDSFDown,
-		    WSFUp, WSFDown,
-		    DUMMY};
-}
-///////////////////////////////////////////////////
 class HTTParticle{
 
   public:
@@ -246,7 +232,7 @@ class HTTParticle{
   void setProperties(const std::vector<Double_t> & aProperties) { properties = aProperties;}
 
   ///Data member getters.
-  const TLorentzVector & getP4(sysEffects::sysEffectsEnum type=sysEffects::NOMINAL) const {return getSystScaleP4(type);}
+  const TLorentzVector & getP4(HTTAnalysis::sysEffects type=HTTAnalysis::NOMINAL) const {return getSystScaleP4(type);}
 
   const TLorentzVector & getChargedP4() const {return chargedP4;}
 
@@ -271,7 +257,7 @@ class HTTParticle{
   ///Return four-momentum modified according to given systematic effect.
   ///The method recognises particle type, e.g. muons are not affected by
   ///TES variations etc.
-  const TLorentzVector & getSystScaleP4(sysEffects::sysEffectsEnum type=sysEffects::NOMINAL) const;
+  const TLorentzVector & getSystScaleP4(HTTAnalysis::sysEffects type=HTTAnalysis::NOMINAL) const;
 
   ///Return four-momentum shifted with scale.
   ///Shift modifies three-momentum transverse part only, leaving mass constant.
@@ -282,7 +268,7 @@ class HTTParticle{
 
   ///Scaled four-momentum cache;
   mutable TLorentzVector p4Cache;
-  mutable sysEffects::sysEffectsEnum lastSystEffect;
+  mutable HTTAnalysis::sysEffects lastSystEffect;
 
   ///Charged and neutral components four-momentum
   TLorentzVector chargedP4, neutralP4;
@@ -310,11 +296,11 @@ class HTTPair{
   void clear();
 
   ///Data member setters.
-  void setP4(const TLorentzVector &aP4, sysEffects::sysEffectsEnum type = sysEffects::NOMINAL) {p4Vector[(unsigned int)type] = aP4;}
+  void setP4(const TLorentzVector &aP4, HTTAnalysis::sysEffects type = HTTAnalysis::NOMINAL) {p4Vector[(unsigned int)type] = aP4;}
 
   void setMET(const TVector2 &aVector) {met = aVector;}
 
-  void setSVMET(const TVector2 &aVector, sysEffects::sysEffectsEnum type = sysEffects::NOMINAL) {svMetVector[(unsigned int)type] = aVector;}
+  void setSVMET(const TVector2 &aVector, HTTAnalysis::sysEffects type = HTTAnalysis::NOMINAL) {svMetVector[(unsigned int)type] = aVector;}
 
   void setMTLeg1(const float & aMT) {mtLeg1 = aMT;}
 
@@ -327,15 +313,15 @@ class HTTPair{
   void setMETMatrix(float m00, float m01, float m10, float m11) {metMatrix.push_back(m00); metMatrix.push_back(m01); metMatrix.push_back(m10); metMatrix.push_back(m11);}
 
   ///Data member getters.
-  const TLorentzVector & getP4(sysEffects::sysEffectsEnum type = sysEffects::NOMINAL) const {return p4Vector[(unsigned int)type];}
+  const TLorentzVector & getP4(HTTAnalysis::sysEffects type = HTTAnalysis::NOMINAL) const {return p4Vector[(unsigned int)type];}
 
-  const TVector2 & getMET(sysEffects::sysEffectsEnum type = sysEffects::NOMINAL) const {return getSystScaleMET(type);}
+  const TVector2 & getMET(HTTAnalysis::sysEffects type = HTTAnalysis::NOMINAL) const {return getSystScaleMET(type);}
 
-  const TVector2 & getSVMET(sysEffects::sysEffectsEnum type = sysEffects::NOMINAL) const {return svMetVector[(unsigned int)type];}
+  const TVector2 & getSVMET(HTTAnalysis::sysEffects type = HTTAnalysis::NOMINAL) const {return svMetVector[(unsigned int)type];}
 
-  float getMTLeg1(sysEffects::sysEffectsEnum type = sysEffects::NOMINAL) const {return getSystScaleMT(leg1, type);}
+  float getMTLeg1(HTTAnalysis::sysEffects type = HTTAnalysis::NOMINAL) const {return getSystScaleMT(leg1, type);}
 
-  float getMTLeg2(sysEffects::sysEffectsEnum type = sysEffects::NOMINAL) const {return getSystScaleMT(leg2, type);}
+  float getMTLeg2(HTTAnalysis::sysEffects type = HTTAnalysis::NOMINAL) const {return getSystScaleMT(leg2, type);}
 
   const HTTParticle & getLeg1() const {return leg1;}
 
@@ -345,7 +331,7 @@ class HTTPair{
 
   const HTTParticle & getTau() const {return abs(leg1.getPDGid())==15 ? leg1 : leg2; }
 
-  float getMTMuon(sysEffects::sysEffectsEnum type = sysEffects::NOMINAL) const {return abs(leg1.getPDGid())==13 ? getMTLeg1(type) : getMTLeg2(type); }
+  float getMTMuon(HTTAnalysis::sysEffects type = HTTAnalysis::NOMINAL) const {return abs(leg1.getPDGid())==13 ? getMTLeg1(type) : getMTLeg2(type); }
 
   std::vector<float> getMETMatrix() const {return metMatrix;}
 
@@ -354,11 +340,11 @@ class HTTPair{
   ///Return MET modified according to given systematic effect.
   ///The MET is corrected for accorging leptons corrections.
   ///The recoil correctino is not updated.
-  const TVector2 & getSystScaleMET(sysEffects::sysEffectsEnum type=sysEffects::NOMINAL) const;
+  const TVector2 & getSystScaleMET(HTTAnalysis::sysEffects type=HTTAnalysis::NOMINAL) const;
 
   ///Return transverse mass caluculated according to the scale shifts.
   float getSystScaleMT(const HTTParticle &aPerticle,
-		       sysEffects::sysEffectsEnum type=sysEffects::NOMINAL) const;
+		       HTTAnalysis::sysEffects type=HTTAnalysis::NOMINAL) const;
 
   ///Nominal met as calculated from PF.
   ///Includes recoil corrections.
@@ -366,7 +352,7 @@ class HTTPair{
 
   ///Scaled four-momentum cache;
   mutable TVector2 metCache;
-  mutable sysEffects::sysEffectsEnum lastSystEffect;
+  mutable HTTAnalysis::sysEffects lastSystEffect;
   mutable float mtCache;
 
   ///Vectors holding p4 and MET for

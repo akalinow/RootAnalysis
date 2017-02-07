@@ -37,20 +37,20 @@ class HTTHistograms: public AnalysisHistograms {
   TH1F* getQCDbackground(unsigned int iCategory, std::string varName,
 			 std::pair<float,float> wselOSCorrection =  std::pair<float,float>(1,0),
 			 std::pair<float,float> wselSSCorrection =  std::pair<float,float>(1,0),
-       unsigned int iSystEffect = (unsigned int)sysEffects::NOMINAL_SVFIT);
+       unsigned int iSystEffect = (unsigned int)HTTAnalysis::NOMINAL_SVFIT);
 
   ///Calculate scaling factor for the WJets MC
   ///Scaling factor is estimated in high Mt region.
   ///Other backgrounds are subtracted, basing on MC
   ///QCD contribution is neglected.
   std::pair<float,float> getWNormalisation(unsigned int iCategory, std::string selName,
-    unsigned int iSystEffect = (unsigned int)sysEffects::NOMINAL_SVFIT);
+    unsigned int iSystEffect = (unsigned int)HTTAnalysis::NOMINAL_SVFIT);
 
   ///Calculate QCD OS/SS ratiousing non isolated events.
   std::pair<float,float> getQCDOStoSS(unsigned int iCategory,
 				      std::pair<float,float> wselOSCorrection =  std::pair<float,float>(1,0),
 				      std::pair<float,float> wselSSCorrection =  std::pair<float,float>(1,0),
-              unsigned int iSystEffect = (unsigned int)sysEffects::NOMINAL_SVFIT);
+              unsigned int iSystEffect = (unsigned int)HTTAnalysis::NOMINAL_SVFIT);
 
    private:
 
@@ -70,7 +70,7 @@ class HTTHistograms: public AnalysisHistograms {
   THStack* plotStack(unsigned int iCategory,
 		     std::string varName,
 		     std::string selName = "OS",
-		     unsigned int iSystEffect = (unsigned int)sysEffects::NOMINAL);
+		     unsigned int iSystEffect = (unsigned int)HTTAnalysis::NOMINAL);
 
   void plotnPCA(const std::string & type);
 

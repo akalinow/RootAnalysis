@@ -18,9 +18,9 @@ bin_PROGRAMS=hTTAnalysis
 # Sources for the a.out
 hTTAnalysis_SOURCES= HTTAnalysis.cc EventProxyHTT.cc \
 	            HTTAnalyzer.cc HTTAnalyzerCPmethods.cc HTTAnalyzerUtilityMethods.cc \
-              HTTAnalyzerTT.cc HTTAnalyzerCPmethodsTT.cc HTTAnalyzerUtilityMethodsTT.cc \
-							MuTauSpecifics.cc \
-              HTTHistograms.cc HTTHistogramsTT.cc HTTEvent.cxx DictCint.cxx
+							ChannelSpecifics.cc MuTauSpecifics.cc \
+							Tools.cc \
+              HTTHistograms.cc HTTEvent.cxx DictCint.cxx
 
 
 # Linker options for a.out

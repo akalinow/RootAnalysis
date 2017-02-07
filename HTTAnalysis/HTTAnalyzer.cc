@@ -8,6 +8,7 @@
 #include "HTTAnalyzer.h"
 #include "HTTHistograms.h"
 #include "MuTauSpecifics.h"
+#include "Tools.h"
 //////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////
 HTTAnalyzer::HTTAnalyzer(const std::string & aName, const std::string & aDecayMode) : Analyzer(aName){
@@ -24,7 +25,7 @@ HTTAnalyzer::HTTAnalyzer(const std::string & aName, const std::string & aDecayMo
         filePath = "MC_Spring16_PU25ns_V1.root";
         puMCFile_ = new TFile(filePath.c_str());
 
-        categoryDecisions.resize((int)HTTAnalyzer::DUMMY);
+        categoryDecisions.resize((int)HTTAnalysis::DUMMY_CAT);
 
         myChannelSpecifics = new MuTauSpecifics(this);
 
@@ -33,10 +34,6 @@ HTTAnalyzer::HTTAnalyzer(const std::string & aName, const std::string & aDecayMo
         ntupleFile_ = 0;
         hStatsFromFile = 0;
 
-        h2DMuonIdCorrections = 0;
-        h2DMuonIsoCorrections = 0;
-        h2DMuonTrgCorrections = 0;
-        h3DTauCorrections = 0;
 }
 //////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////
@@ -45,11 +42,7 @@ HTTAnalyzer::~HTTAnalyzer(){
         if(myHistos_) delete myHistos_;
         if(puDataFile_) delete puDataFile_;
         if(puMCFile_) delete puMCFile_;
-
-        if(h2DMuonIdCorrections) delete h2DMuonIdCorrections;
-        if(h2DMuonIsoCorrections) delete h2DMuonIsoCorrections;
-        if(h2DMuonTrgCorrections) delete h2DMuonTrgCorrections;
-        if(h3DTauCorrections) delete h3DTauCorrections;
+        if(myChannelSpecifics) delete myChannelSpecifics;
 
 }
 //////////////////////////////////////////////////////////////////////////////
@@ -70,37 +63,6 @@ void HTTAnalyzer::initialize(TDirectory* aDir,
         mySelections_ = aSelections;
 
         myHistos_ = new HTTHistograms(aDir, selectionFlavours_);
-}
-//////////////////////////////////////////////////////////////////////////////
-//////////////////////////////////////////////////////////////////////////////
-void HTTAnalyzer::initializeCorrections(){
-
-#pragma omp critical
-        {
-                std::string filePath = "htt_scalefactors_v5.root";
-                TFile aFile(filePath.c_str());
-                RooWorkspace *scaleWorkspace = (RooWorkspace*)aFile.Get("w");
-
-                RooAbsReal *muon_id_scalefactor = scaleWorkspace->function("m_id_ratio");
-                RooAbsReal *muon_iso_scalefactor = scaleWorkspace->function("m_iso_ratio");
-                RooAbsReal *muon_trg_efficiency = scaleWorkspace->function("m_trgOR_data");//OR of the HLT_IsoMu22 and HLT_IsoTkMu22
-                //RooAbsReal *tau_id_scalefactor = scaleWorkspace->function("t_iso_mva_m_pt30_sf");
-
-                h2DMuonIdCorrections = (TH2F*)muon_id_scalefactor->createHistogram("h2DMuonIdCorrections",
-                                                                                   *scaleWorkspace->var("m_pt"),RooFit::Binning(300,0,300),
-                                                                                   RooFit::YVar(*scaleWorkspace->var("m_eta"),RooFit::Binning(10,-2.1,2.1)),
-                                                                                   RooFit::Scaling(kFALSE));
-
-                h2DMuonIsoCorrections = (TH2F*)muon_iso_scalefactor->createHistogram("h2DMuonIsoCorrections",
-                                                                                     *scaleWorkspace->var("m_pt"),RooFit::Binning(300,0,300),
-                                                                                     RooFit::YVar(*scaleWorkspace->var("m_eta"),RooFit::Binning(10,-2.1,2.1)),
-                                                                                     RooFit::Scaling(kFALSE));
-
-                h2DMuonTrgCorrections = (TH2F*)muon_trg_efficiency->createHistogram("h2DMuonTrgCorrections",
-                                                                                    *scaleWorkspace->var("m_pt"),RooFit::Binning(300,0,300),
-                                                                                    RooFit::YVar(*scaleWorkspace->var("m_eta"),RooFit::Binning(10,-2.1,2.1)),
-                                                                                    RooFit::Scaling(kFALSE));
-        }
 }
 //////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////
@@ -146,12 +108,11 @@ void HTTAnalyzer::setAnalysisObjects(const EventProxyHTT & myEventProxy){
 }
 //////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////
-void HTTAnalyzer::addBranch(TTree *tree){/*tree->Branch("muonPt",&muonPt);*/
-}
+void HTTAnalyzer::addBranch(TTree *tree){/*tree->Branch("muonPt",&muonPt);*/}
 //////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////
 void HTTAnalyzer::fillControlHistos(const std::string & hNameSuffix, float eventWeight,
-                                    const sysEffects::sysEffectsEnum & aSystEffect){
+                                    const HTTAnalysis::sysEffects & aSystEffect){
 
         ///Histograms filled for each systematic effect
         ///Fill SVfit and visible masses
@@ -171,7 +132,7 @@ void HTTAnalyzer::fillControlHistos(const std::string & hNameSuffix, float event
         myHistos_->fill2DUnrolledHistogram("h1DUnRollMjjMassSV"+hNameSuffix, aPair.getP4(aSystEffect).M(), jetsMass, eventWeight);
 
         myHistos_->fill1DHistogram("h1DIso"+hNameSuffix,aLeg1.getProperty(PropertyEnum::combreliso),eventWeight);
-        if(aSystEffect!=sysEffects::NOMINAL_SVFIT) return;
+        if(aSystEffect!=HTTAnalysis::NOMINAL_SVFIT) return;
 
         fillDecayPlaneAngle(hNameSuffix, eventWeight, aSystEffect);
         fillGenDecayPlaneAngle(hNameSuffix+"_Gen", eventWeight);
@@ -240,7 +201,7 @@ bool HTTAnalyzer::fillVertices(const std::string & sysType, float eventWeight){
 }
 //////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////
-bool HTTAnalyzer::passCategory(const HTTAnalyzer::muTauCategory & aCategory){
+bool HTTAnalyzer::passCategory(const HTTAnalysis::eventCategories & aCategory){
 
         if(categoryDecisions.size()==0) return false;
         else return categoryDecisions[(int)aCategory];
@@ -300,14 +261,13 @@ bool HTTAnalyzer::analyze(const EventProxyBase& iEvent){
 
         std::string categorySuffix = "";
         std::string systEffectName = "";
-        for(unsigned int iSystEffect = (unsigned int)sysEffects::NOMINAL_SVFIT;
-            iSystEffect<(unsigned int)sysEffects::DUMMY; ++iSystEffect) {
+        for(unsigned int iSystEffect = (unsigned int)HTTAnalysis::NOMINAL_SVFIT;
+            iSystEffect<(unsigned int)HTTAnalysis::DUMMY_SYS; ++iSystEffect) {
 
-                sysEffects::sysEffectsEnum aSystEffect = static_cast<sysEffects::sysEffectsEnum>(iSystEffect);
+                HTTAnalysis::sysEffects aSystEffect = static_cast<HTTAnalysis::sysEffects>(iSystEffect);
 
-                float leg1ScaleFactor = getLeptonCorrection(aLeg1.getP4(aSystEffect).Eta(), aLeg1.getP4(aSystEffect).Pt(), hadronicTauDecayModes::tauDecayMuon);
-                float leg2ScaleFactor = getLeptonCorrection(aLeg2.getP4(aSystEffect).Eta(), aLeg2.getP4(aSystEffect).Pt(),
-                                                           static_cast<hadronicTauDecayModes>(aLeg2.getProperty(PropertyEnum::decayMode)));
+                float leg1ScaleFactor = myChannelSpecifics->getLeg1Correction(aSystEffect);
+                float leg2ScaleFactor = myChannelSpecifics->getLeg2Correction(aSystEffect);
                 float weightSyst = getSystWeight(aSystEffect);
                 float eventWeightWithSyst=eventWeight*weightSyst*leg1ScaleFactor*leg2ScaleFactor;
 
@@ -318,16 +278,16 @@ bool HTTAnalyzer::analyze(const EventProxyBase& iEvent){
 
                 myChannelSpecifics->testAllCategories(aSystEffect);
 
-                for(unsigned int iCategory = HTTAnalyzer::jet0; iCategory<HTTAnalyzer::W; ++iCategory) {
-                        HTTAnalyzer::muTauCategory categoryType = static_cast<HTTAnalyzer::muTauCategory>(iCategory);
+                for(unsigned int iCategory = HTTAnalysis::jet0; iCategory<HTTAnalysis::W; ++iCategory) {
+                        HTTAnalysis::eventCategories categoryType = static_cast<HTTAnalysis::eventCategories>(iCategory);
 
                         if(!passCategory(categoryType)) continue;
 
                         categorySuffix = std::to_string(iCategory);
-                        systEffectName = HTTAnalyzer::systEffectName(iSystEffect);
+                        systEffectName = HTTAnalysis::systEffectName(iSystEffect);
 
                         if(systEffectName.find("CAT")!=std::string::npos) {
-                                std::string categoryName = HTTAnalyzer::categoryName(iCategory);
+                                std::string categoryName = HTTAnalysis::categoryName(iCategory);
                                 systEffectName.replace(systEffectName.find("CAT"),3,categoryName);
                         }
 

@@ -4,7 +4,9 @@
 
 #include "commonUtils.h"
 #include "HTTHistograms.h"
-#include "HTTAnalyzer.h"
+#include "AnalysisEnums.h"
+#include "Tools.h"
+
 #include "TCanvas.h"
 #include "TLegend.h"
 #include "TString.h"
@@ -490,8 +492,8 @@ void HTTHistograms::finalizeHistograms(int nRuns, float weight){
   //////////////
   ///Control regions plots
   ttScale = 1.0;
-  for(unsigned int iCategory = (int)HTTAnalyzer::jet0;
-      iCategory<(int)HTTAnalyzer::CP_Pi;++iCategory){
+  for(unsigned int iCategory = (int)HTTAnalysis::jet0;
+      iCategory<(int)HTTAnalysis::CP_Pi;++iCategory){
 
     //TEST plotCPhistograms(iCategory);
 
@@ -542,11 +544,11 @@ void HTTHistograms::finalizeHistograms(int nRuns, float weight){
     plotStack(iCategory, "NPV");
   }
   ///Make systematic effect histos.
-  for(unsigned int iSystEffect = (unsigned int)sysEffects::NOMINAL_SVFIT;
-      iSystEffect<(unsigned int)sysEffects::DUMMY;++iSystEffect){
+  for(unsigned int iSystEffect = (unsigned int)HTTAnalysis::NOMINAL_SVFIT;
+      iSystEffect<(unsigned int)HTTAnalysis::DUMMY_SYS;++iSystEffect){
 
-    for(unsigned int iCategory = (int)HTTAnalyzer::jet0;
-	iCategory<(int)HTTAnalyzer::CP_Pi;++iCategory){
+    for(unsigned int iCategory = (int)HTTAnalysis::jet0;
+	iCategory<(int)HTTAnalysis::CP_Pi;++iCategory){
 
       wselOSCorrection =  std::pair<float,float>(1.0,0);
       wselSSCorrection =  std::pair<float,float>(1.0,0);
@@ -991,8 +993,8 @@ THStack*  HTTHistograms::plotStack(unsigned int iCategory,
 				   unsigned int iSystEffect){
 
   std::string hName = "h1D"+varName;
-  std::string categoryName = HTTAnalyzer::categoryName(iCategory);
-  std::string systEffectName = HTTAnalyzer::systEffectName(iSystEffect);
+  std::string categoryName = HTTAnalysis::categoryName(iCategory);
+  std::string systEffectName = HTTAnalysis::systEffectName(iSystEffect);
 
   if(systEffectName.find("CAT")!=std::string::npos){
     systEffectName.replace(systEffectName.find("CAT"),3,categoryName);
@@ -1538,13 +1540,13 @@ std::pair<float,float> HTTHistograms::getQCDOStoSS(unsigned int iCategory,
   ///Return fixed values according to SMH2016 TWiki:
   ///https://twiki.cern.ch/twiki/bin/viewauth/CMS/SMTauTau2016#QCD_background_estimation_in_Lta
   std::pair<float,float> result(1,0);
-  if(iCategory == (unsigned int)HTTAnalyzer::jet0) result = std::pair<float,float>(1.0,0.15);
-  else if(iCategory == (unsigned int)HTTAnalyzer::boosted) result = std::pair<float,float>(1.15,0.15*1.15);
-  else if(iCategory == (unsigned int)HTTAnalyzer::vbf) result = std::pair<float,float>(1.2,0.30*1.2);
+  if(iCategory == (unsigned int)HTTAnalysis::jet0) result = std::pair<float,float>(1.0,0.15);
+  else if(iCategory == (unsigned int)HTTAnalysis::boosted) result = std::pair<float,float>(1.15,0.15*1.15);
+  else if(iCategory == (unsigned int)HTTAnalysis::vbf) result = std::pair<float,float>(1.2,0.30*1.2);
   else result = std::pair<float,float>(1.0,0.15);
 
-  if(iSystEffect==(unsigned int)sysEffects::QCDSFUp) result.first+=result.second;
-  if(iSystEffect==(unsigned int)sysEffects::QCDSFDown) result.first-=result.second;
+  if(iSystEffect==(unsigned int)HTTAnalysis::QCDSFUp) result.first+=result.second;
+  if(iSystEffect==(unsigned int)HTTAnalysis::QCDSFDown) result.first-=result.second;
 
   return result;
 
@@ -1663,7 +1665,7 @@ std::pair<float,float> HTTHistograms::getQCDOStoSS(unsigned int iCategory,
   hSoupOS->Draw();
   hSoupOS->Fit("line","","",0.2,0.3);
 
-  std::string categoryName = HTTAnalyzer::categoryName(iCategory);
+  std::string categoryName = HTTAnalysis::categoryName(iCategory);
   c->Print(TString::Format("fig_png/%s_%s.png",hName.c_str(), categoryName.c_str()).Data());
   c->Print(TString::Format("fig_C/%s_%s.C",hName.c_str(), categoryName.c_str()).Data());
 
@@ -1687,8 +1689,8 @@ TH1F* HTTHistograms::getQCDbackground(unsigned int iCategory,
 
   std::string hName = "h1D" + varName;
   std::string hNameSuffix =  "_SS_"+std::to_string(iCategory);
-  std::string systEffectName = HTTAnalyzer::systEffectName(iSystEffect);
-  std::string categoryName = HTTAnalyzer::categoryName(iCategory);
+  std::string systEffectName = HTTAnalysis::systEffectName(iSystEffect);
+  std::string categoryName = HTTAnalysis::categoryName(iCategory);
   if(systEffectName.find("CAT")!=std::string::npos){
     systEffectName.replace(systEffectName.find("CAT"),3,categoryName);
   }
@@ -1772,14 +1774,14 @@ TH1F* HTTHistograms::getQCDbackground(unsigned int iCategory,
 std::pair<float,float> HTTHistograms::getWNormalisation(unsigned int iCategory,
       std::string selName, unsigned int iSystEffect){
 
-  if(iCategory==(unsigned int)(HTTAnalyzer::jet0)) iCategory = HTTAnalyzer::wjets_jet0;
-  else if(iCategory==(unsigned int)(HTTAnalyzer::boosted)) iCategory = HTTAnalyzer::wjets_boosted;
-  else if(iCategory==(unsigned int)(HTTAnalyzer::vbf)) iCategory = HTTAnalyzer::wjets_vbf;
-  else iCategory = HTTAnalyzer::W;
+  if(iCategory==(unsigned int)(HTTAnalysis::jet0)) iCategory = HTTAnalysis::wjets_jet0;
+  else if(iCategory==(unsigned int)(HTTAnalysis::boosted)) iCategory = HTTAnalysis::wjets_boosted;
+  else if(iCategory==(unsigned int)(HTTAnalysis::vbf)) iCategory = HTTAnalysis::wjets_vbf;
+  else iCategory = HTTAnalysis::W;
 
   std::string hNameSuffix =  "_"+selName+"_"+std::to_string(iCategory);
-  std::string systEffectName = HTTAnalyzer::systEffectName(iSystEffect);
-  std::string categoryName = HTTAnalyzer::categoryName(iCategory);
+  std::string systEffectName = HTTAnalysis::systEffectName(iSystEffect);
+  std::string categoryName = HTTAnalysis::categoryName(iCategory);
   if(systEffectName.find("CAT")!=std::string::npos){
     systEffectName.replace(systEffectName.find("CAT"),3,categoryName);
   }
@@ -1872,12 +1874,12 @@ std::pair<float,float> HTTHistograms::getWNormalisation(unsigned int iCategory,
   cout<<"WJets scale:"<<weight<<" dweight "<<dweight<<endl;
 
 float WSFUncertainty = 0.0;
-  if(iCategory==(unsigned int)HTTAnalyzer::wjets_jet0) WSFUncertainty = 0.1;
-  if(iCategory==(unsigned int)HTTAnalyzer::wjets_boosted) WSFUncertainty = 0.1;
-  if(iCategory==(unsigned int)HTTAnalyzer::wjets_vbf) WSFUncertainty = 0.3;
+  if(iCategory==(unsigned int)HTTAnalysis::wjets_jet0) WSFUncertainty = 0.1;
+  if(iCategory==(unsigned int)HTTAnalysis::wjets_boosted) WSFUncertainty = 0.1;
+  if(iCategory==(unsigned int)HTTAnalysis::wjets_vbf) WSFUncertainty = 0.3;
 
-  if(iSystEffect==(unsigned int)sysEffects::WSFUp) weight*=(1+WSFUncertainty);
-  if(iSystEffect==(unsigned int)sysEffects::WSFDown) weight*=(1-WSFUncertainty);
+  if(iSystEffect==(unsigned int)HTTAnalysis::WSFUp) weight*=(1+WSFUncertainty);
+  if(iSystEffect==(unsigned int)HTTAnalysis::WSFDown) weight*=(1-WSFUncertainty);
 
 std::cout << "WSFUncertainty: " << WSFUncertainty <<std::endl;
 cout<<"WJets scale with uncertainty: "<<weight<<" dweight "<<dweight<<endl;

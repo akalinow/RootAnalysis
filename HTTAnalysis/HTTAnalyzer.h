@@ -15,10 +15,10 @@
 //ROOT includes
 #include "TTree.h"
 #include "TList.h"
-#include "RooWorkspace.h"
 
 #include "Analyzer.h"
 #include "ChannelSpecifics.h"
+#include "AnalysisEnums.h"
 
 class HTTHistograms;
 
@@ -35,42 +35,6 @@ class HTTAnalyzer: public Analyzer{
   friend class MuMuSpecifics;
 
  public:
-
-  ///Copy from DataFormats/TauReco/interface/PFTauDecayMode.h
-  enum hadronicTauDecayModes
-  {
-    tauDecay1ChargedPion0PiZero,
-    tauDecay1ChargedPion1PiZero,  // rho (770 MeV) mediated)
-    tauDecay1ChargedPion2PiZero,  // a1  (1.2 GeV) mediated
-    tauDecay1ChargedPion3PiZero,  // contaminated or unmerged photo
-    tauDecay1ChargedPion4PiZero,  // contaminated or unmerged photo
-    tauDecay2ChargedPion0PiZero,  // extra track or un-recod track
-    tauDecay2ChargedPion1PiZero,  // extra track or un-recod track
-    tauDecay2ChargedPion2PiZero,  // extra track or un-recod track
-    tauDecay2ChargedPion3PiZero,  // extra track or un-recod track
-    tauDecay2ChargedPion4PiZero,  // extra track or un-recod track
-    tauDecay3ChargedPion0PiZero,  // a1  (1.2 GeV) mediated
-    tauDecay3ChargedPion1PiZero,  // a1  (1.2 GeV) mediated
-    tauDecay3ChargedPion2PiZero,  // a1  (1.2 GeV) mediated
-    tauDecay3ChargedPion3PiZero,  // a1  (1.2 GeV) mediated
-    tauDecay3ChargedPion4PiZero,  // a1  (1.2 GeV) mediated
-    tauDecaysElectron,
-    tauDecayMuon,
-    tauDecayOther                 // catch-all
-  };
-
-  enum muTauCategory{jet0_low, jet0_high,
-		     jet1_low, jet1_high,
-		     vbf_low, vbf_high,
-		     jet0, boosted, vbf,
-		     CP_Pi, CP_Rho,
-		     wjets_jet0,
-		     wjets_boosted, wjets_vbf,
-		     antiiso_jet0,
-		     antiiso_boosted, antiiso_vbf,
-		     W, TT,
-		     DUMMY //This must be the last one
-  };
 
   HTTAnalyzer(const std::string & aName, const std::string & aDecayMode = "None");
 
@@ -96,55 +60,8 @@ class HTTAnalyzer: public Analyzer{
 
   void setAnalysisObjects(const EventProxyHTT & myEventProxy);
 
-  static std::string categoryName(unsigned int iCategory){
-    if(iCategory==(int)HTTAnalyzer::jet0_low) return "jet0_low";
-    else if(iCategory==(int)HTTAnalyzer::jet0_high) return "jet0_high";
-    else if(iCategory==(int)HTTAnalyzer::jet1_low) return "jet1_low";
-    else if(iCategory==(int)HTTAnalyzer::jet1_high) return "jet1_high";
-    else if(iCategory==(int)HTTAnalyzer::vbf_low) return "vbf_low";
-    else if(iCategory==(int)HTTAnalyzer::vbf_high) return "vbf_high";
-    else if(iCategory==(int)HTTAnalyzer::W) return "W";
-    else if(iCategory==(int)HTTAnalyzer::TT) return "TT";
-    else if(iCategory==(int)HTTAnalyzer::jet0) return "0jet";
-    else if(iCategory==(int)HTTAnalyzer::boosted) return "boosted";
-    else if(iCategory==(int)HTTAnalyzer::vbf) return "vbf";
-    else if(iCategory==(int)HTTAnalyzer::CP_Pi) return "CP_Pi";
-    else if(iCategory==(int)HTTAnalyzer::CP_Rho) return "CP_Rho";
-    else if(iCategory==(int)HTTAnalyzer::wjets_jet0) return "wjets_0jet";
-    else if(iCategory==(int)HTTAnalyzer::wjets_boosted) return "wjets_boosted";
-    else if(iCategory==(int)HTTAnalyzer::wjets_vbf) return "wjets_vbf";
-    else if(iCategory==(int)HTTAnalyzer::antiiso_jet0) return "antiiso_0jet";
-    else if(iCategory==(int)HTTAnalyzer::antiiso_boosted) return "antiiso_boosted";
-    else if(iCategory==(int)HTTAnalyzer::antiiso_vbf) return "antiiso_vbf";
-    return "Unknown";
-  }
-
-  static std::string systEffectName(unsigned int iSystEffect){
-   if(iSystEffect==(int)sysEffects::NOMINAL) return "";
-   else if(iSystEffect==(int)sysEffects::NOMINAL_SVFIT) return "";
-   else if(iSystEffect==(int)sysEffects::TESUp) return "_CMS_shape_t_mt_13TeVUp";
-   else if(iSystEffect==(int)sysEffects::TESDown) return "_CMS_shape_t_mt_13TeVDown";
-   else if(iSystEffect==(int)sysEffects::JESUp) return "_CMS_scale_j_13TeVUp";
-   else if(iSystEffect==(int)sysEffects::JESDown) return "_CMS_scale_j_13TeVDown";
-   else if(iSystEffect==(int)sysEffects::M2TUp) return "_CMS_htt_ZLShape_mt_13TeVUp";
-   else if(iSystEffect==(int)sysEffects::M2TDown) return "_CMS_htt_ZLShape_mt_13TeVDown";
-   else if(iSystEffect==(int)sysEffects::E2TUp) return "_CMS_htt_ZEShape_et_13TeVUp";
-   else if(iSystEffect==(int)sysEffects::E2TDown) return "_CMS_htt_ZEShape_et_13TeVDown";
-   else if(iSystEffect==(int)sysEffects::J2TUp) return "_CMS_htt_jetToTauFake_13TeVUp";
-   else if(iSystEffect==(int)sysEffects::J2TDown) return "_CMS_htt_jetToTauFake_13TeVDown";
-   else if(iSystEffect==(int)sysEffects::ZPtUp) return "_CMS_htt_dyShape_13TeVUp";
-   else if(iSystEffect==(int)sysEffects::ZPtDown) return "_CMS_htt_dyShape_13TeVDown";
-   else if(iSystEffect==(int)sysEffects::TTUp) return "_CMS_htt_ttbarShape_13TeVUp";
-   else if(iSystEffect==(int)sysEffects::TTDown) return "_CMS_htt_ttbarShape_13TeVDown";
-   else if(iSystEffect==(int)sysEffects::QCDSFUp) return "_QCDSFUncert_mt_CAT_13TeVUp";
-   else if(iSystEffect==(int)sysEffects::QCDSFDown) return "_QCDSFUncert_mt_CAT_13TeVDown";
-   else if(iSystEffect==(int)sysEffects::WSFUp) return "_WSFUncert_mt_CAT_13TeVUp";
-   else if(iSystEffect==(int)sysEffects::WSFDown) return "_WSFUncert_mt_CAT_13TeVDown";
-   return "_Unknown";
- }
-
   ///Check it the event passes given category selections.
-  bool passCategory(const HTTAnalyzer::muTauCategory & aCategory);
+  bool passCategory(const HTTAnalysis::eventCategories & aCategory);
 
   ///Return human readable sample name (Data, WJets, etc).
   std::string getSampleName(const EventProxyHTT & myEventProxy);
@@ -168,7 +85,7 @@ class HTTAnalyzer: public Analyzer{
 
   ///Return event weight for systematic effects
   ///implemented by a global event weight.
-  float getSystWeight(const sysEffects::sysEffectsEnum & aSystEffect=sysEffects::NOMINAL);
+  float getSystWeight(const HTTAnalysis::sysEffects & aSystEffect=HTTAnalysis::NOMINAL);
 
   ///Fill pulls between generator and various reco vertices.
   bool fillVertices(const std::string & sysType, float eventWeight);
@@ -180,14 +97,14 @@ class HTTAnalyzer: public Analyzer{
   ///Fill histograms for all control plots.
   ///Histogram names will end with hNameSuffix
   void fillControlHistos(const std::string & hNameSuffix, float eventWeight,
-			 const sysEffects::sysEffectsEnum & aSystEffect=sysEffects::NOMINAL);
+			 const HTTAnalysis::sysEffects & aSystEffect=HTTAnalysis::NOMINAL);
 
 
   ///Fill histograms with cos(phi), where phi is the decay
   ///between tau decay planes. Method used for reconstructed
   ///mu+tau_h mode
   void fillDecayPlaneAngle(const std::string & hNameSuffix, float eventWeight,
-  const sysEffects::sysEffectsEnum & aSystEffect=sysEffects::NOMINAL);
+  const HTTAnalysis::sysEffects & aSystEffect=HTTAnalysis::NOMINAL);
 
   ///Fill histograms with cos(phi), where phi is the decay
   ///between tau decay planes. Method used for
@@ -214,9 +131,6 @@ class HTTAnalyzer: public Analyzer{
   std::vector<HTTParticle> getSeparatedJets(const EventProxyHTT & myEventProxy,
 					    float deltaR);
 
-  ///Get lepton corrections
-  float getLeptonCorrection(float eta, float pt, hadronicTauDecayModes tauDecayMode);
-
  protected:
 
   pat::strbitset *mySelections_;
@@ -229,9 +143,6 @@ class HTTAnalyzer: public Analyzer{
   void getPreselectionEff(const EventProxyHTT & myEventProxy);
 
   void setHistos(HTTHistograms *histos) { myHistos_ = histos;};
-
-  ///Convert RooRealVar functions to histograms
-  void initializeCorrections();
 
   ///Parts of code specific to give decay channel.
   ///In particular category and object selection.
@@ -248,10 +159,6 @@ class HTTAnalyzer: public Analyzer{
 
   ///Histogram with event counts filled during preselection step.
   TH1F *hStatsFromFile;
-
-  ///Histograms with lepton corrections
-  TH2F *h2DMuonIdCorrections, *h2DMuonIsoCorrections, *h2DMuonTrgCorrections;
-  TH3F *h3DTauCorrections;
 
   ///Vector of PU histograms for MC samples
   std::vector<TH1F*> hPUVec_;

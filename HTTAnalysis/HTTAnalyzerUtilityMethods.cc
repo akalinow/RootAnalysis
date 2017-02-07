@@ -1,8 +1,6 @@
 #include <sstream>
 #include <bitset>
 
-#include "RooRealVar.h"
-
 #include "HTTAnalyzer.h"
 #include "HTTHistograms.h"
 //////////////////////////////////////////////////////////////////////////////
@@ -32,19 +30,19 @@ std::string HTTAnalyzer::getSampleName(const EventProxyHTT & myEventProxy){
 }
 //////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////
-float HTTAnalyzer::getSystWeight(const sysEffects::sysEffectsEnum & aSystEffect){
+float HTTAnalyzer::getSystWeight(const HTTAnalysis::sysEffects & aSystEffect){
 
-  if(aSystEffect==sysEffects::NOMINAL || aSystEffect==sysEffects::NOMINAL_SVFIT) return 1.0;
+  if(aSystEffect==HTTAnalysis::NOMINAL || aSystEffect==HTTAnalysis::NOMINAL_SVFIT) return 1.0;
 
-  if(aSystEffect==sysEffects::ZPtUp && sampleName.find("DYJets")!=std::string::npos) return aEvent.getPtReWeight();
-  else if(aSystEffect==sysEffects::ZPtDown && sampleName.find("DYJets")!=std::string::npos) return 1.0/aEvent.getPtReWeight();
-  else if(aSystEffect==sysEffects::TTUp && sampleName.find("TTbar")!=std::string::npos) return aEvent.getPtReWeight();
-  else if(aSystEffect==sysEffects::TTDown && sampleName.find("TTbar")!=std::string::npos) return 1.0/aEvent.getPtReWeight();
-  else if((aSystEffect==sysEffects::J2TUp || aSystEffect==sysEffects::J2TDown)
+  if(aSystEffect==HTTAnalysis::ZPtUp && sampleName.find("DYJets")!=std::string::npos) return aEvent.getPtReWeight();
+  else if(aSystEffect==HTTAnalysis::ZPtDown && sampleName.find("DYJets")!=std::string::npos) return 1.0/aEvent.getPtReWeight();
+  else if(aSystEffect==HTTAnalysis::TTUp && sampleName.find("TTbar")!=std::string::npos) return aEvent.getPtReWeight();
+  else if(aSystEffect==HTTAnalysis::TTDown && sampleName.find("TTbar")!=std::string::npos) return 1.0/aEvent.getPtReWeight();
+  else if((aSystEffect==HTTAnalysis::J2TUp || aSystEffect==HTTAnalysis::J2TDown)
             && aLeg2.getProperty(PropertyEnum::mc_match)==6){
   float delta = 0.2*aLeg2.getP4().Perp()/100.0;
   if(aLeg2.getP4().Perp()>200) delta = 0.4;
-  if(aSystEffect==sysEffects::J2TDown) delta*=-1;
+  if(aSystEffect==HTTAnalysis::J2TDown) delta*=-1;
     return 1-delta;
   }
   else return 1.0;
@@ -222,21 +220,21 @@ std::vector<std::string> HTTAnalyzer::getTauDecayName(int decModeMinus, int decM
 
   std::vector<std::string> types;
 
-  if(decModeMinus==tauDecay1ChargedPion0PiZero && decModePlus==tauDecay1ChargedPion0PiZero) types.push_back("PiPi0Pi0");
+  if(decModeMinus==HTTAnalysis::tauDecay1ChargedPion0PiZero && decModePlus==HTTAnalysis::tauDecay1ChargedPion0PiZero) types.push_back("PiPi0Pi0");
 
   if(isOneProng(decModeMinus) && isOneProng(decModePlus) ) types.push_back("1Prong1Prong");
 
-  if( (decModeMinus==tauDecay1ChargedPion0PiZero && isLepton(decModePlus) ) ||
-      (isLepton(decModeMinus) && decModePlus==tauDecay1ChargedPion0PiZero)) types.push_back("Lepton1Prong0Pi0");
+  if( (decModeMinus==HTTAnalysis::tauDecay1ChargedPion0PiZero && isLepton(decModePlus) ) ||
+      (isLepton(decModeMinus) && decModePlus==HTTAnalysis::tauDecay1ChargedPion0PiZero)) types.push_back("Lepton1Prong0Pi0");
 
   if( (isOneProng(decModeMinus) && isLepton(decModePlus) ) ||
       ( isLepton(decModeMinus) && isOneProng(decModePlus) ) ) types.push_back("Lepton1Prong");
 
-  if(decModeMinus==tauDecay1ChargedPion1PiZero && decModePlus==tauDecay1ChargedPion1PiZero ) types.push_back("PiPlusPiMinus2Pi0");
+  if(decModeMinus==HTTAnalysis::tauDecay1ChargedPion1PiZero && decModePlus==HTTAnalysis::tauDecay1ChargedPion1PiZero ) types.push_back("PiPlusPiMinus2Pi0");
 
 
-  if( isOneProng(decModeMinus) && decModeMinus!=tauDecay1ChargedPion0PiZero &&
-      isOneProng(decModePlus) && decModePlus!=tauDecay1ChargedPion0PiZero )   types.push_back("1Prong1ProngXPi0");
+  if( isOneProng(decModeMinus) && decModeMinus!=HTTAnalysis::tauDecay1ChargedPion0PiZero &&
+      isOneProng(decModePlus) && decModePlus!=HTTAnalysis::tauDecay1ChargedPion0PiZero )   types.push_back("1Prong1ProngXPi0");
 
   if(isLepton(decModePlus) && isLepton(decModeMinus)) types.push_back("LeptonLepton");
 
@@ -245,44 +243,17 @@ std::vector<std::string> HTTAnalyzer::getTauDecayName(int decModeMinus, int decM
 //////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////
 bool HTTAnalyzer::isOneProng(int decMode){
-  if(decMode==tauDecay1ChargedPion0PiZero ||
-     decMode==tauDecay1ChargedPion1PiZero ||
-     decMode==tauDecay1ChargedPion2PiZero ||
-     decMode==tauDecay1ChargedPion3PiZero ) return true;
+  if(decMode==HTTAnalysis::tauDecay1ChargedPion0PiZero ||
+     decMode==HTTAnalysis::tauDecay1ChargedPion1PiZero ||
+     decMode==HTTAnalysis::tauDecay1ChargedPion2PiZero ||
+     decMode==HTTAnalysis::tauDecay1ChargedPion3PiZero ) return true;
   else return false;
 }
 //////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////
 bool HTTAnalyzer::isLepton(int decMode){
-  if(decMode==tauDecaysElectron || decMode==tauDecayMuon) return true;
+  if(decMode==HTTAnalysis::tauDecaysElectron || decMode==HTTAnalysis::tauDecayMuon) return true;
   else return false;
-}
-//////////////////////////////////////////////////////////////////////////////
-//////////////////////////////////////////////////////////////////////////////
-float HTTAnalyzer::getLeptonCorrection(float eta, float pt, hadronicTauDecayModes tauDecayMode){
-
-  if(sampleName.find("Data")!=std::string::npos) return 1.0;
-
-   if(!h2DMuonIdCorrections) initializeCorrections();
-
-  if(tauDecayMode == tauDecayMuon){
-    int iBin = h2DMuonIdCorrections->FindBin(pt, eta);
-    float muon_id_scalefactor = h2DMuonIdCorrections->GetBinContent(iBin);
-    float muon_iso_scalefactor = h2DMuonIsoCorrections->GetBinContent(iBin);
-    float muon_trg_efficiency = h2DMuonTrgCorrections->GetBinContent(iBin);
-
-    return  muon_id_scalefactor*muon_iso_scalefactor*muon_trg_efficiency;
-  }
-  else if(tauDecayMode == tauDecaysElectron) return 1.0;
-  else{
-    if(sampleName.find("H")==std::string::npos &&
-       !(sampleName.find("A")!=std::string::npos && sampleName.find("All")==std::string::npos) && //pseudoscalar
-       sampleName.find("MatchT")==std::string::npos
-       ) return 1.0;
-    float tau_id_scalefactor = 0.9;//according to https://twiki.cern.ch/twiki/bin/view/CMS/SMTauTau2016#MC_corrections
-    return tau_id_scalefactor;
-  }
-  return 1.0;
 }
 //////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////
