@@ -1,7 +1,5 @@
-#ifndef RootAnalysis_Tools_H
-#define RootAnalysis_Tools_H
-
 #include <string>
+#include <vector>
 #include "Tools.h"
 #include "AnalysisEnums.h"
 
@@ -29,7 +27,8 @@ std::string categoryName(unsigned int iCategory){
         else if(iCategory==(int)antiiso_vbf) return "antiiso_vbf";
         return "Unknown";
 }
-
+//////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////////
 std::string systEffectName(unsigned int iSystEffect){
         if(iSystEffect==(int)NOMINAL) return "";
         else if(iSystEffect==(int)NOMINAL_SVFIT) return "";
@@ -53,6 +52,47 @@ std::string systEffectName(unsigned int iSystEffect){
         else if(iSystEffect==(int)WSFDown) return "_WSFUncert_mt_CAT_13TeVDown";
         return "_Unknown";
 }
+//////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////////
+std::vector<std::string> getTauDecayName(int decModeMinus, int decModePlus){
 
+  std::vector<std::string> types;
+
+  if(decModeMinus==HTTAnalysis::tauDecay1ChargedPion0PiZero && decModePlus==HTTAnalysis::tauDecay1ChargedPion0PiZero) types.push_back("PiPi0Pi0");
+
+  if(HTTAnalysis::isOneProng(decModeMinus) && HTTAnalysis::isOneProng(decModePlus) ) types.push_back("1Prong1Prong");
+
+  if( (decModeMinus==HTTAnalysis::tauDecay1ChargedPion0PiZero && isLepton(decModePlus) ) ||
+      (HTTAnalysis::isLepton(decModeMinus) && decModePlus==HTTAnalysis::tauDecay1ChargedPion0PiZero)) types.push_back("Lepton1Prong0Pi0");
+
+  if( (HTTAnalysis::isOneProng(decModeMinus) && HTTAnalysis::isLepton(decModePlus) ) ||
+      (HTTAnalysis::isLepton(decModeMinus) && HTTAnalysis::isOneProng(decModePlus) ) ) types.push_back("Lepton1Prong");
+
+  if(decModeMinus==HTTAnalysis::tauDecay1ChargedPion1PiZero && decModePlus==HTTAnalysis::tauDecay1ChargedPion1PiZero ) types.push_back("PiPlusPiMinus2Pi0");
+
+
+  if(HTTAnalysis::isOneProng(decModeMinus) && decModeMinus!=HTTAnalysis::tauDecay1ChargedPion0PiZero &&
+    HTTAnalysis::isOneProng(decModePlus) && decModePlus!=HTTAnalysis::tauDecay1ChargedPion0PiZero )   types.push_back("1Prong1ProngXPi0");
+
+  if(HTTAnalysis::isLepton(decModePlus) && HTTAnalysis::isLepton(decModeMinus)) types.push_back("LeptonLepton");
+
+  return types;
 }
-#endif
+//////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////////
+bool isOneProng(int decMode){
+  if(decMode==HTTAnalysis::tauDecay1ChargedPion0PiZero ||
+     decMode==HTTAnalysis::tauDecay1ChargedPion1PiZero ||
+     decMode==HTTAnalysis::tauDecay1ChargedPion2PiZero ||
+     decMode==HTTAnalysis::tauDecay1ChargedPion3PiZero ) return true;
+  else return false;
+}
+//////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////////
+bool isLepton(int decMode){
+  if(decMode==HTTAnalysis::tauDecaysElectron || decMode==HTTAnalysis::tauDecayMuon) return true;
+  else return false;
+}
+//////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////////
+}

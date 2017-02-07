@@ -3,6 +3,7 @@
 
 #include "HTTAnalyzer.h"
 #include "HTTHistograms.h"
+#include "Tools.h"
 
 //////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////
@@ -54,7 +55,7 @@ void HTTAnalyzer::fillDecayPlaneAngle(const std::string & hNameSuffix, float eve
   float yTau =  2.*tauLeadingTk.Pt()/aLeg2.getP4().Pt() - 1.;
   float shiftedIPrho = anglesIPRho.first +(yTau<0)*(1-2*(anglesIPRho.first>M_PI))*M_PI;
 
-  if(aLeg2.getProperty(PropertyEnum::decayMode)!=HTTAnalysis::tauDecay1ChargedPion0PiZero && isOneProng(aLeg2.getProperty(PropertyEnum::decayMode))){
+  if(aLeg2.getProperty(PropertyEnum::decayMode)!=HTTAnalysis::tauDecay1ChargedPion0PiZero && HTTAnalysis::isOneProng(aLeg2.getProperty(PropertyEnum::decayMode))){
      myHistos_->fill1DHistogram("h1DyTau"+hNameSuffix,yTau,eventWeight);
 
      myHistos_->fill1DHistogram("h1DPhi-nVecIP"+hNameSuffix,shiftedIPrho,eventWeight);
@@ -128,7 +129,7 @@ void HTTAnalyzer::fillGenDecayPlaneAngle(const std::string & hNameSuffix, float 
   //Method from http://arxiv.org/abs/hep-ph/0204292 (Was)
   //Angle between rho decay planes in the rho-rho.
   ///Here we take rho on one side, mu on the other
-  if(aGenLeg2.getProperty(PropertyEnum::decayMode)!=HTTAnalysis::tauDecay1ChargedPion0PiZero && isOneProng(aGenLeg2.getProperty(PropertyEnum::decayMode))){
+  if(aGenLeg2.getProperty(PropertyEnum::decayMode)!=HTTAnalysis::tauDecay1ChargedPion0PiZero && HTTAnalysis::isOneProng(aGenLeg2.getProperty(PropertyEnum::decayMode))){
 
     float yTau =  2.*tauLeadingTk.Pt()/(aGenLeg2.getChargedP4()+aGenLeg2.getNeutralP4()).Pt() - 1.;
     float shiftedIPrho = anglesIPRho.first +(yTau<0)*(1-2*(anglesIPRho.first>M_PI))*M_PI;

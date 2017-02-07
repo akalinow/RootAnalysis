@@ -1,6 +1,7 @@
 #include "MuTauSpecifics.h"
 #include "HTTAnalyzer.h"
 #include "EventProxyHTT.h"
+#include "Tools.h"
 
 
 MuTauSpecifics::MuTauSpecifics(HTTAnalyzer * aAnalyzer) : ChannelSpecifics(aAnalyzer){
@@ -37,9 +38,9 @@ std::pair<bool, bool> MuTauSpecifics::checkTauDecayMode(const EventProxyHTT & my
         bool goodGenDecayMode = false;
         bool goodRecoDecayMode = false;
 
-        std::vector<std::string> decayNamesGen = myAnalyzer->getTauDecayName(myAnalyzer->aGenLeg2.getProperty(PropertyEnum::decayMode),
+        std::vector<std::string> decayNamesGen = HTTAnalysis::getTauDecayName(myAnalyzer->aGenLeg2.getProperty(PropertyEnum::decayMode),
                                                                              myAnalyzer->aGenLeg1.getProperty(PropertyEnum::decayMode));
-        std::vector<std::string> decayNamesReco = myAnalyzer->getTauDecayName(myAnalyzer->aLeg2.getProperty(PropertyEnum::decayMode),HTTAnalysis::tauDecayMuon);
+        std::vector<std::string> decayNamesReco = HTTAnalysis::getTauDecayName(myAnalyzer->aLeg2.getProperty(PropertyEnum::decayMode),HTTAnalysis::tauDecayMuon);
 
         for(auto it: decayNamesGen) if(it.find("Lepton1Prong")!=std::string::npos) goodGenDecayMode = true;
         for(auto it: decayNamesReco) if(it.find("Lepton1Prong")!=std::string::npos) goodRecoDecayMode = true;
@@ -94,7 +95,7 @@ void MuTauSpecifics::testAllCategories(const HTTAnalysis::sysEffects & aSystEffe
         bool cpTauSelection =  myAnalyzer->aLeg2.getPCARefitPV().Mag()>myAnalyzer->nPCAMin_;
         bool cpPi = cpMuonSelection && cpTauSelection && myAnalyzer->aLeg2.getProperty(PropertyEnum::decayMode)==HTTAnalysis::tauDecay1ChargedPion0PiZero;
         bool cpRho = cpMuonSelection && myAnalyzer->aLeg2.getProperty(PropertyEnum::decayMode)!=HTTAnalysis::tauDecay1ChargedPion0PiZero &&
-                     myAnalyzer->isOneProng(myAnalyzer->aLeg2.getProperty(PropertyEnum::decayMode));
+                     HTTAnalysis::isOneProng(myAnalyzer->aLeg2.getProperty(PropertyEnum::decayMode));
 
         //2D categories
         bool jet0 = myAnalyzer->aLeg2.getP4(aSystEffect).Perp()>30 && myAnalyzer->nJets30 == 0;
