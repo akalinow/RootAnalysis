@@ -8,6 +8,9 @@ namespace HTTAnalysis {
 ///Return current luminosity estimate.
 float getLumi();
 
+///Return sample cross section in [pb]
+float getCrossSection(const std::string & sampleName);
+
 ///Return human readable category name for given category number.
 std::string categoryName(unsigned int iCategory);
 

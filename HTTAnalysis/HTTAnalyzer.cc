@@ -28,6 +28,8 @@ HTTAnalyzer::HTTAnalyzer(const std::string & aName, const std::string & aDecayMo
 
         categoryDecisions.resize((int)HTTAnalysis::DUMMY_CAT);
 
+        std::cout<<"decayMode: "<<aDecayMode<<std::endl;
+
         if(aDecayMode=="MuTau") myChannelSpecifics = new MuTauSpecifics(this);
         else if (aDecayMode=="TauTau") myChannelSpecifics = new TauTauSpecifics(this);
 
@@ -284,9 +286,7 @@ bool HTTAnalyzer::analyze(const EventProxyBase& iEvent){
                                 systEffectName.replace(systEffectName.find("CAT"),3,categoryName);
                         }
 
-                        if(OS) hNameSuffix = sampleName+"_OS_"+categorySuffix+systEffectName;
-                        else if(SS) hNameSuffix = sampleName+"_SS_"+categorySuffix+systEffectName;
-
+                        hNameSuffix = sampleName+"_"+categorySuffix+systEffectName;
                         fillControlHistos(hNameSuffix, eventWeightWithSyst, aSystEffect);
                 }
         }

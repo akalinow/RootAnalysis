@@ -32,28 +32,21 @@ class HTTHistograms: public AnalysisHistograms {
   float getSampleNormalisation(std::string sampleName);
 
   ///Estimate QCD background using the SS/OS method.
-  TH1F* getQCDbackground(unsigned int iCategory, std::string varName,
-			 std::pair<float,float> wselOSCorrection =  std::pair<float,float>(1,0),
-			 std::pair<float,float> wselSSCorrection =  std::pair<float,float>(1,0),
+  TH1F* getQCDbackground(unsigned int iCategory, std::string varName,			 
        unsigned int iSystEffect = (unsigned int)HTTAnalysis::NOMINAL_SVFIT);
 
   ///Calculate scaling factor for the WJets MC
   ///Scaling factor is estimated in high Mt region.
   ///Other backgrounds are subtracted, basing on MC
   ///QCD contribution is neglected.
-  std::pair<float,float> getWNormalisation(unsigned int iCategory, std::string selName,
+  std::pair<float,float> getWNormalisation(unsigned int iCategory,
     unsigned int iSystEffect = (unsigned int)HTTAnalysis::NOMINAL_SVFIT);
 
   ///Calculate QCD ratio between signal and control regions.
   std::pair<float,float> getQCDControlToSignal(unsigned int iCategory,
-				      std::pair<float,float> wselOSCorrection =  std::pair<float,float>(1,0),
-				      std::pair<float,float> wselSSCorrection =  std::pair<float,float>(1,0),
               unsigned int iSystEffect = (unsigned int)HTTAnalysis::NOMINAL_SVFIT);
 
    private:
-
-  std::pair<float,float> wselOSCorrection;
-  std::pair<float,float> wselSSCorrection;
 
   virtual void defineHistograms();
 
@@ -67,7 +60,6 @@ class HTTHistograms: public AnalysisHistograms {
   //varName - name of variable to be plotted,
   THStack* plotStack(unsigned int iCategory,
 		     std::string varName,
-		     std::string selName = "OS",
 		     unsigned int iSystEffect = (unsigned int)HTTAnalysis::NOMINAL);
 
   void plotnPCA(const std::string & type);
@@ -123,6 +115,8 @@ class HTTHistograms: public AnalysisHistograms {
   void plotSingleHistogram(std::string hName);
 
   float muTauDYScale, mumuDYScale;
+
+  std::stringstream outputStream;
 
 };
 

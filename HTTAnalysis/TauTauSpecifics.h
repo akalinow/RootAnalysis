@@ -22,6 +22,7 @@ public:
 float getLeg1Correction(const HTTAnalysis::sysEffects & aSystEffect);
 float getLeg2Correction(const HTTAnalysis::sysEffects & aSystEffect);
 
+virtual std::string getDecayModeName() const {return decayModeName;}
 
 private:
 

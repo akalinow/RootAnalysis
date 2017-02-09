@@ -39,6 +39,86 @@ namespace HTTAnalysis {
 }
 //////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////
+float getCrossSection(const std::string & sampleName){
+
+  float crossSection = 0;
+
+///Cross sections taken from
+  if(sampleName=="DYLowM"){
+    //https://cmsweb.cern.ch/das/request?input=mcm%20prepid=SMP-RunIISpring15MiniAODv2-00016
+    crossSection = 71600;
+  }
+  //https://twiki.cern.ch/twiki/bin/viewauth/CMS/SummaryTable1G25ns#DY_Z
+  if(sampleName.find("DYJetsMatch")!=std::string::npos || sampleName=="DYJets"){
+    //xsection for 3xZ->mu mu M50 in [pb]
+    crossSection = 3*1921.8;
+  }
+  if(sampleName.find("WJets")!=std::string::npos){
+    //xsection for 3xW->mu nu in [pb]
+    //https://twiki.cern.ch/twiki/bin/viewauth/CMS/StandardModelCrossSectionsat13TeVInclusive
+    crossSection = 3*20508.9;
+  }
+  if(sampleName.find("TTbar")!=std::string::npos){
+    //https://twiki.cern.ch/twiki/bin/viewauth/CMS/KlubTwikiRun2
+    //https://twiki.cern.ch/twiki/bin/viewauth/CMS/StandardModelCrossSectionsat13TeVInclusive
+    crossSection = 831.76;
+  }
+
+  //https://twiki.cern.ch/twiki/pub/LHCPhysics/LHCHXSWG/Higgs_XSBR_YR4_update.xlsx
+  //https://twiki.cern.ch/twiki/bin/view/LHCPhysics/CERNYellowReportPageBR2014#Higgs_2_fermions
+  //https://twiki.cern.ch/twiki/bin/view/LHCPhysics/CERNYellowReportPageAt1314TeV2014
+  //Xsection for mass!=125 are calculated using luminosity ratio, and cross section for 8 TeV
+
+  if(sampleName=="ggH120") crossSection = 5.222E+01*6.981E-02;//CERNYellowReportPageAt13TeV*CERNYellowReportPageBR
+  if(sampleName=="ggH125") crossSection = 4.858E+01*6.272E-02;//CERNYellowReportPageAt13TeV*CERNYellowReportPageBR
+  if(sampleName=="ggH130") crossSection = 4.531E+01*5.411E-02;//CERNYellowReportPageAt13TeV*CERNYellowReportPageBR
+
+  if(sampleName=="qqH120") crossSection = 1.676E+00*6.981E-02;//CERNYellowReportPageAt13TeV*CERNYellowReportPageBR
+  if(sampleName=="qqH125") crossSection = 1.601E+00*6.272E-02;//CERNYellowReportPageAt13TeV*CERNYellowReportPageBR
+  if(sampleName=="qqH130") crossSection = 1.531E+00*5.411E-02;//CERNYellowReportPageAt13TeV*CERNYellowReportPageBR
+
+  ///https://twiki.cern.ch/twiki/bin/view/CMS/HiggsToTauTauWorking2016#MC_and_data_samples
+  if(sampleName=="WplusH120") crossSection = 1.565*0.0698*0.5;
+  if(sampleName=="WplusH125") crossSection = 1.373*0.0627*0.5;
+  if(sampleName=="WplusH130") crossSection = 1.209*0.0541*0.5;
+
+  if(sampleName=="WminusH120") crossSection = 1.565*0.0698*0.5;
+  if(sampleName=="WminusH125") crossSection = 1.373*0.0627*0.5;
+  if(sampleName=="WminusH130") crossSection = 1.209*0.0541*0.5;
+
+  if(sampleName=="ZH120") crossSection = 0.994*0.0698;
+  if(sampleName=="ZH125") crossSection = 0.884*0.0627;
+  if(sampleName=="ZH130") crossSection = 0.790*0.0541;
+
+  ///https://twiki.cern.ch/twiki/bin/view/CMS/HiggsToTauTauWorking2016#MC_and_data_samples
+  if(sampleName.find("ZZTo2L2Q")!=std::string::npos) crossSection = 3.22;
+  if(sampleName.find("ZZTo4L")!=std::string::npos) crossSection = 1.212;
+  if(sampleName.find("WZTo1L3Nu")!=std::string::npos) crossSection = 3.05;
+  if(sampleName.find("WZJToLLLNu")!=std::string::npos) crossSection = 4.708;
+  if(sampleName.find("WWTo1L1Nu2Q")!=std::string::npos) crossSection = 1.212;
+  if(sampleName.find("WZTo1L1Nu2Q")!=std::string::npos) crossSection = 10.71;
+  if(sampleName.find("VVTo2L2Nu")!=std::string::npos) crossSection = 11.95;
+  if(sampleName.find("WZTo2L2Q")!=std::string::npos) crossSection = 5.595;
+
+  ///https://twiki.cern.ch/twiki/bin/view/CMS/HiggsToTauTauWorking2016#MC_and_data_samples
+  if(sampleName=="Wantitop") crossSection = 35.6;
+  if(sampleName=="Wtop") crossSection = 35.6;
+  if(sampleName=="t-channel_top") crossSection = 136.02;
+  if(sampleName=="t-channel_antitop") crossSection = 80.95;
+  if(sampleName=="EWKWMinus") crossSection = 20.25;
+  if(sampleName=="EWKWPlus") crossSection = 25.62;
+  if(sampleName=="EWKZ2JetsZToLL") crossSection = 3.987;
+  if(sampleName=="EWKZ2JetsZToNuNu") crossSection = 10.01;
+
+
+  ///https://twiki.cern.ch/twiki/bin/view/CMS/HiggsToTauTauWorking2016#MC_and_data_samples
+  ///matching eff. = 0.00042
+  if(sampleName=="QCD_MC") crossSection = 720648000*0.00042;
+
+  return crossSection;
+}
+//////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////////
 std::string categoryName(unsigned int iCategory){
         if(iCategory==(int)jet0_low) return "jet0_low";
         else if(iCategory==(int)jet0_high) return "jet0_high";
