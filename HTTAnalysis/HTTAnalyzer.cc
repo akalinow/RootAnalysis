@@ -8,6 +8,7 @@
 #include "HTTAnalyzer.h"
 #include "HTTHistograms.h"
 #include "MuTauSpecifics.h"
+#include "TauTauSpecifics.h"
 #include "Tools.h"
 //////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////
@@ -27,7 +28,8 @@ HTTAnalyzer::HTTAnalyzer(const std::string & aName, const std::string & aDecayMo
 
         categoryDecisions.resize((int)HTTAnalysis::DUMMY_CAT);
 
-        myChannelSpecifics = new MuTauSpecifics(this);
+        if(aDecayMode=="MuTau") myChannelSpecifics = new MuTauSpecifics(this);
+        else if (aDecayMode=="TauTau") myChannelSpecifics = new TauTauSpecifics(this);
 
         nPCAMin_ = 0.003;
 
@@ -172,7 +174,15 @@ void HTTAnalyzer::fillControlHistos(const std::string & hNameSuffix, float event
                 myHistos_->fill1DHistogram("h1DEtaLeadingJet"+hNameSuffix,aJet1.getP4(aSystEffect).Eta(),eventWeight);
                 myHistos_->fill1DHistogram("h1DCSVBtagLeadingJet"+hNameSuffix,aJet1.getProperty(PropertyEnum::bCSVscore),eventWeight);
         }
-        if(nJets30>1) myHistos_->fill1DHistogram("h1DWideMass2J"+hNameSuffix,jetsMass,eventWeight);
+        if(nJets30>1){
+          myHistos_->fill1DHistogram("h1DWideMass2J"+hNameSuffix,jetsMass,eventWeight);
+          myHistos_->fill1DHistogram("h1DStatsNJGap30"+hNameSuffix,nJetsInGap30,eventWeight);
+          float jetsEta = std::abs(aJet1.getP4().Eta() - aJet2.getP4().Eta());
+          myHistos_->fill1DHistogram("h1DDeltaEta2J"+hNameSuffix,jetsEta,eventWeight);
+          myHistos_->fill1DHistogram("h1DPtTrailingJet"+hNameSuffix,aJet2.getP4().Pt(),eventWeight);
+          myHistos_->fill1DHistogram("h1DEtaTrailingJet"+hNameSuffix,aJet2.getP4().Eta(),eventWeight);
+          myHistos_->fill1DHistogram("h1DPhiTrailingJet"+hNameSuffix,aJet2.getP4().Phi(),eventWeight);
+        }
         myHistos_->fill1DHistogram("h1DPtMET"+hNameSuffix,aMET.getP4(aSystEffect).Pt(),eventWeight);
 
         if(aJet1.getProperty(PropertyEnum::bCSVscore)>0.8) {
@@ -238,23 +248,6 @@ bool HTTAnalyzer::analyze(const EventProxyBase& iEvent){
         bool goodRecoDecayMode = goodDecayModes.second;
 
         if(goodGenDecayMode) fillGenDecayPlaneAngle(sampleName+"GenNoOfflineSel", eventWeight);
-
-        int tauIDmask = 0;
-        for(unsigned int iBit=0; iBit<aEvent.ntauIds; iBit++) {
-                if(aEvent.tauIDStrings[iBit]=="byTightIsolationMVArun2v1DBoldDMwLT") tauIDmask |= (1<<iBit);
-                if(aEvent.tauIDStrings[iBit]=="againstMuonTight3") tauIDmask |= (1<<iBit);
-                if(aEvent.tauIDStrings[iBit]=="againstElectronVLooseMVA6") tauIDmask |= (1<<iBit);
-        }
-        bool tauID = ( (int)aLeg2.getProperty(PropertyEnum::tauID) & tauIDmask) == tauIDmask;
-        bool muonKinematics = aLeg1.getP4().Pt()>24 && fabs(aLeg1.getP4().Eta())<2.1;
-
-        bool trigger = aLeg1.hasTriggerMatch(TriggerEnum::HLT_IsoMu22) ||
-                       aLeg1.hasTriggerMatch(TriggerEnum::HLT_IsoTkMu22) ||
-                       aLeg1.hasTriggerMatch(TriggerEnum::HLT_IsoMu22_eta2p1) ||
-                       aLeg1.hasTriggerMatch(TriggerEnum::HLT_IsoTkMu22_eta2p1);
-
-        if(sampleName!="Data") trigger = true; //MC trigger included in muon SF
-        if(!muonKinematics || !tauID || !trigger) return true;
 
         bool SS = aLeg2.getCharge()*aLeg1.getCharge() == 1;
         bool OS = aLeg2.getCharge()*aLeg1.getCharge() == -1;

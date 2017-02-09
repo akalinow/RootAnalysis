@@ -25,8 +25,6 @@ class HTTHistograms: public AnalysisHistograms {
 
   std::string getTemplateName(const std::string& name);
 
-  float getLumi();
-
   ///Return sample normalisation based only on
   ///luminosity and cross section.
   ///MC to DATA scaling factors should be applied
@@ -46,8 +44,8 @@ class HTTHistograms: public AnalysisHistograms {
   std::pair<float,float> getWNormalisation(unsigned int iCategory, std::string selName,
     unsigned int iSystEffect = (unsigned int)HTTAnalysis::NOMINAL_SVFIT);
 
-  ///Calculate QCD OS/SS ratiousing non isolated events.
-  std::pair<float,float> getQCDOStoSS(unsigned int iCategory,
+  ///Calculate QCD ratio between signal and control regions.
+  std::pair<float,float> getQCDControlToSignal(unsigned int iCategory,
 				      std::pair<float,float> wselOSCorrection =  std::pair<float,float>(1,0),
 				      std::pair<float,float> wselSSCorrection =  std::pair<float,float>(1,0),
               unsigned int iSystEffect = (unsigned int)HTTAnalysis::NOMINAL_SVFIT);
@@ -125,7 +123,6 @@ class HTTHistograms: public AnalysisHistograms {
   void plotSingleHistogram(std::string hName);
 
   float muTauDYScale, mumuDYScale;
-  float ttScale;
 
 };
 

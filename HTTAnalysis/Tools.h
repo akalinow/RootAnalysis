@@ -5,8 +5,13 @@
 
 namespace HTTAnalysis {
 
+///Return current luminosity estimate.
+float getLumi();
+
+///Return human readable category name for given category number.
 std::string categoryName(unsigned int iCategory);
 
+///Return human readable systematic effect name for given systematic effect number number.
 std::string systEffectName(unsigned int iSystEffect);
 
 ///Return string encoding di-tau decay mode.

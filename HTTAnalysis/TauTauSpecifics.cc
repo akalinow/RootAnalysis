@@ -13,7 +13,6 @@ TauTauSpecifics::TauTauSpecifics(HTTAnalyzer * aAnalyzer) : ChannelSpecifics(aAn
 /////////////////////////////////////////////////////////////////
 void TauTauSpecifics::setAnalysisObjects(const EventProxyHTT & myEventProxy) {
 
-
         myAnalyzer->aLeg1 = myAnalyzer->aPair.getLeg1();
         myAnalyzer->aLeg2 = myAnalyzer->aPair.getLeg2();
 
@@ -50,8 +49,8 @@ std::pair<bool, bool> TauTauSpecifics::checkTauDecayMode(const EventProxyHTT & m
                                                                               myAnalyzer->aGenLeg2.getProperty(PropertyEnum::decayMode));
         std::vector<std::string> decayNamesReco = HTTAnalysis::getTauDecayName(myAnalyzer->aLeg2.getProperty(PropertyEnum::decayMode),HTTAnalysis::tauDecayMuon);
 
-        for(auto it: decayNamesGen) if(it.find("1Prong1Prong")!=std::string::npos) goodGenDecayMode = true;
-        for(auto it: decayNamesReco) if(it.find("1Prong1Prong")!=std::string::npos) goodRecoDecayMode = true;
+        for(auto it : decayNamesGen) if(it.find("1Prong1Prong")!=std::string::npos) goodGenDecayMode = true;
+        for(auto it : decayNamesReco) if(it.find("1Prong1Prong")!=std::string::npos) goodRecoDecayMode = true;
 
         return std::pair<bool, bool>(goodGenDecayMode, goodRecoDecayMode);
 }
@@ -59,10 +58,50 @@ std::pair<bool, bool> TauTauSpecifics::checkTauDecayMode(const EventProxyHTT & m
 /////////////////////////////////////////////////////////////////
 void TauTauSpecifics::testAllCategories(const HTTAnalysis::sysEffects & aSystEffect){
 
-        for(auto && it: myAnalyzer->categoryDecisions) it = false;
+        for(auto && it : myAnalyzer->categoryDecisions) it = false;
+
+        ///This stands for core selection, that is common to all regions.
+        bool tau1Kinematics = myAnalyzer->aLeg1.getP4().Pt()>50 && std::abs(myAnalyzer->aLeg1.getP4().Eta())<2.1;
+        bool tau2Kinematics = myAnalyzer->aLeg2.getP4().Pt()>40 && std::abs(myAnalyzer->aLeg2.getP4().Eta())<2.1;
+
+        int tauIDmask=0, tauIsoTmask=0, tauIsoMmask=0, tauIsoLmask=0;
+
+        for(unsigned int iBit=0; iBit<myAnalyzer->aEvent.ntauIds; iBit++) {
+                if(myAnalyzer->aEvent.tauIDStrings[iBit]=="byTightIsolationMVArun2v1DBoldDMwLT") tauIsoTmask |= (1<<iBit);
+                if(myAnalyzer->aEvent.tauIDStrings[iBit]=="byMediumIsolationMVArun2v1DBoldDMwLT") tauIsoMmask |= (1<<iBit);
+                if(myAnalyzer->aEvent.tauIDStrings[iBit]=="byLooseIsolationMVArun2v1DBoldDMwLT") tauIsoLmask |= (1<<iBit);
+                if(myAnalyzer->aEvent.tauIDStrings[iBit]=="againstMuonLoose3") tauIDmask |= (1<<iBit);
+                if(myAnalyzer->aEvent.tauIDStrings[iBit]=="againstElectronVLooseMVA6") tauIDmask |= (1<<iBit);
+        }
+
+        bool tau1ID = ( (int)myAnalyzer->aLeg1.getProperty(PropertyEnum::tauID) & tauIDmask) == tauIDmask;
+        bool tau1IsoT = ( (int)myAnalyzer->aLeg1.getProperty(PropertyEnum::tauID) & tauIsoTmask) == tauIsoTmask;
+        bool tau1IsoM = ( (int)myAnalyzer->aLeg1.getProperty(PropertyEnum::tauID) & tauIsoMmask) == tauIsoMmask;
+        bool tau1IsoL = ( (int)myAnalyzer->aLeg1.getProperty(PropertyEnum::tauID) & tauIsoLmask) == tauIsoLmask;
+        bool tau2ID = ( (int)myAnalyzer->aLeg2.getProperty(PropertyEnum::tauID) & tauIDmask) == tauIDmask;
+        bool tau2IsoT = ( (int)myAnalyzer->aLeg2.getProperty(PropertyEnum::tauID) & tauIsoTmask) == tauIsoTmask;
+        bool tau2IsoM = ( (int)myAnalyzer->aLeg2.getProperty(PropertyEnum::tauID) & tauIsoMmask) == tauIsoMmask;
+        bool tau2IsoL = ( (int)myAnalyzer->aLeg2.getProperty(PropertyEnum::tauID) & tauIsoLmask) == tauIsoLmask;
+
+        bool fullIso = tau1IsoT && tau2IsoT;
+        bool relaxedIso = (tau1IsoM && tau2IsoL) || (tau2IsoM && tau1IsoL);
+        bool antiIso = (tau1IsoM && tau2IsoL && !tau2IsoT) || (tau2IsoM && tau1IsoL && !tau1IsoT);
+
+
+
+        bool mediumIsoTrigger = myAnalyzer->aLeg1.hasTriggerMatch(TriggerEnum::HLT_DoubleMediumIsoPFTau35_Trk1_eta2p1_Reg) &&
+                                myAnalyzer->aLeg2.hasTriggerMatch(TriggerEnum::HLT_DoubleMediumIsoPFTau35_Trk1_eta2p1_Reg);
+
+        bool mediumCombinedIsoTrigger = myAnalyzer->aLeg1.hasTriggerMatch(TriggerEnum::HLT_DoubleMediumCombinedIsoPFTau35_Trk1_eta2p1_Reg) &&
+                                        myAnalyzer->aLeg2.hasTriggerMatch(TriggerEnum::HLT_DoubleMediumCombinedIsoPFTau35_Trk1_eta2p1_Reg);
+
+        bool trigger = mediumIsoTrigger || mediumCombinedIsoTrigger;
+        if(myAnalyzer->sampleName!="Data") trigger = true; //MC trigger included in SF
+
+        if(!tau1Kinematics || !tau1ID || !tau2Kinematics || !tau2ID || !relaxedIso || !trigger) return;
 
         myAnalyzer->nJets30 = 0;
-        for(auto itJet: myAnalyzer->aSeparatedJets) {
+        for(auto itJet : myAnalyzer->aSeparatedJets) {
                 if(itJet.getP4(aSystEffect).Pt()>30) ++myAnalyzer->nJets30;
         }
 
@@ -83,60 +122,62 @@ void TauTauSpecifics::testAllCategories(const HTTAnalysis::sysEffects & aSystEff
         float higgsPt =  (myAnalyzer->aLeg1.getP4(aSystEffect) + myAnalyzer->aLeg2.getP4(aSystEffect) + myAnalyzer->aMET.getP4(aSystEffect)).Pt();
 
 
-  bool jet0 = myAnalyzer->nJets30==0;
+        bool jet0 = myAnalyzer->nJets30==0;
 
-  bool jet1 = (myAnalyzer->nJets30==1 || (myAnalyzer->nJets30>=2 && !(jetsMass>300 && jetsEta>2.5 && myAnalyzer->nJetsInGap30<1)));
-  bool jet1_low = jet1 && (higgsPt>100 && higgsPt<170);
+        bool jet1 = (myAnalyzer->nJets30==1 || (myAnalyzer->nJets30>=2 && !(jetsMass>300 && jetsEta>2.5 && myAnalyzer->nJetsInGap30<1)));
+        bool jet1_low = jet1 && (higgsPt>100 && higgsPt<170);
 
-  bool jet1_high = jet1 && higgsPt>170;
+        bool jet1_high = jet1 && higgsPt>170;
 
-  bool vbf_1d = myAnalyzer->nJets30>=2 && jetsEta>2.5 && myAnalyzer->nJetsInGap30<1;
-  bool vbf_low =  vbf_1d &&
-    ((higgsPt<100 && jetsMass>300) || (higgsPt>100 && jetsMass>300 && jetsMass<500));
+        bool vbf_1d = myAnalyzer->nJets30>=2 && jetsEta>2.5 && myAnalyzer->nJetsInGap30<1;
+        bool vbf_low =  vbf_1d && ((higgsPt<100 && jetsMass>300) || (higgsPt>100 && jetsMass>300 && jetsMass<500));
+        bool vbf_high = vbf_1d && (higgsPt>100 && jetsMass>500);
+        bool boosted = myAnalyzer->nJets30==1 || (myAnalyzer->nJets30>=2 && !(jetsEta>2.5 && myAnalyzer->nJetsInGap30<1 && higgsPt>100) );
+        bool vbf_2d = myAnalyzer->nJets30>=2 && (jetsEta>2.5 && myAnalyzer->nJetsInGap30<1 && higgsPt>100);
 
-  bool vbf_high = vbf_1d && (higgsPt>100 && jetsMass>500);
-  bool boosted = myAnalyzer->nJets30==1 || (myAnalyzer->nJets30>=2 && !(jetsEta>2.5 && myAnalyzer->nJetsInGap30<1 && higgsPt>100) );
-  bool vbf_2d = myAnalyzer->nJets30>=2 && (jetsEta>2.5 && myAnalyzer->nJetsInGap30<1 && higgsPt>100);
+        //////////
+        // categories by tau decay modes for CP
+        bool isPi1 = (myAnalyzer->aLeg1.getProperty(PropertyEnum::decayMode)==HTTAnalysis::tauDecay1ChargedPion0PiZero && myAnalyzer->aLeg1.getPCARefitPV().Mag()>myAnalyzer->nPCAMin_);
+        bool isPi2 = (myAnalyzer->aLeg2.getProperty(PropertyEnum::decayMode)==HTTAnalysis::tauDecay1ChargedPion0PiZero && myAnalyzer->aLeg2.getPCARefitPV().Mag()>myAnalyzer->nPCAMin_);
+        bool isRho1 = (myAnalyzer->aLeg1.getProperty(PropertyEnum::decayMode)!=HTTAnalysis::tauDecay1ChargedPion0PiZero && HTTAnalysis::isOneProng(myAnalyzer->aLeg1.getProperty(PropertyEnum::decayMode)) );
+        bool isRho2 = (myAnalyzer->aLeg2.getProperty(PropertyEnum::decayMode)!=HTTAnalysis::tauDecay1ChargedPion0PiZero && HTTAnalysis::isOneProng(myAnalyzer->aLeg2.getProperty(PropertyEnum::decayMode)) );
 
-  //////////
-  // categories by tau decay modes for CP
-  bool isPi1 = (myAnalyzer->aLeg1.getProperty(PropertyEnum::decayMode)==HTTAnalysis::tauDecay1ChargedPion0PiZero && myAnalyzer->aLeg1.getPCARefitPV().Mag()>myAnalyzer->nPCAMin_);
-  bool isPi2 = (myAnalyzer->aLeg2.getProperty(PropertyEnum::decayMode)==HTTAnalysis::tauDecay1ChargedPion0PiZero && myAnalyzer->aLeg2.getPCARefitPV().Mag()>myAnalyzer->nPCAMin_);
-  bool isRho1 = (myAnalyzer->aLeg1.getProperty(PropertyEnum::decayMode)!=HTTAnalysis::tauDecay1ChargedPion0PiZero && HTTAnalysis::isOneProng(myAnalyzer->aLeg1.getProperty(PropertyEnum::decayMode)) );
-  bool isRho2 = (myAnalyzer->aLeg2.getProperty(PropertyEnum::decayMode)!=HTTAnalysis::tauDecay1ChargedPion0PiZero && HTTAnalysis::isOneProng(myAnalyzer->aLeg2.getProperty(PropertyEnum::decayMode)) );
+        bool piPi = isPi1 && isPi2;
+        bool piRho = (isPi1 && isRho2) || (isPi2 && isRho1);
+        bool rhoRho = isRho1 && isRho2;
 
-  bool piPi = isPi1 && isPi2;
-  bool piRho = (isPi1 && isRho2) || (isPi2 && isRho1);
-  bool rhoRho = isRho1 && isRho2;
+        myAnalyzer->categoryDecisions[(int)HTTAnalysis::jet1_low] = jet1_low;
+        myAnalyzer->categoryDecisions[(int)HTTAnalysis::jet1_high] = jet1_high;
 
-  myAnalyzer->categoryDecisions[(int)HTTAnalysis::jet1_low] = jet1_low;
-  myAnalyzer->categoryDecisions[(int)HTTAnalysis::jet1_high] = jet1_high;
+        myAnalyzer->categoryDecisions[(int)HTTAnalysis::vbf_low] = vbf_low;
+        myAnalyzer->categoryDecisions[(int)HTTAnalysis::vbf_high] = vbf_high;
 
-  myAnalyzer->categoryDecisions[(int)HTTAnalysis::vbf_low] = vbf_low;
-  myAnalyzer->categoryDecisions[(int)HTTAnalysis::vbf_high] = vbf_high;
+        myAnalyzer->categoryDecisions[(int)HTTAnalysis::jet0] = fullIso && jet0;
+        myAnalyzer->categoryDecisions[(int)HTTAnalysis::boosted] = fullIso && boosted;
+        myAnalyzer->categoryDecisions[(int)HTTAnalysis::vbf] = fullIso && vbf_2d;
 
-  myAnalyzer->categoryDecisions[(int)HTTAnalysis::jet0] = jet0;
-  myAnalyzer->categoryDecisions[(int)HTTAnalysis::boosted] = boosted;
-  myAnalyzer->categoryDecisions[(int)HTTAnalysis::vbf] = vbf_2d;
+        myAnalyzer->categoryDecisions[(int)HTTAnalysis::qcd_jet0] = antiIso && jet0;
+        myAnalyzer->categoryDecisions[(int)HTTAnalysis::qcd_boosted] = antiIso &&  boosted;
+        myAnalyzer->categoryDecisions[(int)HTTAnalysis::qcd_vbf] = antiIso && vbf_2d;
 
-  myAnalyzer->categoryDecisions[(int)HTTAnalysis::pipi] = piPi;
-  myAnalyzer->categoryDecisions[(int)HTTAnalysis::pirho] = piRho;
-  myAnalyzer->categoryDecisions[(int)HTTAnalysis::rhorho] = rhoRho;
+        myAnalyzer->categoryDecisions[(int)HTTAnalysis::pipi] = piPi;
+        myAnalyzer->categoryDecisions[(int)HTTAnalysis::pirho] = piRho;
+        myAnalyzer->categoryDecisions[(int)HTTAnalysis::rhorho] = rhoRho;
 
 }
 /////////////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////////////
 float TauTauSpecifics::getLeg1Correction(const HTTAnalysis::sysEffects & aSystEffect){
 
-        return getLeptonCorrection(myAnalyzer->aLeg1.getP4(aSystEffect).Eta(),
-                                   myAnalyzer->aLeg1.getP4(aSystEffect).Pt(), HTTAnalysis::hadronicTauDecayModes::tauDecayMuon);
+        return getLeptonCorrection(myAnalyzer->aLeg1.getP4().Eta(), myAnalyzer->aLeg1.getP4().Pt(),
+                                   static_cast<HTTAnalysis::hadronicTauDecayModes>(myAnalyzer->aLeg1.getProperty(PropertyEnum::decayMode)));
 
 }
 /////////////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////////////
 float TauTauSpecifics::getLeg2Correction(const HTTAnalysis::sysEffects & aSystEffect){
 
-        return getLeptonCorrection(myAnalyzer->aLeg2.getP4(aSystEffect).Eta(), myAnalyzer->aLeg2.getP4(aSystEffect).Pt(),
+        return getLeptonCorrection(myAnalyzer->aLeg2.getP4().Eta(), myAnalyzer->aLeg2.getP4().Pt(),
                                    static_cast<HTTAnalysis::hadronicTauDecayModes>(myAnalyzer->aLeg2.getProperty(PropertyEnum::decayMode)));
 
 }

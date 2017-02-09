@@ -53,6 +53,23 @@ void MuTauSpecifics::testAllCategories(const HTTAnalysis::sysEffects & aSystEffe
 
         for(auto && it: myAnalyzer->categoryDecisions) it = false;
 
+        int tauIDmask = 0;
+        for(unsigned int iBit=0; iBit<myAnalyzer->aEvent.ntauIds; iBit++) {
+                if(myAnalyzer->aEvent.tauIDStrings[iBit]=="byTightIsolationMVArun2v1DBoldDMwLT") tauIDmask |= (1<<iBit);
+                if(myAnalyzer->aEvent.tauIDStrings[iBit]=="againstMuonTight3") tauIDmask |= (1<<iBit);
+                if(myAnalyzer->aEvent.tauIDStrings[iBit]=="againstElectronVLooseMVA6") tauIDmask |= (1<<iBit);
+        }
+        bool tauID = ( (int)myAnalyzer->aLeg2.getProperty(PropertyEnum::tauID) & tauIDmask) == tauIDmask;
+        bool muonKinematics = myAnalyzer->aLeg1.getP4().Pt()>24 && fabs(myAnalyzer->aLeg1.getP4().Eta())<2.1;
+
+        bool trigger = myAnalyzer->aLeg1.hasTriggerMatch(TriggerEnum::HLT_IsoMu22) ||
+                       myAnalyzer->aLeg1.hasTriggerMatch(TriggerEnum::HLT_IsoTkMu22) ||
+                       myAnalyzer->aLeg1.hasTriggerMatch(TriggerEnum::HLT_IsoMu22_eta2p1) ||
+                       myAnalyzer->aLeg1.hasTriggerMatch(TriggerEnum::HLT_IsoTkMu22_eta2p1);
+
+        if(myAnalyzer->sampleName!="Data") trigger = true; //MC trigger included in muon SF
+        if(!muonKinematics || !tauID || !trigger) return;
+
         myAnalyzer->nJets30 = 0;
         for(auto itJet: myAnalyzer->aSeparatedJets) {
                 if(itJet.getP4(aSystEffect).Pt()>30) ++myAnalyzer->nJets30;
@@ -126,9 +143,9 @@ void MuTauSpecifics::testAllCategories(const HTTAnalysis::sysEffects & aSystEffe
         myAnalyzer->categoryDecisions[(int)HTTAnalysis::wjets_boosted] = muonIso && wSelection && boosted;
         myAnalyzer->categoryDecisions[(int)HTTAnalysis::wjets_vbf] = muonIso && wSelection && vbf;
 
-        myAnalyzer->categoryDecisions[(int)HTTAnalysis::antiiso_jet0] = muonAntiIso && mtSelection && jet0;
-        myAnalyzer->categoryDecisions[(int)HTTAnalysis::antiiso_boosted] = muonAntiIso && mtSelection && boosted;
-        myAnalyzer->categoryDecisions[(int)HTTAnalysis::antiiso_vbf] = muonAntiIso && mtSelection && vbf;
+        myAnalyzer->categoryDecisions[(int)HTTAnalysis::qcd_jet0] = muonAntiIso && mtSelection && jet0;
+        myAnalyzer->categoryDecisions[(int)HTTAnalysis::qcd_boosted] = muonAntiIso && mtSelection && boosted;
+        myAnalyzer->categoryDecisions[(int)HTTAnalysis::qcd_vbf] = muonAntiIso && mtSelection && vbf;
 
         myAnalyzer->categoryDecisions[(int)HTTAnalysis::W] = muonIso && wSelection;
         myAnalyzer->categoryDecisions[(int)HTTAnalysis::TT] = muonIso && ttSelection;

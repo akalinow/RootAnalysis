@@ -5,6 +5,40 @@
 
 namespace HTTAnalysis {
 
+  float getLumi(){
+
+  //./.local/bin/brilcalc lumi --normtag ~lumipro/public/normtag_file/OfflineNormtagV2.json -i lumiSummary_Run2015C_16Dec2015_v1.json
+  float run2015C = 17225935.728*1E-6;
+  float run2015D = 2114239169.533*1E-6;
+
+  //./.local/bin/brilcalc lumi --normtag /afs/cern.ch/user/l/lumipro/public/normtag_file/normtag_DATACERT.json -i processedLumis_SingleMuon.json
+
+  float run2016BPromptReco = 5923961370.727;
+  float run2016BReReco = 5933308579.501;
+
+  float run2016CPromptReco = 2645968083.093;
+  float run2016CReReco = 2645968083.093;
+
+  float run2016DPromptReco = 4353448810.554;
+  float run2016DReReco = 4353448810.554;
+
+  float run2016EReReco = 4049255306.406;
+  float run2016FReReco = 3160088401.247;
+  float run2016GReReco = 7554453635.136;
+
+  float run2016HPromptReco_v2 = 8545039541.475;
+  float run2016HPromptReco_v3 = 216782873.203;
+
+  float run2016 = run2016BReReco + run2016CReReco +
+    run2016DReReco + run2016EReReco +
+    run2016FReReco + run2016GReReco +
+    run2016HPromptReco_v2 + run2016HPromptReco_v3;
+
+  return run2016*1E-6;//pb-1 data for NTUPLES_05_12_2016
+  //return 36446609816.686*1E-6;//pb-1 data for NTUPLES_05_12_2016
+}
+//////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////////
 std::string categoryName(unsigned int iCategory){
         if(iCategory==(int)jet0_low) return "jet0_low";
         else if(iCategory==(int)jet0_high) return "jet0_high";
@@ -22,9 +56,9 @@ std::string categoryName(unsigned int iCategory){
         else if(iCategory==(int)wjets_jet0) return "wjets_0jet";
         else if(iCategory==(int)wjets_boosted) return "wjets_boosted";
         else if(iCategory==(int)wjets_vbf) return "wjets_vbf";
-        else if(iCategory==(int)antiiso_jet0) return "antiiso_0jet";
-        else if(iCategory==(int)antiiso_boosted) return "antiiso_boosted";
-        else if(iCategory==(int)antiiso_vbf) return "antiiso_vbf";
+        else if(iCategory==(int)qcd_jet0) return "qcd_0jet";
+        else if(iCategory==(int)qcd_boosted) return "qcd_boosted";
+        else if(iCategory==(int)qcd_vbf) return "qcd_vbf";
         return "Unknown";
 }
 //////////////////////////////////////////////////////////////////////////////
