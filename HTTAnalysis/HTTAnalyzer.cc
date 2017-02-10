@@ -22,6 +22,8 @@ HTTAnalyzer::HTTAnalyzer(const std::string & aName, const std::string & aDecayMo
         std::string filePath = "Data_Pileup_2016_BCDEFG_v26.root";
         //filePath = "Data_Pileup_2016_July22.root";
         puDataFile_ = new TFile(filePath.c_str());
+        //puDataFile_ = new TFile();
+        //puDataFile_->Open("http://akalinow.web.cern.ch/akalinow/Data_Pileup_2016_BCDEFG_v26.root","CACHEREAD");
 
         filePath = "MC_Spring16_PU25ns_V1.root";
         puMCFile_ = new TFile(filePath.c_str());
