@@ -163,7 +163,7 @@ void MuTauSpecifics::testAllCategories(const HTTAnalysis::sysEffects & aSystEffe
 float MuTauSpecifics::getLeg1Correction(const HTTAnalysis::sysEffects & aSystEffect){
 
         return getLeptonCorrection(myAnalyzer->aLeg1.getP4(aSystEffect).Eta(),
-                                   myAnalyzer->aLeg1.getP4(aSystEffect).Pt(), HTTAnalysis::hadronicTauDecayModes::tauDecayMuon);
+                                   myAnalyzer->aLeg1.getP4(aSystEffect).Pt(), HTTAnalysis::hadronicTauDecayModes::tauDecayMuon, false);
 
 }
 /////////////////////////////////////////////////////////////////
@@ -171,7 +171,7 @@ float MuTauSpecifics::getLeg1Correction(const HTTAnalysis::sysEffects & aSystEff
 float MuTauSpecifics::getLeg2Correction(const HTTAnalysis::sysEffects & aSystEffect){
 
         return getLeptonCorrection(myAnalyzer->aLeg2.getP4(aSystEffect).Eta(), myAnalyzer->aLeg2.getP4(aSystEffect).Pt(),
-                                   static_cast<HTTAnalysis::hadronicTauDecayModes>(myAnalyzer->aLeg2.getProperty(PropertyEnum::decayMode)));
+                                   static_cast<HTTAnalysis::hadronicTauDecayModes>(myAnalyzer->aLeg2.getProperty(PropertyEnum::decayMode)),false);
 
 }
 /////////////////////////////////////////////////////////////////

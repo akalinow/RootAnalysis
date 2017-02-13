@@ -33,7 +33,7 @@ virtual float getLeg1Correction(const HTTAnalysis::sysEffects & aSystEffect) = 0
 ///Return cumulative MC corrections for the leg2
 virtual float getLeg2Correction(const HTTAnalysis::sysEffects & aSystEffect) = 0;
 
-float getLeptonCorrection(float eta, float pt, HTTAnalysis::hadronicTauDecayModes tauDecayMode);
+float getLeptonCorrection(float eta, float pt, HTTAnalysis::hadronicTauDecayModes tauDecayMode, bool useTauTrigger);
 
 virtual std::string getDecayModeName() const {
         return decayModeName;
@@ -48,7 +48,7 @@ HTTAnalyzer *myAnalyzer;
 
 ///Histograms with lepton corrections
 TH2F *h2DMuonIdCorrections, *h2DMuonIsoCorrections, *h2DMuonTrgCorrections;
-TH3F *h3DTauCorrections;
+TH3F *h3DTauCorrections, *h3DTauTrgOSCorrections, *h3DTauTrgSSCorrections;
 
 std::string decayModeName = "None";
 };

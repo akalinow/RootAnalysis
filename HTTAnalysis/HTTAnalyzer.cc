@@ -19,18 +19,18 @@ HTTAnalyzer::HTTAnalyzer(const std::string & aName, const std::string & aDecayMo
         //--calcMode true --minBiasXsec 69200 --maxPileupBin 60 --numPileupBins 600 Data_Pileup_Cert_271036-277148.root
 
         ///Load ROOT file with PU histograms.
-        std::string filePath = "Data_Pileup_2016_BCDEFG_v26.root";
-        //filePath = "Data_Pileup_2016_July22.root";
+        std::string filePath = "Data_Pileup_2016_BCDEFG_v26.root";//TEST
+        filePath = "Data_Pileup_2016_July22.root";//TEST
         puDataFile_ = new TFile(filePath.c_str());
         //puDataFile_ = new TFile();
         //puDataFile_->Open("http://akalinow.web.cern.ch/akalinow/Data_Pileup_2016_BCDEFG_v26.root","CACHEREAD");
 
         filePath = "MC_Spring16_PU25ns_V1.root";
         puMCFile_ = new TFile(filePath.c_str());
+        //puMCFile_ = new TFile();
+        //puMCFile_->Open("http://akalinow.web.cern.ch/akalinow/MC_Moriond17_PU25ns_V1.root","CACHEREAD");
 
         categoryDecisions.resize((int)HTTAnalysis::DUMMY_CAT);
-
-        std::cout<<"decayMode: "<<aDecayMode<<std::endl;
 
         if(aDecayMode=="MuTau") myChannelSpecifics = new MuTauSpecifics(this);
         else if (aDecayMode=="TauTau") myChannelSpecifics = new TauTauSpecifics(this);

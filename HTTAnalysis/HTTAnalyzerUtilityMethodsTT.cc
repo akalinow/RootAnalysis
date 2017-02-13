@@ -13,13 +13,13 @@ void HTTAnalyzerTT::getPreselectionEff(const EventProxyHTT & myEventProxy){
     ntupleFile_ = myEventProxy.getTTree()->GetCurrentFile();
     if(hStatsFromFile) delete hStatsFromFile;
     hStatsFromFile = (TH1F*)ntupleFile_->Get("hStats");
-    
+
     std::string hName = "h1DStats"+getSampleName(myEventProxy);
     TH1F *hStats = myHistos_->get1DHistogram(hName.c_str(),true);
-    
+
     float genWeight = getGenWeight(myEventProxy);
-    
-    hStats->SetBinContent(2,std::abs(hStatsFromFile->GetBinContent(hStatsFromFile->FindBin(1))*genWeight));   
+
+    hStats->SetBinContent(2,std::abs(hStatsFromFile->GetBinContent(hStatsFromFile->FindBin(1))*genWeight));
     hStats->SetBinContent(3,std::abs(hStatsFromFile->GetBinContent(hStatsFromFile->FindBin(3))*genWeight));
   }
 }
@@ -43,13 +43,13 @@ std::string HTTAnalyzerTT::getSampleNameFromFileName(const EventProxyHTT & myEve
   else if(fileName.find("WJetsToLNu")!=std::string::npos && myEventProxy.event->getLHEnOutPartons()==0) sampleName = "W0Jets";
   else if(fileName.find("WJetsToLNu")!=std::string::npos && myEventProxy.event->getLHEnOutPartons()>0)  sampleName = "WAllJets";
   //TEST else if(fileName.find("WJetsToLNu")!=std::string::npos) sampleName = "WJets";
-  
+
   else if(fileName.find("Run201")!=std::string::npos) sampleName = "Data";
   else if(fileName.find("SUSYGluGluToHToTauTau")!=std::string::npos) sampleName = "A";
   else if(fileName.find("GluGluHToTauTauM120")!=std::string::npos) sampleName = "ggH120";
   else if(fileName.find("GluGluHToTauTauM125")!=std::string::npos) sampleName = "ggH125";
   else if(fileName.find("GluGluHToTauTauM130")!=std::string::npos) sampleName = "ggH130";
-  else if(fileName.find("VBFHToTauTauM120")!=std::string::npos) sampleName = "qqH120";  
+  else if(fileName.find("VBFHToTauTauM120")!=std::string::npos) sampleName = "qqH120";
   else if(fileName.find("VBFHToTauTauM125")!=std::string::npos) sampleName = "qqH125";
   else if(fileName.find("VBFHToTauTauM130")!=std::string::npos) sampleName = "qqH130";
   else if(fileName.find("WplusHToTauTau_M120")!=std::string::npos) sampleName = "WplusH120";
@@ -64,7 +64,7 @@ std::string HTTAnalyzerTT::getSampleNameFromFileName(const EventProxyHTT & myEve
   else if(fileName.find("STtWantitop")!=std::string::npos) sampleName = "Wantitop";
   else if(fileName.find("STtWtop")!=std::string::npos) sampleName = "Wtop";
   else if(fileName.find("STtchannel__antitop")!=std::string::npos) sampleName = "t-channel_antitop";
-  else if(fileName.find("STtchannel__top")!=std::string::npos) sampleName = "t-channel_top";   
+  else if(fileName.find("STtchannel__top")!=std::string::npos) sampleName = "t-channel_top";
   else if(fileName.find("ZZTo2L2Q")!=std::string::npos) sampleName = "ZZTo2L2Q";
   else if(fileName.find("ZZTo4L")!=std::string::npos) sampleName = "ZZTo4L";
   else if(fileName.find("WZTo1L3Nu")!=std::string::npos) sampleName = "WZTo1L3Nu";
@@ -84,7 +84,7 @@ std::string HTTAnalyzerTT::getSampleNameFromFileName(const EventProxyHTT & myEve
   std::string matchingMode = getMatchingName(myEventProxy);
 
   if(sampleName=="Unknown") std::cout<<"Unkwown sample type. "<<fileName<<std::endl;
-   
+
   return sampleName + matchingMode;
 }
 //////////////////////////////////////////////////////////////////////////////
@@ -93,30 +93,34 @@ std::string HTTAnalyzerTT::getDYSampleName(const EventProxyHTT & myEventProxy){
 
   std::string fileName = myEventProxy.getTTree()->GetCurrentFile()->GetName();
 
-  std::string jetsName = "";    
+  std::string jetsName = "";
   if(fileName.find("DY1JetsToLL")!=std::string::npos) jetsName ="1Jets";
   else if(fileName.find("DY2JetsToLL")!=std::string::npos) jetsName = "2Jets";
   else if(fileName.find("DY3JetsToLL")!=std::string::npos) jetsName = "3Jets";
   else if(fileName.find("DY4JetsToLL")!=std::string::npos) jetsName = "4Jets";
   else if(fileName.find("DYJetsToLLM10to50")!=std::string::npos) jetsName =  "LowM";
-  //TEST else if(fileName.find("DYJetsToLLM50")!=std::string::npos) jetsName =  "Jets";  
+  //TEST else if(fileName.find("DYJetsToLLM50")!=std::string::npos) jetsName =  "Jets";
   else if(fileName.find("DYJetsToLLM50")!=std::string::npos && myEventProxy.event->getLHEnOutPartons()==0) jetsName =  "0Jets";
-  else if(fileName.find("DYJetsToLLM50")!=std::string::npos && myEventProxy.event->getLHEnOutPartons()>0) jetsName =  "AllJets";  
-  
+  else if(fileName.find("DYJetsToLLM50")!=std::string::npos && myEventProxy.event->getLHEnOutPartons()>0) jetsName =  "AllJets";
+
   int decayModeBoson = myEventProxy.event->getDecayModeBoson();
   int tauMCMatch1 = 6;
   int tauMCMatch2 = 6;
   if(myEventProxy.pairs->size()){
     HTTPair aPair = (*myEventProxy.pairs)[0];
-    HTTParticle aTau1 = aPair.getLeg1();
-    HTTParticle aTau2 = aPair.getLeg2();
-    tauMCMatch1 = aTau1.getProperty(PropertyEnum::mc_match);
-    tauMCMatch2 = aTau1.getProperty(PropertyEnum::mc_match);
-  }    
+    HTTParticle aLeg1 = aPair.getLeg1();
+    HTTParticle aLeg2 = aPair.getLeg2();
+    leg1MCMatch = aLeg1.getProperty(PropertyEnum::mc_match);
+    leg2MCMatch = aLeg1.getProperty(PropertyEnum::mc_match);
+  }
+  if(fileName.find("MT_")!=std::string::npos){
   std::string decayName = "Unknown";
   if(tauMCMatch1==5 && tauMCMatch2==5) decayName = "T";
   else if(tauMCMatch1<6 && tauMCMatch2<6) decayName = "L";
   else decayName = "J";
+}
+if(fileName.find("TT_")!=std::string::npos){
+}
 
   return "DY"+jetsName+"Match"+decayName;
 }
@@ -133,7 +137,7 @@ std::string HTTAnalyzerTT::getMatchingName(const EventProxyHTT & myEventProxy){
   }
   if(!sampleToAnalyze) return "";
   if(!(fileName.find("TT_")!=std::string::npos || fileName.find("MT_")!=std::string::npos)) return "";
-  
+
   int tauMCMatch_1 = 6, tauMCMatch_2 = 6;
   if(myEventProxy.pairs->size() && fileName.find("MT_")!=std::string::npos){
     HTTPair aPair = (*myEventProxy.pairs)[0];
@@ -141,7 +145,7 @@ std::string HTTAnalyzerTT::getMatchingName(const EventProxyHTT & myEventProxy){
     tauMCMatch_1 = aTau.getProperty(PropertyEnum::mc_match);
     if(tauMCMatch_1 == 5) return "MatchT"; else return "MatchJ";
   }
-  
+
   if(myEventProxy.pairs->size() && fileName.find("TT_")!=std::string::npos){
     HTTPair aPair = (*myEventProxy.pairs)[0];
     HTTParticle aTau_1 = aPair.getLeg1(), aTau_2 = aPair.getLeg2();
@@ -158,8 +162,8 @@ float HTTAnalyzerTT::getPUWeight(const EventProxyHTT & myEventProxy){
 
   if(getSampleName(myEventProxy)=="Data") return 1.0;
 
-  if(!puDataFile_ || !puMCFile_ || 
-     puDataFile_->IsZombie() || 
+  if(!puDataFile_ || !puMCFile_ ||
+     puDataFile_->IsZombie() ||
      puMCFile_->IsZombie()){ return 1.0; }
 
   if(!hPUVec_.size())  hPUVec_.resize(1);
@@ -179,7 +183,7 @@ float HTTAnalyzerTT::getPUWeight(const EventProxyHTT & myEventProxy){
     hPUVec_[0] =  hPUData;
   }
 
-  int iBinPU = hPUVec_[0]->FindBin(myEventProxy.event->getNPU());  
+  int iBinPU = hPUVec_[0]->FindBin(myEventProxy.event->getNPU());
   return hPUVec_[0]->GetBinContent(iBinPU);
 }
 //////////////////////////////////////////////////////////////////////////////
@@ -202,14 +206,14 @@ std::vector<std::string> HTTAnalyzerTT::getTauDecayName(int decModeMinus, int de
 
   if( (decModeMinus==tauDecay1ChargedPion0PiZero && isLepton(decModePlus) ) ||
       (isLepton(decModeMinus) && decModePlus==tauDecay1ChargedPion0PiZero)) types.push_back("Lepton1Prong0Pi0");
-    
+
   if( (isOneProng(decModeMinus) && isLepton(decModePlus) ) ||
       ( isLepton(decModeMinus) && isOneProng(decModePlus) ) ) types.push_back("Lepton1Prong");
 
   if(decModeMinus==tauDecay1ChargedPion1PiZero && decModePlus==tauDecay1ChargedPion1PiZero ) types.push_back("PiPlusPiMinus2Pi0");
 
 
-  if( isOneProng(decModeMinus) && decModeMinus!=tauDecay1ChargedPion0PiZero && 
+  if( isOneProng(decModeMinus) && decModeMinus!=tauDecay1ChargedPion0PiZero &&
       isOneProng(decModePlus) && decModePlus!=tauDecay1ChargedPion0PiZero )   types.push_back("1Prong1ProngXPi0");
 
   if(isLepton(decModePlus) && isLepton(decModeMinus)) types.push_back("LeptonLepton");
@@ -236,7 +240,7 @@ bool HTTAnalyzerTT::isLepton(int decMode){
 float HTTAnalyzerTT::getLeptonCorrection(float eta, float pt, hadronicTauDecayModes tauDecayMode){
 
   if(sampleName.find("Data")!=std::string::npos) return 1.0;
-  
+
   if(tauDecayMode == tauDecayMuon){
     scaleWorkspace->var("m_pt")->setVal(pt);
     scaleWorkspace->var("m_eta")->setVal(eta);
@@ -245,7 +249,7 @@ float HTTAnalyzerTT::getLeptonCorrection(float eta, float pt, hadronicTauDecayMo
     float muon_trg_efficiency = scaleWorkspace->function("m_trgOR_data")->getVal();//OR of the HLT_IsoMu22 and HLT_IsoTkMu22
     return  muon_id_scalefactor*muon_iso_scalefactor*muon_trg_efficiency;
   }
-  else if(tauDecayMode == tauDecaysElectron) return 1.0;  
+  else if(tauDecayMode == tauDecaysElectron) return 1.0;
   else{
     float tau_id_scalefactor = 1.0;
     float tau_trg_efficiency = 1.0;
@@ -256,7 +260,7 @@ float HTTAnalyzerTT::getLeptonCorrection(float eta, float pt, hadronicTauDecayMo
        !(sampleName.find("A")!=std::string::npos && sampleName.find("All")==std::string::npos) && //pseudoscalar
        sampleName.find("MatchT")==std::string::npos
        ) {
-      tau_trg_efficiency = scaleWorkspace->function("t_trgTightIsoSS_data")->getVal();      
+      tau_trg_efficiency = scaleWorkspace->function("t_trgTightIsoSS_data")->getVal();
     }
     else{
       //tau_id_scalefactor = scaleWorkspace->function("t_iso_mva_t_pt40_eta2p1_sf")->getVal();

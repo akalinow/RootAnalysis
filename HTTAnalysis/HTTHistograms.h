@@ -32,7 +32,7 @@ class HTTHistograms: public AnalysisHistograms {
   float getSampleNormalisation(std::string sampleName);
 
   ///Estimate QCD background using the SS/OS method.
-  TH1F* getQCDbackground(unsigned int iCategory, std::string varName,			 
+  TH1F* getQCDbackground(unsigned int iCategory, std::string varName,
        unsigned int iSystEffect = (unsigned int)HTTAnalysis::NOMINAL_SVFIT);
 
   ///Calculate scaling factor for the WJets MC
@@ -75,6 +75,9 @@ class HTTHistograms: public AnalysisHistograms {
 			   const std::string & sysType);
 
   void plotCPhistograms(unsigned int iCategory);
+
+  ///Return sum of all non Higgs MC contributions.
+  TH1F *getMCSum(unsigned int iCategory, std::string varName, unsigned int iSystEffect);
 
   ///Return histogram for sum of all DY decay modes, and jet bins
   TH1F *get1D_DYJet_Histogram(const std::string& name);

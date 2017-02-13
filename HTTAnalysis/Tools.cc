@@ -34,6 +34,8 @@ namespace HTTAnalysis {
     run2016FReReco + run2016GReReco +
     run2016HPromptReco_v2 + run2016HPromptReco_v3;
 
+  return 36458345230.615*1e-6; //pb-1 data: Tau2016 v70 (NTUPLES_05_12_2016) TEST
+
   return run2016*1E-6;//pb-1 data for NTUPLES_05_12_2016
   //return 36446609816.686*1E-6;//pb-1 data for NTUPLES_05_12_2016
 }
@@ -69,26 +71,26 @@ float getCrossSection(const std::string & sampleName){
   //https://twiki.cern.ch/twiki/bin/view/LHCPhysics/CERNYellowReportPageAt1314TeV2014
   //Xsection for mass!=125 are calculated using luminosity ratio, and cross section for 8 TeV
 
-  if(sampleName=="ggH120") crossSection = 5.222E+01*6.981E-02;//CERNYellowReportPageAt13TeV*CERNYellowReportPageBR
-  if(sampleName=="ggH125") crossSection = 4.858E+01*6.272E-02;//CERNYellowReportPageAt13TeV*CERNYellowReportPageBR
-  if(sampleName=="ggH130") crossSection = 4.531E+01*5.411E-02;//CERNYellowReportPageAt13TeV*CERNYellowReportPageBR
+  if(sampleName=="ggHTT120") crossSection = 5.222E+01*6.981E-02;//CERNYellowReportPageAt13TeV*CERNYellowReportPageBR
+  if(sampleName=="ggHTT125") crossSection = 4.858E+01*6.272E-02;//CERNYellowReportPageAt13TeV*CERNYellowReportPageBR
+  if(sampleName=="ggHTT130") crossSection = 4.531E+01*5.411E-02;//CERNYellowReportPageAt13TeV*CERNYellowReportPageBR
 
-  if(sampleName=="qqH120") crossSection = 1.676E+00*6.981E-02;//CERNYellowReportPageAt13TeV*CERNYellowReportPageBR
-  if(sampleName=="qqH125") crossSection = 1.601E+00*6.272E-02;//CERNYellowReportPageAt13TeV*CERNYellowReportPageBR
-  if(sampleName=="qqH130") crossSection = 1.531E+00*5.411E-02;//CERNYellowReportPageAt13TeV*CERNYellowReportPageBR
+  if(sampleName=="qqHTT120") crossSection = 1.676E+00*6.981E-02;//CERNYellowReportPageAt13TeV*CERNYellowReportPageBR
+  if(sampleName=="qqHTT125") crossSection = 1.601E+00*6.272E-02;//CERNYellowReportPageAt13TeV*CERNYellowReportPageBR
+  if(sampleName=="qqHTT130") crossSection = 1.531E+00*5.411E-02;//CERNYellowReportPageAt13TeV*CERNYellowReportPageBR
 
   ///https://twiki.cern.ch/twiki/bin/view/CMS/HiggsToTauTauWorking2016#MC_and_data_samples
-  if(sampleName=="WplusH120") crossSection = 1.565*0.0698*0.5;
-  if(sampleName=="WplusH125") crossSection = 1.373*0.0627*0.5;
-  if(sampleName=="WplusH130") crossSection = 1.209*0.0541*0.5;
+  if(sampleName=="WplusHTT120") crossSection = 1.565*0.0698*0.5;
+  if(sampleName=="WplusHTT125") crossSection = 1.373*0.0627*0.5;
+  if(sampleName=="WplusHTT130") crossSection = 1.209*0.0541*0.5;
 
-  if(sampleName=="WminusH120") crossSection = 1.565*0.0698*0.5;
-  if(sampleName=="WminusH125") crossSection = 1.373*0.0627*0.5;
-  if(sampleName=="WminusH130") crossSection = 1.209*0.0541*0.5;
+  if(sampleName=="WminusHTT120") crossSection = 1.565*0.0698*0.5;
+  if(sampleName=="WminusHTT125") crossSection = 1.373*0.0627*0.5;
+  if(sampleName=="WminusHTT130") crossSection = 1.209*0.0541*0.5;
 
-  if(sampleName=="ZH120") crossSection = 0.994*0.0698;
-  if(sampleName=="ZH125") crossSection = 0.884*0.0627;
-  if(sampleName=="ZH130") crossSection = 0.790*0.0541;
+  if(sampleName=="ZHTT120") crossSection = 0.994*0.0698;
+  if(sampleName=="ZHTT125") crossSection = 0.884*0.0627;
+  if(sampleName=="ZHTT130") crossSection = 0.790*0.0541;
 
   ///https://twiki.cern.ch/twiki/bin/view/CMS/HiggsToTauTauWorking2016#MC_and_data_samples
   if(sampleName.find("ZZTo2L2Q")!=std::string::npos) crossSection = 3.22;

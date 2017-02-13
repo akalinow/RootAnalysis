@@ -87,8 +87,6 @@ void TauTauSpecifics::testAllCategories(const HTTAnalysis::sysEffects & aSystEff
         bool relaxedIso = (tau1IsoM && tau2IsoL) || (tau2IsoM && tau1IsoL);
         bool antiIso = (tau1IsoM && tau2IsoL && !tau2IsoT) || (tau2IsoM && tau1IsoL && !tau1IsoT);
 
-
-
         bool mediumIsoTrigger = myAnalyzer->aLeg1.hasTriggerMatch(TriggerEnum::HLT_DoubleMediumIsoPFTau35_Trk1_eta2p1_Reg) &&
                                 myAnalyzer->aLeg2.hasTriggerMatch(TriggerEnum::HLT_DoubleMediumIsoPFTau35_Trk1_eta2p1_Reg);
 
@@ -121,6 +119,8 @@ void TauTauSpecifics::testAllCategories(const HTTAnalysis::sysEffects & aSystEff
         float jetsEta = std::abs(myAnalyzer->aJet1.getP4().Eta() - myAnalyzer->aJet2.getP4().Eta());
         float higgsPt =  (myAnalyzer->aLeg1.getP4(aSystEffect) + myAnalyzer->aLeg2.getP4(aSystEffect) + myAnalyzer->aMET.getP4(aSystEffect)).Pt();
 
+        bool ss = myAnalyzer->aLeg2.getCharge()*myAnalyzer->aLeg1.getCharge() == 1;
+        bool os = myAnalyzer->aLeg2.getCharge()*myAnalyzer->aLeg1.getCharge() == -1;
 
         bool jet0 = myAnalyzer->nJets30==0;
 
@@ -146,40 +146,45 @@ void TauTauSpecifics::testAllCategories(const HTTAnalysis::sysEffects & aSystEff
         bool piRho = (isPi1 && isRho2) || (isPi2 && isRho1);
         bool rhoRho = isRho1 && isRho2;
 
-        myAnalyzer->categoryDecisions[(int)HTTAnalysis::jet1_low] = jet1_low;
-        myAnalyzer->categoryDecisions[(int)HTTAnalysis::jet1_high] = jet1_high;
+        myAnalyzer->categoryDecisions[(int)HTTAnalysis::jet1_low] = os && jet1_low;
+        myAnalyzer->categoryDecisions[(int)HTTAnalysis::jet1_high] = os && jet1_high;
 
-        myAnalyzer->categoryDecisions[(int)HTTAnalysis::vbf_low] = vbf_low;
-        myAnalyzer->categoryDecisions[(int)HTTAnalysis::vbf_high] = vbf_high;
+        myAnalyzer->categoryDecisions[(int)HTTAnalysis::vbf_low] = os && vbf_low;
+        myAnalyzer->categoryDecisions[(int)HTTAnalysis::vbf_high] = os && vbf_high;
 
-        myAnalyzer->categoryDecisions[(int)HTTAnalysis::jet0] = fullIso && jet0;
-        myAnalyzer->categoryDecisions[(int)HTTAnalysis::boosted] = fullIso && boosted;
-        myAnalyzer->categoryDecisions[(int)HTTAnalysis::vbf] = fullIso && vbf_2d;
+        myAnalyzer->categoryDecisions[(int)HTTAnalysis::jet0] = os && fullIso && jet0;
+        myAnalyzer->categoryDecisions[(int)HTTAnalysis::boosted] = os && fullIso && boosted;
+        myAnalyzer->categoryDecisions[(int)HTTAnalysis::vbf] = os && fullIso && vbf_2d;
 
-        myAnalyzer->categoryDecisions[(int)HTTAnalysis::qcd_jet0] = antiIso && jet0;
-        myAnalyzer->categoryDecisions[(int)HTTAnalysis::qcd_boosted] = antiIso &&  boosted;
-        myAnalyzer->categoryDecisions[(int)HTTAnalysis::qcd_vbf] = antiIso && vbf_2d;
+        myAnalyzer->categoryDecisions[(int)HTTAnalysis::qcd_jet0] = os && antiIso && jet0;
+        myAnalyzer->categoryDecisions[(int)HTTAnalysis::qcd_boosted] = os && antiIso &&  boosted;
+        myAnalyzer->categoryDecisions[(int)HTTAnalysis::qcd_vbf] = os && antiIso && vbf_2d;
 
-        myAnalyzer->categoryDecisions[(int)HTTAnalysis::pipi] = piPi;
-        myAnalyzer->categoryDecisions[(int)HTTAnalysis::pirho] = piRho;
-        myAnalyzer->categoryDecisions[(int)HTTAnalysis::rhorho] = rhoRho;
+        myAnalyzer->categoryDecisions[(int)HTTAnalysis::qcd_ss_jet0] = ss && antiIso && jet0;
+        myAnalyzer->categoryDecisions[(int)HTTAnalysis::qcd_ss_boosted] = ss && antiIso &&  boosted;
+        myAnalyzer->categoryDecisions[(int)HTTAnalysis::qcd_ss_vbf] = ss && antiIso && vbf_2d;
 
+        myAnalyzer->categoryDecisions[(int)HTTAnalysis::ss_jet0] = ss && fullIso && jet0;
+        myAnalyzer->categoryDecisions[(int)HTTAnalysis::ss_boosted] = ss && fullIso &&  boosted;
+        myAnalyzer->categoryDecisions[(int)HTTAnalysis::ss_vbf] = ss && fullIso && vbf_2d;
+
+        myAnalyzer->categoryDecisions[(int)HTTAnalysis::pipi] = os && fullIso && piPi;
+        myAnalyzer->categoryDecisions[(int)HTTAnalysis::pirho] = os && fullIso && piRho;
+        myAnalyzer->categoryDecisions[(int)HTTAnalysis::rhorho] = os && fullIso && rhoRho;
 }
 /////////////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////////////
 float TauTauSpecifics::getLeg1Correction(const HTTAnalysis::sysEffects & aSystEffect){
 
         return getLeptonCorrection(myAnalyzer->aLeg1.getP4().Eta(), myAnalyzer->aLeg1.getP4().Pt(),
-                                   static_cast<HTTAnalysis::hadronicTauDecayModes>(myAnalyzer->aLeg1.getProperty(PropertyEnum::decayMode)));
-
+                                   static_cast<HTTAnalysis::hadronicTauDecayModes>(myAnalyzer->aLeg1.getProperty(PropertyEnum::decayMode)),true);
 }
 /////////////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////////////
 float TauTauSpecifics::getLeg2Correction(const HTTAnalysis::sysEffects & aSystEffect){
 
         return getLeptonCorrection(myAnalyzer->aLeg2.getP4().Eta(), myAnalyzer->aLeg2.getP4().Pt(),
-                                   static_cast<HTTAnalysis::hadronicTauDecayModes>(myAnalyzer->aLeg2.getProperty(PropertyEnum::decayMode)));
-
+                                   static_cast<HTTAnalysis::hadronicTauDecayModes>(myAnalyzer->aLeg2.getProperty(PropertyEnum::decayMode)),true);
 }
 /////////////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////////////

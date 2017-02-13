@@ -66,27 +66,27 @@ std::string HTTAnalyzer::getSampleNameFromFileName(const EventProxyHTT & myEvent
         else if(fileName.find("WJetsToLNu")!=std::string::npos && myEventProxy.event->getLHEnOutPartons()>0) sampleName = "WAllJets";
 
         else if(fileName.find("Run201")!=std::string::npos) sampleName =  "Data";
-        else if(fileName.find("SUSYGluGluToHToTauTau")!=std::string::npos) sampleName =  "A";
+        else if(fileName.find("SUSYGluGluToHToTauTau")!=std::string::npos) sampleName =  "ATT";
 
-        else if(fileName.find("GluGluHToTauTauM120")!=std::string::npos) sampleName =  "ggH120";
-        else if(fileName.find("GluGluHToTauTauM125")!=std::string::npos) sampleName =  "ggH125";
-        else if(fileName.find("GluGluHToTauTauM130")!=std::string::npos) sampleName =  "ggH130";
+        else if(fileName.find("GluGluHToTauTauM120")!=std::string::npos) sampleName =  "ggHTT120";
+        else if(fileName.find("GluGluHToTauTauM125")!=std::string::npos) sampleName =  "ggHTT125";
+        else if(fileName.find("GluGluHToTauTauM130")!=std::string::npos) sampleName =  "ggHTT130";
 
-        else if(fileName.find("VBFHToTauTauM120")!=std::string::npos) sampleName =  "qqH120";
-        else if(fileName.find("VBFHToTauTauM125")!=std::string::npos) sampleName =  "qqH125";
-        else if(fileName.find("VBFHToTauTauM130")!=std::string::npos) sampleName =  "qqH130";
+        else if(fileName.find("VBFHToTauTauM120")!=std::string::npos) sampleName =  "qqHTT120";
+        else if(fileName.find("VBFHToTauTauM125")!=std::string::npos) sampleName =  "qqHTT125";
+        else if(fileName.find("VBFHToTauTauM130")!=std::string::npos) sampleName =  "qqHTT130";
 
-        else if(fileName.find("WplusHToTauTauM120")!=std::string::npos) sampleName =  "WplusH120";
-        else if(fileName.find("WplusHToTauTauM125")!=std::string::npos) sampleName =  "WplusH125";
-        else if(fileName.find("WplusHToTauTauM130")!=std::string::npos) sampleName =  "WplusH130";
+        else if(fileName.find("WplusHToTauTauM120")!=std::string::npos) sampleName =  "WplusHTT120";
+        else if(fileName.find("WplusHToTauTauM125")!=std::string::npos) sampleName =  "WplusHTT125";
+        else if(fileName.find("WplusHToTauTauM130")!=std::string::npos) sampleName =  "WplusHTT130";
 
-        else if(fileName.find("WminusHToTauTauM120")!=std::string::npos) sampleName =  "WminusH120";
-        else if(fileName.find("WminusHToTauTauM125")!=std::string::npos) sampleName =  "WminusH125";
-        else if(fileName.find("WminusHToTauTauM130")!=std::string::npos) sampleName =  "WminusH130";
+        else if(fileName.find("WminusHToTauTauM120")!=std::string::npos) sampleName =  "WminusHTT120";
+        else if(fileName.find("WminusHToTauTauM125")!=std::string::npos) sampleName =  "WminusHTT125";
+        else if(fileName.find("WminusHToTauTauM130")!=std::string::npos) sampleName =  "WminusHTT130";
 
-        else if(fileName.find("ZHToTauTauM120")!=std::string::npos) sampleName =  "ZH120";
-        else if(fileName.find("ZHToTauTauM125")!=std::string::npos) sampleName =  "ZH125";
-        else if(fileName.find("ZHToTauTauM130")!=std::string::npos) sampleName =  "ZH130";
+        else if(fileName.find("ZHToTauTauM120")!=std::string::npos) sampleName =  "ZHTT120";
+        else if(fileName.find("ZHToTauTauM125")!=std::string::npos) sampleName =  "ZHTT125";
+        else if(fileName.find("ZHToTauTauM130")!=std::string::npos) sampleName =  "ZHTT130";
 
         else if(fileName.find("STtWantitop")!=std::string::npos) sampleName =  "Wantitop";
         else if(fileName.find("STtWtop")!=std::string::npos) sampleName =  "Wtop";
@@ -132,16 +132,26 @@ std::string HTTAnalyzer::getDYSampleName(const EventProxyHTT & myEventProxy){
         else if(fileName.find("DYJetsToLLM50")!=std::string::npos && myEventProxy.event->getLHEnOutPartons()>0) jetsName =  "AllJets";
 
         int decayModeBoson = myEventProxy.event->getDecayModeBoson();
-        int tauMCMatch = 6;
+        int leg1MCMatch = 6, leg2MCMatch = 6;
         if(myEventProxy.pairs->size()) {
                 HTTPair aPair = (*myEventProxy.pairs)[0];
-                HTTParticle aLeg2 = aPair.getTau();
-                tauMCMatch = aLeg2.getProperty(PropertyEnum::mc_match);
+                HTTParticle aLeg1 = aPair.getLeg1();
+                HTTParticle aLeg2 = aPair.getLeg2();
+                leg1MCMatch = aLeg1.getProperty(PropertyEnum::mc_match);
+                leg2MCMatch = aLeg1.getProperty(PropertyEnum::mc_match);
         }
         std::string decayName = "Unknown";
-        if(tauMCMatch<5) decayName = "L";
-        else if(tauMCMatch==5) decayName = "T";
-        else decayName = "J";
+        if(fileName.find("TT_")!=std::string::npos) {
+                if(leg2MCMatch<5) decayName = "L";
+                else if(leg2MCMatch==5) decayName = "T";
+                else decayName = "J";
+        }
+        if(fileName.find("TT_")!=std::string::npos) {
+                std::string decayName = "Unknown";
+                if(leg1MCMatch==5 && leg2MCMatch==5) decayName = "T";
+                else if(leg1MCMatch<6 && leg2MCMatch<6) decayName = "L";
+                else decayName = "J";
+        }
         return "DY"+jetsName+"Match"+decayName;
 }
 //////////////////////////////////////////////////////////////////////////////
@@ -168,9 +178,9 @@ std::string HTTAnalyzer::getMatchingName(const EventProxyHTT & myEventProxy){
 
         if(myEventProxy.pairs->size() && fileName.find("TT_")!=std::string::npos) {
                 HTTPair aPair = (*myEventProxy.pairs)[0];
-                HTTParticle aLeg2_1 = aPair.getLeg1(), aLeg2_2 = aPair.getLeg2();
-                tauMCMatch_1 = aLeg2_1.getProperty(PropertyEnum::mc_match);
-                tauMCMatch_2 = aLeg2_2.getProperty(PropertyEnum::mc_match);
+                HTTParticle aLeg1 = aPair.getLeg1(), aLeg2 = aPair.getLeg2();
+                tauMCMatch_1 = aLeg1.getProperty(PropertyEnum::mc_match);
+                tauMCMatch_2 = aLeg2.getProperty(PropertyEnum::mc_match);
                 if(tauMCMatch_1 == 5 && tauMCMatch_2 == 5) return "MatchT"; else return "MatchJ";
         }
 
