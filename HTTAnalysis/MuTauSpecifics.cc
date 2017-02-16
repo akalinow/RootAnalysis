@@ -136,6 +136,8 @@ void MuTauSpecifics::testAllCategories(const HTTAnalysis::sysEffects & aSystEffe
         myAnalyzer->categoryDecisions[(int)HTTAnalysis::vbf_low] = os && muonIso && mtSelection && vbf_low;
         myAnalyzer->categoryDecisions[(int)HTTAnalysis::vbf_high] = os && muonIso && mtSelection && vbf_high;
 
+        jet0 &= cpPi;//TEST
+
         myAnalyzer->categoryDecisions[(int)HTTAnalysis::jet0] = os && muonIso && mtSelection && jet0;
         myAnalyzer->categoryDecisions[(int)HTTAnalysis::CP_Pi] = os && muonIso && mtSelection && cpPi;
         myAnalyzer->categoryDecisions[(int)HTTAnalysis::CP_Rho] = os && muonIso && mtSelection && cpRho;
