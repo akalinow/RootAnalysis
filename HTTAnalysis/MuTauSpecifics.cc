@@ -154,6 +154,10 @@ void MuTauSpecifics::testAllCategories(const HTTAnalysis::sysEffects & aSystEffe
         myAnalyzer->categoryDecisions[(int)HTTAnalysis::qcd_boosted] = ss && muonIso && mtSelection && boosted;
         myAnalyzer->categoryDecisions[(int)HTTAnalysis::qcd_vbf] = ss && muonIso && mtSelection && vbf;
 
+        myAnalyzer->categoryDecisions[(int)HTTAnalysis::antiIso_jet0] = ss && muonAntiIso && jet0;
+        myAnalyzer->categoryDecisions[(int)HTTAnalysis::antiIso_boosted] = ss && muonAntiIso && boosted;
+        myAnalyzer->categoryDecisions[(int)HTTAnalysis::antiIso_vbf] = ss && muonAntiIso && vbf;
+
         myAnalyzer->categoryDecisions[(int)HTTAnalysis::W] = muonIso && wSelection;
         myAnalyzer->categoryDecisions[(int)HTTAnalysis::TT] = muonIso && ttSelection;
 

@@ -13,7 +13,7 @@ void HTTAnalyzer::getPreselectionEff(const EventProxyHTT & myEventProxy){
                 hStatsFromFile = (TH1F*)ntupleFile_->Get("hStats");
 
                 std::string hName = "h1DStats"+getSampleName(myEventProxy);
-                TH1F *hStats = myHistos_->get1DHistogram(hName.c_str(),true);
+                TH1F *hStats = myHistos_->get1DHistogram(hName,true);
 
                 float genWeight = getGenWeight(myEventProxy);
 
@@ -138,16 +138,15 @@ std::string HTTAnalyzer::getDYSampleName(const EventProxyHTT & myEventProxy){
                 HTTParticle aLeg1 = aPair.getLeg1();
                 HTTParticle aLeg2 = aPair.getLeg2();
                 leg1MCMatch = aLeg1.getProperty(PropertyEnum::mc_match);
-                leg2MCMatch = aLeg1.getProperty(PropertyEnum::mc_match);
+                leg2MCMatch = aLeg2.getProperty(PropertyEnum::mc_match);
         }
         std::string decayName = "Unknown";
-        if(fileName.find("TT_")!=std::string::npos) {
+        if(fileName.find("MT_")!=std::string::npos) {
                 if(leg2MCMatch<5) decayName = "L";
                 else if(leg2MCMatch==5) decayName = "T";
                 else decayName = "J";
         }
         if(fileName.find("TT_")!=std::string::npos) {
-                std::string decayName = "Unknown";
                 if(leg1MCMatch==5 && leg2MCMatch==5) decayName = "T";
                 else if(leg1MCMatch<6 && leg2MCMatch<6) decayName = "L";
                 else decayName = "J";

@@ -21,7 +21,12 @@ class HTTHistograms: public AnalysisHistograms {
 
   virtual ~HTTHistograms();
 
-  void finalizeHistograms(int nRuns, float weight=1.0);
+  void finalizeHistograms();
+
+  using AnalysisHistograms::get1DHistogram;
+
+  TH1F *get1DHistogram(unsigned int iCategory, std::string varName,
+       unsigned int iSystEffect = (unsigned int)HTTAnalysis::NOMINAL_SVFIT);
 
   std::string getTemplateName(const std::string& name);
 

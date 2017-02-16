@@ -17,6 +17,10 @@ std::string categoryName(unsigned int iCategory);
 ///Return human readable systematic effect name for given systematic effect number number.
 std::string systEffectName(unsigned int iSystEffect);
 
+///Return human readable systematic effect name for given systematic effect number number.
+///Replace CAT pattern by correct category name
+std::string systEffectName(unsigned int iCategory, unsigned int iSystEffect);
+
 ///Return string encoding di-tau decay mode.
 ///The event can belong to more than one category
 std::vector<std::string> getTauDecayName(int decModeMinus, int decModePlus);

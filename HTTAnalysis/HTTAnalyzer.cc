@@ -14,32 +14,28 @@
 //////////////////////////////////////////////////////////////////////////////
 HTTAnalyzer::HTTAnalyzer(const std::string & aName, const std::string & aDecayMode) : Analyzer(aName){
 
-        //pileupCalc.py -i lumiSummary_Run2016BCDE_PromptReco_v12.json
-        //--inputLumiJSON /afs/cern.ch/cms/CAF/CMSCOMM/COMM_DQM/certification/Collisions16/13TeV/PileUp/pileup_latest.txt
-        //--calcMode true --minBiasXsec 69200 --maxPileupBin 60 --numPileupBins 600 Data_Pileup_Cert_271036-277148.root
+#pragma omp critical
+        {
+                //pileupCalc.py -i lumiSummary_Run2016BCDE_PromptReco_v12.json
+                //--inputLumiJSON /afs/cern.ch/cms/CAF/CMSCOMM/COMM_DQM/certification/Collisions16/13TeV/PileUp/pileup_latest.txt
+                //--calcMode true --minBiasXsec 69200 --maxPileupBin 60 --numPileupBins 600 Data_Pileup_Cert_271036-277148.root
+                TFile::SetCacheFileDir("/tmp/");
+                std::string dataPUFileName = "http://akalinow.web.cern.ch/akalinow/Data_Pileup_2016_271036-284044_13TeVMoriond17_23Sep2016ReReco_69p2mbMinBiasXS.root";
+                puDataFile_ = TFile::Open(dataPUFileName.c_str(),"CACHEREAD");
+            
+                std::string mcPUFileName = "http://akalinow.web.cern.ch/akalinow/MC_Moriond17_PU25ns_V1.root";
+                puMCFile_ = TFile::Open(mcPUFileName.c_str(),"CACHEREAD");
 
-        ///Load ROOT file with PU histograms.
-        std::string filePath = "Data_Pileup_2016_BCDEFG_v26.root";//TEST
-        filePath = "Data_Pileup_2016_July22.root";//TEST
-        puDataFile_ = new TFile(filePath.c_str());
-        //puDataFile_ = new TFile();
-        //puDataFile_->Open("http://akalinow.web.cern.ch/akalinow/Data_Pileup_2016_BCDEFG_v26.root","CACHEREAD");
+                categoryDecisions.resize((int)HTTAnalysis::DUMMY_CAT);
 
-        filePath = "MC_Spring16_PU25ns_V1.root";
-        puMCFile_ = new TFile(filePath.c_str());
-        //puMCFile_ = new TFile();
-        //puMCFile_->Open("http://akalinow.web.cern.ch/akalinow/MC_Moriond17_PU25ns_V1.root","CACHEREAD");
+                if(aDecayMode=="MuTau") myChannelSpecifics = new MuTauSpecifics(this);
+                else if (aDecayMode=="TauTau") myChannelSpecifics = new TauTauSpecifics(this);
 
-        categoryDecisions.resize((int)HTTAnalysis::DUMMY_CAT);
+                nPCAMin_ = 0.003;
 
-        if(aDecayMode=="MuTau") myChannelSpecifics = new MuTauSpecifics(this);
-        else if (aDecayMode=="TauTau") myChannelSpecifics = new TauTauSpecifics(this);
-
-        nPCAMin_ = 0.003;
-
-        ntupleFile_ = 0;
-        hStatsFromFile = 0;
-
+                ntupleFile_ = 0;
+                hStatsFromFile = 0;
+        }
 }
 //////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////
@@ -49,7 +45,6 @@ HTTAnalyzer::~HTTAnalyzer(){
         if(puDataFile_) delete puDataFile_;
         if(puMCFile_) delete puMCFile_;
         if(myChannelSpecifics) delete myChannelSpecifics;
-
 }
 //////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////
@@ -73,7 +68,7 @@ void HTTAnalyzer::initialize(TDirectory* aDir,
 //////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////
 void HTTAnalyzer::finalize(){
-        myHistos_->finalizeHistograms(0,1.0);
+        myHistos_->finalizeHistograms();
 }
 //////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////
@@ -82,7 +77,7 @@ std::vector<HTTParticle> HTTAnalyzer::getSeparatedJets(const EventProxyHTT & myE
 
         std::vector<HTTParticle> separatedJets;
 
-        for(auto aJet: *myEventProxy.jets) {
+        for(auto aJet : *myEventProxy.jets) {
                 float dRLeg2 = aJet.getP4().DeltaR(aLeg2.getP4());
                 float dRLeg1 = aJet.getP4().DeltaR(aLeg1.getP4());
                 bool loosePFJetID = aJet.getProperty(PropertyEnum::PFjetID)>=1;
@@ -114,7 +109,8 @@ void HTTAnalyzer::setAnalysisObjects(const EventProxyHTT & myEventProxy){
 }
 //////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////
-void HTTAnalyzer::addBranch(TTree *tree){/*tree->Branch("muonPt",&muonPt);*/}
+void HTTAnalyzer::addBranch(TTree *tree){ /*tree->Branch("muonPt",&muonPt);*/
+}
 //////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////
 void HTTAnalyzer::fillControlHistos(const std::string & hNameSuffix, float eventWeight,
@@ -178,14 +174,14 @@ void HTTAnalyzer::fillControlHistos(const std::string & hNameSuffix, float event
                 myHistos_->fill1DHistogram("h1DEtaLeadingJet"+hNameSuffix,aJet1.getP4(aSystEffect).Eta(),eventWeight);
                 myHistos_->fill1DHistogram("h1DCSVBtagLeadingJet"+hNameSuffix,aJet1.getProperty(PropertyEnum::bCSVscore),eventWeight);
         }
-        if(nJets30>1){
-          myHistos_->fill1DHistogram("h1DWideMass2J"+hNameSuffix,jetsMass,eventWeight);
-          myHistos_->fill1DHistogram("h1DStatsNJGap30"+hNameSuffix,nJetsInGap30,eventWeight);
-          float jetsEta = std::abs(aJet1.getP4().Eta() - aJet2.getP4().Eta());
-          myHistos_->fill1DHistogram("h1DDeltaEta2J"+hNameSuffix,jetsEta,eventWeight);
-          myHistos_->fill1DHistogram("h1DPtTrailingJet"+hNameSuffix,aJet2.getP4().Pt(),eventWeight);
-          myHistos_->fill1DHistogram("h1DEtaTrailingJet"+hNameSuffix,aJet2.getP4().Eta(),eventWeight);
-          myHistos_->fill1DHistogram("h1DPhiTrailingJet"+hNameSuffix,aJet2.getP4().Phi(),eventWeight);
+        if(nJets30>1) {
+                myHistos_->fill1DHistogram("h1DWideMass2J"+hNameSuffix,jetsMass,eventWeight);
+                myHistos_->fill1DHistogram("h1DStatsNJGap30"+hNameSuffix,nJetsInGap30,eventWeight);
+                float jetsEta = std::abs(aJet1.getP4().Eta() - aJet2.getP4().Eta());
+                myHistos_->fill1DHistogram("h1DDeltaEta2J"+hNameSuffix,jetsEta,eventWeight);
+                myHistos_->fill1DHistogram("h1DPtTrailingJet"+hNameSuffix,aJet2.getP4().Pt(),eventWeight);
+                myHistos_->fill1DHistogram("h1DEtaTrailingJet"+hNameSuffix,aJet2.getP4().Eta(),eventWeight);
+                myHistos_->fill1DHistogram("h1DPhiTrailingJet"+hNameSuffix,aJet2.getP4().Phi(),eventWeight);
         }
         myHistos_->fill1DHistogram("h1DPtMET"+hNameSuffix,aMET.getP4(aSystEffect).Pt(),eventWeight);
 
@@ -281,13 +277,7 @@ bool HTTAnalyzer::analyze(const EventProxyBase& iEvent){
                         if(!passCategory(categoryType)) continue;
 
                         categorySuffix = std::to_string(iCategory);
-                        systEffectName = HTTAnalysis::systEffectName(iSystEffect);
-
-                        if(systEffectName.find("CAT")!=std::string::npos) {
-                                std::string categoryName = HTTAnalysis::categoryName(iCategory);
-                                systEffectName.replace(systEffectName.find("CAT"),3,categoryName);
-                        }
-
+                        systEffectName = HTTAnalysis::systEffectName(iCategory, iSystEffect);
                         hNameSuffix = sampleName+"_"+categorySuffix+systEffectName;
                         fillControlHistos(hNameSuffix, eventWeightWithSyst, aSystEffect);
                 }

@@ -124,9 +124,6 @@ const TLorentzVector & HTTParticle::getShiftedP4(float scale) const{
 ////////////////////////////////////////////////
 void HTTPair::clear(){
 
-  p4Vector.clear();
-  svMetVector.clear();
-
   for(auto &it:p4Vector) it*=0;
   for(auto &it:svMetVector) it*=0;
 

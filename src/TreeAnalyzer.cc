@@ -129,13 +129,16 @@ void TreeAnalyzer::parseCfg(const std::string & cfgFileName){
   boost::property_tree::ini_parser::read_ini(cfgFileName, pt);
 
   typedef boost::tokenizer<boost::char_separator<char> > tokenizer;
-  boost::char_separator<char> sep(",");
-  std::string str = pt.get<std::string>("TreeAnalyzer.inputFile");
+  boost::char_separator<char> sep(", ");
+  std::string str = pt.get<std::string>("TreeAnalyzer.inputFiles");
+	std::string dataPath = pt.get<std::string>("TreeAnalyzer.dataPath","");
   tokenizer tokens(str, sep);
   std::cout<<"Reading files: "<<std::endl;
+	std::string fileName;
   for (auto it: tokens){
-    std::cout<<it<<std::endl;
-    fileNames_.push_back(it);
+		fileName = dataPath+"/"+it;
+    std::cout<<fileName<<std::endl;
+    fileNames_.push_back(fileName);
   }
 
   filePath_ = pt.get<std::string>("TreeAnalyzer.outputPath");
