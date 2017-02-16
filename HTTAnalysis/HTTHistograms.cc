@@ -55,12 +55,13 @@ float HTTHistograms::getSampleNormalisation(std::string sampleName){
 
         float weight = crossSection*presEff/nEventsAnalysed;
         if(presEff<0 || fabs(fabs(crossSection)-1.0)<1e-5) weight = 1.0;
-
+        /*
         outputStream<<"Sample name: "<<sampleName<<" ";
         outputStream<<"Xsection: "<<crossSection<<" [pb] "<<" ";
         outputStream<<"Events analyzed: "<<nEventsAnalysed<<" ";
         outputStream<<"Reco preselection efficiency: "<<recoPresEff<<" ";
         outputStream<<"Final weight: "<<weight<<std::endl;
+        */
         return weight;
 }
 /////////////////////////////////////////////////////////
@@ -373,8 +374,6 @@ void HTTHistograms::defineHistograms(){
                 addProfile("hProfVsMagTemplate","",10,0,0.015,file_);
                 addProfile("hProfVsPtTemplate","",20,15,55,file_);
                 addProfile("hProfVsCosTemplate","",20,-1,1,file_);
-
-
         }
 }
 /////////////////////////////////////////////////////////
@@ -383,6 +382,7 @@ void HTTHistograms::finalizeHistograms(){
 
         AnalysisHistograms::finalizeHistograms();
 
+        gErrorIgnoreLevel = kBreak;
         //////////////
         ///Control regions plots
         for(unsigned int iCategory = (int)HTTAnalysis::jet0;
@@ -390,7 +390,7 @@ void HTTHistograms::finalizeHistograms(){
 
                 plotCPhistograms(iCategory);
 
-                plotStack(iCategory, "MassSV");                             
+                plotStack(iCategory, "MassSV");
                 plotStack(iCategory, "MassVis");
                 plotStack(iCategory, "MassTrans");
                 plotStack(iCategory, "UnRollTauPtMassVis");
@@ -1441,7 +1441,7 @@ std::pair<float,float> HTTHistograms::getQCDControlToSignal(unsigned int iCatego
         gStyle->SetOptStat(11);
         gStyle->SetOptFit(11);
         hSoupTight->Draw();
-        hSoupTight->Fit("line","","",100,250);
+        //hSoupTight->Fit("line","","",100,250);
 
         std::string categoryName = HTTAnalysis::categoryName(iCategory);
         std::string systEffectName = HTTAnalysis::systEffectName(iCategory, iSystEffect);
@@ -1449,7 +1449,7 @@ std::pair<float,float> HTTHistograms::getQCDControlToSignal(unsigned int iCatego
         std::string plotName = varName+"_"+hNameSuffix+"_"+systEffectName;
         c->Print(TString::Format("fig_png/%s.png",plotName.c_str()).Data());
         c->Print(TString::Format("fig_C/%s.C",plotName.c_str()).Data());
-
+/*
         float param, dparam;
         param=line->GetParameter(0);
         dparam=line->GetParError(0);
@@ -1458,7 +1458,7 @@ std::pair<float,float> HTTHistograms::getQCDControlToSignal(unsigned int iCatego
                  <<"\tQCD Tight/Loose` ratio: "<<std::endl
                  <<"\tRatio: "<<sumTight/sumLoose<<" +- "<<ratioErr<<std::endl
                  <<"\tFit: "<<param<<" +- "<<dparam<<std::endl;
-
+*/
         result = std::make_pair(sumTight/sumLoose,ratioErr);
         return result;
 }
