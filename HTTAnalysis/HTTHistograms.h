@@ -21,11 +21,14 @@ class HTTHistograms: public AnalysisHistograms {
 
   virtual ~HTTHistograms();
 
-  void finalizeHistograms(int nRuns, float weight=1.0);
+  void finalizeHistograms();
+
+  using AnalysisHistograms::get1DHistogram;
+
+  TH1F *get1DHistogram(unsigned int iCategory, std::string varName,
+       unsigned int iSystEffect = (unsigned int)HTTAnalysis::NOMINAL_SVFIT);
 
   std::string getTemplateName(const std::string& name);
-
-  float getLumi();
 
   ///Return sample normalisation based only on
   ///luminosity and cross section.
@@ -35,27 +38,20 @@ class HTTHistograms: public AnalysisHistograms {
 
   ///Estimate QCD background using the SS/OS method.
   TH1F* getQCDbackground(unsigned int iCategory, std::string varName,
-			 std::pair<float,float> wselOSCorrection =  std::pair<float,float>(1,0),
-			 std::pair<float,float> wselSSCorrection =  std::pair<float,float>(1,0),
-       unsigned int iSystEffect = (unsigned int)sysEffects::NOMINAL_SVFIT);
+       unsigned int iSystEffect = (unsigned int)HTTAnalysis::NOMINAL_SVFIT);
 
   ///Calculate scaling factor for the WJets MC
   ///Scaling factor is estimated in high Mt region.
   ///Other backgrounds are subtracted, basing on MC
   ///QCD contribution is neglected.
-  std::pair<float,float> getWNormalisation(unsigned int iCategory, std::string selName,
-    unsigned int iSystEffect = (unsigned int)sysEffects::NOMINAL_SVFIT);
+  std::pair<float,float> getWNormalisation(unsigned int iCategory,
+    unsigned int iSystEffect = (unsigned int)HTTAnalysis::NOMINAL_SVFIT);
 
-  ///Calculate QCD OS/SS ratiousing non isolated events.
-  std::pair<float,float> getQCDOStoSS(unsigned int iCategory,
-				      std::pair<float,float> wselOSCorrection =  std::pair<float,float>(1,0),
-				      std::pair<float,float> wselSSCorrection =  std::pair<float,float>(1,0),
-              unsigned int iSystEffect = (unsigned int)sysEffects::NOMINAL_SVFIT);
+  ///Calculate QCD ratio between signal and control regions.
+  std::pair<float,float> getQCDControlToSignal(unsigned int iCategory,
+              unsigned int iSystEffect = (unsigned int)HTTAnalysis::NOMINAL_SVFIT);
 
    private:
-
-  std::pair<float,float> wselOSCorrection;
-  std::pair<float,float> wselSSCorrection;
 
   virtual void defineHistograms();
 
@@ -69,8 +65,7 @@ class HTTHistograms: public AnalysisHistograms {
   //varName - name of variable to be plotted,
   THStack* plotStack(unsigned int iCategory,
 		     std::string varName,
-		     std::string selName = "OS",
-		     unsigned int iSystEffect = (unsigned int)sysEffects::NOMINAL);
+		     unsigned int iSystEffect = (unsigned int)HTTAnalysis::NOMINAL);
 
   void plotnPCA(const std::string & type);
 
@@ -85,6 +80,9 @@ class HTTHistograms: public AnalysisHistograms {
 			   const std::string & sysType);
 
   void plotCPhistograms(unsigned int iCategory);
+
+  ///Return sum of all non Higgs MC contributions.
+  TH1F *getMCSum(unsigned int iCategory, std::string varName, unsigned int iSystEffect);
 
   ///Return histogram for sum of all DY decay modes, and jet bins
   TH1F *get1D_DYJet_Histogram(const std::string& name);
@@ -125,7 +123,8 @@ class HTTHistograms: public AnalysisHistograms {
   void plotSingleHistogram(std::string hName);
 
   float muTauDYScale, mumuDYScale;
-  float ttScale;
+
+  std::stringstream outputStream;
 
 };
 

@@ -13,7 +13,6 @@
 
 #include "EventProxyHTT.h"
 #include "HTTAnalyzer.h"
-#include "HTTAnalyzerTT.h"
 
 #include "TFile.h"
 #include "TStopwatch.h"
@@ -57,12 +56,15 @@ int main(int argc, char ** argv) {
 	 std::vector<Analyzer*> myAnalyzers;
 	 EventProxyHTT *myEvent = new EventProxyHTT();
 
-	 if(processName=="Analysis") myAnalyzers.push_back(new HTTAnalyzer("HTTAnalyzer"));
-	 else if(processName=="AnalysisTT") myAnalyzers.push_back(new HTTAnalyzerTT("HTTAnalyzerTT"));
-	 else {
+	 std::string decayModeName;
+	 if(processName=="AnalysisMuTau") decayModeName = "MuTau";
+	 else if(processName=="AnalysisTT") decayModeName = "TauTau";
+	 else{
 	   std::cout<<"Incorrect process name: "<<processName<<std::endl;
 	   return 1;
 	 }
+
+	 myAnalyzers.push_back(new HTTAnalyzer("HTTAnalyzer",decayModeName));
 
 	 TreeAnalyzer *tree = new TreeAnalyzer("TreeAnalyzer",cfgFileName, myEvent);
 	 tree->init(myAnalyzers);

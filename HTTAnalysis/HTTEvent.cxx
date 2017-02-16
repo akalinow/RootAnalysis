@@ -61,13 +61,13 @@ void HTTParticle::clear(){
 
   properties.clear();
 
-  lastSystEffect = sysEffects::NOMINAL;
+  lastSystEffect = HTTAnalysis::NOMINAL;
 }
 ////////////////////////////////////////////////
 ////////////////////////////////////////////////
-const TLorentzVector & HTTParticle::getSystScaleP4(sysEffects::sysEffectsEnum type) const{
+const TLorentzVector & HTTParticle::getSystScaleP4(HTTAnalysis::sysEffects type) const{
 
-  if(type==sysEffects::NOMINAL || type==sysEffects::NOMINAL_SVFIT) {
+  if(type==HTTAnalysis::NOMINAL || type==HTTAnalysis::NOMINAL_SVFIT) {
     lastSystEffect = type;
     return p4;
   }
@@ -77,29 +77,29 @@ const TLorentzVector & HTTParticle::getSystScaleP4(sysEffects::sysEffectsEnum ty
 
   if(abs(getPDGid())==15 && getProperty(PropertyEnum::mc_match)==5){
     ///True taus
-    if(type!=sysEffects::TESUp && type!=sysEffects::TESDown) return p4;
+    if(type!=HTTAnalysis::TESUp && type!=HTTAnalysis::TESDown) return p4;
     float TES = 0.03;
-    if(type==sysEffects::TESDown) TES*=-1;
+    if(type==HTTAnalysis::TESDown) TES*=-1;
     return getShiftedP4(1+TES);
   }
   if(abs(getPDGid())==15 && getProperty(PropertyEnum::mc_match)==3){
     ///Fake e->tau
-    if(type!=sysEffects::E2TUp && type!=sysEffects::E2TDown) return p4;
+    if(type!=HTTAnalysis::E2TUp && type!=HTTAnalysis::E2TDown) return p4;
     float EES = 0.03;
-    if(type==sysEffects::E2TDown) EES*=-1;
+    if(type==HTTAnalysis::E2TDown) EES*=-1;
     return getShiftedP4(1+EES);
   }
   if(abs(getPDGid())==15 && getProperty(PropertyEnum::mc_match)==4){
     ///Fake mu->tau
-    if(type!=sysEffects::M2TUp && type!=sysEffects::M2TDown) return p4;
+    if(type!=HTTAnalysis::M2TUp && type!=HTTAnalysis::M2TDown) return p4;
     float MES = 0.03;
-    if(type==sysEffects::M2TDown) MES*=-1;
+    if(type==HTTAnalysis::M2TDown) MES*=-1;
     return getShiftedP4(1+MES);
   }
   if(abs(getPDGid())==98){
-    if(type!=sysEffects::JESUp && type!=sysEffects::JESDown) return p4;
+    if(type!=HTTAnalysis::JESUp && type!=HTTAnalysis::JESDown) return p4;
     float JES = getProperty(PropertyEnum::jecUnc);
-    if(type==sysEffects::JESDown) JES*=-1;
+    if(type==HTTAnalysis::JESDown) JES*=-1;
     return getShiftedP4(1+JES);
   }
 
@@ -124,9 +124,6 @@ const TLorentzVector & HTTParticle::getShiftedP4(float scale) const{
 ////////////////////////////////////////////////
 void HTTPair::clear(){
 
-  p4Vector.clear();
-  svMetVector.clear();
-
   for(auto &it:p4Vector) it*=0;
   for(auto &it:svMetVector) it*=0;
 
@@ -138,27 +135,27 @@ void HTTPair::clear(){
   leg1.clear();
   leg2.clear();
 
-  lastSystEffect = sysEffects::NOMINAL;
+  lastSystEffect = HTTAnalysis::NOMINAL;
 }
 ////////////////////////////////////////////////
 ////////////////////////////////////////////////
-const TVector2 & HTTPair::getSystScaleMET(sysEffects::sysEffectsEnum type) const{
+const TVector2 & HTTPair::getSystScaleMET(HTTAnalysis::sysEffects type) const{
 
-  if(type==sysEffects::NOMINAL || type==sysEffects::NOMINAL_SVFIT) {
+  if(type==HTTAnalysis::NOMINAL || type==HTTAnalysis::NOMINAL_SVFIT) {
     lastSystEffect = type;
     return met;
   }
   else if(lastSystEffect==type) return metCache;
 
   double metX = met.X();
-  metX+=leg1.getP4(sysEffects::NOMINAL).X();
-  metX+=leg2.getP4(sysEffects::NOMINAL).X();
+  metX+=leg1.getP4(HTTAnalysis::NOMINAL).X();
+  metX+=leg2.getP4(HTTAnalysis::NOMINAL).X();
   metX-=leg1.getP4(type).X();
   metX-=leg2.getP4(type).X();
 
   double metY = met.Y();
-  metY+=leg1.getP4(sysEffects::NOMINAL).Y();
-  metY+=leg2.getP4(sysEffects::NOMINAL).Y();
+  metY+=leg1.getP4(HTTAnalysis::NOMINAL).Y();
+  metY+=leg2.getP4(HTTAnalysis::NOMINAL).Y();
   metY-=leg1.getP4(type).Y();
   metY-=leg2.getP4(type).Y();
 
@@ -169,7 +166,7 @@ const TVector2 & HTTPair::getSystScaleMET(sysEffects::sysEffectsEnum type) const
 ////////////////////////////////////////////////
 ////////////////////////////////////////////////
 float HTTPair::getSystScaleMT(const HTTParticle &aParticle,
-			      sysEffects::sysEffectsEnum type) const{
+			      HTTAnalysis::sysEffects type) const{
 
   const TVector2 & metScaled = getSystScaleMET(type);
   const TLorentzVector & legP4 = aParticle.getP4(type);

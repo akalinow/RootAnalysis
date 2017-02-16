@@ -398,7 +398,8 @@ TH1F* AnalysisHistograms::get1DHistogram(const std::string& name, bool noClone){
      return hClone;
    }
  else {
-   cout<<"ERROR: Histogram: "<<name<<" not found in thread: "<<omp_get_thread_num()<<endl;
+   ///To many ERRORS for histograms absent due to samples not passing the selection.
+   //cout<<"ERROR: Histogram: "<<name<<" not found in thread: "<<omp_get_thread_num()<<endl;
  }
 
  return 0;
