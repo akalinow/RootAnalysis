@@ -389,7 +389,6 @@ void HTTHistograms::finalizeHistograms(){
             iCategory<(int)HTTAnalysis::boosted; ++iCategory) {
 
                 plotCPhistograms(iCategory);
-                return;
 
                 plotStack(iCategory, "MassSV");
                 plotStack(iCategory, "MassVis");
@@ -436,7 +435,7 @@ void HTTHistograms::finalizeHistograms(){
             iSystEffect<(unsigned int)HTTAnalysis::DUMMY_SYS; ++iSystEffect) {
 
                 for(unsigned int iCategory = (int)HTTAnalysis::jet0;
-                    iCategory<(int)HTTAnalysis::CP_Pi; ++iCategory) {
+                    iCategory<(int)HTTAnalysis::wjets_jet0; ++iCategory) {
                         plotStack(iCategory, "MassSV", iSystEffect);
                         plotStack(iCategory, "UnRollTauPtMassVis", iSystEffect);
                         plotStack(iCategory, "UnRollHiggsPtMassSV", iSystEffect);

@@ -257,7 +257,7 @@ bool HTTAnalyzer::analyze(const EventProxyBase& iEvent){
         std::string categorySuffix = "";
         std::string systEffectName = "";
         for(unsigned int iSystEffect = (unsigned int)HTTAnalysis::NOMINAL_SVFIT;
-            iSystEffect<(unsigned int)HTTAnalysis::TESUp; ++iSystEffect) {
+            iSystEffect<(unsigned int)HTTAnalysis::mu_pi; ++iSystEffect) {
 
                 HTTAnalysis::sysEffects aSystEffect = static_cast<HTTAnalysis::sysEffects>(iSystEffect);
 
