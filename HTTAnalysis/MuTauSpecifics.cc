@@ -137,8 +137,6 @@ void MuTauSpecifics::testAllCategories(const HTTAnalysis::sysEffects & aSystEffe
         myAnalyzer->categoryDecisions[(int)HTTAnalysis::vbf_high] = os && muonIso && mtSelection && vbf_high;
 
         myAnalyzer->categoryDecisions[(int)HTTAnalysis::jet0] = os && muonIso && mtSelection && jet0;
-        myAnalyzer->categoryDecisions[(int)HTTAnalysis::CP_Pi] = os && muonIso && mtSelection && cpPi;
-        myAnalyzer->categoryDecisions[(int)HTTAnalysis::CP_Rho] = os && muonIso && mtSelection && cpRho;
         myAnalyzer->categoryDecisions[(int)HTTAnalysis::boosted] = os && muonIso && mtSelection && boosted;
         myAnalyzer->categoryDecisions[(int)HTTAnalysis::vbf] = os && muonIso && mtSelection && vbf;
 
@@ -154,9 +152,12 @@ void MuTauSpecifics::testAllCategories(const HTTAnalysis::sysEffects & aSystEffe
         myAnalyzer->categoryDecisions[(int)HTTAnalysis::qcd_boosted] = ss && muonIso && mtSelection && boosted;
         myAnalyzer->categoryDecisions[(int)HTTAnalysis::qcd_vbf] = ss && muonIso && mtSelection && vbf;
 
-        myAnalyzer->categoryDecisions[(int)HTTAnalysis::antiIso_jet0] = ss && muonAntiIso && jet0;
-        myAnalyzer->categoryDecisions[(int)HTTAnalysis::antiIso_boosted] = ss && muonAntiIso && boosted;
-        myAnalyzer->categoryDecisions[(int)HTTAnalysis::antiIso_vbf] = ss && muonAntiIso && vbf;
+        myAnalyzer->categoryDecisions[(int)HTTAnalysis::antiIso_jet0] = os && muonAntiIso && jet0;
+        myAnalyzer->categoryDecisions[(int)HTTAnalysis::antiIso_boosted] = os && muonAntiIso && boosted;
+        myAnalyzer->categoryDecisions[(int)HTTAnalysis::antiIso_vbf] = os && muonAntiIso && vbf;
+
+        myAnalyzer->categoryDecisions[(int)HTTAnalysis::mu_pi] = os && muonIso && mtSelection && cpPi;
+        myAnalyzer->categoryDecisions[(int)HTTAnalysis::mu_rho] = os && muonIso && mtSelection && cpRho;
 
         myAnalyzer->categoryDecisions[(int)HTTAnalysis::W] = muonIso && wSelection;
         myAnalyzer->categoryDecisions[(int)HTTAnalysis::TT] = muonIso && ttSelection;

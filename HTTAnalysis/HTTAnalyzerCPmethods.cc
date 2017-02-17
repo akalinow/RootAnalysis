@@ -55,7 +55,8 @@ void HTTAnalyzer::fillDecayPlaneAngle(const std::string & hNameSuffix, float eve
   float yTau =  2.*tauLeadingTk.Pt()/aLeg2.getP4().Pt() - 1.;
   float shiftedIPrho = anglesIPRho.first +(yTau<0)*(1-2*(anglesIPRho.first>M_PI))*M_PI;
 
-  if(aLeg2.getProperty(PropertyEnum::decayMode)!=HTTAnalysis::tauDecay1ChargedPion0PiZero && HTTAnalysis::isOneProng(aLeg2.getProperty(PropertyEnum::decayMode))){
+  if(aLeg2.getProperty(PropertyEnum::decayMode)!=HTTAnalysis::tauDecay1ChargedPion0PiZero &&
+    HTTAnalysis::isOneProng(aLeg2.getProperty(PropertyEnum::decayMode))){
      myHistos_->fill1DHistogram("h1DyTau"+hNameSuffix,yTau,eventWeight);
 
      myHistos_->fill1DHistogram("h1DPhi-nVecIP"+hNameSuffix,shiftedIPrho,eventWeight);
@@ -71,7 +72,6 @@ void HTTAnalyzer::fillDecayPlaneAngle(const std::string & hNameSuffix, float eve
 
   if(aLeg2.getProperty(PropertyEnum::decayMode)==HTTAnalysis::tauDecay1ChargedPion0PiZero){
     float cosPhiNN =  tauPCA.Vect().Unit().Dot(muonPCA.Vect().Unit());
-
 
     myHistos_->fill1DHistogram("h1DPhi-nVectors"+hNameSuffix,angles.first,eventWeight);
     myHistos_->fill2DUnrolledHistogram("h1DUnRollMassSVPhiCP"+hNameSuffix,angles.first, aPair.getP4(aSystEffect).M(),eventWeight);
@@ -122,7 +122,6 @@ void HTTAnalyzer::fillGenDecayPlaneAngle(const std::string & hNameSuffix, float 
   if(aGenLeg2.getProperty(PropertyEnum::decayMode)==HTTAnalysis::tauDecay1ChargedPion0PiZero){
     float cosPhiNN =  muonPCA.Vect().Unit().Dot(tauPCA.Vect().Unit());
     myHistos_->fill1DHistogram("h1DCosPhiNN"+hNameSuffix,cosPhiNN);
-
     myHistos_->fill1DHistogram("h1DPhi-nVectors"+hNameSuffix,angles.first,eventWeight);
     myHistos_->fill2DUnrolledHistogram("h1DUnRollMassSVPhiCP"+hNameSuffix,angles.first, aPair.getP4(sysType).M(),eventWeight);
   }

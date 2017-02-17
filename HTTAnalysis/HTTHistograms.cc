@@ -386,7 +386,7 @@ void HTTHistograms::finalizeHistograms(){
         //////////////
         ///Control regions plots
         for(unsigned int iCategory = (int)HTTAnalysis::jet0;
-            iCategory<(int)HTTAnalysis::CP_Pi; ++iCategory) {
+            iCategory<(int)HTTAnalysis::boosted; ++iCategory) {
 
                 plotCPhistograms(iCategory);
 
@@ -435,7 +435,7 @@ void HTTHistograms::finalizeHistograms(){
             iSystEffect<(unsigned int)HTTAnalysis::DUMMY_SYS; ++iSystEffect) {
 
                 for(unsigned int iCategory = (int)HTTAnalysis::jet0;
-                    iCategory<(int)HTTAnalysis::CP_Pi; ++iCategory) {
+                    iCategory<(int)HTTAnalysis::wjets_jet0; ++iCategory) {
                         plotStack(iCategory, "MassSV", iSystEffect);
                         plotStack(iCategory, "UnRollTauPtMassVis", iSystEffect);
                         plotStack(iCategory, "UnRollHiggsPtMassSV", iSystEffect);
@@ -459,7 +459,6 @@ void HTTHistograms::plotCPhistograms(unsigned int iCategory){
         plot_HAZ_Histograms("Phi-nVecIP-yTauPos",hNameSuffix+"_GenNoOfflineSel");
         plot_HAZ_Histograms("Phi-nVecIP",hNameSuffix+"_GenNoOfflineSel");
         plot_HAZ_Histograms("Phi-nVectors",hNameSuffix+"_GenNoOfflineSel");
-
         hNameSuffix =  "_"+std::to_string(iCategory);
 
         //plot_HAZ_Histograms("Phi-nVecIP-yTauNeg",hNameSuffix+"_Gen");
@@ -471,7 +470,7 @@ void HTTHistograms::plotCPhistograms(unsigned int iCategory){
         plot_HAZ_Histograms("Phi-nVecIP",hNameSuffix+"_RefitPV");
 
         plotnPCA("ggHTT125"+hNameSuffix);
-        plotnPCA("A"+hNameSuffix);
+        plotnPCA("ATT"+hNameSuffix);
         plotnPCA("DYJets"+hNameSuffix);
         plotnPCA("WJets"+hNameSuffix);
 
@@ -497,24 +496,24 @@ void HTTHistograms::plotCPhistograms(unsigned int iCategory){
 /////////////////////////////////////////////////////////
 void HTTHistograms::plotnPCA(const std::string & type){
 
-        TH1F* h1DTau = 0;
-        TH1F* h1DMuon = 0;
+        TH1F* h1DLeg2 = 0;
+        TH1F* h1DLeg1 = 0;
 
         if(type.find("DYJets")!=std::string::npos) {
                 std::string typeztt="DYJetsMatchT"+type.substr(type.find("DYJets")+6);
-                h1DTau = get1D_TauMatchJetSum(("h1DnPCATau"+typeztt).c_str(),false,true);
-                h1DMuon = get1D_TauMatchJetSum(("h1DnPCAMuon"+typeztt).c_str(),false,true);
+                h1DLeg2 = get1D_TauMatchJetSum(("h1DnPCALeg2"+typeztt).c_str(),false,true);
+                h1DLeg1 = get1D_TauMatchJetSum(("h1DnPCALeg1"+typeztt).c_str(),false,true);
         }
         else if(type.find("WJets")!=std::string::npos) {
-                h1DTau = get1D_WJet_Histogram("h1DnPCATau"+type);
-                h1DMuon = get1D_WJet_Histogram("h1DnPCAMuon"+type);
+                h1DLeg2 = get1D_WJet_Histogram("h1DnPCALeg2"+type);
+                h1DLeg1 = get1D_WJet_Histogram("h1DnPCALeg1"+type);
         }
         else{
-                h1DTau = get1DHistogram("h1DnPCATau"+type);
-                h1DMuon = get1DHistogram("h1DnPCAMuon"+type);
+                h1DLeg2 = get1DHistogram("h1DnPCALeg2"+type);
+                h1DLeg1 = get1DHistogram("h1DnPCALeg1"+type);
         }
 
-        if(!h1DTau || !h1DMuon) return;
+        if(!h1DLeg2 || !h1DLeg1) return;
 
         TCanvas* c = new TCanvas("AnyHistogram","AnyHistogram",
                                  460,500);
@@ -525,22 +524,22 @@ void HTTHistograms::plotnPCA(const std::string & type){
         l.SetBorderSize(0);
         l.SetFillColor(10);
 
-        h1DTau->SetLineWidth(3);
-        h1DTau->Scale(1.0/h1DTau->Integral(0,h1DTau->GetNbinsX()+1));
+        h1DLeg2->SetLineWidth(3);
+        h1DLeg2->Scale(1.0/h1DLeg2->Integral(0,h1DLeg2->GetNbinsX()+1));
 
-        h1DMuon->SetLineWidth(3);
-        h1DMuon->SetLineColor(2);
-        h1DMuon->Scale(1.0/h1DMuon->Integral(0,h1DMuon->GetNbinsX()+1));
-        h1DMuon->GetYaxis()->SetTitleOffset(1.5);
-        h1DMuon->SetStats(kFALSE);
-        h1DMuon->SetYTitle("Events");
-        h1DMuon->SetXTitle("|n_{RECO}|");
+        h1DLeg1->SetLineWidth(3);
+        h1DLeg1->SetLineColor(2);
+        h1DLeg1->Scale(1.0/h1DLeg1->Integral(0,h1DLeg1->GetNbinsX()+1));
+        h1DLeg1->GetYaxis()->SetTitleOffset(1.5);
+        h1DLeg1->SetStats(kFALSE);
+        h1DLeg1->SetYTitle("Events");
+        h1DLeg1->SetXTitle("|n_{RECO}|");
 
-        h1DMuon->Draw();
-        h1DTau->Draw("same");
+        h1DLeg1->Draw();
+        h1DLeg2->Draw("same");
 
-        l.AddEntry(h1DTau,"hadronic tau");
-        l.AddEntry(h1DMuon,"leptonic tau");
+        l.AddEntry(h1DLeg2,"leg2 (hadronic tau)");
+        l.AddEntry(h1DLeg1,"leg1(leptonic/leading had. tau)");
         l.Draw();
 
         c->Print(TString::Format("fig_png/nPCA_length_%s.png",type.c_str()).Data());

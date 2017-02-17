@@ -168,9 +168,9 @@ void TauTauSpecifics::testAllCategories(const HTTAnalysis::sysEffects & aSystEff
         myAnalyzer->categoryDecisions[(int)HTTAnalysis::ss_boosted] = ss && fullIso &&  boosted;
         myAnalyzer->categoryDecisions[(int)HTTAnalysis::ss_vbf] = ss && fullIso && vbf_2d;
 
-        myAnalyzer->categoryDecisions[(int)HTTAnalysis::pipi] = os && fullIso && piPi;
-        myAnalyzer->categoryDecisions[(int)HTTAnalysis::pirho] = os && fullIso && piRho;
-        myAnalyzer->categoryDecisions[(int)HTTAnalysis::rhorho] = os && fullIso && rhoRho;
+        myAnalyzer->categoryDecisions[(int)HTTAnalysis::pi_pi] = os && fullIso && piPi;
+        myAnalyzer->categoryDecisions[(int)HTTAnalysis::pi_rho] = os && fullIso && piRho;
+        myAnalyzer->categoryDecisions[(int)HTTAnalysis::rho_rho] = os && fullIso && rhoRho;
 }
 /////////////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////////////

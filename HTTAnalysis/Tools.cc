@@ -34,7 +34,7 @@ float getLumi(){
                         run2016FReReco + run2016GReReco +
                         run2016HPromptReco_v2 + run2016HPromptReco_v3;
 
-        run2016 = 35.87*1E3*1E6;//Updated Run2016 luminosity 
+        run2016 = 35.87*1E3*1E6;//Updated Run2016 luminosity
         return run2016*1E-6; //pb-1 data for NTUPLES_05_12_2016
 }
 //////////////////////////////////////////////////////////////////////////////
@@ -131,8 +131,6 @@ std::string categoryName(unsigned int iCategory){
         else if(iCategory==(int)jet0) return "0jet";
         else if(iCategory==(int)boosted) return "boosted";
         else if(iCategory==(int)vbf) return "vbf";
-        else if(iCategory==(int)CP_Pi) return "CP_Pi";
-        else if(iCategory==(int)CP_Rho) return "CP_Rho";
         else if(iCategory==(int)wjets_jet0) return "wjets_0jet";
         else if(iCategory==(int)wjets_boosted) return "wjets_boosted";
         else if(iCategory==(int)wjets_vbf) return "wjets_vbf";
@@ -142,6 +140,11 @@ std::string categoryName(unsigned int iCategory){
         else if(iCategory==(int)antiIso_jet0) return "antiIso_0jet";
         else if(iCategory==(int)antiIso_boosted) return "antiIso_boosted";
         else if(iCategory==(int)antiIso_vbf) return "antiIso_vbf";
+        else if(iCategory==(int)mu_pi) return "CP_MuPi";
+        else if(iCategory==(int)mu_rho) return "CP_MuRho";
+        else if(iCategory==(int)pi_pi) return "CP_PiPi";
+        else if(iCategory==(int)pi_rho) return "CP_PiRho";
+        else if(iCategory==(int)rho_rho) return "CP_RhoRho";  
         return "UnknownCategory";
 }
 //////////////////////////////////////////////////////////////////////////////

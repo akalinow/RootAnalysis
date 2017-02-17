@@ -249,7 +249,7 @@ bool HTTAnalyzer::analyze(const EventProxyBase& iEvent){
         bool goodGenDecayMode = goodDecayModes.first;
         bool goodRecoDecayMode = goodDecayModes.second;
 
-        if(goodGenDecayMode) fillGenDecayPlaneAngle(sampleName+"GenNoOfflineSel", eventWeight);
+        if(goodGenDecayMode) fillGenDecayPlaneAngle(sampleName+"_GenNoOfflineSel", eventWeight);
 
         bool SS = aLeg2.getCharge()*aLeg1.getCharge() == 1;
         bool OS = aLeg2.getCharge()*aLeg1.getCharge() == -1;
@@ -257,7 +257,7 @@ bool HTTAnalyzer::analyze(const EventProxyBase& iEvent){
         std::string categorySuffix = "";
         std::string systEffectName = "";
         for(unsigned int iSystEffect = (unsigned int)HTTAnalysis::NOMINAL_SVFIT;
-            iSystEffect<(unsigned int)HTTAnalysis::DUMMY_SYS; ++iSystEffect) {
+            iSystEffect<(unsigned int)HTTAnalysis::mu_pi; ++iSystEffect) {
 
                 HTTAnalysis::sysEffects aSystEffect = static_cast<HTTAnalysis::sysEffects>(iSystEffect);
 
