@@ -124,6 +124,9 @@ const TLorentzVector & HTTParticle::getShiftedP4(float scale) const{
 ////////////////////////////////////////////////
 void HTTPair::clear(){
 
+  if(!p4Vector.size()) p4Vector.resize(HTTAnalysis::DUMMY_SYS);
+  if(!svMetVector.size()) svMetVector.resize(HTTAnalysis::DUMMY_SYS);
+
   for(auto &it:p4Vector) it*=0;
   for(auto &it:svMetVector) it*=0;
 

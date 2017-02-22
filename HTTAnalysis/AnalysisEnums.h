@@ -51,6 +51,8 @@ enum sysEffects{NOMINAL, NOMINAL_SVFIT,
 		    TTUp, TTDown,
 		    QCDSFUp, QCDSFDown,
 		    WSFUp, WSFDown,
+        //ggUp, ggDown,
+        //ZmumuUp, ZmumuDown,
 		    DUMMY_SYS};
 }
 #endif

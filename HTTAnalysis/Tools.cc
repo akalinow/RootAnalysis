@@ -144,7 +144,7 @@ std::string categoryName(unsigned int iCategory){
         else if(iCategory==(int)mu_rho) return "CP_MuRho";
         else if(iCategory==(int)pi_pi) return "CP_PiPi";
         else if(iCategory==(int)pi_rho) return "CP_PiRho";
-        else if(iCategory==(int)rho_rho) return "CP_RhoRho";  
+        else if(iCategory==(int)rho_rho) return "CP_RhoRho";
         return "UnknownCategory";
 }
 //////////////////////////////////////////////////////////////////////////////
@@ -152,8 +152,8 @@ std::string categoryName(unsigned int iCategory){
 std::string systEffectName(unsigned int iSystEffect){
         if(iSystEffect==(int)NOMINAL) return "";
         else if(iSystEffect==(int)NOMINAL_SVFIT) return "";
-        else if(iSystEffect==(int)TESUp) return "_CMS_shape_t_mt_13TeVUp";
-        else if(iSystEffect==(int)TESDown) return "_CMS_shape_t_mt_13TeVDown";
+        else if(iSystEffect==(int)TESUp) return "_CMS_scale_t_mt_13TeVUp";
+        else if(iSystEffect==(int)TESDown) return "_CMS_scale_t_mt_13TeVDown";
         else if(iSystEffect==(int)JESUp) return "_CMS_scale_j_13TeVUp";
         else if(iSystEffect==(int)JESDown) return "_CMS_scale_j_13TeVDown";
         else if(iSystEffect==(int)M2TUp) return "_CMS_htt_ZLShape_mt_13TeVUp";
@@ -170,7 +170,12 @@ std::string systEffectName(unsigned int iSystEffect){
         else if(iSystEffect==(int)QCDSFDown) return "_QCDSFUncert_mt_CAT_13TeVDown";
         else if(iSystEffect==(int)WSFUp) return "_WSFUncert_mt_CAT_13TeVUp";
         else if(iSystEffect==(int)WSFDown) return "_WSFUncert_mt_CAT_13TeVDown";
-        return "_UnknownSystEffect";
+        //else if(iSystEffect==(int)ggUp) return "_scale_gg_13TeVUp";
+        //else if(iSystEffect==(int)ggDown) return "_scale_gg_13TeVDown";
+        //else if(iSystEffect==(int)ZmumuUp) return "_htt_zmumuShape_CAT_13TeVUp";
+        //else if(iSystEffect==(int)ZmumuDown) return "_htt_zmumuShape_CAT_13TeVUp";
+        else return "UnknownSystEffect";
+
 }
 //////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////
