@@ -108,7 +108,7 @@ void MuTauSpecifics::testAllCategories(const HTTAnalysis::sysEffects & aSystEffe
         bool vbf_high = myAnalyzer->aLeg2.getP4(aSystEffect).Pt()>20 &&
                         myAnalyzer->nJets30==2 && jetsMass>800 && higgsPt>100;
 
-        bool cpMuonSelection = myAnalyzer->aLeg1.getPCARefitPV().Perp()>myAnalyzer->nPCAMin_;
+        bool cpMuonSelection = myAnalyzer->aLeg1.getPCARefitPV().Mag()>myAnalyzer->nPCAMin_;
         bool cpTauSelection =  myAnalyzer->aLeg2.getPCARefitPV().Mag()>myAnalyzer->nPCAMin_;
         bool cpPi = cpMuonSelection && cpTauSelection && myAnalyzer->aLeg2.getProperty(PropertyEnum::decayMode)==HTTAnalysis::tauDecay1ChargedPion0PiZero;
         bool cpRho = cpMuonSelection && myAnalyzer->aLeg2.getProperty(PropertyEnum::decayMode)!=HTTAnalysis::tauDecay1ChargedPion0PiZero &&

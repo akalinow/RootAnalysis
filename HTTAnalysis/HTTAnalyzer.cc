@@ -33,7 +33,7 @@ HTTAnalyzer::HTTAnalyzer(const std::string & aName, const std::string & aDecayMo
                 if(aDecayMode=="MuTau") myChannelSpecifics = new MuTauSpecifics(this);
                 else if (aDecayMode=="TauTau") myChannelSpecifics = new TauTauSpecifics(this);
 
-                nPCAMin_ = 0.003;
+                nPCAMin_ = 0.004;
 
                 ntupleFile_ = 0;
                 hStatsFromFile = 0;
@@ -257,7 +257,7 @@ bool HTTAnalyzer::analyze(const EventProxyBase& iEvent){
         std::string categorySuffix = "";
         std::string systEffectName = "";
         for(unsigned int iSystEffect = (unsigned int)HTTAnalysis::NOMINAL_SVFIT;
-            iSystEffect<(unsigned int)HTTAnalysis::mu_pi; ++iSystEffect) {
+            iSystEffect<(unsigned int)HTTAnalysis::TESUp; ++iSystEffect) {
 
                 HTTAnalysis::sysEffects aSystEffect = static_cast<HTTAnalysis::sysEffects>(iSystEffect);
 

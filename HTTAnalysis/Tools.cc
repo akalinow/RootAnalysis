@@ -34,7 +34,7 @@ float getLumi(){
                         run2016FReReco + run2016GReReco +
                         run2016HPromptReco_v2 + run2016HPromptReco_v3;
 
-        run2016 = 35.87*1E3*1E6;//Updated Run2016 luminosity
+        run2016 = 35.87*1E3*1E6; //Updated Run2016 luminosity
         return run2016*1E-6; //pb-1 data for NTUPLES_05_12_2016
 }
 //////////////////////////////////////////////////////////////////////////////
@@ -119,6 +119,19 @@ float getCrossSection(const std::string & sampleName){
 }
 //////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////
+unsigned int getControlCategory(unsigned int iCategory, const std::string &process){
+
+        if(iCategory==(unsigned int)(HTTAnalysis::jet0)) iCategory = HTTAnalysis::qcd_jet0;
+        else if(iCategory==(unsigned int)(HTTAnalysis::boosted)) iCategory = HTTAnalysis::qcd_boosted;
+        else if(iCategory==(unsigned int)(HTTAnalysis::vbf)) iCategory = HTTAnalysis::qcd_vbf;
+        else if(iCategory==(unsigned int)(HTTAnalysis::wjets_jet0)) iCategory = HTTAnalysis::wjets_qcd_jet0;
+        else if(iCategory==(unsigned int)(HTTAnalysis::wjets_boosted)) iCategory = HTTAnalysis::wjets_qcd_boosted;
+        else if(iCategory==(unsigned int)(HTTAnalysis::wjets_vbf)) iCategory = HTTAnalysis::wjets_qcd_vbf;
+        else iCategory = HTTAnalysis::qcd_jet0;
+
+}
+//////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////////
 std::string categoryName(unsigned int iCategory){
         if(iCategory==(int)jet0_low) return "jet0_low";
         else if(iCategory==(int)jet0_high) return "jet0_high";
@@ -144,7 +157,7 @@ std::string categoryName(unsigned int iCategory){
         else if(iCategory==(int)mu_rho) return "CP_MuRho";
         else if(iCategory==(int)pi_pi) return "CP_PiPi";
         else if(iCategory==(int)pi_rho) return "CP_PiRho";
-        else if(iCategory==(int)rho_rho) return "CP_RhoRho";  
+        else if(iCategory==(int)rho_rho) return "CP_RhoRho";
         return "UnknownCategory";
 }
 //////////////////////////////////////////////////////////////////////////////

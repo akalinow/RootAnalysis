@@ -56,12 +56,12 @@ float HTTHistograms::getSampleNormalisation(std::string sampleName){
         float weight = crossSection*presEff/nEventsAnalysed;
         if(presEff<0 || fabs(fabs(crossSection)-1.0)<1e-5) weight = 1.0;
         /*
-        outputStream<<"Sample name: "<<sampleName<<" ";
-        outputStream<<"Xsection: "<<crossSection<<" [pb] "<<" ";
-        outputStream<<"Events analyzed: "<<nEventsAnalysed<<" ";
-        outputStream<<"Reco preselection efficiency: "<<recoPresEff<<" ";
-        outputStream<<"Final weight: "<<weight<<std::endl;
-        */
+           outputStream<<"Sample name: "<<sampleName<<" ";
+           outputStream<<"Xsection: "<<crossSection<<" [pb] "<<" ";
+           outputStream<<"Events analyzed: "<<nEventsAnalysed<<" ";
+           outputStream<<"Reco preselection efficiency: "<<recoPresEff<<" ";
+           outputStream<<"Final weight: "<<weight<<std::endl;
+         */
         return weight;
 }
 /////////////////////////////////////////////////////////
@@ -79,7 +79,8 @@ HTTHistograms::HTTHistograms(TDirectory *myDir, const std::vector<std::string> &
 }
 /////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////
-HTTHistograms::~HTTHistograms(){ }
+HTTHistograms::~HTTHistograms(){
+}
 /////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////
 TH1F *HTTHistograms::get1D_EWK2JetsSum(const std::string& name){
@@ -344,7 +345,7 @@ void HTTHistograms::defineHistograms(){
                 add1DHistogram("h1DPtTemplate",";p_{T}; Events",20,0,100,file_);
                 add1DHistogram("h1DEtaTemplate",";#eta; Events",24,-2.4,2.4,file_);
                 add1DHistogram("h1DDeltaEtaTemplate",";#Delta#eta; Events",50,0,10,file_);
-                add1DHistogram("h1DPhiTemplate",";#phi; Events",12,0,2*M_PI,file_);
+                add1DHistogram("h1DPhiTemplate",";#phi; Events",6,0,2*M_PI,file_);
                 add1DHistogram("h1DCosPhiTemplate",";cos(#phi); Events",10,-1.0,1.0,file_);
                 add1DHistogram("h1DCSVBtagTemplate",";CSV btag; Events",20,0,1,file_);
                 add1DHistogram("h1DIsoTemplate",";Isolation; Events",20,0,0.3,file_);
@@ -381,6 +382,10 @@ void HTTHistograms::defineHistograms(){
 void HTTHistograms::finalizeHistograms(){
 
         AnalysisHistograms::finalizeHistograms();
+
+        plotCPhistograms((int)HTTAnalysis::mu_pi);
+        plotCPhistograms((int)HTTAnalysis::mu_rho);
+        return;
 
         gErrorIgnoreLevel = kBreak;
         //////////////
@@ -1412,7 +1417,7 @@ std::pair<float,float> HTTHistograms::getQCDControlToSignal(unsigned int iCatego
         std::string varName = "MassVis";
         iCategory = HTTAnalysis::qcd_ss_jet0;
         TH1F *hSoupLoose = get1DHistogram(iCategory, varName+"Data", iSystEffect);
-        if(!hSoupLoose) return result;//MuTau has fixed QCD control to signal transfer factors.
+        if(!hSoupLoose) return result; //MuTau has fixed QCD control to signal transfer factors.
 
         TH1F *hMCSumLoose = getMCSum(iCategory, varName, iSystEffect);
 
@@ -1457,7 +1462,7 @@ std::pair<float,float> HTTHistograms::getQCDControlToSignal(unsigned int iCatego
                  <<"\tQCD Tight/Loose` ratio: "<<std::endl
                  <<"\tRatio: "<<sumTight/sumLoose<<" +- "<<ratioErr<<std::endl
                  <<"\tFit: "<<param<<" +- "<<dparam<<std::endl;
-*/
+ */
         result = std::make_pair(sumTight/sumLoose,ratioErr);
         return result;
 }
@@ -1499,8 +1504,8 @@ std::pair<float,float> HTTHistograms::getWNormalisation(unsigned int iCategory, 
         else if(iCategory==(unsigned int)(HTTAnalysis::vbf)) iCategory = HTTAnalysis::wjets_vbf;
         else iCategory = HTTAnalysis::W;
 
-	std::string systEffectName = HTTAnalysis::systEffectName(iCategory, iSystEffect);
-	std::string hNameSuffix =  "_"+std::to_string(iCategory)+systEffectName;
+        std::string systEffectName = HTTAnalysis::systEffectName(iCategory, iSystEffect);
+        std::string hNameSuffix =  "_"+std::to_string(iCategory)+systEffectName;
 
         std::string varName = "MassTrans";
         std::string hName = "h1D" + varName;
@@ -1544,7 +1549,7 @@ TH1F *HTTHistograms::get1DHistogram(unsigned int iCategory, std::string varName,
 
         std::string hName = "h1D" + varName;
         std::string systEffectName = HTTAnalysis::systEffectName(iCategory, iSystEffect);
-	std::string hNameSuffix =  "_"+std::to_string(iCategory)+systEffectName;
+        std::string hNameSuffix =  "_"+std::to_string(iCategory)+systEffectName;
 
         return get1DHistogram(hName+hNameSuffix);
 }
@@ -1554,7 +1559,7 @@ TH1F *HTTHistograms::getMCSum(unsigned int iCategory, std::string varName, unsig
 
         std::string hName = "h1D" + varName;
         std::string systEffectName = HTTAnalysis::systEffectName(iCategory, iSystEffect);
-	std::string hNameSuffix =  "_"+std::to_string(iCategory)+systEffectName;
+        std::string hNameSuffix =  "_"+std::to_string(iCategory)+systEffectName;
 
         TH1F *hWJets = get1D_WJet_Histogram((hName+"WJets"+hNameSuffix));
         TH1F *hDYJetsLowM = get1D_DYJet_Histogram((hName+"DYLowM"+hNameSuffix));
