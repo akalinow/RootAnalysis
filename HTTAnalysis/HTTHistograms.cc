@@ -445,6 +445,21 @@ void HTTHistograms::finalizeHistograms(){
                 }
         }
 
+        ///Make systematic effect histos for effects not yet implemented.
+        for(unsigned int iSystEffect = (unsigned int)HTTAnalysis::ggUp;
+            iSystEffect<(unsigned int)HTTAnalysis::ZmumuDown; ++iSystEffect) {
+
+                for(unsigned int iCategory = (int)HTTAnalysis::jet0;
+                    iCategory<(int)HTTAnalysis::wjets_jet0; ++iCategory) {
+                        plotStack(iCategory, "MassSV", iSystEffect);
+                        plotStack(iCategory, "UnRollTauPtMassVis", iSystEffect);
+                        plotStack(iCategory, "UnRollHiggsPtMassSV", iSystEffect);
+                        plotStack(iCategory, "UnRollMjjMassSV", iSystEffect);
+                        plotStack(iCategory, "UnRollMassSVPhiCP", iSystEffect);
+                        plotStack(iCategory, "UnRollMassSVYCP", iSystEffect);
+                }
+        }
+
         ofstream eventCountFile("eventCount.txt",ios::out | ios::app);
         outputStream<<"HTTHistograms compilation time: "<<__TIMESTAMP__<<std::endl;
         eventCountFile<<outputStream.str();
@@ -898,6 +913,9 @@ void HTTHistograms::plotSingleHistogram(std::string hName){
 /////////////////////////////////////////////////////////
 THStack*  HTTHistograms::plotStack(unsigned int iCategory,
                                    std::string varName, unsigned int iSystEffect){
+
+        unsigned int iSystEffectOriginal = iSystEffect;
+        if(iSystEffect>(unsigned int)HTTAnalysis::DUMMY_SYS) iSystEffect = HTTAnalysis::NOMINAL_SVFIT;
 
         std::string hName = "h1D"+varName;
         std::string categoryName = HTTAnalysis::categoryName(iCategory);
@@ -1370,6 +1388,10 @@ THStack*  HTTHistograms::plotStack(unsigned int iCategory,
         aLine->SetLineColor(1);
         aLine->SetLineWidth(2);
         aLine->Draw();
+
+        hNameSuffix =std::to_string(iCategory);
+        hNameSuffix+="_"+categoryName;
+        hNameSuffix+=HTTAnalysis::systEffectName(iCategory, iSystEffectOriginal);
 
         std::string plotName;
         if(hName.find_last_of("/")<string::npos) plotName = "fig_png/" + hName.substr(hName.find_last_of("/")) + ".png";

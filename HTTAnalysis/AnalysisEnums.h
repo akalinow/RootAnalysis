@@ -51,8 +51,11 @@ enum sysEffects{NOMINAL, NOMINAL_SVFIT,
 		    TTUp, TTDown,
 		    QCDSFUp, QCDSFDown,
 		    WSFUp, WSFDown,
-        //ggUp, ggDown,
-        //ZmumuUp, ZmumuDown,
-		    DUMMY_SYS};
+        DUMMY_SYS,
+        //syst effects not implemented in data should be put at the end.
+        //histograms will be the same as for NOMINAL
+        ggUp, ggDown,
+        ZmumuUp, ZmumuDown
+      };
 }
 #endif
