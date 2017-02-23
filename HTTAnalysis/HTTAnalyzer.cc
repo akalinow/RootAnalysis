@@ -28,10 +28,12 @@ HTTAnalyzer::HTTAnalyzer(const std::string & aName, const std::string & aDecayMo
                 //std::string mcPUFileName = "http://akalinow.web.cern.ch/akalinow/MC_Moriond17_PU25ns_V1.root";
                 puMCFile_ = TFile::Open(mcPUFileName.c_str(),"CACHEREAD");
 
-                categoryDecisions.resize((int)HTTAnalysis::DUMMY_CAT);
+                //TEST categoryDecisions.resize((int)HTTAnalysis::DUMMY_CAT);
 
                 if(aDecayMode=="MuTau") myChannelSpecifics = new MuTauSpecifics(this);
                 else if (aDecayMode=="TauTau") myChannelSpecifics = new TauTauSpecifics(this);
+
+                categoryDecisions.resize(myChannelSpecifics->getCategoryRejester().size());
 
                 nPCAMin_ = 0.003;
 

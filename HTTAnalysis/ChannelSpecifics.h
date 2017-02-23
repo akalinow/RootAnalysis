@@ -39,7 +39,11 @@ virtual std::string getDecayModeName() const {
         return decayModeName;
 }
 
+const std::vector<HTTAnalysis::eventCategory*> & getCategoryRejester() const {return categoryRejester;}
+
 protected:
+
+virtual void defineCategories();
 
 ///Convert RooRealVar functions to histograms
 void initializeCorrections();
@@ -51,6 +55,10 @@ TH2F *h2DMuonIdCorrections, *h2DMuonIsoCorrections, *h2DMuonTrgCorrections;
 TH3F *h3DTauCorrections, *h3DTauTrgOSCorrections, *h3DTauTrgSSCorrections;
 
 std::string decayModeName = "None";
+
+std::vector<HTTAnalysis::eventCategory*> categoryRejester;
+HTTAnalysis::eventCategory *jet0, *boosted, *vbf;
+
 };
 
 

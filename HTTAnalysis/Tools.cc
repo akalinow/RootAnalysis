@@ -34,7 +34,7 @@ float getLumi(){
                         run2016FReReco + run2016GReReco +
                         run2016HPromptReco_v2 + run2016HPromptReco_v3;
 
-        run2016 = 35.87*1E3*1E6;//Updated Run2016 luminosity
+        run2016 = 35.87*1E3*1E6; //Updated Run2016 luminosity
         return run2016*1E-6; //pb-1 data for NTUPLES_05_12_2016
 }
 //////////////////////////////////////////////////////////////////////////////
@@ -191,10 +191,37 @@ std::string systEffectName(unsigned int iCategory, unsigned int iSystEffect){
 //////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////
 unsigned int getControlCategory(unsigned int iCategory, std::string backgroundName){
+/*
+        unsigned int iControlCategory = (unsigned int)HTTAnalysis::jet0;
 
-  
+        if (backgroundName=="WSF") {
+                if(iCategory==(unsigned int)(HTTAnalysis::jet0)) iCategory = HTTAnalysis::wjets_jet0;
+                else if(iCategory==(unsigned int)(HTTAnalysis::boosted)) iCategory = HTTAnalysis::wjets_boosted;
+                else if(iCategory==(unsigned int)(HTTAnalysis::vbf)) iCategory = HTTAnalysis::wjets_vbf;
+                else iCategory = HTTAnalysis::W;
+        }
 
-
+        if(backgroundName=="QCDSF_numerator") {
+                if(iCategory==(unsigned int)(HTTAnalysis::jet0)) iCategory = HTTAnalysis::ss_jet0;
+                else if(iCategory==(unsigned int)(HTTAnalysis::boosted)) iCategory = HTTAnalysis::ss_boosted;
+                else if(iCategory==(unsigned int)(HTTAnalysis::vbf)) iCategory = HTTAnalysis::ss_vbf;
+        }
+        if(backgroundName=="QCDSF_denominator") {
+                if(iCategory==(unsigned int)(HTTAnalysis::jet0)) iCategory = HTTAnalysis::qcd_ss_jet0;
+                else if(iCategory==(unsigned int)(HTTAnalysis::boosted)) iCategory = HTTAnalysis::qcd_ss_boosted;
+                else if(iCategory==(unsigned int)(HTTAnalysis::vbf)) iCategory = HTTAnalysis::qcd_ss_vbf;
+        }
+        if(backgroundName=="QCDshape") {
+                f(iCategory==(unsigned int)(HTTAnalysis::jet0)) iCategory = HTTAnalysis::qcd_jet0;
+                else if(iCategory==(unsigned int)(HTTAnalysis::boosted)) iCategory = HTTAnalysis::qcd_boosted;
+                else if(iCategory==(unsigned int)(HTTAnalysis::vbf)) iCategory = HTTAnalysis::qcd_vbf;
+                else if(iCategory==(unsigned int)(HTTAnalysis::wjets_jet0)) iCategory = HTTAnalysis::wjets_qcd_jet0;
+                else if(iCategory==(unsigned int)(HTTAnalysis::wjets_boosted)) iCategory = HTTAnalysis::wjets_qcd_boosted;
+                else if(iCategory==(unsigned int)(HTTAnalysis::wjets_vbf)) iCategory = HTTAnalysis::wjets_qcd_vbf;
+                else iCategory = HTTAnalysis::qcd_jet0;
+        }
+        return iCategory;
+        */
 }
 //////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////
@@ -239,4 +266,5 @@ bool isLepton(int decMode){
 }
 //////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////
+
 }
