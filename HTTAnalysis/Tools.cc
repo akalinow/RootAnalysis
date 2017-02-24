@@ -172,8 +172,8 @@ std::string systEffectName(unsigned int iSystEffect){
         else if(iSystEffect==(int)WSFDown) return "_WSFUncert_mt_CAT_13TeVDown";
         else if(iSystEffect==(int)ggUp) return "_scale_gg_13TeVUp";
         else if(iSystEffect==(int)ggDown) return "_scale_gg_13TeVDown";
-        else if(iSystEffect==(int)ZmumuUp) return "_htt_zmumuShape_CAT_13TeVUp";
-        else if(iSystEffect==(int)ZmumuDown) return "_htt_zmumuShape_CAT_13TeVUp";
+        else if(iSystEffect==(int)ZmumuUp) return "_CMS_htt_zmumuShape_CAT_13TeVUp";
+        else if(iSystEffect==(int)ZmumuDown) return "_CMS_htt_zmumuShape_CAT_13TeVDown";
         else return "UnknownSystEffect";
 
 }
@@ -192,7 +192,7 @@ std::string systEffectName(unsigned int iCategory, unsigned int iSystEffect){
 //////////////////////////////////////////////////////////////////////////////
 unsigned int getControlCategory(unsigned int iCategory, std::string backgroundName){
 
-  
+
 
 
 }
