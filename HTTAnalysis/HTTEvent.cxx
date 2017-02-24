@@ -142,9 +142,17 @@ void HTTPair::clear(){
 }
 ////////////////////////////////////////////////
 ////////////////////////////////////////////////
+const TLorentzVector & HTTPair::getP4(HTTAnalysis::sysEffects type) const {
+
+  if(p4Vector.size()>(unsigned int)type) return p4Vector[(unsigned int)type];
+  return p4Vector[(unsigned int)type];
+}
+////////////////////////////////////////////////
+////////////////////////////////////////////////
 const TVector2 & HTTPair::getSystScaleMET(HTTAnalysis::sysEffects type) const{
 
-  if(type==HTTAnalysis::NOMINAL || type==HTTAnalysis::NOMINAL_SVFIT) {
+  if(type==HTTAnalysis::NOMINAL || type==HTTAnalysis::NOMINAL_SVFIT ||
+  (unsigned int)type>(unsigned int)HTTAnalysis::DUMMY_SYS) {
     lastSystEffect = type;
     return met;
   }

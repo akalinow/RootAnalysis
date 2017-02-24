@@ -119,8 +119,7 @@ void MuTauSpecifics::testAllCategories(const HTTAnalysis::sysEffects & aSystEffe
         bool boosted = myAnalyzer->aLeg2.getP4(aSystEffect).Perp()>30 && (myAnalyzer->nJets30==1 || (myAnalyzer->nJets30==2 && jetsMass < 300) || myAnalyzer->nJets30 > 2);
         bool vbf = myAnalyzer->aLeg2.getP4(aSystEffect).Perp()>30 && myAnalyzer->nJets30==2 && jetsMass>300;
 
-        bool wSelection = myAnalyzer->aPair.getMTMuon(aSystEffect)>80 && myAnalyzer->aLeg1.getProperty(PropertyEnum::combreliso)<0.15;
-        bool ttSelection =  myAnalyzer->aPair.getMTMuon(aSystEffect)>150;
+        bool wSelection = myAnalyzer->aPair.getMTMuon(aSystEffect)>80 && myAnalyzer->aLeg1.getProperty(PropertyEnum::combreliso)<0.15;    
         bool muonAntiIso = myAnalyzer->aLeg1.getProperty(PropertyEnum::combreliso)>0.15 && myAnalyzer->aLeg1.getProperty(PropertyEnum::combreliso)<0.30;
         bool muonIso = myAnalyzer->aLeg1.getProperty(PropertyEnum::combreliso)<0.15;
 
@@ -158,9 +157,6 @@ void MuTauSpecifics::testAllCategories(const HTTAnalysis::sysEffects & aSystEffe
 
         myAnalyzer->categoryDecisions[(int)HTTAnalysis::mu_pi] = os && muonIso && mtSelection && cpPi;
         myAnalyzer->categoryDecisions[(int)HTTAnalysis::mu_rho] = os && muonIso && mtSelection && cpRho;
-
-        myAnalyzer->categoryDecisions[(int)HTTAnalysis::W] = muonIso && wSelection;
-        myAnalyzer->categoryDecisions[(int)HTTAnalysis::TT] = muonIso && ttSelection;
 
 }
 /////////////////////////////////////////////////////////////////

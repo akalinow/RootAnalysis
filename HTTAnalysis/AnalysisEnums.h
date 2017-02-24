@@ -36,8 +36,7 @@ enum eventCategories {jet0_low, jet0_high,
                     qcd_ss_jet0, qcd_ss_boosted, qcd_ss_vbf,
                     ss_jet0, ss_boosted, ss_vbf,
                     antiIso_jet0, antiIso_boosted, antiIso_vbf,
-                    mu_pi, mu_rho,  pi_pi, pi_rho, rho_rho,
-                    W, TT,
+                    mu_pi, mu_rho,  pi_pi, pi_rho, rho_rho,        
                     DUMMY_CAT //This must be the last one
 };
 

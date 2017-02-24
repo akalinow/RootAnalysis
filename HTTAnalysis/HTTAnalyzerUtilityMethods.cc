@@ -75,7 +75,7 @@ std::string HTTAnalyzer::getSampleNameFromFileName(const EventProxyHTT & myEvent
         else if(fileName.find("VBFHToTauTauM120")!=std::string::npos) sampleName =  "qqHTT120";
         else if(fileName.find("VBFHToTauTauM125")!=std::string::npos) sampleName =  "qqHTT125";
         else if(fileName.find("VBFHToTauTauM130")!=std::string::npos) sampleName =  "qqHTT130";
-
+                               
         else if(fileName.find("WplusHToTauTauM120")!=std::string::npos) sampleName =  "WplusHTT120";
         else if(fileName.find("WplusHToTauTauM125")!=std::string::npos) sampleName =  "WplusHTT125";
         else if(fileName.find("WplusHToTauTauM130")!=std::string::npos) sampleName =  "WplusHTT130";

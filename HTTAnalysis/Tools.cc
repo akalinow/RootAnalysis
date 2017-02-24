@@ -126,8 +126,6 @@ std::string categoryName(unsigned int iCategory){
         else if(iCategory==(int)jet1_high) return "jet1_high";
         else if(iCategory==(int)vbf_low) return "vbf_low";
         else if(iCategory==(int)vbf_high) return "vbf_high";
-        else if(iCategory==(int)W) return "W";
-        else if(iCategory==(int)TT) return "TT";
         else if(iCategory==(int)jet0) return "0jet";
         else if(iCategory==(int)boosted) return "boosted";
         else if(iCategory==(int)vbf) return "vbf";

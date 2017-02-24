@@ -313,7 +313,7 @@ class HTTPair{
   void setMETMatrix(float m00, float m01, float m10, float m11) {metMatrix.push_back(m00); metMatrix.push_back(m01); metMatrix.push_back(m10); metMatrix.push_back(m11);}
 
   ///Data member getters.
-  const TLorentzVector & getP4(HTTAnalysis::sysEffects type = HTTAnalysis::NOMINAL) const {return p4Vector[(unsigned int)type];}
+  const TLorentzVector & getP4(HTTAnalysis::sysEffects type = HTTAnalysis::NOMINAL) const;
 
   const TVector2 & getMET(HTTAnalysis::sysEffects type = HTTAnalysis::NOMINAL) const {return getSystScaleMET(type);}
 
