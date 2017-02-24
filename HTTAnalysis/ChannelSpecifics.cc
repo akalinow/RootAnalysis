@@ -37,8 +37,18 @@ ChannelSpecifics::~ChannelSpecifics(){
 void ChannelSpecifics::defineCategories(){
 
 jet0 = new HTTAnalysis::eventCategory("jet0", categoryRejester);
-boosted = new HTTAnalysis::eventCategory("jet0", categoryRejester);
-vbf = new HTTAnalysis::eventCategory("jet0", categoryRejester);
+boosted = new HTTAnalysis::eventCategory("boosted", categoryRejester);
+vbf = new HTTAnalysis::eventCategory("vbf", categoryRejester);
+
+antiIso_jet0 = new HTTAnalysis::eventCategory("antiIso_jet0", categoryRejester);
+antiIso_boosted = new HTTAnalysis::eventCategory("antiIso_boosted", categoryRejester);
+antiIso_vbf = new HTTAnalysis::eventCategory("antiIso_vbf", categoryRejester);
+
+mu_pi = new HTTAnalysis::eventCategory("mu_pi", categoryRejester);
+mu_rho = new HTTAnalysis::eventCategory("mu_rho", categoryRejester);
+pi_pi = new HTTAnalysis::eventCategory("pi_pi", categoryRejester);
+pi_rho = new HTTAnalysis::eventCategory("pi_pi", categoryRejester);
+rho_rho = new HTTAnalysis::eventCategory("pi_pi", categoryRejester);
 
 }
 /////////////////////////////////////////////////////////////////

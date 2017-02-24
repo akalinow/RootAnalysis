@@ -32,8 +32,8 @@ HTTAnalyzer::HTTAnalyzer(const std::string & aName, const std::string & aDecayMo
 
                 if(aDecayMode=="MuTau") myChannelSpecifics = new MuTauSpecifics(this);
                 else if (aDecayMode=="TauTau") myChannelSpecifics = new TauTauSpecifics(this);
-
-                categoryDecisions.resize(myChannelSpecifics->getCategoryRejester().size());
+                myNumberOfCategories = myChannelSpecifics->getCategoryRejester().size();
+                categoryDecisions.resize(myNumberOfCategories);
 
                 nPCAMin_ = 0.003;
 
@@ -72,7 +72,7 @@ void HTTAnalyzer::initialize(TDirectory* aDir,
 //////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////
 void HTTAnalyzer::finalize(){
-        myHistos_->finalizeHistograms();
+        myHistos_->finalizeHistograms(myChannelSpecifics->getCategoryRejester());
 }
 //////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////
@@ -87,7 +87,6 @@ std::vector<HTTParticle> HTTAnalyzer::getSeparatedJets(const EventProxyHTT & myE
                 bool loosePFJetID = aJet.getProperty(PropertyEnum::PFjetID)>=1;
                 if(dRLeg1>deltaR && dRLeg2>deltaR && loosePFJetID) separatedJets.push_back(aJet);
         }
-
         return separatedJets;
 }
 //////////////////////////////////////////////////////////////////////////////
@@ -113,8 +112,7 @@ void HTTAnalyzer::setAnalysisObjects(const EventProxyHTT & myEventProxy){
 }
 //////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////
-void HTTAnalyzer::addBranch(TTree *tree){ /*tree->Branch("muonPt",&muonPt);*/
-}
+void HTTAnalyzer::addBranch(TTree *tree){ /*tree->Branch("muonPt",&muonPt);*/}
 //////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////
 void HTTAnalyzer::fillControlHistos(const std::string & hNameSuffix, float eventWeight,
@@ -215,10 +213,10 @@ bool HTTAnalyzer::fillVertices(const std::string & sysType, float eventWeight){
 }
 //////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////
-bool HTTAnalyzer::passCategory(const HTTAnalysis::eventCategories & aCategory){
+bool HTTAnalyzer::passCategory(unsigned int iCategory){
 
         if(categoryDecisions.size()==0) return false;
-        else return categoryDecisions[(int)aCategory];
+        else return categoryDecisions[iCategory];
 
         return false;
 }
@@ -253,14 +251,10 @@ bool HTTAnalyzer::analyze(const EventProxyBase& iEvent){
 
         if(goodGenDecayMode) fillGenDecayPlaneAngle(sampleName+"_GenNoOfflineSel", eventWeight);
 
-        bool SS = aLeg2.getCharge()*aLeg1.getCharge() == 1;
-        bool OS = aLeg2.getCharge()*aLeg1.getCharge() == -1;
-
         std::string categorySuffix = "";
         std::string systEffectName = "";
         for(unsigned int iSystEffect = (unsigned int)HTTAnalysis::NOMINAL_SVFIT;
             iSystEffect<=(unsigned int)HTTAnalysis::ZmumuDown; ++iSystEffect) {
-
 
                 HTTAnalysis::sysEffects aSystEffect = static_cast<HTTAnalysis::sysEffects>(iSystEffect);
 
@@ -276,10 +270,9 @@ bool HTTAnalyzer::analyze(const EventProxyBase& iEvent){
 
                 myChannelSpecifics->testAllCategories(aSystEffect);
 
-                for(unsigned int iCategory = HTTAnalysis::jet0; iCategory<HTTAnalysis::DUMMY_CAT; ++iCategory) {
-                        HTTAnalysis::eventCategories categoryType = static_cast<HTTAnalysis::eventCategories>(iCategory);
+                for(unsigned int iCategory = 0; iCategory<myNumberOfCategories; ++iCategory) {
 
-                        if(!passCategory(categoryType)) continue;
+                        if(!passCategory(iCategory)) continue;
 
                         categorySuffix = std::to_string(iCategory);
                         systEffectName = HTTAnalysis::systEffectName(iCategory, iSystEffect);

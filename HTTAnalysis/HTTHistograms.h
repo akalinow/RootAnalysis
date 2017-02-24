@@ -21,7 +21,7 @@ class HTTHistograms: public AnalysisHistograms {
 
   virtual ~HTTHistograms();
 
-  void finalizeHistograms();
+  void finalizeHistograms(const std::vector<const HTTAnalysis::eventCategory*> & aCategoryRejester);
 
   using AnalysisHistograms::get1DHistogram;
 
@@ -122,7 +122,7 @@ class HTTHistograms: public AnalysisHistograms {
   //histogram name, e.g. including h1D prefix.
   void plotSingleHistogram(std::string hName);
 
-  float muTauDYScale, mumuDYScale;
+  std::vector<const HTTAnalysis::eventCategory*> myCategoryRejester;
 
   std::stringstream outputStream;
 

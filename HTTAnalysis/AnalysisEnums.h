@@ -40,23 +40,18 @@ enum eventCategories {jet0_low, jet0_high,
                     qcd_ss_jet0, qcd_ss_boosted, qcd_ss_vbf,
                     ss_jet0, ss_boosted, ss_vbf,
                     antiIso_jet0, antiIso_boosted, antiIso_vbf,
-                    mu_pi, mu_rho,  pi_pi, pi_rho, rho_rho,        
+                    mu_pi, mu_rho,  pi_pi, pi_rho, rho_rho,
                     DUMMY_CAT //This must be the last one
 };
 
 class eventCategory{
   public:
 
-    eventCategory(const std::string & aName, std::vector<eventCategory*> & categoryRejester){
+    eventCategory(const std::string & aName, std::vector<const eventCategory*> & categoryRejester){
       myName = aName;
 
       myId = categoryRejester.size();
       categoryRejester.push_back(this);
-
-      std::cout<<__func__<<" "
-      <<categoryRejester.size()
-      <<" name: "<<myName
-      <<std::endl;
 
       myWCategory = 0;
       myQCDCategory = 0;
@@ -75,7 +70,7 @@ class eventCategory{
       else return this;
     };
 
-    std::string name() const {return myName;}
+    const std::string & name() const {return myName;}
 
   private:
 

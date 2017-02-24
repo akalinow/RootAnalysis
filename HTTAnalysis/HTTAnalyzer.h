@@ -61,7 +61,7 @@ class HTTAnalyzer: public Analyzer{
   void setAnalysisObjects(const EventProxyHTT & myEventProxy);
 
   ///Check it the event passes given category selections.
-  bool passCategory(const HTTAnalysis::eventCategories & aCategory);
+  bool passCategory(unsigned int iCategory);
 
   ///Return human readable sample name (Data, WJets, etc).
   std::string getSampleName(const EventProxyHTT & myEventProxy);
@@ -171,6 +171,7 @@ class HTTAnalyzer: public Analyzer{
   int nJets30;
   int nJetsInGap30;
   std::vector<bool> categoryDecisions;
+  unsigned int myNumberOfCategories;
 
   //cut on nPCA
   float nPCAMin_;

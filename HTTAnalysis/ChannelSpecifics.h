@@ -39,7 +39,7 @@ virtual std::string getDecayModeName() const {
         return decayModeName;
 }
 
-const std::vector<HTTAnalysis::eventCategory*> & getCategoryRejester() const {return categoryRejester;}
+const std::vector<const HTTAnalysis::eventCategory*> & getCategoryRejester() const {return categoryRejester;}
 
 protected:
 
@@ -56,8 +56,10 @@ TH3F *h3DTauCorrections, *h3DTauTrgOSCorrections, *h3DTauTrgSSCorrections;
 
 std::string decayModeName = "None";
 
-std::vector<HTTAnalysis::eventCategory*> categoryRejester;
+std::vector<const HTTAnalysis::eventCategory*> categoryRejester;
 HTTAnalysis::eventCategory *jet0, *boosted, *vbf;
+HTTAnalysis::eventCategory *antiIso_jet0, *antiIso_boosted, *antiIso_vbf;
+HTTAnalysis::eventCategory *mu_pi, *mu_rho, *pi_pi, *pi_rho, *rho_rho;
 
 };
 

@@ -122,7 +122,7 @@ void MuTauSpecifics::testAllCategories(const HTTAnalysis::sysEffects & aSystEffe
         bool boosted = myAnalyzer->aLeg2.getP4(aSystEffect).Perp()>30 && (myAnalyzer->nJets30==1 || (myAnalyzer->nJets30==2 && jetsMass < 300) || myAnalyzer->nJets30 > 2);
         bool vbf = myAnalyzer->aLeg2.getP4(aSystEffect).Perp()>30 && myAnalyzer->nJets30==2 && jetsMass>300;
 
-        bool wSelection = myAnalyzer->aPair.getMTMuon(aSystEffect)>80 && myAnalyzer->aLeg1.getProperty(PropertyEnum::combreliso)<0.15;    
+        bool wSelection = myAnalyzer->aPair.getMTMuon(aSystEffect)>80 && myAnalyzer->aLeg1.getProperty(PropertyEnum::combreliso)<0.15;
         bool muonAntiIso = myAnalyzer->aLeg1.getProperty(PropertyEnum::combreliso)>0.15 && myAnalyzer->aLeg1.getProperty(PropertyEnum::combreliso)<0.30;
         bool muonIso = myAnalyzer->aLeg1.getProperty(PropertyEnum::combreliso)<0.15;
 
@@ -139,32 +139,56 @@ void MuTauSpecifics::testAllCategories(const HTTAnalysis::sysEffects & aSystEffe
         myAnalyzer->categoryDecisions[(int)HTTAnalysis::vbf_high] = os && muonIso && mtSelection && vbf_high;
 */
 
+        //Main categories
         myAnalyzer->categoryDecisions[ChannelSpecifics::jet0->id()] = os && muonIso && mtSelection && jet0;
         myAnalyzer->categoryDecisions[ChannelSpecifics::boosted->id()] = os && muonIso && mtSelection && boosted;
         myAnalyzer->categoryDecisions[ChannelSpecifics::vbf->id()] = os && muonIso && mtSelection && vbf;
+        myAnalyzer->categoryDecisions[ChannelSpecifics::antiIso_jet0->id()] = os && muonAntiIso && jet0;
+        myAnalyzer->categoryDecisions[ChannelSpecifics::antiIso_boosted->id()] = os && muonAntiIso && boosted;
+        myAnalyzer->categoryDecisions[ChannelSpecifics::antiIso_vbf->id()] = os && muonAntiIso && vbf;
+        myAnalyzer->categoryDecisions[ChannelSpecifics::mu_pi->id()] = os && muonIso && mtSelection && cpPi;
+        myAnalyzer->categoryDecisions[ChannelSpecifics::mu_rho->id()] = os && muonIso && mtSelection && cpRho;
 
+        //W control region
         myAnalyzer->categoryDecisions[ChannelSpecifics::jet0->wControl()->id()] = os && muonIso && wSelection && jet0;
         myAnalyzer->categoryDecisions[ChannelSpecifics::boosted->wControl()->id()] = os && muonIso && wSelection && boosted;
         myAnalyzer->categoryDecisions[ChannelSpecifics::vbf->wControl()->id()] = os && muonIso && wSelection && vbf;
+        myAnalyzer->categoryDecisions[ChannelSpecifics::antiIso_jet0->wControl()->id()] = os && muonAntiIso && wSelection && jet0;
+        myAnalyzer->categoryDecisions[ChannelSpecifics::antiIso_boosted->wControl()->id()] = os && muonAntiIso && wSelection && boosted;
+        myAnalyzer->categoryDecisions[ChannelSpecifics::antiIso_vbf->wControl()->id()] = os && muonAntiIso && wSelection && vbf;
+        myAnalyzer->categoryDecisions[ChannelSpecifics::mu_pi->wControl()->id()] = os && muonIso && wSelection && cpPi;
+        myAnalyzer->categoryDecisions[ChannelSpecifics::mu_rho->wControl()->id()] = os && muonIso && wSelection && cpRho;
 
+        ///QCD region in W control region
         myAnalyzer->categoryDecisions[ChannelSpecifics::jet0->wControl()->qcdControl()->id()] = ss && muonIso && wSelection && jet0;
         myAnalyzer->categoryDecisions[ChannelSpecifics::boosted->wControl()->qcdControl()->id()] = ss && muonIso && wSelection && boosted;
         myAnalyzer->categoryDecisions[ChannelSpecifics::vbf->wControl()->qcdControl()->id()] = ss && muonIso && wSelection && vbf;
+        myAnalyzer->categoryDecisions[ChannelSpecifics::antiIso_jet0->wControl()->qcdControl()->id()] = ss && muonAntiIso && wSelection && jet0;
+        myAnalyzer->categoryDecisions[ChannelSpecifics::antiIso_boosted->wControl()->qcdControl()->id()] = ss && muonAntiIso && wSelection && boosted;
+        myAnalyzer->categoryDecisions[ChannelSpecifics::antiIso_vbf->wControl()->qcdControl()->id()] = ss && muonAntiIso && wSelection && vbf;
+        myAnalyzer->categoryDecisions[ChannelSpecifics::mu_pi->wControl()->qcdControl()->id()] = ss && muonIso && wSelection && cpPi;
+        myAnalyzer->categoryDecisions[ChannelSpecifics::mu_rho->wControl()->qcdControl()->id()] = ss && muonIso && wSelection && cpRho;
 
+        ///QCD region
         myAnalyzer->categoryDecisions[ChannelSpecifics::jet0->qcdControl()->id()] = ss && muonIso && mtSelection && jet0;
         myAnalyzer->categoryDecisions[ChannelSpecifics::boosted->qcdControl()->id()] = ss && muonIso && mtSelection && boosted;
         myAnalyzer->categoryDecisions[ChannelSpecifics::vbf->qcdControl()->id()] = ss && muonIso && mtSelection && vbf;
+        myAnalyzer->categoryDecisions[ChannelSpecifics::antiIso_jet0->qcdControl()->id()] = ss && muonAntiIso && jet0;
+        myAnalyzer->categoryDecisions[ChannelSpecifics::antiIso_boosted->qcdControl()->id()] = ss && muonAntiIso && boosted;
+        myAnalyzer->categoryDecisions[ChannelSpecifics::antiIso_vbf->qcdControl()->id()] = ss && muonAntiIso && vbf;
+        myAnalyzer->categoryDecisions[ChannelSpecifics::mu_pi->qcdControl()->id()] = ss && muonIso && mtSelection && cpPi;
+        myAnalyzer->categoryDecisions[ChannelSpecifics::mu_rho->qcdControl()->id()] = ss && muonIso && mtSelection && cpRho;
 
+        ///W region in QCD region
         myAnalyzer->categoryDecisions[ChannelSpecifics::jet0->qcdControl()->wControl()->id()] = ss && muonIso && wSelection && jet0;
         myAnalyzer->categoryDecisions[ChannelSpecifics::boosted->qcdControl()->wControl()->id()] = ss && muonIso && wSelection && boosted;
         myAnalyzer->categoryDecisions[ChannelSpecifics::vbf->qcdControl()->wControl()->id()] = ss && muonIso && wSelection && vbf;
+        myAnalyzer->categoryDecisions[ChannelSpecifics::antiIso_jet0->qcdControl()->wControl()->id()] = ss && muonAntiIso && jet0;
+        myAnalyzer->categoryDecisions[ChannelSpecifics::antiIso_boosted->qcdControl()->wControl()->id()] = ss && muonAntiIso && boosted;
+        myAnalyzer->categoryDecisions[ChannelSpecifics::antiIso_vbf->qcdControl()->wControl()->id()] = ss && muonAntiIso && vbf;
+        myAnalyzer->categoryDecisions[ChannelSpecifics::mu_pi->qcdControl()->wControl()->id()] = ss && muonIso && wSelection && cpPi;
+        myAnalyzer->categoryDecisions[ChannelSpecifics::mu_rho->qcdControl()->wControl()->id()] = ss && muonIso && wSelection && cpRho;
 
-        myAnalyzer->categoryDecisions[(int)HTTAnalysis::antiIso_jet0] = os && muonAntiIso && jet0;
-        myAnalyzer->categoryDecisions[(int)HTTAnalysis::antiIso_boosted] = os && muonAntiIso && boosted;
-        myAnalyzer->categoryDecisions[(int)HTTAnalysis::antiIso_vbf] = os && muonAntiIso && vbf;
-
-        myAnalyzer->categoryDecisions[(int)HTTAnalysis::mu_pi] = os && muonIso && mtSelection && cpPi;
-        myAnalyzer->categoryDecisions[(int)HTTAnalysis::mu_rho] = os && muonIso && mtSelection && cpRho;
 }
 /////////////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////////////

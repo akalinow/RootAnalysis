@@ -379,19 +379,21 @@ void HTTHistograms::defineHistograms(){
 }
 /////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////
-void HTTHistograms::finalizeHistograms(){
+void HTTHistograms::finalizeHistograms(const std::vector<const HTTAnalysis::eventCategory*> & aCategoryRejester){
 
         AnalysisHistograms::finalizeHistograms();
+
+        myCategoryRejester  = aCategoryRejester;
+        unsigned int myNumberOfCategories = myCategoryRejester.size();
 
         gErrorIgnoreLevel = kBreak;
         //////////////
         ///Control regions plots
-        for(unsigned int iCategory = (int)HTTAnalysis::jet0;
-            iCategory<(int)HTTAnalysis::boosted; ++iCategory) {
+        for(unsigned int iCategory = 0; iCategory<1; ++iCategory) {
 
                 plotCPhistograms(iCategory);
 
-                plotStack(iCategory, "MassSV");            
+                plotStack(iCategory, "MassSV");
                 plotStack(iCategory, "MassVis");
                 plotStack(iCategory, "MassTrans");
                 plotStack(iCategory, "UnRollTauPtMassVis");
@@ -437,8 +439,7 @@ void HTTHistograms::finalizeHistograms(){
 
               if(iSystEffect==(unsigned int)HTTAnalysis::DUMMY_SYS) continue;
 
-                for(unsigned int iCategory = (int)HTTAnalysis::jet0;
-                    iCategory<(int)HTTAnalysis::wjets_jet0; ++iCategory) {
+                for(unsigned int iCategory = 0; iCategory<3; ++iCategory) {
                         plotStack(iCategory, "MassSV", iSystEffect);
                         plotStack(iCategory, "UnRollTauPtMassVis", iSystEffect);
                         plotStack(iCategory, "UnRollHiggsPtMassSV", iSystEffect);
@@ -906,7 +907,7 @@ THStack*  HTTHistograms::plotStack(unsigned int iCategory,
         if(iSystEffect>(unsigned int)HTTAnalysis::DUMMY_SYS) iSystEffect = HTTAnalysis::NOMINAL_SVFIT;
 
         std::string hName = "h1D"+varName;
-        std::string categoryName = HTTAnalysis::categoryName(iCategory);
+        std::string categoryName = myCategoryRejester[iCategory]->name();
         std::string systEffectName = HTTAnalysis::systEffectName(iCategory, iSystEffect);
         std::string hNameSuffix = "_"+std::to_string(iCategory)+systEffectName;
 
@@ -1030,9 +1031,6 @@ THStack*  HTTHistograms::plotStack(unsigned int iCategory,
         if(hWminusHiggs120) hWminusHiggs120->SetDirectory(hSoup->GetDirectory());
         if(hWminusHiggs125) hWminusHiggs125->SetDirectory(hSoup->GetDirectory());
         if(hWminusHiggs130) hWminusHiggs130->SetDirectory(hSoup->GetDirectory());
-
-        hWplusHiggs120->Print();
-        std::cout<<"directory: "<<hWplusHiggs120->GetDirectory()<<std::endl;
 
         TH1F *hHiggs = (TH1F*)hggHiggs125->Clone("hHiggs");
         hHiggs->Reset();
@@ -1427,13 +1425,13 @@ std::pair<float,float> HTTHistograms::getQCDControlToSignal(unsigned int iCatego
         if(iSystEffect==(unsigned int)HTTAnalysis::QCDSFDown) result.first-=result.second;
 
         std::string varName = "MassVis";
-        iCategory = HTTAnalysis::qcd_ss_jet0;
+        iCategory = myCategoryRejester[iCategory]->qcdControl()->id();//  HTTAnalysis::qcd_ss_jet0;
         TH1F *hSoupLoose = get1DHistogram(iCategory, varName+"Data", iSystEffect);
         if(!hSoupLoose) return result; //MuTau has fixed QCD control to signal transfer factors.
 
         TH1F *hMCSumLoose = getMCSum(iCategory, varName, iSystEffect);
 
-        iCategory = HTTAnalysis::ss_jet0;
+        iCategory = myCategoryRejester[iCategory]->id();//HTTAnalysis::ss_jet0;
         TH1F *hSoupTight = get1DHistogram(iCategory, varName+"Data", iSystEffect);
         TH1F *hMCSumTight = getMCSum(iCategory, varName, iSystEffect);
 
@@ -1459,7 +1457,7 @@ std::pair<float,float> HTTHistograms::getQCDControlToSignal(unsigned int iCatego
         hSoupTight->Draw();
         //hSoupTight->Fit("line","","",100,250);
 
-        std::string categoryName = HTTAnalysis::categoryName(iCategory);
+        std::string categoryName = myCategoryRejester[iCategory]->name();
         std::string systEffectName = HTTAnalysis::systEffectName(iCategory, iSystEffect);
         std::string hNameSuffix = "_"+std::to_string(iCategory);
         std::string plotName = varName+"_"+hNameSuffix+"_"+systEffectName;
@@ -1489,15 +1487,7 @@ TH1F* HTTHistograms::getQCDbackground(unsigned int iCategory,
         hName+=systEffectName;
 
         float qcdScale = getQCDControlToSignal(iCategory, iSystEffect).first;
-
-        if(iCategory==(unsigned int)(HTTAnalysis::jet0)) iCategory = HTTAnalysis::qcd_jet0;
-        else if(iCategory==(unsigned int)(HTTAnalysis::boosted)) iCategory = HTTAnalysis::qcd_boosted;
-        else if(iCategory==(unsigned int)(HTTAnalysis::vbf)) iCategory = HTTAnalysis::qcd_vbf;
-        else if(iCategory==(unsigned int)(HTTAnalysis::wjets_jet0)) iCategory = HTTAnalysis::wjets_qcd_jet0;
-        else if(iCategory==(unsigned int)(HTTAnalysis::wjets_boosted)) iCategory = HTTAnalysis::wjets_qcd_boosted;
-        else if(iCategory==(unsigned int)(HTTAnalysis::wjets_vbf)) iCategory = HTTAnalysis::wjets_qcd_vbf;
-        else iCategory = HTTAnalysis::qcd_jet0;
-
+        iCategory = myCategoryRejester[iCategory]->qcdControl()->id();
         TH1F *hMCSum = getMCSum(iCategory, varName, iSystEffect);
         TH1F *hSoup = get1DHistogram(iCategory, varName+"Data", iSystEffect);
         if(!hSoup) return 0;
@@ -1511,11 +1501,7 @@ TH1F* HTTHistograms::getQCDbackground(unsigned int iCategory,
 /////////////////////////////////////////////////////////
 std::pair<float,float> HTTHistograms::getWNormalisation(unsigned int iCategory, unsigned int iSystEffect){
 
-        if(iCategory==(unsigned int)(HTTAnalysis::jet0)) iCategory = HTTAnalysis::wjets_jet0;
-        else if(iCategory==(unsigned int)(HTTAnalysis::boosted)) iCategory = HTTAnalysis::wjets_boosted;
-        else if(iCategory==(unsigned int)(HTTAnalysis::vbf)) iCategory = HTTAnalysis::wjets_vbf;
-        else iCategory = HTTAnalysis::wjets_jet0;
-
+        iCategory = myCategoryRejester[iCategory]->wControl()->id();
         std::string systEffectName = HTTAnalysis::systEffectName(iCategory, iSystEffect);
         std::string hNameSuffix =  "_"+std::to_string(iCategory)+systEffectName;
 
