@@ -39,7 +39,7 @@ void AnalysisHistograms::addProfile(const std::string& name,
 
   hTmp->SetDirectory(0);
 
-  if(iThread==0 && name.find("Template")==std::string::npos) hTmp->SetDirectory(myDir);
+  //TEST if(iThread==0 && name.find("Template")==std::string::npos) hTmp->SetDirectory(myDir);
   if(name.find("Template")!=std::string::npos) iThread = AnalysisHistograms::maxThreads-1;
 
   if(myProfiles_[iThread].find(name)==myProfiles_[iThread].end()) myProfiles_[iThread][name] = hTmp;
@@ -79,7 +79,7 @@ void  AnalysisHistograms::add1DHistogram(const std::string& name, const std::str
   hTmp->Sumw2();
   hTmp->SetDirectory(0);
 
-  if(iThread==0 && name.find("Template")==std::string::npos) hTmp->SetDirectory(myDir);
+  //TEST if(iThread==0 && name.find("Template")==std::string::npos) hTmp->SetDirectory(myDir);
   if(name.find("Template")!=std::string::npos) iThread = AnalysisHistograms::maxThreads-1;
 
   if(my1Dhistograms_[iThread].find(name)==my1Dhistograms_[iThread].end()) my1Dhistograms_[iThread][name] = hTmp;
@@ -98,7 +98,7 @@ void  AnalysisHistograms::add1DHistogram(const std::string& name, const std::str
   hTmp->Sumw2();
   hTmp->SetDirectory(0);
 
-  if(iThread==0 && name.find("Template")==std::string::npos) hTmp->SetDirectory(myDir);
+  //TEST if(iThread==0 && name.find("Template")==std::string::npos) hTmp->SetDirectory(myDir);
   if(name.find("Template")!=std::string::npos) iThread = AnalysisHistograms::maxThreads-1;
 
   if(my1Dhistograms_[iThread].find(name)==my1Dhistograms_[iThread].end()) my1Dhistograms_[iThread][name] = hTmp;
@@ -118,7 +118,7 @@ void  AnalysisHistograms::add2DHistogram(const std::string& name, const std::str
   hTmp->Sumw2();
   hTmp->SetDirectory(0);
 
-  if(iThread==0 && name.find("Template")==std::string::npos) hTmp->SetDirectory(myDir);
+  //TEST if(iThread==0 && name.find("Template")==std::string::npos) hTmp->SetDirectory(myDir);
   if(name.find("Template")!=std::string::npos) iThread = AnalysisHistograms::maxThreads-1;
 
   if(my2Dhistograms_[iThread].find(name)==my2Dhistograms_[iThread].end()) my2Dhistograms_[iThread][name] = hTmp;
@@ -137,7 +137,7 @@ void  AnalysisHistograms::add2DHistogram(const std::string& name, const std::str
   hTmp->Sumw2();
   hTmp->SetDirectory(0);
 
-  if(iThread==0 && name.find("Template")==std::string::npos) hTmp->SetDirectory(myDir);
+  //TEST if(iThread==0 && name.find("Template")==std::string::npos) hTmp->SetDirectory(myDir);
   if(name.find("Template")!=std::string::npos) iThread = AnalysisHistograms::maxThreads-1;
 
   if(my2Dhistograms_[iThread].find(name)==my2Dhistograms_[iThread].end()) my2Dhistograms_[iThread][name] = hTmp;
@@ -157,7 +157,7 @@ void  AnalysisHistograms::add2DHistogram(const std::string& name, const std::str
   hTmp->Sumw2();
   hTmp->SetDirectory(0);
 
-  if(iThread==0 && name.find("Template")==std::string::npos) hTmp->SetDirectory(myDir);
+  //TEST if(iThread==0 && name.find("Template")==std::string::npos) hTmp->SetDirectory(myDir);
   if(name.find("Template")!=std::string::npos) iThread = AnalysisHistograms::maxThreads-1;
 
   if(my2Dhistograms_[iThread].find(name)==my2Dhistograms_[iThread].end()) my2Dhistograms_[iThread][name] = hTmp;
@@ -177,7 +177,7 @@ void  AnalysisHistograms::add3DHistogram(const std::string& name, const std::str
   hTmp->Sumw2();
   hTmp->SetDirectory(0);
 
-  if(iThread==0 && name.find("Template")==std::string::npos) hTmp->SetDirectory(myDir);
+  //TEST if(iThread==0 && name.find("Template")==std::string::npos) hTmp->SetDirectory(myDir);
   if(name.find("Template")!=std::string::npos) iThread = AnalysisHistograms::maxThreads-1;
 
   if(my3Dhistograms_[iThread].find(name)==my3Dhistograms_[iThread].end()) my3Dhistograms_[iThread][name] = hTmp;
@@ -198,7 +198,7 @@ void  AnalysisHistograms::add3DHistogram(const std::string& name, const std::str
   hTmp->Sumw2();
   hTmp->SetDirectory(0);
 
-  if(iThread==0 && name.find("Template")==std::string::npos) hTmp->SetDirectory(myDir);
+  //TEST if(iThread==0 && name.find("Template")==std::string::npos) hTmp->SetDirectory(myDir);
   if(name.find("Template")!=std::string::npos) iThread = AnalysisHistograms::maxThreads-1;
 
   if(my3Dhistograms_[iThread].find(name)==my3Dhistograms_[iThread].end()) my3Dhistograms_[iThread][name] = hTmp;

@@ -391,7 +391,7 @@ void HTTHistograms::finalizeHistograms(){
 
                 plotCPhistograms(iCategory);
 
-                plotStack(iCategory, "MassSV");
+                plotStack(iCategory, "MassSV");            
                 plotStack(iCategory, "MassVis");
                 plotStack(iCategory, "MassTrans");
                 plotStack(iCategory, "UnRollTauPtMassVis");
@@ -414,7 +414,7 @@ void HTTHistograms::finalizeHistograms(){
                 plotStack(iCategory, "PhiLeg2");
 
                 plotStack(iCategory, "PtMET");
-                plotStack(iCategory, "PtMuLeg2MET");
+                plotStack(iCategory, "PtLeg1Leg2MET");
 
                 plotStack(iCategory, "StatsNJ30");
                 plotStack(iCategory, "PtLeadingJet");
@@ -433,22 +433,9 @@ void HTTHistograms::finalizeHistograms(){
 
         ///Make systematic effect histos.
         for(unsigned int iSystEffect = (unsigned int)HTTAnalysis::NOMINAL_SVFIT;
-            iSystEffect<(unsigned int)HTTAnalysis::DUMMY_SYS; ++iSystEffect) {
+            iSystEffect<=(unsigned int)HTTAnalysis::ZmumuDown; ++iSystEffect) {
 
-                for(unsigned int iCategory = (int)HTTAnalysis::jet0;
-                    iCategory<(int)HTTAnalysis::wjets_jet0; ++iCategory) {
-                        plotStack(iCategory, "MassSV", iSystEffect);
-                        plotStack(iCategory, "UnRollTauPtMassVis", iSystEffect);
-                        plotStack(iCategory, "UnRollHiggsPtMassSV", iSystEffect);
-                        plotStack(iCategory, "UnRollMjjMassSV", iSystEffect);
-                        plotStack(iCategory, "UnRollMassSVPhiCP", iSystEffect);
-                        plotStack(iCategory, "UnRollMassSVYCP", iSystEffect);
-                }
-        }
-
-        ///Make systematic effect histos for effects not yet implemented.
-        for(unsigned int iSystEffect = (unsigned int)HTTAnalysis::ggUp;
-            iSystEffect<(unsigned int)HTTAnalysis::ZmumuDown; ++iSystEffect) {
+              if(iSystEffect==(unsigned int)HTTAnalysis::DUMMY_SYS) continue;
 
                 for(unsigned int iCategory = (int)HTTAnalysis::jet0;
                     iCategory<(int)HTTAnalysis::wjets_jet0; ++iCategory) {
@@ -967,7 +954,11 @@ THStack*  HTTHistograms::plotStack(unsigned int iCategory,
         ///Protection against null pointers
         ///Null pointers happen when sample was not read, or there were no
         ///events passing particular selection.
-        if(!hSoup) return 0;
+        if(!hSoup) {
+                std::cout<<"No data events for "<<hName<<" "<<hNameSuffix<<std::endl;
+                return 0;
+        }
+        hSoup->SetDirectory(myDirCopy); //TEST
 
         TH1F *hEmpty = (TH1F*)hSoup->Clone("hEmpty");
         hEmpty->Reset();
@@ -1039,6 +1030,9 @@ THStack*  HTTHistograms::plotStack(unsigned int iCategory,
         if(hWminusHiggs120) hWminusHiggs120->SetDirectory(hSoup->GetDirectory());
         if(hWminusHiggs125) hWminusHiggs125->SetDirectory(hSoup->GetDirectory());
         if(hWminusHiggs130) hWminusHiggs130->SetDirectory(hSoup->GetDirectory());
+
+        hWplusHiggs120->Print();
+        std::cout<<"directory: "<<hWplusHiggs120->GetDirectory()<<std::endl;
 
         TH1F *hHiggs = (TH1F*)hggHiggs125->Clone("hHiggs");
         hHiggs->Reset();
@@ -1520,7 +1514,7 @@ std::pair<float,float> HTTHistograms::getWNormalisation(unsigned int iCategory, 
         if(iCategory==(unsigned int)(HTTAnalysis::jet0)) iCategory = HTTAnalysis::wjets_jet0;
         else if(iCategory==(unsigned int)(HTTAnalysis::boosted)) iCategory = HTTAnalysis::wjets_boosted;
         else if(iCategory==(unsigned int)(HTTAnalysis::vbf)) iCategory = HTTAnalysis::wjets_vbf;
-        else iCategory = HTTAnalysis::W;
+        else iCategory = HTTAnalysis::wjets_jet0;
 
         std::string systEffectName = HTTAnalysis::systEffectName(iCategory, iSystEffect);
         std::string hNameSuffix =  "_"+std::to_string(iCategory)+systEffectName;

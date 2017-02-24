@@ -126,8 +126,6 @@ std::string categoryName(unsigned int iCategory){
         else if(iCategory==(int)jet1_high) return "jet1_high";
         else if(iCategory==(int)vbf_low) return "vbf_low";
         else if(iCategory==(int)vbf_high) return "vbf_high";
-        else if(iCategory==(int)W) return "W";
-        else if(iCategory==(int)TT) return "TT";
         else if(iCategory==(int)jet0) return "0jet";
         else if(iCategory==(int)boosted) return "boosted";
         else if(iCategory==(int)vbf) return "vbf";
@@ -201,27 +199,7 @@ unsigned int getControlCategory(unsigned int iCategory, std::string backgroundNa
                 else iCategory = HTTAnalysis::W;
         }
 
-        if(backgroundName=="QCDSF_numerator") {
-                if(iCategory==(unsigned int)(HTTAnalysis::jet0)) iCategory = HTTAnalysis::ss_jet0;
-                else if(iCategory==(unsigned int)(HTTAnalysis::boosted)) iCategory = HTTAnalysis::ss_boosted;
-                else if(iCategory==(unsigned int)(HTTAnalysis::vbf)) iCategory = HTTAnalysis::ss_vbf;
-        }
-        if(backgroundName=="QCDSF_denominator") {
-                if(iCategory==(unsigned int)(HTTAnalysis::jet0)) iCategory = HTTAnalysis::qcd_ss_jet0;
-                else if(iCategory==(unsigned int)(HTTAnalysis::boosted)) iCategory = HTTAnalysis::qcd_ss_boosted;
-                else if(iCategory==(unsigned int)(HTTAnalysis::vbf)) iCategory = HTTAnalysis::qcd_ss_vbf;
-        }
-        if(backgroundName=="QCDshape") {
-                f(iCategory==(unsigned int)(HTTAnalysis::jet0)) iCategory = HTTAnalysis::qcd_jet0;
-                else if(iCategory==(unsigned int)(HTTAnalysis::boosted)) iCategory = HTTAnalysis::qcd_boosted;
-                else if(iCategory==(unsigned int)(HTTAnalysis::vbf)) iCategory = HTTAnalysis::qcd_vbf;
-                else if(iCategory==(unsigned int)(HTTAnalysis::wjets_jet0)) iCategory = HTTAnalysis::wjets_qcd_jet0;
-                else if(iCategory==(unsigned int)(HTTAnalysis::wjets_boosted)) iCategory = HTTAnalysis::wjets_qcd_boosted;
-                else if(iCategory==(unsigned int)(HTTAnalysis::wjets_vbf)) iCategory = HTTAnalysis::wjets_qcd_vbf;
-                else iCategory = HTTAnalysis::qcd_jet0;
-        }
-        return iCategory;
-        */
+*/
 }
 //////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////
