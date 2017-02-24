@@ -1,9 +1,12 @@
 #include "MuTauSpecifics.h"
+
+#include "AnalysisEnums.h"
 #include "HTTAnalyzer.h"
 #include "EventProxyHTT.h"
 #include "Tools.h"
 
-
+/////////////////////////////////////////////////////////////////
+/////////////////////////////////////////////////////////////////
 MuTauSpecifics::MuTauSpecifics(HTTAnalyzer * aAnalyzer) : ChannelSpecifics(aAnalyzer){
 
         decayModeName = "MuTau";
@@ -125,7 +128,7 @@ void MuTauSpecifics::testAllCategories(const HTTAnalysis::sysEffects & aSystEffe
 
         bool ss = myAnalyzer->aLeg2.getCharge()*myAnalyzer->aLeg1.getCharge() == 1;
         bool os = myAnalyzer->aLeg2.getCharge()*myAnalyzer->aLeg1.getCharge() == -1;
-
+/*
         myAnalyzer->categoryDecisions[(int)HTTAnalysis::jet0_low] = os && muonIso && mtSelection && jet0_low;
         myAnalyzer->categoryDecisions[(int)HTTAnalysis::jet0_high] = os && muonIso && mtSelection && jet0_high;
 
@@ -134,22 +137,27 @@ void MuTauSpecifics::testAllCategories(const HTTAnalysis::sysEffects & aSystEffe
 
         myAnalyzer->categoryDecisions[(int)HTTAnalysis::vbf_low] = os && muonIso && mtSelection && vbf_low;
         myAnalyzer->categoryDecisions[(int)HTTAnalysis::vbf_high] = os && muonIso && mtSelection && vbf_high;
+*/
 
-        myAnalyzer->categoryDecisions[(int)HTTAnalysis::jet0] = os && muonIso && mtSelection && jet0;
-        myAnalyzer->categoryDecisions[(int)HTTAnalysis::boosted] = os && muonIso && mtSelection && boosted;
-        myAnalyzer->categoryDecisions[(int)HTTAnalysis::vbf] = os && muonIso && mtSelection && vbf;
+        myAnalyzer->categoryDecisions[ChannelSpecifics::jet0->id()] = os && muonIso && mtSelection && jet0;
+        myAnalyzer->categoryDecisions[ChannelSpecifics::boosted->id()] = os && muonIso && mtSelection && boosted;
+        myAnalyzer->categoryDecisions[ChannelSpecifics::vbf->id()] = os && muonIso && mtSelection && vbf;
 
-        myAnalyzer->categoryDecisions[(int)HTTAnalysis::wjets_jet0] = os && muonIso && wSelection && jet0;
-        myAnalyzer->categoryDecisions[(int)HTTAnalysis::wjets_boosted] = os && muonIso && wSelection && boosted;
-        myAnalyzer->categoryDecisions[(int)HTTAnalysis::wjets_vbf] = os && muonIso && wSelection && vbf;
+        myAnalyzer->categoryDecisions[ChannelSpecifics::jet0->wControl()->id()] = os && muonIso && wSelection && jet0;
+        myAnalyzer->categoryDecisions[ChannelSpecifics::boosted->wControl()->id()] = os && muonIso && wSelection && boosted;
+        myAnalyzer->categoryDecisions[ChannelSpecifics::vbf->wControl()->id()] = os && muonIso && wSelection && vbf;
 
-        myAnalyzer->categoryDecisions[(int)HTTAnalysis::wjets_qcd_jet0] = ss && muonIso && wSelection && jet0;
-        myAnalyzer->categoryDecisions[(int)HTTAnalysis::wjets_qcd_boosted] = ss && muonIso && wSelection && boosted;
-        myAnalyzer->categoryDecisions[(int)HTTAnalysis::wjets_qcd_vbf] = ss && muonIso && wSelection && vbf;
+        myAnalyzer->categoryDecisions[ChannelSpecifics::jet0->wControl()->qcdControl()->id()] = ss && muonIso && wSelection && jet0;
+        myAnalyzer->categoryDecisions[ChannelSpecifics::boosted->wControl()->qcdControl()->id()] = ss && muonIso && wSelection && boosted;
+        myAnalyzer->categoryDecisions[ChannelSpecifics::vbf->wControl()->qcdControl()->id()] = ss && muonIso && wSelection && vbf;
 
-        myAnalyzer->categoryDecisions[(int)HTTAnalysis::qcd_jet0] = ss && muonIso && mtSelection && jet0;
-        myAnalyzer->categoryDecisions[(int)HTTAnalysis::qcd_boosted] = ss && muonIso && mtSelection && boosted;
-        myAnalyzer->categoryDecisions[(int)HTTAnalysis::qcd_vbf] = ss && muonIso && mtSelection && vbf;
+        myAnalyzer->categoryDecisions[ChannelSpecifics::jet0->qcdControl()->id()] = ss && muonIso && mtSelection && jet0;
+        myAnalyzer->categoryDecisions[ChannelSpecifics::boosted->qcdControl()->id()] = ss && muonIso && mtSelection && boosted;
+        myAnalyzer->categoryDecisions[ChannelSpecifics::vbf->qcdControl()->id()] = ss && muonIso && mtSelection && vbf;
+
+        myAnalyzer->categoryDecisions[ChannelSpecifics::jet0->qcdControl()->wControl()->id()] = ss && muonIso && wSelection && jet0;
+        myAnalyzer->categoryDecisions[ChannelSpecifics::boosted->qcdControl()->wControl()->id()] = ss && muonIso && wSelection && boosted;
+        myAnalyzer->categoryDecisions[ChannelSpecifics::vbf->qcdControl()->wControl()->id()] = ss && muonIso && wSelection && vbf;
 
         myAnalyzer->categoryDecisions[(int)HTTAnalysis::antiIso_jet0] = os && muonAntiIso && jet0;
         myAnalyzer->categoryDecisions[(int)HTTAnalysis::antiIso_boosted] = os && muonAntiIso && boosted;
@@ -157,7 +165,6 @@ void MuTauSpecifics::testAllCategories(const HTTAnalysis::sysEffects & aSystEffe
 
         myAnalyzer->categoryDecisions[(int)HTTAnalysis::mu_pi] = os && muonIso && mtSelection && cpPi;
         myAnalyzer->categoryDecisions[(int)HTTAnalysis::mu_rho] = os && muonIso && mtSelection && cpRho;
-
 }
 /////////////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////////////

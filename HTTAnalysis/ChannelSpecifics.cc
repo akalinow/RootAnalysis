@@ -14,6 +14,7 @@
 ChannelSpecifics::ChannelSpecifics(HTTAnalyzer *aAnalyzer){
 
         initializeCorrections();
+        defineCategories();
 
         myAnalyzer = aAnalyzer;
         h2DMuonIdCorrections = 0;
@@ -29,6 +30,15 @@ ChannelSpecifics::~ChannelSpecifics(){
         if(h2DMuonIsoCorrections) delete h2DMuonIsoCorrections;
         if(h2DMuonTrgCorrections) delete h2DMuonTrgCorrections;
         if(h3DTauCorrections) delete h3DTauCorrections;
+
+}
+/////////////////////////////////////////////////////////////////
+/////////////////////////////////////////////////////////////////
+void ChannelSpecifics::defineCategories(){
+
+jet0 = new HTTAnalysis::eventCategory("jet0", categoryRejester);
+boosted = new HTTAnalysis::eventCategory("jet0", categoryRejester);
+vbf = new HTTAnalysis::eventCategory("jet0", categoryRejester);
 
 }
 /////////////////////////////////////////////////////////////////

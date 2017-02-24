@@ -1,6 +1,10 @@
 #ifndef RootAnalysis_AnalysisEnums_H
 #define RootAnalysis_AnalysisEnums_H
 
+#include <map>
+#include <vector>
+#include <iostream>
+
 namespace HTTAnalysis {
 
 ///Copy from DataFormats/TauReco/interface/PFTauDecayMode.h
@@ -39,6 +43,79 @@ enum eventCategories {jet0_low, jet0_high,
                     mu_pi, mu_rho,  pi_pi, pi_rho, rho_rho,        
                     DUMMY_CAT //This must be the last one
 };
+
+class eventCategory{
+  public:
+
+    eventCategory(const std::string & aName, std::vector<eventCategory*> & categoryRejester){
+      myName = aName;
+
+      myId = categoryRejester.size();
+      categoryRejester.push_back(this);
+
+      std::cout<<__func__<<" "
+      <<categoryRejester.size()
+      <<" name: "<<myName
+      <<std::endl;
+
+      myWCategory = 0;
+      myQCDCategory = 0;
+      if(aName.find("_W")==std::string::npos) myWCategory = new eventCategory(aName+"_W",categoryRejester);
+      if(aName.find("_QCD")==std::string::npos) myQCDCategory = new eventCategory(aName+"_QCD",categoryRejester);
+    };
+
+    unsigned int id() const {return myId;};
+
+    const eventCategory * wControl() const {
+      if(myWCategory) return myWCategory;
+      else return this;
+    };
+    const eventCategory * qcdControl() const {
+      if(myQCDCategory) return myQCDCategory;
+      else return this;
+    };
+
+    std::string name() const {return myName;}
+
+  private:
+
+    std::string myName;
+    unsigned int myId;
+    eventCategory *myWCategory;
+    eventCategory *myQCDCategory;
+
+};
+
+//eventCategory test1("jet0");
+//eventCategory test2("boosted");
+
+/*
+//Signal categories
+eventCategory jet0;
+eventCategory boosted;
+eventCategory vbf;
+//Tight to Loose ratio categories
+eventCategory tight_ss_jet0;
+eventCategory tight_ss_boosted;
+eventCategory tight_ss_vbf;
+
+eventCategory loose_ss_jet0;
+eventCategory loose_ss_boosted;
+eventCategory loose_ss_vbf;
+
+//antiiso control region
+eventCategory antiIso_jet0;
+eventCategory antiIso_boosted;
+eventCategory antiIso_vbf;
+
+//cp categories
+eventCategory mu_pi;
+eventCategory mu_rho;
+
+eventCategory pi_pi;
+eventCategory pi_rho;
+eventCategory rho_rho;
+*/
 
 enum sysEffects{NOMINAL, NOMINAL_SVFIT,
 		    TESUp, TESDown,
