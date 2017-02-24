@@ -166,10 +166,6 @@ void MuTauSpecifics::testAllCategories(const HTTAnalysis::sysEffects & aSystEffe
 
         myAnalyzer->categoryDecisions[(int)HTTAnalysis::mu_pi] = os && muonIso && mtSelection && cpPi;
         myAnalyzer->categoryDecisions[(int)HTTAnalysis::mu_rho] = os && muonIso && mtSelection && cpRho;
-
-        myAnalyzer->categoryDecisions[(int)HTTAnalysis::W] = muonIso && wSelection;
-        myAnalyzer->categoryDecisions[(int)HTTAnalysis::TT] = muonIso && ttSelection;
-
 }
 /////////////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////////////

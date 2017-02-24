@@ -170,10 +170,10 @@ std::string systEffectName(unsigned int iSystEffect){
         else if(iSystEffect==(int)QCDSFDown) return "_QCDSFUncert_mt_CAT_13TeVDown";
         else if(iSystEffect==(int)WSFUp) return "_WSFUncert_mt_CAT_13TeVUp";
         else if(iSystEffect==(int)WSFDown) return "_WSFUncert_mt_CAT_13TeVDown";
-        else if(iSystEffect==(int)ggUp) return "_scale_gg_13TeVUp";
-        else if(iSystEffect==(int)ggDown) return "_scale_gg_13TeVDown";
-        else if(iSystEffect==(int)ZmumuUp) return "_htt_zmumuShape_CAT_13TeVUp";
-        else if(iSystEffect==(int)ZmumuDown) return "_htt_zmumuShape_CAT_13TeVUp";
+        else if(iSystEffect==(int)ggUp) return "_CMS_scale_gg_13TeVUp";
+        else if(iSystEffect==(int)ggDown) return "_CMS_scale_gg_13TeVDown";
+        else if(iSystEffect==(int)ZmumuUp) return "_CMS_htt_zmumuShape_CAT_13TeVUp";
+        else if(iSystEffect==(int)ZmumuDown) return "_CMS_htt_zmumuShape_CAT_13TeVDown";
         else return "UnknownSystEffect";
 
 }
