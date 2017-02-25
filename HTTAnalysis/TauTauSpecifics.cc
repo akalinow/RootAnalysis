@@ -146,31 +146,38 @@ void TauTauSpecifics::testAllCategories(const HTTAnalysis::sysEffects & aSystEff
         bool piRho = (isPi1 && isRho2) || (isPi2 && isRho1);
         bool rhoRho = isRho1 && isRho2;
 
+/*
         myAnalyzer->categoryDecisions[(int)HTTAnalysis::jet1_low] = os && jet1_low;
         myAnalyzer->categoryDecisions[(int)HTTAnalysis::jet1_high] = os && jet1_high;
 
         myAnalyzer->categoryDecisions[(int)HTTAnalysis::vbf_low] = os && vbf_low;
         myAnalyzer->categoryDecisions[(int)HTTAnalysis::vbf_high] = os && vbf_high;
+*/
 
-        myAnalyzer->categoryDecisions[(int)HTTAnalysis::jet0] = os && fullIso && jet0;
-        myAnalyzer->categoryDecisions[(int)HTTAnalysis::boosted] = os && fullIso && boosted;
-        myAnalyzer->categoryDecisions[(int)HTTAnalysis::vbf] = os && fullIso && vbf_2d;
+         //Main categories
+        myAnalyzer->categoryDecisions[ChannelSpecifics::jet0->id()] = os && fullIso && jet0;
+        myAnalyzer->categoryDecisions[ChannelSpecifics::boosted->id()] = os && fullIso && boosted;
+        myAnalyzer->categoryDecisions[ChannelSpecifics::vbf->id()] = os && fullIso && vbf_2d;
 
-        myAnalyzer->categoryDecisions[(int)HTTAnalysis::qcd_jet0] = os && antiIso && jet0;
-        myAnalyzer->categoryDecisions[(int)HTTAnalysis::qcd_boosted] = os && antiIso &&  boosted;
-        myAnalyzer->categoryDecisions[(int)HTTAnalysis::qcd_vbf] = os && antiIso && vbf_2d;
+        ///QCD region
+        myAnalyzer->categoryDecisions[ChannelSpecifics::jet0->qcdEstimate()->id()] = os && antiIso && jet0;
+        myAnalyzer->categoryDecisions[ChannelSpecifics::boosted->qcdEstimate()->id()] = os && antiIso &&  boosted;
+        myAnalyzer->categoryDecisions[ChannelSpecifics::vbf->qcdEstimate()->id()] = os && antiIso && vbf_2d;
 
-        myAnalyzer->categoryDecisions[(int)HTTAnalysis::qcd_ss_jet0] = ss && antiIso && jet0;
-        myAnalyzer->categoryDecisions[(int)HTTAnalysis::qcd_ss_boosted] = ss && antiIso &&  boosted;
-        myAnalyzer->categoryDecisions[(int)HTTAnalysis::qcd_ss_vbf] = ss && antiIso && vbf_2d;
+        ///QCD SF denominator
+        myAnalyzer->categoryDecisions[ChannelSpecifics::jet0->qcdSFDenominator()->id()] = ss && antiIso && jet0;
+        myAnalyzer->categoryDecisions[ChannelSpecifics::boosted->qcdSFDenominator()->id()] = ss && antiIso &&  boosted;
+        myAnalyzer->categoryDecisions[ChannelSpecifics::vbf->qcdSFDenominator()->id()] = ss && antiIso && vbf_2d;
 
-        myAnalyzer->categoryDecisions[(int)HTTAnalysis::ss_jet0] = ss && fullIso && jet0;
-        myAnalyzer->categoryDecisions[(int)HTTAnalysis::ss_boosted] = ss && fullIso &&  boosted;
-        myAnalyzer->categoryDecisions[(int)HTTAnalysis::ss_vbf] = ss && fullIso && vbf_2d;
-
+        ///QCD SF numerator
+        myAnalyzer->categoryDecisions[ChannelSpecifics::jet0->qcdSFNumerator()->id()] = ss && fullIso && jet0;
+        myAnalyzer->categoryDecisions[ChannelSpecifics::boosted->qcdSFNumerator()->id()] = ss && fullIso &&  boosted;
+        myAnalyzer->categoryDecisions[ChannelSpecifics::vbf->qcdSFNumerator()->id()] = ss && fullIso && vbf_2d;
+/*
         myAnalyzer->categoryDecisions[(int)HTTAnalysis::pi_pi] = os && fullIso && piPi;
         myAnalyzer->categoryDecisions[(int)HTTAnalysis::pi_rho] = os && fullIso && piRho;
         myAnalyzer->categoryDecisions[(int)HTTAnalysis::rho_rho] = os && fullIso && rhoRho;
+        */
 }
 /////////////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////////////

@@ -31,53 +31,74 @@ enum hadronicTauDecayModes
 };
 
 enum eventCategories {jet0_low, jet0_high,
-                    jet1_low, jet1_high,
-                    vbf_low, vbf_high,
-                    jet0, boosted, vbf,
-                    wjets_jet0, wjets_boosted, wjets_vbf,
-                    wjets_qcd_jet0, wjets_qcd_boosted, wjets_qcd_vbf,
-                    qcd_jet0, qcd_boosted, qcd_vbf,
-                    qcd_ss_jet0, qcd_ss_boosted, qcd_ss_vbf,
-                    ss_jet0, ss_boosted, ss_vbf,
-                    antiIso_jet0, antiIso_boosted, antiIso_vbf,
-                    mu_pi, mu_rho,  pi_pi, pi_rho, rho_rho,
-                    DUMMY_CAT //This must be the last one
+                      jet1_low, jet1_high,
+                      vbf_low, vbf_high,
+                      jet0, boosted, vbf,
+                      wjets_jet0, wjets_boosted, wjets_vbf,
+                      wjets_qcd_jet0, wjets_qcd_boosted, wjets_qcd_vbf,
+                      qcd_jet0, qcd_boosted, qcd_vbf,
+                      qcd_ss_jet0, qcd_ss_boosted, qcd_ss_vbf,
+                      ss_jet0, ss_boosted, ss_vbf,
+                      antiIso_jet0, antiIso_boosted, antiIso_vbf,
+                      mu_pi, mu_rho,  pi_pi, pi_rho, rho_rho,
+                      DUMMY_CAT //This must be the last one
 };
 
-class eventCategory{
-  public:
+class eventCategory {
+public:
 
-    eventCategory(const std::string & aName, std::vector<const eventCategory*> & categoryRejester){
-      myName = aName;
+eventCategory(const std::string & aName, std::vector<const eventCategory*> & categoryRejester){
+        myName = aName;
 
-      myId = categoryRejester.size();
-      categoryRejester.push_back(this);
+        myId = categoryRejester.size();
+        categoryRejester.push_back(this);
 
-      myWCategory = 0;
-      myQCDCategory = 0;
-      if(aName.find("_W")==std::string::npos) myWCategory = new eventCategory(aName+"_W",categoryRejester);
-      if(aName.find("_QCD")==std::string::npos) myQCDCategory = new eventCategory(aName+"_QCD",categoryRejester);
-    };
+        myWSF = 0;
+        myQCDEstimate = 0;
+        myQCDSFNum = 0;
+        myQCDSFDenom = 0;
+        if(aName.find("_W")==std::string::npos) myWSF = new eventCategory(aName+"_W",categoryRejester);
+        if(aName.find("_QCD")==std::string::npos) {
+                myQCDEstimate = new eventCategory(aName+"_QCD",categoryRejester);
+                myQCDSFNum = new eventCategory(aName+"_QCDSFNum",categoryRejester);
+                myQCDSFDenom = new eventCategory(aName+"_QCDSFDenom",categoryRejester);
+        }
+};
 
-    unsigned int id() const {return myId;};
+unsigned int id() const {
+        return myId;
+};
 
-    const eventCategory * wControl() const {
-      if(myWCategory) return myWCategory;
-      else return this;
-    };
-    const eventCategory * qcdControl() const {
-      if(myQCDCategory) return myQCDCategory;
-      else return this;
-    };
+const eventCategory * wSF() const {
+        if(myWSF) return myWSF;
+        else return this;
+};
+const eventCategory * qcdEstimate() const {
+        if(myQCDEstimate) return myQCDEstimate;
+        else return this;
+};
+const eventCategory * qcdSFNumerator() const {
+        if(myQCDSFNum) return myQCDSFNum;
+        else return this;
+};
+const eventCategory * qcdSFDenominator() const {
+        if(myQCDSFDenom) return myQCDSFDenom;
+        else return this;
+};
 
-    const std::string & name() const {return myName;}
+const std::string & name() const {
+        return myName;
+}
 
-  private:
+private:
 
-    std::string myName;
-    unsigned int myId;
-    eventCategory *myWCategory;
-    eventCategory *myQCDCategory;
+std::string myName;
+unsigned int myId;
+eventCategory *myWSF;
+eventCategory *myQCDEstimate;
+eventCategory *myQCDSFNum;
+eventCategory *myQCDSFDenom;
+
 
 };
 
@@ -85,48 +106,47 @@ class eventCategory{
 //eventCategory test2("boosted");
 
 /*
-//Signal categories
-eventCategory jet0;
-eventCategory boosted;
-eventCategory vbf;
-//Tight to Loose ratio categories
-eventCategory tight_ss_jet0;
-eventCategory tight_ss_boosted;
-eventCategory tight_ss_vbf;
+   //Signal categories
+   eventCategory jet0;
+   eventCategory boosted;
+   eventCategory vbf;
+   //Tight to Loose ratio categories
+   eventCategory tight_ss_jet0;
+   eventCategory tight_ss_boosted;
+   eventCategory tight_ss_vbf;
 
-eventCategory loose_ss_jet0;
-eventCategory loose_ss_boosted;
-eventCategory loose_ss_vbf;
+   eventCategory loose_ss_jet0;
+   eventCategory loose_ss_boosted;
+   eventCategory loose_ss_vbf;
 
-//antiiso control region
-eventCategory antiIso_jet0;
-eventCategory antiIso_boosted;
-eventCategory antiIso_vbf;
+   //antiiso control region
+   eventCategory antiIso_jet0;
+   eventCategory antiIso_boosted;
+   eventCategory antiIso_vbf;
 
-//cp categories
-eventCategory mu_pi;
-eventCategory mu_rho;
+   //cp categories
+   eventCategory mu_pi;
+   eventCategory mu_rho;
 
-eventCategory pi_pi;
-eventCategory pi_rho;
-eventCategory rho_rho;
-*/
+   eventCategory pi_pi;
+   eventCategory pi_rho;
+   eventCategory rho_rho;
+ */
 
-enum sysEffects{NOMINAL, NOMINAL_SVFIT,
-		    TESUp, TESDown,
-		    JESUp, JESDown,
-		    M2TUp, M2TDown,
-		    E2TUp, E2TDown,
-		    J2TUp, J2TDown,
-		    ZPtUp, ZPtDown,
-		    TTUp, TTDown,
-		    QCDSFUp, QCDSFDown,
-		    WSFUp, WSFDown,
-        DUMMY_SYS,
-        //syst effects not implemented in data should be put at the end.
-        //histograms will be the same as for NOMINAL
-        ggUp, ggDown,
-        ZmumuUp, ZmumuDown
-      };
+enum sysEffects {NOMINAL, NOMINAL_SVFIT,
+                 TESUp, TESDown,
+                 JESUp, JESDown,
+                 M2TUp, M2TDown,
+                 E2TUp, E2TDown,
+                 J2TUp, J2TDown,
+                 ZPtUp, ZPtDown,
+                 TTUp, TTDown,
+                 QCDSFUp, QCDSFDown,
+                 WSFUp, WSFDown,
+                 DUMMY_SYS,
+                 //syst effects not implemented in data should be put at the end.
+                 //histograms will be the same as for NOMINAL
+                 ggUp, ggDown,
+                 ZmumuUp, ZmumuDown};
 }
 #endif

@@ -242,7 +242,12 @@ bool HTTAnalyzer::analyze(const EventProxyBase& iEvent){
         getPreselectionEff(myEventProxy);
 
         if(!myEventProxy.pairs->size()) return true;
-
+/*
+        for(int i=0;i<20;++i){
+        std::cout<<"number: "<<i<<" category name: "<<myChannelSpecifics->getCategoryRejester().at(i)->name()<<std::endl;
+      }
+        exit(0);
+*/
         setAnalysisObjects(myEventProxy);
 
         std::pair<bool, bool> goodDecayModes = myChannelSpecifics->checkTauDecayMode(myEventProxy);
