@@ -386,10 +386,20 @@ void HTTHistograms::finalizeHistograms(const std::vector<const HTTAnalysis::even
         myCategoryRejester  = aCategoryRejester;
         unsigned int myNumberOfCategories = myCategoryRejester.size();
 
+        ///
+        std::vector<std::string> mainCategoryNames = {"jet0","boosted", "vbf",
+                                                      "antiIso_jet0", "antiIso_boosted", "antiIso_vbf"};
+        std::vector <unsigned int> mainCategoriesRejester;
+        for(unsigned int iCategory=0; iCategory<myCategoryRejester.size(); ++iCategory) {
+                for(auto nameIt : mainCategoryNames) {
+                        if(myCategoryRejester[iCategory]->name()==nameIt) mainCategoriesRejester.push_back(iCategory);
+                }
+        }
+        ///
         gErrorIgnoreLevel = kBreak;
         //////////////
         ///Control regions plots
-        for(unsigned int iCategory = 0; iCategory<7; ++iCategory) {
+        for(auto iCategory: mainCategoriesRejester) {
 
                 plotCPhistograms(iCategory);
 
@@ -436,10 +446,8 @@ void HTTHistograms::finalizeHistograms(const std::vector<const HTTAnalysis::even
         ///Make systematic effect histos.
         for(unsigned int iSystEffect = (unsigned int)HTTAnalysis::NOMINAL_SVFIT;
             iSystEffect<=(unsigned int)HTTAnalysis::ZmumuDown; ++iSystEffect) {
-
               if(iSystEffect==(unsigned int)HTTAnalysis::DUMMY_SYS) continue;
-
-                for(unsigned int iCategory = 0; iCategory<3; ++iCategory) {
+                for(auto iCategory: mainCategoriesRejester) {
                         plotStack(iCategory, "MassSV", iSystEffect);
                         plotStack(iCategory, "UnRollTauPtMassVis", iSystEffect);
                         plotStack(iCategory, "UnRollHiggsPtMassSV", iSystEffect);
@@ -448,7 +456,7 @@ void HTTHistograms::finalizeHistograms(const std::vector<const HTTAnalysis::even
                         plotStack(iCategory, "UnRollMassSVYCP", iSystEffect);
                 }
         }
-*/
+ */
         ofstream eventCountFile("eventCount.txt",ios::out | ios::app);
         outputStream<<"HTTHistograms compilation time: "<<__TIMESTAMP__<<std::endl;
         eventCountFile<<outputStream.str();
@@ -957,8 +965,8 @@ THStack*  HTTHistograms::plotStack(unsigned int iCategory,
         ///events passing particular selection.
         if(!hSoup) {
                 std::cout<<"No data events for "<<hName<<"Data"<<hNameSuffix
-                <<" ("<<categoryName<<")"
-                <<std::endl;
+                         <<" ("<<categoryName<<")"
+                         <<std::endl;
                 return 0;
         }
         hSoup->SetDirectory(myDirCopy); //TEST
@@ -1427,15 +1435,15 @@ std::pair<float,float> HTTHistograms::getQCDControlToSignal(unsigned int iCatego
         if(iSystEffect==(unsigned int)HTTAnalysis::QCDSFDown) result.first-=result.second;
 
         std::string varName = "MassVis";
-        iCategory = myCategoryRejester[iCategory]->qcdSFDenominator()->id();
-        TH1F *hSoupLoose = get1DHistogram(iCategory, varName+"Data", iSystEffect);
+        unsigned int iCategoryNum = myCategoryRejester[iCategory]->qcdSFDenominator()->id();
+        TH1F *hSoupLoose = get1DHistogram(iCategoryNum, varName+"Data", iSystEffect);
         if(!hSoupLoose) return result; //MuTau has fixed QCD control to signal transfer factors.
 
-        TH1F *hMCSumLoose = getMCSum(iCategory, varName, iSystEffect);
+        TH1F *hMCSumLoose = getMCSum(iCategoryNum, varName, iSystEffect);
 
-        iCategory = myCategoryRejester[iCategory]->qcdSFNumerator()->id();
-        TH1F *hSoupTight = get1DHistogram(iCategory, varName+"Data", iSystEffect);
-        TH1F *hMCSumTight = getMCSum(iCategory, varName, iSystEffect);
+        unsigned int iCategoryDenom = myCategoryRejester[iCategory]->qcdSFNumerator()->id();
+        TH1F *hSoupTight = get1DHistogram(iCategoryDenom, varName+"Data", iSystEffect);
+        TH1F *hMCSumTight = getMCSum(iCategoryDenom, varName, iSystEffect);
 
         double sumTightErr = 0;
         double sumTight = hSoupTight->IntegralAndError(0,hSoupTight->GetNbinsX()+2,sumTightErr);
@@ -1465,16 +1473,16 @@ std::pair<float,float> HTTHistograms::getQCDControlToSignal(unsigned int iCatego
         std::string plotName = varName+"_"+hNameSuffix+"_"+systEffectName;
         c->Print(TString::Format("fig_png/%s.png",plotName.c_str()).Data());
         c->Print(TString::Format("fig_C/%s.C",plotName.c_str()).Data());
-/*
+
         float param, dparam;
         param=line->GetParameter(0);
         dparam=line->GetParError(0);
-
+/*
         std::cout<<"Category: "<<categoryName<<std::endl
                  <<"\tQCD Tight/Loose` ratio: "<<std::endl
                  <<"\tRatio: "<<sumTight/sumLoose<<" +- "<<ratioErr<<std::endl
                  <<"\tFit: "<<param<<" +- "<<dparam<<std::endl;
- */
+*/
         result = std::make_pair(sumTight/sumLoose,ratioErr);
         return result;
 }
@@ -1490,6 +1498,7 @@ TH1F* HTTHistograms::getQCDbackground(unsigned int iCategory,
 
         float qcdScale = getQCDControlToSignal(iCategory, iSystEffect).first;
         iCategory = myCategoryRejester[iCategory]->qcdEstimate()->id();
+    
         TH1F *hMCSum = getMCSum(iCategory, varName, iSystEffect);
         TH1F *hSoup = get1DHistogram(iCategory, varName+"Data", iSystEffect);
         if(!hSoup) return 0;
@@ -1504,6 +1513,7 @@ TH1F* HTTHistograms::getQCDbackground(unsigned int iCategory,
 std::pair<float,float> HTTHistograms::getWNormalisation(unsigned int iCategory, unsigned int iSystEffect){
 
         iCategory = myCategoryRejester[iCategory]->wSF()->id();
+
         std::string systEffectName = HTTAnalysis::systEffectName(iCategory, iSystEffect);
         std::string hNameSuffix =  "_"+std::to_string(iCategory)+systEffectName;
 

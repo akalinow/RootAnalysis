@@ -52,7 +52,8 @@ HTTAnalyzer *myAnalyzer;
 
 ///Histograms with lepton corrections
 TH2F *h2DMuonIdCorrections, *h2DMuonIsoCorrections, *h2DMuonTrgCorrections;
-TH3F *h3DTauCorrections, *h3DTauTrgOSCorrections, *h3DTauTrgSSCorrections;
+TH3F *h3DTauCorrections;
+TH2F *h2DTauTrgGenuineCorrections, *h2DTauTrgFakeCorrections;
 
 std::string decayModeName = "None";
 

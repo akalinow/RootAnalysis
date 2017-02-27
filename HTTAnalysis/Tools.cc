@@ -95,7 +95,7 @@ float getCrossSection(const std::string & sampleName){
         if(sampleName.find("ZZTo4L")!=std::string::npos) crossSection = 1.212;
         if(sampleName.find("WZTo1L3Nu")!=std::string::npos) crossSection = 3.05;
         if(sampleName.find("WZJToLLLNu")!=std::string::npos) crossSection = 4.708;
-        if(sampleName.find("WWTo1L1Nu2Q")!=std::string::npos) crossSection = 1.212;
+        if(sampleName.find("WWTo1L1Nu2Q")!=std::string::npos) crossSection = 49.997;
         if(sampleName.find("WZTo1L1Nu2Q")!=std::string::npos) crossSection = 10.71;
         if(sampleName.find("VVTo2L2Nu")!=std::string::npos) crossSection = 11.95;
         if(sampleName.find("WZTo2L2Q")!=std::string::npos) crossSection = 5.595;
