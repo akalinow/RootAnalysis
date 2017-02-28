@@ -442,7 +442,7 @@ void HTTHistograms::finalizeHistograms(const std::vector<const HTTAnalysis::even
                 plotStack(iCategory, "Phi-nVecIP");
                 plotStack(iCategory, "NPV");
         }
-/*
+
         ///Make systematic effect histos.
         for(unsigned int iSystEffect = (unsigned int)HTTAnalysis::NOMINAL_SVFIT;
             iSystEffect<=(unsigned int)HTTAnalysis::ZmumuDown; ++iSystEffect) {
@@ -456,7 +456,7 @@ void HTTHistograms::finalizeHistograms(const std::vector<const HTTAnalysis::even
                         plotStack(iCategory, "UnRollMassSVYCP", iSystEffect);
                 }
         }
- */
+ 
         ofstream eventCountFile("eventCount.txt",ios::out | ios::app);
         outputStream<<"HTTHistograms compilation time: "<<__TIMESTAMP__<<std::endl;
         eventCountFile<<outputStream.str();
@@ -1498,7 +1498,7 @@ TH1F* HTTHistograms::getQCDbackground(unsigned int iCategory,
 
         float qcdScale = getQCDControlToSignal(iCategory, iSystEffect).first;
         iCategory = myCategoryRejester[iCategory]->qcdEstimate()->id();
-    
+
         TH1F *hMCSum = getMCSum(iCategory, varName, iSystEffect);
         TH1F *hSoup = get1DHistogram(iCategory, varName+"Data", iSystEffect);
         if(!hSoup) return 0;
