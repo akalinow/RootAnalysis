@@ -12,15 +12,13 @@ float getLumi();
 ///Return sample cross section in [pb]
 float getCrossSection(const std::string & sampleName);
 
-///Return human readable category name for given category number.
-std::string categoryName(unsigned int iCategory);
-
 ///Return human readable systematic effect name for given systematic effect number number.
 std::string systEffectName(unsigned int iSystEffect);
 
 ///Return human readable systematic effect name for given systematic effect number number.
 ///Replace CAT pattern by correct category name
-std::string systEffectName(unsigned int iCategory, unsigned int iSystEffect);
+std::string systEffectName(unsigned int iCategory, unsigned int iSystEffect,
+                           const std::vector<const HTTAnalysis::eventCategory*> & aCategoryRejester);
 
 ///Return string encoding di-tau decay mode.
 ///The event can belong to more than one category

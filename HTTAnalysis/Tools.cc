@@ -119,34 +119,6 @@ float getCrossSection(const std::string & sampleName){
 }
 //////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////
-std::string categoryName(unsigned int iCategory){
-        if(iCategory==(int)jet0_low) return "jet0_low";
-        else if(iCategory==(int)jet0_high) return "jet0_high";
-        else if(iCategory==(int)jet1_low) return "jet1_low";
-        else if(iCategory==(int)jet1_high) return "jet1_high";
-        else if(iCategory==(int)vbf_low) return "vbf_low";
-        else if(iCategory==(int)vbf_high) return "vbf_high";
-        else if(iCategory==(int)jet0) return "0jet";
-        else if(iCategory==(int)boosted) return "boosted";
-        else if(iCategory==(int)vbf) return "vbf";
-        else if(iCategory==(int)wjets_jet0) return "wjets_0jet";
-        else if(iCategory==(int)wjets_boosted) return "wjets_boosted";
-        else if(iCategory==(int)wjets_vbf) return "wjets_vbf";
-        else if(iCategory==(int)qcd_jet0) return "qcd_0jet";
-        else if(iCategory==(int)qcd_boosted) return "qcd_boosted";
-        else if(iCategory==(int)qcd_vbf) return "qcd_vbf";
-        else if(iCategory==(int)antiIso_jet0) return "antiIso_0jet";
-        else if(iCategory==(int)antiIso_boosted) return "antiIso_boosted";
-        else if(iCategory==(int)antiIso_vbf) return "antiIso_vbf";
-        else if(iCategory==(int)mu_pi) return "CP_MuPi";
-        else if(iCategory==(int)mu_rho) return "CP_MuRho";
-        else if(iCategory==(int)pi_pi) return "CP_PiPi";
-        else if(iCategory==(int)pi_rho) return "CP_PiRho";
-        else if(iCategory==(int)rho_rho) return "CP_RhoRho";
-        return "UnknownCategory";
-}
-//////////////////////////////////////////////////////////////////////////////
-//////////////////////////////////////////////////////////////////////////////
 std::string systEffectName(unsigned int iSystEffect){
         if(iSystEffect==(int)NOMINAL) return "";
         else if(iSystEffect==(int)NOMINAL_SVFIT) return "";
@@ -172,16 +144,16 @@ std::string systEffectName(unsigned int iSystEffect){
         else if(iSystEffect==(int)ggDown) return "_CMS_scale_gg_13TeVDown";
         else if(iSystEffect==(int)ZmumuUp) return "_CMS_htt_zmumuShape_CAT_13TeVUp";
         else if(iSystEffect==(int)ZmumuDown) return "_CMS_htt_zmumuShape_CAT_13TeVDown";
-        else return "UnknownSystEffect";
-
+        else return "_UnknownSystEffect";
 }
 //////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////
-std::string systEffectName(unsigned int iCategory, unsigned int iSystEffect){
+std::string systEffectName(unsigned int iCategory, unsigned int iSystEffect,
+                            const std::vector<const HTTAnalysis::eventCategory*> & aCategoryRejester){
 
-        std::string categoryName = HTTAnalysis::categoryName(iCategory);
         std::string systEffectName = HTTAnalysis::systEffectName(iSystEffect);
         if(systEffectName.find("CAT")!=std::string::npos) {
+                std::string categoryName = aCategoryRejester[iCategory]->name();
                 systEffectName.replace(systEffectName.find("CAT"),3,categoryName);
         }
         return systEffectName;

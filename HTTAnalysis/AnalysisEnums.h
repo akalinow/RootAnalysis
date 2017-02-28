@@ -30,20 +30,6 @@ enum hadronicTauDecayModes
         tauDecayOther             // catch-all
 };
 
-enum eventCategories {jet0_low, jet0_high,
-                      jet1_low, jet1_high,
-                      vbf_low, vbf_high,
-                      jet0, boosted, vbf,
-                      wjets_jet0, wjets_boosted, wjets_vbf,
-                      wjets_qcd_jet0, wjets_qcd_boosted, wjets_qcd_vbf,
-                      qcd_jet0, qcd_boosted, qcd_vbf,
-                      qcd_ss_jet0, qcd_ss_boosted, qcd_ss_vbf,
-                      ss_jet0, ss_boosted, ss_vbf,
-                      antiIso_jet0, antiIso_boosted, antiIso_vbf,
-                      mu_pi, mu_rho,  pi_pi, pi_rho, rho_rho,
-                      DUMMY_CAT //This must be the last one
-};
-
 class eventCategory {
 public:
 
@@ -102,50 +88,20 @@ eventCategory *myQCDSFDenom;
 
 };
 
-//eventCategory test1("jet0");
-//eventCategory test2("boosted");
-
-/*
-   //Signal categories
-   eventCategory jet0;
-   eventCategory boosted;
-   eventCategory vbf;
-   //Tight to Loose ratio categories
-   eventCategory tight_ss_jet0;
-   eventCategory tight_ss_boosted;
-   eventCategory tight_ss_vbf;
-
-   eventCategory loose_ss_jet0;
-   eventCategory loose_ss_boosted;
-   eventCategory loose_ss_vbf;
-
-   //antiiso control region
-   eventCategory antiIso_jet0;
-   eventCategory antiIso_boosted;
-   eventCategory antiIso_vbf;
-
-   //cp categories
-   eventCategory mu_pi;
-   eventCategory mu_rho;
-
-   eventCategory pi_pi;
-   eventCategory pi_rho;
-   eventCategory rho_rho;
- */
-
 enum sysEffects {NOMINAL, NOMINAL_SVFIT,
                  TESUp, TESDown,
                  JESUp, JESDown,
                  M2TUp, M2TDown,
                  E2TUp, E2TDown,
+                 DUMMY_SYS,
+///Place systematic effects not affectign the SV calculation after DUMMY_SYS
+///all quantities for following syst effects are calculated onfly, no need to rerun
+///the ntuple making step.
                  J2TUp, J2TDown,
                  ZPtUp, ZPtDown,
                  TTUp, TTDown,
                  QCDSFUp, QCDSFDown,
                  WSFUp, WSFDown,
-                 DUMMY_SYS,
-                 //syst effects not implemented in data should be put at the end.
-                 //histograms will be the same as for NOMINAL
                  ggUp, ggDown,
                  ZmumuUp, ZmumuDown};
 }

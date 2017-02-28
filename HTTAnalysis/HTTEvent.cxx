@@ -144,8 +144,10 @@ void HTTPair::clear(){
 ////////////////////////////////////////////////
 const TLorentzVector & HTTPair::getP4(HTTAnalysis::sysEffects type) const {
 
+  //std::cout<<"type: "<<(unsigned int)type<<" size: "<<p4Vector.size()<<std::endl;
+
   if(p4Vector.size()>(unsigned int)type) return p4Vector[(unsigned int)type];
-  return p4Vector[(unsigned int)type];
+  return p4Vector[(unsigned int)HTTAnalysis::NOMINAL_SVFIT];
 }
 ////////////////////////////////////////////////
 ////////////////////////////////////////////////

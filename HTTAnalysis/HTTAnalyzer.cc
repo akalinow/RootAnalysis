@@ -252,8 +252,11 @@ bool HTTAnalyzer::analyze(const EventProxyBase& iEvent){
 
         std::string categorySuffix = "";
         std::string systEffectName = "";
+        const std::vector<const HTTAnalysis::eventCategory*> & aCategoryRejester = myChannelSpecifics->getCategoryRejester();
         for(unsigned int iSystEffect = (unsigned int)HTTAnalysis::NOMINAL_SVFIT;
             iSystEffect<=(unsigned int)HTTAnalysis::ZmumuDown; ++iSystEffect) {
+
+              if(iSystEffect==(unsigned int)HTTAnalysis::DUMMY_SYS) continue;
 
                 HTTAnalysis::sysEffects aSystEffect = static_cast<HTTAnalysis::sysEffects>(iSystEffect);
 
@@ -274,9 +277,9 @@ bool HTTAnalyzer::analyze(const EventProxyBase& iEvent){
                         if(!passCategory(iCategory)) continue;
 
                         categorySuffix = std::to_string(iCategory);
-                        systEffectName = HTTAnalysis::systEffectName(iCategory, iSystEffect);
-                        hNameSuffix = sampleName+"_"+categorySuffix+systEffectName;
-                        fillControlHistos(hNameSuffix, eventWeightWithSyst, aSystEffect);                    
+                        systEffectName = HTTAnalysis::systEffectName(iCategory, iSystEffect, aCategoryRejester);
+                        hNameSuffix = sampleName+"_"+categorySuffix+systEffectName;                    
+                        fillControlHistos(hNameSuffix, eventWeightWithSyst, aSystEffect);
                 }
         }
         return true;
