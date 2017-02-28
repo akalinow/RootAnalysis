@@ -32,7 +32,7 @@ std::string HTTAnalyzer::getSampleName(const EventProxyHTT & myEventProxy){
 //////////////////////////////////////////////////////////////////////////////
 float HTTAnalyzer::getSystWeight(const HTTAnalysis::sysEffects & aSystEffect){
 
-        if(aSystEffect==HTTAnalysis::NOMINAL || aSystEffect==HTTAnalysis::NOMINAL_SVFIT) return 1.0;
+        if(aSystEffect==HTTAnalysis::NOMINAL) return 1.0;
 
         if(aSystEffect==HTTAnalysis::ZPtUp && sampleName.find("DYJets")!=std::string::npos) return aEvent.getPtReWeight();
         else if(aSystEffect==HTTAnalysis::ZPtDown && sampleName.find("DYJets")!=std::string::npos) return 1.0/aEvent.getPtReWeight();

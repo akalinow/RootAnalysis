@@ -56,7 +56,7 @@ class HTTEvent{
     "byVTightIsolationMVArun2v1DBdR03oldDMwLT"
   };
 
-  HTTEvent(){ clear();}
+  HTTEvent(){clear();}
 
   ~HTTEvent(){}
 
@@ -104,6 +104,8 @@ class HTTEvent{
 
   ///Reset class data members
   void clear();
+
+  void clearSelectionWord() {selectionWord.ResetAllBits();}
 
   ///Data member getters.
   unsigned int getRunId() const {return runId;}

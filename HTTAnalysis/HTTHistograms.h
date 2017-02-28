@@ -26,7 +26,7 @@ class HTTHistograms: public AnalysisHistograms {
   using AnalysisHistograms::get1DHistogram;
 
   TH1F *get1DHistogram(unsigned int iCategory, std::string varName,
-       unsigned int iSystEffect = (unsigned int)HTTAnalysis::NOMINAL_SVFIT);
+       unsigned int iSystEffect = (unsigned int)HTTAnalysis::NOMINAL);
 
   std::string getTemplateName(const std::string& name);
 
@@ -38,18 +38,18 @@ class HTTHistograms: public AnalysisHistograms {
 
   ///Estimate QCD background using the SS/OS method.
   TH1F* getQCDbackground(unsigned int iCategory, std::string varName,
-       unsigned int iSystEffect = (unsigned int)HTTAnalysis::NOMINAL_SVFIT);
+       unsigned int iSystEffect = (unsigned int)HTTAnalysis::NOMINAL);
 
   ///Calculate scaling factor for the WJets MC
   ///Scaling factor is estimated in high Mt region.
   ///Other backgrounds are subtracted, basing on MC
   ///QCD contribution is neglected.
   std::pair<float,float> getWNormalisation(unsigned int iCategory,
-    unsigned int iSystEffect = (unsigned int)HTTAnalysis::NOMINAL_SVFIT);
+    unsigned int iSystEffect = (unsigned int)HTTAnalysis::NOMINAL);
 
   ///Calculate QCD ratio between signal and control regions.
   std::pair<float,float> getQCDControlToSignal(unsigned int iCategory,
-              unsigned int iSystEffect = (unsigned int)HTTAnalysis::NOMINAL_SVFIT);
+              unsigned int iSystEffect = (unsigned int)HTTAnalysis::NOMINAL);
 
    private:
 

@@ -446,7 +446,7 @@ void HTTHistograms::finalizeHistograms(const std::vector<const HTTAnalysis::even
         }
 
         ///Make systematic effect histos.
-        for(unsigned int iSystEffect = (unsigned int)HTTAnalysis::NOMINAL_SVFIT;
+        for(unsigned int iSystEffect = (unsigned int)HTTAnalysis::NOMINAL;
             iSystEffect<=(unsigned int)HTTAnalysis::ZmumuDown; ++iSystEffect) {
               if(iSystEffect==(unsigned int)HTTAnalysis::DUMMY_SYS) continue;
                 for(auto iCategory: mainCategoriesRejester) {

@@ -88,7 +88,7 @@ eventCategory *myQCDSFDenom;
 
 };
 
-enum sysEffects {NOMINAL, NOMINAL_SVFIT,
+enum sysEffects {NOMINAL, 
                  TESUp, TESDown,
                  JESUp, JESDown,
                  M2TUp, M2TDown,

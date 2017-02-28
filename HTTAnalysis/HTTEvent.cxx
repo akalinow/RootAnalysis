@@ -46,6 +46,7 @@ void HTTEvent::clear(){
 
   nTracksInRefit = 0;
 
+  selectionWord.ResetAllBits();
 }
 ////////////////////////////////////////////////
 ////////////////////////////////////////////////
@@ -67,7 +68,7 @@ void HTTParticle::clear(){
 ////////////////////////////////////////////////
 const TLorentzVector & HTTParticle::getSystScaleP4(HTTAnalysis::sysEffects type) const{
 
-  if(type==HTTAnalysis::NOMINAL || type==HTTAnalysis::NOMINAL_SVFIT) {
+  if(type==HTTAnalysis::NOMINAL) {
     lastSystEffect = type;
     return p4;
   }
@@ -147,13 +148,13 @@ const TLorentzVector & HTTPair::getP4(HTTAnalysis::sysEffects type) const {
   //std::cout<<"type: "<<(unsigned int)type<<" size: "<<p4Vector.size()<<std::endl;
 
   if(p4Vector.size()>(unsigned int)type) return p4Vector[(unsigned int)type];
-  return p4Vector[(unsigned int)HTTAnalysis::NOMINAL_SVFIT];
+  return p4Vector[(unsigned int)HTTAnalysis::NOMINAL];
 }
 ////////////////////////////////////////////////
 ////////////////////////////////////////////////
 const TVector2 & HTTPair::getSystScaleMET(HTTAnalysis::sysEffects type) const{
 
-  if(type==HTTAnalysis::NOMINAL || type==HTTAnalysis::NOMINAL_SVFIT ||
+  if(type==HTTAnalysis::NOMINAL ||
   (unsigned int)type>(unsigned int)HTTAnalysis::DUMMY_SYS) {
     lastSystEffect = type;
     return met;

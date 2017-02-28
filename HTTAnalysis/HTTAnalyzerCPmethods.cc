@@ -117,7 +117,7 @@ void HTTAnalyzer::fillGenDecayPlaneAngle(const std::string & hNameSuffix, float 
   }
 
   ///////////////////////////////////////////////////////////
-  HTTAnalysis::sysEffects sysType = HTTAnalysis::NOMINAL_SVFIT;
+  HTTAnalysis::sysEffects sysType = HTTAnalysis::NOMINAL;
 
   if(aGenLeg2.getProperty(PropertyEnum::decayMode)==HTTAnalysis::tauDecay1ChargedPion0PiZero){
     float cosPhiNN =  muonPCA.Vect().Unit().Dot(tauPCA.Vect().Unit());

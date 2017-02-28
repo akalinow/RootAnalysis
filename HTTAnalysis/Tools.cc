@@ -120,8 +120,7 @@ float getCrossSection(const std::string & sampleName){
 //////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////
 std::string systEffectName(unsigned int iSystEffect){
-        if(iSystEffect==(int)NOMINAL) return "";
-        else if(iSystEffect==(int)NOMINAL_SVFIT) return "";
+        if(iSystEffect==(int)NOMINAL) return "";      
         else if(iSystEffect==(int)TESUp) return "_CMS_scale_t_mt_13TeVUp";
         else if(iSystEffect==(int)TESDown) return "_CMS_scale_t_mt_13TeVDown";
         else if(iSystEffect==(int)JESUp) return "_CMS_scale_j_13TeVUp";

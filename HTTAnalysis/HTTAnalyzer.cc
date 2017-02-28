@@ -136,7 +136,7 @@ void HTTAnalyzer::fillControlHistos(const std::string & hNameSuffix, float event
         myHistos_->fill2DUnrolledHistogram("h1DUnRollMjjMassSV"+hNameSuffix, aPair.getP4(aSystEffect).M(), jetsMass, eventWeight);
 
         myHistos_->fill1DHistogram("h1DIso"+hNameSuffix,aLeg1.getProperty(PropertyEnum::combreliso),eventWeight);
-        if(aSystEffect!=HTTAnalysis::NOMINAL_SVFIT) return;
+        if(aSystEffect!=HTTAnalysis::NOMINAL) return;
 
         fillDecayPlaneAngle(hNameSuffix, eventWeight, aSystEffect);
         fillGenDecayPlaneAngle(hNameSuffix+"_Gen", eventWeight);
@@ -253,7 +253,7 @@ bool HTTAnalyzer::analyze(const EventProxyBase& iEvent){
         std::string categorySuffix = "";
         std::string systEffectName = "";
         const std::vector<const HTTAnalysis::eventCategory*> & aCategoryRejester = myChannelSpecifics->getCategoryRejester();
-        for(unsigned int iSystEffect = (unsigned int)HTTAnalysis::NOMINAL_SVFIT;
+        for(unsigned int iSystEffect = (unsigned int)HTTAnalysis::NOMINAL;
             iSystEffect<=(unsigned int)HTTAnalysis::ZmumuDown; ++iSystEffect) {
 
               if(iSystEffect==(unsigned int)HTTAnalysis::DUMMY_SYS) continue;
@@ -278,7 +278,7 @@ bool HTTAnalyzer::analyze(const EventProxyBase& iEvent){
 
                         categorySuffix = std::to_string(iCategory);
                         systEffectName = HTTAnalysis::systEffectName(iCategory, iSystEffect, aCategoryRejester);
-                        hNameSuffix = sampleName+"_"+categorySuffix+systEffectName;                    
+                        hNameSuffix = sampleName+"_"+categorySuffix+systEffectName;
                         fillControlHistos(hNameSuffix, eventWeightWithSyst, aSystEffect);
                 }
         }
