@@ -491,16 +491,19 @@ void AnalysisHistograms::finalizeHistograms(){
           my3Dhistograms_[0][it.first] = hEmpty;
         }
       }
+      for(auto it:myProfiles_[iThread]){
+        if(myProfiles_[0].find(it.first)==myProfiles_[0].end()){
+          TProfile *hEmpty = (TProfile*)it.second->Clone();
+          hEmpty->Clear();
+          myProfiles_[0][it.first] = hEmpty;
+        }
+      }
     }
 
   std::cout<<"1D histogram size: "<<my1Dhistograms_[0].size()<<std::endl;
   std::cout<<"2D histogram size: "<<my2Dhistograms_[0].size()<<std::endl;
   std::cout<<"3D histogram size: "<<my3Dhistograms_[0].size()<<std::endl;
-
-//for(auto it:my1Dhistograms_[0]) std::cout<<"thread 0: "<<it.first<<std::endl;
-//for(auto it:my1Dhistograms_[1]) std::cout<<"thread 1: "<<it.first<<std::endl;
-//for(auto it:my1Dhistograms_[2]) std::cout<<"thread 2: "<<it.first<<std::endl;
-
+  std::cout<<"TProfile size: "<<myProfiles_[0].size()<<std::endl;
 
   for(unsigned int iThread = 1;iThread<omp_get_max_threads();++iThread){
     if(my1Dhistograms_[0].size()!=my1Dhistograms_[iThread].size()){
@@ -509,21 +512,24 @@ void AnalysisHistograms::finalizeHistograms(){
       <<" thread "<<iThread<<" "<<my1Dhistograms_[iThread].size()
       <<std::endl;
     }
-
     if(my2Dhistograms_[0].size()!=my2Dhistograms_[iThread].size()){
       std::cout<<"2D histogram size mismatch. "
       <<" thread 0: "<<my2Dhistograms_[0].size()
       <<" thread "<<iThread<<" "<<my2Dhistograms_[iThread].size()
       <<std::endl;
     }
-
     if(my3Dhistograms_[0].size()!=my3Dhistograms_[iThread].size()){
       std::cout<<"3D histogram size mismatch. "
       <<" thread 0: "<<my3Dhistograms_[0].size()
       <<" thread "<<iThread<<" "<<my3Dhistograms_[iThread].size()
       <<std::endl;
     }
-
+    if(myProfiles_[0].size()!=myProfiles_[iThread].size()){
+      std::cout<<"TProfile size mismatch. "
+      <<" thread 0: "<<myProfiles_[0].size()
+      <<" thread "<<iThread<<" "<<myProfiles_[iThread].size()
+      <<std::endl;
+    }
     for(auto it:my1Dhistograms_[0]){
       if(my1Dhistograms_[iThread].find(it.first)!=my1Dhistograms_[iThread].end()) it.second->Add(my1Dhistograms_[iThread].find(it.first)->second);
     }
@@ -532,6 +538,9 @@ void AnalysisHistograms::finalizeHistograms(){
     }
     for(auto it:my3Dhistograms_[0]){
       if(my3Dhistograms_[iThread].find(it.first)!=my3Dhistograms_[iThread].end()) it.second->Add(my3Dhistograms_[iThread].find(it.first)->second);
+    }
+    for(auto it:myProfiles_[0]){
+      if(myProfiles_[iThread].find(it.first)!=myProfiles_[iThread].end()) it.second->Add(myProfiles_[iThread].find(it.first)->second);
     }
   }
 }
