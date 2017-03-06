@@ -203,12 +203,12 @@ float HTTAnalyzer::getPUWeight(const EventProxyHTT & myEventProxy){
                 TH1F *hPUData = (TH1F*)puDataFile_->Get(hName.c_str());
                 TH1F *hPUSample = (TH1F*)puMCFile_->Get(hName.c_str());
                 ///Normalise both histograms.
-                hPUData->Scale(1.0/hPUData->Integral(0,hPUData->GetNbinsX()+1));
+                //TEST hPUData->Scale(1.0/hPUData->Integral(0,hPUData->GetNbinsX()+1));
                 hPUSample->Scale(1.0/hPUSample->Integral(0,hPUSample->GetNbinsX()+1));
                 ///
                 hPUData->SetDirectory(0);
                 hPUSample->SetDirectory(0);
-                hPUData->Divide(hPUSample);
+                //TEST hPUData->Divide(hPUSample);
                 hPUData->SetName(("h1DPUWeight"+getSampleName(myEventProxy)).c_str());
                 hPUVec_[0] =  hPUData;
         }

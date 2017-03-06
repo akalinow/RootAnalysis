@@ -20,15 +20,13 @@ HTTAnalyzer::HTTAnalyzer(const std::string & aName, const std::string & aDecayMo
                 //--inputLumiJSON /afs/cern.ch/cms/CAF/CMSCOMM/COMM_DQM/certification/Collisions16/13TeV/PileUp/pileup_latest.txt
                 //--calcMode true --minBiasXsec 69200 --maxPileupBin 60 --numPileupBins 600 Data_Pileup_Cert_271036-277148.root
                 TFile::SetCacheFileDir("/tmp/");
-                std::string dataPUFileName = "http://akalinow.web.cern.ch/akalinow/Data_Pileup_2016_BCDEFG_v26.root";
-                //std::string dataPUFileName = "http://akalinow.web.cern.ch/akalinow/Data_Pileup_2016_271036-284044_13TeVMoriond17_23Sep2016ReReco_69p2mbMinBiasXS.root";
+                //std::string dataPUFileName = "http://akalinow.web.cern.ch/akalinow/Data_Pileup_2016_BCDEFG_v26.root";
+                std::string dataPUFileName = "http://akalinow.web.cern.ch/akalinow/Data_Pileup_2016_271036-284044_13TeVMoriond17_23Sep2016ReReco_69p2mbMinBiasXS.root";
                 puDataFile_ = TFile::Open(dataPUFileName.c_str(),"CACHEREAD");
 
-                std::string mcPUFileName = "http://akalinow.web.cern.ch/akalinow/MC_Spring16_PU25ns_V1.root";
-                //std::string mcPUFileName = "http://akalinow.web.cern.ch/akalinow/MC_Moriond17_PU25ns_V1.root";
+                //std::string mcPUFileName = "http://akalinow.web.cern.ch/akalinow/MC_Spring16_PU25ns_V1.root";
+                std::string mcPUFileName = "http://akalinow.web.cern.ch/akalinow/MC_Moriond17_PU25ns_V1.root";
                 puMCFile_ = TFile::Open(mcPUFileName.c_str(),"CACHEREAD");
-
-                //TEST categoryDecisions.resize((int)HTTAnalysis::DUMMY_CAT);
 
                 if(aDecayMode=="MuTau") myChannelSpecifics = new MuTauSpecifics(this);
                 else if (aDecayMode=="TauTau") myChannelSpecifics = new TauTauSpecifics(this);
@@ -228,7 +226,7 @@ bool HTTAnalyzer::analyze(const EventProxyBase& iEvent){
         sampleName = getSampleName(myEventProxy);
 
         std::string hNameSuffix = sampleName;
-        float puWeight = getPUWeight(myEventProxy);
+        float puWeight = getPUWeight(myEventProxy);      
         float genWeight = getGenWeight(myEventProxy);
         float ptReweight = 1.0;
         if(sampleName.find("DYJets")!=std::string::npos ||
