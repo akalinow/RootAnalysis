@@ -120,7 +120,7 @@ float getCrossSection(const std::string & sampleName){
 //////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////
 std::string systEffectName(unsigned int iSystEffect){
-        if(iSystEffect==(int)NOMINAL) return "";      
+        if(iSystEffect==(int)NOMINAL) return "";
         else if(iSystEffect==(int)TESUp) return "_CMS_scale_t_mt_13TeVUp";
         else if(iSystEffect==(int)TESDown) return "_CMS_scale_t_mt_13TeVDown";
         else if(iSystEffect==(int)JESUp) return "_CMS_scale_j_13TeVUp";
@@ -156,21 +156,6 @@ std::string systEffectName(unsigned int iCategory, unsigned int iSystEffect,
                 systEffectName.replace(systEffectName.find("CAT"),3,categoryName);
         }
         return systEffectName;
-}
-//////////////////////////////////////////////////////////////////////////////
-//////////////////////////////////////////////////////////////////////////////
-unsigned int getControlCategory(unsigned int iCategory, std::string backgroundName){
-/*
-        unsigned int iControlCategory = (unsigned int)HTTAnalysis::jet0;
-
-        if (backgroundName=="WSF") {
-                if(iCategory==(unsigned int)(HTTAnalysis::jet0)) iCategory = HTTAnalysis::wjets_jet0;
-                else if(iCategory==(unsigned int)(HTTAnalysis::boosted)) iCategory = HTTAnalysis::wjets_boosted;
-                else if(iCategory==(unsigned int)(HTTAnalysis::vbf)) iCategory = HTTAnalysis::wjets_vbf;
-                else iCategory = HTTAnalysis::W;
-        }
-
-*/
 }
 //////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////

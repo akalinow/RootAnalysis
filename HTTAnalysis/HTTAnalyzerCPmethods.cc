@@ -22,6 +22,7 @@ void HTTAnalyzer::fillDecayPlaneAngle(const std::string & hNameSuffix, float eve
 
   const TLorentzVector & muonTk = aLeg1.getChargedP4();
   const TLorentzVector & tauLeadingTk = aLeg2.getChargedP4();
+
   TLorentzVector muonPCA(aLeg1.getPCA(),0);
   TLorentzVector tauPCA(aLeg2.getPCA(),0);
 
@@ -149,7 +150,8 @@ std::pair<float,float> HTTAnalyzer::angleBetweenPlanes(const TLorentzVector &tau
 						       const TLorentzVector &tau2Daughter,
 						       bool sgn){
   //Boost all 4v to (tau1+tau2) rest frame
-  TVector3 boost = (tau1+tau2).BoostVector();
+  //TVector3 boost = (tau1+tau2).BoostVector();
+  TVector3 boost = aPair.getP4().BoostVector();
 
   TLorentzVector tau1Star = tau1;
   TLorentzVector tau2Star = tau2;
