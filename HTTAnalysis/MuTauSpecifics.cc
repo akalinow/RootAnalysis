@@ -124,6 +124,13 @@ void MuTauSpecifics::testAllCategories(const HTTAnalysis::sysEffects & aSystEffe
 
         bool ss = myAnalyzer->aLeg2.getCharge()*myAnalyzer->aLeg1.getCharge() == 1;
         bool os = myAnalyzer->aLeg2.getCharge()*myAnalyzer->aLeg1.getCharge() == -1;
+
+        //cpPi &= std::abs(myAnalyzer->aLeg1.getPCARefitPV().Mag() - myAnalyzer->aGenLeg1.getPCA().Mag())<0.001;//TEST
+        //cpPi &= std::abs(myAnalyzer->aLeg2.getPCARefitPV().Mag() - myAnalyzer->aGenLeg2.getPCA().Mag())<0.001;//TEST
+        //cpPi &=boosted;
+
+
+
 /*
         myAnalyzer->categoryDecisions[(int)HTTAnalysis::jet0_low] = os && muonIso && mtSelection && jet0_low;
         myAnalyzer->categoryDecisions[(int)HTTAnalysis::jet0_high] = os && muonIso && mtSelection && jet0_high;

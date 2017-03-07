@@ -48,11 +48,6 @@ void HTTAnalyzer::fillDecayPlaneAngle(const std::string & hNameSuffix, float eve
     anglesIPRho = angleBetweenPlanes(tauLeadingTk, aLeg2.getNeutralP4(), muonTk, muonPCA);
   }
 
-  myHistos_->fillProfile("hProfRecoVsMagGen_"+hNameSuffix,
-			 aGenLeg2.getPCA().Mag(),
-			 tauPCA.Vect().Mag(),
-			 eventWeight);
-
   float yTau =  2.*tauLeadingTk.Pt()/aLeg2.getP4().Pt() - 1.;
   float shiftedIPrho = anglesIPRho.first +(yTau<0)*(1-2*(anglesIPRho.first>M_PI))*M_PI;
 
@@ -84,8 +79,17 @@ void HTTAnalyzer::fillDecayPlaneAngle(const std::string & hNameSuffix, float eve
     myHistos_->fillProfile("hProfPhiVsMag"+hNameSuffix,aGenLeg1.getPCA().Mag(),cosMuon);
     myHistos_->fillProfile("hProfPhiVsMag"+hNameSuffix,aGenLeg2.getPCA().Mag(),cosTau);
 
-    myHistos_->fillProfile("hProfRecoVsMagGen"+hNameSuffix,aGenLeg1.getPCA().Mag(),muonPCA.Vect().Mag());
-    myHistos_->fillProfile("hProfRecoVsMagGen"+hNameSuffix,aGenLeg2.getPCA().Mag(),tauPCA.Vect().Mag());
+    float delta = std::abs(muonPCA.Vect().Phi() - aGenLeg1.getPCA().Phi());
+    myHistos_->fillProfile("hProfRecoVsMagGen"+hNameSuffix,aGenLeg1.getPCA().Mag(),delta);
+
+    delta = std::abs(tauPCA.Vect().Phi() - aGenLeg2.getPCA().Phi());
+    myHistos_->fillProfile("hProfRecoVsMagGen"+hNameSuffix,aGenLeg2.getPCA().Mag(),delta);
+
+    myHistos_->fill2DHistogram("h2DTestHisto",aGenLeg1.getPCA().Mag(),delta);
+    //TEST myHistos_->fillProfile("hProfRecoVsMagGen"+hNameSuffix,aGenLeg1.getPCA().Mag(),muonPCA.Vect().Mag());
+    //TEST myHistos_->fillProfile("hProfRecoVsMagGen"+hNameSuffix,aGenLeg2.getPCA().Mag(),tauPCA.Vect().Mag());
+
+
 
     }
 }

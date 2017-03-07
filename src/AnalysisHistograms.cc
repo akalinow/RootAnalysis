@@ -39,7 +39,7 @@ void AnalysisHistograms::addProfile(const std::string& name,
 
   hTmp->SetDirectory(0);
 
-  //TEST if(iThread==0 && name.find("Template")==std::string::npos) hTmp->SetDirectory(myDir);
+  if(iThread==0 && name.find("Template")==std::string::npos) hTmp->SetDirectory(myDir);
   if(name.find("Template")!=std::string::npos) iThread = AnalysisHistograms::maxThreads-1;
 
   if(myProfiles_[iThread].find(name)==myProfiles_[iThread].end()) myProfiles_[iThread][name] = hTmp;

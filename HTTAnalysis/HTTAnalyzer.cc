@@ -33,7 +33,7 @@ HTTAnalyzer::HTTAnalyzer(const std::string & aName, const std::string & aDecayMo
                 myNumberOfCategories = myChannelSpecifics->getCategoryRejester().size();
                 categoryDecisions.resize(myNumberOfCategories);
 
-                nPCAMin_ = 0.004;
+                nPCAMin_ = 0.000;
 
                 ntupleFile_ = 0;
                 hStatsFromFile = 0;
@@ -278,6 +278,7 @@ bool HTTAnalyzer::analyze(const EventProxyBase& iEvent){
                         hNameSuffix = sampleName+"_"+categorySuffix+systEffectName;
                         fillControlHistos(hNameSuffix, eventWeightWithSyst, aSystEffect);
                 }
+                continue; //TEST
         }
         return true;
 }

@@ -328,6 +328,8 @@ std::string HTTHistograms::getTemplateName(const std::string& name){
         if(name.find("h1DUnRollMassSVYCP")!=std::string::npos) templateName = "h1DUnRollMassSVYCPTemplate";
         if(name.find("h2DRollMassSVYCP")!=std::string::npos) templateName = "h2DRollMassSVYCPTemplate";
 
+      if(name.find("h2DTestHisto")!=std::string::npos) templateName = "h2DTestHistoTemplate";
+
         return templateName;
 }
 /////////////////////////////////////////////////////////
@@ -372,6 +374,8 @@ void HTTHistograms::defineHistograms(){
                 addRollHistogram("h1DUnRollMassSVPhiCPTemplate","#phi_{IP,IP} CP vs SV Mass; Events;#phi_{IP,IP} CP",phiBins, svMassBins, file_);
                 addRollHistogram("h1DUnRollMassSVYCPTemplate","#phi_{IP,#rho} CP vs SV Mass; Events;#phi_{IP,#rho} CP", phiBins, svMassBins, file_);
 
+                add2DHistogram("h2DTestHistoTemplate","",6,-M_PI,M_PI,6,-M_PI,M_PI,file_);
+
                 addProfile("hProfVsMagTemplate","",10,0,0.015,file_);
                 addProfile("hProfVsPtTemplate","",20,15,55,file_);
                 addProfile("hProfVsCosTemplate","",20,-1,1,file_);
@@ -386,10 +390,15 @@ void HTTHistograms::finalizeHistograms(const std::vector<const HTTAnalysis::even
         unsigned int myNumberOfCategories = myCategoryRejester.size();
 
         ///
+        /*
         std::vector<std::string> mainCategoryNames = {"jet0","boosted", "vbf",
                                                       "antiIso_jet0", "antiIso_boosted", "antiIso_vbf",
                                                       "jet0_QCD",
                                                       "jet0_W", "boosted_W", "vbf_W"};
+                                                      */
+        std::vector<std::string> mainCategoryNames = {"mu_pi"};
+
+
         std::vector <unsigned int> mainCategoriesRejester;
         for(unsigned int iCategory=0; iCategory<myCategoryRejester.size(); ++iCategory) {
                 for(auto nameIt : mainCategoryNames) {
@@ -402,9 +411,11 @@ void HTTHistograms::finalizeHistograms(const std::vector<const HTTAnalysis::even
         ///Control regions plots
         for(auto iCategory: mainCategoriesRejester) {
 
-                //plotCPhistograms(iCategory);
-
+                plotCPhistograms(iCategory);
                 plotStack(iCategory, "MassSV");
+                continue;
+
+
                 plotStack(iCategory, "MassVis");
                 plotStack(iCategory, "MassTrans");
                 plotStack(iCategory, "UnRollTauPtMassVis");
