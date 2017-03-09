@@ -72,9 +72,7 @@ void ChannelSpecifics::initializeCorrections(){
 
                 RooAbsReal *muon_id_scalefactor = scaleWorkspace->function("m_id_ratio");
                 RooAbsReal *muon_iso_scalefactor = scaleWorkspace->function("m_iso_ratio");
-                //RooAbsReal *muon_trg_scalefactor = scaleWorkspace->function("m_trgIsoMu22orTkIsoMu22_desy_ratio");
-                RooAbsReal *muon_trg_scalefactor = scaleWorkspace->function("m_trgMu22OR_eta2p1_desy_data");                
-                //RooAbsReal *tau_id_scalefactor = scaleWorkspace->function("t_iso_mva_m_pt30_sf");
+                RooAbsReal *muon_trg_scalefactor = scaleWorkspace->function("m_trgIsoMu24orTkIsoMu24_desy_ratio");              
                 RooAbsReal *tau_trg_genuine_efficiency = scaleWorkspace->function("t_genuine_TightIso_tt_data");
                 RooAbsReal *tau_trg_fake_efficiency = scaleWorkspace->function("t_fake_TightIso_tt_data");
 

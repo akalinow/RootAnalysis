@@ -345,7 +345,7 @@ void HTTHistograms::defineHistograms(){
                 add1DHistogram("h1DPtTemplate",";p_{T}; Events",20,0,100,file_);
                 add1DHistogram("h1DEtaTemplate",";#eta; Events",24,-2.4,2.4,file_);
                 add1DHistogram("h1DDeltaEtaTemplate",";#Delta#eta; Events",50,0,10,file_);
-                add1DHistogram("h1DPhiTemplate",";#phi; Events",12,0,2*M_PI,file_);
+                add1DHistogram("h1DPhiTemplate",";#phi; Events",6,0,2*M_PI,file_);
                 add1DHistogram("h1DCosPhiTemplate",";cos(#phi); Events",10,-1.0,1.0,file_);
                 add1DHistogram("h1DCSVBtagTemplate",";CSV btag; Events",20,0,1,file_);
                 add1DHistogram("h1DIsoTemplate",";Isolation; Events",20,0,0.3,file_);
@@ -382,7 +382,6 @@ void HTTHistograms::defineHistograms(){
 void HTTHistograms::finalizeHistograms(const std::vector<const HTTAnalysis::eventCategory*> & aCategoryRejester){
 
         AnalysisHistograms::finalizeHistograms();
-
         myCategoryRejester  = aCategoryRejester;
         unsigned int myNumberOfCategories = myCategoryRejester.size();
 
@@ -397,7 +396,7 @@ void HTTHistograms::finalizeHistograms(const std::vector<const HTTAnalysis::even
                         if(myCategoryRejester[iCategory]->name()==nameIt) mainCategoriesRejester.push_back(iCategory);
                 }
         }
-        ///
+
         gErrorIgnoreLevel = kBreak;
         //////////////
         ///Control regions plots
@@ -1434,6 +1433,7 @@ std::pair<float,float> HTTHistograms::getQCDControlToSignal(unsigned int iCatego
         if(iSystEffect==(unsigned int)HTTAnalysis::QCDSFDown) result.first-=result.second;
 
         std::string varName = "MassVis";
+
         unsigned int iCategoryNum = myCategoryRejester[iCategory]->qcdSFDenominator()->id();
         TH1F *hSoupLoose = get1DHistogram(iCategoryNum, varName+"Data", iSystEffect);
         if(!hSoupLoose) return result; //MuTau has fixed QCD control to signal transfer factors.
@@ -1481,7 +1481,7 @@ std::pair<float,float> HTTHistograms::getQCDControlToSignal(unsigned int iCatego
                  <<"\tQCD Tight/Loose` ratio: "<<std::endl
                  <<"\tRatio: "<<sumTight/sumLoose<<" +- "<<ratioErr<<std::endl
                  <<"\tFit: "<<param<<" +- "<<dparam<<std::endl;
-*/
+ */
         result = std::make_pair(sumTight/sumLoose,ratioErr);
         return result;
 }
@@ -1512,7 +1512,6 @@ TH1F* HTTHistograms::getQCDbackground(unsigned int iCategory,
 std::pair<float,float> HTTHistograms::getWNormalisation(unsigned int iCategory, unsigned int iSystEffect){
 
         iCategory = myCategoryRejester[iCategory]->wSF()->id();
-
         std::string systEffectName = HTTAnalysis::systEffectName(iCategory, iSystEffect, myCategoryRejester);
         std::string hNameSuffix =  "_"+std::to_string(iCategory)+systEffectName;
 

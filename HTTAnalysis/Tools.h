@@ -29,7 +29,5 @@ bool isOneProng(int decMode);
 
 ///Check if the decMode points to leptonic tau decay
 bool isLepton(int decMode);
-
-//eventCategory test1("jet0");
 }
 #endif

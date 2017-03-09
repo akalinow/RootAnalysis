@@ -20,22 +20,20 @@ HTTAnalyzer::HTTAnalyzer(const std::string & aName, const std::string & aDecayMo
                 //--inputLumiJSON /afs/cern.ch/cms/CAF/CMSCOMM/COMM_DQM/certification/Collisions16/13TeV/PileUp/pileup_latest.txt
                 //--calcMode true --minBiasXsec 69200 --maxPileupBin 60 --numPileupBins 600 Data_Pileup_Cert_271036-277148.root
                 TFile::SetCacheFileDir("/tmp/");
-                std::string dataPUFileName = "http://akalinow.web.cern.ch/akalinow/Data_Pileup_2016_BCDEFG_v26.root";
-                //std::string dataPUFileName = "http://akalinow.web.cern.ch/akalinow/Data_Pileup_2016_271036-284044_13TeVMoriond17_23Sep2016ReReco_69p2mbMinBiasXS.root";
+                //std::string dataPUFileName = "http://akalinow.web.cern.ch/akalinow/Data_Pileup_2016_BCDEFG_v26.root";
+                std::string dataPUFileName = "http://akalinow.web.cern.ch/akalinow/Data_Pileup_2016_271036-284044_13TeVMoriond17_23Sep2016ReReco_69p2mbMinBiasXS.root";
                 puDataFile_ = TFile::Open(dataPUFileName.c_str(),"CACHEREAD");
 
-                std::string mcPUFileName = "http://akalinow.web.cern.ch/akalinow/MC_Spring16_PU25ns_V1.root";
-                //std::string mcPUFileName = "http://akalinow.web.cern.ch/akalinow/MC_Moriond17_PU25ns_V1.root";
+                //std::string mcPUFileName = "http://akalinow.web.cern.ch/akalinow/MC_Spring16_PU25ns_V1.root";
+                std::string mcPUFileName = "http://akalinow.web.cern.ch/akalinow/MC_Moriond17_PU25ns_V1.root";
                 puMCFile_ = TFile::Open(mcPUFileName.c_str(),"CACHEREAD");
-
-                //TEST categoryDecisions.resize((int)HTTAnalysis::DUMMY_CAT);
 
                 if(aDecayMode=="MuTau") myChannelSpecifics = new MuTauSpecifics(this);
                 else if (aDecayMode=="TauTau") myChannelSpecifics = new TauTauSpecifics(this);
                 myNumberOfCategories = myChannelSpecifics->getCategoryRejester().size();
                 categoryDecisions.resize(myNumberOfCategories);
 
-                nPCAMin_ = 0.003;
+                nPCAMin_ = 0.004;
 
                 ntupleFile_ = 0;
                 hStatsFromFile = 0;
@@ -257,7 +255,6 @@ bool HTTAnalyzer::analyze(const EventProxyBase& iEvent){
             iSystEffect<=(unsigned int)HTTAnalysis::ZmumuDown; ++iSystEffect) {
 
               if(iSystEffect==(unsigned int)HTTAnalysis::DUMMY_SYS) continue;
-
                 HTTAnalysis::sysEffects aSystEffect = static_cast<HTTAnalysis::sysEffects>(iSystEffect);
 
                 float leg1ScaleFactor = myChannelSpecifics->getLeg1Correction(aSystEffect);
