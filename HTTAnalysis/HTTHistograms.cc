@@ -374,7 +374,8 @@ void HTTHistograms::defineHistograms(){
                 addRollHistogram("h1DUnRollMassSVPhiCPTemplate","#phi_{IP,IP} CP vs SV Mass; Events;#phi_{IP,IP} CP",phiBins, svMassBins, file_);
                 addRollHistogram("h1DUnRollMassSVYCPTemplate","#phi_{IP,#rho} CP vs SV Mass; Events;#phi_{IP,#rho} CP", phiBins, svMassBins, file_);
 
-                add2DHistogram("h2DTestHistoTemplate","",6,-M_PI,M_PI,6,-M_PI,M_PI,file_);
+                //add2DHistogram("h2DTestHistoTemplate","",2*12,0,0.01,24,0,1.0,file_);
+		            add2DHistogram("h2DTestHistoTemplate","",22,0,0.2,24,0,1,file_);
 
                 addProfile("hProfVsMagTemplate","",10,0,0.015,file_);
                 addProfile("hProfVsPtTemplate","",20,15,55,file_);
@@ -807,6 +808,7 @@ void HTTHistograms::plotPhiDecayPlanes(const std::string & name){
 
                 if(h1DGenPV && h1DGenPV->GetMaximum()> h1DRefitPV->GetMaximum()) h1DRefitPV->SetMaximum(1.02*h1DGenPV->GetMaximum());
                 h1DRefitPV->SetMinimum(0);
+		h1DRefitPV->SetMaximum(0.25);
                 h1DRefitPV->Draw("HISTO");
 
                 l.AddEntry(h1DRefitPV,"nPCA with refit. PV");

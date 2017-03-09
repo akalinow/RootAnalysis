@@ -4,6 +4,7 @@
 #include "RooAbsReal.h"
 #include "RooRealVar.h"
 #include "RooFormulaVar.h"
+#include "TF1.h"
 
 #include "HTTAnalyzer.h"
 #include "HTTHistograms.h"
@@ -33,10 +34,13 @@ HTTAnalyzer::HTTAnalyzer(const std::string & aName, const std::string & aDecayMo
                 myNumberOfCategories = myChannelSpecifics->getCategoryRejester().size();
                 categoryDecisions.resize(myNumberOfCategories);
 
-                nPCAMin_ = 0.000;
+                nPCAMin_ = 0.004;
 
                 ntupleFile_ = 0;
                 hStatsFromFile = 0;
+
+
+		f1 = new TF1("f1","TMath::Exp(-7.80941e-01-1.02172e+02*x)",0,0.05);
         }
 }
 //////////////////////////////////////////////////////////////////////////////
@@ -229,9 +233,12 @@ bool HTTAnalyzer::analyze(const EventProxyBase& iEvent){
         float puWeight = getPUWeight(myEventProxy);
         float genWeight = getGenWeight(myEventProxy);
         float ptReweight = 1.0;
-        if(sampleName.find("DYJets")!=std::string::npos ||
+        if(sampleName.find("DY")!=std::string::npos ||
            sampleName.find("TTbar")!=std::string::npos)
                 ptReweight = myEventProxy.event->getPtReWeight();
+
+        std::cout<<"sampleName: "<<sampleName<<" ptReweight: "<<ptReweight<<std::endl;
+
         float eventWeight = puWeight*genWeight*ptReweight;
 
         //Fill bookkeeping histogram. Bin 1 holds sum of weights.

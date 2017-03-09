@@ -127,7 +127,10 @@ void MuTauSpecifics::testAllCategories(const HTTAnalysis::sysEffects & aSystEffe
 
         //cpPi &= std::abs(myAnalyzer->aLeg1.getPCARefitPV().Mag() - myAnalyzer->aGenLeg1.getPCA().Mag())<0.001;//TEST
         //cpPi &= std::abs(myAnalyzer->aLeg2.getPCARefitPV().Mag() - myAnalyzer->aGenLeg2.getPCA().Mag())<0.001;//TEST
-        //cpPi &=boosted;
+	//cpPi = true;
+	//cpPi &= myAnalyzer->aLeg1.getPCARefitPV().Mag()>0.003 &&  myAnalyzer->aLeg1.getPCARefitPV().Mag()<0.004;
+	//cpPi &= myAnalyzer->aLeg1.getPCARefitPV().Mag()>0.00;
+        
 
 
 
