@@ -231,7 +231,7 @@ bool HTTAnalyzer::analyze(const EventProxyBase& iEvent){
         float puWeight = getPUWeight(myEventProxy);
         float genWeight = getGenWeight(myEventProxy);
         float ptReweight = 1.0;
-        if(sampleName.find("DYJets")!=std::string::npos ||
+        if(sampleName.find("DY")!=std::string::npos ||
            sampleName.find("TTbar")!=std::string::npos)
                 ptReweight = myEventProxy.event->getPtReWeight();
         float eventWeight = puWeight*genWeight*ptReweight;
