@@ -13,7 +13,7 @@
 
 #include "EventProxyHTT.h"
 #include "HTTAnalyzer.h"
-#include "HTTSynchNTupleBase.h"
+#include "HTTSynchNTuple.h"
 
 #include "TFile.h"
 #include "TStopwatch.h"
@@ -70,7 +70,7 @@ int main(int argc, char ** argv) {
 	 if(processName.find("Analysis")!=std::string::npos)
 	   myAnalyzers.push_back(new HTTAnalyzer("HTTAnalyzer",decayModeName));
 	 else if(processName.find("Synch")!=std::string::npos)
-	   myAnalyzers.push_back(new HTTSynchNTupleBase("SynchNTuple",decayModeName));
+	   myAnalyzers.push_back(new HTTSynchNTuple("SynchNTuple",decayModeName));
 	 else{
 	   std::cout<<"Incorrect process name: "<<processName<<std::endl;
 	   return 1;

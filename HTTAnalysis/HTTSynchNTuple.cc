@@ -1,46 +1,45 @@
 #include <sstream>
 
-#include "HTTSynchNTupleBase.h"
+#include "HTTSynchNTuple.h"
 #include "HTTHistograms.h"
-#include "EventProxyHTT.h"
 
 //////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////
-HTTSynchNTupleBase::HTTSynchNTupleBase(const std::string & aName, const std::string & aDecayMode):Analyzer(aName){ decayMode_ = aDecayMode;}
+HTTSynchNTuple::HTTSynchNTuple(const std::string & aName, const std::string & aDecayMode):Analyzer(aName){ decayMode_ = aDecayMode;}
 //////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////
-HTTSynchNTupleBase::~HTTSynchNTupleBase(){ if(myHistos_) delete myHistos_; }
+HTTSynchNTuple::~HTTSynchNTuple(){ if(myHistos_) delete myHistos_; }
 //////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////
-Analyzer* HTTSynchNTupleBase::clone() const{
+Analyzer* HTTSynchNTuple::clone() const{
 
-  HTTSynchNTupleBase* clone = new HTTSynchNTupleBase(name(),decayMode());
+  HTTSynchNTuple* clone = new HTTSynchNTuple(name(),decayMode());
   clone->setHistos(myHistos_);
   return clone;
 
 };
 //////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////
-void HTTSynchNTupleBase::initialize(TDirectory* aDir,
+void HTTSynchNTuple::initialize(TDirectory* aDir,
 			      pat::strbitset *aSelections){
 
   mySelections_ = aSelections;
   
-  ///The histograms for this analyzer will be saved into "HTTSynchNTupleBase"
+  ///The histograms for this analyzer will be saved into "HTTSynchNTuple"
   ///directory of the ROOT file
   ///NOTE: due to a bug hists land in the Summary directory
   myHistos_ = new HTTHistograms(aDir, selectionFlavours_);
 }
 //////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////
-void HTTSynchNTupleBase::finalize(){ 
+void HTTSynchNTuple::finalize(){ 
 
   myHistos_->finalizeHistograms(std::vector<const HTTAnalysis::eventCategory*>());
  
 }
 //////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////
-void HTTSynchNTupleBase::clearTTreeVariables(){ 
+void HTTSynchNTuple::clearTTreeVariables(){ 
   
   //event ID variables
   run = -999;
@@ -184,7 +183,7 @@ void HTTSynchNTupleBase::clearTTreeVariables(){
 }
 //////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////
-void HTTSynchNTupleBase::addBranch(TTree *tree){
+void HTTSynchNTuple::addBranch(TTree *tree){
 
   //event ID variables
   tree->Branch("run",&run);
@@ -328,7 +327,7 @@ void HTTSynchNTupleBase::addBranch(TTree *tree){
 }
 //////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////
-bool HTTSynchNTupleBase::analyze(const EventProxyBase& iEvent){
+bool HTTSynchNTuple::analyze(const EventProxyBase& iEvent){
 
   const EventProxyHTT & myEventProxy = static_cast<const EventProxyHTT&>(iEvent);
 
@@ -359,7 +358,7 @@ bool HTTSynchNTupleBase::analyze(const EventProxyBase& iEvent){
 }
 //////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////
-void HTTSynchNTupleBase::fillEventID(const HTTEvent &event){
+void HTTSynchNTuple::fillEventID(const HTTEvent &event){
 
   run = event.getRunId();
   lumi = 0; //NEED TO FIX, not in ntuples
@@ -372,7 +371,7 @@ void HTTSynchNTupleBase::fillEventID(const HTTEvent &event){
 }
 //////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////
-void HTTSynchNTupleBase::fillLegs(const HTTParticle &leg1, const HTTParticle &leg2){
+void HTTSynchNTuple::fillLegs(const HTTParticle &leg1, const HTTParticle &leg2){
 
   //Leg 1 (leading tau for tt; electon for et,em; muon for mt)
   pt_1 = leg1.getP4().Pt();
@@ -407,7 +406,7 @@ void HTTSynchNTupleBase::fillLegs(const HTTParticle &leg1, const HTTParticle &le
  }
 //////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////
-void HTTSynchNTupleBase::fillLegsSpecific(const HTTParticle &leg1, const HTTParticle &leg2){
+void HTTSynchNTuple::fillLegsSpecific(const HTTParticle &leg1, const HTTParticle &leg2){
 
   if(decayMode_=="MuTau"){
     //Specific implementation for the mu+tau decay channel
@@ -493,7 +492,7 @@ void HTTSynchNTupleBase::fillLegsSpecific(const HTTParticle &leg1, const HTTPart
 }
 //////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////
-void HTTSynchNTupleBase::fillPair(const HTTEvent &event, HTTPair &pair){
+void HTTSynchNTuple::fillPair(const HTTEvent &event, HTTPair &pair){
 
   //Legs
   TLorentzVector leg1P4 = pair.getLeg1().getP4();
@@ -539,7 +538,7 @@ void HTTSynchNTupleBase::fillPair(const HTTEvent &event, HTTPair &pair){
 }
 //////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////
-void HTTSynchNTupleBase::fillJets(const std::vector<HTTParticle> &jets){
+void HTTSynchNTuple::fillJets(const std::vector<HTTParticle> &jets){
   
   njetspt20 = jets.size();
   njets = 0;
@@ -615,7 +614,7 @@ void HTTSynchNTupleBase::fillJets(const std::vector<HTTParticle> &jets){
 }
 //////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////
-void HTTSynchNTupleBase::fillVetoes(const HTTEvent &event){
+void HTTSynchNTuple::fillVetoes(const HTTEvent &event){
 
   dilepton_veto = event.checkSelectionBit(SelectionBitsEnum::diMuonVeto);
   extraelec_veto = event.checkSelectionBit(SelectionBitsEnum::extraElectronVeto);

@@ -1,5 +1,5 @@
-#ifndef RootAnalysis_HTTSynchNTupleBase_H
-#define RootAnalysis_HTTSynchNTupleBase_H
+#ifndef RootAnalysis_HTTSynchNTuple_H
+#define RootAnalysis_HTTSynchNTuple_H
 
 #include <string>
 
@@ -19,13 +19,13 @@
 class EventProxyHTT;
 class HTTHistograms;
 
-class HTTSynchNTupleBase: public Analyzer{
+class HTTSynchNTuple: public Analyzer{
 
  public:
   
-  HTTSynchNTupleBase(const std::string & aName, const std::string & aDecayMode = "None");
+  HTTSynchNTuple(const std::string & aName, const std::string & aDecayMode = "None");
 
-  virtual ~HTTSynchNTupleBase();
+  virtual ~HTTSynchNTuple();
   
   ///Initialize the analyzer
   virtual void initialize(TDirectory* aDir,
@@ -68,7 +68,7 @@ class HTTSynchNTupleBase: public Analyzer{
   ///Histograms storage.
   HTTHistograms *myHistos_;
   
-  //should this HTTSynchNTupleBase be able to filter events
+  //should this HTTSynchNTuple be able to filter events
   bool filterEvent_;
 
   std::string decayMode_;
