@@ -63,11 +63,18 @@ void MuTauSpecifics::testAllCategories(const HTTAnalysis::sysEffects & aSystEffe
                 if(myAnalyzer->aEvent.tauIDStrings[iBit]=="againstElectronVLooseMVA6") tauIDmask |= (1<<iBit);
         }
         bool tauID = ( (int)myAnalyzer->aLeg2.getProperty(PropertyEnum::tauID) & tauIDmask) == tauIDmask;
+
+        unsigned int muonIDmask = (1<<7);
+        bool muonID = true;
+          if(myAnalyzer->aEvent.getRunId()>278808 || myAnalyzer->aEvent.getRunId()==1){
+        muonID = ((int)myAnalyzer->aLeg1.getProperty(PropertyEnum::muonID) & muonIDmask) == muonIDmask;
+      }
+
         bool muonKinematics = myAnalyzer->aLeg1.getP4().Pt()>24 && fabs(myAnalyzer->aLeg1.getP4().Eta())<2.1;
         bool trigger = myAnalyzer->aLeg1.hasTriggerMatch(TriggerEnum::HLT_IsoMu24) ||
                        myAnalyzer->aLeg1.hasTriggerMatch(TriggerEnum::HLT_IsoTkMu24);
 
-        if(!muonKinematics || !tauID || !trigger) return;
+        if(!muonKinematics || !muonID || !tauID || !trigger) return;
 
         myAnalyzer->nJets30 = 0;
         for(auto itJet: myAnalyzer->aSeparatedJets) {

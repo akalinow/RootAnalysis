@@ -261,7 +261,7 @@ bool HTTAnalyzer::analyze(const EventProxyBase& iEvent){
                 float leg2ScaleFactor = myChannelSpecifics->getLeg2Correction(aSystEffect);
                 float weightSyst = getSystWeight(aSystEffect);
                 float eventWeightWithSyst=eventWeight*weightSyst*leg1ScaleFactor*leg2ScaleFactor;
-
+                
                 TLorentzVector met4v(aPair.getMET(aSystEffect).X(),
                                      aPair.getMET(aSystEffect).Y(), 0,
                                      aPair.getMET(aSystEffect).Mod());
