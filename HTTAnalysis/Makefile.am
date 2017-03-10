@@ -20,6 +20,7 @@ httAnalysis_SOURCES= HTTAnalysis.cc EventProxyHTT.cc \
 	            HTTAnalyzer.cc HTTAnalyzerCPmethods.cc HTTAnalyzerUtilityMethods.cc \
 							ChannelSpecifics.cc MuTauSpecifics.cc TauTauSpecifics.cc \
 							Tools.cc \
+              HTTSynchNTuple.cc \
               HTTHistograms.cc HTTEvent.cxx DictCint.cxx
 
 
