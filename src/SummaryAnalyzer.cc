@@ -47,7 +47,7 @@ void SummaryAnalyzer::initialize(TDirectory* aDir,
   eventWeight_ = 1.0;
 
   mySelectionsTree_ = new TTree("tree","Selections bit words");
-  mySelectionsTree_->SetDirectory(aDir);
+  //mySelectionsTree_->SetDirectory(aDir);
 
   branchWeight_ = mySelectionsTree_->Branch("eventWeight", &eventWeight_);
 
@@ -73,12 +73,12 @@ void SummaryAnalyzer::initialize(TDirectory* aDir,
   ///////////////////////////////////////////////////////
   /////////Create the cut counters for all the cut flow flavours
   for(unsigned int i=0;i<selectionFlavours_.size();++i){
-    cutCounters_.push_back(float(1.0));	  
+    cutCounters_.push_back(float(1.0));
   }
 }
 //////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////
-void SummaryAnalyzer::finalize(){ 
+void SummaryAnalyzer::finalize(){
 
   using namespace std;
 
@@ -99,18 +99,18 @@ void  SummaryAnalyzer::fillEffHisto(std::string type){
   //////////////////
   std::vector<TBits> typeBits;
   TBits tmpBits(nCuts);
-  for(int i=0;i<nCuts;++i){    
+  for(int i=0;i<nCuts;++i){
     if(ci->find(type)==std::string::npos){
       ++ci;
       continue;
-    }    
+    }
     tmpBits.SetBitNumber(i);
     ++ci;
     typeBits.push_back(*(TBits*)tmpBits.Clone());
   }
   TObjArray* branchList = mySelectionsTree_->GetListOfBranches();
   int maxIndex = branchList->GetLast();
-  for(int i=2;i<=maxIndex;++i){    
+  for(int i=2;i<=maxIndex;++i){
     std::string branchName(branchList->At(i)->GetName());
     //cout<<"branch "<<branchName<<endl;
     if(branchName.find(type)==std::string::npos) continue;
@@ -120,16 +120,16 @@ void  SummaryAnalyzer::fillEffHisto(std::string type){
     std::string hName = "h"+branchName;
     ////
     TH1F *h1D = (TH1F*)cutCounterHistos_.FindObject(hName.c_str());
-    TH2F *h = 0; 
+    TH2F *h = 0;
     if(h1D && h1D->GetDimension()==1){
     h1D->SetDirectory(0);
     int nBins = nCuts+1;
     h = new TH2F(hName.c_str(),
 		 h1D->GetTitle(),h1D->GetNbinsX(),
 		 h1D->GetXaxis()->GetXmin(),
-		 h1D->GetXaxis()->GetXmax(),  
-		 nBins, -0.5,nBins-0.5);    
-    h->SetXTitle(h1D->GetXaxis()->GetTitle());   
+		 h1D->GetXaxis()->GetXmax(),
+		 nBins, -0.5,nBins-0.5);
+    h->SetXTitle(h1D->GetXaxis()->GetTitle());
     h->Sumw2();
     h->SetDirectory(myDir_);
     }
@@ -142,7 +142,7 @@ void  SummaryAnalyzer::fillEffHisto(std::string type){
       bitsBranch_->GetEntry(k);
       branchWeight_->GetEntry(k);
       int valY=0;
-      for(uint l=0;l<typeBits.size();++l) valY+= ((selectionWord_ & typeBits[l])==typeBits[l]);      
+      for(uint l=0;l<typeBits.size();++l) valY+= ((selectionWord_ & typeBits[l])==typeBits[l]);
       h->Fill(tmpVal,valY,eventWeight_);
     }
 
@@ -160,11 +160,11 @@ void  SummaryAnalyzer::fillEffHisto(std::string type){
       delete hIntegrated;
     }
     ci = cutNames.begin();
-    for(int i=0;i<nCuts;++i){    
+    for(int i=0;i<nCuts;++i){
       if(ci->find(type)==std::string::npos){
 	++ci;
 	continue;
-      }    
+      }
       h->GetYaxis()->SetBinLabel(i+2,ci->c_str());
       ++ci;
     }
@@ -176,13 +176,13 @@ void  SummaryAnalyzer::fillEffHisto(std::string type){
 //////////////////////////////////////////////////////////////////////////////
 bool SummaryAnalyzer::analyze(const EventProxyBase& iEvent){
   /*
-  const pat::strbitset::bit_vector& orderedBits = mySelections_->bits(); 
+  const pat::strbitset::bit_vector& orderedBits = mySelections_->bits();
   pat::strbitset::bit_vector::const_iterator ci = orderedBits.begin();
-  
+
   int counter = 0;
   selectionWord_.ResetAllBits();
   for(;ci!=orderedBits.end();++ci) selectionWord_.SetBitNumber(counter++,*ci);
-  */  
+  */
   ////
   mySelectionsTree_->Fill();
 
@@ -264,7 +264,7 @@ void SummaryAnalyzer::clean2DHisto(TH2F *hCutCounter){
   for(int i=0;i<hCutCounter->GetNbinsY()+1;++i){
     TString tmpStr(hCutCounter->GetYaxis()->GetBinLabel(i));
      if(tmpStr.Length()>1){
-      iBinY++;     
+      iBinY++;
 	hCutCounterTmp->GetYaxis()->SetBinLabel(iBinY,
 						hCutCounter->GetYaxis()->GetBinLabel(i));
      }
@@ -290,18 +290,18 @@ void SummaryAnalyzer::clean2DHisto(TH2F *hCutCounter){
 //////////////////////////////////////////////////////////////////////////////
 TH1D * SummaryAnalyzer::Integrate(TH1D * histoD) {
 
-   TH1D * histoI = new TH1D(*histoD); 
+   TH1D * histoI = new TH1D(*histoD);
    Float_t *  cont = new Float_t [histoD->GetNbinsX()+2];  //with under+overflow
    Float_t *  errs = new Float_t [histoD->GetNbinsX()+2];  //with under+overflow
    histoI->Reset();
-   
+
 // bin=0 underf
 // bin 1-GetNbinsX() -conten
 // bin GetNbinsX()+1 overflow
 
    Int_t i;
-   for (i = 0; i <= histoD->GetNbinsX()+1; i++) { 
-      cont[i] = histoD->GetBinContent(i);   
+   for (i = 0; i <= histoD->GetNbinsX()+1; i++) {
+      cont[i] = histoD->GetBinContent(i);
       errs[i] = histoD->GetBinError(i);
    }
    Float_t sum=0.;
@@ -313,7 +313,7 @@ TH1D * SummaryAnalyzer::Integrate(TH1D * histoD) {
 	///////////////////////////
         histoI->SetBinContent(i,sum);
         histoI->SetBinError(i,sqrt(sume2));
-   }   
+   }
    return histoI;
 }
 ////////////////////////////////////////////////////
