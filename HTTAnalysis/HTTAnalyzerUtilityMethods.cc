@@ -124,10 +124,10 @@ std::string HTTAnalyzer::getDYSampleName(const EventProxyHTT & myEventProxy){
         std::string fileName = myEventProxy.getTTree()->GetCurrentFile()->GetName();
 
         std::string jetsName = "";
-        if(fileName.find("DY1JetsToLL")!=std::string::npos) jetsName ="1Jets";
-        else if(fileName.find("DY2JetsToLL")!=std::string::npos) jetsName = "2Jets";
-        else if(fileName.find("DY3JetsToLL")!=std::string::npos) jetsName = "3Jets";
-        else if(fileName.find("DY4JetsToLL")!=std::string::npos) jetsName = "4Jets";
+        if(fileName.find("DY1JetsToLLM50")!=std::string::npos) jetsName ="1Jets";
+        else if(fileName.find("DY2JetsToLLM50")!=std::string::npos) jetsName = "2Jets";
+        else if(fileName.find("DY3JetsToLLM50")!=std::string::npos) jetsName = "3Jets";
+        else if(fileName.find("DY4JetsToLLM50")!=std::string::npos) jetsName = "4Jets";
         else if(fileName.find("DYJetsToLLM10to50")!=std::string::npos) jetsName =  "LowM";
         else if(fileName.find("DYJetsToLLM50")!=std::string::npos && myEventProxy.event->getLHEnOutPartons()==0) jetsName =  "0Jets";
         else if(fileName.find("DYJetsToLLM50")!=std::string::npos && myEventProxy.event->getLHEnOutPartons()>0) jetsName =  "AllJets";

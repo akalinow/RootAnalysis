@@ -13,6 +13,7 @@
 
 #include "EventProxyHTT.h"
 #include "HTTAnalyzer.h"
+#include "HTTSynchNTuple.h"
 
 #include "TFile.h"
 #include "TStopwatch.h"
@@ -59,12 +60,21 @@ int main(int argc, char ** argv) {
 	 std::string decayModeName;
 	 if(processName=="AnalysisMuTau") decayModeName = "MuTau";
 	 else if(processName=="AnalysisTT") decayModeName = "TauTau";
+	 else if(processName=="SynchMuTau") decayModeName = "MuTau";
+	 else if(processName=="SynchTT") decayModeName = "TauTau";
 	 else{
 	   std::cout<<"Incorrect process name: "<<processName<<std::endl;
 	   return 1;
 	 }
 
-	 myAnalyzers.push_back(new HTTAnalyzer("HTTAnalyzer",decayModeName));
+	 if(processName.find("Analysis")!=std::string::npos)
+	   myAnalyzers.push_back(new HTTAnalyzer("HTTAnalyzer",decayModeName));
+	 else if(processName.find("Synch")!=std::string::npos)
+	   myAnalyzers.push_back(new HTTSynchNTuple("SynchNTuple",decayModeName));
+	 else{
+	   std::cout<<"Incorrect process name: "<<processName<<std::endl;
+	   return 1;
+	 }
 
 	 TreeAnalyzer *tree = new TreeAnalyzer("TreeAnalyzer",cfgFileName, myEvent);
 	 tree->init(myAnalyzers);
