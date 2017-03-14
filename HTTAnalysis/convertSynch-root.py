@@ -2,7 +2,7 @@ from ROOT import TFile,TTree
 
 #input  = 'RootAnalysis_SynchMuTau.root'
 #output = 'WAW_SYNCFILE_SUSYGluGluToBBHToTauTau_M-1000_2016_mt_0.root'
-input  = 'RootAnalysis_AnalysisTT.root'
+input  = 'RootAnalysis_SynchTT.root'
 output = 'WAW_SYNCFILE_SUSYGluGluToBBHToTauTau_M-1000_2016_tt_0.root'
 
 fin = TFile(input)
