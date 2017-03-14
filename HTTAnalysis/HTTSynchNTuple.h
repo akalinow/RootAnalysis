@@ -94,6 +94,12 @@ class HTTSynchNTuple: public Analyzer{
   ULong64_t npv;
   ULong64_t npu;
   Float_t rho;
+  Float_t puweight;
+  //Weights
+  Float_t trackingweight_1;
+  Float_t trackingweight_2;
+  Float_t effweight;
+  Float_t weight;
   //Leg 1 (leading tau for tt; electon for et,em; muon for mt)
   Float_t pt_1;
   Float_t phi_1;
@@ -121,11 +127,15 @@ class HTTSynchNTuple: public Analyzer{
   Float_t byIsolationMVA3newDMwLTraw_1;
   Float_t byIsolationMVA3oldDMwLTraw_1;
   Float_t chargedIsoPtSum_1;
-  Float_t decayModeFindingOldDMs_1;
+  Bool_t decayModeFindingOldDMs_1;
   Float_t neutralIsoPtSum_1;
   Float_t puCorrPtSum_1;
   Float_t trigweight_1;
   Float_t idisoweight_1;
+  Int_t tau_decay_mode_1;
+  Bool_t mva_olddm_medium_1;
+  Bool_t mva_olddm_tight_1;
+  Bool_t mva_olddm_vtight_1;
   //Leg 2 (trailing tau for tt, tau for et,mt, muon for em)
   Float_t pt_2;
   Float_t phi_2;
@@ -153,17 +163,25 @@ class HTTSynchNTuple: public Analyzer{
   Float_t byIsolationMVA3newDMwLTraw_2;
   Float_t byIsolationMVA3oldDMwLTraw_2;
   Float_t chargedIsoPtSum_2;
-  Float_t decayModeFindingOldDMs_2;
+  Bool_t decayModeFindingOldDMs_2;
   Float_t neutralIsoPtSum_2;
   Float_t puCorrPtSum_2;
   Float_t trigweight_2;
   Float_t idisoweight_2;
+  Int_t tau_decay_mode_2;
+  Bool_t mva_olddm_medium_2;
+  Bool_t mva_olddm_tight_2;
+  Bool_t mva_olddm_vtight_2;
   //di-tau system
   Float_t pt_tt;
   Float_t mt_tot;
   Float_t m_vis;
   Float_t m_sv;
   Float_t mt_sv;
+  Float_t pt_sv;
+  Float_t eta_sv;
+  Float_t phi_sv;
+  Bool_t os;
   //MET
   Float_t met;
   Float_t metphi;
@@ -223,10 +241,17 @@ class HTTSynchNTuple: public Analyzer{
   Bool_t dilepton_veto;
   Bool_t extraelec_veto;
   Bool_t extramuon_veto;
-  Float_t puweight;
-
+  //Trigger
+  Bool_t trg_singlemuon;
+  Bool_t trg_singleelectron;
+  Bool_t trg_singletau_1;
+  Bool_t trg_singletau_2;
+  Bool_t trg_doubletau;
+  Bool_t trg_muonelectron;
+  
  private:
 
+  std::map<std::string,int> *idMasks_;
 	
 };
 
