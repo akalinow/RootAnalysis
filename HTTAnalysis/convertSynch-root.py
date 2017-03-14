@@ -1,9 +1,9 @@
 from ROOT import TFile,TTree
 
-input  = 'RootAnalysis_SynchNTupleTT_VBFMVAMET.root'
-output = 'WAW_VBF_syncTree_tt_SM.root'
-#input  = 'RootAnalysis_SynchNTupleMT_VBFMVAMET.root'
-#output = 'WAW_VBF_syncTree_mt_SM.root'
+#input  = 'RootAnalysis_SynchMuTau.root'
+#output = 'WAW_SYNCFILE_SUSYGluGluToBBHToTauTau_M-1000_2016_mt_0.root'
+input  = 'RootAnalysis_AnalysisTT.root'
+output = 'WAW_SYNCFILE_SUSYGluGluToBBHToTauTau_M-1000_2016_tt_0.root'
 
 fin = TFile(input)
 t = fin.Get("Summary/tree")
