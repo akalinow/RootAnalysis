@@ -50,6 +50,8 @@ class HTTSynchNTuple: public Analyzer{
   virtual void fillJets(const std::vector<HTTParticle> &jets);
   virtual void fillVetoes(const HTTEvent &event);
 
+  virtual bool selectEvent(const HTTEvent &event, HTTPair &pair);
+
   virtual Analyzer* clone() const;
 
   bool filter() const { return filterEvent_;};
@@ -92,7 +94,7 @@ class HTTSynchNTuple: public Analyzer{
   ULong64_t evt;
   //Pielup
   ULong64_t npv;
-  ULong64_t npu;
+  Float_t npu;
   Float_t rho;
   Float_t puweight;
   //Weights

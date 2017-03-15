@@ -383,7 +383,10 @@ bool HTTSynchNTuple::analyze(const EventProxyBase& iEvent){
   HTTPair &aPair = (*myEventProxy.pairs)[0];
   std::vector<HTTParticle> &aJets = *myEventProxy.jets;
   
-  clearTTreeVariables();
+  //i_++;
+  //if(i_%1000==0){
+    //std::cout<<i_<<std::endl;
+  //}
 
   //Set map of tau-Id masks (only ones)
   //for decay channels with taus
@@ -409,11 +412,13 @@ bool HTTSynchNTuple::analyze(const EventProxyBase& iEvent){
       }
     }
   }
-  i_++;
-  if(i_%1000==0){
-    //std::cout<<i_<<std::endl;
-  }
-	
+  //Apply an additional selection
+  if( !selectEvent(aEvent,aPair) )
+      return false;
+
+  //Set default values to tree variables
+  clearTTreeVariables();
+
   ///Filling TTree
   // Event ID variables
   fillEventID(aEvent);
@@ -476,6 +481,8 @@ void HTTSynchNTuple::fillLegs(const HTTParticle &leg1, const HTTParticle &leg2){
   d0_2 = leg2.getProperty(PropertyEnum::dxy);
   dZ_2 = leg2.getProperty(PropertyEnum::dz);
   gen_match_2 = leg2.getProperty(PropertyEnum::mc_match); //according to: https://twiki.cern.ch/twiki/bin/view/CMS/HiggsToTauTauWorking2016#MC_Matching
+
+  os = q_1*q_2<0;
 
   //Decay channel specific
   fillLegsSpecific(leg1,leg2);
@@ -709,7 +716,7 @@ void HTTSynchNTuple::fillJets(const std::vector<HTTParticle> &jets){
       njets++;
     if(std::abs(jets.at(iJet).getP4().Eta())<2.4 && 
        jets.at(iJet).getP4().Pt()>20 &&
-       jets.at(iJet).getProperty(PropertyEnum::bCSVscore)>0.0){//FIXME Correct??
+       jets.at(iJet).getProperty(PropertyEnum::bCSVscore)>0.8484){//FIXME 0.8484 Correct??
       nbtag++;
       bjets.push_back(jets.at(iJet));
     }
@@ -782,3 +789,18 @@ void HTTSynchNTuple::fillVetoes(const HTTEvent &event){
 }
 //////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////
+bool HTTSynchNTuple::selectEvent(const HTTEvent &event, HTTPair &pair){
+  //Add selection to tighten what is in ntuples
+  if(decayMode_=="MuTau"){
+    if( !(std::abs(pair.getLeg1().getP4().Eta())<2.1) )
+      return false;
+    if( !(pair.getLeg1().getP4().Pt()>23) )
+      return false;
+    if( !(pair.getLeg2().getP4().Pt()>30) )
+      return false;
+  }
+  return true;
+}
+//////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////////
+	
