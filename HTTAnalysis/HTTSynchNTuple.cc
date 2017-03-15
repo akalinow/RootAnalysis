@@ -88,7 +88,7 @@ void HTTSynchNTuple::clearTTreeVariables(){
   trigweight_1 = -999;
   idisoweight_1 = -999;
   tau_decay_mode_1 = -999 ;
-  mva_olddm_medium_1 =  0;
+  mva_olddm_medium_1 = 0;
   mva_olddm_tight_1 = 0;
   mva_olddm_vtight_1 = 0;
   //Leg 2 (trailing tau for tt; tau for et,mt; muon for em)
@@ -124,7 +124,7 @@ void HTTSynchNTuple::clearTTreeVariables(){
   trigweight_2 = -999;
   idisoweight_2 = -999;
   tau_decay_mode_2 = -999 ;
-  mva_olddm_medium_2 =  0;
+  mva_olddm_medium_2 = 0;
   mva_olddm_tight_2 = 0;
   mva_olddm_vtight_2 = 0;
   //di-tau system
@@ -498,6 +498,11 @@ void HTTSynchNTuple::fillLegsSpecific(const HTTParticle &leg1, const HTTParticle
     trigweight_1 = 1; //FIXME, to be computed
     idisoweight_1 = 1; //FIXME
     trackingweight_1 = 1; //FIXME
+    trg_singlemuon = ( leg1.hasTriggerMatch(TriggerEnum::HLT_IsoMu22) ||
+		       leg1.hasTriggerMatch(TriggerEnum::HLT_IsoTkMu22) ||
+		       leg1.hasTriggerMatch(TriggerEnum::HLT_IsoMu22_eta2p1) ||
+		       leg1.hasTriggerMatch(TriggerEnum::HLT_IsoTkMu22_eta2p1) );
+
     //Leg2: tau
     iso_2 = leg2.getProperty(PropertyEnum::byIsolationMVArun2v1DBoldDMwLTraw);
     byCombinedIsolationDeltaBetaCorrRaw3Hits_2 = leg2.getProperty(PropertyEnum::byCombinedIsolationDeltaBetaCorrRaw3Hits);
@@ -538,10 +543,12 @@ void HTTSynchNTuple::fillLegsSpecific(const HTTParticle &leg1, const HTTParticle
       puCorrPtSum_2;
     */
     tau_decay_mode_2 = leg2.getProperty(PropertyEnum::decayMode);
-    decayModeFindingOldDMs_2 = (tau_decay_mode_2!=5 && tau_decay_mode_2!=6); //FIXME: is it possible to take ID directly?
+    decayModeFindingOldDMs_2 = (tau_decay_mode_2==0 || tau_decay_mode_2==1 || tau_decay_mode_2==2 || tau_decay_mode_2==10); //FIXME: is it possible to take ID directly?
     trigweight_2 = 1; //1 for single mu
     idisoweight_2 = 1; //1 for now (should be 0.95 or similar
     trackingweight_2 = 1; //1 for tau
+    trg_singletau_1 = leg2.hasTriggerMatch(TriggerEnum::HLT_VLooseIsoPFTau120_Trk50_eta2p1);
+    trg_singletau_2 = leg2.hasTriggerMatch(TriggerEnum::HLT_VLooseIsoPFTau140_Trk50_eta2p1);
 
     return;
   }
@@ -587,7 +594,7 @@ void HTTSynchNTuple::fillLegsSpecific(const HTTParticle &leg1, const HTTParticle
       puCorrPtSum_1;
     */
     tau_decay_mode_1 = leg1.getProperty(PropertyEnum::decayMode);
-    decayModeFindingOldDMs_1 = (tau_decay_mode_1!=5 && tau_decay_mode_1!=6); //FIXME: is it possible to take ID directly?
+    decayModeFindingOldDMs_1 = (tau_decay_mode_1==0 || tau_decay_mode_1==1 || tau_decay_mode_1==2 || tau_decay_mode_1==10); //FIXME: is it possible to take ID directly?
     trigweight_1 = 1; //FIXME, to be computed
     idisoweight_1 = 1; //FIXME
     trackingweight_1 = 1; //FIXME
@@ -632,10 +639,20 @@ void HTTSynchNTuple::fillLegsSpecific(const HTTParticle &leg1, const HTTParticle
       puCorrPtSum_2;
     */
     tau_decay_mode_2 = leg2.getProperty(PropertyEnum::decayMode);
-    decayModeFindingOldDMs_2 = (tau_decay_mode_2!=5 && tau_decay_mode_2!=6); //FIXME: is it possible to take ID directly?
+    decayModeFindingOldDMs_2 = (tau_decay_mode_2==0 || tau_decay_mode_2==1 || tau_decay_mode_2==2 || tau_decay_mode_2==10); //FIXME: is it possible to take ID directly?
     trigweight_2 = 1; //FIXME, to be computed
     idisoweight_2 = 1; //FIXME
     trackingweight_2 = 1; //FIXME
+    //triggers
+    trg_singletau_1 = (leg1.hasTriggerMatch(TriggerEnum::HLT_VLooseIsoPFTau120_Trk50_eta2p1) ||
+		       leg2.hasTriggerMatch(TriggerEnum::HLT_VLooseIsoPFTau120_Trk50_eta2p1) );
+    trg_singletau_2 = (leg1.hasTriggerMatch(TriggerEnum::HLT_VLooseIsoPFTau140_Trk50_eta2p1) ||
+		       leg2.hasTriggerMatch(TriggerEnum::HLT_VLooseIsoPFTau140_Trk50_eta2p1) );
+    trg_doubletau = ( (leg1.hasTriggerMatch(TriggerEnum::HLT_DoubleMediumIsoPFTau35_Trk1_eta2p1_Reg) &&
+		       leg2.hasTriggerMatch(TriggerEnum::HLT_DoubleMediumIsoPFTau35_Trk1_eta2p1_Reg) ) ||
+		      (leg1.hasTriggerMatch(TriggerEnum::HLT_DoubleMediumCombinedIsoPFTau35_Trk1_eta2p1_Reg) &&
+		       leg2.hasTriggerMatch(TriggerEnum::HLT_DoubleMediumCombinedIsoPFTau35_Trk1_eta2p1_Reg) ) );
+
 
     return;
   }
@@ -716,7 +733,7 @@ void HTTSynchNTuple::fillJets(const std::vector<HTTParticle> &jets){
       njets++;
     if(std::abs(jets.at(iJet).getP4().Eta())<2.4 && 
        jets.at(iJet).getP4().Pt()>20 &&
-       jets.at(iJet).getProperty(PropertyEnum::bCSVscore)>0.8484){//FIXME 0.8484 Correct??
+       jets.at(iJet).getProperty(PropertyEnum::bCSVscore)>0.800){//FIXME 0.8484 Correct??
       nbtag++;
       bjets.push_back(jets.at(iJet));
     }
@@ -799,6 +816,13 @@ bool HTTSynchNTuple::selectEvent(const HTTEvent &event, HTTPair &pair){
     if( !(pair.getLeg2().getP4().Pt()>30) )
       return false;
   }
+  else if(decayMode_=="TauTau"){
+    if( !(std::abs(pair.getLeg1().getP4().Eta())<2.1 && std::abs(pair.getLeg2().getP4().Eta())<2.1) )
+      return false;
+    if( !(pair.getLeg1().getP4().Pt()>40 && pair.getLeg2().getP4().Pt()>40) )
+      return false;
+  }
+  //
   return true;
 }
 //////////////////////////////////////////////////////////////////////////////
