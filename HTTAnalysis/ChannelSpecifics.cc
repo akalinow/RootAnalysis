@@ -57,7 +57,7 @@ void ChannelSpecifics::defineCategories(){
         mu_rho = new HTTAnalysis::eventCategory("mu_rho", categoryRejester);
         pi_pi = new HTTAnalysis::eventCategory("pi_pi", categoryRejester);
         pi_rho = new HTTAnalysis::eventCategory("pi_pi", categoryRejester);
-        rho_rho = new HTTAnalysis::eventCategory("pi_pi", categoryRejester);
+        rho_rho = new HTTAnalysis::eventCategory("rho_rho", categoryRejester);
 
 }
 /////////////////////////////////////////////////////////////////
