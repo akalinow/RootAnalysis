@@ -452,6 +452,8 @@ void HTTHistograms::finalizeHistograms(const std::vector<const HTTAnalysis::even
               if(iSystEffect==(unsigned int)HTTAnalysis::DUMMY_SYS) continue;
                 for(auto iCategory: mainCategoriesRejester) {
                         plotStack(iCategory, "MassSV", iSystEffect);
+                        plotStack(iCategory, "MassTrans", iSystEffect);
+                        plotStack(iCategory, "MassVis", iSystEffect);
                         plotStack(iCategory, "UnRollTauPtMassVis", iSystEffect);
                         plotStack(iCategory, "UnRollHiggsPtMassSV", iSystEffect);
                         plotStack(iCategory, "UnRollMjjMassSV", iSystEffect);
