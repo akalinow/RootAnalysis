@@ -249,7 +249,7 @@ bool HTTAnalyzer::analyze(const EventProxyBase& iEvent){
         if(goodGenDecayMode) fillGenDecayPlaneAngle(sampleName+"_GenNoOfflineSel", eventWeight);
 
         std::string categorySuffix = "";
-        std::string systEffectName = "";
+        std::string systEffectName = "";	
         const std::vector<const HTTAnalysis::eventCategory*> & aCategoryRejester = myChannelSpecifics->getCategoryRejester();
         for(unsigned int iSystEffect = (unsigned int)HTTAnalysis::NOMINAL;
             iSystEffect<=(unsigned int)HTTAnalysis::ZmumuDown; ++iSystEffect) {
@@ -273,7 +273,7 @@ bool HTTAnalyzer::analyze(const EventProxyBase& iEvent){
 
                         if(!passCategory(iCategory)) continue;
 
-                        categorySuffix = std::to_string(iCategory);
+                        categorySuffix = aCategoryRejester[iCategory]->name();
                         systEffectName = HTTAnalysis::systEffectName(iCategory, iSystEffect, aCategoryRejester);
                         hNameSuffix = sampleName+"_"+categorySuffix+systEffectName;
                         fillControlHistos(hNameSuffix, eventWeightWithSyst, aSystEffect);

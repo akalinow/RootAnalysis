@@ -135,15 +135,20 @@ float ChannelSpecifics::getLeptonCorrection(float eta, float pt,
         else if(tauDecayMode == HTTAnalysis::tauDecaysElectron) return 1.0;
         else{
                 //according to https://twiki.cern.ch/twiki/bin/view/CMS/SMTauTau2016#MC_corrections
-                float tau_id_scalefactor = 0.95; //h3DTauIdCorrections->GetBinContent(iBin);
+                float tau_id_scalefactor = 1.0;
                 float tau_trg_efficiency = 1.0;
-                if(useTauTrigger) {
+
+		 if(myAnalyzer->sampleName.find("HTT")==std::string::npos &&
+                           myAnalyzer->sampleName.find("ATT")==std::string::npos &&
+                           myAnalyzer->sampleName.find("MatchT")==std::string::npos) {
+		   tau_id_scalefactor = 0.95;
+		 }
+		 if(useTauTrigger) {
                         int iBin = h2DTauTrgGenuineCorrections->FindBin(pt, (int)tauDecayMode);
                         tau_trg_efficiency = h2DTauTrgGenuineCorrections->GetBinContent(iBin);
                         if(myAnalyzer->sampleName.find("HTT")==std::string::npos &&
                            myAnalyzer->sampleName.find("ATT")==std::string::npos &&
                            myAnalyzer->sampleName.find("MatchT")==std::string::npos) {
-                                tau_id_scalefactor = 1.0;
                                 int iBin = h2DTauTrgFakeCorrections->FindBin(pt, (int)tauDecayMode);
                                 tau_trg_efficiency = h2DTauTrgFakeCorrections->GetBinContent(iBin);
                         }
