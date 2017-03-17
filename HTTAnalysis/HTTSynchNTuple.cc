@@ -1,4 +1,5 @@
 #include <sstream>
+#include <algorithm>
 
 #include "HTTSynchNTuple.h"
 #include "HTTHistograms.h"
@@ -530,10 +531,13 @@ void HTTSynchNTuple::fillLegsSpecific(const HTTParticle &leg1, const HTTParticle
     //Leg1: muon
     iso_1 =  leg1.getProperty(PropertyEnum::combreliso);
     //weights
-    int iBin = h2DMuonIdIsoCorrections->FindBin(pt_1, std::abs(eta_1));//MB should use abs? Not used in HTTAnalysis??
+    int iBin;
+    iBin = h2DMuonTrgCorrections->FindBin(std::min(pt_1,(float)999.0), eta_1);
     trigweight_1 = h2DMuonTrgCorrections->GetBinContent(iBin);
+    iBin = h2DMuonIdIsoCorrections->FindBin(std::min(pt_1,(float)999.0), eta_1);
     idisoweight_1 = h2DMuonIdIsoCorrections->GetBinContent(iBin);
-    trackingweight_1 = 1; //FIXME h1DMuonTrkCorrections->GetBinContent(iBin);
+    iBin = h1DMuonTrkCorrections->FindBin(eta_1);
+    trackingweight_1 = h1DMuonTrkCorrections->GetBinContent(iBin);
     //trigger
     trg_singlemuon = ( leg1.hasTriggerMatch(TriggerEnum::HLT_IsoMu22) ||
 		       leg1.hasTriggerMatch(TriggerEnum::HLT_IsoTkMu22) ||
@@ -633,12 +637,14 @@ void HTTSynchNTuple::fillLegsSpecific(const HTTParticle &leg1, const HTTParticle
     tau_decay_mode_1 = leg1.getProperty(PropertyEnum::decayMode);
     decayModeFindingOldDMs_1 = (tau_decay_mode_1==0 || tau_decay_mode_1==1 || tau_decay_mode_1==2 || tau_decay_mode_1==10); //FIXME: is it possible to take ID directly?
     //Weights
-    int iBin = h2DTauTrgGenuineCorrections->FindBin(pt_1, tau_decay_mode_1);
+    int iBin;
     if(gen_match_1==5){ //genuine tau
+      iBin = h2DTauTrgGenuineCorrections->FindBin(std::min(pt_1,(float)999.0), tau_decay_mode_1);
       trigweight_1 = h2DTauTrgGenuineCorrections->GetBinContent(iBin);
       idisoweight_1 = 0.95;
     }
     else{ //fake tau
+      iBin = h2DTauTrgFakeCorrections->FindBin(std::min(pt_1,(float)999.0), tau_decay_mode_1);
       trigweight_1 = h2DTauTrgFakeCorrections->GetBinContent(iBin);
       idisoweight_1 = 1;
     }
@@ -686,12 +692,13 @@ void HTTSynchNTuple::fillLegsSpecific(const HTTParticle &leg1, const HTTParticle
     tau_decay_mode_2 = leg2.getProperty(PropertyEnum::decayMode);
     decayModeFindingOldDMs_2 = (tau_decay_mode_2==0 || tau_decay_mode_2==1 || tau_decay_mode_2==2 || tau_decay_mode_2==10); //FIXME: is it possible to take ID directly?
     //Weights
-    iBin = h2DTauTrgGenuineCorrections->FindBin(pt_2, tau_decay_mode_2);
     if(gen_match_2==5){ //genuine tau
+      iBin = h2DTauTrgGenuineCorrections->FindBin(std::min(pt_2,(float)999.0), tau_decay_mode_2);
       trigweight_2 = h2DTauTrgGenuineCorrections->GetBinContent(iBin);
       idisoweight_2 = 0.95;
     }
     else{ //fake tau
+      iBin = h2DTauTrgFakeCorrections->FindBin(std::min(pt_2,(float)999.0), tau_decay_mode_2);
       trigweight_2 = h2DTauTrgFakeCorrections->GetBinContent(iBin);
       idisoweight_2 = 1;
     }
@@ -901,7 +908,7 @@ void HTTSynchNTuple::initializeCorrections(){
 
   RooWorkspace *scaleWorkspace = (RooWorkspace*)aFile->Get("w");
 
-  RooAbsReal *muon_idiso_scalefactor = scaleWorkspace->function("m_idiso_ratio");//id&iso->idiso
+  RooAbsReal *muon_idiso_scalefactor = scaleWorkspace->function("m_idiso_ratio");//id+iso->idiso
   //RooAbsReal *muon_trg_scalefactor = scaleWorkspace->function("m_trgIsoMu24orTkIsoMu24_desy_ratio");
   RooAbsReal *muon_trg_scalefactor = scaleWorkspace->function("m_trgMu22OR_eta2p1_desy_ratio");//MB 24->22??
   RooAbsReal *muon_trk_scalefactor = scaleWorkspace->function("m_trk_ratio");//MB not in HTTAnalysis
@@ -909,22 +916,20 @@ void HTTSynchNTuple::initializeCorrections(){
   RooAbsReal *tau_trg_fake_efficiency = scaleWorkspace->function("t_fake_TightIso_tt_ratio");//MB data->ratio
   
   h2DMuonIdIsoCorrections = (TH2F*)muon_idiso_scalefactor->createHistogram("h2DMuonIdIsoCorrections",
-									   *scaleWorkspace->var("m_pt"),RooFit::Binning(400,10,200),
-									   RooFit::YVar(*scaleWorkspace->var("m_abs_eta"),RooFit::Binning(10,0,2.4)),
+									   *scaleWorkspace->var("m_pt"),RooFit::Binning(2080,10,1000),
+									   RooFit::YVar(*scaleWorkspace->var("m_eta"),RooFit::Binning(48,-2.4,2.4)),//MB m_abs_eta->m_eta
 									   RooFit::Extended(kFALSE),
 									   RooFit::Scaling(kFALSE));
   
   h2DMuonTrgCorrections = (TH2F*)muon_trg_scalefactor->createHistogram("h2DMuonTrgCorrections",
-								       *scaleWorkspace->var("m_pt"),RooFit::Binning(400,10,200),
-								       RooFit::YVar(*scaleWorkspace->var("m_abs_eta"),RooFit::Binning(10,0,2.4)),
+								       *scaleWorkspace->var("m_pt"),RooFit::Binning(2080,10,1000),
+								       RooFit::YVar(*scaleWorkspace->var("m_eta"),RooFit::Binning(48,-2.4,2.4)),//MB m_abs_eta->m_eta
 								       RooFit::Extended(kFALSE),
 								       RooFit::Scaling(kFALSE));
-  /*
   h1DMuonTrkCorrections = (TH1F*)muon_trk_scalefactor->createHistogram("h1DMuonTrkCorrections",
-								       *scaleWorkspace->var("m_abs_eta"),RooFit::Binning(10,0,2.4),
+								       *scaleWorkspace->var("m_eta"),RooFit::Binning(48,-2.4,2.4),//MB m_abs_eta->m_eta
 								       RooFit::Extended(kFALSE),
 								       RooFit::Scaling(kFALSE));
-  */
   ///WARNING: t_eta and t_dm not used, so histograms have only one bin in this directions
   RooArgSet dependentVars(*scaleWorkspace->var("t_pt"),*scaleWorkspace->var("t_dm"));
   RooArgSet projectedVars;
