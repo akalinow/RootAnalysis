@@ -1,14 +1,46 @@
 #include <sstream>
+#include <algorithm>
 
 #include "HTTSynchNTuple.h"
 #include "HTTHistograms.h"
 
+#include "RooWorkspace.h"
+#include "RooRealVar.h"
+
 //////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////
-HTTSynchNTuple::HTTSynchNTuple(const std::string & aName, const std::string & aDecayMode):Analyzer(aName){ decayMode_ = aDecayMode;}
+HTTSynchNTuple::HTTSynchNTuple(const std::string & aName, const std::string & aDecayMode):Analyzer(aName){ 
+  decayMode_ = aDecayMode;
+  //PU
+  std::string dataPUFileName = "http://akalinow.web.cern.ch/akalinow/Data_Pileup_2016_271036-284044_13TeVMoriond17_23Sep2016ReReco_69p2mbMinBiasXS.root";
+  puDataFile_ = TFile::Open(dataPUFileName.c_str(),"CACHEREAD");
+  std::string mcPUFileName = "http://akalinow.web.cern.ch/akalinow/MC_Moriond17_PU25ns_V1.root";
+  puMCFile_ = TFile::Open(mcPUFileName.c_str(),"CACHEREAD");
+  //Corrections
+  initializeCorrections();
+  h2DMuonIdIsoCorrections = 0;
+  h2DMuonTrgCorrections = 0;
+  h1DMuonTrkCorrections = 0;
+  h2DTauTrgGenuineCorrections = 0;
+  h2DTauTrgFakeCorrections = 0;
+  h3DTauCorrections = 0;
+}
 //////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////
-HTTSynchNTuple::~HTTSynchNTuple(){ if(myHistos_) delete myHistos_; if(idMasks_) delete idMasks_;}
+HTTSynchNTuple::~HTTSynchNTuple(){ 
+  if(myHistos_) delete myHistos_; 
+  if(idMasks_) delete idMasks_;
+  //PU
+  if(puDataFile_) delete puDataFile_;
+  if(puMCFile_) delete puMCFile_;
+  //Corrections
+  if(h2DMuonIdIsoCorrections) delete h2DMuonIdIsoCorrections;
+  if(h2DMuonTrgCorrections) delete h2DMuonTrgCorrections;
+  if(h1DMuonTrkCorrections) delete h1DMuonTrkCorrections;
+  if(h2DTauTrgGenuineCorrections) delete h2DTauTrgGenuineCorrections;
+  if(h2DTauTrgFakeCorrections) delete h2DTauTrgFakeCorrections;
+  if(h3DTauCorrections) delete h3DTauCorrections;
+}
 //////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////
 Analyzer* HTTSynchNTuple::clone() const{
@@ -431,8 +463,8 @@ bool HTTSynchNTuple::analyze(const EventProxyBase& iEvent){
   // Fill extra lepton vetoes info
   fillVetoes(aEvent);
   // Weights
-  Float_t w_leg1 = trackingweight_1*trackingweight_1*trigweight_1*idisoweight_1; 
-  Float_t w_leg2 = trackingweight_2*trackingweight_2*trigweight_2*idisoweight_2; 
+  Float_t w_leg1 = trackingweight_1*trigweight_1*idisoweight_1; 
+  Float_t w_leg2 = trackingweight_2*trigweight_2*idisoweight_2; 
   effweight = w_leg1*w_leg2;
   weight = puweight*effweight;
   return true;
@@ -448,7 +480,7 @@ void HTTSynchNTuple::fillEventID(const HTTEvent &event){
   npv = event.getNPV();
   npu = event.getNPU();
   rho = 0; //FIXME, not in ntuples
-  puweight = 1; //FIXME, to be computed
+  puweight = getPUWeight(npu);
 }
 //////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////
@@ -463,6 +495,7 @@ void HTTSynchNTuple::fillLegs(const HTTParticle &leg1, const HTTParticle &leg2){
     m_1 = 0.1057; //muon mass
   else if(std::abs(leg1.getPDGid())==15 && leg1.getProperty(PropertyEnum::decayMode)==0)
     m_1 = 0.13957; //pi+/- mass
+  if(m_1 < 0) m_1 = 0; //protect against numerical instability
   q_1 = leg1.getCharge();
   d0_1 = leg1.getProperty(PropertyEnum::dxy);
   dZ_1 = leg1.getProperty(PropertyEnum::dz);
@@ -477,6 +510,7 @@ void HTTSynchNTuple::fillLegs(const HTTParticle &leg1, const HTTParticle &leg2){
     m_2 = 0.1057; //muon mass
   else if(std::abs(leg2.getPDGid())==15 && leg2.getProperty(PropertyEnum::decayMode)==0)
     m_2 = 0.13957; //pi+/- mass
+  if(m_2 < 0) m_2 = 0; //protect against numerical instability
   q_2 = leg2.getCharge();
   d0_2 = leg2.getProperty(PropertyEnum::dxy);
   dZ_2 = leg2.getProperty(PropertyEnum::dz);
@@ -491,13 +525,20 @@ void HTTSynchNTuple::fillLegs(const HTTParticle &leg1, const HTTParticle &leg2){
 //////////////////////////////////////////////////////////////////////////////
 void HTTSynchNTuple::fillLegsSpecific(const HTTParticle &leg1, const HTTParticle &leg2){
 
+  if(!h2DMuonIdIsoCorrections) initializeCorrections();//MB why it is needed??
   if(decayMode_=="MuTau"){
     //Specific implementation for the mu+tau decay channel
     //Leg1: muon
     iso_1 =  leg1.getProperty(PropertyEnum::combreliso);
-    trigweight_1 = 1; //FIXME, to be computed
-    idisoweight_1 = 1; //FIXME
-    trackingweight_1 = 1; //FIXME
+    //weights
+    int iBin;
+    iBin = h2DMuonTrgCorrections->FindBin(std::min(pt_1,(float)999.0), eta_1);
+    trigweight_1 = h2DMuonTrgCorrections->GetBinContent(iBin);
+    iBin = h2DMuonIdIsoCorrections->FindBin(std::min(pt_1,(float)999.0), eta_1);
+    idisoweight_1 = h2DMuonIdIsoCorrections->GetBinContent(iBin);
+    iBin = h1DMuonTrkCorrections->FindBin(eta_1);
+    trackingweight_1 = h1DMuonTrkCorrections->GetBinContent(iBin);
+    //trigger
     trg_singlemuon = ( leg1.hasTriggerMatch(TriggerEnum::HLT_IsoMu22) ||
 		       leg1.hasTriggerMatch(TriggerEnum::HLT_IsoTkMu22) ||
 		       leg1.hasTriggerMatch(TriggerEnum::HLT_IsoMu22_eta2p1) ||
@@ -544,8 +585,8 @@ void HTTSynchNTuple::fillLegsSpecific(const HTTParticle &leg1, const HTTParticle
     */
     tau_decay_mode_2 = leg2.getProperty(PropertyEnum::decayMode);
     decayModeFindingOldDMs_2 = (tau_decay_mode_2==0 || tau_decay_mode_2==1 || tau_decay_mode_2==2 || tau_decay_mode_2==10); //FIXME: is it possible to take ID directly?
-    trigweight_2 = 1; //1 for single mu
-    idisoweight_2 = 1; //1 for now (should be 0.95 or similar
+    trigweight_2 = 1; //1, single mu
+    idisoweight_2 = (gen_match_2==5 ? 0.95 : 1); //0.95 for genuine tau, otherwise 1
     trackingweight_2 = 1; //1 for tau
     trg_singletau_1 = leg2.hasTriggerMatch(TriggerEnum::HLT_VLooseIsoPFTau120_Trk50_eta2p1);
     trg_singletau_2 = leg2.hasTriggerMatch(TriggerEnum::HLT_VLooseIsoPFTau140_Trk50_eta2p1);
@@ -595,9 +636,19 @@ void HTTSynchNTuple::fillLegsSpecific(const HTTParticle &leg1, const HTTParticle
     */
     tau_decay_mode_1 = leg1.getProperty(PropertyEnum::decayMode);
     decayModeFindingOldDMs_1 = (tau_decay_mode_1==0 || tau_decay_mode_1==1 || tau_decay_mode_1==2 || tau_decay_mode_1==10); //FIXME: is it possible to take ID directly?
-    trigweight_1 = 1; //FIXME, to be computed
-    idisoweight_1 = 1; //FIXME
-    trackingweight_1 = 1; //FIXME
+    //Weights
+    int iBin;
+    if(gen_match_1==5){ //genuine tau
+      iBin = h2DTauTrgGenuineCorrections->FindBin(std::min(pt_1,(float)999.0), tau_decay_mode_1);
+      trigweight_1 = h2DTauTrgGenuineCorrections->GetBinContent(iBin);
+      idisoweight_1 = 0.95;
+    }
+    else{ //fake tau
+      iBin = h2DTauTrgFakeCorrections->FindBin(std::min(pt_1,(float)999.0), tau_decay_mode_1);
+      trigweight_1 = h2DTauTrgFakeCorrections->GetBinContent(iBin);
+      idisoweight_1 = 1;
+    }
+    trackingweight_1 = 1;//1 for tau
 
     //Leg2: trailing tau
     iso_2 = leg2.getProperty(PropertyEnum::byIsolationMVArun2v1DBoldDMwLTraw);
@@ -640,9 +691,18 @@ void HTTSynchNTuple::fillLegsSpecific(const HTTParticle &leg1, const HTTParticle
     */
     tau_decay_mode_2 = leg2.getProperty(PropertyEnum::decayMode);
     decayModeFindingOldDMs_2 = (tau_decay_mode_2==0 || tau_decay_mode_2==1 || tau_decay_mode_2==2 || tau_decay_mode_2==10); //FIXME: is it possible to take ID directly?
-    trigweight_2 = 1; //FIXME, to be computed
-    idisoweight_2 = 1; //FIXME
-    trackingweight_2 = 1; //FIXME
+    //Weights
+    if(gen_match_2==5){ //genuine tau
+      iBin = h2DTauTrgGenuineCorrections->FindBin(std::min(pt_2,(float)999.0), tau_decay_mode_2);
+      trigweight_2 = h2DTauTrgGenuineCorrections->GetBinContent(iBin);
+      idisoweight_2 = 0.95;
+    }
+    else{ //fake tau
+      iBin = h2DTauTrgFakeCorrections->FindBin(std::min(pt_2,(float)999.0), tau_decay_mode_2);
+      trigweight_2 = h2DTauTrgFakeCorrections->GetBinContent(iBin);
+      idisoweight_2 = 1;
+    }
+    trackingweight_2 = 1;//1 for tau
     //triggers
     trg_singletau_1 = (leg1.hasTriggerMatch(TriggerEnum::HLT_VLooseIsoPFTau120_Trk50_eta2p1) ||
 		       leg2.hasTriggerMatch(TriggerEnum::HLT_VLooseIsoPFTau120_Trk50_eta2p1) );
@@ -733,7 +793,7 @@ void HTTSynchNTuple::fillJets(const std::vector<HTTParticle> &jets){
       njets++;
     if(std::abs(jets.at(iJet).getP4().Eta())<2.4 && 
        jets.at(iJet).getP4().Pt()>20 &&
-       jets.at(iJet).getProperty(PropertyEnum::bCSVscore)>0.800){//FIXME 0.8484 Correct??
+       jets.at(iJet).getProperty(PropertyEnum::bCSVscore)>0.8484){//FIXME 0.8484 Correct??
       nbtag++;
       bjets.push_back(jets.at(iJet));
     }
@@ -807,6 +867,19 @@ void HTTSynchNTuple::fillVetoes(const HTTEvent &event){
 //////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////
 bool HTTSynchNTuple::selectEvent(const HTTEvent &event, HTTPair &pair){
+  //MET filters
+  int metFilters = (int)event.getMETFilterDecision();
+  bool metFiltersPass = true;
+  for(int i=0;i<6;++i){//0-5 classic filters
+    metFiltersPass &= ( (metFilters & 1<<i) == 1<<i );
+    //std::cout<<i<<". flt: "<<( (metFilters & 1<<i) == 1<<i )<<", all: "<<metFiltersPass<<std::endl;
+  }
+  for(int i=6;i<8;++i){//6-badChCand, 7-badPFMuon, require that are not fired
+    metFiltersPass &= !( (metFilters & 1<<i) == 1<<i );
+    //std::cout<<i<<". flt: "<<!( (metFilters & 1<<i) == 1<<i )<<", all: "<<metFiltersPass<<std::endl;
+  }
+  if(!metFiltersPass) return false;
+
   //Add selection to tighten what is in ntuples
   if(decayMode_=="MuTau"){
     if( !(std::abs(pair.getLeg1().getP4().Eta())<2.1) )
@@ -824,6 +897,90 @@ bool HTTSynchNTuple::selectEvent(const HTTEvent &event, HTTPair &pair){
   }
   //
   return true;
+}
+//////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////////
+void HTTSynchNTuple::initializeCorrections(){
+  //MB: basically a copy of ChannelSpecifics::initializeCorrections()
+
+  std::string correctionFileName = "http://akalinow.web.cern.ch/akalinow/htt_scalefactors_v16_3.root";
+  TFile *aFile = TFile::Open(correctionFileName.c_str(),"CACHEREAD");
+
+  RooWorkspace *scaleWorkspace = (RooWorkspace*)aFile->Get("w");
+
+  RooAbsReal *muon_idiso_scalefactor = scaleWorkspace->function("m_idiso_ratio");//id+iso->idiso
+  //RooAbsReal *muon_trg_scalefactor = scaleWorkspace->function("m_trgIsoMu24orTkIsoMu24_desy_ratio");
+  RooAbsReal *muon_trg_scalefactor = scaleWorkspace->function("m_trgMu22OR_eta2p1_desy_ratio");//MB 24->22??
+  RooAbsReal *muon_trk_scalefactor = scaleWorkspace->function("m_trk_ratio");//MB not in HTTAnalysis
+  RooAbsReal *tau_trg_genuine_efficiency = scaleWorkspace->function("t_genuine_TightIso_tt_ratio");//MB data->ratio
+  RooAbsReal *tau_trg_fake_efficiency = scaleWorkspace->function("t_fake_TightIso_tt_ratio");//MB data->ratio
+  
+  h2DMuonIdIsoCorrections = (TH2F*)muon_idiso_scalefactor->createHistogram("h2DMuonIdIsoCorrections",
+									   *scaleWorkspace->var("m_pt"),RooFit::Binning(2080,10,1000),
+									   RooFit::YVar(*scaleWorkspace->var("m_eta"),RooFit::Binning(48,-2.4,2.4)),//MB m_abs_eta->m_eta
+									   RooFit::Extended(kFALSE),
+									   RooFit::Scaling(kFALSE));
+  
+  h2DMuonTrgCorrections = (TH2F*)muon_trg_scalefactor->createHistogram("h2DMuonTrgCorrections",
+								       *scaleWorkspace->var("m_pt"),RooFit::Binning(2080,10,1000),
+								       RooFit::YVar(*scaleWorkspace->var("m_eta"),RooFit::Binning(48,-2.4,2.4)),//MB m_abs_eta->m_eta
+								       RooFit::Extended(kFALSE),
+								       RooFit::Scaling(kFALSE));
+  h1DMuonTrkCorrections = (TH1F*)muon_trk_scalefactor->createHistogram("h1DMuonTrkCorrections",
+								       *scaleWorkspace->var("m_eta"),RooFit::Binning(48,-2.4,2.4),//MB m_abs_eta->m_eta
+								       RooFit::Extended(kFALSE),
+								       RooFit::Scaling(kFALSE));
+  ///WARNING: t_eta and t_dm not used, so histograms have only one bin in this directions
+  RooArgSet dependentVars(*scaleWorkspace->var("t_pt"),*scaleWorkspace->var("t_dm"));
+  RooArgSet projectedVars;
+
+  const RooAbsReal * tau_trg_genuine_efficiency_proj = tau_trg_genuine_efficiency->createPlotProjection(dependentVars,projectedVars);
+  const RooAbsReal * tau_trg_fake_efficiency_proj = tau_trg_fake_efficiency->createPlotProjection(dependentVars,projectedVars);
+  
+  h2DTauTrgGenuineCorrections = (TH2F*)tau_trg_genuine_efficiency_proj->createHistogram("h3DTauTrgGenuineCorrections",
+											*scaleWorkspace->var("t_pt"),RooFit::Binning(5000,0,1000),
+											RooFit::YVar(*scaleWorkspace->var("t_dm"),RooFit::Binning(3,-0.5,10.5)),
+											RooFit::Extended(kFALSE),
+											RooFit::Scaling(kFALSE));
+
+  h2DTauTrgFakeCorrections = (TH2F*)tau_trg_fake_efficiency_proj->createHistogram("h3DTauTrgFakeCorrections",
+										  *scaleWorkspace->var("t_pt"),RooFit::Binning(5000,0,1000),
+										  RooFit::YVar(*scaleWorkspace->var("t_dm"),RooFit::Binning(3,-0.5,10.5)),
+										  RooFit::Extended(kFALSE),
+										  RooFit::Scaling(kFALSE));
+
+  delete aFile;
+
+  return;
+}
+//////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////////
+float HTTSynchNTuple::getPUWeight(float nPU){
+  //MB: basically a copy of HTTAnalyzer::getPUWeight
+
+  if(nPU<0) return 1.0;//not defined, e.g. for data
+  
+  if(!puDataFile_ || !puMCFile_ ||
+     puDataFile_->IsZombie() ||
+     puMCFile_->IsZombie()) { return 1.0; }
+
+  if(!hPUVec_.size()) hPUVec_.resize(1);
+
+  if(!hPUVec_[0]) {
+    std::string hName = "pileup";
+    TH1F *hPUData = (TH1F*)puDataFile_->Get(hName.c_str());
+    TH1F *hPUSample = (TH1F*)puMCFile_->Get(hName.c_str());
+    ///Normalise both histograms.
+    hPUSample->Scale(1.0/hPUSample->Integral(0,hPUSample->GetNbinsX()+1));
+    ///
+    hPUData->SetDirectory(0);
+    hPUSample->SetDirectory(0);
+    hPUData->SetName("h1DPUWeightSynch");
+    hPUVec_[0] =  hPUData;
+  }
+
+  int iBinPU = hPUVec_[0]->FindBin(nPU);
+  return hPUVec_[0]->GetBinContent(iBinPU);
 }
 //////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////

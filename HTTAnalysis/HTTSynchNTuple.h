@@ -11,8 +11,12 @@
 #include "TDirectory.h"
 
 //ROOT includes
+#include "TFile.h"
 #include "TTree.h"
 #include "TList.h"
+#include "TH1F.h"
+#include "TH2F.h"
+#include "TH3F.h"
 
 #include "Analyzer.h"
 
@@ -52,6 +56,9 @@ class HTTSynchNTuple: public Analyzer{
 
   virtual bool selectEvent(const HTTEvent &event, HTTPair &pair);
 
+  virtual void initializeCorrections();
+  virtual float getPUWeight(float nPU);
+
   virtual Analyzer* clone() const;
 
   bool filter() const { return filterEvent_;};
@@ -76,13 +83,23 @@ class HTTSynchNTuple: public Analyzer{
   std::string decayMode_;
 
   //event counter
-  Int_t i_ = 0;
+  //Int_t i_ = 0;
 
   ///Reconstructed objects selected for given event.
   //HTTEvent aEvent;
   //HTTPair aPair;
 
   HTTParticle leg1, leg2;
+
+  ///Histograms with lepton corrections
+  TH2F *h2DMuonIdIsoCorrections, *h2DMuonTrgCorrections;
+  TH1F *h1DMuonTrkCorrections;
+  TH3F *h3DTauCorrections;
+  TH2F *h2DTauTrgGenuineCorrections, *h2DTauTrgFakeCorrections;
+
+  //For PU
+  TFile *puDataFile_, *puMCFile_;
+  std::vector<TH1F*> hPUVec_;
 
   ///////////////////////////////////////////////////////////
   ///////////////////////////////////////////////////////////
