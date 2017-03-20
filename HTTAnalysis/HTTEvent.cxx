@@ -126,9 +126,13 @@ const TLorentzVector & HTTParticle::getShiftedP4(float scale) const{
 void HTTPair::clear(){
 
   if(!p4Vector.size()) p4Vector.resize(HTTAnalysis::DUMMY_SYS);
+  if(!leg1p4Vector.size()) leg1p4Vector.resize(HTTAnalysis::DUMMY_SYS);
+  if(!leg2p4Vector.size()) leg2p4Vector.resize(HTTAnalysis::DUMMY_SYS);
   if(!svMetVector.size()) svMetVector.resize(HTTAnalysis::DUMMY_SYS);
 
   for(auto &it:p4Vector) it*=0;
+  for(auto &it:leg1p4Vector) it*=0;
+  for(auto &it:leg2p4Vector) it*=0;
   for(auto &it:svMetVector) it*=0;
 
   metMatrix.clear();
@@ -145,10 +149,22 @@ void HTTPair::clear(){
 ////////////////////////////////////////////////
 const TLorentzVector & HTTPair::getP4(HTTAnalysis::sysEffects type) const {
 
-  //std::cout<<"type: "<<(unsigned int)type<<" size: "<<p4Vector.size()<<std::endl;
-
   if(p4Vector.size()>(unsigned int)type) return p4Vector[(unsigned int)type];
   return p4Vector[(unsigned int)HTTAnalysis::NOMINAL];
+}
+////////////////////////////////////////////////
+////////////////////////////////////////////////
+const TLorentzVector & HTTPair::getLeg1P4(HTTAnalysis::sysEffects type) const {
+
+  if(leg1p4Vector.size()>(unsigned int)type) return leg1p4Vector[(unsigned int)type];
+  return leg1p4Vector[(unsigned int)HTTAnalysis::NOMINAL];
+}
+////////////////////////////////////////////////
+////////////////////////////////////////////////
+const TLorentzVector & HTTPair::getLeg2P4(HTTAnalysis::sysEffects type) const {
+
+  if(leg2p4Vector.size()>(unsigned int)type) return leg2p4Vector[(unsigned int)type];
+  return leg2p4Vector[(unsigned int)HTTAnalysis::NOMINAL];
 }
 ////////////////////////////////////////////////
 ////////////////////////////////////////////////
