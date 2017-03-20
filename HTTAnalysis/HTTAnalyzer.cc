@@ -249,7 +249,7 @@ bool HTTAnalyzer::analyze(const EventProxyBase& iEvent){
         if(goodGenDecayMode) fillGenDecayPlaneAngle(sampleName+"_GenNoOfflineSel", eventWeight);
 
         std::string categorySuffix = "";
-        std::string systEffectName = "";	
+        std::string systEffectName = "";
         const std::vector<const HTTAnalysis::eventCategory*> & aCategoryRejester = myChannelSpecifics->getCategoryRejester();
         for(unsigned int iSystEffect = (unsigned int)HTTAnalysis::NOMINAL;
             iSystEffect<=(unsigned int)HTTAnalysis::ZmumuDown; ++iSystEffect) {
@@ -261,7 +261,7 @@ bool HTTAnalyzer::analyze(const EventProxyBase& iEvent){
                 float leg2ScaleFactor = myChannelSpecifics->getLeg2Correction(aSystEffect);
                 float weightSyst = getSystWeight(aSystEffect);
                 float eventWeightWithSyst=eventWeight*weightSyst*leg1ScaleFactor*leg2ScaleFactor;
-                
+
                 TLorentzVector met4v(aPair.getMET(aSystEffect).X(),
                                      aPair.getMET(aSystEffect).Y(), 0,
                                      aPair.getMET(aSystEffect).Mod());
@@ -272,7 +272,6 @@ bool HTTAnalyzer::analyze(const EventProxyBase& iEvent){
                 for(unsigned int iCategory = 0; iCategory<myNumberOfCategories; ++iCategory) {
 
                         if(!passCategory(iCategory)) continue;
-
                         categorySuffix = aCategoryRejester[iCategory]->name();
                         systEffectName = HTTAnalysis::systEffectName(iCategory, iSystEffect, aCategoryRejester);
                         hNameSuffix = sampleName+"_"+categorySuffix+systEffectName;
