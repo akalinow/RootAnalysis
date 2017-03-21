@@ -92,7 +92,8 @@ class HTTSynchNTuple: public Analyzer{
   HTTParticle leg1, leg2;
 
   ///Histograms with lepton corrections
-  TH2F *h2DMuonIdIsoCorrections, *h2DMuonTrgCorrections;
+  TH2F *h2DMuonIdCorrections;
+  TH3F *h3DMuonIsoCorrections, *h3DMuonTrgCorrections;
   TH1F *h1DMuonTrkCorrections;
   TH3F *h3DTauCorrections;
   TH2F *h2DTauTrgGenuineCorrections, *h2DTauTrgFakeCorrections;
