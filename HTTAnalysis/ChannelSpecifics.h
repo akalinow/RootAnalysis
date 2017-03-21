@@ -7,6 +7,7 @@
 
 class HTTAnalyzer;
 class EventProxyHTT;
+class TH1F;
 class TH2F;
 class TH3F;
 
@@ -33,7 +34,7 @@ virtual float getLeg1Correction(const HTTAnalysis::sysEffects & aSystEffect) = 0
 ///Return cumulative MC corrections for the leg2
 virtual float getLeg2Correction(const HTTAnalysis::sysEffects & aSystEffect) = 0;
 
-float getLeptonCorrection(float eta, float pt, HTTAnalysis::hadronicTauDecayModes tauDecayMode, bool useTauTrigger);
+float getLeptonCorrection(float eta, float pt, float iso, HTTAnalysis::hadronicTauDecayModes tauDecayMode, bool useTauTrigger);
 
 virtual std::string getDecayModeName() const {
         return decayModeName;
@@ -51,9 +52,11 @@ void initializeCorrections();
 HTTAnalyzer *myAnalyzer;
 
 ///Histograms with lepton corrections
-TH2F *h2DMuonIdCorrections, *h2DMuonIsoCorrections, *h2DMuonTrgCorrections;
-TH3F *h3DTauCorrections;
-TH2F *h2DTauTrgGenuineCorrections, *h2DTauTrgFakeCorrections;
+TH2F *h2DMuonIdCorrections;
+  TH3F *h3DMuonIsoCorrections, *h3DMuonTrgCorrections;
+  TH1F *h1DMuonTrkCorrections;
+  TH3F *h3DTauCorrections;
+  TH2F *h2DTauTrgGenuineCorrections, *h2DTauTrgFakeCorrections;
 
 std::string decayModeName = "None";
 
