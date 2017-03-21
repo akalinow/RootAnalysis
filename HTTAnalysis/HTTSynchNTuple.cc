@@ -6,6 +6,7 @@
 
 #include "RooWorkspace.h"
 #include "RooRealVar.h"
+#include "RooBinning.h"
 
 //////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////
@@ -18,8 +19,9 @@ HTTSynchNTuple::HTTSynchNTuple(const std::string & aName, const std::string & aD
   puMCFile_ = TFile::Open(mcPUFileName.c_str(),"CACHEREAD");
   //Corrections
   initializeCorrections();
-  h2DMuonIdIsoCorrections = 0;
-  h2DMuonTrgCorrections = 0;
+  h2DMuonIdCorrections = 0;
+  h3DMuonIsoCorrections = 0;
+  h3DMuonTrgCorrections = 0;
   h1DMuonTrkCorrections = 0;
   h2DTauTrgGenuineCorrections = 0;
   h2DTauTrgFakeCorrections = 0;
@@ -34,8 +36,9 @@ HTTSynchNTuple::~HTTSynchNTuple(){
   if(puDataFile_) delete puDataFile_;
   if(puMCFile_) delete puMCFile_;
   //Corrections
-  if(h2DMuonIdIsoCorrections) delete h2DMuonIdIsoCorrections;
-  if(h2DMuonTrgCorrections) delete h2DMuonTrgCorrections;
+  if(h2DMuonIdCorrections) delete h2DMuonIdCorrections;
+  if(h3DMuonIsoCorrections) delete h3DMuonIsoCorrections;
+  if(h3DMuonTrgCorrections) delete h3DMuonTrgCorrections;
   if(h1DMuonTrkCorrections) delete h1DMuonTrkCorrections;
   if(h2DTauTrgGenuineCorrections) delete h2DTauTrgGenuineCorrections;
   if(h2DTauTrgFakeCorrections) delete h2DTauTrgFakeCorrections;
@@ -525,17 +528,19 @@ void HTTSynchNTuple::fillLegs(const HTTParticle &leg1, const HTTParticle &leg2){
 //////////////////////////////////////////////////////////////////////////////
 void HTTSynchNTuple::fillLegsSpecific(const HTTParticle &leg1, const HTTParticle &leg2){
 
-  if(!h2DMuonIdIsoCorrections) initializeCorrections();//MB why it is needed??
+  if(!h2DMuonIdCorrections) initializeCorrections();//MB why it is needed??
   if(decayMode_=="MuTau"){
     //Specific implementation for the mu+tau decay channel
     //Leg1: muon
     iso_1 =  leg1.getProperty(PropertyEnum::combreliso);
     //weights
     int iBin;
-    iBin = h2DMuonTrgCorrections->FindBin(std::min(pt_1,(float)999.0), eta_1);
-    trigweight_1 = h2DMuonTrgCorrections->GetBinContent(iBin);
-    iBin = h2DMuonIdIsoCorrections->FindBin(std::min(pt_1,(float)999.0), eta_1);
-    idisoweight_1 = h2DMuonIdIsoCorrections->GetBinContent(iBin);
+    iBin = h3DMuonTrgCorrections->FindBin(std::min(pt_1,(Float_t)999.9), eta_1, std::min(iso_1,(Float_t)0.499));
+    trigweight_1 = h3DMuonTrgCorrections->GetBinContent(iBin);
+    iBin = h2DMuonIdCorrections->FindBin(std::min(pt_1,(Float_t)999.9), eta_1);
+    idisoweight_1 = h2DMuonIdCorrections->GetBinContent(iBin);
+    iBin = h3DMuonIsoCorrections->FindBin(std::min(pt_1,(Float_t)999.9), eta_1, std::min(iso_1,(Float_t)0.499));
+    idisoweight_1 *= h3DMuonIsoCorrections->GetBinContent(iBin);
     iBin = h1DMuonTrkCorrections->FindBin(eta_1);
     trackingweight_1 = h1DMuonTrkCorrections->GetBinContent(iBin);
     //trigger
@@ -638,13 +643,15 @@ void HTTSynchNTuple::fillLegsSpecific(const HTTParticle &leg1, const HTTParticle
     decayModeFindingOldDMs_1 = (tau_decay_mode_1==0 || tau_decay_mode_1==1 || tau_decay_mode_1==2 || tau_decay_mode_1==10); //FIXME: is it possible to take ID directly?
     //Weights
     int iBin;
+    int tau_decay_mode_tmp;
+    tau_decay_mode_tmp  = tau_decay_mode_1==2 ? 1 : tau_decay_mode_1; //to handle very rare dm==2    
     if(gen_match_1==5){ //genuine tau
-      iBin = h2DTauTrgGenuineCorrections->FindBin(std::min(pt_1,(float)999.0), tau_decay_mode_1);
+      iBin = h2DTauTrgGenuineCorrections->FindBin(std::min(pt_1,(Float_t)999.9), tau_decay_mode_tmp);
       trigweight_1 = h2DTauTrgGenuineCorrections->GetBinContent(iBin);
       idisoweight_1 = 0.95;
     }
     else{ //fake tau
-      iBin = h2DTauTrgFakeCorrections->FindBin(std::min(pt_1,(float)999.0), tau_decay_mode_1);
+      iBin = h2DTauTrgFakeCorrections->FindBin(std::min(pt_1,(Float_t)999.9), tau_decay_mode_tmp);
       trigweight_1 = h2DTauTrgFakeCorrections->GetBinContent(iBin);
       idisoweight_1 = 1;
     }
@@ -692,13 +699,14 @@ void HTTSynchNTuple::fillLegsSpecific(const HTTParticle &leg1, const HTTParticle
     tau_decay_mode_2 = leg2.getProperty(PropertyEnum::decayMode);
     decayModeFindingOldDMs_2 = (tau_decay_mode_2==0 || tau_decay_mode_2==1 || tau_decay_mode_2==2 || tau_decay_mode_2==10); //FIXME: is it possible to take ID directly?
     //Weights
+    tau_decay_mode_tmp  = tau_decay_mode_2==2 ? 1 : tau_decay_mode_2; //to handle very rare dm==2    
     if(gen_match_2==5){ //genuine tau
-      iBin = h2DTauTrgGenuineCorrections->FindBin(std::min(pt_2,(float)999.0), tau_decay_mode_2);
+      iBin = h2DTauTrgGenuineCorrections->FindBin(std::min(pt_2,(Float_t)999.9), tau_decay_mode_tmp);
       trigweight_2 = h2DTauTrgGenuineCorrections->GetBinContent(iBin);
       idisoweight_2 = 0.95;
     }
     else{ //fake tau
-      iBin = h2DTauTrgFakeCorrections->FindBin(std::min(pt_2,(float)999.0), tau_decay_mode_2);
+      iBin = h2DTauTrgFakeCorrections->FindBin(std::min(pt_2,(Float_t)999.9), tau_decay_mode_tmp);
       trigweight_2 = h2DTauTrgFakeCorrections->GetBinContent(iBin);
       idisoweight_2 = 1;
     }
@@ -762,7 +770,7 @@ void HTTSynchNTuple::fillPair(const HTTEvent &event, HTTPair &pair){
 
   //di-tau system
   pt_tt = (mvametP4 + leg1P4 + leg2P4).Pt();
-  mt_tot = TMath::Sqrt( 2. * leg1P4.Pt() * mvametP4.Pt() * ( 1. - TMath::Cos( leg1P4.Phi() - mvametP4.Phi() ) ) + 2. * leg2P4.Pt() * mvametP4.Pt() * (1. - TMath::Cos( leg2P4.Phi() - mvametP4.Phi() )) + 2. * leg1P4.Pt() * leg2P4.Pt() * TMath::Cos(leg1P4.Phi() - leg2P4.Phi()) );
+  mt_tot = TMath::Sqrt( 2. * leg1P4.Pt() * mvametP4.Pt() * (1. - TMath::Cos( leg1P4.Phi() - mvametP4.Phi() ) ) + 2. * leg2P4.Pt() * mvametP4.Pt() * (1. - TMath::Cos( leg2P4.Phi() - mvametP4.Phi() ) ) + 2. * leg1P4.Pt() * leg2P4.Pt() * (1. - TMath::Cos(leg1P4.Phi() - leg2P4.Phi() ) ) );
   m_vis = (leg1P4 + leg2P4).M();
   m_sv = pair.getP4().M();
 
@@ -874,8 +882,8 @@ bool HTTSynchNTuple::selectEvent(const HTTEvent &event, HTTPair &pair){
     metFiltersPass &= ( (metFilters & 1<<i) == 1<<i );
     //std::cout<<i<<". flt: "<<( (metFilters & 1<<i) == 1<<i )<<", all: "<<metFiltersPass<<std::endl;
   }
-  for(int i=6;i<8;++i){//6-badChCand, 7-badPFMuon, require that are not fired
-    metFiltersPass &= !( (metFilters & 1<<i) == 1<<i );
+  for(int i=6;i<8;++i){//6-badChCand, 7-badPFMuon
+    metFiltersPass &= ( (metFilters & 1<<i) == 1<<i );
     //std::cout<<i<<". flt: "<<!( (metFilters & 1<<i) == 1<<i )<<", all: "<<metFiltersPass<<std::endl;
   }
   if(!metFiltersPass) return false;
@@ -908,28 +916,40 @@ void HTTSynchNTuple::initializeCorrections(){
 
   RooWorkspace *scaleWorkspace = (RooWorkspace*)aFile->Get("w");
 
-  RooAbsReal *muon_idiso_scalefactor = scaleWorkspace->function("m_idiso_ratio");//id+iso->idiso
-  //RooAbsReal *muon_trg_scalefactor = scaleWorkspace->function("m_trgIsoMu24orTkIsoMu24_desy_ratio");
-  RooAbsReal *muon_trg_scalefactor = scaleWorkspace->function("m_trgMu22OR_eta2p1_desy_ratio");//MB 24->22??
+  RooAbsReal *muon_id_scalefactor = scaleWorkspace->function("m_id_ratio");
+  RooAbsReal *muon_iso_scalefactor = scaleWorkspace->function("m_iso_binned_ratio");
+  RooAbsReal *muon_trg_scalefactor = scaleWorkspace->function("m_trgOR4_binned_ratio");//MB 24->22
   RooAbsReal *muon_trk_scalefactor = scaleWorkspace->function("m_trk_ratio");//MB not in HTTAnalysis
   RooAbsReal *tau_trg_genuine_efficiency = scaleWorkspace->function("t_genuine_TightIso_tt_ratio");//MB data->ratio
   RooAbsReal *tau_trg_fake_efficiency = scaleWorkspace->function("t_fake_TightIso_tt_ratio");//MB data->ratio
-  
-  h2DMuonIdIsoCorrections = (TH2F*)muon_idiso_scalefactor->createHistogram("h2DMuonIdIsoCorrections",
-									   *scaleWorkspace->var("m_pt"),RooFit::Binning(2080,10,1000),
-									   RooFit::YVar(*scaleWorkspace->var("m_eta"),RooFit::Binning(48,-2.4,2.4)),//MB m_abs_eta->m_eta
-									   RooFit::Extended(kFALSE),
-									   RooFit::Scaling(kFALSE));
-  
-  h2DMuonTrgCorrections = (TH2F*)muon_trg_scalefactor->createHistogram("h2DMuonTrgCorrections",
-								       *scaleWorkspace->var("m_pt"),RooFit::Binning(2080,10,1000),
-								       RooFit::YVar(*scaleWorkspace->var("m_eta"),RooFit::Binning(48,-2.4,2.4)),//MB m_abs_eta->m_eta
-								       RooFit::Extended(kFALSE),
-								       RooFit::Scaling(kFALSE));
+
+  h2DMuonIdCorrections = (TH2F*)muon_id_scalefactor->createHistogram("h2DMuonIdCorrections",
+								     *scaleWorkspace->var("m_pt"),RooFit::Binning(1980,10,1000),
+								     RooFit::YVar(*scaleWorkspace->var("m_eta"),RooFit::Binning(48,-2.4,2.4)),//MB m_abs_eta->m_eta
+								     RooFit::Extended(kFALSE),
+								     RooFit::Scaling(kFALSE));
+  //  
+  RooArgSet dependentVarsForMu(*scaleWorkspace->var("m_pt"),*scaleWorkspace->var("m_eta"),*scaleWorkspace->var("m_iso"));
+  RooArgSet projectedVarsForMu;
+  const RooAbsReal *muon_iso_scalefactor_proj = muon_iso_scalefactor->createPlotProjection(dependentVarsForMu,projectedVarsForMu);
+  h3DMuonIsoCorrections = (TH3F*)muon_iso_scalefactor_proj->createHistogram("h3DMuonIsoCorrections",
+								       *scaleWorkspace->var("m_pt"),RooFit::Binning(1980,10,1000),
+								       RooFit::YVar(*scaleWorkspace->var("m_eta"),RooFit::Binning(48,-2.4,2.4)),
+									    RooFit::ZVar(*scaleWorkspace->var("m_iso"),RooFit::Binning(12,-0.05,0.55)),
+											RooFit::Extended(kFALSE),
+											RooFit::Scaling(kFALSE));
+  const RooAbsReal *muon_trg_scalefactor_proj = muon_trg_scalefactor->createPlotProjection(dependentVarsForMu,projectedVarsForMu);
+  h3DMuonTrgCorrections = (TH3F*)muon_trg_scalefactor_proj->createHistogram("h3DMuonTrgCorrections",
+									    *scaleWorkspace->var("m_pt"),RooFit::Binning(1980,10,1000),
+									    RooFit::YVar(*scaleWorkspace->var("m_eta"),RooFit::Binning(48,-2.4,2.4)),
+									    RooFit::ZVar(*scaleWorkspace->var("m_iso"),RooFit::Binning(12,-0.05,0.55)),
+									    RooFit::Extended(kFALSE),
+									    RooFit::Scaling(kFALSE));
   h1DMuonTrkCorrections = (TH1F*)muon_trk_scalefactor->createHistogram("h1DMuonTrkCorrections",
 								       *scaleWorkspace->var("m_eta"),RooFit::Binning(48,-2.4,2.4),//MB m_abs_eta->m_eta
 								       RooFit::Extended(kFALSE),
 								       RooFit::Scaling(kFALSE));
+
   ///WARNING: t_eta and t_dm not used, so histograms have only one bin in this directions
   RooArgSet dependentVars(*scaleWorkspace->var("t_pt"),*scaleWorkspace->var("t_dm"));
   RooArgSet projectedVars;
@@ -937,15 +957,22 @@ void HTTSynchNTuple::initializeCorrections(){
   const RooAbsReal * tau_trg_genuine_efficiency_proj = tau_trg_genuine_efficiency->createPlotProjection(dependentVars,projectedVars);
   const RooAbsReal * tau_trg_fake_efficiency_proj = tau_trg_fake_efficiency->createPlotProjection(dependentVars,projectedVars);
   
-  h2DTauTrgGenuineCorrections = (TH2F*)tau_trg_genuine_efficiency_proj->createHistogram("h3DTauTrgGenuineCorrections",
+  RooBinning binsForTauTrg(0,1000);
+  binsForTauTrg.addUniform(1, 0, 30);
+  binsForTauTrg.addUniform(2000, 30, 130);
+  binsForTauTrg.addUniform(1000, 130, 330);
+  binsForTauTrg.addUniform(1340, 330, 1000);
+  h2DTauTrgGenuineCorrections = (TH2F*)tau_trg_genuine_efficiency_proj->createHistogram("h2DTauTrgGenuineCorrections",
 											*scaleWorkspace->var("t_pt"),RooFit::Binning(5000,0,1000),
-											RooFit::YVar(*scaleWorkspace->var("t_dm"),RooFit::Binning(3,-0.5,10.5)),
+											//*scaleWorkspace->var("t_pt"),RooFit::Binning(binsForTauTrg),
+											RooFit::YVar(*scaleWorkspace->var("t_dm"),RooFit::Binning(11,-0.5,10.5)),//MB proper binning (3->11) for DMs==0,1(2),10
 											RooFit::Extended(kFALSE),
 											RooFit::Scaling(kFALSE));
 
-  h2DTauTrgFakeCorrections = (TH2F*)tau_trg_fake_efficiency_proj->createHistogram("h3DTauTrgFakeCorrections",
+  h2DTauTrgFakeCorrections = (TH2F*)tau_trg_fake_efficiency_proj->createHistogram("h2DTauTrgFakeCorrections",
 										  *scaleWorkspace->var("t_pt"),RooFit::Binning(5000,0,1000),
-										  RooFit::YVar(*scaleWorkspace->var("t_dm"),RooFit::Binning(3,-0.5,10.5)),
+										  //*scaleWorkspace->var("t_pt"),RooFit::Binning(binsForTauTrg),
+										  RooFit::YVar(*scaleWorkspace->var("t_dm"),RooFit::Binning(11,-0.5,10.5)),//MB proper binning (3->11) for DMs==0,1(2),10
 										  RooFit::Extended(kFALSE),
 										  RooFit::Scaling(kFALSE));
 
