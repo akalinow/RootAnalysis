@@ -185,7 +185,7 @@ float TauTauSpecifics::getLeg1Correction(const HTTAnalysis::sysEffects & aSystEf
 
         return getLeptonCorrection(myAnalyzer->aLeg1.getP4().Eta(),
                                    myAnalyzer->aLeg1.getP4().Pt(),
-                                   myAnalyzer->aLeg2.getProperty(PropertyEnum::byIsolationMVArun2v1DBoldDMwLTraw),
+                                   myAnalyzer->aLeg1.getProperty(PropertyEnum::byIsolationMVArun2v1DBoldDMwLTraw),
                                    static_cast<HTTAnalysis::hadronicTauDecayModes>(myAnalyzer->aLeg1.getProperty(PropertyEnum::decayMode)),true);
 }
 /////////////////////////////////////////////////////////////////
