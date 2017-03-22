@@ -119,11 +119,13 @@ void ChannelSpecifics::initializeCorrections(){
                 const RooAbsReal * tau_trg_genuine_efficiency_proj = tau_trg_genuine_efficiency->createPlotProjection(dependentVars,projectedVars);
                 const RooAbsReal * tau_trg_fake_efficiency_proj = tau_trg_fake_efficiency->createPlotProjection(dependentVars,projectedVars);
 
+		/*
                 RooBinning binsForTauTrg(0,1000);
                 binsForTauTrg.addUniform(1, 0, 30);
                 binsForTauTrg.addUniform(2000, 30, 130);
                 binsForTauTrg.addUniform(1000, 130, 330);
                 binsForTauTrg.addUniform(1340, 330, 1000);
+		*/
                 h2DTauTrgGenuineCorrections = (TH2F*)tau_trg_genuine_efficiency_proj->createHistogram("h2DTauTrgGenuineCorrections",
                                                                                                       *scaleWorkspace->var("t_pt"),RooFit::Binning(5000,0,1000),
                                                                                                       //*scaleWorkspace->var("t_pt"),RooFit::Binning(binsForTauTrg),
@@ -180,10 +182,10 @@ float ChannelSpecifics::getLeptonCorrection(float eta, float pt, float iso,
                 if(useTauTrigger) {
                         int tauDecayModeFix = (int)tauDecayMode;
                         if(tauDecayModeFix==2) tauDecayModeFix=1;//DM=2 is not covered by parametrisation.
-                        int iBin = h2DTauTrgGenuineCorrections->FindBin(pt, tauDecayModeFix);
+                        int iBin = h2DTauTrgGenuineCorrections->FindBin(std::min(pt,(Float_t)999.9), tauDecayModeFix);
                         tau_trg_efficiency = h2DTauTrgGenuineCorrections->GetBinContent(iBin);
                         if(fakeTau) {
-                                int iBin = h2DTauTrgFakeCorrections->FindBin(std::min(pt,(Float_t)999.9), tauDecayModeFix);
+                                iBin = h2DTauTrgFakeCorrections->FindBin(std::min(pt,(Float_t)999.9), tauDecayModeFix);
                                 tau_trg_efficiency = h2DTauTrgFakeCorrections->GetBinContent(iBin);
                         }
                 }
