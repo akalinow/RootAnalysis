@@ -70,6 +70,9 @@ void ChannelSpecifics::initializeCorrections(){
 
 #pragma omp critical(ROOFIT_INITIALIZATION)
         {
+
+                std::cout<<"Initializing corrections for thread "<<omp_get_thread_num()<<std::endl;
+
                 std::string correctionFileName = "http://akalinow.web.cern.ch/akalinow/htt_scalefactors_v16_4.root";
                 TFile *aFile = TFile::Open(correctionFileName.c_str(),"CACHEREAD");
 
