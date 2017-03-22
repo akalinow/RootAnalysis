@@ -4,7 +4,7 @@ from ROOT import *
 import array
 import numpy
 
-WAW_fileName = "RootAnalysis_AnalysisMuTau.root"
+WAW_fileName = "RootAnalysis_AnalysisMuTau_Artur.root"
 
 channel="mt"
 
@@ -163,7 +163,7 @@ for iCategory in xrange(0,len(categoryNames)):
     categoryDirMade=True
 
     for key,value in histogramsMap.iteritems():
-        hName = histoPrefix[categoryName] + key+"_"+str(iCategory)
+        hName = histoPrefix[categoryName] + key
         histogram = WAW_file.Get(hName)
         if(histogram==None):
             print hName,"is missing"
@@ -182,7 +182,7 @@ for iCategory in xrange(0,len(categoryNames)):
             if nuisanceParam.count("zmumuShape")>0 and cat.count("vbf")>0: cat = "VBF"
             nuisanceParam = nuisanceParam.replace("CAT",cat)
             
-            histos = getSingleNPHistos(histoPrefix[categoryName] + key+"_"+str(iCategory), nuisanceParam, histogram)
+            histos = getSingleNPHistos(histoPrefix[categoryName] + key, nuisanceParam, histogram)
             histogramUp = histos[0]
             histogramUp.SetName(value+"_"+nuisanceParam+"Up")
             histogramUp.Write()
@@ -291,7 +291,6 @@ for iCategory in xrange(0,len(categoryNames)):
 
     for key,value in histogramsMap.iteritems():
         hName = histoPrefix[categoryName] + key
-        hName = hName +"_"+str(iCategory)
         histogram = WAW_file.Get(hName)
         if(histogram==None):
             print hName, " is missing"
