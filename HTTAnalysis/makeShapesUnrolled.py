@@ -89,6 +89,17 @@ nuisanceParams = [
     "CMS_htt_zmumuShape_CAT_13TeV",
     ]
 
+def rebinHisto(histo, categoryName):
+    nbins = 0
+    if categoryName.count("antiiso")>0:
+        xbins = numpy.array([40.0,80.0,120.0,160.0,200.0])
+        nbins = 4
+    if categoryName.count("wjets")>0:
+        xbins = numpy.array([80.0,200.0])
+        nbins = 1
+    newHisto = histo.Rebin(nbins, "rebinned", xbins)
+    return newHisto
+
 def getSingleNPHistos(prefix, np, histo):
         
     hName = prefix+"_"+np
@@ -113,18 +124,6 @@ def getSingleNPHistos(prefix, np, histo):
 
     txtFile.close()
     return (hUp, hDown)
-
-def rebinHisto(histo, categoryName):
-    if categoryName.count("antiiso")>0:
-        histo.Rebin(4)
-        newHisto = TH1F(histo.GetName(),histo.GetTitle(),4,40,200)
-        for i in xrange(1,5):
-            newHisto.SetBinContent(i, histo.GetBinContent(i+1))
-        return newHisto
-    if categoryName.count("wjets")>0:
-        newHisto = TH1F(histo.GetName(),histo.GetTitle(),1,80,200)
-        newHisto.SetBinContent(1, histo.Integral(histo.GetBin(81),histo.GetBin(199)))
-        return newHisto
 
 #basic categories
 categoryDirMade = False
@@ -283,6 +282,7 @@ for iCategory in xrange(0,len(categoryCombineNames)):
             open("histogramSearch.txt","a").write("Search for histo: "+hName+": 0\n")
         else:
             open("histogramSearch.txt","a").write("Search for histo: "+hName+": 1\n")
+        histogram=rebinHisto(histogram, categoryName)
         histogram.SetName(value)
             
         histogram.Write()
@@ -292,6 +292,8 @@ for iCategory in xrange(0,len(categoryCombineNames)):
             histos = getSingleNPHistos(hName, np ,histogram)
             hUp = histos[0]
             hDown = histos[1]
+            hUp=rebinHisto(hUp, categoryName)
+            hDown=rebinHisto(hDown, categoryName)
             hUp.SetName(value+"_"+np+"Up")
             hUp.Write()
             hDown.SetName(value+"_"+np+"Down")
@@ -311,6 +313,8 @@ for iCategory in xrange(0,len(categoryCombineNames)):
                   if nuisanceParam.count("zmumuShape")>0 and cat.count("vbf")>0:  nuisanceParam.replace("vbf","VBF")
                   hUp = histos[0]
                   hDown = histos[1]
+                  hUp=rebinHisto(hUp, categoryName)
+                  hDown=rebinHisto(hDown, categoryName)
                   hUp.SetName(value+"_"+nuisanceParam+"Up")
                   hUp.Write()
                   hDown.SetName(value+"_"+nuisanceParam+"Down")
