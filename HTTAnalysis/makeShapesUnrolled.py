@@ -305,11 +305,12 @@ for iCategory in xrange(0,len(categoryCombineNames)):
             if cat.count("0jet")>0: cat = "0jet"
             elif cat.count("boosted")>0: cat = "boosted"
             elif cat.count("vbf")>0: cat = "vbf"
+            nuisanceParamRA = nuisanceParam.replace("CAT",categoryRootAnalysisNames[iCategory])
             nuisanceParam = nuisanceParam.replace("CAT",cat)
 
             for proc in value1:
                   if proc!= value: continue
-                  histos = getSingleNPHistos(hName, nuisanceParam, histogram)
+                  histos = getSingleNPHistos(hName, nuisanceParamRA, histogram)
                   if nuisanceParam.count("zmumuShape")>0 and cat.count("vbf")>0:  nuisanceParam.replace("vbf","VBF")
                   hUp = histos[0]
                   hDown = histos[1]
