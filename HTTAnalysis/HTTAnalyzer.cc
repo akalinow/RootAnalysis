@@ -123,7 +123,7 @@ void HTTAnalyzer::fillControlHistos(const std::string & hNameSuffix, float event
         float higgsPt =  (aVisSum + aMET.getP4(aSystEffect)).Pt();
         float jetsMass = 0;
         if(nJets30>1) jetsMass = (aJet1.getP4(aSystEffect)+aJet2.getP4(aSystEffect)).M();
-
+        
         myHistos_->fill1DHistogram("h1DMassSV"+hNameSuffix,aPair.getP4(aSystEffect).M(),eventWeight);
         myHistos_->fill1DHistogram("h1DMassVis"+hNameSuffix, visMass, eventWeight);
         myHistos_->fill1DHistogram("h1DMassTrans"+hNameSuffix,aPair.getMTMuon(aSystEffect),eventWeight);
