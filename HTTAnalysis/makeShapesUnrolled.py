@@ -4,7 +4,7 @@ from ROOT import *
 import array
 import numpy
 
-WAW_fileName = "RootAnalysis_AnalysisMuTau.root"
+WAW_fileName = "/cms/cms/akalinow/CMS/HiggsCP/Data/NTUPLES_03_03_2017/MT/Histograms/RootAnalysis_AnalysisMuTau.root"
 
 channel="mt"
 
@@ -27,30 +27,24 @@ nbins = {
          "mt_vbf":(6,5)
          }
 
-categoryEnum = [
-        "jet0_low", "jet0_high",
-        "jet1_low", "jet1_high",
-        "vbf_low", "vbf_high",
-        "jet0", "boosted", "vbf",
-        "wjets_jet0", "wjets_boosted", "wjets_vbf",
-        "wjets_qcd_jet0", "wjets_qcd_boosted", "wjets_qcd_vbf",
-        "qcd_jet0", "qcd_boosted", "qcd_vbf",
-        "qcd_ss_jet0", "qcd_ss_boosted", "qcd_ss_vbf",
-        "ss_jet0", "ss_boosted", "ss_vbf",
-        "antiIso_jet0", "antiIso_boosted", "antiIso_vbf",
-        "antiIso_qcd_jet0", "antiIso_qcd_boosted", "antiIso_qcd_vbf"
+categoryRootAnalysisNames = [
+        "0jet", "boosted", "vbf",
+        "0jet_W", "boosted_W", "vbf_W",
+        "antiIso_0jet", "antiIso_boosted", "antiIso_vbf",
         ]
 
-categoryNames = list()
+categoryCombineNames = list()
 
-for i in xrange(0,len(categoryEnum)):
-        tmp = categoryEnum[i]
+for i in xrange(0,len(categoryRootAnalysisNames)):
+        tmp = categoryRootAnalysisNames[i]
+        if tmp.count("_W"):
+          tmp = tmp[:-2]
+          tmp = "wjets_"+tmp
         tmp = channel+"_"+tmp
         if tmp.count("wjets")>0 or tmp.count("antiIso")>0:
                 tmp = tmp + "_cr"
-        tmp = tmp.replace('jet0','0jet')
         tmp = tmp.replace('antiIso','antiiso')
-        categoryNames.append(tmp)
+        categoryCombineNames.append(tmp)
 
 histogramsMap = {
     "Data":"data_obs",
@@ -94,68 +88,54 @@ nuisanceParams = [
     "CMS_scale_gg_13TeV",
     "CMS_htt_zmumuShape_CAT_13TeV",
     ]
-#AAAAAAAAAAAAAAa brakuje CMS_ przy scale_gg i nizej tez
+
+def rebinHisto(histo, categoryName):
+    nbins = 0
+    if categoryName.count("antiiso")>0:
+        xbins = numpy.array([40.0,80.0,120.0,160.0,200.0])
+        nbins = 4
+    if categoryName.count("wjets")>0:
+        xbins = numpy.array([80.0,200.0])
+        nbins = 1
+    newHisto = histo.Rebin(nbins, "rebinned", xbins)
+    return newHisto
+
 def getSingleNPHistos(prefix, np, histo):
         
     hName = prefix+"_"+np
     hUp = WAW_file.Get(hName+"Up")
+    txtFile=open("histogramSearch.txt","a")
 
     if hUp==None :
         print "Missing histogram: ",hName+"Up"
+        txtFile.write("Search for histo: "+hName+"Up: 0\n")
         hUp = histo.Clone()
+    else: 
+        txtFile.write("Search for histo: "+hName+"Up: 1\n")
 
     hDown = WAW_file.Get(hName+"Down")
     if hDown==None :
         #almost always where there is no Up histo, there is no down histo, so there is no need to print its name again
+        txtFile.write("Search for histo: "+hName+"Down: 0\n")
         #print prefix+np
         hDown = histo.Clone()
+    else: 
+        txtFile.write("Search for histo: "+hName+"Down: 1\n")
 
+    txtFile.close()
     return (hUp, hDown)
-
-
-
-def getDoubleNPHistos(prefix, np1, np2, histo):
-
-    hUpUp = WAW_file.Get(prefix+np1+"Up"+np2+"Up")
-    if hUpUp==None :
-        print "Missing histogram: ",prefix+np1+"Up/Down"+np2+"Up/Down"
-        hUpUp = histo.Clone()
-
-    hUpDown = WAW_file.Get(prefix+np1+"Up"+np2+"Down")
-    if hUpDown==None :
-        hUpDown = histo.Clone()
-
-    hDownUp = WAW_file.Get(prefix+np1+"Down"+np2+"Up")
-    if hDownUp==None :
-        hDownUp = histo.Clone()
-
-    hDownDown = WAW_file.Get(prefix+np1+"Down"+np2+"Down")
-    if hDownDown==None :
-        hDownDown = histo.Clone()
-
-    return (hUpUp, hUpDown, hDownUp, hDownDown)
-
-def rebinHisto(histo, categoryName):
-    if categoryName.count("antiiso")>0:
-        histo.Rebin(4)
-        newHisto = TH1F(histo.GetName(),histo.GetTitle(),4,40,200)
-        for i in xrange(1,5):
-            newHisto.SetBinContent(i, histo.GetBinContent(i+1))
-        return newHisto
-    if categoryName.count("wjets")>0:
-        newHisto = TH1F(histo.GetName(),histo.GetTitle(),1,80,200)
-        newHisto.SetBinContent(1, histo.Integral(histo.GetBin(81),histo.GetBin(199)))
-        return newHisto
 
 #basic categories
 categoryDirMade = False
 
 hData = 0
 
+open("histogramSearch.txt","w").write("Looking for histograms for Combine \n")
+
 print "MAIN REGION\n\n\n\n\n"
 
-for iCategory in xrange(0,len(categoryNames)):
-    categoryName = categoryNames[iCategory]
+for iCategory in xrange(0,len(categoryCombineNames)):
+    categoryName = categoryCombineNames[iCategory]
     if categoryName not in histoPrefix.keys(): continue
     if categoryDirMade: gDirectory.cd("..")
     gDirectory.mkdir(categoryName)
@@ -163,11 +143,14 @@ for iCategory in xrange(0,len(categoryNames)):
     categoryDirMade=True
 
     for key,value in histogramsMap.iteritems():
-        hName = histoPrefix[categoryName] + key+"_"+str(iCategory)
+        hName = histoPrefix[categoryName] + key+"_"+categoryRootAnalysisNames[iCategory]
         histogram = WAW_file.Get(hName)
         if(histogram==None):
             print hName,"is missing"
             histogram = TH1F(value,"",nbins[categoryName][0]*nbins[categoryName][1],0.5,nbins[categoryName][0]*nbins[categoryName][1] + 0.5)
+            open("histogramSearch.txt","a").write("Search for histo: "+hName+": 0\n")
+        else:
+            open("histogramSearch.txt","a").write("Search for histo: "+hName+": 1\n")
         histogram.SetName(value)
         histogram.Write()
 
@@ -179,10 +162,10 @@ for iCategory in xrange(0,len(categoryNames)):
             if cat.count("0jet")>0: cat = "0jet"
             elif cat.count("boosted")>0: cat = "boosted"
             elif cat.count("vbf")>0: cat = "vbf"
-            if nuisanceParam.count("zmumuShape")>0 and cat.count("vbf")>0: cat = "VBF"
             nuisanceParam = nuisanceParam.replace("CAT",cat)
             
-            histos = getSingleNPHistos(histoPrefix[categoryName] + key+"_"+str(iCategory), nuisanceParam, histogram)
+            histos = getSingleNPHistos(histoPrefix[categoryName] + key+"_"+categoryRootAnalysisNames[iCategory], nuisanceParam, histogram)
+            if nuisanceParam.count("zmumuShape")>0 and cat.count("vbf")>0:  nuisanceParam.replace("vbf","VBF")
             histogramUp = histos[0]
             histogramUp.SetName(value+"_"+nuisanceParam+"Up")
             histogramUp.Write()
@@ -261,11 +244,11 @@ histogramsMap = {
 #when another nuisance parameter is considered in the process, also histos Nuisance1_Nuisance2 should be added
 nuisanceParams = {
     "CMS_htt_jetToTauFake_13TeV":("ZJ","W","TTJ"),
-    "CMS_htt_ZLShape_CHANNEL_13TeV":("ZL",""),
+    "CMS_htt_ZLShape_CHANNEL_13TeV":("ZL",),
     "CMS_htt_dyShape_13TeV":("ZL","ZJ","ZTT"),
     "CMS_htt_ttbarShape_13TeV":("TT","TTT","TTJ"),
     "QCDSFUncert_CHANNEL_CAT_13TeV":("QCD","W"),
-    "WSFUncert_CHANNEL_CAT_13TeV":("W",""),
+    "WSFUncert_CHANNEL_CAT_13TeV":("W",),
     "CMS_scale_gg_13TeV":("ggH120","ggH125","ggH130")
     }
     
@@ -281,8 +264,8 @@ nbins = {"mt_wjets_0jet_cr":(1,80,200),
 
 categoryDirMade = True
 
-for iCategory in xrange(0,len(categoryNames)):
-    categoryName = categoryNames[iCategory]
+for iCategory in xrange(0,len(categoryCombineNames)):
+    categoryName = categoryCombineNames[iCategory]
     if categoryName not in histoPrefix.keys(): continue
     if categoryDirMade: gDirectory.cd("..")
     gDirectory.mkdir(categoryName)
@@ -291,11 +274,15 @@ for iCategory in xrange(0,len(categoryNames)):
 
     for key,value in histogramsMap.iteritems():
         hName = histoPrefix[categoryName] + key
-        hName = hName +"_"+str(iCategory)
+        hName = hName +"_"+categoryRootAnalysisNames[iCategory]
         histogram = WAW_file.Get(hName)
         if(histogram==None):
             print hName, " is missing"
             histogram = TH1F(value,"",nbins[categoryName][0],nbins[categoryName][1],nbins[categoryName][2])
+            open("histogramSearch.txt","a").write("Search for histo: "+hName+": 0\n")
+        else:
+            open("histogramSearch.txt","a").write("Search for histo: "+hName+": 1\n")
+        histogram=rebinHisto(histogram, categoryName)
         histogram.SetName(value)
             
         histogram.Write()
@@ -305,6 +292,8 @@ for iCategory in xrange(0,len(categoryNames)):
             histos = getSingleNPHistos(hName, np ,histogram)
             hUp = histos[0]
             hDown = histos[1]
+            hUp=rebinHisto(hUp, categoryName)
+            hDown=rebinHisto(hDown, categoryName)
             hUp.SetName(value+"_"+np+"Up")
             hUp.Write()
             hDown.SetName(value+"_"+np+"Down")
@@ -316,14 +305,16 @@ for iCategory in xrange(0,len(categoryNames)):
             if cat.count("0jet")>0: cat = "0jet"
             elif cat.count("boosted")>0: cat = "boosted"
             elif cat.count("vbf")>0: cat = "vbf"
-            if nuisanceParam.count("zmumuShape")>0 and cat.count("vbf")>0: cat = "VBF"
             nuisanceParam = nuisanceParam.replace("CAT",cat)
 
             for proc in value1:
                   if proc!= value: continue
                   histos = getSingleNPHistos(hName, nuisanceParam, histogram)
+                  if nuisanceParam.count("zmumuShape")>0 and cat.count("vbf")>0:  nuisanceParam.replace("vbf","VBF")
                   hUp = histos[0]
                   hDown = histos[1]
+                  hUp=rebinHisto(hUp, categoryName)
+                  hDown=rebinHisto(hDown, categoryName)
                   hUp.SetName(value+"_"+nuisanceParam+"Up")
                   hUp.Write()
                   hDown.SetName(value+"_"+nuisanceParam+"Down")
