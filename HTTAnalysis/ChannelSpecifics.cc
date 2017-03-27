@@ -45,11 +45,11 @@ ChannelSpecifics::~ChannelSpecifics(){
 /////////////////////////////////////////////////////////////////
 void ChannelSpecifics::defineCategories(){
 
-        jet0 = new HTTAnalysis::eventCategory("jet0", categoryRejester);
+        jet0 = new HTTAnalysis::eventCategory("0jet", categoryRejester);
         boosted = new HTTAnalysis::eventCategory("boosted", categoryRejester);
         vbf = new HTTAnalysis::eventCategory("vbf", categoryRejester);
 
-        antiIso_jet0 = new HTTAnalysis::eventCategory("antiIso_jet0", categoryRejester);
+        antiIso_jet0 = new HTTAnalysis::eventCategory("antiIso_0jet", categoryRejester);
         antiIso_boosted = new HTTAnalysis::eventCategory("antiIso_boosted", categoryRejester);
         antiIso_vbf = new HTTAnalysis::eventCategory("antiIso_vbf", categoryRejester);
 
@@ -108,7 +108,6 @@ void ChannelSpecifics::initializeCorrections(){
                                                                                      *scaleWorkspace->var("m_eta"),RooFit::Binning(48,-2.4,2.4),//MB m_abs_eta->m_eta
                                                                                      RooFit::Extended(kFALSE),
                                                                                      RooFit::Scaling(kFALSE));
-
                 ///WARNING: t_eta and t_dm not used, so histograms have only one bin in this directions
                 RooArgSet dependentVars(*scaleWorkspace->var("t_pt"),*scaleWorkspace->var("t_dm"));
                 RooArgSet projectedVars;

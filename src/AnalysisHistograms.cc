@@ -473,28 +473,28 @@ void AnalysisHistograms::finalizeHistograms(){
     for(auto it:my1Dhistograms_[iThread]){
       if(my1Dhistograms_[0].find(it.first)==my1Dhistograms_[0].end()){
         TH1F *hEmpty = (TH1F*)it.second->Clone();
-        hEmpty->Clear();
+        hEmpty->Reset();
         my1Dhistograms_[0][it.first] = hEmpty;
       }
     }
     for(auto it:my2Dhistograms_[iThread]){
       if(my2Dhistograms_[0].find(it.first)==my2Dhistograms_[0].end()){
         TH2F *hEmpty = (TH2F*)it.second->Clone();
-        hEmpty->Clear();
+        hEmpty->Reset();
         my2Dhistograms_[0][it.first] = hEmpty;
       }
     }
     for(auto it:my3Dhistograms_[iThread]){
         if(my3Dhistograms_[0].find(it.first)==my3Dhistograms_[0].end()){
           TH3F *hEmpty = (TH3F*)it.second->Clone();
-          hEmpty->Clear();
+          hEmpty->Reset();
           my3Dhistograms_[0][it.first] = hEmpty;
         }
       }
       for(auto it:myProfiles_[iThread]){
         if(myProfiles_[0].find(it.first)==myProfiles_[0].end()){
           TProfile *hEmpty = (TProfile*)it.second->Clone();
-          hEmpty->Clear();
+          hEmpty->Reset();          
           myProfiles_[0][it.first] = hEmpty;
         }
       }
