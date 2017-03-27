@@ -41,11 +41,11 @@ ChannelSpecifics::~ChannelSpecifics(){
 /////////////////////////////////////////////////////////////////
 void ChannelSpecifics::defineCategories(){
 
-        jet0 = new HTTAnalysis::eventCategory("jet0", categoryRejester);
+        jet0 = new HTTAnalysis::eventCategory("0jet", categoryRejester);
         boosted = new HTTAnalysis::eventCategory("boosted", categoryRejester);
         vbf = new HTTAnalysis::eventCategory("vbf", categoryRejester);
 
-        antiIso_jet0 = new HTTAnalysis::eventCategory("antiIso_jet0", categoryRejester);
+        antiIso_jet0 = new HTTAnalysis::eventCategory("antiIso_0jet", categoryRejester);
         antiIso_boosted = new HTTAnalysis::eventCategory("antiIso_boosted", categoryRejester);
         antiIso_vbf = new HTTAnalysis::eventCategory("antiIso_vbf", categoryRejester);
 
@@ -72,25 +72,25 @@ void ChannelSpecifics::initializeCorrections(){
 
                 RooAbsReal *muon_id_scalefactor = scaleWorkspace->function("m_id_ratio");
                 RooAbsReal *muon_iso_scalefactor = scaleWorkspace->function("m_iso_ratio");
-                RooAbsReal *muon_trg_scalefactor = scaleWorkspace->function("m_trgIsoMu24orTkIsoMu24_desy_ratio");              
+                RooAbsReal *muon_trg_scalefactor = scaleWorkspace->function("m_trgIsoMu24orTkIsoMu24_desy_ratio");
                 RooAbsReal *tau_trg_genuine_efficiency = scaleWorkspace->function("t_genuine_TightIso_tt_data");
                 RooAbsReal *tau_trg_fake_efficiency = scaleWorkspace->function("t_fake_TightIso_tt_data");
 
                 h2DMuonIdCorrections = (TH2F*)muon_id_scalefactor->createHistogram("h2DMuonIdCorrections",
                                                                                    *scaleWorkspace->var("m_pt"),RooFit::Binning(400,10,200),
-                                                                                   RooFit::YVar(*scaleWorkspace->var("m_abs_eta"),RooFit::Binning(10,0,2.4)),
+                                                                                   RooFit::YVar(*scaleWorkspace->var("m_eta"),RooFit::Binning(10,-2.4,2.4)),
                                                                                    RooFit::Extended(kFALSE),
                                                                                    RooFit::Scaling(kFALSE));
 
                 h2DMuonIsoCorrections = (TH2F*)muon_iso_scalefactor->createHistogram("h2DMuonIsoCorrections",
                                                                                      *scaleWorkspace->var("m_pt"),RooFit::Binning(400,10,200),
-                                                                                     RooFit::YVar(*scaleWorkspace->var("m_abs_eta"),RooFit::Binning(10,0,2.4)),
+                                                                                     RooFit::YVar(*scaleWorkspace->var("m_eta"),RooFit::Binning(10,-2.4,2.4)),
                                                                                      RooFit::Extended(kFALSE),
                                                                                      RooFit::Scaling(kFALSE));
 
                 h2DMuonTrgCorrections = (TH2F*)muon_trg_scalefactor->createHistogram("h2DMuonTrgCorrections",
                                                                                      *scaleWorkspace->var("m_pt"),RooFit::Binning(400,10,200),
-                                                                                     RooFit::YVar(*scaleWorkspace->var("m_abs_eta"),RooFit::Binning(10,0,2.4)),
+                                                                                     RooFit::YVar(*scaleWorkspace->var("m_eta"),RooFit::Binning(10,-2.4,2.4)),
                                                                                      RooFit::Extended(kFALSE),
                                                                                      RooFit::Scaling(kFALSE));
                 ///WARNING: t_eta and t_dm not used, so histograms have only one bin in this directions

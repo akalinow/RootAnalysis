@@ -70,6 +70,7 @@ const TLorentzVector & HTTParticle::getSystScaleP4(HTTAnalysis::sysEffects type)
 
   if(type==HTTAnalysis::NOMINAL) {
     lastSystEffect = type;
+    p4Cache = p4;
     return p4;
   }
   else if(lastSystEffect==type) return p4Cache;
