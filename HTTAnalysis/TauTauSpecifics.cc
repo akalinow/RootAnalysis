@@ -183,14 +183,18 @@ void TauTauSpecifics::testAllCategories(const HTTAnalysis::sysEffects & aSystEff
 /////////////////////////////////////////////////////////////////
 float TauTauSpecifics::getLeg1Correction(const HTTAnalysis::sysEffects & aSystEffect){
 
-        return getLeptonCorrection(myAnalyzer->aLeg1.getP4().Eta(), myAnalyzer->aLeg1.getP4().Pt(),
+        return getLeptonCorrection(myAnalyzer->aLeg1.getP4().Eta(),
+                                   myAnalyzer->aLeg1.getP4().Pt(),
+                                   myAnalyzer->aLeg1.getProperty(PropertyEnum::byIsolationMVArun2v1DBoldDMwLTraw),
                                    static_cast<HTTAnalysis::hadronicTauDecayModes>(myAnalyzer->aLeg1.getProperty(PropertyEnum::decayMode)),true);
 }
 /////////////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////////////
 float TauTauSpecifics::getLeg2Correction(const HTTAnalysis::sysEffects & aSystEffect){
 
-        return getLeptonCorrection(myAnalyzer->aLeg2.getP4().Eta(), myAnalyzer->aLeg2.getP4().Pt(),
+        return getLeptonCorrection(myAnalyzer->aLeg2.getP4().Eta(),
+                                   myAnalyzer->aLeg2.getP4().Pt(),
+                                   myAnalyzer->aLeg2.getProperty(PropertyEnum::byIsolationMVArun2v1DBoldDMwLTraw),
                                    static_cast<HTTAnalysis::hadronicTauDecayModes>(myAnalyzer->aLeg2.getProperty(PropertyEnum::decayMode)),true);
 }
 /////////////////////////////////////////////////////////////////

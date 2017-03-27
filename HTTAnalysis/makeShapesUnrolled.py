@@ -2,11 +2,11 @@
 
 from ROOT import *
 import array
+import numpy
 
+WAW_fileName = "/cms/cms/akalinow/CMS/HiggsCP/Data/NTUPLES_03_03_2017/MT/Histograms/RootAnalysis_AnalysisMuTau.root"
 
-WAW_fileName = "RootAnalysis_Analysis.root"
-
-channel="mt_"
+channel="mt"
 
 SYNCH_fileName = "htt_mt.inputs-sm-13TeV-2D.root"
 
@@ -27,114 +27,115 @@ nbins = {
          "mt_vbf":(6,5)
          }
 
-categoryNames = [
-                 "muTau_0jet_low", "muTau_0jet_high",
-                 "muTau_1jet_low", "muTau_1jet_high",
-                 "muTau_vbf_low",  "muTau_vbf_high",
+categoryRootAnalysisNames = [
+        "0jet", "boosted", "vbf",
+        "0jet_W", "boosted_W", "vbf_W",
+        "antiIso_0jet", "antiIso_boosted", "antiIso_vbf",
+        ]
 
-                 "mt_0jet", 
-                 "mt_boosted", "mt_vbf",
-                 "mt_CP_Phi", "mt_CP_Rho",
-                 "mt_wjets_0jet_cr", 
-                 "mt_wjets_boosted_cr", "mt_wjets_vbf_cr",
-                 "mt_antiiso_0jet_cr",
-                 "mt_antiiso_boosted_cr", "mt_antiiso_vbf_cr"
-                 ]
+categoryCombineNames = list()
+
+for i in xrange(0,len(categoryRootAnalysisNames)):
+        tmp = categoryRootAnalysisNames[i]
+        if tmp.count("_W"):
+          tmp = tmp[:-2]
+          tmp = "wjets_"+tmp
+        tmp = channel+"_"+tmp
+        if tmp.count("wjets")>0 or tmp.count("antiIso")>0:
+                tmp = tmp + "_cr"
+        tmp = tmp.replace('antiIso','antiiso')
+        categoryCombineNames.append(tmp)
 
 histogramsMap = {
-    "Data_OS":"data_obs",
-    "DYJetsMatchT_OS":"ZTT",
-    "DYJetsMatchL_OS":"ZL",
-    "DYJetsMatchJ_OS":"ZJ",
-    "WJets_OS":"W",
-    "TTbarMatchJ_OS":"TTJ",
-    "TTbarMatchT_OS":"TTT",
-    "ST_OS":"T",
-    "DiBosonMatchT_OS":"VVT",
-    "DiBosonMatchJ_OS":"VVJ",
+    "Data":"data_obs",
+    "DYJetsMatchT":"ZTT",
+    "DYJetsMatchL":"ZL",
+    "DYJetsMatchJ":"ZJ",
+    "WJets":"W",
+    "TTbarMatchJ":"TTJ",
+    "TTbarMatchT":"TTT",
+    "ST":"T",
+    "DiBosonMatchT":"VVT",
+    "DiBosonMatchJ":"VVJ",
     "QCDEstimate":"QCD",
-    "ggH120_OS":"ggH120",
-    "qqH120_OS":"qqH120",
-    "ggH125_OS":"ggH125",
-    "qqH125_OS":"qqH125",
-    "ggH130_OS":"ggH130",
-    "qqH130_OS":"qqH130",
-    "ZH120_OS":"ZH120",
-    "WH120_OS":"WH120",
-    "ZH125_OS":"ZH125",
-    "WH125_OS":"WH125",
-    "ZH130_OS":"ZH130",
-    "WH130_OS":"WH130",
-    "EWK2Jets_OS":"EWKZ"
+    "ggHTT120":"ggH120",
+    "qqHTT120":"qqH120",
+    "ggHTT125":"ggH125",
+    "qqHTT125":"qqH125",
+    "ggHTT130":"ggH130",
+    "qqHTT130":"qqH130",
+    "ZHTT120":"ZH120",
+    "WHTT120":"WH120",
+    "ZHTT125":"ZH125",
+    "WHTT125":"WH125",
+    "ZHTT130":"ZH130",
+    "WHTT130":"WH130",
+    "EWK2Jets":"EWKZ"
     }
 
 #according to https://twiki.cern.ch/twiki/bin/view/CMS/SMTauTau2016#Systematic_uncertainties
-nuisanceParams = {
-    "CMS_shape_t_13TeV":(("mt_","tt_","et_","em_"),("","")),
-    "CMS_scale_t_13TeV":(("mt_","tt_","et_","em_"),("","")),
-    "CMS_scale_e_13TeV":(("em_",""),("","")),
-    "CMS_scale_j_13TeV":(("",""),("","")),
-    "CMS_htt_jetToTauFake_13TeV":(("",""),("","")),
-    "CMS_htt_ZLShape_13TeV":(("mt_",""),("","")),
-    "CMS_htt_dyShape_13TeV":(("",""),("","")),
-    "CMS_htt_ttbarShape_13TeV":(("",""),("","")),
-    "QCDSFUncert_13TeV":(("mt_",""),("0jet_","vbf_","boosted_")),
-    "WSFUncert_13TeV":(("mt_",""),("0jet_","vbf_","boosted_")),
-    "CMS_scale_gg_13TeV":(("",""),("","")),
-    "CMS_htt_zmumuShape_13TeV":(("",""),("0jet_","vbf_","boosted_")),
-    }
+nuisanceParams = [
+    #"CMS_shape_t_CHANNEL_13TeV",
+    "CMS_scale_t_CHANNEL_13TeV",
+    #"CMS_scale_e_CHANNEL_13TeV",
+    "CMS_scale_j_13TeV",
+    "CMS_htt_jetToTauFake_13TeV",
+    "CMS_htt_ZLShape_CHANNEL_13TeV",
+    "CMS_htt_dyShape_13TeV",
+    "CMS_htt_ttbarShape_13TeV",
+    "QCDSFUncert_CHANNEL_CAT_13TeV",
+    "WSFUncert_CHANNEL_CAT_13TeV",
+    "CMS_scale_gg_13TeV",
+    "CMS_htt_zmumuShape_CAT_13TeV",
+    ]
+
+def rebinHisto(histo, categoryName):
+    nbins = 0
+    if categoryName.count("antiiso")>0:
+        xbins = numpy.array([40.0,80.0,120.0,160.0,200.0])
+        nbins = 4
+    if categoryName.count("wjets")>0:
+        xbins = numpy.array([80.0,200.0])
+        nbins = 1
+    newHisto = histo.Rebin(nbins, "rebinned", xbins)
+    return newHisto
 
 def getSingleNPHistos(prefix, np, histo):
-
+        
     hName = prefix+"_"+np
     hUp = WAW_file.Get(hName+"Up")
+    txtFile=open("histogramSearch.txt","a")
 
     if hUp==None :
         print "Missing histogram: ",hName+"Up"
+        txtFile.write("Search for histo: "+hName+"Up: 0\n")
         hUp = histo.Clone()
+    else: 
+        txtFile.write("Search for histo: "+hName+"Up: 1\n")
 
     hDown = WAW_file.Get(hName+"Down")
     if hDown==None :
         #almost always where there is no Up histo, there is no down histo, so there is no need to print its name again
+        txtFile.write("Search for histo: "+hName+"Down: 0\n")
         #print prefix+np
         hDown = histo.Clone()
+    else: 
+        txtFile.write("Search for histo: "+hName+"Down: 1\n")
 
+    txtFile.close()
     return (hUp, hDown)
-
-
-
-def getDoubleNPHistos(prefix, np1, np2, histo):
-
-    hUpUp = WAW_file.Get(prefix+np1+"Up"+np2+"Up")
-    if hUpUp==None :
-        print "Missing histogram: ",prefix+np1+"Up/Down"+np2+"Up/Down"
-        hUpUp = histo.Clone()
-
-    hUpDown = WAW_file.Get(prefix+np1+"Up"+np2+"Down")
-    if hUpDown==None :
-        hUpDown = histo.Clone()
-
-    hDownUp = WAW_file.Get(prefix+np1+"Down"+np2+"Up")
-    if hDownUp==None :
-        hDownUp = histo.Clone()
-
-    hDownDown = WAW_file.Get(prefix+np1+"Down"+np2+"Down")
-    if hDownDown==None :
-        hDownDown = histo.Clone()
-
-    return (hUpUp, hUpDown, hDownUp, hDownDown)
-
-import array
 
 #basic categories
 categoryDirMade = False
 
 hData = 0
 
+open("histogramSearch.txt","w").write("Looking for histograms for Combine \n")
+
 print "MAIN REGION\n\n\n\n\n"
 
-for iCategory in xrange(0,len(categoryNames)):
-    categoryName = categoryNames[iCategory]
+for iCategory in xrange(0,len(categoryCombineNames)):
+    categoryName = categoryCombineNames[iCategory]
     if categoryName not in histoPrefix.keys(): continue
     if categoryDirMade: gDirectory.cd("..")
     gDirectory.mkdir(categoryName)
@@ -142,38 +143,36 @@ for iCategory in xrange(0,len(categoryNames)):
     categoryDirMade=True
 
     for key,value in histogramsMap.iteritems():
-        hName = histoPrefix[categoryName] + key+"_"+str(iCategory)
+        hName = histoPrefix[categoryName] + key+"_"+categoryRootAnalysisNames[iCategory]
         histogram = WAW_file.Get(hName)
         if(histogram==None):
             print hName,"is missing"
             histogram = TH1F(value,"",nbins[categoryName][0]*nbins[categoryName][1],0.5,nbins[categoryName][0]*nbins[categoryName][1] + 0.5)
+            open("histogramSearch.txt","a").write("Search for histo: "+hName+": 0\n")
+        else:
+            open("histogramSearch.txt","a").write("Search for histo: "+hName+": 1\n")
         histogram.SetName(value)
         histogram.Write()
 
         if value=="data_obs": continue
 
-        for key1, value1 in nuisanceParams.items():
-            index = key1.find("13TeV")
-            name = key1
-            for chn in value1[0]:
-                if (chn==channel or chn==""):
-                  name = key1[:index]+chn+key1[index:]
-                  done1 = True
-                  for cat in value1[1]:
-                    index = name.find("13TeV")
-                    nuisanceParam = name[:index]+cat+name[index:]
+        for nuisanceParam in nuisanceParams:
+            nuisanceParam = nuisanceParam.replace("CHANNEL",channel)
+            cat = categoryName
+            if cat.count("0jet")>0: cat = "0jet"
+            elif cat.count("boosted")>0: cat = "boosted"
+            elif cat.count("vbf")>0: cat = "vbf"
+            nuisanceParam = nuisanceParam.replace("CAT",cat)
+            
+            histos = getSingleNPHistos(histoPrefix[categoryName] + key+"_"+categoryRootAnalysisNames[iCategory], nuisanceParam, histogram)
+            if nuisanceParam.count("zmumuShape")>0 and cat.count("vbf")>0:  nuisanceParam.replace("vbf","VBF")
+            histogramUp = histos[0]
+            histogramUp.SetName(value+"_"+nuisanceParam+"Up")
+            histogramUp.Write()
 
-                    histos = getSingleNPHistos(histoPrefix[categoryName] + key+"_"+str(iCategory), nuisanceParam, histogram)
-                    histogramUp = histos[0]
-                    histogramUp.SetName(value+"_"+nuisanceParam+"Up")
-                    histogramUp.Write()
-
-                    histogramDown = histos[1]
-                    histogramDown.SetName(value+"_"+nuisanceParam+"Down")
-                    histogramDown.Write()
-
-                    if cat=="": break
-                if (chn=="" or done1): break
+            histogramDown = histos[1]
+            histogramDown.SetName(value+"_"+nuisanceParam+"Down")
+            histogramDown.Write()
 
 print "\n\n\n\n\nCONTROL REGIONS\n\n\n\n\n"
 
@@ -191,52 +190,52 @@ histoPrefix = {
          }
 
 histogramsMap = {
-    "Data_OS":"data_obs",
-    "DYJetsMatchT_OS":"ZTT",
-    "DYJetsMatchL_OS":"ZL",
-    "DYJetsMatchJ_OS":"ZJ",
-    #"DYJetsSDB_OS":"Z_SDB",
-    #"DYJetsQCD_OS":"ZQCD",
+    "Data":"data_obs",
+    "DYJetsMatchT":"ZTT",
+    "DYJetsMatchL":"ZL",
+    "DYJetsMatchJ":"ZJ",
+    #"DYJetsSDB":"Z_SDB",
+    #"DYJetsQCD":"ZQCD",
     #"DYJetsHMTSDB_SS":"Z_SS_HMT_SDB",
-    "WJets_OS":"W",
-    #"WJetsQCD_OS":"WQCD",
-    #"WJetsQCDUp_OS":"WQCDUp",
-    #"WJetsQCDDown_OS":"WQCDDown",
-    #"WJetsQCDYield_OS":"WQCDYield",
-    #"WJetsQCDYieldUp_OS":"WQCDYieldUp",
-    #"WJetsQCDYieldDown_OS":"WQCDYieldDown",
-    #"WJetsHigh_OS":"W_High",
-    #"WJetsLow_OS":"W_Low",
+    "WJets":"W",
+    #"WJetsQCD":"WQCD",
+    #"WJetsQCDUp":"WQCDUp",
+    #"WJetsQCDDown":"WQCDDown",
+    #"WJetsQCDYield":"WQCDYield",
+    #"WJetsQCDYieldUp":"WQCDYieldUp",
+    #"WJetsQCDYieldDown":"WQCDYieldDown",
+    #"WJetsHigh":"W_High",
+    #"WJetsLow":"W_Low",
     #"WJetsHMTSDB_SS":"W_SS_HMT_SDB",
-    "TTbarMatchJ_OS":"TTJ",
-    "TTbarMatchT_OS":"TTT",
-    #"TTbar_OS":"TT",
-    #"TTbarSDB_OS":"TT_SDB",
+    "TTbarMatchJ":"TTJ",
+    "TTbarMatchT":"TTT",
+    #"TTbar":"TT",
+    #"TTbarSDB":"TT_SDB",
     #"TTbarHMTSDB_SS":"TT_SS_HMT_SDB",
-    #"TTbarYield_OS":"TTYield",
-    "ST_OS":"T",
-    #"STQCD_OS":"TopQCD",
-    "DiBosonMatchT_OS":"VVT",
-    "DiBosonMatchJ_OS":"VVJ",
-    #"DiBoson_OS":"VV",
-    #"DiBosonQCD_OS":"VV_QCD",
-    #"DiBosonSDB_OS":"VV_SDB",
+    #"TTbarYield":"TTYield",
+    "ST":"T",
+    #"STQCD":"TopQCD",
+    "DiBosonMatchT":"VVT",
+    "DiBosonMatchJ":"VVJ",
+    #"DiBoson":"VV",
+    #"DiBosonQCD":"VV_QCD",
+    #"DiBosonSDB":"VV_SDB",
     #"DiBosonHMTSDB_SS":"VV_SS_HMT_SDB",
     #"QCDEstimateHMTSDB_SS":"QCD_SS_HMT_SDB",
     "QCDEstimate":"QCD",
-    "ggH120_OS":"ggH120",
-    "qqH120_OS":"qqH120",
-    "ggH125_OS":"ggH125",
-    "qqH125_OS":"qqH125",
-    "ggH130_OS":"ggH130",
-    "qqH130_OS":"qqH130",
-    "ZH120_OS":"ZH120",
-    "ZH125_OS":"ZH125",
-    "ZH130_OS":"ZH130",
-    "WH120_OS":"WH120",
-    "WH125_OS":"WH125",
-    "WH130_OS":"WH130",
-    "EWK2Jets_OS":"EWKZ",
+    "ggHTT120":"ggH120",
+    "qqHTT120":"qqH120",
+    "ggHTT125":"ggH125",
+    "qqHTT125":"qqH125",
+    "ggHTT130":"ggH130",
+    "qqHTT130":"qqH130",
+    "ZHTT120":"ZH120",
+    "ZHTT125":"ZH125",
+    "ZHTT130":"ZH130",
+    "WHTT120":"WH120",
+    "WHTT125":"WH125",
+    "WHTT130":"WH130",
+    "EWK2Jets":"EWKZ",
     #"BkgErr":"BKGErr"
     }
 
@@ -244,15 +243,15 @@ histogramsMap = {
 #CMS_scale_t_13TeV and CMS_scale_j_13TeV are applied to all processes
 #when another nuisance parameter is considered in the process, also histos Nuisance1_Nuisance2 should be added
 nuisanceParams = {
-    "CMS_htt_jetToTauFake_13TeV":(("",""),("ZJ","W","TTJ")),
-    "CMS_htt_ZLShape_13TeV":(("mt_",""),("ZL","")),
-    "CMS_htt_dyShape_13TeV":(("",""),("ZL","ZJ","ZTT")),
-    "CMS_htt_ttbarShape_13TeV":(("",""),("TT","TTT","TTJ")),
-    "QCDSFUncert_13TeV":(("mt_",""),("QCD","W")),
-    "WSFUncert_13TeV":(("mt_",""),("W","")),
-    "CMS_scale_gg_13TeV":(("",""),("ggH120","ggH125","ggH130"))
+    "CMS_htt_jetToTauFake_13TeV":("ZJ","W","TTJ"),
+    "CMS_htt_ZLShape_CHANNEL_13TeV":("ZL",),
+    "CMS_htt_dyShape_13TeV":("ZL","ZJ","ZTT"),
+    "CMS_htt_ttbarShape_13TeV":("TT","TTT","TTJ"),
+    "QCDSFUncert_CHANNEL_CAT_13TeV":("QCD","W"),
+    "WSFUncert_CHANNEL_CAT_13TeV":("W",),
+    "CMS_scale_gg_13TeV":("ggH120","ggH125","ggH130")
     }
-
+    
 nbins = {"mt_wjets_0jet_cr":(1,80,200),
          "mt_wjets_boosted_cr":(1,80,200),
          "mt_wjets_vbf_cr":(1,80,200),
@@ -265,8 +264,8 @@ nbins = {"mt_wjets_0jet_cr":(1,80,200),
 
 categoryDirMade = True
 
-for iCategory in xrange(0,len(categoryNames)):
-    categoryName = categoryNames[iCategory]
+for iCategory in xrange(0,len(categoryCombineNames)):
+    categoryName = categoryCombineNames[iCategory]
     if categoryName not in histoPrefix.keys(): continue
     if categoryDirMade: gDirectory.cd("..")
     gDirectory.mkdir(categoryName)
@@ -275,14 +274,17 @@ for iCategory in xrange(0,len(categoryNames)):
 
     for key,value in histogramsMap.iteritems():
         hName = histoPrefix[categoryName] + key
-        if categoryName.count("antiiso")>0 and value!="QCD": 
-            hName = hName+"noMuIso"
-        hName = hName +"_"+str(iCategory)
+        hName = hName +"_"+categoryRootAnalysisNames[iCategory]
         histogram = WAW_file.Get(hName)
         if(histogram==None):
             print hName, " is missing"
             histogram = TH1F(value,"",nbins[categoryName][0],nbins[categoryName][1],nbins[categoryName][2])
+            open("histogramSearch.txt","a").write("Search for histo: "+hName+": 0\n")
+        else:
+            open("histogramSearch.txt","a").write("Search for histo: "+hName+": 1\n")
+        histogram=rebinHisto(histogram, categoryName)
         histogram.SetName(value)
+            
         histogram.Write()
         if value=="data_obs": continue
 
@@ -290,47 +292,31 @@ for iCategory in xrange(0,len(categoryNames)):
             histos = getSingleNPHistos(hName, np ,histogram)
             hUp = histos[0]
             hDown = histos[1]
+            hUp=rebinHisto(hUp, categoryName)
+            hDown=rebinHisto(hDown, categoryName)
             hUp.SetName(value+"_"+np+"Up")
             hUp.Write()
             hDown.SetName(value+"_"+np+"Down")
             hDown.Write()
 
-        for key1, value1 in nuisanceParams.items():
-            index = key1.find("13TeV")
-            name = key1
-            for chn in value1[0]:
-                if (chn!=channel and chn!=""): continue
-                name = key1[:index]+chn+key1[index:]
-                if key1.count("Uncert")>0:
-                  index = name.find("13TeV")
-                  cat = categoryName.split("_")[2]
-                  name = name[:index]+cat+"_"+name[index:]
-                done1 = True
+        for nuisanceParam, value1 in nuisanceParams.items():
+            nuisanceParam = nuisanceParam.replace("CHANNEL",channel)
+            cat = categoryName
+            if cat.count("0jet")>0: cat = "0jet"
+            elif cat.count("boosted")>0: cat = "boosted"
+            elif cat.count("vbf")>0: cat = "vbf"
+            nuisanceParam = nuisanceParam.replace("CAT",cat)
 
-                for proc in value1[1]:
+            for proc in value1:
                   if proc!= value: continue
-                  histos = getSingleNPHistos(hName, name, histogram)
+                  histos = getSingleNPHistos(hName, nuisanceParam, histogram)
+                  if nuisanceParam.count("zmumuShape")>0 and cat.count("vbf")>0:  nuisanceParam.replace("vbf","VBF")
                   hUp = histos[0]
                   hDown = histos[1]
-                  hUp.SetName(value+"_"+name+"Up")
+                  hUp=rebinHisto(hUp, categoryName)
+                  hDown=rebinHisto(hDown, categoryName)
+                  hUp.SetName(value+"_"+nuisanceParam+"Up")
                   hUp.Write()
-                  hDown.SetName(value+"_"+name+"Down")
+                  hDown.SetName(value+"_"+nuisanceParam+"Down")
                   hDown.Write()
-                  '''
-                  for np in ("CMS_scale_j_13TeV", "CMS_scale_t_mt_13TeV"):
-                    histos = getDoubleNPHistos(hName, name, np ,histogram)
-                    hUpUp = histos[0]
-                    hUpDown = histos[1]
-                    hDownUp = histos[2]
-                    hDownDown = histos[3]
-                    hUpUp.SetName(value+"_"+name+"Up_"+np+"Up")
-                    hUpUp.Write()
-                    hUpDown.SetName(value+"_"+name+"Up_"+np+"Down")
-                    hUpDown.Write()
-                    hDownUp.SetName(value+"_"+name+"Down_"+np+"Up")
-                    hDownUp.Write()
-                    hDownDown.SetName(value+"_"+name+"Down_"+np+"Down")
-                    hDownDown.Write()
-                  '''
-                  if proc=="": break
-                if (chn=="" or done1): break
+                

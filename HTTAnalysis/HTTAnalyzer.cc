@@ -271,7 +271,6 @@ bool HTTAnalyzer::analyze(const EventProxyBase& iEvent){
                 for(unsigned int iCategory = 0; iCategory<myNumberOfCategories; ++iCategory) {
 
                         if(!passCategory(iCategory)) continue;
-
                         categorySuffix = aCategoryRejester[iCategory]->name();
 
                         systEffectName = HTTAnalysis::systEffectName(iCategory, iSystEffect, aCategoryRejester);

@@ -62,6 +62,7 @@ int main(int argc, char ** argv) {
 	 else if(processName=="AnalysisTT") decayModeName = "TauTau";
 	 else if(processName=="SynchMuTau") decayModeName = "MuTau";
 	 else if(processName=="SynchTT") decayModeName = "TauTau";
+	 else if(processName=="SynchMM") decayModeName = "MuMu";
 	 else{
 	   std::cout<<"Incorrect process name: "<<processName<<std::endl;
 	   return 1;

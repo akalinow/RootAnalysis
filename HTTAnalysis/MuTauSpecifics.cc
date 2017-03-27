@@ -197,14 +197,18 @@ void MuTauSpecifics::testAllCategories(const HTTAnalysis::sysEffects & aSystEffe
 float MuTauSpecifics::getLeg1Correction(const HTTAnalysis::sysEffects & aSystEffect){
 
         return getLeptonCorrection(myAnalyzer->aLeg1.getP4(aSystEffect).Eta(),
-                                   myAnalyzer->aLeg1.getP4(aSystEffect).Pt(), HTTAnalysis::hadronicTauDecayModes::tauDecayMuon, false);
+                                   myAnalyzer->aLeg1.getP4(aSystEffect).Pt(),
+                                   myAnalyzer->aLeg1.getProperty(PropertyEnum::combreliso),
+                                   HTTAnalysis::hadronicTauDecayModes::tauDecayMuon, false);
 
 }
 /////////////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////////////
 float MuTauSpecifics::getLeg2Correction(const HTTAnalysis::sysEffects & aSystEffect){
 
-        return getLeptonCorrection(myAnalyzer->aLeg2.getP4(aSystEffect).Eta(), myAnalyzer->aLeg2.getP4(aSystEffect).Pt(),
+        return getLeptonCorrection(myAnalyzer->aLeg2.getP4(aSystEffect).Eta(),
+                                   myAnalyzer->aLeg2.getP4(aSystEffect).Pt(),
+                                   myAnalyzer->aLeg2.getProperty(PropertyEnum::byIsolationMVArun2v1DBoldDMwLTraw),
                                    static_cast<HTTAnalysis::hadronicTauDecayModes>(myAnalyzer->aLeg2.getProperty(PropertyEnum::decayMode)),false);
 
 }
