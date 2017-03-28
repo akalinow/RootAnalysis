@@ -8,14 +8,13 @@
 #include "TH1F.h"
 #include "TH2F.h"
 #include "TH3F.h"
+#include "TRandom3.h"
 
+#include "BTagCalibrationStandalone.h"
 
 /////////////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////////////
 ChannelSpecifics::ChannelSpecifics(HTTAnalyzer *aAnalyzer){
-
-        initializeCorrections();
-        defineCategories();
 
         myAnalyzer = aAnalyzer;
 
@@ -26,6 +25,10 @@ ChannelSpecifics::ChannelSpecifics(HTTAnalyzer *aAnalyzer){
         h2DTauTrgGenuineCorrections = 0;
         h2DTauTrgFakeCorrections = 0;
         h3DTauCorrections = 0;
+
+        initializeLeptonCorrections();
+        initializeBTagCorrections();
+        defineCategories();
 
 }
 /////////////////////////////////////////////////////////////////
@@ -39,6 +42,12 @@ ChannelSpecifics::~ChannelSpecifics(){
         if(h2DTauTrgGenuineCorrections) delete h2DTauTrgGenuineCorrections;
         if(h2DTauTrgFakeCorrections) delete h2DTauTrgFakeCorrections;
         if(h3DTauCorrections) delete h3DTauCorrections;
+
+        //btagging
+        if(calib) delete calib;
+        if(reader) delete reader;
+        if(btagEffFile_) delete btagEffFile_;
+        if(rand_) delete rand_;
 
 }
 /////////////////////////////////////////////////////////////////
@@ -66,7 +75,7 @@ void ChannelSpecifics::defineCategories(){
 }
 /////////////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////////////
-void ChannelSpecifics::initializeCorrections(){
+void ChannelSpecifics::initializeLeptonCorrections(){
 
 #pragma omp critical(ROOFIT_INITIALIZATION)
         {
@@ -144,13 +153,50 @@ void ChannelSpecifics::initializeCorrections(){
 }
 /////////////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////////////
+void ChannelSpecifics::initializeBTagCorrections(){
+
+#pragma omp critical(BTAG_INITIALIZATION)
+        {
+  std::string csvFileName =  "CSVv2_Moriond17_B_H.csv";
+  std::string weightsFileName = "http://akalinow.web.cern.ch/akalinow/"+csvFileName;
+  TFile::Open(weightsFileName.c_str(),"CACHEREAD");
+  std::string userName(std::getenv("USER"));
+  std::string correctionFileName = "/tmp/"+userName+"/"+csvFileName;
+
+  calib = new BTagCalibration("CSVv2", correctionFileName);
+  reader = new BTagCalibrationReader(BTagEntry::OP_MEDIUM,  // operating point
+				     "central",             // central sys type
+				     {"up", "down"});       // other sys types
+
+  reader->load(*calib,               // calibration instance
+	       BTagEntry::FLAV_B,    // btag flavour
+	       "comb");              // measurement type
+  reader->load(*calib,               // calibration instance
+	       BTagEntry::FLAV_C,    // btag flavour
+	       "comb");              // measurement type
+  reader->load(*calib,               // calibration instance
+	       BTagEntry::FLAV_UDSG, // btag flavour
+	       "incl");              // measurement type
+
+  std::string efficiencyFileName = "http://akalinow.web.cern.ch/akalinow/tagging_efficiencies_Moriond2017.root";
+  btagEffFile_ = TFile::Open(efficiencyFileName.c_str(),"CACHEREAD");
+
+  btag_eff_b_ = (TH2F*)btagEffFile_->Get("btag_eff_b")->Clone("btag_eff_b");
+  btag_eff_c_ = (TH2F*)btagEffFile_->Get("btag_eff_c")->Clone("btag_eff_c");
+  btag_eff_oth_ = (TH2F*)btagEffFile_->Get("btag_eff_oth")->Clone("btag_eff_oth");
+
+  rand_ = new TRandom3();
+}
+}
+/////////////////////////////////////////////////////////////////
+/////////////////////////////////////////////////////////////////
 float ChannelSpecifics::getLeptonCorrection(float eta, float pt, float iso,
                                             HTTAnalysis::hadronicTauDecayModes tauDecayMode,
                                             bool useTauTrigger){
 
         if(myAnalyzer->sampleName.find("Data")!=std::string::npos) return 1.0;
 
-        if(!h2DMuonIdCorrections) initializeCorrections();
+        if(!h2DMuonIdCorrections) initializeLeptonCorrections();
 
         if(tauDecayMode == HTTAnalysis::tauDecayMuon) {
                 int iBin = h3DMuonTrgCorrections->FindBin(std::min(pt,(Float_t)999.9), eta, std::min(iso,(Float_t)0.499));
@@ -191,6 +237,63 @@ float ChannelSpecifics::getLeptonCorrection(float eta, float pt, float iso,
                 return tau_id_scalefactor*tau_trg_efficiency;
         }
         return 1.0;
+}
+/////////////////////////////////////////////////////////////////
+/////////////////////////////////////////////////////////////////
+bool ChannelSpecifics::promoteBJet(const HTTParticle &jet){
+  //MB: https://twiki.cern.ch/twiki/bin/view/CMS/BTagCalibration#Standalone
+  bool decision = false;
+
+  if(!reader) initializeBTagCorrections();
+
+  BTagEntry::JetFlavor jetFlavour;
+  if(std::abs(jet.getProperty(PropertyEnum::Flavour))==5)//b-quark
+    jetFlavour = BTagEntry::FLAV_B;
+  else if(std::abs(jet.getProperty(PropertyEnum::Flavour))==4)//c-quark
+    jetFlavour = BTagEntry::FLAV_C;
+  else //light quark, gluon or undefined
+    jetFlavour = BTagEntry::FLAV_UDSG;
+  // Note: this is for b jets, for c jets (light jets) use FLAV_C (FLAV_UDSG)
+  double btag_SF = reader->eval_auto_bounds("central",
+					    jetFlavour,
+					    jet.getP4().Eta(),
+					    jet.getP4().Pt()
+					    //,jet.getProperty(PropertyEnum::bCSVscore) //MB: it is not needed when WP is definied
+					    );
+  rand_->SetSeed((int)((jet.getP4().Eta()+5)*100000));
+  double rand_num = rand_->Rndm();
+  /*
+  std::cout<<"\tbtag_SF(flav,CSVv2): "<<btag_SF
+	   <<"("<<jetFlavour<<","
+	   <<jet.getProperty(PropertyEnum::bCSVscore)<<")"<<std::endl;
+  std::cout<<"\tbtag_rand_num: "<<rand_num<<std::endl;
+  */
+  if(btag_SF>1){
+    double tagging_efficiency = 1;
+    TH2F *histo_eff = btag_eff_oth_;
+    if(jetFlavour == BTagEntry::FLAV_B)
+      histo_eff = btag_eff_b_;
+    else if(jetFlavour == BTagEntry::FLAV_C)
+      histo_eff = btag_eff_c_;
+    if( jet.getP4().Pt() > histo_eff->GetXaxis()->GetBinLowEdge(histo_eff->GetNbinsX()+1) ){
+      tagging_efficiency = histo_eff->GetBinContent( histo_eff->GetNbinsX(),histo_eff->GetYaxis()->FindBin(std::abs(jet.getP4().Eta())) );
+    }
+    else{
+      tagging_efficiency = histo_eff->GetBinContent( histo_eff->GetXaxis()->FindBin(jet.getP4().Pt()),histo_eff->GetYaxis()->FindBin(std::abs(jet.getP4().Eta())) );
+    }
+    //std::cout<<"\tbtag_eff: "<<tagging_efficiency<<std::endl;
+    if(tagging_efficiency < 1e-9)//protection
+      decision = false;
+    else if(tagging_efficiency > 1.-1e-9)//protection
+      decision = true;
+    else
+      decision = (rand_num < (1. - btag_SF)/(1. - 1./tagging_efficiency) );
+  }
+  else{
+    decision = (rand_num < 1. - btag_SF);
+  }
+  //std::cout<<"\tbtag_decision: "<<decision<<std::endl;
+  return !decision;
 }
 /////////////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////////////
