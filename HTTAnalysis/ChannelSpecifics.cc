@@ -18,6 +18,7 @@ ChannelSpecifics::ChannelSpecifics(HTTAnalyzer *aAnalyzer){
 
         myAnalyzer = aAnalyzer;
 
+        initializeLeptonCorrections();
         h2DMuonIdCorrections = 0;
         h3DMuonIsoCorrections = 0;
         h3DMuonTrgCorrections = 0;
@@ -26,7 +27,7 @@ ChannelSpecifics::ChannelSpecifics(HTTAnalyzer *aAnalyzer){
         h2DTauTrgFakeCorrections = 0;
         h3DTauCorrections = 0;
 
-        initializeLeptonCorrections();
+        //initializeLeptonCorrections();
         initializeBTagCorrections();
         defineCategories();
 
@@ -81,7 +82,7 @@ void ChannelSpecifics::initializeLeptonCorrections(){
         {
 
                 std::cout<<"Initializing corrections for thread "<<omp_get_thread_num()<<std::endl;
-
+                TFile::SetCacheFileDir("/tmp/");
                 std::string correctionFileName = "http://akalinow.web.cern.ch/akalinow/htt_scalefactors_v16_4.root";
                 TFile *aFile = TFile::Open(correctionFileName.c_str(),"CACHEREAD");
 
@@ -89,10 +90,10 @@ void ChannelSpecifics::initializeLeptonCorrections(){
 
                 RooAbsReal *muon_id_scalefactor = scaleWorkspace->function("m_id_ratio");
                 RooAbsReal *muon_iso_scalefactor = scaleWorkspace->function("m_iso_binned_ratio");
-                RooAbsReal *muon_trg_scalefactor = scaleWorkspace->function("m_trgOR4_binned_ratio");//MB 24->22
-                RooAbsReal *muon_trk_scalefactor = scaleWorkspace->function("m_trk_ratio");//MB not in HTTAnalysis
-                RooAbsReal *tau_trg_genuine_efficiency = scaleWorkspace->function("t_genuine_TightIso_tt_ratio");//MB data->ratio
-                RooAbsReal *tau_trg_fake_efficiency = scaleWorkspace->function("t_fake_TightIso_tt_ratio");//MB data->ratio
+                RooAbsReal *muon_trg_scalefactor = scaleWorkspace->function("m_trgOR4_binned_ratio");
+                RooAbsReal *muon_trk_scalefactor = scaleWorkspace->function("m_trk_ratio");
+                RooAbsReal *tau_trg_genuine_efficiency = scaleWorkspace->function("t_genuine_TightIso_tt_ratio");
+                RooAbsReal *tau_trg_fake_efficiency = scaleWorkspace->function("t_fake_TightIso_tt_ratio");
 
                 h2DMuonIdCorrections = (TH2F*)muon_id_scalefactor->createHistogram("h2DMuonIdCorrections",
                                                                                    *scaleWorkspace->var("m_pt"),RooFit::Binning(1980,10,1000),
@@ -160,8 +161,7 @@ void ChannelSpecifics::initializeBTagCorrections(){
   std::string csvFileName =  "CSVv2_Moriond17_B_H.csv";
   std::string weightsFileName = "http://akalinow.web.cern.ch/akalinow/"+csvFileName;
   TFile::Open(weightsFileName.c_str(),"CACHEREAD");
-  std::string userName(std::getenv("USER"));
-  std::string correctionFileName = "/tmp/"+userName+"/"+csvFileName;
+  std::string correctionFileName = "/tmp/akalinow/"+csvFileName;
 
   calib = new BTagCalibration("CSVv2", correctionFileName);
   reader = new BTagCalibrationReader(BTagEntry::OP_MEDIUM,  // operating point

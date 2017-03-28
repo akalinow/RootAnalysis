@@ -68,25 +68,35 @@ std::string HTTAnalyzer::getSampleNameFromFileName(const EventProxyHTT & myEvent
         else if(fileName.find("Run201")!=std::string::npos) sampleName =  "Data";
         else if(fileName.find("SUSYGluGluToHToTauTau")!=std::string::npos) sampleName =  "ATT";
 
+        else if(fileName.find("GluGluHToTauTauM110")!=std::string::npos) sampleName =  "ggHTT120";
         else if(fileName.find("GluGluHToTauTauM120")!=std::string::npos) sampleName =  "ggHTT120";
         else if(fileName.find("GluGluHToTauTauM125")!=std::string::npos) sampleName =  "ggHTT125";
         else if(fileName.find("GluGluHToTauTauM130")!=std::string::npos) sampleName =  "ggHTT130";
+        else if(fileName.find("GluGluHToTauTauM140")!=std::string::npos) sampleName =  "ggHTT140";
 
+        else if(fileName.find("VBFHToTauTauM110")!=std::string::npos) sampleName =  "qqHTT110";
         else if(fileName.find("VBFHToTauTauM120")!=std::string::npos) sampleName =  "qqHTT120";
         else if(fileName.find("VBFHToTauTauM125")!=std::string::npos) sampleName =  "qqHTT125";
         else if(fileName.find("VBFHToTauTauM130")!=std::string::npos) sampleName =  "qqHTT130";
+        else if(fileName.find("VBFHToTauTauM140")!=std::string::npos) sampleName =  "qqHTT140";
 
+        else if(fileName.find("WplusHToTauTauM110")!=std::string::npos) sampleName =  "WplusHTT110";
         else if(fileName.find("WplusHToTauTauM120")!=std::string::npos) sampleName =  "WplusHTT120";
         else if(fileName.find("WplusHToTauTauM125")!=std::string::npos) sampleName =  "WplusHTT125";
         else if(fileName.find("WplusHToTauTauM130")!=std::string::npos) sampleName =  "WplusHTT130";
+        else if(fileName.find("WplusHToTauTauM140")!=std::string::npos) sampleName =  "WplusHTT140";
 
+        else if(fileName.find("WminusHToTauTauM110")!=std::string::npos) sampleName =  "WminusHTT110";
         else if(fileName.find("WminusHToTauTauM120")!=std::string::npos) sampleName =  "WminusHTT120";
         else if(fileName.find("WminusHToTauTauM125")!=std::string::npos) sampleName =  "WminusHTT125";
         else if(fileName.find("WminusHToTauTauM130")!=std::string::npos) sampleName =  "WminusHTT130";
+        else if(fileName.find("WminusHToTauTauM140")!=std::string::npos) sampleName =  "WminusHTT140";
 
+        else if(fileName.find("ZHToTauTauM110")!=std::string::npos) sampleName =  "ZHTT110";
         else if(fileName.find("ZHToTauTauM120")!=std::string::npos) sampleName =  "ZHTT120";
         else if(fileName.find("ZHToTauTauM125")!=std::string::npos) sampleName =  "ZHTT125";
         else if(fileName.find("ZHToTauTauM130")!=std::string::npos) sampleName =  "ZHTT130";
+        else if(fileName.find("ZHToTauTauM140")!=std::string::npos) sampleName =  "ZHTT140";
 
         else if(fileName.find("STtWantitop")!=std::string::npos) sampleName =  "Wantitop";
         else if(fileName.find("STtWtop")!=std::string::npos) sampleName =  "Wtop";
