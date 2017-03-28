@@ -94,9 +94,14 @@ void TauTauSpecifics::testAllCategories(const HTTAnalysis::sysEffects & aSystEff
                                         myAnalyzer->aLeg2.hasTriggerMatch(TriggerEnum::HLT_DoubleMediumCombinedIsoPFTau35_Trk1_eta2p1_Reg);
 
         bool trigger = mediumIsoTrigger || mediumCombinedIsoTrigger;
-        if(myAnalyzer->sampleName!="Data") trigger = true; //MC trigger included in SF
 
-        if(!tau1Kinematics || !tau1ID || !tau2Kinematics || !tau2ID || !relaxedIso || !trigger) return;
+        unsigned int metFilters = myAnalyzer->aEvent.getMETFilterDecision();
+        unsigned int dataMask = (1<<8) -1;
+        unsigned int mcMask = dataMask - (1<<6) - (1<<7);
+        bool metFilterDecision = (metFilters & mcMask) == mcMask;
+        if(myAnalyzer->sampleName=="Data") metFilterDecision = (metFilters & dataMask) == dataMask;
+
+        if(!tau1Kinematics || !tau1ID || !tau2Kinematics || !tau2ID || !relaxedIso || !trigger || !metFilterDecision) return;
 
         myAnalyzer->nJets30 = 0;
         for(auto itJet : myAnalyzer->aSeparatedJets) {
@@ -145,14 +150,6 @@ void TauTauSpecifics::testAllCategories(const HTTAnalysis::sysEffects & aSystEff
         bool piPi = isPi1 && isPi2;
         bool piRho = (isPi1 && isRho2) || (isPi2 && isRho1);
         bool rhoRho = isRho1 && isRho2;
-
-/*
-        myAnalyzer->categoryDecisions[(int)HTTAnalysis::jet1_low] = os && jet1_low;
-        myAnalyzer->categoryDecisions[(int)HTTAnalysis::jet1_high] = os && jet1_high;
-
-        myAnalyzer->categoryDecisions[(int)HTTAnalysis::vbf_low] = os && vbf_low;
-        myAnalyzer->categoryDecisions[(int)HTTAnalysis::vbf_high] = os && vbf_high;
-*/
 
          //Main categories
         myAnalyzer->categoryDecisions[ChannelSpecifics::jet0->id()] = os && fullIso && jet0;

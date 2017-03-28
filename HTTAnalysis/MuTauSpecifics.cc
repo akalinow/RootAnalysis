@@ -77,7 +77,13 @@ void MuTauSpecifics::testAllCategories(const HTTAnalysis::sysEffects & aSystEffe
                        myAnalyzer->aLeg1.hasTriggerMatch(TriggerEnum::HLT_IsoMu22_eta2p1) ||
                        myAnalyzer->aLeg1.hasTriggerMatch(TriggerEnum::HLT_IsoTkMu22_eta2p1);
 
-        if(!muonKinematics || !muonID || !tauID || !trigger) return;
+        unsigned int metFilters = myAnalyzer->aEvent.getMETFilterDecision();
+        unsigned int dataMask = (1<<8) -1;
+        unsigned int mcMask = dataMask - (1<<6) - (1<<7);
+        bool metFilterDecision = (metFilters & mcMask) == mcMask;
+        if(myAnalyzer->sampleName=="Data") metFilterDecision = (metFilters & dataMask) == dataMask;
+
+        if(!muonKinematics || !muonID || !tauID || !trigger || !metFilterDecision) return;
 
         myAnalyzer->nJets30 = 0;
         for(auto itJet: myAnalyzer->aSeparatedJets) {
