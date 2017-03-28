@@ -8,17 +8,20 @@
 #include "RooRealVar.h"
 #include "RooBinning.h"
 
+#include "BTagCalibrationStandalone.h"
+
 //////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////
 HTTSynchNTuple::HTTSynchNTuple(const std::string & aName, const std::string & aDecayMode):Analyzer(aName){ 
   decayMode_ = aDecayMode;
+  TFile::SetCacheFileDir("/tmp/");
   //PU
   std::string dataPUFileName = "http://akalinow.web.cern.ch/akalinow/Data_Pileup_2016_271036-284044_13TeVMoriond17_23Sep2016ReReco_69p2mbMinBiasXS.root";
   puDataFile_ = TFile::Open(dataPUFileName.c_str(),"CACHEREAD");
   std::string mcPUFileName = "http://akalinow.web.cern.ch/akalinow/MC_Moriond17_PU25ns_V1.root";
   puMCFile_ = TFile::Open(mcPUFileName.c_str(),"CACHEREAD");
   //Corrections
-  initializeCorrections();
+  //initializeCorrections();//MB needed??
   h2DMuonIdCorrections = 0;
   h3DMuonIsoCorrections = 0;
   h3DMuonTrgCorrections = 0;
@@ -26,6 +29,7 @@ HTTSynchNTuple::HTTSynchNTuple(const std::string & aName, const std::string & aD
   h2DTauTrgGenuineCorrections = 0;
   h2DTauTrgFakeCorrections = 0;
   h3DTauCorrections = 0;
+  initializeBTagCorrections();
 }
 //////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////
@@ -43,6 +47,11 @@ HTTSynchNTuple::~HTTSynchNTuple(){
   if(h2DTauTrgGenuineCorrections) delete h2DTauTrgGenuineCorrections;
   if(h2DTauTrgFakeCorrections) delete h2DTauTrgFakeCorrections;
   if(h3DTauCorrections) delete h3DTauCorrections;
+  //btagging
+  if(calib) delete calib;
+  if(reader) delete reader;
+  if(btagEffFile_) delete btagEffFile_;
+  if(rand_) delete rand_;
 }
 //////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////
@@ -801,7 +810,9 @@ void HTTSynchNTuple::fillJets(const std::vector<HTTParticle> &jets){
       njets++;
     if(std::abs(jets.at(iJet).getP4().Eta())<2.4 && 
        jets.at(iJet).getP4().Pt()>20 &&
-       jets.at(iJet).getProperty(PropertyEnum::bCSVscore)>0.8484){//FIXME 0.8484 Correct??
+       jets.at(iJet).getProperty(PropertyEnum::bCSVscore)>0.8484 && //FIXME 0.8484 Correct??
+       promoteBJet(jets.at(iJet)) &&      
+       true){
       nbtag++;
       bjets.push_back(jets.at(iJet));
     }
@@ -976,7 +987,7 @@ void HTTSynchNTuple::initializeCorrections(){
 										  RooFit::YVar(*scaleWorkspace->var("t_dm"),RooFit::Binning(11,-0.5,10.5)),//MB proper binning (3->11) for DMs==0,1(2),10
 										  RooFit::Extended(kFALSE),
 										  RooFit::Scaling(kFALSE));
-
+  
   delete aFile;
 
   return;
@@ -1012,4 +1023,89 @@ float HTTSynchNTuple::getPUWeight(float nPU){
 }
 //////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////
-	
+void HTTSynchNTuple::initializeBTagCorrections(){
+  std::string correctionFileName = "./CSVv2_Moriond17_B_H.csv";
+
+  calib = new BTagCalibration("CSVv2", correctionFileName);
+  reader = new BTagCalibrationReader(BTagEntry::OP_MEDIUM,  // operating point
+				     "central",             // central sys type
+				     {"up", "down"});       // other sys types
+
+  reader->load(*calib,               // calibration instance
+	       BTagEntry::FLAV_B,    // btag flavour
+	       "comb");              // measurement type
+  reader->load(*calib,               // calibration instance
+	       BTagEntry::FLAV_C,    // btag flavour
+	       "comb");              // measurement type
+  reader->load(*calib,               // calibration instance
+	       BTagEntry::FLAV_UDSG, // btag flavour
+	       "incl");              // measurement type
+
+  std::string efficiencyFileName = "./tagging_efficiencies_Moriond2017.root";
+  btagEffFile_ = TFile::Open(efficiencyFileName.c_str(),"CACHEREAD");
+  
+  btag_eff_b_ = (TH2F*)btagEffFile_->Get("btag_eff_b")->Clone("btag_eff_b");
+  btag_eff_c_ = (TH2F*)btagEffFile_->Get("btag_eff_c")->Clone("btag_eff_c");
+  btag_eff_oth_ = (TH2F*)btagEffFile_->Get("btag_eff_oth")->Clone("btag_eff_oth");
+
+  rand_ = new TRandom3(); 
+
+  return;
+}
+//////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////////
+bool HTTSynchNTuple::promoteBJet(const HTTParticle &jet){
+  //MB: https://twiki.cern.ch/twiki/bin/view/CMS/BTagCalibration#Standalone
+  bool decision = false;
+
+  if(!reader) initializeBTagCorrections();
+
+  BTagEntry::JetFlavor jetFlavour;
+  if(std::abs(jet.getProperty(PropertyEnum::Flavour))==5)//b-quark
+    jetFlavour = BTagEntry::FLAV_B;
+  else if(std::abs(jet.getProperty(PropertyEnum::Flavour))==4)//c-quark
+    jetFlavour = BTagEntry::FLAV_C;
+  else //light quark, gluon or undefined
+    jetFlavour = BTagEntry::FLAV_UDSG;
+  // Note: this is for b jets, for c jets (light jets) use FLAV_C (FLAV_UDSG)
+  double btag_SF = reader->eval_auto_bounds("central", 
+					    jetFlavour, 
+					    jet.getP4().Eta(),
+					    jet.getP4().Pt()
+					    //,jet.getProperty(PropertyEnum::bCSVscore) //MB: it is not needed when WP is definied
+					    ); 
+  rand_->SetSeed((int)((jet.getP4().Eta()+5)*100000));
+  double rand_num = rand_->Rndm();
+  std::cout<<"\tbtag_SF(flav,CSVv2): "<<btag_SF
+	   <<"("<<jetFlavour<<","
+	   <<jet.getProperty(PropertyEnum::bCSVscore)<<")"<<std::endl;
+  std::cout<<"\tbtag_rand_num: "<<rand_num<<std::endl;
+  if(btag_SF>1){
+    double tagging_efficiency = 1;
+    TH2F *histo_eff = btag_eff_oth_;
+    if(jetFlavour == BTagEntry::FLAV_B)
+      histo_eff = btag_eff_b_;
+    else if(jetFlavour == BTagEntry::FLAV_C)
+      histo_eff = btag_eff_c_;
+    if( jet.getP4().Pt() > histo_eff->GetXaxis()->GetBinLowEdge(histo_eff->GetNbinsX()+1) ){
+      tagging_efficiency = histo_eff->GetBinContent( histo_eff->GetNbinsX(),histo_eff->GetYaxis()->FindBin(std::abs(jet.getP4().Eta())) );
+    }
+    else{
+      tagging_efficiency = histo_eff->GetBinContent( histo_eff->GetXaxis()->FindBin(jet.getP4().Pt()),histo_eff->GetYaxis()->FindBin(std::abs(jet.getP4().Eta())) );
+    }
+    std::cout<<"\tbtag_eff: "<<tagging_efficiency<<std::endl;
+    if(tagging_efficiency < 1e-9)//protection
+      decision = false;
+    else if(tagging_efficiency > 1.-1e-9)//protection
+      decision = true;
+    else
+      decision = (rand_num < (1. - btag_SF)/(1. - 1./tagging_efficiency) );
+  }
+  else{    
+    decision = (rand_num < 1. - btag_SF);
+  }
+  std::cout<<"\tbtag_decision: "<<decision<<std::endl;
+  return !decision;
+}
+//////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////////
