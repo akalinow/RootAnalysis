@@ -4,7 +4,7 @@ from ROOT import *
 import array
 import numpy
 
-WAW_fileName = "/cms/cms/akalinow/CMS/HiggsCP/Data/NTUPLES_03_03_2017/MT/Histograms/RootAnalysis_AnalysisMuTau.root"
+WAW_fileName = "/cms/cms/akalinow/CMS/HiggsCP/Data/NTUPLES_28_03_2017/MT/Histograms/RootAnalysis_AnalysisMuTau.root"
 
 channel="mt"
 
@@ -55,8 +55,9 @@ histogramsMap = {
     "TTbarMatchJ":"TTJ",
     "TTbarMatchT":"TTT",
     "ST":"T",
-    "DiBosonMatchT":"VVT",
-    "DiBosonMatchJ":"VVJ",
+    #"DiBosonMatchT":"VVT",
+    #"DiBosonMatchJ":"VVJ",
+    "DiBoson":"VV",
     "QCDEstimate":"QCD",
     "ggHTT120":"ggH120",
     "qqHTT120":"qqH120",
@@ -99,30 +100,36 @@ def rebinHisto(histo, categoryName):
         nbins = 1
     newHisto = histo.Rebin(nbins, "rebinned", xbins)
     return newHisto
+    
+def getHistogram(name, histo):
+    if name.count("DiBoson")>0: name=name.replace("DiBoson","DiBosonMatchT")
+    h = WAW_file.Get(name)
+    txtFile=open("histogramSearch.txt","a")
+    if h==None :
+        print "Missing histogram: ",name
+        txtFile.write("Search for histo: "+name+": 0\n")
+        h = histo.Clone()
+    else: 
+        txtFile.write("Search for histo: "+name+": 1\n")
+        
+    if name.count("DiBoson")>0:
+        name=name.replace("MatchT","MatchJ")
+        hJ = WAW_file.Get(name)
+        if hJ==None :
+          print "Missing histogram: ",name
+          txtFile.write("Search for histo: "+name+": 0\n")
+          hJ = histo.Clone()
+        else:
+          txtFile.write("Search for histo: "+name+": 1\n")
+          h.Add(hJ)
+    txtFile.close()
+    return h
 
 def getSingleNPHistos(prefix, np, histo):
         
     hName = prefix+"_"+np
-    hUp = WAW_file.Get(hName+"Up")
-    txtFile=open("histogramSearch.txt","a")
-
-    if hUp==None :
-        print "Missing histogram: ",hName+"Up"
-        txtFile.write("Search for histo: "+hName+"Up: 0\n")
-        hUp = histo.Clone()
-    else: 
-        txtFile.write("Search for histo: "+hName+"Up: 1\n")
-
-    hDown = WAW_file.Get(hName+"Down")
-    if hDown==None :
-        #almost always where there is no Up histo, there is no down histo, so there is no need to print its name again
-        txtFile.write("Search for histo: "+hName+"Down: 0\n")
-        #print prefix+np
-        hDown = histo.Clone()
-    else: 
-        txtFile.write("Search for histo: "+hName+"Down: 1\n")
-
-    txtFile.close()
+    hUp = getHistogram(hName+"Up",histo)
+    hDown = getHistogram(hName+"Down",histo)
     return (hUp, hDown)
 
 #basic categories
@@ -144,13 +151,8 @@ for iCategory in xrange(0,len(categoryCombineNames)):
 
     for key,value in histogramsMap.iteritems():
         hName = histoPrefix[categoryName] + key+"_"+categoryRootAnalysisNames[iCategory]
-        histogram = WAW_file.Get(hName)
-        if(histogram==None):
-            print hName,"is missing"
-            histogram = TH1F(value,"",nbins[categoryName][0]*nbins[categoryName][1],0.5,nbins[categoryName][0]*nbins[categoryName][1] + 0.5)
-            open("histogramSearch.txt","a").write("Search for histo: "+hName+": 0\n")
-        else:
-            open("histogramSearch.txt","a").write("Search for histo: "+hName+": 1\n")
+        templateHisto = TH1F(value,"",nbins[categoryName][0]*nbins[categoryName][1],0.5,nbins[categoryName][0]*nbins[categoryName][1] + 0.5)
+        histogram = getHistogram(hName, templateHisto)
         histogram.SetName(value)
         histogram.Write()
 
@@ -165,7 +167,7 @@ for iCategory in xrange(0,len(categoryCombineNames)):
             nuisanceParam = nuisanceParam.replace("CAT",cat)
             
             histos = getSingleNPHistos(histoPrefix[categoryName] + key+"_"+categoryRootAnalysisNames[iCategory], nuisanceParam, histogram)
-            if nuisanceParam.count("zmumuShape")>0 and cat.count("vbf")>0:  nuisanceParam.replace("vbf","VBF")
+            if nuisanceParam.count("zmumuShape")>0 and cat.count("vbf")>0:  nuisanceParam=nuisanceParam.replace("vbf","VBF")
             histogramUp = histos[0]
             histogramUp.SetName(value+"_"+nuisanceParam+"Up")
             histogramUp.Write()
@@ -215,9 +217,9 @@ histogramsMap = {
     #"TTbarYield":"TTYield",
     "ST":"T",
     #"STQCD":"TopQCD",
-    "DiBosonMatchT":"VVT",
-    "DiBosonMatchJ":"VVJ",
-    #"DiBoson":"VV",
+    #"DiBosonMatchT":"VVT",
+    #"DiBosonMatchJ":"VVJ",
+    "DiBoson":"VV",
     #"DiBosonQCD":"VV_QCD",
     #"DiBosonSDB":"VV_SDB",
     #"DiBosonHMTSDB_SS":"VV_SS_HMT_SDB",
@@ -275,13 +277,8 @@ for iCategory in xrange(0,len(categoryCombineNames)):
     for key,value in histogramsMap.iteritems():
         hName = histoPrefix[categoryName] + key
         hName = hName +"_"+categoryRootAnalysisNames[iCategory]
-        histogram = WAW_file.Get(hName)
-        if(histogram==None):
-            print hName, " is missing"
-            histogram = TH1F(value,"",nbins[categoryName][0],nbins[categoryName][1],nbins[categoryName][2])
-            open("histogramSearch.txt","a").write("Search for histo: "+hName+": 0\n")
-        else:
-            open("histogramSearch.txt","a").write("Search for histo: "+hName+": 1\n")
+        templateHisto = TH1F(value,"",nbins[categoryName][0]*nbins[categoryName][1],0.5,nbins[categoryName][0]*nbins[categoryName][1] + 0.5)
+        histogram = getHistogram(hName, templateHisto)
         histogram=rebinHisto(histogram, categoryName)
         histogram.SetName(value)
             
