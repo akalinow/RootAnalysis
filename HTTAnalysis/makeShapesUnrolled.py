@@ -251,7 +251,8 @@ nuisanceParams = {
     "CMS_htt_ttbarShape_13TeV":("TT","TTT","TTJ"),
     "QCDSFUncert_CHANNEL_CAT_13TeV":("QCD","W"),
     "WSFUncert_CHANNEL_CAT_13TeV":("W",),
-    "CMS_scale_gg_13TeV":("ggH120","ggH125","ggH130")
+    "CMS_scale_gg_13TeV":("ggH120","ggH125","ggH130"),
+    "CMS_htt_zmumuShape_CAT_13TeV":("ZTT",)
     }
     
 nbins = {"mt_wjets_0jet_cr":(1,80,200),
