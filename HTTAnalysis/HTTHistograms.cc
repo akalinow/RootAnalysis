@@ -1235,7 +1235,6 @@ THStack*  HTTHistograms::plotStack(unsigned int iCategory,
         THStack *hs = new THStack("hs","Stacked histograms");
         /////////
         hs->Add(hHiggs,"hist");
-
         hs->Add(hEWK2Jets,"hist");
         hs->Add(hQCD,"hist");
         hs->Add(hTTbarJ,"hist");
