@@ -1,5 +1,6 @@
 #include <sstream>
 #include <algorithm>
+#include <cstdlib>
 
 #include "HTTSynchNTuple.h"
 #include "HTTHistograms.h"
@@ -8,17 +9,20 @@
 #include "RooRealVar.h"
 #include "RooBinning.h"
 
+#include "BTagCalibrationStandalone.h"
+
 //////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////
-HTTSynchNTuple::HTTSynchNTuple(const std::string & aName, const std::string & aDecayMode):Analyzer(aName){ 
+HTTSynchNTuple::HTTSynchNTuple(const std::string & aName, const std::string & aDecayMode):Analyzer(aName){
   decayMode_ = aDecayMode;
+  TFile::SetCacheFileDir("/tmp/");
   //PU
   std::string dataPUFileName = "http://akalinow.web.cern.ch/akalinow/Data_Pileup_2016_271036-284044_13TeVMoriond17_23Sep2016ReReco_69p2mbMinBiasXS.root";
   puDataFile_ = TFile::Open(dataPUFileName.c_str(),"CACHEREAD");
   std::string mcPUFileName = "http://akalinow.web.cern.ch/akalinow/MC_Moriond17_PU25ns_V1.root";
   puMCFile_ = TFile::Open(mcPUFileName.c_str(),"CACHEREAD");
   //Corrections
-  initializeCorrections();
+  //initializeCorrections();//MB needed??
   h2DMuonIdCorrections = 0;
   h3DMuonIsoCorrections = 0;
   h3DMuonTrgCorrections = 0;
@@ -26,11 +30,12 @@ HTTSynchNTuple::HTTSynchNTuple(const std::string & aName, const std::string & aD
   h2DTauTrgGenuineCorrections = 0;
   h2DTauTrgFakeCorrections = 0;
   h3DTauCorrections = 0;
+  initializeBTagCorrections();
 }
 //////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////
-HTTSynchNTuple::~HTTSynchNTuple(){ 
-  if(myHistos_) delete myHistos_; 
+HTTSynchNTuple::~HTTSynchNTuple(){
+  if(myHistos_) delete myHistos_;
   if(idMasks_) delete idMasks_;
   //PU
   if(puDataFile_) delete puDataFile_;
@@ -43,6 +48,11 @@ HTTSynchNTuple::~HTTSynchNTuple(){
   if(h2DTauTrgGenuineCorrections) delete h2DTauTrgGenuineCorrections;
   if(h2DTauTrgFakeCorrections) delete h2DTauTrgFakeCorrections;
   if(h3DTauCorrections) delete h3DTauCorrections;
+  //btagging
+  if(calib) delete calib;
+  if(reader) delete reader;
+  if(btagEffFile_) delete btagEffFile_;
+  if(rand_) delete rand_;
 }
 //////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////
@@ -59,7 +69,7 @@ void HTTSynchNTuple::initialize(TDirectory* aDir,
 			      pat::strbitset *aSelections){
 
   mySelections_ = aSelections;
-  
+
   ///The histograms for this analyzer will be saved into "HTTSynchNTuple"
   ///directory of the ROOT file
   ///NOTE: due to a bug hists land in the Summary directory
@@ -69,15 +79,15 @@ void HTTSynchNTuple::initialize(TDirectory* aDir,
 }
 //////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////
-void HTTSynchNTuple::finalize(){ 
+void HTTSynchNTuple::finalize(){
 
   myHistos_->finalizeHistograms(std::vector<const HTTAnalysis::eventCategory*>());
- 
+
 }
 //////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////
-void HTTSynchNTuple::clearTTreeVariables(){ 
-  
+void HTTSynchNTuple::clearTTreeVariables(){
+
   //event ID variables
   run = -999;
   lumi = -999;
@@ -103,7 +113,7 @@ void HTTSynchNTuple::clearTTreeVariables(){
   puppimt_1 = -999;
   iso_1 = -999;
   id_e_mva_nt_loose_1 = -999;
-  gen_match_1 = -999;	
+  gen_match_1 = -999;
   againstElectronLooseMVA6_1 = -999;
   againstElectronMediumMVA6_1 = -999;
   againstElectronTightMVA6_1 = -999;
@@ -414,10 +424,10 @@ bool HTTSynchNTuple::analyze(const EventProxyBase& iEvent){
 
   const EventProxyHTT & myEventProxy = static_cast<const EventProxyHTT&>(iEvent);
 
-  HTTEvent &aEvent = *myEventProxy.event;  
+  HTTEvent &aEvent = *myEventProxy.event;
   HTTPair &aPair = (*myEventProxy.pairs)[0];
   std::vector<HTTParticle> &aJets = *myEventProxy.jets;
-  
+
   //i_++;
   //if(i_%1000==0){
     //std::cout<<i_<<std::endl;
@@ -466,8 +476,8 @@ bool HTTSynchNTuple::analyze(const EventProxyBase& iEvent){
   // Fill extra lepton vetoes info
   fillVetoes(aEvent);
   // Weights
-  Float_t w_leg1 = trackingweight_1*trigweight_1*idisoweight_1; 
-  Float_t w_leg2 = trackingweight_2*trigweight_2*idisoweight_2; 
+  Float_t w_leg1 = trackingweight_1*trigweight_1*idisoweight_1;
+  Float_t w_leg2 = trackingweight_2*trigweight_2*idisoweight_2;
   effweight = w_leg1*w_leg2;
   weight = puweight*effweight;
   return true;
@@ -502,7 +512,7 @@ void HTTSynchNTuple::fillLegs(const HTTParticle &leg1, const HTTParticle &leg2){
   q_1 = leg1.getCharge();
   d0_1 = leg1.getProperty(PropertyEnum::dxy);
   dZ_1 = leg1.getProperty(PropertyEnum::dz);
-  gen_match_1 = leg1.getProperty(PropertyEnum::mc_match); 
+  gen_match_1 = leg1.getProperty(PropertyEnum::mc_match);
 
   //Leg 2 (trailing tau for tt, electon for et,em muon for mt)
   pt_2 = leg2.getP4().Pt();
@@ -644,7 +654,7 @@ void HTTSynchNTuple::fillLegsSpecific(const HTTParticle &leg1, const HTTParticle
     //Weights
     int iBin;
     int tau_decay_mode_tmp;
-    tau_decay_mode_tmp  = tau_decay_mode_1==2 ? 1 : tau_decay_mode_1; //to handle very rare dm==2    
+    tau_decay_mode_tmp  = tau_decay_mode_1==2 ? 1 : tau_decay_mode_1; //to handle very rare dm==2
     if(gen_match_1==5){ //genuine tau
       iBin = h2DTauTrgGenuineCorrections->FindBin(std::min(pt_1,(Float_t)999.9), tau_decay_mode_tmp);
       trigweight_1 = h2DTauTrgGenuineCorrections->GetBinContent(iBin);
@@ -699,7 +709,7 @@ void HTTSynchNTuple::fillLegsSpecific(const HTTParticle &leg1, const HTTParticle
     tau_decay_mode_2 = leg2.getProperty(PropertyEnum::decayMode);
     decayModeFindingOldDMs_2 = (tau_decay_mode_2==0 || tau_decay_mode_2==1 || tau_decay_mode_2==2 || tau_decay_mode_2==10); //FIXME: is it possible to take ID directly?
     //Weights
-    tau_decay_mode_tmp  = tau_decay_mode_2==2 ? 1 : tau_decay_mode_2; //to handle very rare dm==2    
+    tau_decay_mode_tmp  = tau_decay_mode_2==2 ? 1 : tau_decay_mode_2; //to handle very rare dm==2
     if(gen_match_2==5){ //genuine tau
       iBin = h2DTauTrgGenuineCorrections->FindBin(std::min(pt_2,(Float_t)999.9), tau_decay_mode_tmp);
       trigweight_2 = h2DTauTrgGenuineCorrections->GetBinContent(iBin);
@@ -749,13 +759,13 @@ void HTTSynchNTuple::fillPair(const HTTEvent &event, HTTPair &pair){
   //Legs
   TLorentzVector leg1P4 = pair.getLeg1().getP4();
   TLorentzVector leg2P4 = pair.getLeg2().getP4();
-	
+
   //MET
   TLorentzVector metP4(event.getMET().X(), event.getMET().Y(), 0, event.getMET().Mod());
   met = event.getMET().Mod();
   metphi = event.getMET().Phi_mpi_pi(event.getMET().Phi());
-  pfmt_1 = TMath::Sqrt(2.*leg1P4.Pt()*metP4.Pt()*(1.-TMath::Cos(leg1P4.Phi()-metP4.Phi()))); 
-  pfmt_2 = TMath::Sqrt(2.*leg2P4.Pt()*metP4.Pt()*(1.-TMath::Cos(leg2P4.Phi()-metP4.Phi()))); 
+  pfmt_1 = TMath::Sqrt(2.*leg1P4.Pt()*metP4.Pt()*(1.-TMath::Cos(leg1P4.Phi()-metP4.Phi())));
+  pfmt_2 = TMath::Sqrt(2.*leg2P4.Pt()*metP4.Pt()*(1.-TMath::Cos(leg2P4.Phi()-metP4.Phi())));
   TLorentzVector mvametP4(pair.getMET().X(), pair.getMET().Y(), 0, pair.getMET().Mod());
   mvamet = pair.getMET().Mod();
   mvametphi = pair.getMET().Phi_mpi_pi(pair.getMET().Phi());
@@ -786,12 +796,12 @@ void HTTSynchNTuple::fillPair(const HTTEvent &event, HTTPair &pair){
   mvacov01 = pair.getMETMatrix().at(1);
   mvacov10 = pair.getMETMatrix().at(2);
   mvacov11 = pair.getMETMatrix().at(3);
-  
+
 }
 //////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////
 void HTTSynchNTuple::fillJets(const std::vector<HTTParticle> &jets){
-  
+
   njetspt20 = jets.size();
   njets = 0;
   nbtag = 0;
@@ -799,13 +809,15 @@ void HTTSynchNTuple::fillJets(const std::vector<HTTParticle> &jets){
   for(unsigned int iJet=0; iJet<jets.size(); ++iJet){
     if(jets.at(iJet).getP4().Pt()>30)
       njets++;
-    if(std::abs(jets.at(iJet).getP4().Eta())<2.4 && 
+    if(std::abs(jets.at(iJet).getP4().Eta())<2.4 &&
        jets.at(iJet).getP4().Pt()>20 &&
-       jets.at(iJet).getProperty(PropertyEnum::bCSVscore)>0.8484){//FIXME 0.8484 Correct??
+       jets.at(iJet).getProperty(PropertyEnum::bCSVscore)>0.8484 && //FIXME 0.8484 Correct??
+       promoteBJet(jets.at(iJet)) &&
+       true){
       nbtag++;
       bjets.push_back(jets.at(iJet));
     }
-  } 
+  }
   if(jets.size()==0) return;
 
   HTTParticle aLeadingJet = jets.at(0);
@@ -841,7 +853,7 @@ void HTTSynchNTuple::fillJets(const std::vector<HTTParticle> &jets){
 	if(jets.at(iJet).getP4().Pt()>30)
 	  njetingap++;
       }
-    }				
+    }
   }
   //b-jets
   if(bjets.size()>0){
@@ -911,7 +923,7 @@ bool HTTSynchNTuple::selectEvent(const HTTEvent &event, HTTPair &pair){
 void HTTSynchNTuple::initializeCorrections(){
   //MB: basically a copy of ChannelSpecifics::initializeCorrections()
 
-  std::string correctionFileName = "http://akalinow.web.cern.ch/akalinow/htt_scalefactors_v16_3.root";
+  std::string correctionFileName = "http://akalinow.web.cern.ch/akalinow/htt_scalefactors_v16_4.root";
   TFile *aFile = TFile::Open(correctionFileName.c_str(),"CACHEREAD");
 
   RooWorkspace *scaleWorkspace = (RooWorkspace*)aFile->Get("w");
@@ -928,7 +940,7 @@ void HTTSynchNTuple::initializeCorrections(){
 								     RooFit::YVar(*scaleWorkspace->var("m_eta"),RooFit::Binning(48,-2.4,2.4)),//MB m_abs_eta->m_eta
 								     RooFit::Extended(kFALSE),
 								     RooFit::Scaling(kFALSE));
-  //  
+  //
   RooArgSet dependentVarsForMu(*scaleWorkspace->var("m_pt"),*scaleWorkspace->var("m_eta"),*scaleWorkspace->var("m_iso"));
   RooArgSet projectedVarsForMu;
   const RooAbsReal *muon_iso_scalefactor_proj = muon_iso_scalefactor->createPlotProjection(dependentVarsForMu,projectedVarsForMu);
@@ -987,7 +999,7 @@ float HTTSynchNTuple::getPUWeight(float nPU){
   //MB: basically a copy of HTTAnalyzer::getPUWeight
 
   if(nPU<0) return 1.0;//not defined, e.g. for data
-  
+
   if(!puDataFile_ || !puMCFile_ ||
      puDataFile_->IsZombie() ||
      puMCFile_->IsZombie()) { return 1.0; }
@@ -1012,4 +1024,94 @@ float HTTSynchNTuple::getPUWeight(float nPU){
 }
 //////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////
-	
+void HTTSynchNTuple::initializeBTagCorrections(){
+
+  std::string csvFileName =  "CSVv2_Moriond17_B_H.csv";
+  std::string weightsFileName = "http://akalinow.web.cern.ch/akalinow/"+csvFileName;
+  TFile::Open(weightsFileName.c_str(),"CACHEREAD");
+  std::string userName(std::getenv("USER"));
+  std::string correctionFileName = "/tmp/"+userName+"/"+csvFileName;
+
+  calib = new BTagCalibration("CSVv2", correctionFileName);
+  reader = new BTagCalibrationReader(BTagEntry::OP_MEDIUM,  // operating point
+				     "central",             // central sys type
+				     {"up", "down"});       // other sys types
+
+  reader->load(*calib,               // calibration instance
+	       BTagEntry::FLAV_B,    // btag flavour
+	       "comb");              // measurement type
+  reader->load(*calib,               // calibration instance
+	       BTagEntry::FLAV_C,    // btag flavour
+	       "comb");              // measurement type
+  reader->load(*calib,               // calibration instance
+	       BTagEntry::FLAV_UDSG, // btag flavour
+	       "incl");              // measurement type
+
+  std::string efficiencyFileName = "http://akalinow.web.cern.ch/akalinow/tagging_efficiencies_Moriond2017.root";
+  btagEffFile_ = TFile::Open(efficiencyFileName.c_str(),"CACHEREAD");
+
+  btag_eff_b_ = (TH2F*)btagEffFile_->Get("btag_eff_b")->Clone("btag_eff_b");
+  btag_eff_c_ = (TH2F*)btagEffFile_->Get("btag_eff_c")->Clone("btag_eff_c");
+  btag_eff_oth_ = (TH2F*)btagEffFile_->Get("btag_eff_oth")->Clone("btag_eff_oth");
+
+  rand_ = new TRandom3();
+
+  return;
+}
+//////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////////
+bool HTTSynchNTuple::promoteBJet(const HTTParticle &jet){
+  //MB: https://twiki.cern.ch/twiki/bin/view/CMS/BTagCalibration#Standalone
+  bool decision = false;
+
+  if(!reader) initializeBTagCorrections();
+
+  BTagEntry::JetFlavor jetFlavour;
+  if(std::abs(jet.getProperty(PropertyEnum::Flavour))==5)//b-quark
+    jetFlavour = BTagEntry::FLAV_B;
+  else if(std::abs(jet.getProperty(PropertyEnum::Flavour))==4)//c-quark
+    jetFlavour = BTagEntry::FLAV_C;
+  else //light quark, gluon or undefined
+    jetFlavour = BTagEntry::FLAV_UDSG;
+  // Note: this is for b jets, for c jets (light jets) use FLAV_C (FLAV_UDSG)
+  double btag_SF = reader->eval_auto_bounds("central",
+					    jetFlavour,
+					    jet.getP4().Eta(),
+					    jet.getP4().Pt()
+					    //,jet.getProperty(PropertyEnum::bCSVscore) //MB: it is not needed when WP is definied
+					    );
+  rand_->SetSeed((int)((jet.getP4().Eta()+5)*100000));
+  double rand_num = rand_->Rndm();
+  std::cout<<"\tbtag_SF(flav,CSVv2): "<<btag_SF
+	   <<"("<<jetFlavour<<","
+	   <<jet.getProperty(PropertyEnum::bCSVscore)<<")"<<std::endl;
+  std::cout<<"\tbtag_rand_num: "<<rand_num<<std::endl;
+  if(btag_SF>1){
+    double tagging_efficiency = 1;
+    TH2F *histo_eff = btag_eff_oth_;
+    if(jetFlavour == BTagEntry::FLAV_B)
+      histo_eff = btag_eff_b_;
+    else if(jetFlavour == BTagEntry::FLAV_C)
+      histo_eff = btag_eff_c_;
+    if( jet.getP4().Pt() > histo_eff->GetXaxis()->GetBinLowEdge(histo_eff->GetNbinsX()+1) ){
+      tagging_efficiency = histo_eff->GetBinContent( histo_eff->GetNbinsX(),histo_eff->GetYaxis()->FindBin(std::abs(jet.getP4().Eta())) );
+    }
+    else{
+      tagging_efficiency = histo_eff->GetBinContent( histo_eff->GetXaxis()->FindBin(jet.getP4().Pt()),histo_eff->GetYaxis()->FindBin(std::abs(jet.getP4().Eta())) );
+    }
+    std::cout<<"\tbtag_eff: "<<tagging_efficiency<<std::endl;
+    if(tagging_efficiency < 1e-9)//protection
+      decision = false;
+    else if(tagging_efficiency > 1.-1e-9)//protection
+      decision = true;
+    else
+      decision = (rand_num < (1. - btag_SF)/(1. - 1./tagging_efficiency) );
+  }
+  else{
+    decision = (rand_num < 1. - btag_SF);
+  }
+  std::cout<<"\tbtag_decision: "<<decision<<std::endl;
+  return !decision;
+}
+//////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////////

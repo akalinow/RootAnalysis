@@ -388,10 +388,11 @@ void HTTHistograms::finalizeHistograms(const std::vector<const HTTAnalysis::even
         unsigned int myNumberOfCategories = myCategoryRejester.size();
 
         ///
-        std::vector<std::string> mainCategoryNames = {"jet0","boosted", "vbf",
-                                                      "antiIso_jet0", "antiIso_boosted", "antiIso_vbf",
-                                                      "jet0_QCD",
-                                                      "jet0_W", "boosted_W", "vbf_W"};
+        std::vector<std::string> mainCategoryNames = {"0jet","boosted", "vbf",
+                                                      "antiIso_0jet", "antiIso_boosted", "antiIso_vbf",
+                                                      "0jet_QCD",
+                                                      "0jet_W", "boosted_W", "vbf_W"};
+
         std::vector <unsigned int> mainCategoriesRejester;
         for(unsigned int iCategory=0; iCategory<myCategoryRejester.size(); ++iCategory) {
                 for(auto nameIt : mainCategoryNames) {
@@ -972,10 +973,12 @@ THStack*  HTTHistograms::plotStack(unsigned int iCategory,
                     //     <<std::endl;
                 return 0;
         }
-        hSoup->SetDirectory(myDirCopy); //TEST
 
         TH1F *hEmpty = (TH1F*)hSoup->Clone("hEmpty");
         hEmpty->Reset();
+
+        hSoup->SetDirectory(myDirCopy);
+
         if(!hQCD) hQCD = (TH1F*)hEmpty->Clone((hName+"QCDEstimate_"+std::to_string(iCategory)).c_str());
         if(!hQCD_MC) hQCD_MC = (TH1F*)hEmpty->Clone((hName+"QCD_MC"+hNameSuffix).c_str());
         if(!hWJets) hWJets = (TH1F*)hEmpty->Clone((hName+"WJets"+hNameSuffix).c_str());
@@ -1013,6 +1016,7 @@ THStack*  HTTHistograms::plotStack(unsigned int iCategory,
         ///Set histograms directory, so the histograms are saved
         if(hQCD) hQCD->SetDirectory(hSoup->GetDirectory());
         if(hQCD_MC) hQCD_MC->SetDirectory(hSoup->GetDirectory());
+
         if(hWJets) hWJets->SetDirectory(hSoup->GetDirectory());
         if(hDYJetsLowM) hDYJetsLowM->SetDirectory(hSoup->GetDirectory());
         if(hDYJetsZJ) hDYJetsZJ->SetDirectory(hSoup->GetDirectory());
@@ -1231,7 +1235,6 @@ THStack*  HTTHistograms::plotStack(unsigned int iCategory,
         THStack *hs = new THStack("hs","Stacked histograms");
         /////////
         hs->Add(hHiggs,"hist");
-
         hs->Add(hEWK2Jets,"hist");
         hs->Add(hQCD,"hist");
         hs->Add(hTTbarJ,"hist");
@@ -1421,7 +1424,7 @@ std::pair<float,float> HTTHistograms::getQCDControlToSignal(unsigned int iCatego
         ///Return fixed values according to SMH2016 TWiki:
         ///https://twiki.cern.ch/twiki/bin/viewauth/CMS/SMTauTau2016#QCD_background_estimation_in_Lta
         std::pair<float,float> result(1,0);
-        if(myCategoryRejester[iCategory]->name().find("jet0")!=std::string::npos) result = std::pair<float,float>(1.0,0.15);
+        if(myCategoryRejester[iCategory]->name().find("0jet")!=std::string::npos) result = std::pair<float,float>(1.0,0.15);
         else if(myCategoryRejester[iCategory]->name().find("boosted")!=std::string::npos) result = std::pair<float,float>(1.15,0.15*1.15);
         else if(myCategoryRejester[iCategory]->name().find("vbf")) result = std::pair<float,float>(1.2,0.30*1.2);
         else result = std::pair<float,float>(1.0,0.15);
@@ -1487,7 +1490,7 @@ std::pair<float,float> HTTHistograms::getQCDControlToSignal(unsigned int iCatego
 TH1F* HTTHistograms::getQCDbackground(unsigned int iCategory,
                                       std::string varName,
                                       unsigned int iSystEffect){
-  
+
         std::string categoryName = myCategoryRejester[iCategory]->name();
         std::string hName = "h1D" + varName+"QCDEstimate_"+categoryName;
         std::string systEffectName = HTTAnalysis::systEffectName(iCategory, iSystEffect, myCategoryRejester);
@@ -1539,7 +1542,7 @@ std::pair<float,float> HTTHistograms::getWNormalisation(unsigned int iCategory, 
         weight=intdata/inthWJets;
 
         float WSFUncertainty = 0.0;
-        if(categoryName.find("jet0_W")!=std::string::npos) WSFUncertainty = 0.1;
+        if(categoryName.find("0jet_W")!=std::string::npos) WSFUncertainty = 0.1;
         if(categoryName.find("boosted_W")!=std::string::npos) WSFUncertainty = 0.1;
         if(categoryName.find("vbf_W")!=std::string::npos) WSFUncertainty = 0.3;
 

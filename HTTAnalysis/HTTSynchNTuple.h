@@ -17,11 +17,16 @@
 #include "TH1F.h"
 #include "TH2F.h"
 #include "TH3F.h"
+#include "TRandom3.h"
 
 #include "Analyzer.h"
 
 class EventProxyHTT;
 class HTTHistograms;
+
+//For btag calibration
+class BTagCalibration;
+class BTagCalibrationReader;
 
 class HTTSynchNTuple: public Analyzer{
 
@@ -59,6 +64,8 @@ class HTTSynchNTuple: public Analyzer{
   virtual void initializeCorrections();
   virtual float getPUWeight(float nPU);
 
+  virtual void initializeBTagCorrections();
+  virtual bool promoteBJet(const HTTParticle &jet);
   virtual Analyzer* clone() const;
 
   bool filter() const { return filterEvent_;};
@@ -101,6 +108,13 @@ class HTTSynchNTuple: public Analyzer{
   //For PU
   TFile *puDataFile_, *puMCFile_;
   std::vector<TH1F*> hPUVec_;
+
+  //For btag calibration
+  BTagCalibration *calib;
+  BTagCalibrationReader *reader;
+  TFile *btagEffFile_;
+  TH2F *btag_eff_b_, *btag_eff_c_, *btag_eff_oth_;
+  TRandom3 *rand_;
 
   ///////////////////////////////////////////////////////////
   ///////////////////////////////////////////////////////////
