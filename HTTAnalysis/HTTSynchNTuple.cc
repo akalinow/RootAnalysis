@@ -15,7 +15,8 @@
 //////////////////////////////////////////////////////////////////////////////
 HTTSynchNTuple::HTTSynchNTuple(const std::string & aName, const std::string & aDecayMode):Analyzer(aName){
   decayMode_ = aDecayMode;
-  TFile::SetCacheFileDir("/tmp/");
+  std::string cacheDirPath = "/tmp/"+std::string(std::getenv("USER"))+"/";
+  TFile::SetCacheFileDir(cacheDirPath.c_str());
   //PU
   std::string dataPUFileName = "http://akalinow.web.cern.ch/akalinow/Data_Pileup_2016_271036-284044_13TeVMoriond17_23Sep2016ReReco_69p2mbMinBiasXS.root";
   puDataFile_ = TFile::Open(dataPUFileName.c_str(),"CACHEREAD");
@@ -1030,7 +1031,7 @@ void HTTSynchNTuple::initializeBTagCorrections(){
   std::string weightsFileName = "http://akalinow.web.cern.ch/akalinow/"+csvFileName;
   TFile::Open(weightsFileName.c_str(),"CACHEREAD");
   std::string userName(std::getenv("USER"));
-  std::string correctionFileName = "/tmp/"+userName+"/"+csvFileName;
+  std::string correctionFileName = "/tmp/"+userName+"/akalinow/"+csvFileName;
 
   calib = new BTagCalibration("CSVv2", correctionFileName);
   reader = new BTagCalibrationReader(BTagEntry::OP_MEDIUM,  // operating point
@@ -1082,10 +1083,11 @@ bool HTTSynchNTuple::promoteBJet(const HTTParticle &jet){
 					    );
   rand_->SetSeed((int)((jet.getP4().Eta()+5)*100000));
   double rand_num = rand_->Rndm();
-  std::cout<<"\tbtag_SF(flav,CSVv2): "<<btag_SF
-	   <<"("<<jetFlavour<<","
-	   <<jet.getProperty(PropertyEnum::bCSVscore)<<")"<<std::endl;
-  std::cout<<"\tbtag_rand_num: "<<rand_num<<std::endl;
+  //debug
+  //std::cout<<"\tbtag_SF(flav,CSVv2): "<<btag_SF
+  //	   <<"("<<jetFlavour<<","
+  //	   <<jet.getProperty(PropertyEnum::bCSVscore)<<")"<<std::endl;
+  //std::cout<<"\tbtag_rand_num: "<<rand_num<<std::endl;
   if(btag_SF>1){
     double tagging_efficiency = 1;
     TH2F *histo_eff = btag_eff_oth_;
@@ -1099,7 +1101,8 @@ bool HTTSynchNTuple::promoteBJet(const HTTParticle &jet){
     else{
       tagging_efficiency = histo_eff->GetBinContent( histo_eff->GetXaxis()->FindBin(jet.getP4().Pt()),histo_eff->GetYaxis()->FindBin(std::abs(jet.getP4().Eta())) );
     }
-    std::cout<<"\tbtag_eff: "<<tagging_efficiency<<std::endl;
+    //debug
+    //std::cout<<"\tbtag_eff: "<<tagging_efficiency<<std::endl;
     if(tagging_efficiency < 1e-9)//protection
       decision = false;
     else if(tagging_efficiency > 1.-1e-9)//protection
@@ -1110,7 +1113,8 @@ bool HTTSynchNTuple::promoteBJet(const HTTParticle &jet){
   else{
     decision = (rand_num < 1. - btag_SF);
   }
-  std::cout<<"\tbtag_decision: "<<decision<<std::endl;
+  //debug
+  //std::cout<<"\tbtag_decision: "<<decision<<std::endl;
   return !decision;
 }
 //////////////////////////////////////////////////////////////////////////////
