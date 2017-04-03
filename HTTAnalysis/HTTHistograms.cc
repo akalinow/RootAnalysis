@@ -298,7 +298,7 @@ std::string HTTHistograms::getTemplateName(const std::string& name){
         if(name.find("h1DNPV")!=std::string::npos) templateName = "h1DNPVTemplate";
         if(name.find("h1DNPU")!=std::string::npos) templateName = "h1DNPUTemplate";
         if(name.find("h1DMass")!=std::string::npos) templateName = "h1DMassTemplate";
-        if(name.find("h1DWideMass")!=std::string::npos) templateName = "h1DWideMassTemplate";
+        if(name.find("h1DBigMass")!=std::string::npos) templateName = "h1DBigMassTemplate";
         if(name.find("h1DStats")!=std::string::npos) templateName = "h1DStatsTemplate";
         if(name.find("h1DPt")!=std::string::npos) templateName = "h1DPtTemplate";
         if(name.find("h1DEta")!=std::string::npos) templateName = "h1DEtaTemplate";
@@ -343,7 +343,7 @@ void HTTHistograms::defineHistograms(){
                 add1DHistogram("h1DNPVTemplate",";Number of PV; Events",61,-0.5,60.5,file_);
                 add1DHistogram("h1DNPUTemplate",";Number of PV; Events",600,0,60,file_);
                 add1DHistogram("h1DMassTemplate",";mass [GeV/c^{2}]; Events",35,0,350,file_);
-                add1DHistogram("h1DWideMassTemplate",";mass [GeV/c^{2}]; Events",25,0,1500,file_);
+                add1DHistogram("h1DBigMassTemplate",";mass [GeV/c^{2}]; Events",25,0,1500,file_);
                 add1DHistogram("h1DPtTemplate",";p_{T}; Events",20,0,100,file_);
                 add1DHistogram("h1DEtaTemplate",";#eta; Events",24,-2.4,2.4,file_);
                 add1DHistogram("h1DDeltaEtaTemplate",";#Delta#eta; Events",50,0,10,file_);
@@ -438,7 +438,9 @@ void HTTHistograms::finalizeHistograms(const std::vector<const HTTAnalysis::even
                 plotStack(iCategory, "CSVBtagLeadingJet");
                 plotStack(iCategory, "PtLeadingBJet");
                 plotStack(iCategory, "EtaLeadingBJet");
-                plotStack(iCategory, "WideMass2J");
+                plotStack(iCategory, "BigMass2Jet");
+                plotStack(iCategory, "DeltaEta2Jet");
+
 
                 plotStack(iCategory, "nPCALeg1");
                 plotStack(iCategory, "nPCALeg2");
