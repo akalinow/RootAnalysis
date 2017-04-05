@@ -137,7 +137,7 @@ categoryDirMade = False
 
 hData = 0
 
-open("histogramSearch.txt","w").write("Looking for histograms for Combine \n")
+open("histogramSearchMT.txt","w").write("Looking for histograms for Combine \n")
 
 print "MAIN REGION\n\n\n\n\n"
 
@@ -252,7 +252,7 @@ nuisanceParams = {
     "QCDSFUncert_CHANNEL_CAT_13TeV":("QCD","W"),
     "WSFUncert_CHANNEL_CAT_13TeV":("W",),
     "CMS_scale_gg_13TeV":("ggH120","ggH125","ggH130"),
-    "CMS_htt_zmumuShape_CAT_13TeV":("ZTT",)
+    "CMS_htt_zmumuShape_CAT_13TeV":("ZTT","ZL", "ZJ")
     }
     
 nbins = {"mt_wjets_0jet_cr":(1,80,200),
@@ -309,7 +309,8 @@ for iCategory in xrange(0,len(categoryCombineNames)):
             for proc in value1:
                   if proc!= value: continue
                   histos = getSingleNPHistos(hName, nuisanceParamRA, histogram)
-                  if nuisanceParam.count("zmumuShape")>0 and cat.count("vbf")>0:  nuisanceParam.replace("vbf","VBF")
+                  if nuisanceParam.count("zmumuShape")>0 and cat.count("vbf")>0:
+                    nuisanceParam = nuisanceParam.replace("vbf","VBF")
                   hUp = histos[0]
                   hDown = histos[1]
                   hUp=rebinHisto(hUp, categoryName)
@@ -319,3 +320,180 @@ for iCategory in xrange(0,len(categoryCombineNames)):
                   hDown.SetName(value+"_"+nuisanceParam+"Down")
                   hDown.Write()
                 
+
+##########################################################
+######### tauH-tauH channel###############################
+##########################################################
+
+
+WAW_fileName = "/cms/cms/akalinow/CMS/HiggsCP/Data/NTUPLES_28_03_2017/TT/Histograms/RootAnalysis_AnalysisMuTau.root"
+
+channel="tt"
+
+SYNCH_fileName = "htt_mt.inputs-sm-13TeV-2D.root"
+
+WAW_file = TFile(WAW_fileName)
+SYNCH_file = TFile(SYNCH_fileName,"RECREATE")
+
+#WAW to SYNCH histograms names map
+histoPrefix = {
+         "mt_0jet":"HTTAnalyzer/h1DUnRollTauPtMassVis",
+         "mt_boosted":"HTTAnalyzer/h1DUnRollHiggsPtMassSV",
+         "mt_vbf":"HTTAnalyzer/h1DUnRollMjjMassSV"
+         }
+
+#define number of bins in each category (nbinsX, nbinsY) in case when you need to create an empty histo
+nbins = {
+         "mt_0jet":(13,7),
+         "mt_boosted":(11,7),
+         "mt_vbf":(6,5)
+         }
+
+categoryRootAnalysisNames = [
+        "0jet", "boosted", "vbf",
+        "0jet_W", "boosted_W", "vbf_W",
+        "antiIso_0jet", "antiIso_boosted", "antiIso_vbf",
+        ]
+
+categoryCombineNames = list()
+
+for i in xrange(0,len(categoryRootAnalysisNames)):
+        tmp = categoryRootAnalysisNames[i]
+        if tmp.count("_W"):
+          tmp = tmp[:-2]
+          tmp = "wjets_"+tmp
+        tmp = channel+"_"+tmp
+        if tmp.count("wjets")>0 or tmp.count("antiIso")>0:
+                tmp = tmp + "_cr"
+        tmp = tmp.replace('antiIso','antiiso')
+        categoryCombineNames.append(tmp)
+
+histogramsMap = {
+    "Data":"data_obs",
+    "DYJetsMatchT":"ZTT",
+    "DYJetsMatchL":"ZL",
+    "DYJetsMatchJ":"ZJ",
+    "WJets":"W",
+    "TTbarMatchJ":"TTJ",
+    "TTbarMatchT":"TTT",
+    "ST":"T",
+    #"DiBosonMatchT":"VVT",
+    #"DiBosonMatchJ":"VVJ",
+    "DiBoson":"VV",
+    "QCDEstimate":"QCD",
+    "ggHTT120":"ggH120",
+    "qqHTT120":"qqH120",
+    "ggHTT125":"ggH125",
+    "qqHTT125":"qqH125",
+    "ggHTT130":"ggH130",
+    "qqHTT130":"qqH130",
+    "ZHTT120":"ZH120",
+    "WHTT120":"WH120",
+    "ZHTT125":"ZH125",
+    "WHTT125":"WH125",
+    "ZHTT130":"ZH130",
+    "WHTT130":"WH130",
+    "EWK2Jets":"EWKZ"
+    }
+
+#according to https://twiki.cern.ch/twiki/bin/view/CMS/SMTauTau2016#Systematic_uncertainties
+nuisanceParams = [
+    #"CMS_shape_t_CHANNEL_13TeV",
+    "CMS_scale_t_CHANNEL_13TeV",
+    #"CMS_scale_e_CHANNEL_13TeV",
+    "CMS_scale_j_13TeV",
+    "CMS_htt_jetToTauFake_13TeV",
+    "CMS_htt_ZLShape_CHANNEL_13TeV",
+    "CMS_htt_dyShape_13TeV",
+    "CMS_htt_ttbarShape_13TeV",
+    "QCDSFUncert_CHANNEL_CAT_13TeV",
+    "WSFUncert_CHANNEL_CAT_13TeV",
+    "CMS_scale_gg_13TeV",
+    "CMS_htt_zmumuShape_CAT_13TeV",
+    ]
+
+def rebinHisto(histo, categoryName):
+    nbins = 0
+    if categoryName.count("antiiso")>0:
+        xbins = numpy.array([40.0,80.0,120.0,160.0,200.0])
+        nbins = 4
+    if categoryName.count("wjets")>0:
+        xbins = numpy.array([80.0,200.0])
+        nbins = 1
+    newHisto = histo.Rebin(nbins, "rebinned", xbins)
+    return newHisto
+    
+def getHistogram(name, histo):
+    if name.count("DiBoson")>0: name=name.replace("DiBoson","DiBosonMatchT")
+    h = WAW_file.Get(name)
+    txtFile=open("histogramSearch.txt","a")
+    if h==None :
+        print "Missing histogram: ",name
+        txtFile.write("Search for histo: "+name+": 0\n")
+        h = histo.Clone()
+    else: 
+        txtFile.write("Search for histo: "+name+": 1\n")
+        
+    if name.count("DiBoson")>0:
+        name=name.replace("MatchT","MatchJ")
+        hJ = WAW_file.Get(name)
+        if hJ==None :
+          print "Missing histogram: ",name
+          txtFile.write("Search for histo: "+name+": 0\n")
+          hJ = histo.Clone()
+        else:
+          txtFile.write("Search for histo: "+name+": 1\n")
+          h.Add(hJ)
+    txtFile.close()
+    return h
+
+def getSingleNPHistos(prefix, np, histo):
+        
+    hName = prefix+"_"+np
+    hUp = getHistogram(hName+"Up",histo)
+    hDown = getHistogram(hName+"Down",histo)
+    return (hUp, hDown)
+
+#basic categories
+categoryDirMade = False
+
+hData = 0
+
+open("histogramSearchMT.txt","w").write("Looking for histograms for Combine \n")
+
+print "MAIN REGION\n\n\n\n\n"
+
+for iCategory in xrange(0,len(categoryCombineNames)):
+    categoryName = categoryCombineNames[iCategory]
+    if categoryName not in histoPrefix.keys(): continue
+    if categoryDirMade: gDirectory.cd("..")
+    gDirectory.mkdir(categoryName)
+    gDirectory.cd(categoryName)
+    categoryDirMade=True
+
+    for key,value in histogramsMap.iteritems():
+        hName = histoPrefix[categoryName] + key+"_"+categoryRootAnalysisNames[iCategory]
+        templateHisto = TH1F(value,"",nbins[categoryName][0]*nbins[categoryName][1],0.5,nbins[categoryName][0]*nbins[categoryName][1] + 0.5)
+        histogram = getHistogram(hName, templateHisto)
+        histogram.SetName(value)
+        histogram.Write()
+
+        if value=="data_obs": continue
+
+        for nuisanceParam in nuisanceParams:
+            nuisanceParam = nuisanceParam.replace("CHANNEL",channel)
+            cat = categoryName
+            if cat.count("0jet")>0: cat = "0jet"
+            elif cat.count("boosted")>0: cat = "boosted"
+            elif cat.count("vbf")>0: cat = "vbf"
+            nuisanceParam = nuisanceParam.replace("CAT",cat)
+            
+            histos = getSingleNPHistos(histoPrefix[categoryName] + key+"_"+categoryRootAnalysisNames[iCategory], nuisanceParam, histogram)
+            if nuisanceParam.count("zmumuShape")>0 and cat.count("vbf")>0:  nuisanceParam=nuisanceParam.replace("vbf","VBF")
+            histogramUp = histos[0]
+            histogramUp.SetName(value+"_"+nuisanceParam+"Up")
+            histogramUp.Write()
+
+            histogramDown = histos[1]
+            histogramDown.SetName(value+"_"+nuisanceParam+"Down")
+            histogramDown.Write()
