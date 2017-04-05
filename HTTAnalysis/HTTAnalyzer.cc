@@ -123,7 +123,7 @@ void HTTAnalyzer::fillControlHistos(const std::string & hNameSuffix, float event
         float higgsPt =  (aVisSum + aMET.getP4(aSystEffect)).Pt();
         float jetsMass = 0;
         if(nJets30>1) jetsMass = (aJet1.getP4(aSystEffect)+aJet2.getP4(aSystEffect)).M();
-        
+
         myHistos_->fill1DHistogram("h1DMassSV"+hNameSuffix,aPair.getP4(aSystEffect).M(),eventWeight);
         myHistos_->fill1DHistogram("h1DMassVis"+hNameSuffix, visMass, eventWeight);
         myHistos_->fill1DHistogram("h1DMassTrans"+hNameSuffix,aPair.getMTMuon(aSystEffect),eventWeight);
@@ -174,10 +174,10 @@ void HTTAnalyzer::fillControlHistos(const std::string & hNameSuffix, float event
                 myHistos_->fill1DHistogram("h1DCSVBtagLeadingJet"+hNameSuffix,aJet1.getProperty(PropertyEnum::bCSVscore),eventWeight);
         }
         if(nJets30>1) {
-                myHistos_->fill1DHistogram("h1DWideMass2J"+hNameSuffix,jetsMass,eventWeight);
+                myHistos_->fill1DHistogram("h1DBigMass2Jet"+hNameSuffix,jetsMass,eventWeight);
                 myHistos_->fill1DHistogram("h1DStatsNJGap30"+hNameSuffix,nJetsInGap30,eventWeight);
                 float jetsEta = std::abs(aJet1.getP4().Eta() - aJet2.getP4().Eta());
-                myHistos_->fill1DHistogram("h1DDeltaEta2J"+hNameSuffix,jetsEta,eventWeight);
+                myHistos_->fill1DHistogram("h1DDeltaEta2Jet"+hNameSuffix,jetsEta,eventWeight);
                 myHistos_->fill1DHistogram("h1DPtTrailingJet"+hNameSuffix,aJet2.getP4().Pt(),eventWeight);
                 myHistos_->fill1DHistogram("h1DEtaTrailingJet"+hNameSuffix,aJet2.getP4().Eta(),eventWeight);
                 myHistos_->fill1DHistogram("h1DPhiTrailingJet"+hNameSuffix,aJet2.getP4().Phi(),eventWeight);
@@ -259,6 +259,7 @@ bool HTTAnalyzer::analyze(const EventProxyBase& iEvent){
                 float leg1ScaleFactor = myChannelSpecifics->getLeg1Correction(aSystEffect);
                 float leg2ScaleFactor = myChannelSpecifics->getLeg2Correction(aSystEffect);
                 float weightSyst = getSystWeight(aSystEffect);
+
                 float eventWeightWithSyst=eventWeight*weightSyst*leg1ScaleFactor*leg2ScaleFactor;
 
                 TLorentzVector met4v(aPair.getMET(aSystEffect).X(),
@@ -273,9 +274,14 @@ bool HTTAnalyzer::analyze(const EventProxyBase& iEvent){
                         if(!passCategory(iCategory)) continue;
                         categorySuffix = aCategoryRejester[iCategory]->name();
 
+                        float reweightDY = 1.0;
+                        if(sampleName.find("DY")!=std::string::npos &&
+                        sampleName.find("MatchT")!=std::string::npos &&
+                        categorySuffix.find("vbf")!=std::string::npos) reweightDY = 1.35;
+
                         systEffectName = HTTAnalysis::systEffectName(iCategory, iSystEffect, aCategoryRejester);
                         hNameSuffix = sampleName+"_"+categorySuffix+systEffectName;
-                        fillControlHistos(hNameSuffix, eventWeightWithSyst, aSystEffect);
+                        fillControlHistos(hNameSuffix, eventWeightWithSyst*reweightDY, aSystEffect);
                 }
         }
         return true;
