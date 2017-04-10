@@ -4,7 +4,6 @@
 #include "RooAbsReal.h"
 #include "RooRealVar.h"
 #include "RooFormulaVar.h"
-#include "TF1.h"
 
 #include "HTTAnalyzer.h"
 #include "HTTHistograms.h"
@@ -17,6 +16,7 @@ HTTAnalyzer::HTTAnalyzer(const std::string & aName, const std::string & aDecayMo
 
 #pragma omp critical
         {
+          /*
                 //pileupCalc.py -i lumiSummary_Run2016BCDE_PromptReco_v12.json
                 //--inputLumiJSON /afs/cern.ch/cms/CAF/CMSCOMM/COMM_DQM/certification/Collisions16/13TeV/PileUp/pileup_latest.txt
                 //--calcMode true --minBiasXsec 69200 --maxPileupBin 60 --numPileupBins 600 Data_Pileup_Cert_271036-277148.root
@@ -28,7 +28,7 @@ HTTAnalyzer::HTTAnalyzer(const std::string & aName, const std::string & aDecayMo
                 //std::string mcPUFileName = "http://akalinow.web.cern.ch/akalinow/MC_Spring16_PU25ns_V1.root";
                 std::string mcPUFileName = "http://akalinow.web.cern.ch/akalinow/MC_Moriond17_PU25ns_V1.root";
                 puMCFile_ = TFile::Open(mcPUFileName.c_str(),"CACHEREAD");
-
+*/
                 if(aDecayMode=="MuTau") myChannelSpecifics = new MuTauSpecifics(this);
                 else if (aDecayMode=="TauTau") myChannelSpecifics = new TauTauSpecifics(this);
                 myNumberOfCategories = myChannelSpecifics->getCategoryRejester().size();
@@ -38,9 +38,9 @@ HTTAnalyzer::HTTAnalyzer(const std::string & aName, const std::string & aDecayMo
 
                 ntupleFile_ = 0;
                 hStatsFromFile = 0;
+                puDataFile_ = 0;
+                puMCFile_ = 0;
 
-
-		f1 = new TF1("f1","TMath::Exp(-7.80941e-01-1.02172e+02*x)",0,0.05);
         }
 }
 //////////////////////////////////////////////////////////////////////////////
@@ -136,7 +136,6 @@ void HTTAnalyzer::fillControlHistos(const std::string & hNameSuffix, float event
         myHistos_->fill2DUnrolledHistogram("h1DUnRollTauPtMassVis"+hNameSuffix, visMass, aLeg2.getP4(aSystEffect).Pt(),eventWeight);
         myHistos_->fill2DUnrolledHistogram("h1DUnRollHiggsPtMassSV"+hNameSuffix, aPair.getP4(aSystEffect).M(), higgsPt, eventWeight);
         myHistos_->fill2DUnrolledHistogram("h1DUnRollMjjMassSV"+hNameSuffix, aPair.getP4(aSystEffect).M(), jetsMass, eventWeight);
-
         myHistos_->fill1DHistogram("h1DIso"+hNameSuffix,aLeg1.getProperty(PropertyEnum::combreliso),eventWeight);
         if(aSystEffect!=HTTAnalysis::NOMINAL) return;
 
@@ -179,10 +178,10 @@ void HTTAnalyzer::fillControlHistos(const std::string & hNameSuffix, float event
                 myHistos_->fill1DHistogram("h1DCSVBtagLeadingJet"+hNameSuffix,aJet1.getProperty(PropertyEnum::bCSVscore),eventWeight);
         }
         if(nJets30>1) {
-                myHistos_->fill1DHistogram("h1DWideMass2J"+hNameSuffix,jetsMass,eventWeight);
+                myHistos_->fill1DHistogram("h1DBigMass2Jet"+hNameSuffix,jetsMass,eventWeight);
                 myHistos_->fill1DHistogram("h1DStatsNJGap30"+hNameSuffix,nJetsInGap30,eventWeight);
                 float jetsEta = std::abs(aJet1.getP4().Eta() - aJet2.getP4().Eta());
-                myHistos_->fill1DHistogram("h1DDeltaEta2J"+hNameSuffix,jetsEta,eventWeight);
+                myHistos_->fill1DHistogram("h1DDeltaEta2Jet"+hNameSuffix,jetsEta,eventWeight);
                 myHistos_->fill1DHistogram("h1DPtTrailingJet"+hNameSuffix,aJet2.getP4().Pt(),eventWeight);
                 myHistos_->fill1DHistogram("h1DEtaTrailingJet"+hNameSuffix,aJet2.getP4().Eta(),eventWeight);
                 myHistos_->fill1DHistogram("h1DPhiTrailingJet"+hNameSuffix,aJet2.getP4().Phi(),eventWeight);
@@ -237,8 +236,6 @@ bool HTTAnalyzer::analyze(const EventProxyBase& iEvent){
            sampleName.find("TTbar")!=std::string::npos)
                 ptReweight = myEventProxy.event->getPtReWeight();
 
-        std::cout<<"sampleName: "<<sampleName<<" ptReweight: "<<ptReweight<<std::endl;
-
         float eventWeight = puWeight*genWeight*ptReweight;
 
         //Fill bookkeeping histogram. Bin 1 holds sum of weights.
@@ -254,6 +251,7 @@ bool HTTAnalyzer::analyze(const EventProxyBase& iEvent){
         bool goodRecoDecayMode = goodDecayModes.second;
 
         if(goodGenDecayMode) fillGenDecayPlaneAngle(sampleName+"_GenNoOfflineSel", eventWeight);
+        if(!goodGenDecayMode) return true;//TEST
 
         std::string categorySuffix = "";
         std::string systEffectName = "";
@@ -267,8 +265,9 @@ bool HTTAnalyzer::analyze(const EventProxyBase& iEvent){
                 float leg1ScaleFactor = myChannelSpecifics->getLeg1Correction(aSystEffect);
                 float leg2ScaleFactor = myChannelSpecifics->getLeg2Correction(aSystEffect);
                 float weightSyst = getSystWeight(aSystEffect);
+
                 float eventWeightWithSyst=eventWeight*weightSyst*leg1ScaleFactor*leg2ScaleFactor;
-                
+
                 TLorentzVector met4v(aPair.getMET(aSystEffect).X(),
                                      aPair.getMET(aSystEffect).Y(), 0,
                                      aPair.getMET(aSystEffect).Mod());
@@ -279,11 +278,16 @@ bool HTTAnalyzer::analyze(const EventProxyBase& iEvent){
                 for(unsigned int iCategory = 0; iCategory<myNumberOfCategories; ++iCategory) {
 
                         if(!passCategory(iCategory)) continue;
+                        categorySuffix = aCategoryRejester[iCategory]->name();
 
-                        categorySuffix = std::to_string(iCategory);
+                        float reweightDY = 1.0;
+                        if(sampleName.find("DY")!=std::string::npos &&
+                        sampleName.find("MatchT")!=std::string::npos &&
+                        categorySuffix.find("vbf")!=std::string::npos) reweightDY = 1.35;
+
                         systEffectName = HTTAnalysis::systEffectName(iCategory, iSystEffect, aCategoryRejester);
                         hNameSuffix = sampleName+"_"+categorySuffix+systEffectName;
-                        fillControlHistos(hNameSuffix, eventWeightWithSyst, aSystEffect);
+                        fillControlHistos(hNameSuffix, eventWeightWithSyst*reweightDY, aSystEffect);
                 }
                 continue; //TEST
         }

@@ -21,6 +21,7 @@ httAnalysis_SOURCES= HTTAnalysis.cc EventProxyHTT.cc \
 							ChannelSpecifics.cc MuTauSpecifics.cc TauTauSpecifics.cc \
 							Tools.cc \
               HTTSynchNTuple.cc \
+              BTagCalibrationStandalone.cpp \
               HTTHistograms.cc HTTEvent.cxx DictCint.cxx
 
 

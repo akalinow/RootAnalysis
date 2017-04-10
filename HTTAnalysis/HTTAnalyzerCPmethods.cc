@@ -43,10 +43,12 @@ void HTTAnalyzer::fillDecayPlaneAngle(const std::string & hNameSuffix, float eve
   if(aLeg1.getCharge()>0) {
     angles = angleBetweenPlanes(muonTk, muonPCA, tauLeadingTk, tauPCA);
     anglesIPRho = angleBetweenPlanes(muonTk, muonPCA, tauLeadingTk, aLeg2.getNeutralP4());
+    //angles = angleBetweenPlanes(muonTk, muonPCA, aGenLeg2.getP4(), aGenLeg2.getChargedP4());//TEST
   }
   else{
     angles = angleBetweenPlanes(tauLeadingTk, tauPCA, muonTk, muonPCA);
     anglesIPRho = angleBetweenPlanes(tauLeadingTk, aLeg2.getNeutralP4(), muonTk, muonPCA);
+    //angles = angleBetweenPlanes(aGenLeg2.getP4(), aGenLeg2.getChargedP4(), muonTk, muonPCA);//TEST
   }
 
   float yTau =  2.*tauLeadingTk.Pt()/aLeg2.getP4().Pt() - 1.;
@@ -70,7 +72,12 @@ void HTTAnalyzer::fillDecayPlaneAngle(const std::string & hNameSuffix, float eve
   if(aLeg2.getProperty(PropertyEnum::decayMode)==HTTAnalysis::tauDecay1ChargedPion0PiZero){
     float cosPhiNN =  tauPCA.Vect().Unit().Dot(muonPCA.Vect().Unit());
 
-    float eventWeightTmp = eventWeight*pow(aLeg1.getPCARefitPV().Mag(),2);
+
+    float x =  muonPCA.Vect().Mag()/0.004;
+    float eventWeightTmp = eventWeight;
+    //eventWeightTmp /= exp(-0.656064-0.343095*x);
+    //eventWeightTmp /= exp(-0.656064-0.343095*x);
+    //if(x>5) eventWeightTmp = 0;
 
     myHistos_->fill1DHistogram("h1DPhi-nVectors"+hNameSuffix,angles.first,eventWeightTmp);
     myHistos_->fill2DUnrolledHistogram("h1DUnRollMassSVPhiCP"+hNameSuffix,angles.first, aPair.getP4(aSystEffect).M(),eventWeight);
@@ -82,9 +89,10 @@ void HTTAnalyzer::fillDecayPlaneAngle(const std::string & hNameSuffix, float eve
     myHistos_->fillProfile("hProfPhiVsMag"+hNameSuffix,aGenLeg1.getPCA().Mag(),cosMuon);
     myHistos_->fillProfile("hProfPhiVsMag"+hNameSuffix,aGenLeg2.getPCA().Mag(),cosTau);
 
-    float delta = muonPCA.Vect().Angle(aGenLeg1.getPCA())/M_PI;
-    //delta = tauPCA.Vect().Angle(aGenLeg2.getPCA())/M_PI;
+    myHistos_->fillProfile("hProfRecoVsMagGen"+hNameSuffix,aGenLeg1.getPCA().Mag(),muonPCA.Vect().Mag());
+    myHistos_->fillProfile("hProfRecoVsMagGen"+hNameSuffix,aGenLeg2.getPCA().Mag(),tauPCA.Vect().Mag());
 
+//////////////////TEST
     float deltaPhiLegs = std::abs(aLeg1.getP4().Vect().DeltaPhi(aLeg2.getP4().Vect()))/M_PI;
     float deltaPhiMET = std::abs(aLeg1.getP4().Vect().DeltaPhi(aMET.getP4().Vect()))/M_PI;
 
@@ -98,24 +106,93 @@ void HTTAnalyzer::fillDecayPlaneAngle(const std::string & hNameSuffix, float eve
     float delta_dz = std::abs(dzLeg1 + dzLeg2);
     float abseta = std::abs(aLeg1.getP4().Eta());
 
-    //myHistos_->fillProfile("hProfRecoVsMagGen"+hNameSuffix,aGenLeg1.getPCA().Mag(),delta);
-    //myHistos_->fill2DHistogram("h2DTestHisto"+hNameSuffix,aGenLeg1.getPCA().Mag(),delta);
-
-    myHistos_->fillProfile("hProfRecoVsMagGen"+hNameSuffix,aLeg1.getPCARefitPV().Mag(),delta);
-    //myHistos_->fill2DHistogram("h2DTestHisto"+hNameSuffix,aLeg1.getPCARefitPV().Mag(),delta);
-    myHistos_->fill2DHistogram("h2DTestHisto"+hNameSuffix,dzLeg1,delta);
-    //myHistos_->fill2DHistogram("h2DTestHisto_delta_dxy"+hNameSuffix,delta_dz,delta);
-
-    //myHistos_->fill2DHistogram("h2DTestHisto",aGenLeg2.getPCA().Mag(),aGenLeg1.getPCA().Mag());
-
-    //delta = std::abs(tauPCA.Vect().Phi() - aGenLeg2.getPCA().Phi());
-    //myHistos_->fillProfile("hProfRecoVsMagGen"+hNameSuffix,aGenLeg2.getPCA().Mag(),delta);
-
-    //TEST myHistos_->fillProfile("hProfRecoVsMagGen"+hNameSuffix,aGenLeg1.getPCA().Mag(),muonPCA.Vect().Mag());
-    //TEST myHistos_->fillProfile("hProfRecoVsMagGen"+hNameSuffix,aGenLeg2.getPCA().Mag(),tauPCA.Vect().Mag());
+    TLorentzVector leg1SVFitP4 = aPair.getLeg1P4();
+    TLorentzVector leg2SVFitP4 = aPair.getLeg2P4();
 
 
+    TLorentzVector getTauPCA(aGenLeg2.getPCA(),0);
+    angles = angleBetweenPlanes(muonTk, muonPCA, aGenLeg2.getChargedP4(), getTauPCA);
+    std::pair<float,float> anglesSVFit1 = angleBetweenPlanes(muonTk, leg1SVFitP4, aGenLeg2.getChargedP4(), aGenLeg2.getP4());
+    std::pair<float,float> anglesSVFit = angleBetweenPlanes(leg1SVFitP4, muonTk, aGenLeg2.getP4(), aGenLeg2.getChargedP4());
+    std::pair<float,float> anglesGen = angleBetweenPlanes(aGenLeg1.getP4(), aGenLeg1.getChargedP4(), aGenLeg2.getP4(), aGenLeg2.getChargedP4());
 
+    float delta1 = leg1SVFitP4.Vect().Angle(aGenLeg1.getP4().Vect())/M_PI;
+    //delta1 = leg1SVFitP4.DeltaR(aGenLeg1.getP4());
+    //delta1 = leg1SVFitP4.E()/aGenLeg1.getP4().E();
+    //delta1 = (leg1SVFitP4.Vect().X()-aGenLeg1.getP4().Vect().X())/aGenLeg1.getP4().Vect().X();
+
+    float delta2 = leg2SVFitP4.Vect().Angle(aGenLeg2.getP4().Vect())/M_PI;
+    //delta2 = leg2SVFitP4.DeltaR(aGenLeg2.getP4());
+    //delta2 = leg2SVFitP4.E()/aGenLeg2.getP4().E();
+    //delta2 = (leg1SVFitP4.Vect().Z()-aGenLeg1.getP4().Vect().Z())/aGenLeg1.getP4().Vect().Z();
+
+    float delta3 = muonTk.Vect().Angle(aGenLeg1.getChargedP4().Vect());
+    float delta4 = leg1SVFitP4.Vect().Unit().Angle(muonPCA.Vect().Unit());
+    //delta4 = aGenLeg1.getP4().Vect().Unit().Angle(muonPCA.Vect().Unit());
+    delta4-=M_PI/2;
+    delta4*=-1;
+    delta4/=M_PI;
+
+    float delta5 = muonPCA.Vect().Angle(aGenLeg1.getPCA())/M_PI;
+
+    float delta6 = leg1SVFitP4.Vect().Angle(muonTk.Vect())/M_PI;
+    float delta7 = aGenLeg1.getP4().Vect().Angle(aGenLeg1.getChargedP4().Vect())/M_PI;
+    float delta8 = muonPCA.Vect().Mag()/0.004;
+
+    float delta9 = aGenLeg1.getP4().Vect().Angle(aGenLeg1.getPCA());
+    delta9-=M_PI/2;
+    delta9*=-1;
+    delta9/=M_PI;
+
+    float delta10 = aGenLeg1.getPCA().Mag();
+    float delta11 = aGenLeg1.getPCA().Angle(muonPCA.Vect())/M_PI;
+          //delta11 = muonPCA.Vect().Mag()/aGenLeg1.getPCA().Mag();
+    float delta12 = (aGenLeg1.getP4() + aGenLeg2.getP4()).Perp();
+          //delta12 = (aLeg1.getP4() + aLeg2.getP4()).Phi();
+          delta12 = aGenLeg1.getChargedP4().Vect().Eta() - aGenLeg1.getP4().Vect().Eta();
+          //delta12 = aLeg1.getChargedP4().Vect().Eta() - leg1SVFitP4.Vect().Eta();
+
+    float delta13 = anglesSVFit.first - anglesSVFit1.first;
+    float delta14 = aEvent.getGenPV().X() - aEvent.getRefittedPV().X();
+
+
+    float gamma = leg1SVFitP4.Gamma();
+    //gamma = aGenLeg1.getP4().Gamma();
+
+    if(delta7>0.5){
+    std::cout << "hNameSuffix: "<<hNameSuffix
+    <<" delta4: "<<delta4 <<" delta7: "<<delta7
+    <<" delta4/delta7: "<<delta4/delta7
+    <<" delta9: "<<delta9
+    <<" Tau pt: "<<aGenLeg1.getP4().Perp()<<" mupn pt: "<<muonTk.Perp()
+    <<" Higgs pt: "<<(aGenLeg1.getP4() + aGenLeg2.getP4()).Perp()
+              << '\n';
+  }
+
+    //delta4*=gamma;
+
+    float deltaSVFit = std::abs(anglesSVFit.first - anglesGen.first);
+    float deltaNPCA = angles.first - anglesGen.first;
+    float delta = std::min(deltaSVFit, deltaNPCA);
+
+    if(delta>M_PI) delta-=2*M_PI;
+    delta = std::abs(delta/M_PI);
+
+    if(deltaNPCA>M_PI) deltaNPCA-=2*M_PI;
+    else if (deltaNPCA<-M_PI) deltaNPCA+=2*M_PI;
+    deltaNPCA = deltaNPCA/M_PI;
+
+    if(deltaSVFit>M_PI) deltaSVFit-=2*M_PI;
+    deltaSVFit = std::abs(deltaSVFit/M_PI);
+
+    eventWeight = 1.0;
+    eventWeight /= exp(-0.656064-0.343095*delta8);
+    eventWeight /= exp(-0.656064-0.343095*delta8);
+    if(delta8<5) myHistos_->fill2DHistogram("h2DTestHisto"+hNameSuffix,delta8,angles.first, eventWeight);
+    myHistos_->fillProfile("hProfTest1"+hNameSuffix,delta8,deltaNPCA);
+
+//if(std::abs(delta4)<10.005) myHistos_->fill2DHistogram("h2DTestHisto"+hNameSuffix,delta11,deltaNPCA);
+///////////////////////////
     }
 }
 //////////////////////////////////////////////////////////////////////////////
@@ -179,8 +256,9 @@ std::pair<float,float> HTTAnalyzer::angleBetweenPlanes(const TLorentzVector &tau
 						       const TLorentzVector &tau2Daughter,
 						       bool sgn){
   //Boost all 4v to (tau1+tau2) rest frame
-  //TVector3 boost = (tau1+tau2).BoostVector();
-  TVector3 boost = aPair.getP4().BoostVector();
+  TVector3 boost = (tau1+tau2).BoostVector();
+  //TVector3 boost = aPair.getP4().BoostVector();
+  //TVector3 boost = (aGenLeg1.getP4()+aGenLeg2.getP4()).BoostVector();
 
   TLorentzVector tau1Star = tau1;
   TLorentzVector tau2Star = tau2;

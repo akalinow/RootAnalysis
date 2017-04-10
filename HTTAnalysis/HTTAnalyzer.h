@@ -26,7 +26,6 @@ class TH1F;
 class TH2F;
 class TH3F;
 class TLorentzVector;
-class TF1;
 
 class HTTAnalyzer: public Analyzer{
 
@@ -176,8 +175,6 @@ class HTTAnalyzer: public Analyzer{
 
   //cut on nPCA
   float nPCAMin_;
-
-  TF1 *f1;
 
 };
 

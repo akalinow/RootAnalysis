@@ -42,11 +42,11 @@ std::pair<bool, bool> MuTauSpecifics::checkTauDecayMode(const EventProxyHTT & my
         bool goodRecoDecayMode = false;
 
         std::vector<std::string> decayNamesGen = HTTAnalysis::getTauDecayName(myAnalyzer->aGenLeg2.getProperty(PropertyEnum::decayMode),
-                                                                             myAnalyzer->aGenLeg1.getProperty(PropertyEnum::decayMode));
+                                                                              myAnalyzer->aGenLeg1.getProperty(PropertyEnum::decayMode));
         std::vector<std::string> decayNamesReco = HTTAnalysis::getTauDecayName(myAnalyzer->aLeg2.getProperty(PropertyEnum::decayMode),HTTAnalysis::tauDecayMuon);
 
-        for(auto it: decayNamesGen) if(it.find("Lepton1Prong")!=std::string::npos) goodGenDecayMode = true;
-        for(auto it: decayNamesReco) if(it.find("Lepton1Prong")!=std::string::npos) goodRecoDecayMode = true;
+        for(auto it: decayNamesGen) if(it.find("Lepton1Prong0Pi0")!=std::string::npos) goodGenDecayMode = true;
+        for(auto it: decayNamesReco) if(it.find("Lepton1Prong0Pi0")!=std::string::npos) goodRecoDecayMode = true;
 
         return std::pair<bool, bool>(goodGenDecayMode, goodRecoDecayMode);
 }
@@ -66,15 +66,24 @@ void MuTauSpecifics::testAllCategories(const HTTAnalysis::sysEffects & aSystEffe
 
         unsigned int muonIDmask = (1<<7);
         bool muonID = true;
-          if(myAnalyzer->aEvent.getRunId()>278808 || myAnalyzer->aEvent.getRunId()==1){
-        muonID = ((int)myAnalyzer->aLeg1.getProperty(PropertyEnum::muonID) & muonIDmask) == muonIDmask;
-      }
+        if(myAnalyzer->aEvent.getRunId()>278808 || myAnalyzer->aEvent.getRunId()==1) {
+                muonID = ((int)myAnalyzer->aLeg1.getProperty(PropertyEnum::muonID) & muonIDmask) == muonIDmask;
+        }
 
         bool muonKinematics = myAnalyzer->aLeg1.getP4().Pt()>24 && fabs(myAnalyzer->aLeg1.getP4().Eta())<2.1;
-        bool trigger = myAnalyzer->aLeg1.hasTriggerMatch(TriggerEnum::HLT_IsoMu24) ||
-                       myAnalyzer->aLeg1.hasTriggerMatch(TriggerEnum::HLT_IsoTkMu24);
 
-        if(!muonKinematics || !muonID || !tauID || !trigger) return;
+        bool trigger = myAnalyzer->aLeg1.hasTriggerMatch(TriggerEnum::HLT_IsoMu22) ||
+                       myAnalyzer->aLeg1.hasTriggerMatch(TriggerEnum::HLT_IsoTkMu22) ||
+                       myAnalyzer->aLeg1.hasTriggerMatch(TriggerEnum::HLT_IsoMu22_eta2p1) ||
+                       myAnalyzer->aLeg1.hasTriggerMatch(TriggerEnum::HLT_IsoTkMu22_eta2p1);
+
+        unsigned int metFilters = myAnalyzer->aEvent.getMETFilterDecision();
+        unsigned int dataMask = (1<<8) -1;
+        unsigned int mcMask = dataMask - (1<<6) - (1<<7);
+        bool metFilterDecision = (metFilters & mcMask) == mcMask;
+        if(myAnalyzer->sampleName=="Data") metFilterDecision = (metFilters & dataMask) == dataMask;
+
+        if(!muonKinematics || !muonID || !tauID || !trigger || !metFilterDecision) return;
 
         myAnalyzer->nJets30 = 0;
         for(auto itJet: myAnalyzer->aSeparatedJets) {
@@ -132,25 +141,9 @@ void MuTauSpecifics::testAllCategories(const HTTAnalysis::sysEffects & aSystEffe
         bool ss = myAnalyzer->aLeg2.getCharge()*myAnalyzer->aLeg1.getCharge() == 1;
         bool os = myAnalyzer->aLeg2.getCharge()*myAnalyzer->aLeg1.getCharge() == -1;
 
-        //cpPi &= std::abs(myAnalyzer->aLeg1.getPCARefitPV().Mag() - myAnalyzer->aGenLeg1.getPCA().Mag())<0.001;//TEST
-        //cpPi &= std::abs(myAnalyzer->aLeg2.getPCARefitPV().Mag() - myAnalyzer->aGenLeg2.getPCA().Mag())<0.001;//TEST
-	//cpPi = true;
-	//cpPi &= myAnalyzer->aLeg1.getPCARefitPV().Mag()>0.003 &&  myAnalyzer->aLeg1.getPCARefitPV().Mag()<0.004;
-	//cpPi &= myAnalyzer->aLeg1.getPCARefitPV().Mag()>0.00;
-        
-
-
-
-/*
-        myAnalyzer->categoryDecisions[(int)HTTAnalysis::jet0_low] = os && muonIso && mtSelection && jet0_low;
-        myAnalyzer->categoryDecisions[(int)HTTAnalysis::jet0_high] = os && muonIso && mtSelection && jet0_high;
-
-        myAnalyzer->categoryDecisions[(int)HTTAnalysis::jet1_low] = os && muonIso && mtSelection && jet1_low;
-        myAnalyzer->categoryDecisions[(int)HTTAnalysis::jet1_high] = os && muonIso && mtSelection && jet1_high;
-
-        myAnalyzer->categoryDecisions[(int)HTTAnalysis::vbf_low] = os && muonIso && mtSelection && vbf_low;
-        myAnalyzer->categoryDecisions[(int)HTTAnalysis::vbf_high] = os && muonIso && mtSelection && vbf_high;
-*/
+////TEST
+        //cpPi&=boosted;
+//////
 
         //Main categories
         myAnalyzer->categoryDecisions[ChannelSpecifics::jet0->id()] = os && muonIso && mtSelection && jet0;
@@ -207,14 +200,18 @@ void MuTauSpecifics::testAllCategories(const HTTAnalysis::sysEffects & aSystEffe
 float MuTauSpecifics::getLeg1Correction(const HTTAnalysis::sysEffects & aSystEffect){
 
         return getLeptonCorrection(myAnalyzer->aLeg1.getP4(aSystEffect).Eta(),
-                                   myAnalyzer->aLeg1.getP4(aSystEffect).Pt(), HTTAnalysis::hadronicTauDecayModes::tauDecayMuon, false);
+                                   myAnalyzer->aLeg1.getP4(aSystEffect).Pt(),
+                                   myAnalyzer->aLeg1.getProperty(PropertyEnum::combreliso),
+                                   HTTAnalysis::hadronicTauDecayModes::tauDecayMuon, false);
 
 }
 /////////////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////////////
 float MuTauSpecifics::getLeg2Correction(const HTTAnalysis::sysEffects & aSystEffect){
 
-        return getLeptonCorrection(myAnalyzer->aLeg2.getP4(aSystEffect).Eta(), myAnalyzer->aLeg2.getP4(aSystEffect).Pt(),
+        return getLeptonCorrection(myAnalyzer->aLeg2.getP4(aSystEffect).Eta(),
+                                   myAnalyzer->aLeg2.getP4(aSystEffect).Pt(),
+                                   myAnalyzer->aLeg2.getProperty(PropertyEnum::byIsolationMVArun2v1DBoldDMwLTraw),
                                    static_cast<HTTAnalysis::hadronicTauDecayModes>(myAnalyzer->aLeg2.getProperty(PropertyEnum::decayMode)),false);
 
 }

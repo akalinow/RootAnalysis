@@ -7,8 +7,14 @@
 
 class HTTAnalyzer;
 class EventProxyHTT;
+class TH1F;
 class TH2F;
 class TH3F;
+class TRandom3;
+class TFile;
+
+class BTagCalibration;
+class BTagCalibrationReader;
 
 class ChannelSpecifics {
 
@@ -33,27 +39,41 @@ virtual float getLeg1Correction(const HTTAnalysis::sysEffects & aSystEffect) = 0
 ///Return cumulative MC corrections for the leg2
 virtual float getLeg2Correction(const HTTAnalysis::sysEffects & aSystEffect) = 0;
 
-float getLeptonCorrection(float eta, float pt, HTTAnalysis::hadronicTauDecayModes tauDecayMode, bool useTauTrigger);
+float getLeptonCorrection(float eta, float pt, float iso, HTTAnalysis::hadronicTauDecayModes tauDecayMode, bool useTauTrigger);
+
+virtual bool promoteBJet(const HTTParticle &jet);
 
 virtual std::string getDecayModeName() const {
         return decayModeName;
 }
 
-const std::vector<const HTTAnalysis::eventCategory*> & getCategoryRejester() const {return categoryRejester;}
+const std::vector<const HTTAnalysis::eventCategory*> & getCategoryRejester() const {
+        return categoryRejester;
+}
 
 protected:
 
 virtual void defineCategories();
 
-///Convert RooRealVar functions to histograms
-void initializeCorrections();
+void initializeLeptonCorrections();
+
+void initializeBTagCorrections();
 
 HTTAnalyzer *myAnalyzer;
 
 ///Histograms with lepton corrections
-TH2F *h2DMuonIdCorrections, *h2DMuonIsoCorrections, *h2DMuonTrgCorrections;
+TH2F *h2DMuonIdCorrections;
+TH3F *h3DMuonIsoCorrections, *h3DMuonTrgCorrections;
+TH1F *h1DMuonTrkCorrections;
 TH3F *h3DTauCorrections;
 TH2F *h2DTauTrgGenuineCorrections, *h2DTauTrgFakeCorrections;
+
+//For btag calibration
+BTagCalibration *calib;
+BTagCalibrationReader *reader;
+TFile *btagEffFile_;
+TH2F *btag_eff_b_, *btag_eff_c_, *btag_eff_oth_;
+TRandom3 *rand_;
 
 std::string decayModeName = "None";
 

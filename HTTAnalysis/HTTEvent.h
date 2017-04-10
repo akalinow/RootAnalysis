@@ -100,6 +100,8 @@ class HTTEvent{
   void setSelectionBit(SelectionBitsEnum iBit, bool value = true) {selectionWord.SetBitNumber((int)iBit, value);}
 
   void setMET(const TVector2 &aVector) {met = aVector;}
+
+  void setMETFilterDecision(unsigned int aMETFilterDecision) {metFilterDecision = aMETFilterDecision;}
   ////////////////////////
 
   ///Reset class data members
@@ -147,6 +149,8 @@ class HTTEvent{
   int getNTracksInRefit() const {return nTracksInRefit;}
 
   bool checkSelectionBit(SelectionBitsEnum iBit) const {return selectionWord.TestBitNumber((unsigned int)iBit);}
+
+  unsigned int getMETFilterDecision() const { return metFilterDecision;}
 
  private:
 
@@ -205,6 +209,9 @@ class HTTEvent{
 
   //MET vector
   TVector2 met;
+
+  //MET filter decision
+  unsigned int metFilterDecision;
 
 };
 
@@ -300,6 +307,10 @@ class HTTPair{
   ///Data member setters.
   void setP4(const TLorentzVector &aP4, HTTAnalysis::sysEffects type = HTTAnalysis::NOMINAL) {p4Vector[(unsigned int)type] = aP4;}
 
+  void setLeg1P4(const TLorentzVector &aP4, HTTAnalysis::sysEffects type = HTTAnalysis::NOMINAL) {leg1p4Vector[(unsigned int)type] = aP4;}
+
+  void setLeg2P4(const TLorentzVector &aP4, HTTAnalysis::sysEffects type = HTTAnalysis::NOMINAL) {leg2p4Vector[(unsigned int)type] = aP4;}
+  
   void setMET(const TVector2 &aVector) {met = aVector;}
 
   void setSVMET(const TVector2 &aVector, HTTAnalysis::sysEffects type = HTTAnalysis::NOMINAL) {svMetVector[(unsigned int)type] = aVector;}
@@ -316,6 +327,10 @@ class HTTPair{
 
   ///Data member getters.
   const TLorentzVector & getP4(HTTAnalysis::sysEffects type = HTTAnalysis::NOMINAL) const;
+
+  const TLorentzVector & getLeg1P4(HTTAnalysis::sysEffects type = HTTAnalysis::NOMINAL) const;
+
+  const TLorentzVector & getLeg2P4(HTTAnalysis::sysEffects type = HTTAnalysis::NOMINAL) const;
 
   const TVector2 & getMET(HTTAnalysis::sysEffects type = HTTAnalysis::NOMINAL) const {return getSystScaleMET(type);}
 
@@ -360,6 +375,8 @@ class HTTPair{
   ///Vectors holding p4 and MET for
   ///for various scale variances.
   std::vector<TLorentzVector> p4Vector;
+  std::vector<TLorentzVector> leg1p4Vector;
+  std::vector<TLorentzVector> leg2p4Vector;
   std::vector<TVector2> svMetVector;
 
   //MVAMET covariance matrix in order 00,01,10,11

@@ -70,35 +70,35 @@ const TLorentzVector & HTTParticle::getSystScaleP4(HTTAnalysis::sysEffects type)
 
   if(type==HTTAnalysis::NOMINAL) {
     lastSystEffect = type;
+    p4Cache = p4;
     return p4;
   }
   else if(lastSystEffect==type) return p4Cache;
 
   lastSystEffect = type;
-
-  if(abs(getPDGid())==15 && getProperty(PropertyEnum::mc_match)==5){
-    ///True taus
-    if(type!=HTTAnalysis::TESUp && type!=HTTAnalysis::TESDown) return p4;
+///True taus
+  if(abs(getPDGid())==15 && getProperty(PropertyEnum::mc_match)==5 &&
+    (type==HTTAnalysis::TESUp || type==HTTAnalysis::TESDown)){
     float TES = 0.03;
     if(type==HTTAnalysis::TESDown) TES*=-1;
     return getShiftedP4(1+TES);
   }
-  if(abs(getPDGid())==15 && getProperty(PropertyEnum::mc_match)==3){
-    ///Fake e->tau
-    if(type!=HTTAnalysis::E2TUp && type!=HTTAnalysis::E2TDown) return p4;
+  ///Fake e->tau
+  if(abs(getPDGid())==15 && getProperty(PropertyEnum::mc_match)==3 &&
+    (type==HTTAnalysis::E2TUp || type==HTTAnalysis::E2TDown)){
     float EES = 0.03;
     if(type==HTTAnalysis::E2TDown) EES*=-1;
     return getShiftedP4(1+EES);
   }
-  if(abs(getPDGid())==15 && getProperty(PropertyEnum::mc_match)==4){
-    ///Fake mu->tau
-    if(type!=HTTAnalysis::M2TUp && type!=HTTAnalysis::M2TDown) return p4;
+  ///Fake mu->tau
+  if(abs(getPDGid())==15 && getProperty(PropertyEnum::mc_match)==4 &&
+    (type==HTTAnalysis::M2TUp || type==HTTAnalysis::M2TDown)){
     float MES = 0.03;
     if(type==HTTAnalysis::M2TDown) MES*=-1;
     return getShiftedP4(1+MES);
   }
-  if(abs(getPDGid())==98){
-    if(type!=HTTAnalysis::JESUp && type!=HTTAnalysis::JESDown) return p4;
+  if(abs(getPDGid())==98 &&
+    (type==HTTAnalysis::JESUp || type==HTTAnalysis::JESDown)){
     float JES = getProperty(PropertyEnum::jecUnc);
     if(type==HTTAnalysis::JESDown) JES*=-1;
     return getShiftedP4(1+JES);
@@ -126,9 +126,13 @@ const TLorentzVector & HTTParticle::getShiftedP4(float scale) const{
 void HTTPair::clear(){
 
   if(!p4Vector.size()) p4Vector.resize(HTTAnalysis::DUMMY_SYS);
+  if(!leg1p4Vector.size()) leg1p4Vector.resize(HTTAnalysis::DUMMY_SYS);
+  if(!leg2p4Vector.size()) leg2p4Vector.resize(HTTAnalysis::DUMMY_SYS);
   if(!svMetVector.size()) svMetVector.resize(HTTAnalysis::DUMMY_SYS);
 
   for(auto &it:p4Vector) it*=0;
+  for(auto &it:leg1p4Vector) it*=0;
+  for(auto &it:leg2p4Vector) it*=0;
   for(auto &it:svMetVector) it*=0;
 
   metMatrix.clear();
@@ -145,10 +149,22 @@ void HTTPair::clear(){
 ////////////////////////////////////////////////
 const TLorentzVector & HTTPair::getP4(HTTAnalysis::sysEffects type) const {
 
-  //std::cout<<"type: "<<(unsigned int)type<<" size: "<<p4Vector.size()<<std::endl;
-
   if(p4Vector.size()>(unsigned int)type) return p4Vector[(unsigned int)type];
   return p4Vector[(unsigned int)HTTAnalysis::NOMINAL];
+}
+////////////////////////////////////////////////
+////////////////////////////////////////////////
+const TLorentzVector & HTTPair::getLeg1P4(HTTAnalysis::sysEffects type) const {
+
+  if(leg1p4Vector.size()>(unsigned int)type) return leg1p4Vector[(unsigned int)type];
+  return leg1p4Vector[(unsigned int)HTTAnalysis::NOMINAL];
+}
+////////////////////////////////////////////////
+////////////////////////////////////////////////
+const TLorentzVector & HTTPair::getLeg2P4(HTTAnalysis::sysEffects type) const {
+
+  if(leg2p4Vector.size()>(unsigned int)type) return leg2p4Vector[(unsigned int)type];
+  return leg2p4Vector[(unsigned int)HTTAnalysis::NOMINAL];
 }
 ////////////////////////////////////////////////
 ////////////////////////////////////////////////

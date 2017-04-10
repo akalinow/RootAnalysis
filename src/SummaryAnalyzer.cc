@@ -47,7 +47,7 @@ void SummaryAnalyzer::initialize(TDirectory* aDir,
   eventWeight_ = 1.0;
 
   mySelectionsTree_ = new TTree("tree","Selections bit words");
-  //mySelectionsTree_->SetDirectory(aDir);
+  mySelectionsTree_->SetDirectory(aDir);
 
   branchWeight_ = mySelectionsTree_->Branch("eventWeight", &eventWeight_);
 
