@@ -79,7 +79,7 @@ void  AnalysisHistograms::add1DHistogram(const std::string& name, const std::str
   hTmp->Sumw2();
   hTmp->SetDirectory(0);
 
-  //TEST if(iThread==0 && name.find("Template")==std::string::npos) hTmp->SetDirectory(myDir);
+  if(iThread==0 && name.find("Template")==std::string::npos) hTmp->SetDirectory(myDir);
   if(name.find("Template")!=std::string::npos) iThread = AnalysisHistograms::maxThreads-1;
 
   if(my1Dhistograms_[iThread].find(name)==my1Dhistograms_[iThread].end()) my1Dhistograms_[iThread][name] = hTmp;

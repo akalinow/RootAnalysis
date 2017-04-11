@@ -34,6 +34,7 @@ void HTTAnalyzer::fillDecayPlaneAngle(const std::string & hNameSuffix, float eve
   if(hNameSuffix.find("RefitPV")!=std::string::npos){
     muonPCA.SetVect(aLeg1.getPCARefitPV());
     tauPCA.SetVect(aLeg2.getPCARefitPV());
+    tauPCA.SetVect(aGenLeg2.getPCA());//TEST
   }
   if(hNameSuffix.find("GenPV")!=std::string::npos){
     muonPCA.SetVect(aLeg1.getPCAGenPV());
@@ -43,12 +44,12 @@ void HTTAnalyzer::fillDecayPlaneAngle(const std::string & hNameSuffix, float eve
   if(aLeg1.getCharge()>0) {
     angles = angleBetweenPlanes(muonTk, muonPCA, tauLeadingTk, tauPCA);
     anglesIPRho = angleBetweenPlanes(muonTk, muonPCA, tauLeadingTk, aLeg2.getNeutralP4());
-    //angles = angleBetweenPlanes(muonTk, muonPCA, aGenLeg2.getP4(), aGenLeg2.getChargedP4());//TEST
+    angles = angleBetweenPlanes(muonTk, muonPCA, aGenLeg2.getChargedP4(), tauPCA);//TEST
   }
   else{
     angles = angleBetweenPlanes(tauLeadingTk, tauPCA, muonTk, muonPCA);
     anglesIPRho = angleBetweenPlanes(tauLeadingTk, aLeg2.getNeutralP4(), muonTk, muonPCA);
-    //angles = angleBetweenPlanes(aGenLeg2.getP4(), aGenLeg2.getChargedP4(), muonTk, muonPCA);//TEST
+    angles = angleBetweenPlanes(aGenLeg2.getChargedP4(), tauPCA, muonTk, muonPCA);//TEST
   }
 
   float yTau =  2.*tauLeadingTk.Pt()/aLeg2.getP4().Pt() - 1.;
@@ -77,7 +78,9 @@ void HTTAnalyzer::fillDecayPlaneAngle(const std::string & hNameSuffix, float eve
     float eventWeightTmp = eventWeight;
     //eventWeightTmp /= exp(-0.656064-0.343095*x);
     //eventWeightTmp /= exp(-0.656064-0.343095*x);
-    //if(x>5) eventWeightTmp = 0;
+    //eventWeightTmp /= exp(-0.656064-0.343095*x);
+    //eventWeightTmp /= exp(-0.656064-0.343095*x);
+    if(x>3) eventWeightTmp = 0;
 
     myHistos_->fill1DHistogram("h1DPhi-nVectors"+hNameSuffix,angles.first,eventWeightTmp);
     myHistos_->fill2DUnrolledHistogram("h1DUnRollMassSVPhiCP"+hNameSuffix,angles.first, aPair.getP4(aSystEffect).M(),eventWeight);
@@ -157,8 +160,10 @@ void HTTAnalyzer::fillDecayPlaneAngle(const std::string & hNameSuffix, float eve
 
 
     float gamma = leg1SVFitP4.Gamma();
+    float gamma1 = leg1SVFitP4.Gamma();
+    float gamma2 = leg2SVFitP4.Gamma();
     //gamma = aGenLeg1.getP4().Gamma();
-
+/*
     if(delta7>0.5){
     std::cout << "hNameSuffix: "<<hNameSuffix
     <<" delta4: "<<delta4 <<" delta7: "<<delta7
@@ -168,10 +173,10 @@ void HTTAnalyzer::fillDecayPlaneAngle(const std::string & hNameSuffix, float eve
     <<" Higgs pt: "<<(aGenLeg1.getP4() + aGenLeg2.getP4()).Perp()
               << '\n';
   }
-
+*/
     //delta4*=gamma;
 
-    float deltaSVFit = std::abs(anglesSVFit.first - anglesGen.first);
+    float deltaSVFit = anglesSVFit.first - anglesGen.first;
     float deltaNPCA = angles.first - anglesGen.first;
     float delta = std::min(deltaSVFit, deltaNPCA);
 
@@ -183,12 +188,18 @@ void HTTAnalyzer::fillDecayPlaneAngle(const std::string & hNameSuffix, float eve
     deltaNPCA = deltaNPCA/M_PI;
 
     if(deltaSVFit>M_PI) deltaSVFit-=2*M_PI;
-    deltaSVFit = std::abs(deltaSVFit/M_PI);
+    else if (deltaSVFit<-M_PI) deltaSVFit+=2*M_PI;
+    deltaSVFit = deltaSVFit/M_PI;
 
     eventWeight = 1.0;
-    eventWeight /= exp(-0.656064-0.343095*delta8);
-    eventWeight /= exp(-0.656064-0.343095*delta8);
-    if(delta8<5) myHistos_->fill2DHistogram("h2DTestHisto"+hNameSuffix,delta8,angles.first, eventWeight);
+    //eventWeight /= exp(-0.656064-0.343095*delta8);
+    //eventWeight /= exp(-0.656064-0.343095*delta8);
+    //eventWeight /= exp(-0.656064-0.343095*delta8);
+    //eventWeight /= exp(-0.656064-0.343095*delta8);
+    if(delta8<50 && gamma1>-40 && gamma2>-30) {
+      myHistos_->fill2DHistogram("h2DTestHisto"+hNameSuffix,gamma1+gamma2,aPair.getP4().M(), eventWeight);
+      myHistos_->fill1DHistogram("h1DPhiTestHisto"+hNameSuffix,angles.first, eventWeight);
+  }
     myHistos_->fillProfile("hProfTest1"+hNameSuffix,delta8,deltaNPCA);
 
 //if(std::abs(delta4)<10.005) myHistos_->fill2DHistogram("h2DTestHisto"+hNameSuffix,delta11,deltaNPCA);

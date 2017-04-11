@@ -142,7 +142,7 @@ void MuTauSpecifics::testAllCategories(const HTTAnalysis::sysEffects & aSystEffe
         bool os = myAnalyzer->aLeg2.getCharge()*myAnalyzer->aLeg1.getCharge() == -1;
 
 ////TEST
-        //cpPi&=boosted;
+        //cpPi&=jet0;
 //////
 
         //Main categories

@@ -350,7 +350,7 @@ void HTTHistograms::defineHistograms(){
                 add1DHistogram("h1DPtTemplate",";p_{T}; Events",20,0,100,file_);
                 add1DHistogram("h1DEtaTemplate",";#eta; Events",24,-2.4,2.4,file_);
                 add1DHistogram("h1DDeltaEtaTemplate",";#Delta#eta; Events",50,0,10,file_);
-                add1DHistogram("h1DPhiTemplate",";#phi; Events",6,0,2*M_PI,file_);
+                add1DHistogram("h1DPhiTemplate",";#phi; Events",12,0,2*M_PI,file_);
                 add1DHistogram("h1DCosPhiTemplate",";cos(#phi); Events",10,-1.0,1.0,file_);
                 add1DHistogram("h1DCSVBtagTemplate",";CSV btag; Events",20,0,1,file_);
                 add1DHistogram("h1DIsoTemplate",";Isolation; Events",20,0,0.3,file_);
@@ -377,7 +377,7 @@ void HTTHistograms::defineHistograms(){
                 addRollHistogram("h1DUnRollMassSVPhiCPTemplate","#phi_{IP,IP} CP vs SV Mass; Events;#phi_{IP,IP} CP",phiBins, svMassBins, file_);
                 addRollHistogram("h1DUnRollMassSVYCPTemplate","#phi_{IP,#rho} CP vs SV Mass; Events;#phi_{IP,#rho} CP", phiBins, svMassBins, file_);
 
-                add2DHistogram("h2DTestHistoTemplate","",30,0,5,6,0,2*M_PI,file_);
+                add2DHistogram("h2DTestHistoTemplate","",30,0,250,40,40,240,file_);
                 addProfile("hProfTestTemplate","",30,0,3,file_);
 
                 addProfile("hProfVsMagTemplate","",10,0,0.015,file_);
