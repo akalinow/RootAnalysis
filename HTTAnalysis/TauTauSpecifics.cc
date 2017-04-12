@@ -143,8 +143,8 @@ void TauTauSpecifics::testAllCategories(const HTTAnalysis::sysEffects & aSystEff
         bool vbf_1d = myAnalyzer->nJets30>=2 && jetsEta>2.5 && myAnalyzer->nJetsInGap30<1;
         bool vbf_low =  vbf_1d && ((higgsPt<100 && jetsMass>300) || (higgsPt>100 && jetsMass>300 && jetsMass<500));
         bool vbf_high = vbf_1d && (higgsPt>100 && jetsMass>500);
-        bool boosted = myAnalyzer->nJets30==1 || (myAnalyzer->nJets30>=2 && !(jetsEta>2.5 && myAnalyzer->nJetsInGap30<1 && higgsPt>100) );
-        bool vbf_2d = myAnalyzer->nJets30>=2 && (jetsEta>2.5 && myAnalyzer->nJetsInGap30<1 && higgsPt>100);
+        bool boosted = myAnalyzer->nJets30==1 || myAnalyzer->nJets30>=2 && !(jetsEta>2.5 && higgsPt>100);
+        bool vbf_2d = myAnalyzer->nJets30>=2 && (jetsEta>2.5 && higgsPt>100);
 
         //////////
         // categories by tau decay modes for CP
