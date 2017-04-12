@@ -1059,7 +1059,7 @@ THStack*  HTTHistograms::plotStack(unsigned int iCategory,
         float scale = 0;
 
         std::string sampleName = "WJets";
-        pair<float,float> dataToMCScale = getWNormalisation(iCategory);
+        pair<float,float> dataToMCScale = getWNormalisation(iCategory, iSystEffect);
         weight = getSampleNormalisation(sampleName);
         scale = weight*lumi*dataToMCScale.first;
         hWJets->Scale(scale);
@@ -1553,7 +1553,11 @@ std::pair<float,float> HTTHistograms::getWNormalisation(unsigned int iCategory, 
         if(iSystEffect==(unsigned int)HTTAnalysis::WSFUp) weight*=(1+WSFUncertainty);
         if(iSystEffect==(unsigned int)HTTAnalysis::WSFDown) weight*=(1-WSFUncertainty);
 
-        outputStream<<"WJets scale with uncertainty: "<<weight<<" WSFUncertainty "<<WSFUncertainty<<endl;
+        outputStream<<"WJets scale with uncertainty: "<<weight<<" WSFUncertainty "<<WSFUncertainty
+        <<" iSystEffect: "<<iSystEffect
+        <<" HTTAnalysis::WSFUp "<<HTTAnalysis::WSFUp
+        <<" HTTAnalysis::WSFDown "<<HTTAnalysis::WSFDown
+        <<endl;
 
         return std::make_pair(weight, WSFUncertainty);
 }

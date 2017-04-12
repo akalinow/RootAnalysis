@@ -68,7 +68,7 @@ float getCrossSection(const std::string & sampleName){
         //https://twiki.cern.ch/twiki/bin/view/LHCPhysics/CERNYellowReportPageBR2014#Higgs_2_fermions
         //https://twiki.cern.ch/twiki/bin/view/LHCPhysics/CERNYellowReportPageAt1314TeV2014
         //Xsection for mass!=125 are calculated using luminosity ratio, and cross section for 8 TeV
-
+      
         if(sampleName=="ggHTT120") crossSection = 5.222E+01*6.981E-02; //CERNYellowReportPageAt13TeV*CERNYellowReportPageBR
         if(sampleName=="ggHTT125") crossSection = 4.858E+01*6.272E-02; //CERNYellowReportPageAt13TeV*CERNYellowReportPageBR
         if(sampleName=="ggHTT130") crossSection = 4.531E+01*5.411E-02; //CERNYellowReportPageAt13TeV*CERNYellowReportPageBR
