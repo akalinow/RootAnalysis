@@ -82,7 +82,11 @@ class HTTHistograms: public AnalysisHistograms {
   void plotCPhistograms(unsigned int iCategory);
 
   ///Return sum of all non Higgs MC contributions.
-  TH1F *getMCSum(unsigned int iCategory, std::string varName, unsigned int iSystEffect);
+  ///sumForW control W MC to DATA correction. By default
+  ///the correction is estimated. To avoid circular dependency,
+  ///it has to be switched off when calculating the scale factor itself.
+  ///as getWNormalisation() method calls this one.
+  TH1F *getMCSum(unsigned int iCategory, std::string varName, unsigned int iSystEffect, bool sumForW = false);
 
   ///Return histogram for sum of all DY decay modes, and jet bins
   TH1F *get1D_DYJet_Histogram(const std::string& name);

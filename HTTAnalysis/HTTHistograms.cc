@@ -1525,12 +1525,12 @@ std::pair<float,float> HTTHistograms::getWNormalisation(unsigned int iCategory, 
         std::string hName = "h1D" + varName;
 
         TH1F *hWJets = get1D_WJet_Histogram((hName+"WJets"+hNameSuffix));
+        if(!hWJets) return std::make_pair(1.0, 0.0);
         TH1F *hMCSum = getMCSum(iCategory, varName, iSystEffect);
         TH1F *hQCD = (TH1F*)getQCDbackground(iCategory,varName, iSystEffect);
         TH1F *hSoup = get1DHistogram(iCategory,varName+"Data", iSystEffect);
         float lumi = HTTAnalysis::getLumi();
 
-        if(!hWJets) return std::make_pair(1.0, 0.0);
         ///Normalise MC histograms according to cross sections
         std::string sampleName = "WJets";
         float weight = getSampleNormalisation(sampleName);
@@ -1575,7 +1575,9 @@ TH1F *HTTHistograms::get1DHistogram(unsigned int iCategory, std::string varName,
 }
 /////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////
-TH1F *HTTHistograms::getMCSum(unsigned int iCategory, std::string varName, unsigned int iSystEffect){
+TH1F *HTTHistograms::getMCSum(unsigned int iCategory, std::string varName,
+                              unsigned int iSystEffect,
+                              bool sumForW){
 
         std::string hName = "h1D" + varName;
         std::string systEffectName = HTTAnalysis::systEffectName(iCategory, iSystEffect, myCategoryRejester);
@@ -1625,7 +1627,8 @@ TH1F *HTTHistograms::getMCSum(unsigned int iCategory, std::string varName, unsig
         hDYJets->Scale(scale);
 
         sampleName = "WJets";
-        std::pair<float, float> wselCorrection(1,1); //getWNormalisation(iCategory, iSystEffect);//FIMXE
+        std::pair<float, float> wselCorrection(1,1);
+        //FIXME if(!sumForW) wselCorrection = getWNormalisation(iCategory, iSystEffect);
         scale = getSampleNormalisation(sampleName)*lumi*wselCorrection.first;
         hWJets->Scale(scale);
 
