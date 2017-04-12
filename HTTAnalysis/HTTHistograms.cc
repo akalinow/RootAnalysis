@@ -390,7 +390,7 @@ void HTTHistograms::finalizeHistograms(const std::vector<const HTTAnalysis::even
         ///
         std::vector<std::string> mainCategoryNames = {"0jet","boosted", "vbf",
                                                       "antiIso_0jet", "antiIso_boosted", "antiIso_vbf",
-                                                      "0jet_QCD",
+                                                      "0jet_QCD", "boosted_QCD", "vbf_QCD",
                                                       "0jet_W", "boosted_W", "vbf_W"};
 
         std::vector <unsigned int> mainCategoriesRejester;
@@ -1438,13 +1438,15 @@ std::pair<float,float> HTTHistograms::getQCDControlToSignal(unsigned int iCatego
 
         unsigned int iCategoryNum = myCategoryRejester[iCategory]->qcdSFDenominator()->id();
         TH1F *hSoupLoose = get1DHistogram(iCategoryNum, varName+"Data", iSystEffect);
-        if(!hSoupLoose) return result; //MuTau has fixed QCD control to signal transfer factors.
+        if(!hSoupLoose) return result; //MuTau has fixed QCD control to signal transfer factors. In MuTau this category is not defined
 
         TH1F *hMCSumLoose = getMCSum(iCategoryNum, varName, iSystEffect);
+        if(hMCSumLoose) hSoupLoose->Add(hMCSumLoose, -1);
 
         unsigned int iCategoryDenom = myCategoryRejester[iCategory]->qcdSFNumerator()->id();
         TH1F *hSoupTight = get1DHistogram(iCategoryDenom, varName+"Data", iSystEffect);
         TH1F *hMCSumTight = getMCSum(iCategoryDenom, varName, iSystEffect);
+        if(hMCSumTight && hSoupTight) hSoupTight->Add(hMCSumTight, -1);
 
         double sumTightErr = 0;
         double sumTight = hSoupTight->IntegralAndError(0,hSoupTight->GetNbinsX()+2,sumTightErr);

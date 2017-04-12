@@ -94,6 +94,12 @@ void TauTauSpecifics::testAllCategories(const HTTAnalysis::sysEffects & aSystEff
                                         myAnalyzer->aLeg2.hasTriggerMatch(TriggerEnum::HLT_DoubleMediumCombinedIsoPFTau35_Trk1_eta2p1_Reg);
 
         bool trigger = mediumIsoTrigger || mediumCombinedIsoTrigger;
+        
+        if(myAnalyzer->aEvent.getRunId()>280385) {
+                trigger = mediumCombinedIsoTrigger;
+        } else if(myAnalyzer->aEvent.getRunId()>1) {
+                trigger = mediumIsoTrigger;
+        }
 
         unsigned int metFilters = myAnalyzer->aEvent.getMETFilterDecision();
         unsigned int dataMask = (1<<8) -1;
