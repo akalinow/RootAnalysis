@@ -73,6 +73,14 @@ void ChannelSpecifics::defineCategories(){
         pi_rho = new HTTAnalysis::eventCategory("pi_pi", categoryRejester);
         rho_rho = new HTTAnalysis::eventCategory("rho_rho", categoryRejester);
 
+	inclusive = new HTTAnalysis::eventCategory("inclusive", categoryRejester);
+        antiIso_inclusive = new HTTAnalysis::eventCategory("antiIso_inclusive", categoryRejester);
+
+	bjet = new HTTAnalysis::eventCategory("bjet", categoryRejester);
+	nobjet = new HTTAnalysis::eventCategory("nobjet", categoryRejester);
+        antiIso_bjet = new HTTAnalysis::eventCategory("antiIso_bjet", categoryRejester);
+        antiIso_nobjet = new HTTAnalysis::eventCategory("antiIso_nobjet", categoryRejester);
+
 }
 /////////////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////////////

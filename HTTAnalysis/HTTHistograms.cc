@@ -301,7 +301,8 @@ std::string HTTHistograms::getTemplateName(const std::string& name){
         if(name.find("h1DBigMass")!=std::string::npos) templateName = "h1DBigMassTemplate";
         if(name.find("h1DStats")!=std::string::npos) templateName = "h1DStatsTemplate";
         if(name.find("h1DPt")!=std::string::npos) templateName = "h1DPtTemplate";
-        if(name.find("h1DEta")!=std::string::npos) templateName = "h1DEtaTemplate";
+        if(name.find("h1DEta")!=std::string::npos && name.find("Jet")==std::string::npos) templateName = "h1DEtaTemplate";
+        if(name.find("h1DEta")!=std::string::npos && name.find("Jet")!=std::string::npos) templateName = "h1DJetEtaTemplate";
         if(name.find("h1DDeltaEta")!=std::string::npos) templateName = "h1DDeltaEtaTemplate";
         if(name.find("h1DIso")!=std::string::npos) templateName = "h1DIsoTemplate";
         if(name.find("h1DPhi")!=std::string::npos) templateName = "h1DPhiTemplate";
@@ -346,6 +347,7 @@ void HTTHistograms::defineHistograms(){
                 add1DHistogram("h1DBigMassTemplate",";mass [GeV/c^{2}]; Events",25,0,1500,file_);
                 add1DHistogram("h1DPtTemplate",";p_{T}; Events",20,0,100,file_);
                 add1DHistogram("h1DEtaTemplate",";#eta; Events",24,-2.4,2.4,file_);
+                add1DHistogram("h1DJetEtaTemplate",";#eta; Events",50,-5,5,file_);
                 add1DHistogram("h1DDeltaEtaTemplate",";#Delta#eta; Events",50,0,10,file_);
                 add1DHistogram("h1DPhiTemplate",";#phi; Events",6,0,2*M_PI,file_);
                 add1DHistogram("h1DCosPhiTemplate",";cos(#phi); Events",10,-1.0,1.0,file_);
@@ -391,7 +393,9 @@ void HTTHistograms::finalizeHistograms(const std::vector<const HTTAnalysis::even
         std::vector<std::string> mainCategoryNames = {"0jet","boosted", "vbf",
                                                       "antiIso_0jet", "antiIso_boosted", "antiIso_vbf",
                                                       "0jet_QCD", "boosted_QCD", "vbf_QCD",
-                                                      "0jet_W", "boosted_W", "vbf_W"};
+                                                      "0jet_W", "boosted_W", "vbf_W"
+						      ,"inclusive","bjet","nobjet"
+	};
 
         std::vector <unsigned int> mainCategoriesRejester;
         for(unsigned int iCategory=0; iCategory<myCategoryRejester.size(); ++iCategory) {

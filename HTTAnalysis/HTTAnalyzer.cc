@@ -107,6 +107,17 @@ void HTTAnalyzer::setAnalysisObjects(const EventProxyHTT & myEventProxy){
         aSeparatedJets = getSeparatedJets(myEventProxy, 0.5);
         aJet1 = aSeparatedJets.size() ? aSeparatedJets[0] : HTTParticle();
         aJet2 = aSeparatedJets.size()>1 ? aSeparatedJets[1] : HTTParticle();
+	aBJet1 = HTTParticle();
+	for(auto itJet: aSeparatedJets) {
+          if(std::abs(itJet.getP4().Eta())<2.4 &&
+             itJet.getProperty(PropertyEnum::bCSVscore)>0.8484 && //Medium WP
+             myChannelSpecifics->promoteBJet(itJet)
+	     ){
+	    aBJet1 = itJet;
+	    break;
+	  }
+	}
+           
 }
 //////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////
@@ -184,10 +195,9 @@ void HTTAnalyzer::fillControlHistos(const std::string & hNameSuffix, float event
         }
         myHistos_->fill1DHistogram("h1DPtMET"+hNameSuffix,aMET.getP4(aSystEffect).Pt(),eventWeight);
 
-        if(aJet1.getProperty(PropertyEnum::bCSVscore)>0.8) {
-                myHistos_->fill1DHistogram("h1DPtLeadingBJet"+hNameSuffix,aJet1.getP4(aSystEffect).Pt(),eventWeight);
-                myHistos_->fill1DHistogram("h1DEtaLeadingBJet"+hNameSuffix,aJet1.getP4(aSystEffect).Eta(),eventWeight);
-        }
+	myHistos_->fill1DHistogram("h1DPtLeadingBJet"+hNameSuffix,aBJet1.getP4(aSystEffect).Pt(),eventWeight);
+	myHistos_->fill1DHistogram("h1DEtaLeadingBJet"+hNameSuffix,aBJet1.getP4(aSystEffect).Eta(),eventWeight);
+
 }
 //////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////

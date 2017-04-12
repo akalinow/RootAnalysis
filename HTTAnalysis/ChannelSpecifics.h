@@ -81,6 +81,10 @@ std::vector<const HTTAnalysis::eventCategory*> categoryRejester;
 HTTAnalysis::eventCategory *jet0, *boosted, *vbf;
 HTTAnalysis::eventCategory *antiIso_jet0, *antiIso_boosted, *antiIso_vbf;
 HTTAnalysis::eventCategory *mu_pi, *mu_rho, *pi_pi, *pi_rho, *rho_rho;
+HTTAnalysis::eventCategory *inclusive;
+HTTAnalysis::eventCategory *antiIso_inclusive;
+HTTAnalysis::eventCategory *bjet, *nobjet;
+HTTAnalysis::eventCategory *antiIso_bjet, *antiIso_nobjet;
 
 };
 
