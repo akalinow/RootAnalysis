@@ -252,8 +252,11 @@ bool ChannelSpecifics::promoteBJet(const HTTParticle &jet,
 				   const HTTAnalysis::sysEffects & aSystEffect,
 				   std::string correctionType){
   //MB: https://twiki.cern.ch/twiki/bin/view/CMS/BTagCalibration#Standalone
-  bool decision = false;
 
+  //Always promote bjets from data
+  if(myAnalyzer->sampleName.find("Data")!=std::string::npos) return true;
+
+  bool decision = false;
   if(!reader) initializeBTagCorrections();
 
   BTagEntry::JetFlavor jetFlavour;
