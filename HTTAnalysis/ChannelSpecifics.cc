@@ -249,13 +249,12 @@ float ChannelSpecifics::getLeptonCorrection(float eta, float pt, float iso,
 /////////////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////////////
 bool ChannelSpecifics::promoteBJet(const HTTParticle &jet,
-				   const std::string &sampleName,
 				   const HTTAnalysis::sysEffects & aSystEffect,
 				   std::string correctionType){
   //MB: https://twiki.cern.ch/twiki/bin/view/CMS/BTagCalibration#Standalone
 
   //Always promote bjets from data
-  if(sampleName.find("Data")!=std::string::npos) return true;
+  if(myAnalyzer->sampleName.find("Data")!=std::string::npos) return true;
 
   bool decision = false;
   if(!reader) initializeBTagCorrections();
