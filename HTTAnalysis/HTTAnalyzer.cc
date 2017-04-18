@@ -111,7 +111,7 @@ void HTTAnalyzer::setAnalysisObjects(const EventProxyHTT & myEventProxy){
 	for(auto itJet: aSeparatedJets) {
           if(std::abs(itJet.getP4().Eta())<2.4 &&
              itJet.getProperty(PropertyEnum::bCSVscore)>0.8484 && //Medium WP
-             (getSampleName(myEventProxy)=="Data" || myChannelSpecifics->promoteBJet(itJet))
+	     myChannelSpecifics->promoteBJet(itJet,getSampleName(myEventProxy))
 	     ){
 	    aBJet1 = itJet;
 	    break;

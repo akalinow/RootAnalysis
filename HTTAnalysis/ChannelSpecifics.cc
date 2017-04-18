@@ -249,11 +249,15 @@ float ChannelSpecifics::getLeptonCorrection(float eta, float pt, float iso,
 /////////////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////////////
 bool ChannelSpecifics::promoteBJet(const HTTParticle &jet,
+				   const std::string &sampleName,
 				   const HTTAnalysis::sysEffects & aSystEffect,
 				   std::string correctionType){
   //MB: https://twiki.cern.ch/twiki/bin/view/CMS/BTagCalibration#Standalone
-  bool decision = false;
 
+  //Always promote bjets from data
+  if(sampleName=="Data") return true;
+
+  bool decision = false;
   if(!reader) initializeBTagCorrections();
 
   BTagEntry::JetFlavor jetFlavour;

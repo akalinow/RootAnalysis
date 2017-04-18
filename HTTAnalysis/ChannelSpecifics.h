@@ -42,6 +42,7 @@ virtual float getLeg2Correction(const HTTAnalysis::sysEffects & aSystEffect) = 0
 float getLeptonCorrection(float eta, float pt, float iso, HTTAnalysis::hadronicTauDecayModes tauDecayMode, bool useTauTrigger);
 
 virtual bool promoteBJet(const HTTParticle &jet,
+			 const std::string &sampleName,
 			 const HTTAnalysis::sysEffects &aSystEffect=HTTAnalysis::NOMINAL,
 			 std::string correctionType="central");
 
