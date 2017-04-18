@@ -41,7 +41,9 @@ virtual float getLeg2Correction(const HTTAnalysis::sysEffects & aSystEffect) = 0
 
 float getLeptonCorrection(float eta, float pt, float iso, HTTAnalysis::hadronicTauDecayModes tauDecayMode, bool useTauTrigger);
 
-virtual bool promoteBJet(const HTTParticle &jet);
+virtual bool promoteBJet(const HTTParticle &jet,
+			 const HTTAnalysis::sysEffects &aSystEffect=HTTAnalysis::NOMINAL,
+			 std::string correctionType="central");
 
 virtual std::string getDecayModeName() const {
         return decayModeName;
@@ -83,8 +85,8 @@ HTTAnalysis::eventCategory *antiIso_jet0, *antiIso_boosted, *antiIso_vbf;
 HTTAnalysis::eventCategory *mu_pi, *mu_rho, *pi_pi, *pi_rho, *rho_rho;
 HTTAnalysis::eventCategory *inclusive;
 HTTAnalysis::eventCategory *antiIso_inclusive;
-HTTAnalysis::eventCategory *bjet, *nobjet;
-HTTAnalysis::eventCategory *antiIso_bjet, *antiIso_nobjet;
+HTTAnalysis::eventCategory *btag, *nobtag;
+HTTAnalysis::eventCategory *antiIso_btag, *antiIso_nobtag;
 
 };
 

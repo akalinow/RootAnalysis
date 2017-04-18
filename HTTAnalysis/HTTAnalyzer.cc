@@ -195,8 +195,12 @@ void HTTAnalyzer::fillControlHistos(const std::string & hNameSuffix, float event
         }
         myHistos_->fill1DHistogram("h1DPtMET"+hNameSuffix,aMET.getP4(aSystEffect).Pt(),eventWeight);
 
-	myHistos_->fill1DHistogram("h1DPtLeadingBJet"+hNameSuffix,aBJet1.getP4(aSystEffect).Pt(),eventWeight);
-	myHistos_->fill1DHistogram("h1DEtaLeadingBJet"+hNameSuffix,aBJet1.getP4(aSystEffect).Eta(),eventWeight);
+        myHistos_->fill1DHistogram("h1DStatsNBJets"+hNameSuffix,nBJets,eventWeight);
+        ///Fill b-jets info
+	if(nBJets>0){
+	  myHistos_->fill1DHistogram("h1DPtLeadingBJet"+hNameSuffix,aBJet1.getP4(aSystEffect).Pt(),eventWeight);
+	  myHistos_->fill1DHistogram("h1DEtaLeadingBJet"+hNameSuffix,aBJet1.getP4(aSystEffect).Eta(),eventWeight);
+	}
 
 }
 //////////////////////////////////////////////////////////////////////////////
