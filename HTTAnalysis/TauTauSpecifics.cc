@@ -130,7 +130,8 @@ void TauTauSpecifics::testAllCategories(const HTTAnalysis::sysEffects & aSystEff
 	  if(std::abs(itJet.getP4(aSystEffect).Eta())<2.4 &&
 	     itJet.getP4(aSystEffect).Pt()>20 && //MB needed??
 	     itJet.getProperty(PropertyEnum::bCSVscore)>0.8484 && //Medium WP
-	     promoteBJet(itJet,aSystEffect,"central")//FIXME: need to variate central to up/down
+	     (myAnalyzer->sampleName=="Data" || promoteBJet(itJet,aSystEffect,"central"))//FIXME: need to variate central to up/down
+
 	     ) 	++myAnalyzer->nBJets;
         }
 
