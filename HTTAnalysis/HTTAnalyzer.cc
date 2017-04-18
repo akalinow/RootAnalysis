@@ -277,12 +277,12 @@ bool HTTAnalyzer::analyze(const EventProxyBase& iEvent){
                         float reweightDY = 1.0;
                         //if(sampleName.find("DY")!=std::string::npos &&
                         //sampleName.find("MatchT")!=std::string::npos &&
-                        //categorySuffix.find("vbf")!=std::string::npos) reweightDY = 1.35;
+                        //categorySuffix.find("antiIso")!=std::string::npos) reweightDY = 1.0;
 
                         systEffectName = HTTAnalysis::systEffectName(iCategory, iSystEffect, aCategoryRejester);
                         hNameSuffix = sampleName+"_"+categorySuffix+systEffectName;
                         fillControlHistos(hNameSuffix, eventWeightWithSyst*reweightDY, aSystEffect);
-                }                
+                }
         }
         return true;
 }

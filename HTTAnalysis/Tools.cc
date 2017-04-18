@@ -43,10 +43,10 @@ float getCrossSection(const std::string & sampleName){
 
         float crossSection = 0;
 
-///Cross sections taken from
+       ///Cross sections taken from
         if(sampleName=="DYLowM") {
-                //https://cmsweb.cern.ch/das/request?input=mcm%20prepid=SMP-RunIISpring15MiniAODv2-00016
-                crossSection = 71600;
+              //https://twiki.cern.ch/twiki/bin/viewauth/CMS/SummaryTable1G25ns#DY_Z
+                crossSection = 18610;
         }
         //https://twiki.cern.ch/twiki/bin/viewauth/CMS/SummaryTable1G25ns#DY_Z
         if(sampleName.find("DYJetsMatch")!=std::string::npos || sampleName=="DYJets") {
@@ -68,7 +68,7 @@ float getCrossSection(const std::string & sampleName){
         //https://twiki.cern.ch/twiki/bin/view/LHCPhysics/CERNYellowReportPageBR2014#Higgs_2_fermions
         //https://twiki.cern.ch/twiki/bin/view/LHCPhysics/CERNYellowReportPageAt1314TeV2014
         //Xsection for mass!=125 are calculated using luminosity ratio, and cross section for 8 TeV
-      
+
         if(sampleName=="ggHTT120") crossSection = 5.222E+01*6.981E-02; //CERNYellowReportPageAt13TeV*CERNYellowReportPageBR
         if(sampleName=="ggHTT125") crossSection = 4.858E+01*6.272E-02; //CERNYellowReportPageAt13TeV*CERNYellowReportPageBR
         if(sampleName=="ggHTT130") crossSection = 4.531E+01*5.411E-02; //CERNYellowReportPageAt13TeV*CERNYellowReportPageBR

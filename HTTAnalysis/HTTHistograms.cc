@@ -347,14 +347,14 @@ void HTTHistograms::defineHistograms(){
                 add1DHistogram("h1DPtTemplate",";p_{T}; Events",20,0,100,file_);
                 add1DHistogram("h1DEtaTemplate",";#eta; Events",24,-2.4,2.4,file_);
                 add1DHistogram("h1DDeltaEtaTemplate",";#Delta#eta; Events",50,0,10,file_);
-                add1DHistogram("h1DPhiTemplate",";#phi; Events",6,0,2*M_PI,file_);
+                add1DHistogram("h1DPhiTemplate",";#phi; Events",2*9,-M_PI,2*M_PI,file_);
                 add1DHistogram("h1DCosPhiTemplate",";cos(#phi); Events",10,-1.0,1.0,file_);
                 add1DHistogram("h1DCSVBtagTemplate",";CSV btag; Events",20,0,1,file_);
                 add1DHistogram("h1DIsoTemplate",";Isolation; Events",20,0,0.3,file_);
                 add1DHistogram("h1DIDTemplate",";ID; Events",20,0.8,1,file_);
                 add1DHistogram("h1DVxPullTemplate",";#phi^{*} [rad]; Events",11,-0.01,0.01,file_);
                 add1DHistogram("h1DyTauTemplate",";yTau; Events",15,-1,1,file_);
-                add1DHistogram("h1DnPCATemplate",";#hat{n}_{RECO}>; Events",10,0,0.015,file_);
+                add1DHistogram("h1DnPCATemplate",";#hat{n}_{RECO}>; Events",20,0,0.02,file_);
 
                 // 0jet: unroll in tau_Pt using bins of {30,35,40,45,50,55,300} and in visible mass using bins of {0,60,65,70,75,80,85,90,95,100,105,110,400}
                 std::vector<double> massVisBins = {0,60,65,70,75,80,85,90,95,100,105,110,400};
@@ -383,6 +383,8 @@ void HTTHistograms::defineHistograms(){
 /////////////////////////////////////////////////////////
 void HTTHistograms::finalizeHistograms(const std::vector<const HTTAnalysis::eventCategory*> & aCategoryRejester){
 
+        std::cout<<"HTTHistograms::finalizeHistograms() START"<<std::endl;
+
         AnalysisHistograms::finalizeHistograms();
         myCategoryRejester  = aCategoryRejester;
         unsigned int myNumberOfCategories = myCategoryRejester.size();
@@ -390,6 +392,7 @@ void HTTHistograms::finalizeHistograms(const std::vector<const HTTAnalysis::even
         ///
         std::vector<std::string> mainCategoryNames = {"0jet","boosted", "vbf",
                                                       "antiIso_0jet", "antiIso_boosted", "antiIso_vbf",
+                                                      "antiIso_0jet_QCD","0jet_W_QCD",
                                                       "0jet_QCD", "boosted_QCD", "vbf_QCD",
                                                       "0jet_W", "boosted_W", "vbf_W"};
 
@@ -441,7 +444,6 @@ void HTTHistograms::finalizeHistograms(const std::vector<const HTTAnalysis::even
                 plotStack(iCategory, "BigMass2Jet");
                 plotStack(iCategory, "DeltaEta2Jet");
 
-
                 plotStack(iCategory, "nPCALeg1");
                 plotStack(iCategory, "nPCALeg2");
                 plotStack(iCategory, "Phi-nVectors");
@@ -464,11 +466,13 @@ void HTTHistograms::finalizeHistograms(const std::vector<const HTTAnalysis::even
                         plotStack(iCategory, "UnRollMassSVYCP", iSystEffect);
                 }
         }
-
         ofstream eventCountFile("eventCount.txt",ios::out | ios::app);
         outputStream<<"HTTHistograms compilation time: "<<__TIMESTAMP__<<std::endl;
         eventCountFile<<outputStream.str();
         eventCountFile.close();
+
+        std::cout<<"HTTHistograms::finalizeHistograms() END"<<std::endl;
+
 }
 /////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////
@@ -1228,9 +1232,9 @@ THStack*  HTTHistograms::plotStack(unsigned int iCategory,
         hDYJetsZL->SetFillColor(kOrange-3);
         hDYJetsZJ->SetFillColor(kOrange-6);
         hDYJetsZTT->SetFillColor(kOrange-9);
-        hDYJetsLowM->SetFillColor(kOrange-7);
+        hDYJetsLowM->SetFillColor(kGreen+4);
         hQCD->SetFillColor(kMagenta-10);
-        hHiggs->SetFillColor(kCyan+4);
+        hHiggs->SetFillColor(kCyan+2);
 
         hSoup->SetLineWidth(1);
 
@@ -1319,7 +1323,7 @@ THStack*  HTTHistograms::plotStack(unsigned int iCategory,
         float highEnd = 170;
         float lowEnd = -150;
 
-        if(varName.find("Phi-")!=std::string::npos) lowEnd = 0;
+        if(varName.find("Phi-")!=std::string::npos) lowEnd = -M_PI;
 
         int binHigh = hs->GetXaxis()->FindBin(highEnd);
         int binLow = hs->GetXaxis()->FindBin(lowEnd);

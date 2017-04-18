@@ -70,12 +70,14 @@ void MuTauSpecifics::testAllCategories(const HTTAnalysis::sysEffects & aSystEffe
                 muonID = ((int)myAnalyzer->aLeg1.getProperty(PropertyEnum::muonID) & muonIDmask) == muonIDmask;
         }
 
-        bool muonKinematics = myAnalyzer->aLeg1.getP4().Pt()>24 && fabs(myAnalyzer->aLeg1.getP4().Eta())<2.1;
+        bool muonKinematics = myAnalyzer->aLeg1.getP4().Pt()>20 && fabs(myAnalyzer->aLeg1.getP4().Eta())<2.1;
 
         bool trigger = myAnalyzer->aLeg1.hasTriggerMatch(TriggerEnum::HLT_IsoMu22) ||
                        myAnalyzer->aLeg1.hasTriggerMatch(TriggerEnum::HLT_IsoTkMu22) ||
                        myAnalyzer->aLeg1.hasTriggerMatch(TriggerEnum::HLT_IsoMu22_eta2p1) ||
                        myAnalyzer->aLeg1.hasTriggerMatch(TriggerEnum::HLT_IsoTkMu22_eta2p1);
+
+        if(myAnalyzer->aLeg1.getP4().Pt()<23) trigger = myAnalyzer->aLeg1.hasTriggerMatch(TriggerEnum::HLT_IsoMu19_eta2p1_LooseIsoPFTau20_SingleL1);
 
         unsigned int metFilters = myAnalyzer->aEvent.getMETFilterDecision();
         unsigned int dataMask = (1<<8) -1;
@@ -134,7 +136,7 @@ void MuTauSpecifics::testAllCategories(const HTTAnalysis::sysEffects & aSystEffe
         bool boosted = myAnalyzer->aLeg2.getP4(aSystEffect).Perp()>30 && (myAnalyzer->nJets30==1 || (myAnalyzer->nJets30==2 && jetsMass < 300) || myAnalyzer->nJets30 > 2);
         bool vbf = myAnalyzer->aLeg2.getP4(aSystEffect).Perp()>30 && myAnalyzer->nJets30==2 && jetsMass>300;
 
-        bool wSelection = myAnalyzer->aPair.getMTMuon(aSystEffect)>80 && myAnalyzer->aLeg1.getProperty(PropertyEnum::combreliso)<0.15;
+        bool wSelection = myAnalyzer->aPair.getMTMuon(aSystEffect)>80;
         bool muonAntiIso = myAnalyzer->aLeg1.getProperty(PropertyEnum::combreliso)>0.15 && myAnalyzer->aLeg1.getProperty(PropertyEnum::combreliso)<0.30;
         bool muonIso = myAnalyzer->aLeg1.getProperty(PropertyEnum::combreliso)<0.15;
 
