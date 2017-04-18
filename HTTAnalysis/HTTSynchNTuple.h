@@ -219,6 +219,8 @@ class HTTSynchNTuple: public Analyzer{
   //MET
   Float_t met;
   Float_t metphi;
+  Float_t pfmet;
+  Float_t pfmetphi;
   Float_t puppimet;
   Float_t puppimetphi;
   Float_t mvamet;

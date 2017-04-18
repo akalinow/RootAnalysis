@@ -103,6 +103,14 @@ void MuTauSpecifics::testAllCategories(const HTTAnalysis::sysEffects & aSystEffe
                         }
                 }
         }
+	myAnalyzer->nBJets = 0;
+	for(auto itJet: myAnalyzer->aSeparatedJets) {
+	  if(std::abs(itJet.getP4(aSystEffect).Eta())<2.4 &&
+	     itJet.getP4(aSystEffect).Pt()>20 && //MB needed??
+	     itJet.getProperty(PropertyEnum::bCSVscore)>0.8484 && //Medium WP
+	     promoteBJet(itJet,aSystEffect,"central")//FIXME: need to variate central to up/down
+	     ) 	++myAnalyzer->nBJets;
+        }
 
         float jetsMass = (myAnalyzer->aJet1.getP4(aSystEffect)+myAnalyzer->aJet2.getP4(aSystEffect)).M();
         float higgsPt =  (myAnalyzer->aLeg1.getP4(aSystEffect) + myAnalyzer->aLeg2.getP4(aSystEffect) + myAnalyzer->aMET.getP4(aSystEffect)).Pt();
@@ -142,6 +150,9 @@ void MuTauSpecifics::testAllCategories(const HTTAnalysis::sysEffects & aSystEffe
 
         bool ss = myAnalyzer->aLeg2.getCharge()*myAnalyzer->aLeg1.getCharge() == 1;
         bool os = myAnalyzer->aLeg2.getCharge()*myAnalyzer->aLeg1.getCharge() == -1;
+	//b-tag categories
+	bool btag = myAnalyzer->nBJets>=1 && myAnalyzer->nJets30<=1;
+	bool nobtag = myAnalyzer->nBJets==0;
 
         //Main categories
         myAnalyzer->categoryDecisions[ChannelSpecifics::jet0->id()] = os && muonIso && mtSelection && jet0;
@@ -153,6 +164,14 @@ void MuTauSpecifics::testAllCategories(const HTTAnalysis::sysEffects & aSystEffe
         myAnalyzer->categoryDecisions[ChannelSpecifics::mu_pi->id()] = os && muonIso && mtSelection && cpPi;
         myAnalyzer->categoryDecisions[ChannelSpecifics::mu_rho->id()] = os && muonIso && mtSelection && cpRho;
 
+	 myAnalyzer->categoryDecisions[ChannelSpecifics::inclusive->id()] = os && muonIso && mtSelection;
+	 //myAnalyzer->categoryDecisions[ChannelSpecifics::antiIso_inclusive->id()] = os && muonAntiIso && mtSelection;
+	 myAnalyzer->categoryDecisions[ChannelSpecifics::btag->id()] = os && muonIso && mtSelection && btag;
+	 //myAnalyzer->categoryDecisions[ChannelSpecifics::antiIso_btag->id()] = os && muonAntiIso && mtSelection && btag;
+	 myAnalyzer->categoryDecisions[ChannelSpecifics::nobtag->id()] = os && muonIso && mtSelection && nobtag;
+	 //myAnalyzer->categoryDecisions[ChannelSpecifics::antiIso_nobtag->id()] = os && muonAntiIso && mtSelection && nobtag;
+	 
+
         //W control region
         myAnalyzer->categoryDecisions[ChannelSpecifics::jet0->wSF()->id()] = os && muonIso && wSelection && jet0;
         myAnalyzer->categoryDecisions[ChannelSpecifics::boosted->wSF()->id()] = os && muonIso && wSelection && boosted;
@@ -162,6 +181,9 @@ void MuTauSpecifics::testAllCategories(const HTTAnalysis::sysEffects & aSystEffe
         myAnalyzer->categoryDecisions[ChannelSpecifics::antiIso_vbf->wSF()->id()] = os && muonAntiIso && wSelection && vbf;
         myAnalyzer->categoryDecisions[ChannelSpecifics::mu_pi->wSF()->id()] = os && muonIso && wSelection && cpPi;
         myAnalyzer->categoryDecisions[ChannelSpecifics::mu_rho->wSF()->id()] = os && muonIso && wSelection && cpRho;
+        myAnalyzer->categoryDecisions[ChannelSpecifics::inclusive->wSF()->id()] = os && muonIso && wSelection;
+        myAnalyzer->categoryDecisions[ChannelSpecifics::btag->wSF()->id()] = os && muonIso && wSelection && btag;
+        myAnalyzer->categoryDecisions[ChannelSpecifics::nobtag->wSF()->id()] = os && muonIso && wSelection && nobtag;
 
         ///QCD region in W SF control region
         myAnalyzer->categoryDecisions[ChannelSpecifics::jet0->wSF()->qcdEstimate()->id()] = ss && muonIso && wSelection && jet0;
@@ -172,6 +194,9 @@ void MuTauSpecifics::testAllCategories(const HTTAnalysis::sysEffects & aSystEffe
         myAnalyzer->categoryDecisions[ChannelSpecifics::antiIso_vbf->wSF()->qcdEstimate()->id()] = ss && muonAntiIso && wSelection && vbf;
         myAnalyzer->categoryDecisions[ChannelSpecifics::mu_pi->wSF()->qcdEstimate()->id()] = ss && muonIso && wSelection && cpPi;
         myAnalyzer->categoryDecisions[ChannelSpecifics::mu_rho->wSF()->qcdEstimate()->id()] = ss && muonIso && wSelection && cpRho;
+        myAnalyzer->categoryDecisions[ChannelSpecifics::inclusive->wSF()->qcdEstimate()->id()] = ss && muonIso && wSelection;
+        myAnalyzer->categoryDecisions[ChannelSpecifics::btag->wSF()->qcdEstimate()->id()] = ss && muonIso && wSelection && btag;
+        myAnalyzer->categoryDecisions[ChannelSpecifics::nobtag->wSF()->qcdEstimate()->id()] = ss && muonIso && wSelection && nobtag;
 
         ///QCD region
         myAnalyzer->categoryDecisions[ChannelSpecifics::jet0->qcdEstimate()->id()] = ss && muonIso && mtSelection && jet0;
@@ -182,6 +207,9 @@ void MuTauSpecifics::testAllCategories(const HTTAnalysis::sysEffects & aSystEffe
         myAnalyzer->categoryDecisions[ChannelSpecifics::antiIso_vbf->qcdEstimate()->id()] = ss && muonAntiIso && mtSelection && vbf;
         myAnalyzer->categoryDecisions[ChannelSpecifics::mu_pi->qcdEstimate()->id()] = ss && muonIso && mtSelection && cpPi;
         myAnalyzer->categoryDecisions[ChannelSpecifics::mu_rho->qcdEstimate()->id()] = ss && muonIso && mtSelection && cpRho;
+        myAnalyzer->categoryDecisions[ChannelSpecifics::inclusive->qcdEstimate()->id()] = ss && muonIso && mtSelection;
+        myAnalyzer->categoryDecisions[ChannelSpecifics::btag->qcdEstimate()->id()] = ss && muonIso && mtSelection && btag;
+        myAnalyzer->categoryDecisions[ChannelSpecifics::nobtag->qcdEstimate()->id()] = ss && muonIso && mtSelection && nobtag;
 
         ///W SF region in QCD region
         myAnalyzer->categoryDecisions[ChannelSpecifics::jet0->qcdEstimate()->wSF()->id()] = ss && muonIso && wSelection && jet0;
@@ -192,6 +220,9 @@ void MuTauSpecifics::testAllCategories(const HTTAnalysis::sysEffects & aSystEffe
         myAnalyzer->categoryDecisions[ChannelSpecifics::antiIso_vbf->qcdEstimate()->wSF()->id()] = ss && muonAntiIso && wSelection && vbf;
         myAnalyzer->categoryDecisions[ChannelSpecifics::mu_pi->qcdEstimate()->wSF()->id()] = ss && muonIso && wSelection && cpPi;
         myAnalyzer->categoryDecisions[ChannelSpecifics::mu_rho->qcdEstimate()->wSF()->id()] = ss && muonIso && wSelection && cpRho;
+        myAnalyzer->categoryDecisions[ChannelSpecifics::inclusive->qcdEstimate()->wSF()->id()] = ss && muonIso && wSelection;
+        myAnalyzer->categoryDecisions[ChannelSpecifics::btag->qcdEstimate()->wSF()->id()] = ss && muonIso && wSelection && btag;
+        myAnalyzer->categoryDecisions[ChannelSpecifics::nobtag->qcdEstimate()->wSF()->id()] = ss && muonIso && wSelection && nobtag;
 }
 /////////////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////////////

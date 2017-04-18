@@ -73,6 +73,14 @@ void ChannelSpecifics::defineCategories(){
         pi_rho = new HTTAnalysis::eventCategory("pi_pi", categoryRejester);
         rho_rho = new HTTAnalysis::eventCategory("rho_rho", categoryRejester);
 
+	inclusive = new HTTAnalysis::eventCategory("inclusive", categoryRejester);
+        antiIso_inclusive = new HTTAnalysis::eventCategory("antiIso_inclusive", categoryRejester);
+
+	btag = new HTTAnalysis::eventCategory("btag", categoryRejester);
+	nobtag = new HTTAnalysis::eventCategory("nobtag", categoryRejester);
+        antiIso_btag = new HTTAnalysis::eventCategory("antiIso_btag", categoryRejester);
+        antiIso_nobtag = new HTTAnalysis::eventCategory("antiIso_nobtag", categoryRejester);
+
 }
 /////////////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////////////
@@ -240,7 +248,9 @@ float ChannelSpecifics::getLeptonCorrection(float eta, float pt, float iso,
 }
 /////////////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////////////
-bool ChannelSpecifics::promoteBJet(const HTTParticle &jet){
+bool ChannelSpecifics::promoteBJet(const HTTParticle &jet,
+				   const HTTAnalysis::sysEffects & aSystEffect,
+				   std::string correctionType){
   //MB: https://twiki.cern.ch/twiki/bin/view/CMS/BTagCalibration#Standalone
   bool decision = false;
 
@@ -254,10 +264,10 @@ bool ChannelSpecifics::promoteBJet(const HTTParticle &jet){
   else //light quark, gluon or undefined
     jetFlavour = BTagEntry::FLAV_UDSG;
   // Note: this is for b jets, for c jets (light jets) use FLAV_C (FLAV_UDSG)
-  double btag_SF = reader->eval_auto_bounds("central",
+  double btag_SF = reader->eval_auto_bounds(correctionType,//"central","up","down"
 					    jetFlavour,
-					    jet.getP4().Eta(),
-					    jet.getP4().Pt()
+					    jet.getP4(aSystEffect).Eta(),
+					    jet.getP4(aSystEffect).Pt()
 					    //,jet.getProperty(PropertyEnum::bCSVscore) //MB: it is not needed when WP is definied
 					    );
   rand_->SetSeed((int)((jet.getP4().Eta()+5)*100000));
@@ -275,11 +285,11 @@ bool ChannelSpecifics::promoteBJet(const HTTParticle &jet){
       histo_eff = btag_eff_b_;
     else if(jetFlavour == BTagEntry::FLAV_C)
       histo_eff = btag_eff_c_;
-    if( jet.getP4().Pt() > histo_eff->GetXaxis()->GetBinLowEdge(histo_eff->GetNbinsX()+1) ){
-      tagging_efficiency = histo_eff->GetBinContent( histo_eff->GetNbinsX(),histo_eff->GetYaxis()->FindBin(std::abs(jet.getP4().Eta())) );
+    if( jet.getP4(aSystEffect).Pt() > histo_eff->GetXaxis()->GetBinLowEdge(histo_eff->GetNbinsX()+1) ){
+      tagging_efficiency = histo_eff->GetBinContent( histo_eff->GetNbinsX(),histo_eff->GetYaxis()->FindBin(std::abs(jet.getP4(aSystEffect).Eta())) );
     }
     else{
-      tagging_efficiency = histo_eff->GetBinContent( histo_eff->GetXaxis()->FindBin(jet.getP4().Pt()),histo_eff->GetYaxis()->FindBin(std::abs(jet.getP4().Eta())) );
+      tagging_efficiency = histo_eff->GetBinContent( histo_eff->GetXaxis()->FindBin(jet.getP4(aSystEffect).Pt()),histo_eff->GetYaxis()->FindBin(std::abs(jet.getP4(aSystEffect).Eta())) );
     }
     //std::cout<<"\tbtag_eff: "<<tagging_efficiency<<std::endl;
     if(tagging_efficiency < 1e-9)//protection

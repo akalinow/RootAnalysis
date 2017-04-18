@@ -166,10 +166,11 @@ class HTTAnalyzer: public Analyzer{
 
   HTTParticle aLeg2, aLeg1, aMET;
   HTTParticle aGenLeg1, aGenLeg2;
-  HTTParticle aJet1, aJet2;
+  HTTParticle aJet1, aJet2, aBJet1;
   std::vector<HTTParticle> aSeparatedJets;
   int nJets30;
   int nJetsInGap30;
+  int nBJets;
   std::vector<bool> categoryDecisions;
   unsigned int myNumberOfCategories;
 
