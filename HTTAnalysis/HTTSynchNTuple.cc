@@ -187,6 +187,8 @@ void HTTSynchNTuple::clearTTreeVariables(){
   //MET
   met = -999;
   metphi = -999;
+  pfmet = -999;
+  pfmetphi = -999;
   puppimet = -999;
   puppimetphi = -999;
   mvamet = -999;
@@ -354,6 +356,8 @@ void HTTSynchNTuple::addBranch(TTree *tree){
   //MET
   tree->Branch("met",&met);
   tree->Branch("metphi",&metphi);
+  tree->Branch("pfmet",&pfmet);
+  tree->Branch("pfmetphi",&pfmetphi);
   tree->Branch("puppimet",&puppimet);
   tree->Branch("puppimetphi",&puppimetphi);
   tree->Branch("mvamet",&mvamet);
@@ -762,14 +766,17 @@ void HTTSynchNTuple::fillPair(const HTTEvent &event, HTTPair &pair){
   TLorentzVector leg2P4 = pair.getLeg2().getP4();
 
   //MET
-  TLorentzVector metP4(event.getMET().X(), event.getMET().Y(), 0, event.getMET().Mod());
-  met = event.getMET().Mod();
-  metphi = event.getMET().Phi_mpi_pi(event.getMET().Phi());
-  pfmt_1 = TMath::Sqrt(2.*leg1P4.Pt()*metP4.Pt()*(1.-TMath::Cos(leg1P4.Phi()-metP4.Phi())));
-  pfmt_2 = TMath::Sqrt(2.*leg2P4.Pt()*metP4.Pt()*(1.-TMath::Cos(leg2P4.Phi()-metP4.Phi())));
+  TLorentzVector pfmetP4(event.getMET().X(), event.getMET().Y(), 0, event.getMET().Mod());
+  pfmet = event.getMET().Mod();
+  pfmetphi = event.getMET().Phi_mpi_pi(event.getMET().Phi());
+  pfmt_1 = TMath::Sqrt(2.*leg1P4.Pt()*pfmetP4.Pt()*(1.-TMath::Cos(leg1P4.Phi()-pfmetP4.Phi())));
+  pfmt_2 = TMath::Sqrt(2.*leg2P4.Pt()*pfmetP4.Pt()*(1.-TMath::Cos(leg2P4.Phi()-pfmetP4.Phi())));
+  //Pair met: by default called MVAMET which can be wrong...
   TLorentzVector mvametP4(pair.getMET().X(), pair.getMET().Y(), 0, pair.getMET().Mod());
   mvamet = pair.getMET().Mod();
   mvametphi = pair.getMET().Phi_mpi_pi(pair.getMET().Phi());
+  met = mvamet;
+  metphi = mvametphi;
   mt_1 = TMath::Sqrt(2.*leg1P4.Pt()*mvametP4.Pt()*(1.-TMath::Cos(leg1P4.Phi()-mvametP4.Phi())));
   mt_2 = TMath::Sqrt(2.*leg2P4.Pt()*mvametP4.Pt()*(1.-TMath::Cos(leg2P4.Phi()-mvametP4.Phi())));
   /*
@@ -797,6 +804,10 @@ void HTTSynchNTuple::fillPair(const HTTEvent &event, HTTPair &pair){
   mvacov01 = pair.getMETMatrix().at(1);
   mvacov10 = pair.getMETMatrix().at(2);
   mvacov11 = pair.getMETMatrix().at(3);
+  metcov00 = mvacov00;
+  metcov01 = mvacov01;
+  metcov10 = mvacov10;
+  metcov11 = mvacov11;
 
 }
 //////////////////////////////////////////////////////////////////////////////

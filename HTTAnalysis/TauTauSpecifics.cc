@@ -125,6 +125,14 @@ void TauTauSpecifics::testAllCategories(const HTTAnalysis::sysEffects & aSystEff
                         }
                 }
         }
+	myAnalyzer->nBJets = 0;
+	for(auto itJet: myAnalyzer->aSeparatedJets) {
+	  if(std::abs(itJet.getP4(aSystEffect).Eta())<2.4 &&
+	     itJet.getP4(aSystEffect).Pt()>20 && //MB needed??
+	     itJet.getProperty(PropertyEnum::bCSVscore)>0.8484 && //Medium WP
+	     promoteBJet(itJet,aSystEffect,"central")//FIXME: need to variate central to up/down
+	     ) 	++myAnalyzer->nBJets;
+        }
 
         float jetsMass = (myAnalyzer->aJet1.getP4(aSystEffect)+myAnalyzer->aJet2.getP4(aSystEffect)).M();
         float jetsEta = std::abs(myAnalyzer->aJet1.getP4().Eta() - myAnalyzer->aJet2.getP4().Eta());
@@ -157,25 +165,40 @@ void TauTauSpecifics::testAllCategories(const HTTAnalysis::sysEffects & aSystEff
         bool piRho = (isPi1 && isRho2) || (isPi2 && isRho1);
         bool rhoRho = isRho1 && isRho2;
 
+	bool btag = myAnalyzer->nBJets>=1 && myAnalyzer->nJets30<=1;
+	bool nobtag = myAnalyzer->nBJets==0;
+
          //Main categories
         myAnalyzer->categoryDecisions[ChannelSpecifics::jet0->id()] = os && fullIso && jet0;
         myAnalyzer->categoryDecisions[ChannelSpecifics::boosted->id()] = os && fullIso && boosted;
         myAnalyzer->categoryDecisions[ChannelSpecifics::vbf->id()] = os && fullIso && vbf_2d;
+	myAnalyzer->categoryDecisions[ChannelSpecifics::inclusive->id()] = os && fullIso;
+	myAnalyzer->categoryDecisions[ChannelSpecifics::btag->id()] = os && fullIso && btag;
+	myAnalyzer->categoryDecisions[ChannelSpecifics::nobtag->id()] = os && fullIso && nobtag;
 
         ///QCD region
         myAnalyzer->categoryDecisions[ChannelSpecifics::jet0->qcdEstimate()->id()] = os && antiIso && jet0;
         myAnalyzer->categoryDecisions[ChannelSpecifics::boosted->qcdEstimate()->id()] = os && antiIso &&  boosted;
         myAnalyzer->categoryDecisions[ChannelSpecifics::vbf->qcdEstimate()->id()] = os && antiIso && vbf_2d;
+        myAnalyzer->categoryDecisions[ChannelSpecifics::inclusive->qcdEstimate()->id()] = os && antiIso;
+        myAnalyzer->categoryDecisions[ChannelSpecifics::btag->qcdEstimate()->id()] = os && antiIso && btag;
+        myAnalyzer->categoryDecisions[ChannelSpecifics::nobtag->qcdEstimate()->id()] = os && antiIso && nobtag;
 
         ///QCD SF denominator
         myAnalyzer->categoryDecisions[ChannelSpecifics::jet0->qcdSFDenominator()->id()] = ss && antiIso && jet0;
         myAnalyzer->categoryDecisions[ChannelSpecifics::boosted->qcdSFDenominator()->id()] = ss && antiIso &&  boosted;
         myAnalyzer->categoryDecisions[ChannelSpecifics::vbf->qcdSFDenominator()->id()] = ss && antiIso && vbf_2d;
+        myAnalyzer->categoryDecisions[ChannelSpecifics::inclusive->qcdSFDenominator()->id()] = ss && antiIso;
+        myAnalyzer->categoryDecisions[ChannelSpecifics::btag->qcdSFDenominator()->id()] = ss && antiIso && btag;
+        myAnalyzer->categoryDecisions[ChannelSpecifics::nobtag->qcdSFDenominator()->id()] = ss && antiIso && nobtag;
 
         ///QCD SF numerator
         myAnalyzer->categoryDecisions[ChannelSpecifics::jet0->qcdSFNumerator()->id()] = ss && fullIso && jet0;
         myAnalyzer->categoryDecisions[ChannelSpecifics::boosted->qcdSFNumerator()->id()] = ss && fullIso &&  boosted;
         myAnalyzer->categoryDecisions[ChannelSpecifics::vbf->qcdSFNumerator()->id()] = ss && fullIso && vbf_2d;
+        myAnalyzer->categoryDecisions[ChannelSpecifics::inclusive->qcdSFNumerator()->id()] = ss && fullIso;
+        myAnalyzer->categoryDecisions[ChannelSpecifics::btag->qcdSFNumerator()->id()] = ss && fullIso && btag;
+        myAnalyzer->categoryDecisions[ChannelSpecifics::nobtag->qcdSFNumerator()->id()] = ss && fullIso && nobtag;
 /*
         myAnalyzer->categoryDecisions[(int)HTTAnalysis::pi_pi] = os && fullIso && piPi;
         myAnalyzer->categoryDecisions[(int)HTTAnalysis::pi_rho] = os && fullIso && piRho;

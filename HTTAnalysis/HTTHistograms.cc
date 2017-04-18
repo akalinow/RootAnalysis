@@ -145,7 +145,7 @@ TH1F *HTTHistograms::getNormalised_NJet_Histogram(const std::string& hName){
         TH1F *hNJetsStats = 0;
 
         if(hName.find("W")!=std::string::npos &&
-           hName.find("DY")==std::string::npos) {
+	   hName.find("DY")==std::string::npos) {
                 sampleName = hName.substr(hName.find("W"));
                 std::string selName = sampleName.substr(sampleName.find("_"));
                 sampleName = sampleName.substr(0,sampleName.size()-selName.size());
@@ -301,7 +301,8 @@ std::string HTTHistograms::getTemplateName(const std::string& name){
         if(name.find("h1DBigMass")!=std::string::npos) templateName = "h1DBigMassTemplate";
         if(name.find("h1DStats")!=std::string::npos) templateName = "h1DStatsTemplate";
         if(name.find("h1DPt")!=std::string::npos) templateName = "h1DPtTemplate";
-        if(name.find("h1DEta")!=std::string::npos) templateName = "h1DEtaTemplate";
+        if(name.find("h1DEta")!=std::string::npos && name.find("Jet")==std::string::npos) templateName = "h1DEtaTemplate";
+        if(name.find("h1DEta")!=std::string::npos && name.find("Jet")!=std::string::npos) templateName = "h1DJetEtaTemplate";
         if(name.find("h1DDeltaEta")!=std::string::npos) templateName = "h1DDeltaEtaTemplate";
         if(name.find("h1DIso")!=std::string::npos) templateName = "h1DIsoTemplate";
         if(name.find("h1DPhi")!=std::string::npos) templateName = "h1DPhiTemplate";
@@ -346,6 +347,7 @@ void HTTHistograms::defineHistograms(){
                 add1DHistogram("h1DBigMassTemplate",";mass [GeV/c^{2}]; Events",25,0,1500,file_);
                 add1DHistogram("h1DPtTemplate",";p_{T}; Events",20,0,100,file_);
                 add1DHistogram("h1DEtaTemplate",";#eta; Events",24,-2.4,2.4,file_);
+                add1DHistogram("h1DJetEtaTemplate",";#eta; Events",50,-5,5,file_);
                 add1DHistogram("h1DDeltaEtaTemplate",";#Delta#eta; Events",50,0,10,file_);
                 add1DHistogram("h1DPhiTemplate",";#phi; Events",6,0,2*M_PI,file_);
                 add1DHistogram("h1DCosPhiTemplate",";cos(#phi); Events",10,-1.0,1.0,file_);
@@ -391,7 +393,9 @@ void HTTHistograms::finalizeHistograms(const std::vector<const HTTAnalysis::even
         std::vector<std::string> mainCategoryNames = {"0jet","boosted", "vbf",
                                                       "antiIso_0jet", "antiIso_boosted", "antiIso_vbf",
                                                       "0jet_QCD", "boosted_QCD", "vbf_QCD",
-                                                      "0jet_W", "boosted_W", "vbf_W"};
+                                                      "0jet_W", "boosted_W", "vbf_W"
+						      ,"inclusive","btag","nobtag"
+	};
 
         std::vector <unsigned int> mainCategoriesRejester;
         for(unsigned int iCategory=0; iCategory<myCategoryRejester.size(); ++iCategory) {
@@ -435,6 +439,7 @@ void HTTHistograms::finalizeHistograms(const std::vector<const HTTAnalysis::even
                 plotStack(iCategory, "StatsNJ30");
                 plotStack(iCategory, "PtLeadingJet");
                 plotStack(iCategory, "EtaLeadingJet");
+                plotStack(iCategory, "StatsNBJets");
                 plotStack(iCategory, "CSVBtagLeadingJet");
                 plotStack(iCategory, "PtLeadingBJet");
                 plotStack(iCategory, "EtaLeadingBJet");
@@ -452,7 +457,7 @@ void HTTHistograms::finalizeHistograms(const std::vector<const HTTAnalysis::even
         ///Make systematic effect histos.
         for(unsigned int iSystEffect = (unsigned int)HTTAnalysis::NOMINAL;
             iSystEffect<=(unsigned int)HTTAnalysis::ZmumuDown; ++iSystEffect) {
-                if(iSystEffect==(unsigned int)HTTAnalysis::DUMMY_SYS) continue;
+              if(iSystEffect==(unsigned int)HTTAnalysis::DUMMY_SYS) continue;
                 for(auto iCategory: mainCategoriesRejester) {
                         plotStack(iCategory, "MassSV", iSystEffect);
                         plotStack(iCategory, "MassTrans", iSystEffect);
@@ -479,7 +484,7 @@ void HTTHistograms::plotCPhistograms(unsigned int iCategory){
         plot_HAZ_Histograms("Phi-nVecIP-yTauPos",hNameSuffix+"_GenNoOfflineSel");
         plot_HAZ_Histograms("Phi-nVecIP",hNameSuffix+"_GenNoOfflineSel");
         plot_HAZ_Histograms("Phi-nVectors",hNameSuffix+"_GenNoOfflineSel");
-        std::string categoryName = myCategoryRejester[iCategory]->name();
+	std::string categoryName = myCategoryRejester[iCategory]->name();
         hNameSuffix =  "_"+categoryName;
 
         //plot_HAZ_Histograms("Phi-nVecIP-yTauNeg",hNameSuffix+"_Gen");
@@ -971,8 +976,8 @@ THStack*  HTTHistograms::plotStack(unsigned int iCategory,
         ///events passing particular selection.
         if(!hSoup) {
                 //std::cout<<"No data events for "<<hName<<"Data"<<hNameSuffix
-                //       <<" ("<<categoryName<<")"
-                //     <<std::endl;
+                  //       <<" ("<<categoryName<<")"
+                    //     <<std::endl;
                 return 0;
         }
 
@@ -1518,7 +1523,7 @@ std::pair<float,float> HTTHistograms::getWNormalisation(unsigned int iCategory, 
 
         iCategory = myCategoryRejester[iCategory]->wSF()->id();
         std::string systEffectName = HTTAnalysis::systEffectName(iCategory, iSystEffect, myCategoryRejester);
-        std::string categoryName = myCategoryRejester[iCategory]->name();
+	std::string categoryName = myCategoryRejester[iCategory]->name();
         std::string hNameSuffix =  "_"+categoryName+systEffectName;
 
         std::string varName = "MassTrans";
@@ -1553,11 +1558,11 @@ std::pair<float,float> HTTHistograms::getWNormalisation(unsigned int iCategory, 
         if(iSystEffect==(unsigned int)HTTAnalysis::WSFUp) weight*=(1+WSFUncertainty);
         if(iSystEffect==(unsigned int)HTTAnalysis::WSFDown) weight*=(1-WSFUncertainty);
 
-        outputStream<<"WJets scale with uncertainty: "<<weight<<" WSFUncertainty "<<WSFUncertainty
+	outputStream<<"WJets scale with uncertainty: "<<weight<<" WSFUncertainty "<<WSFUncertainty
         <<" iSystEffect: "<<iSystEffect
-        <<" HTTAnalysis::WSFUp "<<HTTAnalysis::WSFUp
-        <<" HTTAnalysis::WSFDown "<<HTTAnalysis::WSFDown
-        <<endl;
+	<<" HTTAnalysis::WSFUp "<<HTTAnalysis::WSFUp
+	<<" HTTAnalysis::WSFDown "<<HTTAnalysis::WSFDown
+	<<endl;
 
         return std::make_pair(weight, WSFUncertainty);
 }
@@ -1568,7 +1573,7 @@ TH1F *HTTHistograms::get1DHistogram(unsigned int iCategory, std::string varName,
 
         std::string hName = "h1D" + varName;
         std::string systEffectName = HTTAnalysis::systEffectName(iCategory, iSystEffect, myCategoryRejester);
-        std::string categoryName = myCategoryRejester[iCategory]->name();
+	std::string categoryName = myCategoryRejester[iCategory]->name();
         std::string hNameSuffix =  "_"+categoryName+systEffectName;
 
         return get1DHistogram(hName+hNameSuffix);
@@ -1581,7 +1586,7 @@ TH1F *HTTHistograms::getMCSum(unsigned int iCategory, std::string varName,
 
         std::string hName = "h1D" + varName;
         std::string systEffectName = HTTAnalysis::systEffectName(iCategory, iSystEffect, myCategoryRejester);
-        std::string categoryName = myCategoryRejester[iCategory]->name();
+	std::string categoryName = myCategoryRejester[iCategory]->name();
         std::string hNameSuffix =  "_"+categoryName+systEffectName;
 
         TH1F *hWJets = get1D_WJet_Histogram((hName+"WJets"+hNameSuffix));
