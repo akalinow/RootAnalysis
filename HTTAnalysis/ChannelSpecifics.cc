@@ -255,7 +255,7 @@ bool ChannelSpecifics::promoteBJet(const HTTParticle &jet,
   //MB: https://twiki.cern.ch/twiki/bin/view/CMS/BTagCalibration#Standalone
 
   //Always promote bjets from data
-  if(sampleName=="Data") return true;
+  if(sampleName.find("Data")!=std::string::npos) return true;
 
   bool decision = false;
   if(!reader) initializeBTagCorrections();
