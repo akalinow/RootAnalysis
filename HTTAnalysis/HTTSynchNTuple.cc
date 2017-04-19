@@ -82,7 +82,7 @@ void HTTSynchNTuple::initialize(TDirectory* aDir,
 //////////////////////////////////////////////////////////////////////////////
 void HTTSynchNTuple::finalize(){
 
-  myHistos_->finalizeHistograms(std::vector<const HTTAnalysis::eventCategory*>());
+  myHistos_->finalizeHistograms(decayMode_, std::vector<const HTTAnalysis::eventCategory*>());
 
 }
 //////////////////////////////////////////////////////////////////////////////

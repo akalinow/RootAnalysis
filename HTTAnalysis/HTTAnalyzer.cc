@@ -70,7 +70,9 @@ void HTTAnalyzer::initialize(TDirectory* aDir,
 //////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////
 void HTTAnalyzer::finalize(){
-        myHistos_->finalizeHistograms(myChannelSpecifics->getCategoryRejester());
+
+        std::string myDecayMode = myChannelSpecifics->getDecayModeName();
+        myHistos_->finalizeHistograms(myDecayMode, myChannelSpecifics->getCategoryRejester());
 }
 //////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////
@@ -117,7 +119,7 @@ void HTTAnalyzer::setAnalysisObjects(const EventProxyHTT & myEventProxy){
 	    break;
 	  }
 	}
-           
+
 }
 //////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////
@@ -158,9 +160,18 @@ void HTTAnalyzer::fillControlHistos(const std::string & hNameSuffix, float event
         myHistos_->fill1DHistogram("h1DNPV"+hNameSuffix,aEvent.getNPV(),eventWeight);
 
         ///Fill leg1 (muon or first tau)
+        float phi = aLeg1.getP4(aSystEffect).Phi();
+        if(sampleName.find("Data")==std::string::npos){
+          phi+=M_PI;
+          if(phi<-M_PI) phi+=2*M_PI;
+          if(phi>M_PI) phi-=2*M_PI;
+          phi*=-1;
+        }
+        myHistos_->fill1DHistogram("h1DPhiLeg1"+hNameSuffix,phi,eventWeight);
+
         myHistos_->fill1DHistogram("h1DPtLeg1"+hNameSuffix,aLeg1.getP4(aSystEffect).Pt(),eventWeight);
         myHistos_->fill1DHistogram("h1DEtaLeg1"+hNameSuffix,aLeg1.getP4(aSystEffect).Eta(),eventWeight);
-        myHistos_->fill1DHistogram("h1DPhiLeg1"+hNameSuffix,aLeg1.getP4(aSystEffect).Phi(),eventWeight);
+        //myHistos_->fill1DHistogram("h1DPhiLeg1"+hNameSuffix,aLeg1.getP4(aSystEffect).Phi(),eventWeight);
         myHistos_->fill1DHistogram("h1DIsoLeg1"+hNameSuffix,aLeg1.getProperty(PropertyEnum::combreliso),eventWeight);
         myHistos_->fill1DHistogram("h1DIDLeg1"+hNameSuffix,aLeg1.getProperty(PropertyEnum::byIsolationMVArun2v1DBoldDMwLTraw),eventWeight);
         myHistos_->fill1DHistogram("h1DPtLeg1LeadingTk"+hNameSuffix,aLeg1.getProperty(PropertyEnum::leadChargedParticlePt),eventWeight);
@@ -193,7 +204,18 @@ void HTTAnalyzer::fillControlHistos(const std::string & hNameSuffix, float event
                 myHistos_->fill1DHistogram("h1DEtaTrailingJet"+hNameSuffix,aJet2.getP4().Eta(),eventWeight);
                 myHistos_->fill1DHistogram("h1DPhiTrailingJet"+hNameSuffix,aJet2.getP4().Phi(),eventWeight);
         }
+        phi = aMET.getP4(aSystEffect).Phi();
+        if(sampleName.find("Data")==std::string::npos){
+          phi+=M_PI;
+          if(phi<-M_PI) phi+=2*M_PI;
+          if(phi>M_PI) phi-=2*M_PI;
+          phi*=-1;
+        }
+        myHistos_->fill1DHistogram("h1DPhiMET"+hNameSuffix,phi,eventWeight);
+
+        //myHistos_->fill1DHistogram("h1DPhiMET"+hNameSuffix,aMET.getP4(aSystEffect).Phi(),eventWeight);
         myHistos_->fill1DHistogram("h1DPtMET"+hNameSuffix,aMET.getP4(aSystEffect).Pt(),eventWeight);
+
 
         ///Fill b-jets info
         myHistos_->fill1DHistogram("h1DStatsNBJets"+hNameSuffix,nBJets,eventWeight);
@@ -289,9 +311,8 @@ bool HTTAnalyzer::analyze(const EventProxyBase& iEvent){
                         categorySuffix = aCategoryRejester[iCategory]->name();
 
                         float reweightDY = 1.0;
-                        //if(sampleName.find("DY")!=std::string::npos &&
-                        //sampleName.find("MatchT")!=std::string::npos &&
-                        //categorySuffix.find("antiIso")!=std::string::npos) reweightDY = 1.0;
+                        if(sampleName.find("DY")!=std::string::npos &&
+                           sampleName.find("MatchT")!=std::string::npos) reweightDY = myChannelSpecifics->getDYReweight(categorySuffix, aSystEffect);
 
                         systEffectName = HTTAnalysis::systEffectName(iCategory, iSystEffect, aCategoryRejester);
                         hNameSuffix = sampleName+"_"+categorySuffix+systEffectName;
