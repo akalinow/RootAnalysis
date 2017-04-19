@@ -454,7 +454,7 @@ void HTTHistograms::finalizeHistograms(const std::string & myDecayMode,
                 plotStack(iCategory, "StatsNJ30");
                 plotStack(iCategory, "PtLeadingJet");
                 plotStack(iCategory, "EtaLeadingJet");
-                plotStack(iCategory, "StatsNBJets");
+                plotStack(iCategory, "StatsNBTag");
                 plotStack(iCategory, "CSVBtagLeadingJet");
                 plotStack(iCategory, "PtLeadingBJet");
                 plotStack(iCategory, "EtaLeadingBJet");

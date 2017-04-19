@@ -113,7 +113,7 @@ void HTTAnalyzer::setAnalysisObjects(const EventProxyHTT & myEventProxy){
 	for(auto itJet: aSeparatedJets) {
           if(std::abs(itJet.getP4().Eta())<2.4 &&
              itJet.getProperty(PropertyEnum::bCSVscore)>0.8484 && //Medium WP
-             myChannelSpecifics->promoteBJet(itJet)
+	     myChannelSpecifics->promoteBJet(itJet)
 	     ){
 	    aBJet1 = itJet;
 	    break;
@@ -218,7 +218,7 @@ void HTTAnalyzer::fillControlHistos(const std::string & hNameSuffix, float event
 
 
         ///Fill b-jets info
-        myHistos_->fill1DHistogram("h1DStatsNBJets"+hNameSuffix,nBJets,eventWeight);
+        myHistos_->fill1DHistogram("h1DStatsNBTag"+hNameSuffix,nBJets,eventWeight);
 	if(nBJets>0){
 	  myHistos_->fill1DHistogram("h1DPtLeadingBJet"+hNameSuffix,aBJet1.getP4(aSystEffect).Pt(),eventWeight);
 	  myHistos_->fill1DHistogram("h1DEtaLeadingBJet"+hNameSuffix,aBJet1.getP4(aSystEffect).Eta(),eventWeight);
