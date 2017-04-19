@@ -389,9 +389,7 @@ void HTTHistograms::finalizeHistograms(const std::string & myDecayMode,
         std::cout<<"HTTHistograms::finalizeHistograms() START"<<std::endl;
 
         AnalysisHistograms::finalizeHistograms();
-
-        return;
-
+        
         myCategoryRejester  = aCategoryRejester;
         unsigned int myNumberOfCategories = myCategoryRejester.size();
 
