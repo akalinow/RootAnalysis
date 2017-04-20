@@ -947,25 +947,35 @@ THStack*  HTTHistograms::plotStack(unsigned int iCategory,
         std::string systEffectName = HTTAnalysis::systEffectName(iCategory, iSystEffect, myCategoryRejester);
         std::string hNameSuffix = "_"+categoryName+systEffectName;
 
+        TH1F *hggHiggs110 = get1DHistogram((hName+"ggHTT110"+hNameSuffix));
         TH1F *hggHiggs120 = get1DHistogram((hName+"ggHTT120"+hNameSuffix));
         TH1F *hggHiggs125 = get1DHistogram((hName+"ggHTT125"+hNameSuffix));
         TH1F *hggHiggs130 = get1DHistogram((hName+"ggHTT130"+hNameSuffix));
+        TH1F *hggHiggs140 = get1DHistogram((hName+"ggHTT140"+hNameSuffix));
 
+        TH1F *hqqHiggs110 = get1DHistogram((hName+"qqHTT110"+hNameSuffix));
         TH1F *hqqHiggs120 = get1DHistogram((hName+"qqHTT120"+hNameSuffix));
         TH1F *hqqHiggs125 = get1DHistogram((hName+"qqHTT125"+hNameSuffix));
         TH1F *hqqHiggs130 = get1DHistogram((hName+"qqHTT130"+hNameSuffix));
+        TH1F *hqqHiggs140 = get1DHistogram((hName+"qqHTT140"+hNameSuffix));
 
+        TH1F *hZHiggs110 = get1DHistogram((hName+"ZHTT110"+hNameSuffix));
         TH1F *hZHiggs120 = get1DHistogram((hName+"ZHTT120"+hNameSuffix));
         TH1F *hZHiggs125 = get1DHistogram((hName+"ZHTT125"+hNameSuffix));
         TH1F *hZHiggs130 = get1DHistogram((hName+"ZHTT130"+hNameSuffix));
+        TH1F *hZHiggs140 = get1DHistogram((hName+"ZHTT140"+hNameSuffix));
 
+        TH1F *hWplusHiggs110 = get1DHistogram((hName+"WplusHTT110"+hNameSuffix));
         TH1F *hWplusHiggs120 = get1DHistogram((hName+"WplusHTT120"+hNameSuffix));
         TH1F *hWplusHiggs125 = get1DHistogram((hName+"WplusHTT125"+hNameSuffix));
         TH1F *hWplusHiggs130 = get1DHistogram((hName+"WplusHTT130"+hNameSuffix));
+        TH1F *hWplusHiggs140 = get1DHistogram((hName+"WplusHTT140"+hNameSuffix));
 
+        TH1F *hWminusHiggs110 = get1DHistogram((hName+"WminusHTT110"+hNameSuffix));
         TH1F *hWminusHiggs120 = get1DHistogram((hName+"WminusHTT120"+hNameSuffix));
         TH1F *hWminusHiggs125 = get1DHistogram((hName+"WminusHTT125"+hNameSuffix));
         TH1F *hWminusHiggs130 = get1DHistogram((hName+"WminusHTT130"+hNameSuffix));
+        TH1F *hWminusHiggs140 = get1DHistogram((hName+"WminusHTT140"+hNameSuffix));
 
         TH1F *hWJets = get1D_WJet_Histogram((hName+"WJets"+hNameSuffix));
         TH1F *hTTbarJ = get1D_TT_Histogram((hName+"TTbar"+hNameSuffix),"MatchJ");
@@ -1017,25 +1027,35 @@ THStack*  HTTHistograms::plotStack(unsigned int iCategory,
         if(!hVVT) hVVT = (TH1F*)hEmpty->Clone((hName+"DiBosonMatchT"+hNameSuffix).c_str());
         if(!hEWK2Jets) hEWK2Jets = (TH1F*)hEmpty->Clone((hName+"EWK2Jets"+hNameSuffix).c_str());
 
+        if(!hggHiggs110) hggHiggs110 = (TH1F*)hEmpty->Clone((hName+"ggHTT110"+hNameSuffix).c_str());
         if(!hggHiggs120) hggHiggs120 = (TH1F*)hEmpty->Clone((hName+"ggHTT120"+hNameSuffix).c_str());
         if(!hggHiggs125) hggHiggs125 = (TH1F*)hEmpty->Clone((hName+"ggHTT125"+hNameSuffix).c_str());
         if(!hggHiggs130) hggHiggs130 = (TH1F*)hEmpty->Clone((hName+"ggHTT130"+hNameSuffix).c_str());
+        if(!hggHiggs140) hggHiggs140 = (TH1F*)hEmpty->Clone((hName+"ggHTT140"+hNameSuffix).c_str());
 
+        if(!hqqHiggs110) hqqHiggs110 = (TH1F*)hEmpty->Clone((hName+"qqHTT110"+hNameSuffix).c_str());
         if(!hqqHiggs120) hqqHiggs120 = (TH1F*)hEmpty->Clone((hName+"qqHTT120"+hNameSuffix).c_str());
         if(!hqqHiggs125) hqqHiggs125 = (TH1F*)hEmpty->Clone((hName+"qqHTT125"+hNameSuffix).c_str());
         if(!hqqHiggs130) hqqHiggs130 = (TH1F*)hEmpty->Clone((hName+"qqHTT130"+hNameSuffix).c_str());
+        if(!hqqHiggs140) hqqHiggs140 = (TH1F*)hEmpty->Clone((hName+"qqHTT140"+hNameSuffix).c_str());
 
+        if(!hZHiggs110) hZHiggs110 = (TH1F*)hEmpty->Clone((hName+"ZHTT110"+hNameSuffix).c_str());
         if(!hZHiggs120) hZHiggs120 = (TH1F*)hEmpty->Clone((hName+"ZHTT120"+hNameSuffix).c_str());
         if(!hZHiggs125) hZHiggs125 = (TH1F*)hEmpty->Clone((hName+"ZHTT125"+hNameSuffix).c_str());
         if(!hZHiggs130) hZHiggs130 = (TH1F*)hEmpty->Clone((hName+"ZHTT130"+hNameSuffix).c_str());
+        if(!hZHiggs140) hZHiggs140 = (TH1F*)hEmpty->Clone((hName+"ZHTT140"+hNameSuffix).c_str());
 
+        if(!hWplusHiggs110) hWplusHiggs110 = (TH1F*)hEmpty->Clone((hName+"WplusHTT110"+hNameSuffix).c_str());
         if(!hWplusHiggs120) hWplusHiggs120 = (TH1F*)hEmpty->Clone((hName+"WplusHTT120"+hNameSuffix).c_str());
         if(!hWplusHiggs125) hWplusHiggs125 = (TH1F*)hEmpty->Clone((hName+"WplusHTT125"+hNameSuffix).c_str());
         if(!hWplusHiggs130) hWplusHiggs130 = (TH1F*)hEmpty->Clone((hName+"WplusHTT130"+hNameSuffix).c_str());
+        if(!hWplusHiggs140) hWplusHiggs140 = (TH1F*)hEmpty->Clone((hName+"WplusHTT140"+hNameSuffix).c_str());
 
+        if(!hWminusHiggs110) hWminusHiggs110 = (TH1F*)hEmpty->Clone((hName+"WminusHTT110"+hNameSuffix).c_str());
         if(!hWminusHiggs120) hWminusHiggs120 = (TH1F*)hEmpty->Clone((hName+"WminusHTT120"+hNameSuffix).c_str());
         if(!hWminusHiggs125) hWminusHiggs125 = (TH1F*)hEmpty->Clone((hName+"WminusHTT125"+hNameSuffix).c_str());
         if(!hWminusHiggs130) hWminusHiggs130 = (TH1F*)hEmpty->Clone((hName+"WminusHTT130"+hNameSuffix).c_str());
+        if(!hWminusHiggs140) hWminusHiggs140 = (TH1F*)hEmpty->Clone((hName+"WminusHTT140"+hNameSuffix).c_str());
 
         ///Set histograms directory, so the histograms are saved
         if(hQCD) hQCD->SetDirectory(hSoup->GetDirectory());
@@ -1053,25 +1073,35 @@ THStack*  HTTHistograms::plotStack(unsigned int iCategory,
         if(hVVT) hVVT->SetDirectory(hSoup->GetDirectory());
         if(hEWK2Jets) hEWK2Jets->SetDirectory(hSoup->GetDirectory());
 
+        if(hggHiggs110) hggHiggs110->SetDirectory(hSoup->GetDirectory());
         if(hggHiggs120) hggHiggs120->SetDirectory(hSoup->GetDirectory());
         if(hggHiggs125) hggHiggs125->SetDirectory(hSoup->GetDirectory());
         if(hggHiggs130) hggHiggs130->SetDirectory(hSoup->GetDirectory());
+        if(hggHiggs140) hggHiggs140->SetDirectory(hSoup->GetDirectory());
 
+        if(hqqHiggs110) hqqHiggs110->SetDirectory(hSoup->GetDirectory());
         if(hqqHiggs120) hqqHiggs120->SetDirectory(hSoup->GetDirectory());
         if(hqqHiggs125) hqqHiggs125->SetDirectory(hSoup->GetDirectory());
         if(hqqHiggs130) hqqHiggs130->SetDirectory(hSoup->GetDirectory());
+        if(hqqHiggs140) hqqHiggs140->SetDirectory(hSoup->GetDirectory());
 
+        if(hZHiggs110) hZHiggs110->SetDirectory(hSoup->GetDirectory());
         if(hZHiggs120) hZHiggs120->SetDirectory(hSoup->GetDirectory());
         if(hZHiggs125) hZHiggs125->SetDirectory(hSoup->GetDirectory());
         if(hZHiggs130) hZHiggs130->SetDirectory(hSoup->GetDirectory());
+        if(hZHiggs140) hZHiggs140->SetDirectory(hSoup->GetDirectory());
 
+        if(hWplusHiggs110) hWplusHiggs110->SetDirectory(hSoup->GetDirectory());
         if(hWplusHiggs120) hWplusHiggs120->SetDirectory(hSoup->GetDirectory());
         if(hWplusHiggs125) hWplusHiggs125->SetDirectory(hSoup->GetDirectory());
         if(hWplusHiggs130) hWplusHiggs130->SetDirectory(hSoup->GetDirectory());
+        if(hWplusHiggs140) hWplusHiggs140->SetDirectory(hSoup->GetDirectory());
 
+        if(hWminusHiggs110) hWminusHiggs110->SetDirectory(hSoup->GetDirectory());
         if(hWminusHiggs120) hWminusHiggs120->SetDirectory(hSoup->GetDirectory());
         if(hWminusHiggs125) hWminusHiggs125->SetDirectory(hSoup->GetDirectory());
         if(hWminusHiggs130) hWminusHiggs130->SetDirectory(hSoup->GetDirectory());
+        if(hWminusHiggs140) hWminusHiggs140->SetDirectory(hSoup->GetDirectory());
 
         TH1F *hHiggs = (TH1F*)hggHiggs125->Clone("hHiggs");
         hHiggs->Reset();
@@ -1141,6 +1171,16 @@ THStack*  HTTHistograms::plotStack(unsigned int iCategory,
         scale = lumi;
         hVVT->Scale(scale);
 
+        sampleName = "ggHTT110";
+        weight = getSampleNormalisation(sampleName);
+        scale = weight*lumi;
+        hggHiggs110->Scale(scale);
+
+        sampleName = "qqHTT110";
+        weight = getSampleNormalisation(sampleName);
+        scale = weight*lumi;
+        hqqHiggs110->Scale(scale);
+
         sampleName = "ggHTT120";
         weight = getSampleNormalisation(sampleName);
         scale = weight*lumi;
@@ -1171,6 +1211,21 @@ THStack*  HTTHistograms::plotStack(unsigned int iCategory,
         scale = weight*lumi;
         hqqHiggs130->Scale(scale);
 
+        sampleName = "ggHTT140";
+        weight = getSampleNormalisation(sampleName);
+        scale = weight*lumi;
+        hggHiggs140->Scale(scale);
+
+        sampleName = "qqHTT140";
+        weight = getSampleNormalisation(sampleName);
+        scale = weight*lumi;
+        hqqHiggs140->Scale(scale);
+
+        sampleName = "ZHTT110";
+        weight = getSampleNormalisation(sampleName);
+        scale = weight*lumi;
+        hZHiggs110->Scale(scale);
+
         sampleName = "ZHTT120";
         weight = getSampleNormalisation(sampleName);
         scale = weight*lumi;
@@ -1185,6 +1240,16 @@ THStack*  HTTHistograms::plotStack(unsigned int iCategory,
         weight = getSampleNormalisation(sampleName);
         scale = weight*lumi;
         hZHiggs130->Scale(scale);
+
+        sampleName = "ZHTT140";
+        weight = getSampleNormalisation(sampleName);
+        scale = weight*lumi;
+        hZHiggs140->Scale(scale);
+
+        sampleName = "WminusHTT110";
+        weight = getSampleNormalisation(sampleName);
+        scale = weight*lumi;
+        hWminusHiggs110->Scale(scale);
 
         sampleName = "WminusHTT120";
         weight = getSampleNormalisation(sampleName);
@@ -1201,6 +1266,16 @@ THStack*  HTTHistograms::plotStack(unsigned int iCategory,
         scale = weight*lumi;
         hWminusHiggs130->Scale(scale);
 
+        sampleName = "WminusHTT140";
+        weight = getSampleNormalisation(sampleName);
+        scale = weight*lumi;
+        hWminusHiggs140->Scale(scale);
+
+        sampleName = "WplusHTT110";
+        weight = getSampleNormalisation(sampleName);
+        scale = weight*lumi;
+        hWplusHiggs110->Scale(scale);
+
         sampleName = "WplusHTT120";
         weight = getSampleNormalisation(sampleName);
         scale = weight*lumi;
@@ -1216,7 +1291,15 @@ THStack*  HTTHistograms::plotStack(unsigned int iCategory,
         scale = weight*lumi;
         hWplusHiggs130->Scale(scale);
 
+        sampleName = "WplusHTT140";
+        weight = getSampleNormalisation(sampleName);
+        scale = weight*lumi;
+        hWplusHiggs140->Scale(scale);
+
         //Join Wplus and Wminus processes////////////////////
+        TH1F *hWHiggs110 = hWplusHiggs110;
+        hWHiggs110->Add(hWminusHiggs110);
+        hWHiggs110->SetName((hName+"WHTT110"+hNameSuffix).c_str());
         TH1F *hWHiggs120 = hWplusHiggs120;
         hWHiggs120->Add(hWminusHiggs120);
         hWHiggs120->SetName((hName+"WHTT120"+hNameSuffix).c_str());
@@ -1226,9 +1309,14 @@ THStack*  HTTHistograms::plotStack(unsigned int iCategory,
         TH1F *hWHiggs130 = hWplusHiggs130;
         hWHiggs130->Add(hWminusHiggs130);
         hWHiggs130->SetName((hName+"WHTT130"+hNameSuffix).c_str());
+        TH1F *hWHiggs140 = hWplusHiggs140;
+        hWHiggs140->Add(hWminusHiggs140);
+        hWHiggs140->SetName((hName+"WHTT140"+hNameSuffix).c_str());
+        hWHiggs110->SetDirectory(hSoup->GetDirectory());
         hWHiggs120->SetDirectory(hSoup->GetDirectory());
         hWHiggs125->SetDirectory(hSoup->GetDirectory());
         hWHiggs130->SetDirectory(hSoup->GetDirectory());
+        hWHiggs140->SetDirectory(hSoup->GetDirectory());
         /////////////////////////////////////////////////////
 
         hHiggs->Add(hggHiggs125);

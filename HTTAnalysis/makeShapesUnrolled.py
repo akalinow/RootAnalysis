@@ -4,7 +4,7 @@ from ROOT import *
 import array
 import numpy
 
-WAW_fileName = "/cms/cms/akalinow/CMS/HiggsCP/Data/NTUPLES_28_03_2017/MT/Histograms/RootAnalysis_AnalysisMuTau.root"
+WAW_fileName = "/cms/cms/akalinow/CMS/HiggsCP/Data/NTUPLES_28_03_2017/MT/Histograms/RootAnalysis_AnalysisMuTau_WSFUnct_fix.root"
 
 channel="mt"
 
