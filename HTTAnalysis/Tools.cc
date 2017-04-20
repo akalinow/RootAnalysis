@@ -69,36 +69,36 @@ float getCrossSection(const std::string & sampleName){
         //https://twiki.cern.ch/twiki/bin/view/LHCPhysics/CERNYellowReportPageAt1314TeV2014
         //Xsection for mass!=125 are calculated using luminosity ratio, and cross section for 8 TeV
 
-        if(sampleName=="ggHTT110") crossSection = 2.470E+01*2.230*7.95E-02; //CERNYellowReportPageAt13TeV*CERNYellowReportPageAt13TeV*CERNYellowReportPageBR
-        if(sampleName=="ggHTT120") crossSection = 5.222E+01*6.981E-02; //CERNYellowReportPageAt13TeV*CERNYellowReportPageBR
-        if(sampleName=="ggHTT125") crossSection = 4.858E+01*6.272E-02; //CERNYellowReportPageAt13TeV*CERNYellowReportPageBR
-        if(sampleName=="ggHTT130") crossSection = 4.531E+01*5.411E-02; //CERNYellowReportPageAt13TeV*CERNYellowReportPageBR
-        if(sampleName=="ggHTT140") crossSection = 1.542E+01*2.358*3.52E-02; //CERNYellowReportPageAt13TeV*CERNYellowReportPageAt13TeV*CERNYellowReportPageBR
+        if(sampleName=="ggHTT110") crossSection = 5.790E+01*7.91E-02; //Analysis Note
+        if(sampleName=="ggHTT120") crossSection = 5.222E+01*6.98E-02; //CERNYellowReportPageAt13TeV*CERNYellowReportPageBR
+        if(sampleName=="ggHTT125") crossSection = 4.858E+01*6.27E-02; //CERNYellowReportPageAt13TeV*CERNYellowReportPageBR
+        if(sampleName=="ggHTT130") crossSection = 4.531E+01*5.41E-02; //CERNYellowReportPageAt13TeV*CERNYellowReportPageBR
+        if(sampleName=="ggHTT140") crossSection = 3.600E+01*3.60E-02; //Analysis Note
 
-        if(sampleName=="qqHTT110") crossSection = 1.809E+00*1.797*7.95E-02; //CERNYellowReportPageAt13TeV*CERNYellowReportPageAt13TeV*CERNYellowReportPageBR
-        if(sampleName=="qqHTT120") crossSection = 1.676E+00*6.981E-02; //CERNYellowReportPageAt13TeV*CERNYellowReportPageBR
-        if(sampleName=="qqHTT125") crossSection = 1.601E+00*6.272E-02; //CERNYellowReportPageAt13TeV*CERNYellowReportPageBR
-        if(sampleName=="qqHTT130") crossSection = 1.531E+00*5.411E-02; //CERNYellowReportPageAt13TeV*CERNYellowReportPageBR
-        if(sampleName=="ggHTT140") crossSection = 1.389E+00*1.852*3.52E-02; //CERNYellowReportPageAt13TeV*CERNYellowReportPageAt13TeV*CERNYellowReportPageBR
+        if(sampleName=="qqHTT110") crossSection = 4.434E+00*7.95E-02; //Analysis Note
+        if(sampleName=="qqHTT120") crossSection = 3.935E+00*6.98E-02; //CERNYellowReportPageAt13TeV*CERNYellowReportPageBR
+        if(sampleName=="qqHTT125") crossSection = 3.782E+00*6.27E-02; //CERNYellowReportPageAt13TeV*CERNYellowReportPageBR
+        if(sampleName=="qqHTT130") crossSection = 3.637E+00*5.41E-02; //CERNYellowReportPageAt13TeV*CERNYellowReportPageBR
+        if(sampleName=="qqHTT140") crossSection = 3.492E+00*3.60E-02; //Analysis Note
 
         ///https://twiki.cern.ch/twiki/bin/view/CMS/HiggsToTauTauWorking2016#MC_and_data_samples
-        if(sampleName=="WplusHTT110") crossSection = 0.6720*1.758*7.95E-02; //CERNYellowReportPageAt13TeV*CERNYellowReportPageAt13TeV*CERNYellowReportPageBR
-        if(sampleName=="WplusHTT120") crossSection = 1.565*0.0698*0.5;
-        if(sampleName=="WplusHTT125") crossSection = 1.373*0.0627*0.5;
-        if(sampleName=="WplusHTT130") crossSection = 1.209*0.0541*0.5;
-        if(sampleName=="WplusHTT140") crossSection = 0.3032*1.810*3.52E-02; //CERNYellowReportPageAt13TeV*CERNYellowReportPageAt13TeV*CERNYellowReportPageBR
+        if(sampleName=="WplusHTT110") crossSection = 1.335*7.91E-02; //Analysis Note
+        if(sampleName=="WplusHTT120") crossSection = 0.9558*0.0698;
+        if(sampleName=="WplusHTT125") crossSection = 0.8400*0.0627;
+        if(sampleName=="WplusHTT130") crossSection = 0.7414*0.0541;
+        if(sampleName=="WplusHTT140") crossSection = 0.6308*3.60E-02; //Analysis Note
 
-        if(sampleName=="WmiusHTT110") crossSection = 0.3995*1.758*7.95E-02; //CERNYellowReportPageAt13TeV*CERNYellowReportPageAt13TeV*CERNYellowReportPageBR
-        if(sampleName=="WminusHTT120") crossSection = 1.565*0.0698*0.5;
-        if(sampleName=="WminusHTT125") crossSection = 1.373*0.0627*0.5;
-        if(sampleName=="WminusHTT130") crossSection = 1.209*0.0541*0.5;
-        if(sampleName=="WmiusHTT140") crossSection = 0.1738*1.810*3.52E-02; //CERNYellowReportPageAt13TeV*CERNYellowReportPageAt13TeV*CERNYellowReportPageBR
+        if(sampleName=="WminusHTT110") crossSection = 0.8587*7.91E-02; //Analysis Note
+        if(sampleName=="WminusHTT120") crossSection = 0.6092*0.0698;
+        if(sampleName=="WminusHTT125") crossSection = 0.5328*0.0627;
+        if(sampleName=="WminusHTT130") crossSection = 0.4676*0.0541;
+        if(sampleName=="WminusHTT140") crossSection = 0.3940*3.60E-02; //Analysis Note
 
-        if(sampleName=="ZHTT110") crossSection = 0.6125*1.758*7.95E-02; //CERNYellowReportPageAt13TeV*CERNYellowReportPageAt13TeV*CERNYellowReportPageBR
+        if(sampleName=="ZHTT110") crossSection = 1.309*7.15E-02; //Analysis Note
         if(sampleName=="ZHTT120") crossSection = 0.994*0.0698;
         if(sampleName=="ZHTT125") crossSection = 0.884*0.0627;
         if(sampleName=="ZHTT130") crossSection = 0.790*0.0541;
-        if(sampleName=="ZHTT140") crossSection = 0.2898*1.810*3.52E-02; //CERNYellowReportPageAt13TeV*CERNYellowReportPageAt13TeV*CERNYellowReportPageBR
+        if(sampleName=="ZHTT140") crossSection = 0.6514*3.60E-02; //Analysis Note
 
         ///https://twiki.cern.ch/twiki/bin/view/CMS/HiggsToTauTauWorking2016#MC_and_data_samples
         if(sampleName.find("ZZTo2L2Q")!=std::string::npos) crossSection = 3.22;
