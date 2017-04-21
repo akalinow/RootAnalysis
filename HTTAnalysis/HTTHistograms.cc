@@ -389,7 +389,7 @@ void HTTHistograms::finalizeHistograms(const std::string & myDecayMode,
         std::cout<<"HTTHistograms::finalizeHistograms() START"<<std::endl;
 
         AnalysisHistograms::finalizeHistograms();
-        
+
         myCategoryRejester  = aCategoryRejester;
         unsigned int myNumberOfCategories = myCategoryRejester.size();
 
@@ -405,7 +405,7 @@ void HTTHistograms::finalizeHistograms(const std::string & myDecayMode,
           mainCategoryNames.push_back("boosted_W");
           mainCategoryNames.push_back("vbf_W");
         }
-        if(myDecayMode=="TT"){
+        if(myDecayMode=="TauTau"){
           mainCategoryNames.push_back("0jet_QCD");
           mainCategoryNames.push_back("boosted_QCD");
           mainCategoryNames.push_back("vbf_QCD");
