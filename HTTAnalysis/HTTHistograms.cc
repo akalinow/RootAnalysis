@@ -319,8 +319,14 @@ std::string HTTHistograms::getTemplateName(const std::string& name){
         if(name.find("h1DUnRollTauPtMassVis")!=std::string::npos) templateName = "h1DUnRollTauPtMassVisTemplate";
         if(name.find("h2DRollTauPtMassVis")!=std::string::npos) templateName = "h2DRollTauPtMassVisTemplate";
 
+        if(name.find("h1DUnRollTauDMMassVis")!=std::string::npos) templateName = "h1DUnRollTauDMMassVisTemplate";
+        if(name.find("h2DRollTauDMMassVis")!=std::string::npos) templateName = "h2DRollTauDMMassVisTemplate";
+
         if(name.find("h1DUnRollHiggsPtMassSV")!=std::string::npos) templateName = "h1DUnRollHiggsPtMassSVTemplate";
         if(name.find("h2DRollHiggsPtMassSV")!=std::string::npos) templateName = "h2DRollHiggsPtMassSVTemplate";
+
+        if(name.find("h1DUnRollGammaSumMassSV")!=std::string::npos) templateName = "h1DUnRollGammaSumMassSVTemplate";
+        if(name.find("h2DRollGammaSumMassSV")!=std::string::npos) templateName = "h2DRollGammaSumMassSVTemplate";
 
         if(name.find("h1DUnRollMjjMassSV")!=std::string::npos) templateName = "h1DUnRollMjjMassSVTemplate";
         if(name.find("h2DRollMjjMassSV")!=std::string::npos) templateName = "h2DRollMjjMassSVTemplate";
@@ -361,15 +367,20 @@ void HTTHistograms::defineHistograms(){
                 // 0jet: unroll in tau_Pt using bins of {30,35,40,45,50,55,300} and in visible mass using bins of {0,60,65,70,75,80,85,90,95,100,105,110,400}
                 std::vector<double> massVisBins = {0,60,65,70,75,80,85,90,95,100,105,110,400};
                 std::vector<double> tauPtBins = {30,35,40,45,50,55,300};
+                std::vector<double> tauDecayModeBins = {-0.5,0.5,1.5};
                 addRollHistogram("h1DUnRollTauPtMassVisTemplate","Visible Mass vs tau pt; Events",massVisBins, tauPtBins, file_);
+                addRollHistogram("h1DUnRollTauDMMassVisTemplate","Visible Mass vs tau DM; Events",massVisBins, tauDecayModeBins, file_);
                 //Boosted: unroll in Higgs_Pt using Higgs_Pt bins of {0,100,150,200,250,300,5000}, and in SV mass using bins of {0,80,90,100,110,120,130,140,150,160,300}
                 std::vector<double> higgsPtBins = {0,100,150,200,250,300,5000};
                 std::vector<double> svMassBins = {0,80,90,100,110,120,130,140,150,160,300};
+                std::vector<double> gammaSumBins = {0,60,70,100,150,200,250,500};
                 addRollHistogram("h1DUnRollHiggsPtMassSVTemplate","SV Mass vs Higgs Pt; Events",svMassBins, higgsPtBins, file_);
+                addRollHistogram("h1DUnRollGammaSumMassSVTemplate","SV Mass vs Higgs Pt; Events",svMassBins, gammaSumBins, file_);
                 //VBF: unroll in mjj using bins of {300,700,1100,1500,10000}, and in SV mass using bins of {0,95,115,135,155,400}
                 vector<double> mjjBins = {300,700,1100,1500,10000};
                 vector<double> svMassBinsVBF =  {0,95,115,135,155,400};
                 addRollHistogram("h1DUnRollMjjMassSVTemplate","SV Mass vs Mjj; Events",svMassBinsVBF, mjjBins, file_);
+
                 ///2D CP histograms
                 vector<double> phiBins;
                 for(unsigned int iBin=0; iBin<=12; ++iBin) phiBins.push_back(iBin*2.0*M_PI/12);
@@ -477,7 +488,9 @@ void HTTHistograms::finalizeHistograms(const std::string & myDecayMode,
                         plotStack(iCategory, "MassTrans", iSystEffect);
                         plotStack(iCategory, "MassVis", iSystEffect);
                         plotStack(iCategory, "UnRollTauPtMassVis", iSystEffect);
+                        plotStack(iCategory, "UnRollTauDMMassVis", iSystEffect);
                         plotStack(iCategory, "UnRollHiggsPtMassSV", iSystEffect);
+                        plotStack(iCategory, "UnRollGammaSumMassSV", iSystEffect);
                         plotStack(iCategory, "UnRollMjjMassSV", iSystEffect);
                         plotStack(iCategory, "UnRollMassSVPhiCP", iSystEffect);
                         plotStack(iCategory, "UnRollMassSVYCP", iSystEffect);
