@@ -23,8 +23,8 @@ AC_CONFIG_FILES(Makefile
                 test/Makefile
                 src/Makefile
                 OTFAnalysis/Makefile
-		CPwithPytia8/Makefile
-		HTTAnalysis/Makefile)
+		            CPwithPytia8/Makefile
+		            HTTAnalysis/Makefile
+                HZZAnalysis/Makefile)
 
 AC_OUTPUT
-
