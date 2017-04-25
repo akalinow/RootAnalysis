@@ -75,6 +75,8 @@ class HTTEvent{
 
   void setPtReWeight(float x){ptReWeight = x;}
 
+  void setPtReWeightSUSY(float x){ptReWeightSUSY = x;}
+
   void setLHE_Ht(float x){lheHt = x;}
 
   void setLHEnOutPartons(int x){lheNOutPartons = x;}
@@ -122,6 +124,8 @@ class HTTEvent{
 
   float getPtReWeight() const {return ptReWeight;}
 
+  float getPtReWeightSUSY() const {return ptReWeightSUSY;}
+
   float getMCWeight() const {return mcWeight;}
 
   float getLHE_Ht() const {return lheHt;}
@@ -162,7 +166,7 @@ class HTTEvent{
   float mcWeight;
 
   ///Weight used to modify the pt shape.
-  float ptReWeight;
+  float ptReWeight, ptReWeightSUSY;
 
   ///Ht value from LHE record.
   float lheHt;

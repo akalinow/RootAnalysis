@@ -59,7 +59,7 @@ void HZZHistograms::defineHistograms(){
 
  if(!histosInitialized_){
    //Make template histos
-   add1DHistogram("h1DMassTemplate","",50,0,200,file_);
+   add1DHistogram("h1DMassTemplate","",85,0,170,file_);
    histosInitialized_ = true;
  }
 }
@@ -96,7 +96,7 @@ void HZZHistograms::plotAnyHistogram(const std::string & hName){
     h1D->SetLineColor(1);
     h1D->SetFillColor(1);
     h1D->SetMarkerStyle(20);
-    h1D->Draw("HIST p");
+    h1D->Draw("p");
     c->Print(TString::Format("fig_png/%s.png",hName.c_str()).Data());
   }
 }
