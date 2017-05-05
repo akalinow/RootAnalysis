@@ -67,6 +67,8 @@ void HZZHistograms::defineHistograms(){
 /////////////////////////////////////////////////////////
 void HZZHistograms::finalizeHistograms(){
 
+  AnalysisHistograms::finalizeHistograms();
+
   plotAnyHistogram("h1DMass4Mu");
   plotAnyHistogram("h1DMassZ1");
   plotAnyHistogram("h1DMassZ2");

@@ -1,4 +1,4 @@
-///This is a simplae script for making a test data file.
+///This is a simple script for making a test data file.
 ///This script should be executem form ROOT command line:
 /// > root
 /// [0] .x makeTestData.cxx

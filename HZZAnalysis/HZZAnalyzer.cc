@@ -54,28 +54,40 @@ void HZZAnalyzer::addBranch(TTree *tree){ /*tree->Branch("muonPt",&muonPt);*/
 bool HZZAnalyzer::analyze(const EventProxyBase& iEvent){
 
         const EventProxyHTT & myEventProxy = static_cast<const EventProxyHTT&>(iEvent);
-	
+        std::string fileName = myEventProxy.getTTree()->GetCurrentFile()->GetName();
+
+        bool singleMuTrigger = false;
         bool muonID = true;
-        unsigned int muonIDmask = (1<<0);
+        unsigned int muonIDmask = (1<<6);
         std::vector<const HTTParticle *> myMuonsPlus, myMuonsMinus, myMuons;
-        for(unsigned int iLepton=0;iLepton<myEventProxy.leptons->size();++iLepton) {
-	  const HTTParticle * aLepton = &myEventProxy.leptons->at(iLepton);
-	  
+        for(unsigned int iLepton=0; iLepton<myEventProxy.leptons->size(); ++iLepton) {
+                const HTTParticle * aLepton = &myEventProxy.leptons->at(iLepton);
+
                 int pdgId = aLepton->getProperty(PropertyEnum::PDGId);
                 if(std::abs(pdgId)!=13) continue;
                 muonID = (int)aLepton->getProperty(PropertyEnum::muonID) & muonIDmask;
+
+                singleMuTrigger |= aLepton->hasTriggerMatch(TriggerEnum::HLT_IsoMu22) ||
+                                   aLepton->hasTriggerMatch(TriggerEnum::HLT_IsoTkMu22) ||
+                                   aLepton->hasTriggerMatch(TriggerEnum::HLT_IsoMu22_eta2p1) ||
+                                   aLepton->hasTriggerMatch(TriggerEnum::HLT_IsoTkMu22_eta2p1);
+
+
                 if(!muonID) continue;
                 if(aLepton->getP4().Perp()<5 || std::abs(aLepton->getP4().Eta())>2.4) continue;
-                if(aLepton->getProperty(PropertyEnum::combreliso)>0.4) continue;	       		
+                if(aLepton->getProperty(PropertyEnum::combreliso)>0.35) continue;
                 if(pdgId==-13) myMuonsPlus.push_back(aLepton);
                 if(pdgId==13) myMuonsMinus.push_back(aLepton);
                 myMuons.push_back(aLepton);
         }
-      
+
         if(myMuonsPlus.size()!=2 || myMuonsMinus.size()!=2) return true;
 
-	float deltaR;	
-	deltaR = myMuonsPlus[0]->getP4().DeltaR(myMuonsPlus[1]->getP4());
+        if(fileName.find("Single")==std::string::npos && singleMuTrigger) return true;
+        if(fileName.find("Single")!=std::string::npos && !singleMuTrigger) return true;
+
+        float deltaR;
+        deltaR = myMuonsPlus[0]->getP4().DeltaR(myMuonsPlus[1]->getP4());
         if(deltaR<0.02) return true;
 
         deltaR = myMuonsMinus[0]->getP4().DeltaR(myMuonsMinus[1]->getP4());
@@ -102,7 +114,7 @@ bool HZZAnalyzer::analyze(const EventProxyBase& iEvent){
 
         float deltaMass = 9999;
         float deltaTmp = 9999;
-      
+
         for(auto aMuonPlus: myMuonsPlus) {
                 for(auto aMuonMinus: myMuonsMinus) {
                         deltaR = aMuonPlus->getP4().DeltaR(aMuonMinus->getP4());
