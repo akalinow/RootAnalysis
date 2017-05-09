@@ -25,6 +25,19 @@ class TH2F;
 class TH3F;
 class TLorentzVector;
 
+
+  typedef struct {
+  ///Variables saved into a TTree
+  float mass4Mu;
+  float massZ1, massZ2;
+  float muon1ID, muon2ID, muon3ID, muon4ID;
+  float muon1Isolation, muon2Isolation, muon3Isolation, muon4Isolation;
+  float muon1Pt, muon2Pt, muon3Pt, muon4Pt;
+  float muon1SIP, muon2SIP, muon3SIP, muon4SIP;
+
+  } ENTRY;
+
+
 class HZZAnalyzer: public Analyzer{
 
  public:
@@ -72,7 +85,10 @@ class HZZAnalyzer: public Analyzer{
 
   ///Reconstructed objects selected for given event.
   HTTEvent aEvent;
-  
+
+  ENTRY aEntry;
+
+
 };
 
 #endif

@@ -214,7 +214,7 @@ int TreeAnalyzer::loop(){
 
   unsigned int eventCount[nThreads_]{0};
 
-#pragma omp parallel for schedule(dynamic,500)
+#pragma omp parallel for schedule(dynamic,50000)
     for(unsigned int aEvent=0;aEvent<nEventsToAnalyze_;++aEvent){
       if(aEvent< nEventsToPrint_ || aEvent%printoutStep==0)
 	std::cout<<"Events analyzed: "<<aEvent<<"/"<<nEventsToAnalyze_
@@ -231,7 +231,7 @@ int TreeAnalyzer::loop(){
 //////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////
 bool TreeAnalyzer::analyze(const EventProxyBase& iEvent){
-  
+
   bool decision = true;
   for(unsigned int i=0;i<myAnalyzers_.size();++i){
     if(!decision) break;
