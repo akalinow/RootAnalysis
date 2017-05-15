@@ -9,17 +9,17 @@ EventProxyBase::EventProxyBase(): fileNames_(), treeName_(""), accumulatedSize_(
 /////////////////////////////////////////////////////////////////////////////
 void EventProxyBase::init(std::vector<std::string> const& iFileNames){
 
-  Int_t cachesize = 10000000; //10 MBytes
-  
+  Int_t cachesize = 1<<26; //10 MBytes
+
   fChain = boost::shared_ptr<TChain>(new TChain(treeName_.c_str()));
 
   for (auto it= iFileNames.begin(), itEnd = iFileNames.end();it!=itEnd; ++it) fChain->Add(it->c_str(),-1);
   accumulatedSize_ = fChain->GetEntries();
-  
+
   fChain->SetCacheSize(cachesize);
   fChain->AddBranchToCache("*",kFALSE);
   fChain->SetDirectory(0);
-  fChain->SetParallelUnzip(kFALSE);  
+  fChain->SetParallelUnzip(kFALSE);
 }
 //////////////////////////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////////////////////////
