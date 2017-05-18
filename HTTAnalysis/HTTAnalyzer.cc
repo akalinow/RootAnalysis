@@ -65,7 +65,7 @@ void HTTAnalyzer::initialize(TDirectory* aDir,
 
         mySelections_ = aSelections;
 
-        myHistos_ = new HTTHistograms(aDir, selectionFlavours_);
+        myHistos_ = new HTTHistograms(aDir, selectionFlavours_, myChannelSpecifics->getDecayModeName());
 }
 //////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////
@@ -143,6 +143,7 @@ void HTTAnalyzer::fillControlHistos(const std::string & hNameSuffix, float event
 
         ///Unrolled distributions for 2D fit
         myHistos_->fill2DUnrolledHistogram("h1DUnRollTauPtMassVis"+hNameSuffix, visMass, aLeg2.getP4(aSystEffect).Pt(),eventWeight);
+        //std::cout<<visMass<<" "<<aLeg2.getProperty(PropertyEnum::decayMode)<<"\t";//test
         myHistos_->fill2DUnrolledHistogram("h1DUnRollTauDMMassVis"+hNameSuffix, visMass, aLeg2.getProperty(PropertyEnum::decayMode),eventWeight);
         float gammaSum = aPair.getLeg1P4(aSystEffect).Gamma() + aPair.getLeg2P4(aSystEffect).Gamma();
         myHistos_->fill2DUnrolledHistogram("h1DUnRollGammaSumMassSV"+hNameSuffix, aPair.getP4(aSystEffect).M(), gammaSum,eventWeight);

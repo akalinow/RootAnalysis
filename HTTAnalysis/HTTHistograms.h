@@ -17,7 +17,7 @@ public:
 
 HTTHistograms(TDirectory *myDir);
 
-HTTHistograms(TDirectory *myDir, const std::vector<std::string> & flavours);
+HTTHistograms(TDirectory *myDir, const std::vector<std::string> & flavours, std::string channel = "");
 
 virtual ~HTTHistograms();
 
@@ -130,6 +130,7 @@ void plotSingleHistogram(std::string hName);
 std::vector<const HTTAnalysis::eventCategory*> myCategoryRejester;
 
 std::stringstream outputStream;
+std::string myChannel_;
 
 };
 

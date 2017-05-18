@@ -71,9 +71,10 @@ HTTHistograms::HTTHistograms(TDirectory *myDir){
 }
 /////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////
-HTTHistograms::HTTHistograms(TDirectory *myDir, const std::vector<std::string> & flavours){
+HTTHistograms::HTTHistograms(TDirectory *myDir, const std::vector<std::string> & flavours, std::string channel){
 
         selectionFlavours_ = flavours;
+        myChannel_ = channel;
 
         AnalysisHistograms::init(myDir);
 }
@@ -367,7 +368,7 @@ void HTTHistograms::defineHistograms(){
                 // 0jet: unroll in tau_Pt using bins of {30,35,40,45,50,55,300} and in visible mass using bins of {0,60,65,70,75,80,85,90,95,100,105,110,400}
                 std::vector<double> massVisBins = {0,60,65,70,75,80,85,90,95,100,105,110,400};
                 std::vector<double> tauPtBins = {30,35,40,45,50,55,300};
-                std::vector<double> tauDecayModeBins = {-0.5,0.5,1.5};
+                std::vector<double> tauDecayModeBins = {0,1,2,12.5};
                 addRollHistogram("h1DUnRollTauPtMassVisTemplate","Visible Mass vs tau pt; Events",massVisBins, tauPtBins, file_);
                 addRollHistogram("h1DUnRollTauDMMassVisTemplate","Visible Mass vs tau DM; Events",massVisBins, tauDecayModeBins, file_);
                 //Boosted: unroll in Higgs_Pt using Higgs_Pt bins of {0,100,150,200,250,300,5000}, and in SV mass using bins of {0,80,90,100,110,120,130,140,150,160,300}
@@ -432,7 +433,7 @@ void HTTHistograms::finalizeHistograms(const std::string & myDecayMode,
         gErrorIgnoreLevel = kBreak;
         //////////////
         ///Control regions plots
-        for(auto iCategory: mainCategoriesRejester) {
+/*        for(auto iCategory: mainCategoriesRejester) {
 
                 //plotCPhistograms(iCategory);
 
@@ -477,7 +478,7 @@ void HTTHistograms::finalizeHistograms(const std::string & myDecayMode,
                 plotStack(iCategory, "Phi-nVectors");
                 plotStack(iCategory, "Phi-nVecIP");
                 plotStack(iCategory, "NPV");
-        }
+        }*/
 
         ///Make systematic effect histos.
         for(unsigned int iSystEffect = (unsigned int)HTTAnalysis::NOMINAL;

@@ -4,7 +4,8 @@ from ROOT import *
 import array
 import numpy
 
-WAW_fileName = "/cms/cms/akalinow/CMS/HiggsCP/Data/NTUPLES_28_03_2017/MT/Histograms/RootAnalysis_AnalysisMuTau_WSFUnct_fix.root"
+WAW_fileName = "/cms/cms/akalinow/CMS/HiggsCP/Data/NTUPLES_28_03_2017/Histograms/24_04_2017/RootAnalysis_AnalysisMuTau.root"
+WAW_fileName = "RootAnalysis_AnalysisMuTau.root"
 
 channel="mt"
 
@@ -15,7 +16,7 @@ SYNCH_file = TFile(SYNCH_fileName,"RECREATE")
 
 #WAW to SYNCH histograms names map
 histoPrefix = {
-         "mt_0jet":"HTTAnalyzer/h1DUnRollTauPtMassVis",
+         "mt_0jet":"HTTAnalyzer/h1DUnRollTauDMMassVis",
          "mt_boosted":"HTTAnalyzer/h1DUnRollHiggsPtMassSV",
          "mt_vbf":"HTTAnalyzer/h1DUnRollMjjMassSV"
          }
@@ -59,18 +60,26 @@ histogramsMap = {
     #"DiBosonMatchJ":"VVJ",
     "DiBoson":"VV",
     "QCDEstimate":"QCD",
+    "ggHTT110":"ggH110",
+    "qqHTT110":"qqH110",
     "ggHTT120":"ggH120",
     "qqHTT120":"qqH120",
     "ggHTT125":"ggH125",
     "qqHTT125":"qqH125",
     "ggHTT130":"ggH130",
     "qqHTT130":"qqH130",
+    "ggHTT140":"ggH140",
+    "qqHTT140":"qqH140",
+    "ZHTT110":"ZH110",
+    "WHTT110":"WH110",
     "ZHTT120":"ZH120",
     "WHTT120":"WH120",
     "ZHTT125":"ZH125",
     "WHTT125":"WH125",
     "ZHTT130":"ZH130",
     "WHTT130":"WH130",
+    "ZHTT140":"ZH140",
+    "WHTT140":"WH140",
     "EWK2Jets":"EWKZ"
     }
 
@@ -91,17 +100,26 @@ nuisanceParams = [
     ]
 
 def rebinHisto(histo, categoryName):
-    nbins = 0
+    nbins = 1
+    rebinned = False
     if categoryName.count("antiiso")>0:
         xbins = numpy.array([40.0,80.0,120.0,160.0,200.0])
         nbins = 4
+        rebinned = True
     if categoryName.count("wjets")>0:
         xbins = numpy.array([80.0,200.0])
         nbins = 1
+        rebinned = True
     if categoryName.count("qcd")>0:
         xbins = numpy.array([0.0,300.0])
         nbins = 1
-    newHisto = histo.Rebin(nbins, "rebinned", xbins)
+        rebinned = True
+    if categoryName=="tt_0jet":
+        xbins = numpy.array([40.0,50,60,70,80.0,90,100,110,120.0,130,140,150,160.0,170,180,190,200.0,210,220,230,240,250,260,270,280,290,300])
+        nbins = 26
+        print "tu"
+        rebinned = True
+    newHisto = histo.Rebin(nbins, "rebinned", xbins) if rebinned else histo
     return newHisto
     
 def getHistogram(name, histo):
@@ -228,18 +246,26 @@ histogramsMap = {
     #"DiBosonHMTSDB_SS":"VV_SS_HMT_SDB",
     #"QCDEstimateHMTSDB_SS":"QCD_SS_HMT_SDB",
     "QCDEstimate":"QCD",
+    "ggHTT110":"ggH110",
+    "qqHTT110":"qqH110",
     "ggHTT120":"ggH120",
     "qqHTT120":"qqH120",
     "ggHTT125":"ggH125",
     "qqHTT125":"qqH125",
     "ggHTT130":"ggH130",
     "qqHTT130":"qqH130",
+    "ggHTT140":"ggH140",
+    "qqHTT140":"qqH140",
+    "ZHTT110":"ZH110",
+    "WHTT110":"WH110",
     "ZHTT120":"ZH120",
-    "ZHTT125":"ZH125",
-    "ZHTT130":"ZH130",
     "WHTT120":"WH120",
+    "ZHTT125":"ZH125",
     "WHTT125":"WH125",
+    "ZHTT130":"ZH130",
     "WHTT130":"WH130",
+    "ZHTT140":"ZH140",
+    "WHTT140":"WH140",
     "EWK2Jets":"EWKZ",
     #"BkgErr":"BKGErr"
     }
@@ -329,7 +355,7 @@ for iCategory in xrange(0,len(categoryCombineNames)):
 ##########################################################
 
 
-WAW_fileName = "RootAnalysis_AnalysisTT.root"
+WAW_fileName = "/cms/cms/akalinow/CMS/HiggsCP/Data/NTUPLES_28_03_2017/Histograms/24_04_2017/RootAnalysis_AnalysisTT.root"
 
 channel="tt"
 
@@ -380,18 +406,26 @@ histogramsMap = {
     "DiBosonMatchJ":"VVJ",
     #"DiBoson":"VV",
     "QCDEstimate":"QCD",
+    "ggHTT110":"ggH110",
+    "qqHTT110":"qqH110",
     "ggHTT120":"ggH120",
     "qqHTT120":"qqH120",
     "ggHTT125":"ggH125",
     "qqHTT125":"qqH125",
     "ggHTT130":"ggH130",
     "qqHTT130":"qqH130",
+    "ggHTT140":"ggH140",
+    "qqHTT140":"qqH140",
+    "ZHTT110":"ZH110",
+    "WHTT110":"WH110",
     "ZHTT120":"ZH120",
     "WHTT120":"WH120",
     "ZHTT125":"ZH125",
     "WHTT125":"WH125",
     "ZHTT130":"ZH130",
     "WHTT130":"WH130",
+    "ZHTT140":"ZH140",
+    "WHTT140":"WH140",
     "EWK2Jets":"EWKZ"
     }
 
@@ -432,6 +466,7 @@ for iCategory in xrange(0,len(categoryCombineNames)):
         hName = histoPrefix[categoryName] + key+"_"+categoryRootAnalysisNames[iCategory]
         templateHisto = TH1F(value,"",nbins[categoryName][0]*nbins[categoryName][1],0.5,nbins[categoryName][0]*nbins[categoryName][1] + 0.5)
         histogram = getHistogram(hName, templateHisto)
+        histogram=rebinHisto(histogram, categoryName)        
         histogram.SetName(value)
         histogram.Write()
 
@@ -449,10 +484,12 @@ for iCategory in xrange(0,len(categoryCombineNames)):
             if nuisanceParam.count("zmumuShape")>0 and cat.count("vbf")>0:  nuisanceParam=nuisanceParam.replace("vbf","VBF")
             nuisanceParam=nuisanceParam.replace("mt","tt")
             histogramUp = histos[0]
+            histogramUp=rebinHisto(histogramUp, categoryName)
             histogramUp.SetName(value+"_"+nuisanceParam+"Up")
             histogramUp.Write()
 
             histogramDown = histos[1]
+            histogramDown=rebinHisto(histogramDown, categoryName)
             histogramDown.SetName(value+"_"+nuisanceParam+"Down")
             histogramDown.Write()
 
@@ -502,18 +539,26 @@ histogramsMap = {
     #"DiBosonHMTSDB_SS":"VV_SS_HMT_SDB",
     #"QCDEstimateHMTSDB_SS":"QCD_SS_HMT_SDB",
     "QCDEstimate":"QCD",
+    "ggHTT110":"ggH110",
+    "qqHTT110":"qqH110",
     "ggHTT120":"ggH120",
     "qqHTT120":"qqH120",
     "ggHTT125":"ggH125",
     "qqHTT125":"qqH125",
     "ggHTT130":"ggH130",
     "qqHTT130":"qqH130",
+    "ggHTT140":"ggH140",
+    "qqHTT140":"qqH140",
+    "ZHTT110":"ZH110",
+    "WHTT110":"WH110",
     "ZHTT120":"ZH120",
-    "ZHTT125":"ZH125",
-    "ZHTT130":"ZH130",
     "WHTT120":"WH120",
+    "ZHTT125":"ZH125",
     "WHTT125":"WH125",
+    "ZHTT130":"ZH130",
     "WHTT130":"WH130",
+    "ZHTT140":"ZH140",
+    "WHTT140":"WH140",
     "EWK2Jets":"EWKZ",
     #"BkgErr":"BKGErr"
     }
