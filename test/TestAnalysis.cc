@@ -44,10 +44,16 @@ int main(int argc, char ** argv) {
 
 	boost::property_tree::ptree pt;
 	boost::property_tree::ini_parser::read_ini(cfgFileName, pt);
-	
+
 	typedef boost::tokenizer<boost::char_separator<char> > tokenizer;
 	std::string processName = pt.get<std::string>("TreeAnalyzer.processName","Test");
-	
+
+  //Tell Root we want to be multi-threaded
+  ROOT::EnableThreadSafety();
+  //When threading, also have to keep ROOT from logging all TObjects into a list
+  TObject::SetObjectStat(false);
+
+
 	//----------------------------------------------------------
 	 std::vector<Analyzer*> myAnalyzers;
 	 EventProxyTest *myEvent = new EventProxyTest();
@@ -67,12 +73,12 @@ int main(int argc, char ** argv) {
 	 printf("%4.2f events / RealTime second .\n", nEventsAnalysed/rtime);
 	 printf("%4.2f events / CpuTime second .\n", nEventsAnalysed/ctime);
 	 printf("CPU time/Real time %4.2f .\n", ctime/rtime);
-	 
+
 	 tree->scaleHistograms();
 	 for(unsigned int i=0;i<myAnalyzers.size();++i) delete myAnalyzers[i];
 	 delete tree;
 	 delete myEvent;
-	 
+
 	 std::cout<<"Done"<<std::endl;
 	 return 0;
 

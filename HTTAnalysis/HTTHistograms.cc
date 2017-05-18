@@ -61,7 +61,7 @@ float HTTHistograms::getSampleNormalisation(std::string sampleName){
            outputStream<<"Events analyzed: "<<nEventsAnalysed<<" ";
            outputStream<<"Reco preselection efficiency: "<<recoPresEff<<" ";
            outputStream<<"Final weight: "<<weight<<std::endl;
-         */
+	*/
         return weight;
 }
 /////////////////////////////////////////////////////////

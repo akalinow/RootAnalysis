@@ -70,35 +70,35 @@ const TLorentzVector & HTTParticle::getSystScaleP4(HTTAnalysis::sysEffects type)
 
   if(type==HTTAnalysis::NOMINAL) {
     lastSystEffect = type;
-    p4Cache = p4;
     return p4;
   }
   else if(lastSystEffect==type) return p4Cache;
 
   lastSystEffect = type;
-///True taus
-  if(abs(getPDGid())==15 && getProperty(PropertyEnum::mc_match)==5 &&
-    (type==HTTAnalysis::TESUp || type==HTTAnalysis::TESDown)){
+
+  if(abs(getPDGid())==15 && getProperty(PropertyEnum::mc_match)==5){
+    ///True taus
+    if(type!=HTTAnalysis::TESUp && type!=HTTAnalysis::TESDown) return p4;
     float TES = 0.03;
     if(type==HTTAnalysis::TESDown) TES*=-1;
     return getShiftedP4(1+TES);
   }
-  ///Fake e->tau
-  if(abs(getPDGid())==15 && getProperty(PropertyEnum::mc_match)==3 &&
-    (type==HTTAnalysis::E2TUp || type==HTTAnalysis::E2TDown)){
+  if(abs(getPDGid())==15 && getProperty(PropertyEnum::mc_match)==3){
+    ///Fake e->tau
+    if(type!=HTTAnalysis::E2TUp && type!=HTTAnalysis::E2TDown) return p4;
     float EES = 0.03;
     if(type==HTTAnalysis::E2TDown) EES*=-1;
     return getShiftedP4(1+EES);
   }
-  ///Fake mu->tau
-  if(abs(getPDGid())==15 && getProperty(PropertyEnum::mc_match)==4 &&
-    (type==HTTAnalysis::M2TUp || type==HTTAnalysis::M2TDown)){
+  if(abs(getPDGid())==15 && getProperty(PropertyEnum::mc_match)==4){
+    ///Fake mu->tau
+    if(type!=HTTAnalysis::M2TUp && type!=HTTAnalysis::M2TDown) return p4;
     float MES = 0.03;
     if(type==HTTAnalysis::M2TDown) MES*=-1;
     return getShiftedP4(1+MES);
   }
-  if(abs(getPDGid())==98 &&
-    (type==HTTAnalysis::JESUp || type==HTTAnalysis::JESDown)){
+  if(abs(getPDGid())==98){
+    if(type!=HTTAnalysis::JESUp && type!=HTTAnalysis::JESDown) return p4;
     float JES = getProperty(PropertyEnum::jecUnc);
     if(type==HTTAnalysis::JESDown) JES*=-1;
     return getShiftedP4(1+JES);
