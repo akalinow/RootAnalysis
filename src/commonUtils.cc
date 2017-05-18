@@ -103,7 +103,7 @@ double Eval(TGraph* gr, float val, bool error){
   if(index==-10) return -999.0;
   if(index==0) return -999.0;
   //if(index==0 && tmp>0.01) return -999.0;
-  if(error) return gr->GetErrorY(index);  
+  if(error) return gr->GetErrorY(index);
   return y[index];
 
 }
@@ -111,18 +111,18 @@ double Eval(TGraph* gr, float val, bool error){
 ////////////////////////////////////////////////////
 TH1F * Integrate(TH1F * histoD) {
 
-   TH1F * histoI = new TH1F(*histoD); 
+   TH1F * histoI = new TH1F(*histoD);
    Float_t *  cont = new Float_t [histoD->GetNbinsX()+2];  //with under+overflow
    Float_t *  errs = new Float_t [histoD->GetNbinsX()+2];  //with under+overflow
    histoI->Reset();
-   
+
 // bin=0 underf
 // bin 1-GetNbinsX() -conten
 // bin GetNbinsX()+1 overflow
 
    Int_t i;
-   for (i = 0; i <= histoD->GetNbinsX()+1; i++) { 
-      cont[i] = histoD->GetBinContent(i);   
+   for (i = 0; i <= histoD->GetNbinsX()+1; i++) {
+      cont[i] = histoD->GetBinContent(i);
       errs[i] = histoD->GetBinError(i);
    }
    Float_t sum=0.;
@@ -134,7 +134,7 @@ TH1F * Integrate(TH1F * histoD) {
 	///////////////////////////
         histoI->SetBinContent(i,sum);
         histoI->SetBinError(i,sqrt(sume2));
-   }   
+   }
 // for (i = 0; i<=histoI->GetNbinsX()+1;i++){
 //      cout <<"bin: "<<i<<" cont: "<<histoI->GetBinContent(i);
 //      cout <<            " error: "<<histoI->GetBinError(i)<<endl;
@@ -146,18 +146,18 @@ TH1F * Integrate(TH1F * histoD) {
 ////////////////////////////////////////////////////
 TH1D * Integrate(TH1D * histoD) {
 
-   TH1D * histoI = new TH1D(*histoD); 
+   TH1D * histoI = new TH1D(*histoD);
    Float_t *  cont = new Float_t [histoD->GetNbinsX()+2];  //with under+overflow
    Float_t *  errs = new Float_t [histoD->GetNbinsX()+2];  //with under+overflow
    histoI->Reset();
-   
+
 // bin=0 underf
 // bin 1-GetNbinsX() -conten
 // bin GetNbinsX()+1 overflow
 
    Int_t i;
-   for (i = 0; i <= histoD->GetNbinsX()+1; i++) { 
-      cont[i] = histoD->GetBinContent(i);   
+   for (i = 0; i <= histoD->GetNbinsX()+1; i++) {
+      cont[i] = histoD->GetBinContent(i);
       errs[i] = histoD->GetBinError(i);
    }
    Float_t sum=0.;
@@ -169,7 +169,7 @@ TH1D * Integrate(TH1D * histoD) {
 	///////////////////////////
         histoI->SetBinContent(i,sum);
         histoI->SetBinError(i,sqrt(sume2));
-   }   
+   }
 // for (i = 0; i<=histoI->GetNbinsX()+1;i++){
 //      cout <<"bin: "<<i<<" cont: "<<histoI->GetBinContent(i);
 //      cout <<            " error: "<<histoI->GetBinError(i)<<endl;
@@ -181,7 +181,7 @@ TH1D * Integrate(TH1D * histoD) {
 ////////////////////////////////////////////////////
 TH2F *Integrate(TH2F *histoD, int opt){
 
-  TH2F * histoI = new TH2F(*histoD); 
+  TH2F * histoI = new TH2F(*histoD);
   histoI->Reset();
 
   float sum = 0.0;
@@ -248,7 +248,7 @@ TGraph* getSgnVsBkg(TH1F *hSgn, TH1F *hBkg, int opt){
     //if(valSgn<0.1) continue;
     //if(nBins>15 && (7*i)%10!=0) continue;
     //if(valBkg==lastVal) continue;
-    //if(valBkg!=0) lastVal = valBkg; 
+    //if(valBkg!=0) lastVal = valBkg;
     ////////////////////
     x[n] = 1 - valSgn;
     ex[n] = errSgn;
@@ -266,7 +266,7 @@ TGraph* getSgnVsBkg(TH1F *hSgn, TH1F *hBkg, int opt){
     ey1[n] = errBkg;
     n++;
   }
-  
+
  for(int i=0;i<n;i++){
     x2[i] = x[n-i-1];
     y2[i] = y1[n-i-1];
@@ -314,11 +314,11 @@ TH1F* get1DHisto(string hName,string proj,
 		 float low, float high,
 		 TFile *file){
 
-  TH2F *h2D = (TH2F*)file->Get(hName.c_str()); 
+  TH2F *h2D = (TH2F*)file->Get(hName.c_str());
 
   int binLow = h2D->GetYaxis()->FindBin(low);
   int binHigh = h2D->GetYaxis()->FindBin(high);
-  
+
   TH1D* h1D = 0;
 
   std::cout<<"h2D: "<<h2D<<" proj: "<<proj<<std::endl;
