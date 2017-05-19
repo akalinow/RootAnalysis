@@ -117,7 +117,6 @@ def rebinHisto(histo, categoryName):
     if categoryName=="tt_0jet":
         xbins = numpy.array([40.0,50,60,70,80.0,90,100,110,120.0,130,140,150,160.0,170,180,190,200.0,210,220,230,240,250,260,270,280,290,300])
         nbins = 26
-        print "tu"
         rebinned = True
     newHisto = histo.Rebin(nbins, "rebinned", xbins) if rebinned else histo
     return newHisto
@@ -356,6 +355,7 @@ for iCategory in xrange(0,len(categoryCombineNames)):
 
 
 WAW_fileName = "/cms/cms/akalinow/CMS/HiggsCP/Data/NTUPLES_28_03_2017/Histograms/24_04_2017/RootAnalysis_AnalysisTT.root"
+WAW_fileName = "RootAnalysis_AnalysisTT.root"
 
 channel="tt"
 

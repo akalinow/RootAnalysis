@@ -375,11 +375,19 @@ void HTTHistograms::defineHistograms(){
                 std::vector<double> higgsPtBins = {0,100,150,200,250,300,5000};
                 std::vector<double> svMassBins = {0,80,90,100,110,120,130,140,150,160,300};
                 std::vector<double> gammaSumBins = {0,60,70,100,150,200,250,500};
+                if(myChannel_ == "TauTau"){
+                  higgsPtBins = {0,100,170,300,115000};
+                  svMassBins = {0,40,60,70,80,90,100,110,120,130,150,200,250};
+                  }
                 addRollHistogram("h1DUnRollHiggsPtMassSVTemplate","SV Mass vs Higgs Pt; Events",svMassBins, higgsPtBins, file_);
                 addRollHistogram("h1DUnRollGammaSumMassSVTemplate","SV Mass vs Higgs Pt; Events",svMassBins, gammaSumBins, file_);
                 //VBF: unroll in mjj using bins of {300,700,1100,1500,10000}, and in SV mass using bins of {0,95,115,135,155,400}
                 vector<double> mjjBins = {300,700,1100,1500,10000};
                 vector<double> svMassBinsVBF =  {0,95,115,135,155,400};
+                if(myChannel_ == "TauTau"){
+                  mjjBins = {0,300,500,800,115000};
+                  svMassBinsVBF = {0,40,60,70,80,90,100,110,120,130,150,200,250};
+                  }
                 addRollHistogram("h1DUnRollMjjMassSVTemplate","SV Mass vs Mjj; Events",svMassBinsVBF, mjjBins, file_);
 
                 ///2D CP histograms
