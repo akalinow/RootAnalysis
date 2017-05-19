@@ -356,7 +356,6 @@ bool AnalysisHistograms::fill2DUnrolledHistogram(const std::string &name, float 
         int iUnrolledBinY = hRolled->GetYaxis()->FindBin(val2);
         int iUnrolledBin = iUnrolledBinX + (iUnrolledBinY-1)*nBinsX;
 
-//if(name.find("boosted")!=std::string::npos) std::cout<<iUnrolledBinX<<" "<<iUnrolledBinY<<" "<<weight<<" "<<iUnrolledBin<<"\n";//test
         return fill1DHistogram(name, iUnrolledBin-0.5, weight);
 }
 //////////////////////////////////////////////////////////////////////////////
