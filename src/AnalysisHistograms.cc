@@ -55,7 +55,7 @@ void AnalysisHistograms::addRollHistogram(const std::string& name, const std::st
         int nBinsX = binsX.size()-1;
         int nBinsY = binsY.size()-1;
         ///Include only overflow bins in unrolled histogram.
-        int nUnrolledBins = (nBinsX+1)*(nBinsY+1);
+        int nUnrolledBins = nBinsX*nBinsY;
 
         TString rolledName(name.c_str());
         rolledName.ReplaceAll("UnRoll","Roll");
@@ -65,7 +65,7 @@ void AnalysisHistograms::addRollHistogram(const std::string& name, const std::st
                        nBinsX, binsX.data(),
                        nBinsY, binsY.data(),
                        file_);
-        add1DHistogram(name,title,nUnrolledBins, 0.5, nUnrolledBins+0.5,file_);
+        add1DHistogram(name,title,nUnrolledBins, 0, nUnrolledBins,file_);
 }
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////
 void AnalysisHistograms::add1DHistogram(const std::string& name, const std::string& title,
@@ -354,10 +354,9 @@ bool AnalysisHistograms::fill2DUnrolledHistogram(const std::string &name, float 
         int nBinsX = hRolled->GetNbinsX();
         int iUnrolledBinX = hRolled->GetXaxis()->FindBin(val1);
         int iUnrolledBinY = hRolled->GetYaxis()->FindBin(val2);
-        int iUnrolledBin = iUnrolledBinX + (iUnrolledBinY-1)*(nBinsX+1);
+        int iUnrolledBin = iUnrolledBinX + (iUnrolledBinY-1)*nBinsX;
 
-
-        return fill1DHistogram(name, iUnrolledBin, weight);
+        return fill1DHistogram(name, iUnrolledBin-0.5, weight);
 }
 //////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////

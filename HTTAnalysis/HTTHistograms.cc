@@ -71,9 +71,10 @@ HTTHistograms::HTTHistograms(TDirectory *myDir){
 }
 /////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////
-HTTHistograms::HTTHistograms(TDirectory *myDir, const std::vector<std::string> & flavours){
+HTTHistograms::HTTHistograms(TDirectory *myDir, const std::vector<std::string> & flavours, std::string channel){
 
         selectionFlavours_ = flavours;
+        myChannel_ = channel;
 
         AnalysisHistograms::init(myDir);
 }
@@ -367,18 +368,26 @@ void HTTHistograms::defineHistograms(){
                 // 0jet: unroll in tau_Pt using bins of {30,35,40,45,50,55,300} and in visible mass using bins of {0,60,65,70,75,80,85,90,95,100,105,110,400}
                 std::vector<double> massVisBins = {0,60,65,70,75,80,85,90,95,100,105,110,400};
                 std::vector<double> tauPtBins = {30,35,40,45,50,55,300};
-                std::vector<double> tauDecayModeBins = {-0.5,0.5,1.5};
+                std::vector<double> tauDecayModeBins = {0,1,2,12.5};
                 addRollHistogram("h1DUnRollTauPtMassVisTemplate","Visible Mass vs tau pt; Events",massVisBins, tauPtBins, file_);
                 addRollHistogram("h1DUnRollTauDMMassVisTemplate","Visible Mass vs tau DM; Events",massVisBins, tauDecayModeBins, file_);
                 //Boosted: unroll in Higgs_Pt using Higgs_Pt bins of {0,100,150,200,250,300,5000}, and in SV mass using bins of {0,80,90,100,110,120,130,140,150,160,300}
                 std::vector<double> higgsPtBins = {0,100,150,200,250,300,5000};
                 std::vector<double> svMassBins = {0,80,90,100,110,120,130,140,150,160,300};
                 std::vector<double> gammaSumBins = {0,60,70,100,150,200,250,500};
+                if(myChannel_ == "TauTau"){
+                  higgsPtBins = {0,100,170,300,115000};
+                  svMassBins = {0,40,60,70,80,90,100,110,120,130,150,200,250};
+                  }
                 addRollHistogram("h1DUnRollHiggsPtMassSVTemplate","SV Mass vs Higgs Pt; Events",svMassBins, higgsPtBins, file_);
                 addRollHistogram("h1DUnRollGammaSumMassSVTemplate","SV Mass vs Higgs Pt; Events",svMassBins, gammaSumBins, file_);
                 //VBF: unroll in mjj using bins of {300,700,1100,1500,10000}, and in SV mass using bins of {0,95,115,135,155,400}
                 vector<double> mjjBins = {300,700,1100,1500,10000};
                 vector<double> svMassBinsVBF =  {0,95,115,135,155,400};
+                if(myChannel_ == "TauTau"){
+                  mjjBins = {0,300,500,800,115000};
+                  svMassBinsVBF = {0,40,60,70,80,90,100,110,120,130,150,200,250};
+                  }
                 addRollHistogram("h1DUnRollMjjMassSVTemplate","SV Mass vs Mjj; Events",svMassBinsVBF, mjjBins, file_);
 
                 ///2D CP histograms
@@ -432,7 +441,7 @@ void HTTHistograms::finalizeHistograms(const std::string & myDecayMode,
         gErrorIgnoreLevel = kBreak;
         //////////////
         ///Control regions plots
-        for(auto iCategory: mainCategoriesRejester) {
+/*        for(auto iCategory: mainCategoriesRejester) {
 
                 //plotCPhistograms(iCategory);
 
@@ -477,7 +486,7 @@ void HTTHistograms::finalizeHistograms(const std::string & myDecayMode,
                 plotStack(iCategory, "Phi-nVectors");
                 plotStack(iCategory, "Phi-nVecIP");
                 plotStack(iCategory, "NPV");
-        }
+        }*/
 
         ///Make systematic effect histos.
         for(unsigned int iSystEffect = (unsigned int)HTTAnalysis::NOMINAL;

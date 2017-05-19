@@ -65,7 +65,7 @@ void HTTAnalyzer::initialize(TDirectory* aDir,
 
         mySelections_ = aSelections;
 
-        myHistos_ = new HTTHistograms(aDir, selectionFlavours_);
+        myHistos_ = new HTTHistograms(aDir, selectionFlavours_, myChannelSpecifics->getDecayModeName());
 }
 //////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////
