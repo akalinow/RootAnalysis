@@ -1,4 +1,4 @@
-#include <cstdlib> 
+#include <cstdlib>
 #include <string>
 #include <omp.h>
 #include <bitset>
@@ -12,6 +12,7 @@
 
 
 int iCandOTF = 0;
+int iCandNN = 1;
 //////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////
 OTFAnalyzer::OTFAnalyzer(const std::string & aName):Analyzer(aName){
@@ -50,11 +51,11 @@ Analyzer* OTFAnalyzer::clone() const{
 };
 //////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////
-void OTFAnalyzer::finalize(){ 
+void OTFAnalyzer::finalize(){
 
   if(omp_get_max_threads()==1){
     std::cout<<"tmpMap.size(): "<<tmpMap.size()<<std::endl;
- 
+
     std::ostringstream stringStr;
     TH2F *h = myHistos_->get2DHistogram("h2DRateVsQualityOtf",true);
     if(h){
@@ -63,13 +64,13 @@ void OTFAnalyzer::finalize(){
 	stringStr<<iBin;
 	h->GetYaxis()->SetBinLabel(iBin,stringStr.str().c_str());
       }
-      
+
       for(auto it: tmpMap){
-	int iBinX = h->GetYaxis()->FindFixBin(it.second);   
+	int iBinX = h->GetYaxis()->FindFixBin(it.second);
 	if(iBinX>=h->GetYaxis()->GetNbins()) continue;
-	
+
 	std::bitset<18> bits(it.first);
-	
+
 	stringStr.str("");
 	stringStr<<it.first;
 	std::string label = bits.to_string()+" "+stringStr.str();
@@ -77,8 +78,8 @@ void OTFAnalyzer::finalize(){
       }
     }
   }
-  
-  myHistos_->finalizeHistograms(0,1.0); 
+
+  myHistos_->finalizeHistograms(0,1.0);
 }
 //////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////
@@ -97,7 +98,7 @@ void OTFAnalyzer::registerCuts(){
 //////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////
 bool OTFAnalyzer::passQuality(std::vector<L1Obj> * myL1Coll,
-		 const std::string & sysType, 
+		 const std::string & sysType,
 		 int iCand){
 
   if(sysType.find("Gmt")!=std::string::npos){
@@ -106,14 +107,22 @@ bool OTFAnalyzer::passQuality(std::vector<L1Obj> * myL1Coll,
       fabs(myL1Coll->operator[](iCand).eta)<1.3 &&
       true;
   }
-  
+
+  if(sysType.find("NN")!=std::string::npos){
+  return myL1Coll->size()>iCand &&
+         myL1Coll->operator[](iCand).mtfType==1 &&
+         myL1Coll->operator[](iCand).q>4 &&
+    true;
+  }
+
   if(sysType.find("Otf")!=std::string::npos){
   return myL1Coll->size()>iCand &&
-         myL1Coll->operator[](iCand).q>4 &&   
+         myL1Coll->operator[](iCand).mtfType==2 &&
+         myL1Coll->operator[](iCand).q>4 &&
     true;
   }
   else return myL1Coll->size();
- 
+
 }
 //////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////
@@ -126,7 +135,7 @@ void OTFAnalyzer::fillTurnOnCurve(const int & iPtCut,
 
   std::vector<L1Obj> * myL1Coll = &(theEvent->l1ObjectsGmt);
   std::string hName = "h2DGmt"+selType;
- 
+
   if(sysType=="Rpc"){
     myL1Coll = &(theEvent->l1ObjectsRpc);
     hName = "h2DRpc"+selType;
@@ -137,9 +146,15 @@ void OTFAnalyzer::fillTurnOnCurve(const int & iPtCut,
   }
   if(sysType=="Otf") {
     iCand = iCandOTF;
-    myL1Coll = &(theEvent->l1ObjectsOtf);   
+    myL1Coll = &(theEvent->l1ObjectsOtf);
     //if(myL1Coll->size()>1 && myL1Coll->operator[](0).q<myL1Coll->operator[](1).q) iCand = 1;
     hName = "h2DOtf"+selType;
+  }
+  if(sysType=="NN") {
+    iCand = iCandNN;
+    myL1Coll = &(theEvent->l1ObjectsOtf);
+    //if(myL1Coll->size()>1 && myL1Coll->operator[](0).q<myL1Coll->operator[](1).q) iCand = 1;
+    hName = "h2DNN"+selType;
   }
 
 
@@ -155,30 +170,30 @@ void OTFAnalyzer::fillTurnOnCurve(const int & iPtCut,
       iCand = index;
     }
   }
-  
+
   bool qualityCut = passQuality(myL1Coll,sysType,iCand);
-  bool pass = myL1Coll->size() && myL1Coll->operator[](iCand).pt>=ptCut && qualityCut && deltaR<0.2;
-  
+  bool pass = myL1Coll->size() && myL1Coll->operator[](iCand).pt>=ptCut && qualityCut && deltaR<100.2;///TEST
+
   std::string tmpName = hName+"Pt"+std::to_string(ptCut);
   myHistos_->fill2DHistogram(tmpName,theEvent->pt, pass);
-  
+
   ///Fill histos for eff vs eta/phi only for events at the plateau.
   if(selType.size()==0 && theEvent->pt<(ptCut + 20)) return;
-  
+
   tmpName = hName+"EtaHit"+std::to_string(ptCut);
   myHistos_->fill2DHistogram(tmpName,theEvent->etaHit, pass);
-  
+
   tmpName = hName+"PhiHit"+std::to_string(ptCut);
   myHistos_->fill2DHistogram(tmpName,theEvent->phiHit, pass);
-  
+
   tmpName = hName+"EtaVx"+std::to_string(ptCut);
   myHistos_->fill2DHistogram(tmpName,theEvent->eta, pass);
-  
+
   tmpName = hName+"PhiVx"+std::to_string(ptCut);
   myHistos_->fill2DHistogram(tmpName,theEvent->phi, pass);
 
   tmpName = hName+"Quality"+std::to_string(ptCut);
-  int q = -10; 
+  int q = -10;
   if(myL1Coll->size()) q = myL1Coll->operator[](iCand).hits;
   if(tmpMap.find(q)==tmpMap.end()) tmpMap[q] = tmpMap.size();
   int xPosition = tmpMap[q];
@@ -196,7 +211,7 @@ void OTFAnalyzer::fillRateHisto(const std::string & sysType,
 	std::vector<L1Obj> * myL1Coll = &(theEvent->l1ObjectsGmt);
 	std::string hName = "h2DRate"+selType+"Gmt";
 
-	
+
 
 	if(sysType=="Rpc"){
 			myL1Coll = &(theEvent->l1ObjectsRpc);
@@ -217,21 +232,32 @@ void OTFAnalyzer::fillRateHisto(const std::string & sysType,
 	  }
 	  hName = "h2DRate"+selType+"Otf";
 	  ptCut = OTFHistograms::ptBins[OTFHistograms::ptCutsOtf[iCut]];
-
 	}
-	
+  if(sysType=="NN") {
+	  iCand = iCandNN;
+	  myL1Coll = &(theEvent->l1ObjectsOtf);
+	  if(myL1Coll->size()>1){
+	    ///Take higher quality
+	    if(myL1Coll->operator[](0).q<myL1Coll->operator[](1).q) iCand = 1;
+	    ///take lower pt in case of the same quality
+	    else if (myL1Coll->operator[](0).pt>myL1Coll->operator[](1).pt) iCand = 1;
+	  }
+	  hName = "h2DRate"+selType+"NN";
+	  ptCut = OTFHistograms::ptBins[OTFHistograms::ptCutsOtf[iCut]];
+	}
+
 	bool qualityCut = passQuality(myL1Coll,sysType,iCand);
 	bool pass = myL1Coll->size() && qualityCut;
 	float val = 0;
 
-	if(pass) val = myL1Coll->operator[](iCand).pt;	
+	if(pass) val = myL1Coll->operator[](iCand).pt;
         if(selType=="Tot") myHistos_->fill2DHistogram(hName,theEvent->pt,val);
 
 	///Rate vs selected variable is plotted for given pt cut.
 	pass = pass && (myL1Coll->operator[](iCand).pt>=ptCut);
 	if(selType=="VsEta") myHistos_->fill2DHistogram(hName,theEvent->pt,pass*theEvent->eta+(!pass)*99);
 	if(selType=="VsPt") myHistos_->fill2DHistogram(hName,theEvent->pt,pass*theEvent->pt+(!pass)*(-100));
-	int q = -10; 
+	int q = -10;
 	if(pass) q = myL1Coll->operator[](iCand).hits;
 
 	std::bitset<18> hitsWord(q);
@@ -243,7 +269,7 @@ void OTFAnalyzer::fillRateHisto(const std::string & sysType,
 	  myHistos_->fill2DHistogram(hName,ptGen,pass*val+(!pass)*(-10));
 	}
 	if(sysType=="Gmt" && selType=="VsQuality") myHistos_->fill2DHistogram(hName,theEvent->pt,pass*q+(!pass)*(-10));
-	
+
 
 }
 //////////////////////////////////////////////////////////////////////////////
@@ -259,7 +285,7 @@ void OTFAnalyzer::fillGhostHisto(const std::string & sysType,
 
   std::vector<unsigned int> myCounts(6), myCountsMinus(6), myCountsPlus(6);
 
-  for(unsigned int iCandTmp=0;iCandTmp<myL1Coll->size();++iCandTmp){    
+  for(unsigned int iCandTmp=0;iCandTmp<myL1Coll->size();++iCandTmp){
     if(!passQuality(myL1Coll,sysType,iCandTmp)) continue;
     unsigned int iProcessor = myL1Coll->operator[](iCandTmp).phi;
     if(sysType=="Gmt") iProcessor = 2;
@@ -269,8 +295,8 @@ void OTFAnalyzer::fillGhostHisto(const std::string & sysType,
     if(iCharge==1) ++myCountsPlus[iProcessor];
   }
 
-  
-  for(unsigned int iProcessor=0;iProcessor<6;++iProcessor){    
+
+  for(unsigned int iProcessor=0;iProcessor<6;++iProcessor){
     myHistos_->fill2DHistogram(hName,iProcessor,myCounts[iProcessor]);
     myHistos_->fill2DHistogram(hName+"SS",iProcessor,abs(myCountsPlus[iProcessor]-myCountsMinus[iProcessor]));
     myHistos_->fill2DHistogram(hName+"OS",iProcessor,abs(myCountsPlus[iProcessor]*(myCountsPlus[iProcessor]<2)
@@ -291,21 +317,22 @@ bool OTFAnalyzer::analyze(const EventProxyBase& iEvent){
   std::string selType = "";
   std::string sysTypeGmt="Gmt";
   std::string sysTypeOtf="Otf";
+  std::string sysTypeNN="NN";
   std::string sysTypeRpc="Rpc";
   std::string sysTypeOther="Other";
-  
-  
+
+
   if(theEvent->pt<0.01){
-  
+
     fillRateHisto("Otf","Tot");
     fillRateHisto("Gmt","Tot");
-    
+
     fillRateHisto("Gmt","VsEta");
     fillRateHisto("Gmt","VsPt");
-    
+
     fillRateHisto("Otf","VsEta");
     fillRateHisto("Otf","VsPt");
-    
+
     fillRateHisto("Otf","VsQuality");
     fillRateHisto("Gmt","VsQuality");
   }
@@ -314,6 +341,7 @@ bool OTFAnalyzer::analyze(const EventProxyBase& iEvent){
       if(iCut>0 && iCut<14) continue;
       fillTurnOnCurve(iCut,sysTypeGmt,selType);
       fillTurnOnCurve(iCut,sysTypeOtf,selType);
+      fillTurnOnCurve(iCut,sysTypeNN,selType);
       fillTurnOnCurve(iCut,sysTypeRpc,selType);
       fillTurnOnCurve(iCut,sysTypeOther,selType);
     }
@@ -327,15 +355,16 @@ bool OTFAnalyzer::analyze(const EventProxyBase& iEvent){
       if(iType==1) pass = theEvent->pt>ptCut && theEvent->pt<(ptCut+5);
       if(iType==2) pass = theEvent->pt<10;
       if(!pass) continue;
-      
+
       selType = std::string(TString::Format("Type%d",iType));
       fillTurnOnCurve(OTFHistograms::ptCutsGmt[iCut],sysTypeGmt,selType);
       fillTurnOnCurve(OTFHistograms::ptCutsGmt[iCut],sysTypeRpc,selType);
       fillTurnOnCurve(OTFHistograms::ptCutsGmt[iCut],sysTypeOther,selType);
-      fillTurnOnCurve(OTFHistograms::ptCutsOtf[iCut],sysTypeOtf,selType);	  
+      fillTurnOnCurve(OTFHistograms::ptCutsOtf[iCut],sysTypeOtf,selType);
+      fillTurnOnCurve(OTFHistograms::ptCutsOtf[iCut],sysTypeNN,selType);
     }
     /////////////////
-  } 
+  }
   return true;
 }
 //////////////////////////////////////////////////////////////////////////////
@@ -352,7 +381,7 @@ bool  OTFAnalyzer::checkSelections(const std::string & type){
 //////////////////////////////////////////////////////////////////////////////
 void  OTFAnalyzer::addBranch(TTree *tree){
 
- for(unsigned int i=0;i<selectionFlavours_.size();++i){ 
+ for(unsigned int i=0;i<selectionFlavours_.size();++i){
    std::map<std::string,float>::const_iterator CI = treeVariables_.begin();
     for(;CI!=treeVariables_.end();++CI) tree->Branch(CI->first.c_str(),&treeVariables_[CI->first]);
   }
@@ -364,8 +393,7 @@ void OTFAnalyzer::clear(){
   ///Clear variables
   std::map<std::string,float>::iterator it=treeVariables_.begin();
   for(;it!=treeVariables_.end();++it) it->second = -999;
-  
+
 }
 //////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////
-
