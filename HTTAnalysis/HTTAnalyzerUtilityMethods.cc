@@ -63,7 +63,11 @@ std::string HTTAnalyzer::getSampleNameFromFileName(const EventProxyHTT & myEvent
         else if(fileName.find("W3JetsToLNu")!=std::string::npos) sampleName = "W3Jets";
         else if(fileName.find("W4JetsToLNu")!=std::string::npos) sampleName = "W4Jets";
         else if(fileName.find("WJetsToLNu")!=std::string::npos && myEventProxy.event->getLHEnOutPartons()==0) sampleName = "W0Jets";
-        else if(fileName.find("WJetsToLNu")!=std::string::npos && myEventProxy.event->getLHEnOutPartons()>0) sampleName = "WAllJets";
+        else if(fileName.find("WJetsToLNu")!=std::string::npos && myEventProxy.event->getLHEnOutPartons()==1) sampleName = "W1JetsIncl";
+        else if(fileName.find("WJetsToLNu")!=std::string::npos && myEventProxy.event->getLHEnOutPartons()==2) sampleName = "W2JetsIncl";
+        else if(fileName.find("WJetsToLNu")!=std::string::npos && myEventProxy.event->getLHEnOutPartons()==3) sampleName = "W3JetsIncl";
+        else if(fileName.find("WJetsToLNu")!=std::string::npos && myEventProxy.event->getLHEnOutPartons()==4) sampleName = "W4JetsIncl";
+        //else if(fileName.find("WJetsToLNu")!=std::string::npos && myEventProxy.event->getLHEnOutPartons()>0) sampleName = "WAllJets";
 
         else if(fileName.find("Run201")!=std::string::npos) sampleName =  "Data";
         else if(fileName.find("SUSYGluGluToHToTauTau")!=std::string::npos) sampleName =  "ATT";

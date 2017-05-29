@@ -49,7 +49,10 @@ float HTTHistograms::getSampleNormalisation(std::string sampleName){
         //test HACK fixme!!!
         std::vector<std::string> sampleNames = {"TTbar", "ZZTo2L2Q", "ZZTo4L","WZTo1L3Nu", "WZJToLLLNu", "WWTo1L1Nu2Q", "WZTo1L1Nu2Q", "VVTo2L2Nu", "WZTo2L2Q"};
         for(auto sampleNameTmp : sampleNames) {
-                if(sampleName.find(sampleNameTmp+"Match")!=std::string::npos) {hStats = get1D_TauMatchJetSum(hName, true, false); nEventsAnalysed=hStats->GetBinContent(1); }
+                if(sampleName.find(sampleNameTmp+"Match")!=std::string::npos) {
+                  hStats = get1D_TauMatchJetSum(hName, true, false);
+                  nEventsAnalysed=hStats->GetBinContent(1);
+                }
         }
         //test
 
@@ -136,6 +139,31 @@ TH1F *HTTHistograms::get1D_DYJet_Histogram(const std::string& name){
 }
 /////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////
+float HTTHistograms::getSampleLuminosity(const std::string& sampleName, float crossSection){
+
+  TH1F *hStats = 0;
+  if(sampleName.find("Match")!=std::string::npos) {
+    bool sumDecayModes = true;
+    bool sumJetBins = false;
+    hStats = get1D_TauMatchJetSum("h1DStats"+sampleName, sumDecayModes, sumJetBins);
+  }
+  else hStats = get1DHistogram("h1DStats"+sampleName);
+
+  if(!hStats){
+    std::cout<<"getSampleLuminosity(): hStats for sampleName: "
+      <<sampleName<<" not found! Crashing."
+      <<std::endl;
+  }
+
+  float recoPresEff = hStats->GetBinContent(3)/hStats->GetBinContent(2);
+  int nEventsAnalysed = hStats->GetBinContent(1);
+  float nEventsBeforePreselection = nEventsAnalysed/recoPresEff;
+
+  float luminosity = nEventsBeforePreselection/crossSection;
+  return luminosity;
+}
+/////////////////////////////////////////////////////////
+/////////////////////////////////////////////////////////
 TH1F *HTTHistograms::getNormalised_NJet_Histogram(const std::string& hName){
 
         TH1F *hNJets = get1DHistogram(hName);
@@ -164,7 +192,7 @@ TH1F *HTTHistograms::getNormalised_NJet_Histogram(const std::string& hName){
 
         float recoPresEff = hNJetsStats->GetBinContent(3)/hNJetsStats->GetBinContent(2);
         int nEventsAnalysed = hNJetsStats->GetBinContent(1);
-
+/*
         if(sampleName.find("0Jets")!=std::string::npos ||
            sampleName.find("AllJets")!=std::string::npos) {
                 TString allJetsName = "h1DStats"+sampleName;
@@ -178,8 +206,10 @@ TH1F *HTTHistograms::getNormalised_NJet_Histogram(const std::string& hName){
                 recoPresEff =  (hNJetsStats->GetBinContent(3) + hAllJetsStats->GetBinContent(3));
                 recoPresEff /= (hNJetsStats->GetBinContent(2) + hAllJetsStats->GetBinContent(2));
                 nEventsAnalysed = hNJetsStats->GetBinContent(1) + hAllJetsStats->GetBinContent(1);
-        }
 
+                std::cout<<"nEventsAnalysed/recoPresEff: "<<nEventsAnalysed/recoPresEff<<std::endl;
+        }
+*/
         if(hNJets) hNJets->Scale(recoPresEff/nEventsAnalysed);
         return hNJets;
 }
@@ -187,49 +217,93 @@ TH1F *HTTHistograms::getNormalised_NJet_Histogram(const std::string& hName){
 /////////////////////////////////////////////////////////
 TH1F *HTTHistograms::get1D_VJetSum(const std::string& name){
 
-        TString hName = name;
-
-        if(name.find("AllJets")!=std::string::npos) return getNormalised_NJet_Histogram(name.c_str());
-        if(name.find("0Jets")!=std::string::npos) return getNormalised_NJet_Histogram(name.c_str());
         if(name.find("Jets")==std::string::npos) return get1DHistogram(name.c_str());
 
+        std::vector<float> jetsLOSigma(5);
+        std::string bosonType = "";
+        if(name.find("W")!=std::string::npos && name.find("DY")==std::string::npos){
+          jetsLOSigma = {50380, 9644.5, 3144.5, 954.8, 485.6};
+          bosonType = "W";
+        }
+        if(name.find("DY")!=std::string::npos){
+          jetsLOSigma = {4954.0, 1012.5, 332.8, 101.8, 54.8};
+          bosonType = "DY";
+        }
+        float inclusiveSampleCrossSection = jetsLOSigma[0];
+
+        float inclusiveSampleLuminosity = getSampleLuminosity(bosonType+"0Jets",inclusiveSampleCrossSection) +
+                                          getSampleLuminosity(bosonType+"1JetsIncl",inclusiveSampleCrossSection) +
+                                          getSampleLuminosity(bosonType+"2JetsIncl",inclusiveSampleCrossSection) +
+                                          getSampleLuminosity(bosonType+"3JetsIncl",inclusiveSampleCrossSection) +
+                                          getSampleLuminosity(bosonType+"4JetsIncl",inclusiveSampleCrossSection);
+        float jets1SampleLuminosity = getSampleLuminosity(bosonType+"1Jets",jetsLOSigma[1]);
+        float jets2SampleLuminosity = getSampleLuminosity(bosonType+"2Jets",jetsLOSigma[2]);
+        float jets3SampleLuminosity = getSampleLuminosity(bosonType+"3Jets",jetsLOSigma[3]);
+        float jets4SampleLuminosity = getSampleLuminosity(bosonType+"4Jets",jetsLOSigma[4]);
+
+        TString hName = name;
+
         hName.ReplaceAll("Jets","0Jets");
-        TH1F *h0Jets = getNormalised_NJet_Histogram(hName.Data());
+        TH1F *h0Jets = get1DHistogram(hName.Data());
 
         hName = name;
         hName.ReplaceAll("Jets","1Jets");
-        TH1F *h1Jets = getNormalised_NJet_Histogram(hName.Data());
+        TH1F *h1Jets = get1DHistogram(hName.Data());
+
+        hName = name;
+        hName.ReplaceAll("Jets","1JetsIncl");
+        TH1F *h1JetsIncl = get1DHistogram(hName.Data());
 
         hName = name;
         hName.ReplaceAll("Jets","2Jets");
-        TH1F *h2Jets = getNormalised_NJet_Histogram(hName.Data());
+        TH1F *h2Jets = get1DHistogram(hName.Data());
+
+        hName = name;
+        hName.ReplaceAll("Jets","2JetsIncl");
+        TH1F *h2JetsIncl = get1DHistogram(hName.Data());
 
         hName = name;
         hName.ReplaceAll("Jets","3Jets");
-        TH1F *h3Jets = getNormalised_NJet_Histogram(hName.Data());
+        TH1F *h3Jets = get1DHistogram(hName.Data());
+
+        hName = name;
+        hName.ReplaceAll("Jets","3JetsIncl");
+        TH1F *h3JetsIncl = get1DHistogram(hName.Data());
 
         hName = name;
         hName.ReplaceAll("Jets","4Jets");
-        TH1F *h4Jets = getNormalised_NJet_Histogram(hName.Data());
+        TH1F *h4Jets = get1DHistogram(hName.Data());
+
+        hName = name;
+        hName.ReplaceAll("Jets","4JetsIncl");
+        TH1F *h4JetsIncl = get1DHistogram(hName.Data());
 
         TH1F *hJets = 0;
         if(h0Jets) hJets = (TH1F*)h0Jets->Clone(name.c_str());
         else if(h1Jets) hJets = (TH1F*)h1Jets->Clone(name.c_str());
         else if(h2Jets) hJets = (TH1F*)h2Jets->Clone(name.c_str());
+        else if(h3Jets) hJets = (TH1F*)h3Jets->Clone(name.c_str());
+        else if(h4Jets) hJets = (TH1F*)h4Jets->Clone(name.c_str());
 
         if(!hJets) return 0;
         if(!h1Jets && !h2Jets && !h3Jets && !h4Jets) return getNormalised_NJet_Histogram(name.c_str());
 
-        std::vector<float> jetsLOSigma(5);
-        if(name.find("W")!=std::string::npos && name.find("DY")==std::string::npos) jetsLOSigma = {50380, 9644.5, 3144.5, 954.8, 485.6};
-        if(name.find("DY")!=std::string::npos) jetsLOSigma = {4954.0, 1012.5, 332.8, 101.8, 54.8};
-
         hJets->Reset();
-        if(h0Jets) hJets->Add(h0Jets, jetsLOSigma[0]/jetsLOSigma[0]);
-        if(h1Jets) hJets->Add(h1Jets, jetsLOSigma[1]/jetsLOSigma[0]);
-        if(h2Jets) hJets->Add(h2Jets, jetsLOSigma[2]/jetsLOSigma[0]);
-        if(h3Jets) hJets->Add(h3Jets, jetsLOSigma[3]/jetsLOSigma[0]);
-        if(h4Jets) hJets->Add(h4Jets, jetsLOSigma[4]/jetsLOSigma[0]);
+        if(h0Jets) hJets->Add(h0Jets, 1.0/inclusiveSampleLuminosity);
+
+        if(h1Jets) hJets->Add(h1Jets, 1.0/(jets1SampleLuminosity + inclusiveSampleLuminosity));
+        if(h1JetsIncl) hJets->Add(h1JetsIncl, 1.0/(jets1SampleLuminosity + inclusiveSampleLuminosity));
+
+        if(h2Jets) hJets->Add(h2Jets, 1.0/(jets2SampleLuminosity + inclusiveSampleLuminosity));
+        if(h2JetsIncl) hJets->Add(h2JetsIncl, 1.0/(jets2SampleLuminosity + inclusiveSampleLuminosity));
+
+        if(h3Jets) hJets->Add(h3Jets, 1.0/(jets3SampleLuminosity + inclusiveSampleLuminosity));
+        if(h3JetsIncl) hJets->Add(h3JetsIncl, 1.0/(jets3SampleLuminosity + inclusiveSampleLuminosity));
+
+        if(h4Jets) hJets->Add(h4Jets, 1.0/(jets4SampleLuminosity + inclusiveSampleLuminosity));
+        if(h4JetsIncl) hJets->Add(h4JetsIncl, 1.0/(jets4SampleLuminosity + inclusiveSampleLuminosity));
+      
+        hJets->Scale(1.0/inclusiveSampleCrossSection);
 
         return hJets;
 }
@@ -400,6 +474,33 @@ void HTTHistograms::finalizeHistograms(const std::string & myDecayMode,
         std::cout<<"HTTHistograms::finalizeHistograms() START"<<std::endl;
 
         AnalysisHistograms::finalizeHistograms();
+
+        //TH1F *hWAllJets = get1DHistogram("h1DNPartonsWAllJets_");
+        //hWAllJets->Print("all");
+
+        TH1F *hW0Jets = get1DHistogram("h1DNPartonsW0Jets_");
+        hW0Jets->Print();
+
+        TH1F *hW1Jets = get1DHistogram("h1DNPartonsW1Jets_");
+        hW1Jets->Print();
+
+        TH1F *hW2Jets = get1DHistogram("h1DNPartonsW2Jets_");
+        hW2Jets->Print();
+
+        TH1F *hW3Jets = get1DHistogram("h1DNPartonsW3Jets_");
+        hW3Jets->Print();
+
+        //TH1F *hW4Jets = get1DHistogram("h1DNPartonsW4Jets_");
+        //hW4Jets->Print();
+
+        //hWAllJets->Scale(1.0/hWAllJets->Integral());
+        //hWAllJets->Print("all");
+        TH1F *hWJets = get1D_WJet_Histogram("h1DNPartonsWJets_");
+        //hWJets->SetBinContent(1,0);
+        //hWJets->Scale(9236.42/7.8168e-05);
+        hWJets->Print("all");
+
+        return;
 
         myCategoryRejester  = aCategoryRejester;
         unsigned int myNumberOfCategories = myCategoryRejester.size();

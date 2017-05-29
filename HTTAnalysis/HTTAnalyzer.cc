@@ -274,8 +274,10 @@ bool HTTAnalyzer::analyze(const EventProxyBase& iEvent){
 
         //Fill bookkeeping histogram. Bin 1 holds sum of weights.
         myHistos_->fill1DHistogram("h1DStats"+sampleName,0,eventWeight);
-        myHistos_->fill1DHistogram("h1DNPartons"+hNameSuffix,myEventProxy.event->getLHEnOutPartons(),eventWeight);
+        myHistos_->fill1DHistogram("h1DNPartons"+hNameSuffix+"_",myEventProxy.event->getLHEnOutPartons(),eventWeight);
         getPreselectionEff(myEventProxy);
+
+        return true; //TEST
 
         if(!myEventProxy.pairs->size()) return true;
         setAnalysisObjects(myEventProxy);

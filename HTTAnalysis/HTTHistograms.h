@@ -37,6 +37,9 @@ std::string getTemplateName(const std::string& name);
 ///on top of this normalisation.
 float getSampleNormalisation(std::string sampleName);
 
+///Return luminosity corresponding to given MC sample.
+float getSampleLuminosity(const std::string& sampleName, float crossSection);
+
 ///Estimate QCD background using the SS/OS method.
 TH1F* getQCDbackground(unsigned int iCategory, std::string varName,
                        unsigned int iSystEffect = (unsigned int) HTTAnalysis::NOMINAL);
