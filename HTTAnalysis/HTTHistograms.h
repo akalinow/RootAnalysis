@@ -113,7 +113,9 @@ TH1F *get1D_TauMatchJetSum(const std::string& name, bool sumDecayModes, bool sum
 
 //Return sum of histograms where you substitute pattern with all sample names.
 //If tauMatchSuffix is specified, you will have sum of histos that match the suffix
-TH1F* get1D_SumPattern_Histogram(const std::string& name, std::string pattern, std::vector<std::string> sampleNames, std::string tauMatchSuffix = "");
+TH1F* get1D_SumPattern_Histogram(const std::string& name, const std::string & pattern,
+                                 const std::vector<std::string> & sampleNames,
+                                 std::string tauMatchSuffix = "");
 
 ///Return histogram for sum of all W/Z jet bins
 ///The results is scaled to 1/LO_xsection.
@@ -121,10 +123,6 @@ TH1F *get1D_VJetSum(const std::string& name);
 
 ///Return histogram for sum of the EWK + 2jets samples
 TH1F *get1D_EWK2JetsSum(const std::string& name);
-
-///Return histogram from nJets sample normalised by
-///preselection/number of analysed events
-TH1F *getNormalised_NJet_Histogram(const std::string& hName);
 
 //Plot a single histogram. One has to provide the full
 //histogram name, e.g. including h1D prefix.

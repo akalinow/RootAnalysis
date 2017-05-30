@@ -21,51 +21,49 @@
 
 
 /////////////////////////////////////////////////////////
+/////////////////////////////////////////////////////////
+float HTTHistograms::getSampleLuminosity(const std::string& sampleName, float crossSection){
+
+  TH1F *hStats = 0;
+  bool sumDecayModes = true;
+  bool sumJetBins = false;
+
+  if(sampleName.find("DY")!=std::string::npos ||
+     sampleName.find("Match")!=std::string::npos) {
+            hStats = get1D_TauMatchJetSum("h1DStats"+sampleName, sumDecayModes, sumJetBins);
+            }
+  else hStats = get1DHistogram("h1DStats"+sampleName);
+
+  if(!hStats){
+    //std::cout<<"getSampleLuminosity(): hStats for sampleName: "
+      //<<sampleName<<" not found! Lookng for sum over tau MC matches."
+      //<<std::endl;
+    hStats = get1D_TauMatchJetSum("h1DStats"+sampleName, sumDecayModes, sumJetBins);
+}
+if(!hStats){
+    //std::cout<<"getSampleLuminosity(): hStats for sampleName: "
+      //<<sampleName<<" not found! Using histogram with 1.0 for event counts."
+      //<<std::endl;
+    hStats = new TH1F("h1DStats","",11,-0.5,10.5);
+    hStats->SetBinContent(1,1);
+    hStats->SetBinContent(2,1);
+    hStats->SetBinContent(3,1);
+  }
+
+  float recoPresEff = hStats->GetBinContent(3)/hStats->GetBinContent(2);
+  int nEventsAnalysed = hStats->GetBinContent(1);
+  float nEventsBeforePreselection = nEventsAnalysed/recoPresEff;
+
+  float luminosity = nEventsBeforePreselection/crossSection;
+  return luminosity;
+}
+/////////////////////////////////////////////////////////
+/////////////////////////////////////////////////////////
 float HTTHistograms::getSampleNormalisation(std::string sampleName){
 
-        std::string hName = "h1DStats"+sampleName;
-        TH1F *hStats = new TH1F("h1DStats","",11,-0.5,10.5);
-        hStats->SetBinContent(1,1);
-        hStats->SetBinContent(2,1);
-        hStats->SetBinContent(3,1);
-
-        if(sampleName.find("DYJetsMatch")!=std::string::npos || sampleName=="DYJets") { /*DYJets50 are normalised for analysed events and preselection for each nJets sample*/}
-        else if(sampleName.find("WJets")!=std::string::npos) { /*WJets are normalised for analysed events and preselection for each nJets sample*/ }
-        else if(sampleName=="ST") { /*WJets are normalised for analysed events and preselection for each nJets sample*/ }
-        else hStats = get1DHistogram(hName);
-
-        if(!hStats) hStats = get1D_TauMatchJetSum(hName,true,false);
-
-        if(!hStats) return 0;
-
-        float genPresEff = 1.0;
-        float recoPresEff = hStats->GetBinContent(3)/hStats->GetBinContent(2);
-        float presEff = genPresEff*recoPresEff;
-        float kFactor = 1.0;
-
         float crossSection = HTTAnalysis::getCrossSection(sampleName);
-        int nEventsAnalysed = hStats->GetBinContent(1);
-
-        //test HACK fixme!!!
-        std::vector<std::string> sampleNames = {"TTbar", "ZZTo2L2Q", "ZZTo4L","WZTo1L3Nu", "WZJToLLLNu", "WWTo1L1Nu2Q", "WZTo1L1Nu2Q", "VVTo2L2Nu", "WZTo2L2Q"};
-        for(auto sampleNameTmp : sampleNames) {
-                if(sampleName.find(sampleNameTmp+"Match")!=std::string::npos) {
-                  hStats = get1D_TauMatchJetSum(hName, true, false);
-                  nEventsAnalysed=hStats->GetBinContent(1);
-                }
-        }
-        //test
-
-        float weight = crossSection*presEff/nEventsAnalysed;
-        if(presEff<0 || fabs(fabs(crossSection)-1.0)<1e-5) weight = 1.0;
-        /*
-           outputStream<<"Sample name: "<<sampleName<<" ";
-           outputStream<<"Xsection: "<<crossSection<<" [pb] "<<" ";
-           outputStream<<"Events analyzed: "<<nEventsAnalysed<<" ";
-           outputStream<<"Reco preselection efficiency: "<<recoPresEff<<" ";
-           outputStream<<"Final weight: "<<weight<<std::endl;
-	*/
-        return weight;
+        float sampleLuminosity = getSampleLuminosity(sampleName, crossSection);
+        return 1.0/sampleLuminosity;
 }
 /////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////
@@ -136,82 +134,6 @@ TH1F *HTTHistograms::get1D_DYJet_Histogram(const std::string& name){
         TH1F *histo = get1D_TauMatchJetSum(name, sumDecayModes, sumJetBins);
 
         return histo;
-}
-/////////////////////////////////////////////////////////
-/////////////////////////////////////////////////////////
-float HTTHistograms::getSampleLuminosity(const std::string& sampleName, float crossSection){
-
-  TH1F *hStats = 0;
-  if(sampleName.find("Match")!=std::string::npos) {
-    bool sumDecayModes = true;
-    bool sumJetBins = false;
-    hStats = get1D_TauMatchJetSum("h1DStats"+sampleName, sumDecayModes, sumJetBins);
-  }
-  else hStats = get1DHistogram("h1DStats"+sampleName);
-
-  if(!hStats){
-    std::cout<<"getSampleLuminosity(): hStats for sampleName: "
-      <<sampleName<<" not found! Crashing."
-      <<std::endl;
-  }
-
-  float recoPresEff = hStats->GetBinContent(3)/hStats->GetBinContent(2);
-  int nEventsAnalysed = hStats->GetBinContent(1);
-  float nEventsBeforePreselection = nEventsAnalysed/recoPresEff;
-
-  float luminosity = nEventsBeforePreselection/crossSection;
-  return luminosity;
-}
-/////////////////////////////////////////////////////////
-/////////////////////////////////////////////////////////
-TH1F *HTTHistograms::getNormalised_NJet_Histogram(const std::string& hName){
-
-        TH1F *hNJets = get1DHistogram(hName);
-        if(!hNJets) return hNJets;
-
-        std::string sampleName = "";
-        TH1F *hNJetsStats = 0;
-
-        if(hName.find("W")!=std::string::npos &&
-           hName.find("DY")==std::string::npos) {
-                sampleName = hName.substr(hName.find("W"));
-                std::string selName = sampleName.substr(sampleName.find("_"));
-                sampleName = sampleName.substr(0,sampleName.size()-selName.size());
-                hNJetsStats = get1DHistogram("h1DStats"+sampleName);
-        }
-        if(hName.find("DY")!=std::string::npos) {
-                sampleName = hName.substr(hName.find("DY"));
-                std::string selName = sampleName.substr(sampleName.find("_"));
-                sampleName = sampleName.substr(0,sampleName.size()-selName.size());
-                bool sumDecayModes = true;
-                bool sumJetBins = false;
-                hNJetsStats = get1D_TauMatchJetSum("h1DStats"+sampleName, sumDecayModes, sumJetBins);
-        }
-
-        if(!hNJetsStats) return hNJets;
-
-        float recoPresEff = hNJetsStats->GetBinContent(3)/hNJetsStats->GetBinContent(2);
-        int nEventsAnalysed = hNJetsStats->GetBinContent(1);
-/*
-        if(sampleName.find("0Jets")!=std::string::npos ||
-           sampleName.find("AllJets")!=std::string::npos) {
-                TString allJetsName = "h1DStats"+sampleName;
-                if(sampleName.find("0Jets")!=std::string::npos) allJetsName.ReplaceAll("0Jets","AllJets");
-                if(sampleName.find("AllJets")!=std::string::npos) allJetsName.ReplaceAll("AllJets","0Jets");
-                TH1F *hAllJetsStats = 0;
-                bool sumDecayModes = true;
-                bool sumJetBins = false;
-                if(hName.find("W")!=std::string::npos && hName.find("DY")==std::string::npos) hAllJetsStats = get1DHistogram(allJetsName.Data());
-                if(hName.find("DY")!=std::string::npos) hAllJetsStats = get1D_TauMatchJetSum(allJetsName.Data(), sumDecayModes, sumJetBins);
-                recoPresEff =  (hNJetsStats->GetBinContent(3) + hAllJetsStats->GetBinContent(3));
-                recoPresEff /= (hNJetsStats->GetBinContent(2) + hAllJetsStats->GetBinContent(2));
-                nEventsAnalysed = hNJetsStats->GetBinContent(1) + hAllJetsStats->GetBinContent(1);
-
-                std::cout<<"nEventsAnalysed/recoPresEff: "<<nEventsAnalysed/recoPresEff<<std::endl;
-        }
-*/
-        if(hNJets) hNJets->Scale(recoPresEff/nEventsAnalysed);
-        return hNJets;
 }
 /////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////
@@ -286,7 +208,6 @@ TH1F *HTTHistograms::get1D_VJetSum(const std::string& name){
         else if(h4Jets) hJets = (TH1F*)h4Jets->Clone(name.c_str());
 
         if(!hJets) return 0;
-        if(!h1Jets && !h2Jets && !h3Jets && !h4Jets) return getNormalised_NJet_Histogram(name.c_str());
 
         hJets->Reset();
         if(h0Jets) hJets->Add(h0Jets, 1.0/inclusiveSampleLuminosity);
@@ -302,14 +223,16 @@ TH1F *HTTHistograms::get1D_VJetSum(const std::string& name){
 
         if(h4Jets) hJets->Add(h4Jets, 1.0/(jets4SampleLuminosity + inclusiveSampleLuminosity));
         if(h4JetsIncl) hJets->Add(h4JetsIncl, 1.0/(jets4SampleLuminosity + inclusiveSampleLuminosity));
-      
+
         hJets->Scale(1.0/inclusiveSampleCrossSection);
 
         return hJets;
 }
 /////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////
-TH1F* HTTHistograms::get1D_SumPattern_Histogram(const std::string& name, std::string pattern, std::vector<std::string> sampleNames, std::string tauMatchSuffix){
+TH1F* HTTHistograms::get1D_SumPattern_Histogram(const std::string& name, const std::string & pattern,
+                                                const std::vector<std::string> & sampleNames,
+                                                std::string tauMatchSuffix){
 
         TString hName = name;
         TH1F *hSum = 0;
@@ -366,50 +289,49 @@ std::string HTTHistograms::getTemplateName(const std::string& name){
 
         std::string templateName = "TemplateNotFound: "+name;
         if(name.find("hProf")!=std::string::npos && name.find("VsMag")!=std::string::npos) templateName = "hProfVsMagTemplate";
-        if(name.find("hProf")!=std::string::npos && name.find("VsPt")!=std::string::npos) templateName = "hProfVsPtTemplate";
-        if(name.find("hProf")!=std::string::npos && name.find("VsCos")!=std::string::npos) templateName = "hProfVsCosTemplate";
+        else if(name.find("hProf")!=std::string::npos && name.find("VsPt")!=std::string::npos) templateName = "hProfVsPtTemplate";
+        else if(name.find("hProf")!=std::string::npos && name.find("VsCos")!=std::string::npos) templateName = "hProfVsCosTemplate";
+        else if(name.find("h1DNPV")!=std::string::npos) templateName = "h1DNPVTemplate";
+        else if(name.find("h1DNPU")!=std::string::npos) templateName = "h1DNPUTemplate";
+        else if(name.find("h1DMass")!=std::string::npos) templateName = "h1DMassTemplate";
+        else if(name.find("h1DBigMass")!=std::string::npos) templateName = "h1DBigMassTemplate";
+        else if(name.find("h1DStats")!=std::string::npos) templateName = "h1DStatsTemplate";
+        else if(name.find("h1DPt")!=std::string::npos) templateName = "h1DPtTemplate";
+        else if(name.find("h1DEtaLeg")!=std::string::npos) templateName = "h1DEtaTemplate";
+        else if(name.find("h1DEta")!=std::string::npos && name.find("Jet")!=std::string::npos) templateName = "h1DJetEtaTemplate";
+        else if(name.find("h1DDeltaEta")!=std::string::npos) templateName = "h1DDeltaEtaTemplate";
+        else if(name.find("h1DIso")!=std::string::npos) templateName = "h1DIsoTemplate";
+        else if(name.find("h1DPhi")!=std::string::npos) templateName = "h1DPhiTemplate";
+        else if(name.find("h1DCosPhi")!=std::string::npos) templateName = "h1DCosPhiTemplate";
+        else if(name.find("h1DCSVBtag")!=std::string::npos) templateName = "h1DCSVBtagTemplate";
+        else if(name.find("h1DID")!=std::string::npos) templateName = "h1DIDTemplate";
+        else if(name.find("h1DVxPull")!=std::string::npos) templateName = "h1DVxPullTemplate";
+        else if(name.find("h1DnPCA")!=std::string::npos) templateName = "h1DnPCATemplate";
+        else if(name.find("h1DyTau")!=std::string::npos) templateName = "h1DyTauTemplate";
+        else if(name.find("h1DNPartons")!=std::string::npos) templateName = "h1DStatsTemplate";
 
-        if(name.find("h1DNPV")!=std::string::npos) templateName = "h1DNPVTemplate";
-        if(name.find("h1DNPU")!=std::string::npos) templateName = "h1DNPUTemplate";
-        if(name.find("h1DMass")!=std::string::npos) templateName = "h1DMassTemplate";
-        if(name.find("h1DBigMass")!=std::string::npos) templateName = "h1DBigMassTemplate";
-        if(name.find("h1DStats")!=std::string::npos) templateName = "h1DStatsTemplate";
-        if(name.find("h1DPt")!=std::string::npos) templateName = "h1DPtTemplate";
-        if(name.find("h1DEta")!=std::string::npos && name.find("Jet")==std::string::npos) templateName = "h1DEtaTemplate";
-        if(name.find("h1DEta")!=std::string::npos && name.find("Jet")!=std::string::npos) templateName = "h1DJetEtaTemplate";
-        if(name.find("h1DDeltaEta")!=std::string::npos) templateName = "h1DDeltaEtaTemplate";
-        if(name.find("h1DIso")!=std::string::npos) templateName = "h1DIsoTemplate";
-        if(name.find("h1DPhi")!=std::string::npos) templateName = "h1DPhiTemplate";
-        if(name.find("h1DCosPhi")!=std::string::npos) templateName = "h1DCosPhiTemplate";
-        if(name.find("h1DCSVBtag")!=std::string::npos) templateName = "h1DCSVBtagTemplate";
-        if(name.find("h1DID")!=std::string::npos) templateName = "h1DIDTemplate";
-        if(name.find("h1DVxPull")!=std::string::npos) templateName = "h1DVxPullTemplate";
-        if(name.find("h1DnPCA")!=std::string::npos) templateName = "h1DnPCATemplate";
-        if(name.find("h1DyTau")!=std::string::npos) templateName = "h1DyTauTemplate";
-        if(name.find("h1DNPartons")!=std::string::npos) templateName = "h1DStatsTemplate";
+        else if(name.find("h2DVxPullVsNTrack")!=std::string::npos) templateName = "h2DVxPullVsNTrackTemplate";
 
-        if(name.find("h2DVxPullVsNTrack")!=std::string::npos) templateName = "h2DVxPullVsNTrackTemplate";
+        else if(name.find("h1DUnRollTauPtMassVis")!=std::string::npos) templateName = "h1DUnRollTauPtMassVisTemplate";
+        else if(name.find("h2DRollTauPtMassVis")!=std::string::npos) templateName = "h2DRollTauPtMassVisTemplate";
 
-        if(name.find("h1DUnRollTauPtMassVis")!=std::string::npos) templateName = "h1DUnRollTauPtMassVisTemplate";
-        if(name.find("h2DRollTauPtMassVis")!=std::string::npos) templateName = "h2DRollTauPtMassVisTemplate";
+        else if(name.find("h1DUnRollTauDMMassVis")!=std::string::npos) templateName = "h1DUnRollTauDMMassVisTemplate";
+        else if(name.find("h2DRollTauDMMassVis")!=std::string::npos) templateName = "h2DRollTauDMMassVisTemplate";
 
-        if(name.find("h1DUnRollTauDMMassVis")!=std::string::npos) templateName = "h1DUnRollTauDMMassVisTemplate";
-        if(name.find("h2DRollTauDMMassVis")!=std::string::npos) templateName = "h2DRollTauDMMassVisTemplate";
+        else if(name.find("h1DUnRollHiggsPtMassSV")!=std::string::npos) templateName = "h1DUnRollHiggsPtMassSVTemplate";
+        else if(name.find("h2DRollHiggsPtMassSV")!=std::string::npos) templateName = "h2DRollHiggsPtMassSVTemplate";
 
-        if(name.find("h1DUnRollHiggsPtMassSV")!=std::string::npos) templateName = "h1DUnRollHiggsPtMassSVTemplate";
-        if(name.find("h2DRollHiggsPtMassSV")!=std::string::npos) templateName = "h2DRollHiggsPtMassSVTemplate";
+        else if(name.find("h1DUnRollGammaSumMassSV")!=std::string::npos) templateName = "h1DUnRollGammaSumMassSVTemplate";
+        else if(name.find("h2DRollGammaSumMassSV")!=std::string::npos) templateName = "h2DRollGammaSumMassSVTemplate";
 
-        if(name.find("h1DUnRollGammaSumMassSV")!=std::string::npos) templateName = "h1DUnRollGammaSumMassSVTemplate";
-        if(name.find("h2DRollGammaSumMassSV")!=std::string::npos) templateName = "h2DRollGammaSumMassSVTemplate";
+        else if(name.find("h1DUnRollMjjMassSV")!=std::string::npos) templateName = "h1DUnRollMjjMassSVTemplate";
+        else if(name.find("h2DRollMjjMassSV")!=std::string::npos) templateName = "h2DRollMjjMassSVTemplate";
 
-        if(name.find("h1DUnRollMjjMassSV")!=std::string::npos) templateName = "h1DUnRollMjjMassSVTemplate";
-        if(name.find("h2DRollMjjMassSV")!=std::string::npos) templateName = "h2DRollMjjMassSVTemplate";
+        else if(name.find("h1DUnRollMassSVPhiCP")!=std::string::npos) templateName = "h1DUnRollMassSVPhiCPTemplate";
+        else if(name.find("h2DRollMassSVPhiCP")!=std::string::npos) templateName = "h2DRollMassSVPhiCPTemplate";
 
-        if(name.find("h1DUnRollMassSVPhiCP")!=std::string::npos) templateName = "h1DUnRollMassSVPhiCPTemplate";
-        if(name.find("h2DRollMassSVPhiCP")!=std::string::npos) templateName = "h2DRollMassSVPhiCPTemplate";
-
-        if(name.find("h1DUnRollMassSVYCP")!=std::string::npos) templateName = "h1DUnRollMassSVYCPTemplate";
-        if(name.find("h2DRollMassSVYCP")!=std::string::npos) templateName = "h2DRollMassSVYCPTemplate";
+        else if(name.find("h1DUnRollMassSVYCP")!=std::string::npos) templateName = "h1DUnRollMassSVYCPTemplate";
+        else if(name.find("h2DRollMassSVYCP")!=std::string::npos) templateName = "h2DRollMassSVYCPTemplate";
 
         return templateName;
 }
@@ -474,33 +396,6 @@ void HTTHistograms::finalizeHistograms(const std::string & myDecayMode,
         std::cout<<"HTTHistograms::finalizeHistograms() START"<<std::endl;
 
         AnalysisHistograms::finalizeHistograms();
-
-        //TH1F *hWAllJets = get1DHistogram("h1DNPartonsWAllJets_");
-        //hWAllJets->Print("all");
-
-        TH1F *hW0Jets = get1DHistogram("h1DNPartonsW0Jets_");
-        hW0Jets->Print();
-
-        TH1F *hW1Jets = get1DHistogram("h1DNPartonsW1Jets_");
-        hW1Jets->Print();
-
-        TH1F *hW2Jets = get1DHistogram("h1DNPartonsW2Jets_");
-        hW2Jets->Print();
-
-        TH1F *hW3Jets = get1DHistogram("h1DNPartonsW3Jets_");
-        hW3Jets->Print();
-
-        //TH1F *hW4Jets = get1DHistogram("h1DNPartonsW4Jets_");
-        //hW4Jets->Print();
-
-        //hWAllJets->Scale(1.0/hWAllJets->Integral());
-        //hWAllJets->Print("all");
-        TH1F *hWJets = get1D_WJet_Histogram("h1DNPartonsWJets_");
-        //hWJets->SetBinContent(1,0);
-        //hWJets->Scale(9236.42/7.8168e-05);
-        hWJets->Print("all");
-
-        return;
 
         myCategoryRejester  = aCategoryRejester;
         unsigned int myNumberOfCategories = myCategoryRejester.size();
@@ -595,7 +490,7 @@ void HTTHistograms::finalizeHistograms(const std::string & myDecayMode,
                         plotStack(iCategory, "UnRollMjjMassSV", iSystEffect);
                         plotStack(iCategory, "UnRollMassSVPhiCP", iSystEffect);
                         plotStack(iCategory, "UnRollMassSVYCP", iSystEffect);
-                }
+                }                
         }
 
         ofstream eventCountFile("eventCount.txt",ios::out | ios::app);
@@ -1468,10 +1363,10 @@ THStack*  HTTHistograms::plotStack(unsigned int iCategory,
         hs->Add(hST,"hist");
         hs->Add(hVVJ,"hist");
         hs->Add(hVVT,"hist");
-        hs->Add(hWJets,"hist");
         hs->Add(hDYJetsLowM,"hist");
         hs->Add(hDYJetsZJ,"hist");
         hs->Add(hDYJetsZL,"hist");
+        hs->Add(hWJets,"hist");
         hs->Add(hDYJetsZTT,"hist");
         ////////
         TH1F *hMCSum = (TH1F*)hWJets->Clone("hMCSum");
@@ -1534,8 +1429,8 @@ THStack*  HTTHistograms::plotStack(unsigned int iCategory,
 
         if(!hNameSuffix.size()) hNameSuffix = "baseline";
         hs->SetTitle(("Variable: "+varName+" selection: "+hNameSuffix).c_str());
-        hs->SetMaximum(4400);
         hs->Draw("hist");
+
         hs->GetXaxis()->SetTitle(varName.c_str());
         hs->GetYaxis()->SetTitleOffset(1.4);
         hMCSum->SetFillColor(5);
@@ -1564,7 +1459,6 @@ THStack*  HTTHistograms::plotStack(unsigned int iCategory,
         hs->GetHistogram()->SetTitleOffset(1.0);
         hs->SetMaximum(1.1*max);
         hs->SetMinimum(0.1);
-
         hSoup->DrawCopy("same");
 
         TLegend *leg = new TLegend(0.79,0.12,0.99,0.82,NULL,"brNDC");
@@ -1590,32 +1484,31 @@ THStack*  HTTHistograms::plotStack(unsigned int iCategory,
                        hs->GetXaxis()->GetXmin()) +
                   hs->GetXaxis()->GetXmin();
 
-        float y = 0.8*(max -
-                       hs->GetMinimum()) +
-                  hs->GetMinimum();
+        float y = 0.8*(max - hs->GetMinimum()) + hs->GetMinimum();
         c1->cd();
         pad2->Draw();
         pad2->cd();
 
-        hSoup = (TH1F*)hSoup->Clone("hDataMCRatio");
-        hSoup->SetDirectory(0);
-        hSoup->GetXaxis()->SetRange(binLow,binHigh);
-        hSoup->SetTitle("");
-        hSoup->SetXTitle("");
-        //hSoup->SetYTitle("#frac{N_{obs} - N_{exp}}{#sqrt{N_{obs}}}");
-        hSoup->SetYTitle("#frac{N_{obs}}{N_{exp}}");
-        hSoup->GetXaxis()->SetLabelSize(0.09);
-        hSoup->GetYaxis()->SetLabelSize(0.09);
-        hSoup->GetYaxis()->SetTitleSize(0.09);
-        hSoup->GetYaxis()->SetTitleOffset(0.5);
-        hSoup->Divide(hMCSum);
-        hSoup->SetLineWidth(3);
-        hSoup->SetMinimum(0.55);
-        hSoup->SetMaximum(1.55);
-        hSoup->SetStats(kFALSE);
-        hSoup->SetFillStyle(0);
-        hSoup->Draw("E1");
-        TLine *aLine = new TLine(hSoup->GetXaxis()->GetXmin(),1.0,highEnd,1.0);
+        TH1F *hDataMCRatio = (TH1F*)hSoup->Clone("hDataMCRatio");
+        hDataMCRatio->SetDirectory(0);
+        hDataMCRatio->GetXaxis()->SetRange(binLow,binHigh);
+        hDataMCRatio->SetTitle("");
+        hDataMCRatio->SetXTitle("");
+        //hDataMCRatio->SetYTitle("#frac{N_{obs} - N_{exp}}{#sqrt{N_{obs}}}");
+        hDataMCRatio->SetYTitle("#frac{N_{obs}}{N_{exp}}");
+        hDataMCRatio->GetXaxis()->SetLabelSize(0.09);
+        hDataMCRatio->GetYaxis()->SetLabelSize(0.09);
+        hDataMCRatio->GetYaxis()->SetTitleSize(0.09);
+        hDataMCRatio->GetYaxis()->SetTitleOffset(0.5);
+        hDataMCRatio->Divide(hMCSum);
+
+        hDataMCRatio->SetLineWidth(3);
+        hDataMCRatio->SetMinimum(0.55);
+        hDataMCRatio->SetMaximum(1.55);
+        hDataMCRatio->SetStats(kFALSE);
+        hDataMCRatio->SetFillStyle(0);
+        hDataMCRatio->Draw("E1");
+        TLine *aLine = new TLine(hDataMCRatio->GetXaxis()->GetXmin(),1.0,highEnd,1.0);
         aLine->SetLineColor(1);
         aLine->SetLineWidth(2);
         aLine->Draw();

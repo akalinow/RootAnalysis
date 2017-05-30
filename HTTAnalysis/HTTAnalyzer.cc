@@ -163,18 +163,9 @@ void HTTAnalyzer::fillControlHistos(const std::string & hNameSuffix, float event
         myHistos_->fill1DHistogram("h1DNPV"+hNameSuffix,aEvent.getNPV(),eventWeight);
 
         ///Fill leg1 (muon or first tau)
-        float phi = aLeg1.getP4(aSystEffect).Phi();
-        if(sampleName.find("Data")==std::string::npos){
-          phi+=M_PI;
-          if(phi<-M_PI) phi+=2*M_PI;
-          if(phi>M_PI) phi-=2*M_PI;
-          phi*=-1;
-        }
-        myHistos_->fill1DHistogram("h1DPhiLeg1"+hNameSuffix,phi,eventWeight);
-
         myHistos_->fill1DHistogram("h1DPtLeg1"+hNameSuffix,aLeg1.getP4(aSystEffect).Pt(),eventWeight);
         myHistos_->fill1DHistogram("h1DEtaLeg1"+hNameSuffix,aLeg1.getP4(aSystEffect).Eta(),eventWeight);
-        //myHistos_->fill1DHistogram("h1DPhiLeg1"+hNameSuffix,aLeg1.getP4(aSystEffect).Phi(),eventWeight);
+        myHistos_->fill1DHistogram("h1DPhiLeg1"+hNameSuffix,aLeg1.getP4(aSystEffect).Phi(),eventWeight);
         myHistos_->fill1DHistogram("h1DIsoLeg1"+hNameSuffix,aLeg1.getProperty(PropertyEnum::combreliso),eventWeight);
         myHistos_->fill1DHistogram("h1DIDLeg1"+hNameSuffix,aLeg1.getProperty(PropertyEnum::byIsolationMVArun2v1DBoldDMwLTraw),eventWeight);
         myHistos_->fill1DHistogram("h1DPtLeg1LeadingTk"+hNameSuffix,aLeg1.getProperty(PropertyEnum::leadChargedParticlePt),eventWeight);
@@ -207,18 +198,8 @@ void HTTAnalyzer::fillControlHistos(const std::string & hNameSuffix, float event
                 myHistos_->fill1DHistogram("h1DEtaTrailingJet"+hNameSuffix,aJet2.getP4().Eta(),eventWeight);
                 myHistos_->fill1DHistogram("h1DPhiTrailingJet"+hNameSuffix,aJet2.getP4().Phi(),eventWeight);
         }
-        phi = aMET.getP4(aSystEffect).Phi();
-        if(sampleName.find("Data")==std::string::npos){
-          phi+=M_PI;
-          if(phi<-M_PI) phi+=2*M_PI;
-          if(phi>M_PI) phi-=2*M_PI;
-          phi*=-1;
-        }
-        myHistos_->fill1DHistogram("h1DPhiMET"+hNameSuffix,phi,eventWeight);
-
-        //myHistos_->fill1DHistogram("h1DPhiMET"+hNameSuffix,aMET.getP4(aSystEffect).Phi(),eventWeight);
+        myHistos_->fill1DHistogram("h1DPhiMET"+hNameSuffix,aMET.getP4(aSystEffect).Phi(),eventWeight);
         myHistos_->fill1DHistogram("h1DPtMET"+hNameSuffix,aMET.getP4(aSystEffect).Pt(),eventWeight);
-
 
         ///Fill b-jets info
         myHistos_->fill1DHistogram("h1DStatsNBTag"+hNameSuffix,nBJets,eventWeight);
@@ -260,6 +241,8 @@ bool HTTAnalyzer::passCategory(unsigned int iCategory){
 //////////////////////////////////////////////////////////////////////////////
 bool HTTAnalyzer::analyze(const EventProxyBase& iEvent){
 
+        bool runSystematics = false;
+
         const EventProxyHTT & myEventProxy = static_cast<const EventProxyHTT&>(iEvent);
         sampleName = getSampleName(myEventProxy);
 
@@ -277,8 +260,6 @@ bool HTTAnalyzer::analyze(const EventProxyBase& iEvent){
         myHistos_->fill1DHistogram("h1DNPartons"+hNameSuffix+"_",myEventProxy.event->getLHEnOutPartons(),eventWeight);
         getPreselectionEff(myEventProxy);
 
-        return true; //TEST
-
         if(!myEventProxy.pairs->size()) return true;
         setAnalysisObjects(myEventProxy);
 
@@ -294,7 +275,9 @@ bool HTTAnalyzer::analyze(const EventProxyBase& iEvent){
         for(unsigned int iSystEffect = (unsigned int)HTTAnalysis::NOMINAL;
             iSystEffect<=(unsigned int)HTTAnalysis::ZmumuDown; ++iSystEffect) {
 
+              if(!runSystematics && iSystEffect!=(unsigned int)HTTAnalysis::NOMINAL) continue;
               if(iSystEffect==(unsigned int)HTTAnalysis::DUMMY_SYS) continue;
+
                 HTTAnalysis::sysEffects aSystEffect = static_cast<HTTAnalysis::sysEffects>(iSystEffect);
 
                 float leg1ScaleFactor = myChannelSpecifics->getLeg1Correction(aSystEffect);

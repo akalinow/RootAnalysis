@@ -144,7 +144,11 @@ std::string HTTAnalyzer::getDYSampleName(const EventProxyHTT & myEventProxy){
         else if(fileName.find("DY4JetsToLLM50")!=std::string::npos) jetsName = "4Jets";
         else if(fileName.find("DYJetsToLLM10to50")!=std::string::npos) jetsName =  "LowM";
         else if(fileName.find("DYJetsToLLM50")!=std::string::npos && myEventProxy.event->getLHEnOutPartons()==0) jetsName =  "0Jets";
-        else if(fileName.find("DYJetsToLLM50")!=std::string::npos && myEventProxy.event->getLHEnOutPartons()>0) jetsName =  "AllJets";
+        else if(fileName.find("DYJetsToLLM50")!=std::string::npos && myEventProxy.event->getLHEnOutPartons()==1) jetsName =  "1JetsIncl";
+        else if(fileName.find("DYJetsToLLM50")!=std::string::npos && myEventProxy.event->getLHEnOutPartons()==2) jetsName =  "2JetsIncl";
+        else if(fileName.find("DYJetsToLLM50")!=std::string::npos && myEventProxy.event->getLHEnOutPartons()==3) jetsName =  "3JetsIncl";
+        else if(fileName.find("DYJetsToLLM50")!=std::string::npos && myEventProxy.event->getLHEnOutPartons()==4) jetsName =  "4JetsIncl";
+        //else if(fileName.find("DYJetsToLLM50")!=std::string::npos && myEventProxy.event->getLHEnOutPartons()>0) jetsName =  "AllJets";
 
         int decayModeBoson = myEventProxy.event->getDecayModeBoson();
         int leg1MCMatch = 6, leg2MCMatch = 6;
