@@ -337,6 +337,7 @@ std::string HTTHistograms::getTemplateName(const std::string& name){
 
         if(name.find("h1DUnRollMassSVYCP")!=std::string::npos) templateName = "h1DUnRollMassSVYCPTemplate";
         if(name.find("h2DRollMassSVYCP")!=std::string::npos) templateName = "h2DRollMassSVYCPTemplate";
+        if(name.find("h1DRun")!=std::string::npos) templateName = "h1DRunTemplate";//test
 
         return templateName;
 }
@@ -364,6 +365,7 @@ void HTTHistograms::defineHistograms(){
                 add1DHistogram("h1DVxPullTemplate",";#phi^{*} [rad]; Events",11,-0.01,0.01,file_);
                 add1DHistogram("h1DyTauTemplate",";yTau; Events",15,-1,1,file_);
                 add1DHistogram("h1DnPCATemplate",";#hat{n}_{RECO}>; Events",20,0,0.02,file_);
+                add1DHistogram("h1DRunTemplate",";RunNumber>; Events",33,272000,285000,file_);//test
 
                 // 0jet: unroll in tau_Pt using bins of {30,35,40,45,50,55,300} and in visible mass using bins of {0,60,65,70,75,80,85,90,95,100,105,110,400}
                 std::vector<double> massVisBins = {0,60,65,70,75,80,85,90,95,100,105,110,400};
@@ -441,7 +443,7 @@ void HTTHistograms::finalizeHistograms(const std::string & myDecayMode,
         gErrorIgnoreLevel = kBreak;
         //////////////
         ///Control regions plots
-/*        for(auto iCategory: mainCategoriesRejester) {
+        for(auto iCategory: mainCategoriesRejester) {
 
                 //plotCPhistograms(iCategory);
 
@@ -449,6 +451,7 @@ void HTTHistograms::finalizeHistograms(const std::string & myDecayMode,
                 plotStack(iCategory, "MassVis");
                 plotStack(iCategory, "MassTrans");
                 plotStack(iCategory, "UnRollTauPtMassVis");
+                plotStack(iCategory, "UnRollTauDMMassVis");
                 plotStack(iCategory, "UnRollHiggsPtMassSV");
                 plotStack(iCategory, "UnRollMjjMassSV");
                 plotStack(iCategory, "UnRollMassSVPhiCP");
@@ -486,10 +489,11 @@ void HTTHistograms::finalizeHistograms(const std::string & myDecayMode,
                 plotStack(iCategory, "Phi-nVectors");
                 plotStack(iCategory, "Phi-nVecIP");
                 plotStack(iCategory, "NPV");
-        }*/
+        }
+        plotSingleHistogram("h1DRunNumberData");
 
         ///Make systematic effect histos.
-        for(unsigned int iSystEffect = (unsigned int)HTTAnalysis::NOMINAL;
+/*        for(unsigned int iSystEffect = (unsigned int)HTTAnalysis::NOMINAL;
             iSystEffect<=(unsigned int)HTTAnalysis::ZmumuDown; ++iSystEffect) {
                 if(iSystEffect==(unsigned int)HTTAnalysis::DUMMY_SYS) continue;
                 for(auto iCategory: mainCategoriesRejester) {
@@ -504,7 +508,7 @@ void HTTHistograms::finalizeHistograms(const std::string & myDecayMode,
                         plotStack(iCategory, "UnRollMassSVPhiCP", iSystEffect);
                         plotStack(iCategory, "UnRollMassSVYCP", iSystEffect);
                 }
-        }
+        }*/
 
         ofstream eventCountFile("eventCount.txt",ios::out | ios::app);
         outputStream<<"HTTHistograms compilation time: "<<__TIMESTAMP__<<std::endl;
@@ -1556,9 +1560,9 @@ std::pair<float,float> HTTHistograms::getQCDControlToSignal(unsigned int iCatego
         ///Return fixed values according to SMH2016 TWiki:
         ///https://twiki.cern.ch/twiki/bin/viewauth/CMS/SMTauTau2016#QCD_background_estimation_in_Lta
         std::pair<float,float> result(1,0);
-        if(myCategoryRejester[iCategory]->name().find("0jet")!=std::string::npos) result = std::pair<float,float>(1.0,0.15);
-        else if(myCategoryRejester[iCategory]->name().find("boosted")!=std::string::npos) result = std::pair<float,float>(1.15,0.15*1.15);
-        else if(myCategoryRejester[iCategory]->name().find("vbf")) result = std::pair<float,float>(1.2,0.30*1.2);
+        if(myCategoryRejester[iCategory]->name().find("0jet")!=std::string::npos) result = std::pair<float,float>(1.07,0.15*1.07);
+        else if(myCategoryRejester[iCategory]->name().find("boosted")!=std::string::npos) result = std::pair<float,float>(1.06,0.15*1.15);
+        else if(myCategoryRejester[iCategory]->name().find("vbf")) result = std::pair<float,float>(1.0,0.30*1.0);
         else result = std::pair<float,float>(1.0,0.15);
 
         if(iSystEffect==(unsigned int)HTTAnalysis::QCDSFUp) result.first+=result.second;

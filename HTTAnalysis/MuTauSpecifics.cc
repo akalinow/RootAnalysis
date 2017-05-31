@@ -86,6 +86,7 @@ void MuTauSpecifics::testAllCategories(const HTTAnalysis::sysEffects & aSystEffe
         unsigned int dataMask = (1<<8) -1;
         unsigned int mcMask = dataMask - (1<<6) - (1<<7);
         bool metFilterDecision = (metFilters & mcMask) == mcMask;
+        metFilterDecision = true;//test AP 19.05.2017
         if(myAnalyzer->sampleName=="Data") metFilterDecision = (metFilters & dataMask) == dataMask;
 
         if(!muonKinematics || !muonID || !tauID || !trigger || !metFilterDecision) return;
@@ -144,8 +145,8 @@ void MuTauSpecifics::testAllCategories(const HTTAnalysis::sysEffects & aSystEffe
 
         //2D categories
         bool jet0 = myAnalyzer->aLeg2.getP4(aSystEffect).Perp()>30 && myAnalyzer->nJets30 == 0;
-        bool boosted = myAnalyzer->aLeg2.getP4(aSystEffect).Perp()>30 && (myAnalyzer->nJets30==1 || (myAnalyzer->nJets30==2 && jetsMass < 300) || myAnalyzer->nJets30 > 2);
-        bool vbf = myAnalyzer->aLeg2.getP4(aSystEffect).Perp()>30 && myAnalyzer->nJets30==2 && jetsMass>300;
+        bool boosted = myAnalyzer->aLeg2.getP4(aSystEffect).Perp()>30 && (myAnalyzer->nJets30==1 || (myAnalyzer->nJets30>=2 && (jetsMass < 300 || higgsPt < 50 || myAnalyzer->aLeg2.getP4(aSystEffect).Perp()<40)));
+        bool vbf = myAnalyzer->aLeg2.getP4(aSystEffect).Perp()>40 && myAnalyzer->nJets30>=2 && jetsMass>300 && higgsPt > 50;
 
         bool wSelection = myAnalyzer->aPair.getMTMuon(aSystEffect)>80;
         bool muonAntiIso = myAnalyzer->aLeg1.getProperty(PropertyEnum::combreliso)>0.15 && myAnalyzer->aLeg1.getProperty(PropertyEnum::combreliso)<0.30;
