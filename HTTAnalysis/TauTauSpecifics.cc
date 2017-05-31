@@ -61,8 +61,8 @@ void TauTauSpecifics::testAllCategories(const HTTAnalysis::sysEffects & aSystEff
         for(auto && it : myAnalyzer->categoryDecisions) it = false;
 
         ///This stands for core selection, that is common to all regions.
-        bool tau1Kinematics = myAnalyzer->aLeg1.getP4().Pt()>50 && std::abs(myAnalyzer->aLeg1.getP4().Eta())<2.1;
-        bool tau2Kinematics = myAnalyzer->aLeg2.getP4().Pt()>40 && std::abs(myAnalyzer->aLeg2.getP4().Eta())<2.1;
+        bool tau1Kinematics = myAnalyzer->aLeg1.getP4(aSystEffect).Pt()>50 && std::abs(myAnalyzer->aLeg1.getP4(aSystEffect).Eta())<2.1;
+        bool tau2Kinematics = myAnalyzer->aLeg2.getP4(aSystEffect).Pt()>40 && std::abs(myAnalyzer->aLeg2.getP4(aSystEffect).Eta())<2.1;
 
         int tauIDmask=0, tauIsoTmask=0, tauIsoMmask=0, tauIsoLmask=0;
 
@@ -94,7 +94,7 @@ void TauTauSpecifics::testAllCategories(const HTTAnalysis::sysEffects & aSystEff
                                         myAnalyzer->aLeg2.hasTriggerMatch(TriggerEnum::HLT_DoubleMediumCombinedIsoPFTau35_Trk1_eta2p1_Reg);
 
         bool trigger = mediumIsoTrigger || mediumCombinedIsoTrigger;
-        
+
         if(myAnalyzer->aEvent.getRunId()>280385) {
                 trigger = mediumCombinedIsoTrigger;
         } else if(myAnalyzer->aEvent.getRunId()>1) {
@@ -117,21 +117,21 @@ void TauTauSpecifics::testAllCategories(const HTTAnalysis::sysEffects & aSystEff
         myAnalyzer->nJetsInGap30 = 0;
         if(myAnalyzer->nJets30>=2) {
                 for(unsigned int iJet=2; iJet<myAnalyzer->aSeparatedJets.size(); ++iJet) {
-                        if( (myAnalyzer->aSeparatedJets.at(iJet).getP4().Eta()>myAnalyzer->aJet1.getP4().Eta() &&
-                             myAnalyzer->aSeparatedJets.at(iJet).getP4().Eta()<myAnalyzer->aJet2.getP4().Eta()) ||
-                            (myAnalyzer->aSeparatedJets.at(iJet).getP4().Eta()<myAnalyzer->aJet1.getP4().Eta() &&
-                             myAnalyzer->aSeparatedJets.at(iJet).getP4().Eta()>myAnalyzer->aJet2.getP4().Eta()) ) {
+                        if( (myAnalyzer->aSeparatedJets.at(iJet).getP4(aSystEffect).Eta()>myAnalyzer->aJet1.getP4(aSystEffect).Eta() &&
+                             myAnalyzer->aSeparatedJets.at(iJet).getP4(aSystEffect).Eta()<myAnalyzer->aJet2.getP4(aSystEffect).Eta()) ||
+                            (myAnalyzer->aSeparatedJets.at(iJet).getP4(aSystEffect).Eta()<myAnalyzer->aJet1.getP4(aSystEffect).Eta() &&
+                             myAnalyzer->aSeparatedJets.at(iJet).getP4(aSystEffect).Eta()>myAnalyzer->aJet2.getP4(aSystEffect).Eta()) ) {
                                 if(myAnalyzer->aSeparatedJets.at(iJet).getP4(aSystEffect).Pt()>30) myAnalyzer->nJetsInGap30++;
                         }
                 }
         }
-	myAnalyzer->nBJets = 0;
-	for(auto itJet: myAnalyzer->aSeparatedJets) {
-	  if(std::abs(itJet.getP4(aSystEffect).Eta())<2.4 &&
-	     itJet.getP4(aSystEffect).Pt()>20 && //MB needed??
-	     itJet.getProperty(PropertyEnum::bCSVscore)>0.8484 && //Medium WP
-	     promoteBJet(itJet,aSystEffect,"central")//FIXME: need to variate central to up/down
-	     ) 	++myAnalyzer->nBJets;
+        myAnalyzer->nBJets = 0;
+        for(auto itJet: myAnalyzer->aSeparatedJets) {
+                if(std::abs(itJet.getP4(aSystEffect).Eta())<2.4 &&
+                   itJet.getP4(aSystEffect).Pt()>20 && //MB needed??
+                   itJet.getProperty(PropertyEnum::bCSVscore)>0.8484 && //Medium WP
+                   promoteBJet(itJet,aSystEffect,"central")//FIXME: need to variate central to up/down
+                   ) ++myAnalyzer->nBJets;
         }
 
         float jetsMass = (myAnalyzer->aJet1.getP4(aSystEffect)+myAnalyzer->aJet2.getP4(aSystEffect)).M();
@@ -165,16 +165,16 @@ void TauTauSpecifics::testAllCategories(const HTTAnalysis::sysEffects & aSystEff
         bool piRho = (isPi1 && isRho2) || (isPi2 && isRho1);
         bool rhoRho = isRho1 && isRho2;
 
-	bool btag = myAnalyzer->nBJets>=1 && myAnalyzer->nJets30<=1;
-	bool nobtag = myAnalyzer->nBJets==0;
+        bool btag = myAnalyzer->nBJets>=1 && myAnalyzer->nJets30<=1;
+        bool nobtag = myAnalyzer->nBJets==0;
 
-         //Main categories
+        //Main categories
         myAnalyzer->categoryDecisions[ChannelSpecifics::jet0->id()] = os && fullIso && jet0;
         myAnalyzer->categoryDecisions[ChannelSpecifics::boosted->id()] = os && fullIso && boosted;
         myAnalyzer->categoryDecisions[ChannelSpecifics::vbf->id()] = os && fullIso && vbf_2d;
-	myAnalyzer->categoryDecisions[ChannelSpecifics::inclusive->id()] = os && fullIso;
-	myAnalyzer->categoryDecisions[ChannelSpecifics::btag->id()] = os && fullIso && btag;
-	myAnalyzer->categoryDecisions[ChannelSpecifics::nobtag->id()] = os && fullIso && nobtag;
+        myAnalyzer->categoryDecisions[ChannelSpecifics::inclusive->id()] = os && fullIso;
+        myAnalyzer->categoryDecisions[ChannelSpecifics::btag->id()] = os && fullIso && btag;
+        myAnalyzer->categoryDecisions[ChannelSpecifics::nobtag->id()] = os && fullIso && nobtag;
 
         ///QCD region
         myAnalyzer->categoryDecisions[ChannelSpecifics::jet0->qcdEstimate()->id()] = os && antiIso && jet0;
@@ -203,7 +203,7 @@ void TauTauSpecifics::testAllCategories(const HTTAnalysis::sysEffects & aSystEff
         myAnalyzer->categoryDecisions[(int)HTTAnalysis::pi_pi] = os && fullIso && piPi;
         myAnalyzer->categoryDecisions[(int)HTTAnalysis::pi_rho] = os && fullIso && piRho;
         myAnalyzer->categoryDecisions[(int)HTTAnalysis::rho_rho] = os && fullIso && rhoRho;
-        */
+ */
 }
 /////////////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////////////
