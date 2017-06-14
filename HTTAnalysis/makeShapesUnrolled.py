@@ -35,6 +35,7 @@ categoryRootAnalysisNames = [
         ]
 
 categoryCombineNames = list()
+print "Hello world"
 
 for i in xrange(0,len(categoryRootAnalysisNames)):
         tmp = categoryRootAnalysisNames[i]
