@@ -1555,7 +1555,7 @@ std::pair<float,float> HTTHistograms::getQCDControlToSignal(unsigned int iCatego
         ///https://twiki.cern.ch/twiki/bin/viewauth/CMS/SMTauTau2016#QCD_background_estimation_in_Lta
         std::pair<float,float> result(1,0);
         if(myCategoryRejester[iCategory]->name().find("0jet")!=std::string::npos) result = std::pair<float,float>(1.07,0.15*1.07);
-        else if(myCategoryRejester[iCategory]->name().find("boosted")!=std::string::npos) result = std::pair<float,float>(1.06,0.15*1.15);
+        else if(myCategoryRejester[iCategory]->name().find("boosted")!=std::string::npos) result = std::pair<float,float>(1.06,0.15*1.06);
         else if(myCategoryRejester[iCategory]->name().find("vbf")) result = std::pair<float,float>(1.0,0.30*1.0);
         else result = std::pair<float,float>(1.0,0.15);
 
