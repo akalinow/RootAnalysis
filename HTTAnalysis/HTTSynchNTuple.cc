@@ -27,9 +27,12 @@ HTTSynchNTuple::HTTSynchNTuple(const std::string & aName, const std::string & aD
   h2DMuonIdCorrections = 0;
   h3DMuonIsoCorrections = 0;
   h3DMuonTrgCorrections = 0;
+  h3DMuonXTrgCorrections = 0;
   h1DMuonTrkCorrections = 0;
   h2DTauTrgGenuineCorrections = 0;
   h2DTauTrgFakeCorrections = 0;
+  h2DTauXTrgGenuineCorrections = 0;
+  h2DTauXTrgFakeCorrections = 0;
   h3DTauCorrections = 0;
   initializeBTagCorrections();
 }
@@ -45,9 +48,12 @@ HTTSynchNTuple::~HTTSynchNTuple(){
   if(h2DMuonIdCorrections) delete h2DMuonIdCorrections;
   if(h3DMuonIsoCorrections) delete h3DMuonIsoCorrections;
   if(h3DMuonTrgCorrections) delete h3DMuonTrgCorrections;
+  if(h3DMuonXTrgCorrections) delete h3DMuonXTrgCorrections;
   if(h1DMuonTrkCorrections) delete h1DMuonTrkCorrections;
   if(h2DTauTrgGenuineCorrections) delete h2DTauTrgGenuineCorrections;
   if(h2DTauTrgFakeCorrections) delete h2DTauTrgFakeCorrections;
+  if(h2DTauXTrgGenuineCorrections) delete h2DTauXTrgGenuineCorrections;
+  if(h2DTauXTrgFakeCorrections) delete h2DTauXTrgFakeCorrections;
   if(h3DTauCorrections) delete h3DTauCorrections;
   //btagging
   if(calib) delete calib;
@@ -552,6 +558,10 @@ void HTTSynchNTuple::fillLegsSpecific(const HTTParticle &leg1, const HTTParticle
     int iBin;
     iBin = h3DMuonTrgCorrections->FindBin(std::min(pt_1,(Float_t)999.9), eta_1, std::min(iso_1,(Float_t)0.499));
     trigweight_1 = h3DMuonTrgCorrections->GetBinContent(iBin);
+    if(pt_1<23){//xtrigger mu-tau
+      iBin = h3DMuonXTrgCorrections->FindBin(std::min(pt_1,(Float_t)999.9), eta_1, std::min(iso_1,(Float_t)0.299));
+      trigweight_1 = h3DMuonXTrgCorrections->GetBinContent(iBin);      
+    }
     iBin = h2DMuonIdCorrections->FindBin(std::min(pt_1,(Float_t)999.9), eta_1);
     idisoweight_1 = h2DMuonIdCorrections->GetBinContent(iBin);
     iBin = h3DMuonIsoCorrections->FindBin(std::min(pt_1,(Float_t)999.9), eta_1, std::min(iso_1,(Float_t)0.499));
@@ -606,6 +616,16 @@ void HTTSynchNTuple::fillLegsSpecific(const HTTParticle &leg1, const HTTParticle
     tau_decay_mode_2 = leg2.getProperty(PropertyEnum::decayMode);
     decayModeFindingOldDMs_2 = (tau_decay_mode_2==0 || tau_decay_mode_2==1 || tau_decay_mode_2==2 || tau_decay_mode_2==10); //FIXME: is it possible to take ID directly?
     trigweight_2 = 1; //1, single mu
+    if(pt_1<23){//xtrigger mu-tau
+      if(gen_match_2==5){ //genuine tau
+	iBin = h2DTauXTrgGenuineCorrections->FindBin(std::min(pt_2,(Float_t)999.9),eta_2);
+	trigweight_2 = h2DTauXTrgGenuineCorrections->GetBinContent(iBin);
+      }
+      else{ //fake tau
+	iBin = h2DTauXTrgFakeCorrections->FindBin(std::min(pt_2,(Float_t)999.9), eta_2);
+	trigweight_2 = h2DTauXTrgFakeCorrections->GetBinContent(iBin);
+      }  
+    }
     idisoweight_2 = (gen_match_2==5 ? 0.95 : 1); //0.95 for genuine tau, otherwise 1
     trackingweight_2 = 1; //1 for tau
     trg_singletau_1 = leg2.hasTriggerMatch(TriggerEnum::HLT_VLooseIsoPFTau120_Trk50_eta2p1);
@@ -946,6 +966,8 @@ void HTTSynchNTuple::initializeCorrections(){
   RooAbsReal *muon_id_scalefactor = scaleWorkspace->function("m_id_ratio");
   RooAbsReal *muon_iso_scalefactor = scaleWorkspace->function("m_iso_binned_ratio");
   RooAbsReal *muon_trg_scalefactor = scaleWorkspace->function("m_trgOR4_binned_ratio");//MB 24->22
+  RooAbsReal *muon_xtrg_scalefactor_iso  = scaleWorkspace->function("m_trgMu19leg_eta2p1_desy_ratio");//mu-iso<0.15?
+  RooAbsReal *muon_xtrg_scalefactor_aiso = scaleWorkspace->function("m_trgMu19leg_eta2p1_aiso0p15to0p3_desy_ratio");//0.15<mu-iso<0.3?
   RooAbsReal *muon_trk_scalefactor = scaleWorkspace->function("m_trk_ratio");//MB not in HTTAnalysis
   RooAbsReal *tau_trg_genuine_efficiency = scaleWorkspace->function("t_genuine_TightIso_tt_ratio");//MB data->ratio
   RooAbsReal *tau_trg_fake_efficiency = scaleWorkspace->function("t_fake_TightIso_tt_ratio");//MB data->ratio
@@ -972,6 +994,28 @@ void HTTSynchNTuple::initializeCorrections(){
 									    RooFit::ZVar(*scaleWorkspace->var("m_iso"),RooFit::Binning(12,-0.05,0.55)),
 									    RooFit::Extended(kFALSE),
 									    RooFit::Scaling(kFALSE));
+  //Uwaga: ponizsze korekcje sa 2d, do wlozenia w 3d
+  TH2F *h2DMuonXTrgCorrections_iso = (TH2F*)muon_xtrg_scalefactor_iso->createHistogram("h2DMuonXTrgCorrections_iso",
+										       *scaleWorkspace->var("m_pt"),RooFit::Binning(1980,10,1000),
+										       RooFit::YVar(*scaleWorkspace->var("m_eta"),RooFit::Binning(48,-2.4,2.4)),//MB m_abs_eta->m_eta
+										       RooFit::Extended(kFALSE),
+										       RooFit::Scaling(kFALSE));
+  TH2F *h2DMuonXTrgCorrections_aiso = (TH2F*)muon_xtrg_scalefactor_iso->createHistogram("h2DMuonXTrgCorrections_aiso",
+										       *scaleWorkspace->var("m_pt"),RooFit::Binning(1980,10,1000),
+										       RooFit::YVar(*scaleWorkspace->var("m_eta"),RooFit::Binning(48,-2.4,2.4)),//MB m_abs_eta->m_eta
+										       RooFit::Extended(kFALSE),
+										       RooFit::Scaling(kFALSE));
+  h3DMuonXTrgCorrections = new TH3F("h3DMuonXTrgCorrections","",1980,10,1000,48,-2.4,2.4,8,-0.05,0.35);//less iso-bins than for id/single-trg due to different range
+  for(int iX=0; iX<1980; ++iX){
+    for(int iY=0; iY<48; ++iY){
+      float binContent = h2DMuonXTrgCorrections_iso->GetBinContent(iX+1,iY+1);
+      for(int iZ=0; iZ<4; ++iZ)//bins 1-4 correspond with iso<0.15
+	h3DMuonXTrgCorrections->SetBinContent(iX+1,iY+1,iZ+1,binContent);
+      binContent = h2DMuonXTrgCorrections_aiso->GetBinContent(iX+1,iY+1);
+      for(int iZ=4; iZ<8; ++iZ)//bins 4-8 correspond with 0.15<iso<0.3
+	h3DMuonXTrgCorrections->SetBinContent(iX+1,iY+1,iZ+1,binContent);
+    }
+  }
   h1DMuonTrkCorrections = (TH1F*)muon_trk_scalefactor->createHistogram("h1DMuonTrkCorrections",
 								       *scaleWorkspace->var("m_eta"),RooFit::Binning(48,-2.4,2.4),//MB m_abs_eta->m_eta
 								       RooFit::Extended(kFALSE),
@@ -1005,6 +1049,42 @@ void HTTSynchNTuple::initializeCorrections(){
 										  RooFit::Scaling(kFALSE));
 
   delete aFile;
+  if(h2DMuonXTrgCorrections_iso) delete h2DMuonXTrgCorrections_iso;
+  if(h2DMuonXTrgCorrections_aiso) delete h2DMuonXTrgCorrections_aiso;
+
+  ////
+  //Open different RooWorkspace for missig SFs - ugly:(
+				   
+  //FIXME std::string correctionFileName_b = "http://akalinow.web.cern.ch/akalinow/htt_scalefactors_sm_moriond_v2.root";
+  //FIXME TFile *bFile = TFile::Open(correctionFileName_b.c_str(),"CACHEREAD");
+  std::string correctionFileName_b = "./htt_scalefactors_sm_moriond_v2.root";
+  TFile *bFile = TFile::Open(correctionFileName_b.c_str());
+
+  RooWorkspace *scaleWorkspace_b = (RooWorkspace*)bFile->Get("w");
+
+  RooAbsReal *tau_xtrg_genuine_efficiency = scaleWorkspace_b->function("t_genuine_TightIso_mt_ratio");//MB data->ratio
+  RooAbsReal *tau_xtrg_fake_efficiency = scaleWorkspace_b->function("t_fake_TightIso_mt_ratio");//MB data->ratio
+
+  ///WARNING: t_eta and t_dm not used, so histograms have only one bin in this directions
+  RooArgSet dependentVarsForMT(*scaleWorkspace_b->var("t_pt"),*scaleWorkspace_b->var("t_eta"));
+  RooArgSet projectedVarsForMT;
+
+  const RooAbsReal * tau_xtrg_genuine_efficiency_proj = tau_xtrg_genuine_efficiency->createPlotProjection(dependentVarsForMT,projectedVarsForMT);
+  const RooAbsReal * tau_xtrg_fake_efficiency_proj = tau_xtrg_fake_efficiency->createPlotProjection(dependentVarsForMT,projectedVarsForMT);
+
+  h2DTauXTrgGenuineCorrections = (TH2F*)tau_xtrg_genuine_efficiency_proj->createHistogram("h2DTauXTrgGenuineCorrections",
+											  *scaleWorkspace_b->var("t_pt"),RooFit::Binning(5000,0,1000),
+											  RooFit::YVar(*scaleWorkspace_b->var("t_eta"),RooFit::Binning(4,-2.5,2.5)),//MB binning in eta: barrel/endcaps, i.e. <1.5
+											  RooFit::Extended(kFALSE),
+											  RooFit::Scaling(kFALSE));
+
+  h2DTauXTrgFakeCorrections = (TH2F*)tau_xtrg_fake_efficiency_proj->createHistogram("h2DTauXTrgFakeCorrections",
+										    *scaleWorkspace_b->var("t_pt"),RooFit::Binning(5000,0,1000),
+										    RooFit::YVar(*scaleWorkspace_b->var("t_eta"),RooFit::Binning(4,-2.5,2.5)),//MB binning in eta: barrel/endcaps, i.e. <1.5
+										    RooFit::Extended(kFALSE),
+										    RooFit::Scaling(kFALSE));
+
+  delete bFile;
 
   return;
 }

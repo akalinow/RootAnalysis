@@ -100,10 +100,11 @@ class HTTSynchNTuple: public Analyzer{
 
   ///Histograms with lepton corrections
   TH2F *h2DMuonIdCorrections;
-  TH3F *h3DMuonIsoCorrections, *h3DMuonTrgCorrections;
+  TH3F *h3DMuonIsoCorrections, *h3DMuonTrgCorrections, *h3DMuonXTrgCorrections;
   TH1F *h1DMuonTrkCorrections;
   TH3F *h3DTauCorrections;
   TH2F *h2DTauTrgGenuineCorrections, *h2DTauTrgFakeCorrections;
+  TH2F *h2DTauXTrgGenuineCorrections, *h2DTauXTrgFakeCorrections;
 
   //For PU
   TFile *puDataFile_, *puMCFile_;
