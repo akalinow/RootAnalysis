@@ -361,7 +361,6 @@ void HTTHistograms::defineHistograms(){
                 add1DHistogram("h1DVxPullTemplate",";#phi^{*} [rad]; Events",11,-0.01,0.01,file_);
                 add1DHistogram("h1DyTauTemplate",";yTau; Events",15,-1,1,file_);
                 add1DHistogram("h1DnPCATemplate",";#hat{n}_{RECO}>; Events",20,0,0.02,file_);
-                add1DHistogram("h1DRunTemplate",";RunNumber>; Events",33,272000,285000,file_);//test
 
                 // 0jet: unroll in tau_Pt using bins of {30,35,40,45,50,55,300} and in visible mass using bins of {0,60,65,70,75,80,85,90,95,100,105,110,400}
                 std::vector<double> massVisBins = {0,60,65,70,75,80,85,90,95,100,105,110,400};
@@ -486,7 +485,6 @@ void HTTHistograms::finalizeHistograms(const std::string & myDecayMode,
                 plotStack(iCategory, "Phi-nVecIP");
                 plotStack(iCategory, "NPV");
         }
-        plotSingleHistogram("h1DRunNumberData");
 
         ///Make systematic effect histos.
 /*        for(unsigned int iSystEffect = (unsigned int)HTTAnalysis::NOMINAL;

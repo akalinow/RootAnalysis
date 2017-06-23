@@ -245,7 +245,6 @@ bool HTTAnalyzer::analyze(const EventProxyBase& iEvent){
 
         const EventProxyHTT & myEventProxy = static_cast<const EventProxyHTT&>(iEvent);
         sampleName = getSampleName(myEventProxy);
-        myHistos_->fill1DHistogram("h1DRunNumber"+sampleName,myEventProxy.event->getRunId());
 
         std::string hNameSuffix = sampleName;
         float puWeight = getPUWeight(myEventProxy);
