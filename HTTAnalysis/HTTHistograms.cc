@@ -437,7 +437,7 @@ void HTTHistograms::finalizeHistograms(const std::string & myDecayMode,
         gErrorIgnoreLevel = kBreak;
         //////////////
         ///Control regions plots
-/*        for(auto iCategory: mainCategoriesRejester) {
+        for(auto iCategory: mainCategoriesRejester) {
 
                 //plotCPhistograms(iCategory);
 
@@ -445,6 +445,7 @@ void HTTHistograms::finalizeHistograms(const std::string & myDecayMode,
                 plotStack(iCategory, "MassVis");
                 plotStack(iCategory, "MassTrans");
                 plotStack(iCategory, "UnRollTauPtMassVis");
+                plotStack(iCategory, "UnRollTauDMMassVis");
                 plotStack(iCategory, "UnRollHiggsPtMassSV");
                 plotStack(iCategory, "UnRollMjjMassSV");
                 plotStack(iCategory, "UnRollMassSVPhiCP");
@@ -482,10 +483,10 @@ void HTTHistograms::finalizeHistograms(const std::string & myDecayMode,
                 plotStack(iCategory, "Phi-nVectors");
                 plotStack(iCategory, "Phi-nVecIP");
                 plotStack(iCategory, "NPV");
-        }*/
+        }
 
         ///Make systematic effect histos.
-        for(unsigned int iSystEffect = (unsigned int)HTTAnalysis::NOMINAL;
+/*        for(unsigned int iSystEffect = (unsigned int)HTTAnalysis::NOMINAL;
             iSystEffect<=(unsigned int)HTTAnalysis::ZmumuDown; ++iSystEffect) {
                 if(iSystEffect==(unsigned int)HTTAnalysis::DUMMY_SYS) continue;
                 for(auto iCategory: mainCategoriesRejester) {
@@ -499,8 +500,8 @@ void HTTHistograms::finalizeHistograms(const std::string & myDecayMode,
                         plotStack(iCategory, "UnRollMjjMassSV", iSystEffect);
                         plotStack(iCategory, "UnRollMassSVPhiCP", iSystEffect);
                         plotStack(iCategory, "UnRollMassSVYCP", iSystEffect);
-                }                
-        }
+                }
+        }*/
 
         ofstream eventCountFile("eventCount.txt",ios::out | ios::app);
         outputStream<<"HTTHistograms compilation time: "<<__TIMESTAMP__<<std::endl;
@@ -1550,9 +1551,9 @@ std::pair<float,float> HTTHistograms::getQCDControlToSignal(unsigned int iCatego
         ///Return fixed values according to SMH2016 TWiki:
         ///https://twiki.cern.ch/twiki/bin/viewauth/CMS/SMTauTau2016#QCD_background_estimation_in_Lta
         std::pair<float,float> result(1,0);
-        if(myCategoryRejester[iCategory]->name().find("0jet")!=std::string::npos) result = std::pair<float,float>(1.0,0.15);
-        else if(myCategoryRejester[iCategory]->name().find("boosted")!=std::string::npos) result = std::pair<float,float>(1.15,0.15*1.15);
-        else if(myCategoryRejester[iCategory]->name().find("vbf")) result = std::pair<float,float>(1.2,0.30*1.2);
+        if(myCategoryRejester[iCategory]->name().find("0jet")!=std::string::npos) result = std::pair<float,float>(1.07,0.15*1.07);
+        else if(myCategoryRejester[iCategory]->name().find("boosted")!=std::string::npos) result = std::pair<float,float>(1.06,0.15*1.06);
+        else if(myCategoryRejester[iCategory]->name().find("vbf")) result = std::pair<float,float>(1.0,0.30*1.0);
         else result = std::pair<float,float>(1.0,0.15);
 
         if(iSystEffect==(unsigned int)HTTAnalysis::QCDSFUp) result.first+=result.second;
