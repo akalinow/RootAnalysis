@@ -290,7 +290,6 @@ std::string HTTHistograms::getTemplateName(const std::string& name){
 
         std::string templateName = "TemplateNotFound: "+name;
         if(name.find("hProf")!=std::string::npos && name.find("VsMag")!=std::string::npos) templateName = "hProfVsMagTemplate";
-        else if(name.find("h1DRun")!=std::string::npos) templateName = "h1DRunTemplate";//test
         else if(name.find("hProf")!=std::string::npos && name.find("VsPt")!=std::string::npos) templateName = "hProfVsPtTemplate";
         else if(name.find("hProf")!=std::string::npos && name.find("VsCos")!=std::string::npos) templateName = "hProfVsCosTemplate";
         else if(name.find("h1DNPV")!=std::string::npos) templateName = "h1DNPVTemplate";
