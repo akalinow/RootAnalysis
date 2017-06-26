@@ -1055,11 +1055,9 @@ void HTTSynchNTuple::initializeCorrections(){
   ////
   //Open different RooWorkspace for missig SFs - ugly:(
 				   
-  //FIXME std::string correctionFileName_b = "http://akalinow.web.cern.ch/akalinow/htt_scalefactors_sm_moriond_v2.root";
-  //FIXME TFile *bFile = TFile::Open(correctionFileName_b.c_str(),"CACHEREAD");
-  std::string correctionFileName_b = "./htt_scalefactors_sm_moriond_v2.root";
-  TFile *bFile = TFile::Open(correctionFileName_b.c_str());
-
+  std::string correctionFileName_b = "http://akalinow.web.cern.ch/akalinow/htt_scalefactors_sm_moriond_v2.root";
+  TFile *bFile = TFile::Open(correctionFileName_b.c_str(),"CACHEREAD");
+  
   RooWorkspace *scaleWorkspace_b = (RooWorkspace*)bFile->Get("w");
 
   RooAbsReal *tau_xtrg_genuine_efficiency = scaleWorkspace_b->function("t_genuine_TightIso_mt_ratio");//MB data->ratio
