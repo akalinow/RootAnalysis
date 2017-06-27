@@ -36,8 +36,9 @@ void HZZAnalyzer::initialize(TDirectory* aDir,
                              pat::strbitset *aSelections){
 
         mySelections_ = aSelections;
-
         myHistos_ = new HZZHistograms(aDir, selectionFlavours_);
+        ntupleFile_ = 0;
+        hStatsFromFile_ = 0;
 }
 //////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////
@@ -49,28 +50,52 @@ void HZZAnalyzer::finalize(){
 //////////////////////////////////////////////////////////////////////////////
 void HZZAnalyzer::addBranch(TTree *tree){
 
-        std::string leafList = "mass4Mu/f:massZ1/f:massZ2/f";
-        leafList+=":muon1ID/f:muon2ID/f:muon3ID/f:muon4ID/f";
-        leafList+=":muon1Isolation/f:muon2Isolation/f:muon3Isolation/f:muon4Isolation/f";
+        std::string leafList = "mass4Mu/f";
+        leafList+=":massZ1/f:massZ2/f";
+        leafList+=":nMuons/f:trigger/f";
         leafList+=":muon1Pt/f:muon2Pt/f:muon3Pt/f:muon4Pt/f";
+        leafList+=":muon1Eta/f:muon2Eta/f:muon3Eta/f:muon4Eta/f";
+        leafList+=":muon1Phi/f:muon2Phi/f:muon3Phi/f:muon4Phi/f";
         leafList+=":muon1SIP/f:muon2SIP/f:muon3SIP/f:muon4SIP/f";
+        leafList+=":muon1Isol/f:muon2Isol/f:muon3Isol/f:muon4Isol/f";
+        leafList+=":muon1ID/f:muon2ID/f:muon3ID/f:muon4ID/f";
 
         tree->Branch("entry",&aEntry,leafList.c_str());
 
 }
 //////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////
+void HZZAnalyzer::getPreselectionEff(const EventProxyHTT & myEventProxy){
+
+          if(ntupleFile_!=myEventProxy.getTTree()->GetCurrentFile()) {
+                ntupleFile_ = myEventProxy.getTTree()->GetCurrentFile();
+                if(hStatsFromFile_) delete hStatsFromFile_;
+                hStatsFromFile_ = (TH1F*)ntupleFile_->Get("hStats");
+
+                std::string hName = "h1DStats";
+                TH1F *hStats = myHistos_->get1DHistogram(hName,true);
+
+                myHistos_->fill1DHistogram("h1DStats",2,std::abs(hStatsFromFile_->GetBinContent(hStatsFromFile_->FindBin(1))));
+                myHistos_->fill1DHistogram("h1DStats",3,std::abs(hStatsFromFile_->GetBinContent(hStatsFromFile_->FindBin(3))));
+
+                //hStats->Fill(1,std::abs(hStatsFromFile_->GetBinContent(hStatsFromFile_->FindBin(1))));
+                //hStats->Fill(2,std::abs(hStatsFromFile_->GetBinContent(hStatsFromFile_->FindBin(3))));
+        }
+}
 bool HZZAnalyzer::analyze(const EventProxyBase& iEvent){
 
         const EventProxyHTT & myEventProxy = static_cast<const EventProxyHTT&>(iEvent);
         std::string fileName = myEventProxy.getTTree()->GetCurrentFile()->GetName();
+        getPreselectionEff(myEventProxy);
+        myHistos_->fill1DHistogram("h1DStats",0);
 
-        bool applyCuts = true;
+        bool applyCuts = false;
 
         bool singleMuTrigger = false;
         bool muonID = true;
         unsigned int muonIDmask = (1<<6);
         std::vector<const HTTParticle *> myMuonsPlus, myMuonsMinus, myMuons;
+
         for(unsigned int iLepton=0; iLepton<myEventProxy.leptons->size(); ++iLepton) {
                 const HTTParticle * aLepton = &myEventProxy.leptons->at(iLepton);
 
@@ -82,8 +107,6 @@ bool HZZAnalyzer::analyze(const EventProxyBase& iEvent){
                                    aLepton->hasTriggerMatch(TriggerEnum::HLT_IsoTkMu22) ||
                                    aLepton->hasTriggerMatch(TriggerEnum::HLT_IsoMu22_eta2p1) ||
                                    aLepton->hasTriggerMatch(TriggerEnum::HLT_IsoTkMu22_eta2p1);
-
-
 
                 if(aLepton->getP4().Perp()<5 || std::abs(aLepton->getP4().Eta())>2.4) continue;
                 if(applyCuts) {
@@ -98,19 +121,19 @@ bool HZZAnalyzer::analyze(const EventProxyBase& iEvent){
                 myMuons.push_back(aLepton);
         }
 
-        if(myMuonsPlus.size()!=2 || myMuonsMinus.size()!=2) return false;
+        if(applyCuts && !singleMuTrigger) return false;
+        if(applyCuts && myMuonsPlus.size()!=2 || myMuonsMinus.size()!=2) return false;
 
-        if(applyCuts) {
-                if(fileName.find("Single")==std::string::npos && singleMuTrigger) return false;
-                if(fileName.find("Single")!=std::string::npos && !singleMuTrigger) return false;
+        float deltaR = 1;
+          if(myMuonsPlus.size()>1){
+          deltaR = myMuonsPlus[0]->getP4().DeltaR(myMuonsPlus[1]->getP4());
+          if(deltaR<0.02) return false;
         }
 
-        float deltaR;
-        deltaR = myMuonsPlus[0]->getP4().DeltaR(myMuonsPlus[1]->getP4());
-        if(deltaR<0.02) return false;
-
-        deltaR = myMuonsMinus[0]->getP4().DeltaR(myMuonsMinus[1]->getP4());
-        if(deltaR<0.02) return false;
+        if(myMuonsMinus.size()>1){
+          deltaR = myMuonsMinus[0]->getP4().DeltaR(myMuonsMinus[1]->getP4());
+          if(deltaR<0.02) return false;
+        }
 
         for(auto aMuonPlus: myMuonsPlus) {
                 for(auto aMuonMinus: myMuonsMinus) {
@@ -160,38 +183,79 @@ bool HZZAnalyzer::analyze(const EventProxyBase& iEvent){
                 if(p4Z1.M()<40) return false;
         }
 
+        myHistos_->fill1DHistogram("h1DStats",1);
+
         aEntry.mass4Mu = p4ZZ.M();
         aEntry.massZ1 = p4Z1.M();
         aEntry.massZ2 = p4Z2.M();
 
-        aEntry.muon1Pt = myMuons[0]->getP4().Perp();
-        aEntry.muon2Pt = myMuons[1]->getP4().Perp();
-        aEntry.muon3Pt = myMuons[2]->getP4().Perp();
-        aEntry.muon4Pt = myMuons[3]->getP4().Perp();
+        aEntry.nMuons = myMuons.size();
+        aEntry.trigger = singleMuTrigger;
 
-        aEntry.muon1Isolation = myMuons[0]->getProperty(PropertyEnum::combreliso);
-        aEntry.muon2Isolation = myMuons[1]->getProperty(PropertyEnum::combreliso);
-        aEntry.muon3Isolation = myMuons[2]->getProperty(PropertyEnum::combreliso);
-        aEntry.muon4Isolation = myMuons[3]->getProperty(PropertyEnum::combreliso);
-
-        aEntry.muon1ID = myMuons[0]->getProperty(PropertyEnum::muonID);
-        aEntry.muon2ID = myMuons[1]->getProperty(PropertyEnum::muonID);
-        aEntry.muon3ID = myMuons[2]->getProperty(PropertyEnum::muonID);
-        aEntry.muon4ID = myMuons[3]->getProperty(PropertyEnum::muonID);
-
-        aEntry.muon1SIP = myMuons[0]->getProperty(PropertyEnum::SIP);
-        aEntry.muon2SIP = myMuons[1]->getProperty(PropertyEnum::SIP);
-        aEntry.muon3SIP = myMuons[2]->getProperty(PropertyEnum::SIP);
-        aEntry.muon4SIP = myMuons[3]->getProperty(PropertyEnum::SIP);
+        if(myMuons.size()>0){
+          aEntry.muon1Pt = myMuons[0]->getP4().Perp();
+          aEntry.muon1Eta = myMuons[0]->getP4().Eta();
+          aEntry.muon1Phi = myMuons[0]->getP4().Phi();
+          aEntry.muon1Isol = myMuons[0]->getProperty(PropertyEnum::combreliso);
+          aEntry.muon1ID = ((int)myMuons[0]->getProperty(PropertyEnum::muonID) & muonIDmask)>0;
+          aEntry.muon1SIP = myMuons[0]->getProperty(PropertyEnum::SIP);
+        }
+        else{
+          aEntry.muon1Pt = -99;
+          aEntry.muon1Eta = -99;
+          aEntry.muon1Phi = -99;
+          aEntry.muon1Isol = -99;
+          aEntry.muon1ID = -99;
+        }
+        if(myMuons.size()>1){
+          aEntry.muon2Pt = myMuons[1]->getP4().Perp();
+          aEntry.muon2Eta = myMuons[1]->getP4().Eta();
+          aEntry.muon2Phi = myMuons[1]->getP4().Phi();
+          aEntry.muon2Isol = myMuons[1]->getProperty(PropertyEnum::combreliso);
+          aEntry.muon2ID = ((int)myMuons[1]->getProperty(PropertyEnum::muonID) & muonIDmask)>0;
+          aEntry.muon2SIP = myMuons[1]->getProperty(PropertyEnum::SIP);
+        }
+        else{
+          aEntry.muon2Pt = -99;
+          aEntry.muon2Eta = -99;
+          aEntry.muon2Phi = -99;
+          aEntry.muon2Isol = -99;
+          aEntry.muon2ID = -99;
+        }
+        if(myMuons.size()>2){
+          aEntry.muon3Pt = myMuons[2]->getP4().Perp();
+          aEntry.muon3Eta = myMuons[2]->getP4().Eta();
+          aEntry.muon3Phi = myMuons[2]->getP4().Phi();
+          aEntry.muon3Isol = myMuons[2]->getProperty(PropertyEnum::combreliso);
+          aEntry.muon3ID = ((int)myMuons[2]->getProperty(PropertyEnum::muonID) & muonIDmask)>0;
+          aEntry.muon3SIP = myMuons[2]->getProperty(PropertyEnum::SIP);
+        }
+        else{
+          aEntry.muon3Pt = -99;
+          aEntry.muon3Eta = -99;
+          aEntry.muon3Phi = -99;
+          aEntry.muon3Isol = -99;
+          aEntry.muon3ID = -99;
+        }
+        if(myMuons.size()>3){
+          aEntry.muon4Pt = myMuons[3]->getP4().Perp();
+          aEntry.muon4Eta = myMuons[3]->getP4().Eta();
+          aEntry.muon4Phi = myMuons[3]->getP4().Phi();
+          aEntry.muon4Isol = myMuons[3]->getProperty(PropertyEnum::combreliso);
+          aEntry.muon4ID = ((int)myMuons[3]->getProperty(PropertyEnum::muonID) & muonIDmask)>0;
+          aEntry.muon4SIP = myMuons[3]->getProperty(PropertyEnum::SIP);
+        }
+        else{
+          aEntry.muon4Pt = -99;
+          aEntry.muon4Eta = -99;
+          aEntry.muon4Phi = -99;
+          aEntry.muon4Isol = -99;
+          aEntry.muon4ID = -99;
+        }
 
         myHistos_->fill1DHistogram("h1DMassZ1",p4Z1.M());
         myHistos_->fill1DHistogram("h1DMassZ2",p4Z2.M());
         myHistos_->fill1DHistogram("h1DMass4Mu",p4ZZ.M());
-
-        myHistos_->fill1DHistogram("h1DPtMu1",myMuons[0]->getP4().Perp());
-        myHistos_->fill1DHistogram("h1DPtMu2",myMuons[1]->getP4().Perp());
-        myHistos_->fill1DHistogram("h1DPtMu3",myMuons[2]->getP4().Perp());
-        myHistos_->fill1DHistogram("h1DPtMu4",myMuons[3]->getP4().Perp());
 
         return true;
 }

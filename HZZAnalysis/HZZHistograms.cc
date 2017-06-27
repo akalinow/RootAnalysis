@@ -45,7 +45,7 @@ HZZHistograms::~HZZHistograms(){ }
 std::string HZZHistograms::getTemplateName(const std::string& name){
 
   std::string templateName = "";
-
+  if(name.find("h1DStats")!=std::string::npos) templateName = "h1DStatsTemplate";
   if(name.find("h1DMass")!=std::string::npos) templateName = "h1DMassTemplate";
   if(name.find("h1DPt")!=std::string::npos) templateName = "h1DPtTemplate";
 
@@ -60,7 +60,8 @@ void HZZHistograms::defineHistograms(){
 
  if(!histosInitialized_){
    //Make template histos
-   add1DHistogram("h1DMassTemplate","",100,0,200,file_);
+   add1DHistogram("h1DStatsTemplate","",21,-0.5,20.5,file_);
+   add1DHistogram("h1DMassTemplate","",128,0,256,file_);
    add1DHistogram("h1DPtTemplate","",50,0,100,file_);
    histosInitialized_ = true;
  }
