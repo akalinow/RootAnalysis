@@ -20,13 +20,6 @@ MuTauSpecifics::MuTauSpecifics(HTTAnalyzer * aAnalyzer) : ChannelSpecifics(aAnal
         for(int i=0; i<tauID_FRSF_ele->GetNbinsX(); i++){
           tauID_FRSF_ele->SetBinContent(i+1, binContents_ele[i]);
           }
-          /*test
-        for(int i=0; i<tauID_FRSF_ele->GetNbinsX(); i++){
-          std::cout<<tauID_FRSF_ele->GetBinLowEdge(i+1)<<std::endl<<tauID_FRSF_ele->GetBinContent(i+1)<<std::endl;
-          }
-        for(int i=0; i<tauID_FRSF_mu->GetNbinsX(); i++){
-          std::cout<<tauID_FRSF_mu->GetBinLowEdge(i+1)<<std::endl<<tauID_FRSF_mu->GetBinContent(i+1)<<std::endl;
-          }*/
         
 
 }

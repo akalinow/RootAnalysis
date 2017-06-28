@@ -56,7 +56,7 @@ const std::vector<const HTTAnalysis::eventCategory*> & getCategoryRejester() con
         return categoryRejester;
 }
 
-float getTauIDSF(float eta, int mc_match);// {return 1.0;}
+float getTauIDSF(float eta, int mc_match);
 
 protected:
 
