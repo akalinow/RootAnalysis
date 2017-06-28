@@ -24,6 +24,8 @@ float getLeg2Correction(const HTTAnalysis::sysEffects & aSystEffect);
 
 virtual std::string getDecayModeName() const {return decayModeName;}
 
+//float getTauIDSF(float eta, int mc_match);
+
 private:
 
   std::string decayModeName = "MuTau";

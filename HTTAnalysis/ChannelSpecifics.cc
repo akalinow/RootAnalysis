@@ -5,7 +5,6 @@
 #include "RooRealVar.h"
 #include "RooBinning.h"
 #include "TFile.h"
-#include "TH1F.h"
 #include "TH2F.h"
 #include "TH3F.h"
 #include "TRandom3.h"
@@ -189,8 +188,8 @@ void ChannelSpecifics::initializeLeptonCorrections(){
                                                                                                 RooFit::Scaling(kFALSE));
 
                 delete aFile;
-                if(h2DMuonXTrgCorrections_iso) delete h2DMuonXTrgCorrections_iso;
-                if(h2DMuonXTrgCorrections_aiso) delete h2DMuonXTrgCorrections_aiso;
+                //if(h2DMuonXTrgCorrections_iso) delete h2DMuonXTrgCorrections_iso; FIXME
+                //if(h2DMuonXTrgCorrections_aiso) delete h2DMuonXTrgCorrections_aiso; FIXME
 
                 ////
                 //Open different RooWorkspace for missig SFs - ugly:(
@@ -265,7 +264,7 @@ void ChannelSpecifics::initializeBTagCorrections(){
 /////////////////////////////////////////////////////////////////
 float ChannelSpecifics::getLeptonCorrection(float eta, float pt, float iso,
                                             HTTAnalysis::hadronicTauDecayModes tauDecayMode,
-                                            bool useTauTrigger, bool useXTrigger){
+                                            bool useTauTrigger, int mc_match, bool useXTrigger){
 
         if(myAnalyzer->sampleName.find("Data")!=std::string::npos) return 1.0;
 
@@ -292,15 +291,13 @@ float ChannelSpecifics::getLeptonCorrection(float eta, float pt, float iso,
         }
         else if(tauDecayMode == HTTAnalysis::tauDecaysElectron) return 1.0;
         else{
-                bool fakeTau = myAnalyzer->sampleName.find("HTT")==std::string::npos &&
-                               myAnalyzer->sampleName.find("ATT")==std::string::npos &&
-                               myAnalyzer->sampleName.find("MatchT")==std::string::npos;
+                bool fakeTau = mc_match!=5;
 
                 //according to https://twiki.cern.ch/twiki/bin/view/CMS/SMTauTau2016#MC_corrections
-                float tau_id_scalefactor = 1.0;
+                float tau_id_scalefactor = getTauIDSF(eta, mc_match);
                 float tau_trg_efficiency = 1.0;
 
-                if(!fakeTau) tau_id_scalefactor = 0.95;
+                //if(!fakeTau) tau_id_scalefactor = 0.95;
                 if(useTauTrigger) {
                         int tauDecayModeFix = (int)tauDecayMode;
                         if(tauDecayModeFix==2) tauDecayModeFix=1; //DM=2 is not covered by parametrisation.
@@ -414,3 +411,20 @@ float ChannelSpecifics::getDYReweight(const std::string & categoryName, const HT
         }
         return weight;
 }
+/////////////////////////////////////////////////////////////////
+/////////////////////////////////////////////////////////////////
+float ChannelSpecifics::getTauIDSF(float eta, int mc_match){
+
+        if(mc_match == 5) return 0.95;
+        if(mc_match == 2 || mc_match == 4){
+          int iBin = tauID_FRSF_mu->FindBin(std::abs(eta));
+          return tauID_FRSF_mu->GetBinContent(iBin);
+          }
+        if(mc_match == 1 || mc_match == 3){
+          int iBin = tauID_FRSF_ele->FindBin(std::abs(eta));
+          return tauID_FRSF_ele->GetBinContent(iBin);
+          }
+        return 1.0;
+}
+/////////////////////////////////////////////////////////////////
+/////////////////////////////////////////////////////////////////
