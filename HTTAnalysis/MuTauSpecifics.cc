@@ -149,7 +149,7 @@ void MuTauSpecifics::testAllCategories(const HTTAnalysis::sysEffects & aSystEffe
         bool jet0 = myAnalyzer->aLeg2.getP4(aSystEffect).Perp()>30 && myAnalyzer->nJets30 == 0;
         bool boosted = myAnalyzer->aLeg2.getP4(aSystEffect).Perp()>30 && (myAnalyzer->nJets30==1 || (myAnalyzer->nJets30>=2 && (jetsMass < 300 || higgsPt < 50 || myAnalyzer->aLeg2.getP4(aSystEffect).Perp()<40)));
         bool vbf = myAnalyzer->aLeg2.getP4(aSystEffect).Perp()>40 && myAnalyzer->nJets30>=2 && jetsMass>300 && higgsPt > 50;
-
+        
         bool wSelection = myAnalyzer->aPair.getMTMuon(aSystEffect)>80;
         bool muonAntiIso = myAnalyzer->aLeg1.getProperty(PropertyEnum::combreliso)>0.15 && myAnalyzer->aLeg1.getProperty(PropertyEnum::combreliso)<0.30;
         bool muonIso = myAnalyzer->aLeg1.getProperty(PropertyEnum::combreliso)<0.15;
@@ -244,10 +244,13 @@ float MuTauSpecifics::getLeg1Correction(const HTTAnalysis::sysEffects & aSystEff
 /////////////////////////////////////////////////////////////////
 float MuTauSpecifics::getLeg2Correction(const HTTAnalysis::sysEffects & aSystEffect){
 
+        bool useTauTrigger = false, useXTrigger = false;
+        if(myAnalyzer->aLeg1.getP4(aSystEffect).Pt()<23) {useTauTrigger = true; useXTrigger = true;}
+        
         return getLeptonCorrection(myAnalyzer->aLeg2.getP4(aSystEffect).Eta(),
                                    myAnalyzer->aLeg2.getP4(aSystEffect).Pt(),
                                    myAnalyzer->aLeg2.getProperty(PropertyEnum::byIsolationMVArun2v1DBoldDMwLTraw),
-                                   static_cast<HTTAnalysis::hadronicTauDecayModes>(myAnalyzer->aLeg2.getProperty(PropertyEnum::decayMode)),false);
+                                   static_cast<HTTAnalysis::hadronicTauDecayModes>(myAnalyzer->aLeg2.getProperty(PropertyEnum::decayMode)),useTauTrigger, useXTrigger);
 
 }
 /////////////////////////////////////////////////////////////////

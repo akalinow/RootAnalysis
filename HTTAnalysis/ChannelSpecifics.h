@@ -39,7 +39,7 @@ virtual float getLeg1Correction(const HTTAnalysis::sysEffects & aSystEffect) = 0
 ///Return cumulative MC corrections for the leg2
 virtual float getLeg2Correction(const HTTAnalysis::sysEffects & aSystEffect) = 0;
 
-float getLeptonCorrection(float eta, float pt, float iso, HTTAnalysis::hadronicTauDecayModes tauDecayMode, bool useTauTrigger);
+float getLeptonCorrection(float eta, float pt, float iso, HTTAnalysis::hadronicTauDecayModes tauDecayMode, bool useTauTrigger, bool useXTrigger = false);
 
 float getDYReweight(const std::string & categoryName, const HTTAnalysis::sysEffects & aSystEffect = HTTAnalysis::NOMINAL);
 
@@ -71,6 +71,7 @@ TH3F *h3DMuonIsoCorrections, *h3DMuonTrgCorrections, *h3DMuonXTrgCorrections;
 TH1F *h1DMuonTrkCorrections;
 TH3F *h3DTauCorrections;
 TH2F *h2DTauTrgGenuineCorrections, *h2DTauTrgFakeCorrections;
+TH2F *h2DTauXTrgGenuineCorrections, *h2DTauXTrgFakeCorrections;
 
 //For btag calibration
 BTagCalibration *calib;
