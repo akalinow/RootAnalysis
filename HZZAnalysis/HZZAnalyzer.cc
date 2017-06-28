@@ -75,8 +75,8 @@ void HZZAnalyzer::getPreselectionEff(const EventProxyHTT & myEventProxy){
                 std::string hName = "h1DStats";
                 TH1F *hStats = myHistos_->get1DHistogram(hName,true);
 
-                myHistos_->fill1DHistogram("h1DStats",2,std::abs(hStatsFromFile_->GetBinContent(hStatsFromFile_->FindBin(1))));
-                myHistos_->fill1DHistogram("h1DStats",3,std::abs(hStatsFromFile_->GetBinContent(hStatsFromFile_->FindBin(3))));
+                myHistos_->fill1DHistogram("h1DStats",2,std::abs(hStatsFromFile_->GetBinContent(hStatsFromFile_->FindBin(0))));
+                myHistos_->fill1DHistogram("h1DStats",3,std::abs(hStatsFromFile_->GetBinContent(hStatsFromFile_->FindBin(2))));
 
                 //hStats->Fill(1,std::abs(hStatsFromFile_->GetBinContent(hStatsFromFile_->FindBin(1))));
                 //hStats->Fill(2,std::abs(hStatsFromFile_->GetBinContent(hStatsFromFile_->FindBin(3))));
@@ -121,8 +121,8 @@ bool HZZAnalyzer::analyze(const EventProxyBase& iEvent){
                 myMuons.push_back(aLepton);
         }
 
+        if(myMuonsPlus.size()!=2 || myMuonsMinus.size()!=2) return false;
         if(applyCuts && !singleMuTrigger) return false;
-        if(applyCuts && myMuonsPlus.size()!=2 || myMuonsMinus.size()!=2) return false;
 
         float deltaR = 1;
           if(myMuonsPlus.size()>1){
