@@ -5,7 +5,6 @@
 #include "RooRealVar.h"
 #include "RooBinning.h"
 #include "TFile.h"
-#include "TH1F.h"
 #include "TH2F.h"
 #include "TH3F.h"
 #include "TRandom3.h"
@@ -26,6 +25,8 @@ ChannelSpecifics::ChannelSpecifics(HTTAnalyzer *aAnalyzer){
         h1DMuonTrkCorrections = 0;
         h2DTauTrgGenuineCorrections = 0;
         h2DTauTrgFakeCorrections = 0;
+        h2DTauXTrgGenuineCorrections = 0;
+        h2DTauXTrgFakeCorrections = 0;
         h3DTauCorrections = 0;
 
         //initializeLeptonCorrections();
@@ -44,6 +45,8 @@ ChannelSpecifics::~ChannelSpecifics(){
         if(h1DMuonTrkCorrections) delete h1DMuonTrkCorrections;
         if(h2DTauTrgGenuineCorrections) delete h2DTauTrgGenuineCorrections;
         if(h2DTauTrgFakeCorrections) delete h2DTauTrgFakeCorrections;
+        if(h2DTauXTrgGenuineCorrections) delete h2DTauXTrgGenuineCorrections;
+        if(h2DTauXTrgFakeCorrections) delete h2DTauXTrgFakeCorrections;
         if(h3DTauCorrections) delete h3DTauCorrections;
 
         //btagging
@@ -100,11 +103,12 @@ void ChannelSpecifics::initializeLeptonCorrections(){
 
                 RooAbsReal *muon_id_scalefactor = scaleWorkspace->function("m_id_ratio");
                 RooAbsReal *muon_iso_scalefactor = scaleWorkspace->function("m_iso_binned_ratio");
-                RooAbsReal *muon_trg_scalefactor = scaleWorkspace->function("m_trgOR4_binned_ratio");
-                RooAbsReal *muon_xtrg_scalefactor = scaleWorkspace->function("m_trgMu19leg_eta2p1_desy_ratio");
-                RooAbsReal *muon_trk_scalefactor = scaleWorkspace->function("m_trk_ratio");
-                RooAbsReal *tau_trg_genuine_efficiency = scaleWorkspace->function("t_genuine_TightIso_tt_ratio");
-                RooAbsReal *tau_trg_fake_efficiency = scaleWorkspace->function("t_fake_TightIso_tt_ratio");
+                RooAbsReal *muon_trg_scalefactor = scaleWorkspace->function("m_trgOR4_binned_ratio");//MB 24->22
+                RooAbsReal *muon_xtrg_scalefactor_iso  = scaleWorkspace->function("m_trgMu19leg_eta2p1_desy_ratio");//mu-iso<0.15?
+                RooAbsReal *muon_xtrg_scalefactor_aiso = scaleWorkspace->function("m_trgMu19leg_eta2p1_aiso0p15to0p3_desy_ratio");//0.15<mu-iso<0.3?
+                RooAbsReal *muon_trk_scalefactor = scaleWorkspace->function("m_trk_ratio");//MB not in HTTAnalysis
+                RooAbsReal *tau_trg_genuine_efficiency = scaleWorkspace->function("t_genuine_TightIso_tt_ratio");//MB data->ratio
+                RooAbsReal *tau_trg_fake_efficiency = scaleWorkspace->function("t_fake_TightIso_tt_ratio");//MB data->ratio
 
                 h2DMuonIdCorrections = (TH2F*)muon_id_scalefactor->createHistogram("h2DMuonIdCorrections",
                                                                                    *scaleWorkspace->var("m_pt"),RooFit::Binning(1980,10,1000),
@@ -132,6 +136,29 @@ void ChannelSpecifics::initializeLeptonCorrections(){
                                                                                      *scaleWorkspace->var("m_eta"),RooFit::Binning(48,-2.4,2.4),//MB m_abs_eta->m_eta
                                                                                      RooFit::Extended(kFALSE),
                                                                                      RooFit::Scaling(kFALSE));
+                //Uwaga: ponizsze korekcje sa 2d, do wlozenia w 3d
+                TH2F *h2DMuonXTrgCorrections_iso = (TH2F*)muon_xtrg_scalefactor_iso->createHistogram("h2DMuonXTrgCorrections_iso",
+									                       *scaleWorkspace->var("m_pt"),RooFit::Binning(1980,10,1000),
+									                       RooFit::YVar(*scaleWorkspace->var("m_eta"),RooFit::Binning(48,-2.4,2.4)),//MB m_abs_eta->m_eta
+									                       RooFit::Extended(kFALSE),
+									                       RooFit::Scaling(kFALSE));
+                TH2F *h2DMuonXTrgCorrections_aiso = (TH2F*)muon_xtrg_scalefactor_iso->createHistogram("h2DMuonXTrgCorrections_aiso",
+									                       *scaleWorkspace->var("m_pt"),RooFit::Binning(1980,10,1000),
+									                       RooFit::YVar(*scaleWorkspace->var("m_eta"),RooFit::Binning(48,-2.4,2.4)),//MB m_abs_eta->m_eta
+									                       RooFit::Extended(kFALSE),
+									                       RooFit::Scaling(kFALSE));
+                h3DMuonXTrgCorrections = new TH3F("h3DMuonXTrgCorrections","",1980,10,1000,48,-2.4,2.4,8,-0.05,0.35);//less iso-bins than for id/single-trg due to different range
+                for(int iX=0; iX<1980; ++iX){
+                  for(int iY=0; iY<48; ++iY){
+                    float binContent = h2DMuonXTrgCorrections_iso->GetBinContent(iX+1,iY+1);
+                    for(int iZ=0; iZ<4; ++iZ)//bins 1-4 correspond with iso<0.15
+                      h3DMuonXTrgCorrections->SetBinContent(iX+1,iY+1,iZ+1,binContent);
+                      binContent = h2DMuonXTrgCorrections_aiso->GetBinContent(iX+1,iY+1);
+                    for(int iZ=4; iZ<8; ++iZ)//bins 4-8 correspond with 0.15<iso<0.3
+                      h3DMuonXTrgCorrections->SetBinContent(iX+1,iY+1,iZ+1,binContent);
+                  }
+                }
+                
                 ///WARNING: t_eta and t_dm not used, so histograms have only one bin in this directions
                 RooArgSet dependentVars(*scaleWorkspace->var("t_pt"),*scaleWorkspace->var("t_dm"));
                 RooArgSet projectedVars;
@@ -161,6 +188,40 @@ void ChannelSpecifics::initializeLeptonCorrections(){
                                                                                                 RooFit::Scaling(kFALSE));
 
                 delete aFile;
+                //if(h2DMuonXTrgCorrections_iso) delete h2DMuonXTrgCorrections_iso; FIXME
+                //if(h2DMuonXTrgCorrections_aiso) delete h2DMuonXTrgCorrections_aiso; FIXME
+
+                ////
+                //Open different RooWorkspace for missig SFs - ugly:(
+				                 
+                std::string correctionFileName_b = "http://akalinow.web.cern.ch/akalinow/htt_scalefactors_sm_moriond_v2.root";
+                TFile *bFile = TFile::Open(correctionFileName_b.c_str(),"CACHEREAD");
+                
+                RooWorkspace *scaleWorkspace_b = (RooWorkspace*)bFile->Get("w");
+
+                RooAbsReal *tau_xtrg_genuine_efficiency = scaleWorkspace_b->function("t_genuine_TightIso_mt_ratio");//MB data->ratio
+                RooAbsReal *tau_xtrg_fake_efficiency = scaleWorkspace_b->function("t_fake_TightIso_mt_ratio");//MB data->ratio
+
+                ///WARNING: t_eta and t_dm not used, so histograms have only one bin in this directions
+                RooArgSet dependentVarsForMT(*scaleWorkspace_b->var("t_pt"),*scaleWorkspace_b->var("t_eta"));
+                RooArgSet projectedVarsForMT;
+
+                const RooAbsReal * tau_xtrg_genuine_efficiency_proj = tau_xtrg_genuine_efficiency->createPlotProjection(dependentVarsForMT,projectedVarsForMT);
+                const RooAbsReal * tau_xtrg_fake_efficiency_proj = tau_xtrg_fake_efficiency->createPlotProjection(dependentVarsForMT,projectedVarsForMT);
+
+                h2DTauXTrgGenuineCorrections = (TH2F*)tau_xtrg_genuine_efficiency_proj->createHistogram("h2DTauXTrgGenuineCorrections",
+											                *scaleWorkspace_b->var("t_pt"),RooFit::Binning(5000,0,1000),
+											                RooFit::YVar(*scaleWorkspace_b->var("t_eta"),RooFit::Binning(4,-2.5,2.5)),//MB binning in eta: barrel/endcaps, i.e. <1.5
+											                RooFit::Extended(kFALSE),
+											                RooFit::Scaling(kFALSE));
+
+                h2DTauXTrgFakeCorrections = (TH2F*)tau_xtrg_fake_efficiency_proj->createHistogram("h2DTauXTrgFakeCorrections",
+										                  *scaleWorkspace_b->var("t_pt"),RooFit::Binning(5000,0,1000),
+										                  RooFit::YVar(*scaleWorkspace_b->var("t_eta"),RooFit::Binning(4,-2.5,2.5)),//MB binning in eta: barrel/endcaps, i.e. <1.5
+										                  RooFit::Extended(kFALSE),
+										                  RooFit::Scaling(kFALSE));
+
+                delete bFile;
         }
 }
 /////////////////////////////////////////////////////////////////
@@ -203,7 +264,7 @@ void ChannelSpecifics::initializeBTagCorrections(){
 /////////////////////////////////////////////////////////////////
 float ChannelSpecifics::getLeptonCorrection(float eta, float pt, float iso,
                                             HTTAnalysis::hadronicTauDecayModes tauDecayMode,
-                                            bool useTauTrigger){
+                                            bool useTauTrigger, int mc_match, bool useXTrigger){
 
         if(myAnalyzer->sampleName.find("Data")!=std::string::npos) return 1.0;
 
@@ -212,6 +273,10 @@ float ChannelSpecifics::getLeptonCorrection(float eta, float pt, float iso,
         if(tauDecayMode == HTTAnalysis::tauDecayMuon) {
                 int iBin = h3DMuonTrgCorrections->FindBin(std::min(pt,(Float_t)999.9), eta, std::min(iso,(Float_t)0.499));
                 float trigweight = h3DMuonTrgCorrections->GetBinContent(iBin);
+                if(pt<23){//xtrigger mu-tau
+                  iBin = h3DMuonXTrgCorrections->FindBin(std::min(pt,(Float_t)999.9), eta, std::min(iso,(Float_t)0.299));
+                  trigweight = h3DMuonXTrgCorrections->GetBinContent(iBin);      
+                }
 
                 iBin = h2DMuonIdCorrections->FindBin(std::min(pt,(Float_t)999.9), eta);
                 float idweight = h2DMuonIdCorrections->GetBinContent(iBin);
@@ -226,15 +291,13 @@ float ChannelSpecifics::getLeptonCorrection(float eta, float pt, float iso,
         }
         else if(tauDecayMode == HTTAnalysis::tauDecaysElectron) return 1.0;
         else{
-                bool fakeTau = myAnalyzer->sampleName.find("HTT")==std::string::npos &&
-                               myAnalyzer->sampleName.find("ATT")==std::string::npos &&
-                               myAnalyzer->sampleName.find("MatchT")==std::string::npos;
+                bool fakeTau = mc_match!=5;
 
                 //according to https://twiki.cern.ch/twiki/bin/view/CMS/SMTauTau2016#MC_corrections
-                float tau_id_scalefactor = 1.0;
+                float tau_id_scalefactor = getTauIDSF(eta, mc_match);
                 float tau_trg_efficiency = 1.0;
 
-                if(!fakeTau) tau_id_scalefactor = 0.95;
+                //if(!fakeTau) tau_id_scalefactor = 0.95;
                 if(useTauTrigger) {
                         int tauDecayModeFix = (int)tauDecayMode;
                         if(tauDecayModeFix==2) tauDecayModeFix=1; //DM=2 is not covered by parametrisation.
@@ -243,6 +306,16 @@ float ChannelSpecifics::getLeptonCorrection(float eta, float pt, float iso,
                         if(fakeTau) {
                                 iBin = h2DTauTrgFakeCorrections->FindBin(std::min(pt,(Float_t)999.9), tauDecayModeFix);
                                 tau_trg_efficiency = h2DTauTrgFakeCorrections->GetBinContent(iBin);
+                        }
+                        if(useXTrigger){//xtrigger mu-tau
+                          if(!fakeTau){ //genuine tau
+	                          iBin = h2DTauXTrgGenuineCorrections->FindBin(std::min(pt,(Float_t)999.9),eta);
+	                          tau_trg_efficiency = h2DTauXTrgGenuineCorrections->GetBinContent(iBin);
+                          }
+                          else{ //fake tau
+	                          iBin = h2DTauXTrgFakeCorrections->FindBin(std::min(pt,(Float_t)999.9), eta);
+	                          tau_trg_efficiency = h2DTauXTrgFakeCorrections->GetBinContent(iBin);
+                          }  
                         }
                 }
                 return tau_id_scalefactor*tau_trg_efficiency;
@@ -338,3 +411,20 @@ float ChannelSpecifics::getDYReweight(const std::string & categoryName, const HT
         }
         return weight;
 }
+/////////////////////////////////////////////////////////////////
+/////////////////////////////////////////////////////////////////
+float ChannelSpecifics::getTauIDSF(float eta, int mc_match){
+
+        if(mc_match == 5) return 0.95;
+        if(mc_match == 2 || mc_match == 4){
+          int iBin = tauID_FRSF_mu->FindBin(std::abs(eta));
+          return tauID_FRSF_mu->GetBinContent(iBin);
+          }
+        if(mc_match == 1 || mc_match == 3){
+          int iBin = tauID_FRSF_ele->FindBin(std::abs(eta));
+          return tauID_FRSF_ele->GetBinContent(iBin);
+          }
+        return 1.0;
+}
+/////////////////////////////////////////////////////////////////
+/////////////////////////////////////////////////////////////////

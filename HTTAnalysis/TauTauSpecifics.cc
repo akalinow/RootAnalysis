@@ -7,6 +7,16 @@
 TauTauSpecifics::TauTauSpecifics(HTTAnalyzer * aAnalyzer) : ChannelSpecifics(aAnalyzer){
 
         decayModeName = "TauTau";
+        tauID_FRSF_mu = new TH1F("tauID_FRSF_mu", "", 5, bins_mu_);
+        Float_t binContents_mu[5] = {1.010, 1.007, 0.870, 1.154, 2.281};
+        for(int i=0; i<tauID_FRSF_mu->GetNbinsX(); i++){
+          tauID_FRSF_mu->SetBinContent(i+1, binContents_mu[i]);
+          }
+        tauID_FRSF_ele = new TH1F("tauID_FRSF_ele", "", 3, bins_ele_);
+        Float_t binContents_ele[3] = {1.213, 1, 1.375};
+        for(int i=0; i<tauID_FRSF_ele->GetNbinsX(); i++){
+          tauID_FRSF_ele->SetBinContent(i+1, binContents_ele[i]);
+          }
 
 }
 /////////////////////////////////////////////////////////////////
@@ -212,7 +222,8 @@ float TauTauSpecifics::getLeg1Correction(const HTTAnalysis::sysEffects & aSystEf
         return getLeptonCorrection(myAnalyzer->aLeg1.getP4().Eta(),
                                    myAnalyzer->aLeg1.getP4().Pt(),
                                    myAnalyzer->aLeg1.getProperty(PropertyEnum::byIsolationMVArun2v1DBoldDMwLTraw),
-                                   static_cast<HTTAnalysis::hadronicTauDecayModes>(myAnalyzer->aLeg1.getProperty(PropertyEnum::decayMode)),true);
+                                   static_cast<HTTAnalysis::hadronicTauDecayModes>(myAnalyzer->aLeg1.getProperty(PropertyEnum::decayMode)),true, 
+                                   myAnalyzer->aLeg1.getProperty(PropertyEnum::mc_match));
 }
 /////////////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////////////
@@ -221,7 +232,8 @@ float TauTauSpecifics::getLeg2Correction(const HTTAnalysis::sysEffects & aSystEf
         return getLeptonCorrection(myAnalyzer->aLeg2.getP4().Eta(),
                                    myAnalyzer->aLeg2.getP4().Pt(),
                                    myAnalyzer->aLeg2.getProperty(PropertyEnum::byIsolationMVArun2v1DBoldDMwLTraw),
-                                   static_cast<HTTAnalysis::hadronicTauDecayModes>(myAnalyzer->aLeg2.getProperty(PropertyEnum::decayMode)),true);
+                                   static_cast<HTTAnalysis::hadronicTauDecayModes>(myAnalyzer->aLeg2.getProperty(PropertyEnum::decayMode)),true, 
+                                   myAnalyzer->aLeg2.getProperty(PropertyEnum::mc_match));
 }
 /////////////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////////////

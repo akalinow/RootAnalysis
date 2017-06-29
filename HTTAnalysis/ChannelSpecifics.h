@@ -4,6 +4,7 @@
 #include <string>
 #include "HTTEvent.h"
 #include "AnalysisEnums.h"
+#include "TH1F.h"
 
 class HTTAnalyzer;
 class EventProxyHTT;
@@ -39,7 +40,7 @@ virtual float getLeg1Correction(const HTTAnalysis::sysEffects & aSystEffect) = 0
 ///Return cumulative MC corrections for the leg2
 virtual float getLeg2Correction(const HTTAnalysis::sysEffects & aSystEffect) = 0;
 
-float getLeptonCorrection(float eta, float pt, float iso, HTTAnalysis::hadronicTauDecayModes tauDecayMode, bool useTauTrigger);
+float getLeptonCorrection(float eta, float pt, float iso, HTTAnalysis::hadronicTauDecayModes tauDecayMode, bool useTauTrigger, int mc_match, bool useXTrigger = false);
 
 float getDYReweight(const std::string & categoryName, const HTTAnalysis::sysEffects & aSystEffect = HTTAnalysis::NOMINAL);
 
@@ -54,6 +55,8 @@ virtual std::string getDecayModeName() const {
 const std::vector<const HTTAnalysis::eventCategory*> & getCategoryRejester() const {
         return categoryRejester;
 }
+
+float getTauIDSF(float eta, int mc_match);
 
 protected:
 
@@ -71,6 +74,7 @@ TH3F *h3DMuonIsoCorrections, *h3DMuonTrgCorrections, *h3DMuonXTrgCorrections;
 TH1F *h1DMuonTrkCorrections;
 TH3F *h3DTauCorrections;
 TH2F *h2DTauTrgGenuineCorrections, *h2DTauTrgFakeCorrections;
+TH2F *h2DTauXTrgGenuineCorrections, *h2DTauXTrgFakeCorrections;
 
 //For btag calibration
 BTagCalibration *calib;
@@ -89,6 +93,9 @@ HTTAnalysis::eventCategory *inclusive;
 HTTAnalysis::eventCategory *antiIso_inclusive;
 HTTAnalysis::eventCategory *btag, *nobtag;
 HTTAnalysis::eventCategory *antiIso_btag, *antiIso_nobtag;
+
+TH1F *tauID_FRSF_mu, *tauID_FRSF_ele;
+Float_t bins_mu_[6] = {0,0.4,0.8,1.2,1.7,2.3}, bins_ele_[4] = {0,1.46,1.558,10};
 
 };
 
