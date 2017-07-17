@@ -52,7 +52,7 @@ string expoEff(float number, float error){
   }
   int sgn = (unsigned int)(log(number)/fabs(log(number)));
   float tmp = number*pow(10.0,-sgn*base);
-  if(base!=0) sprintf(text,"${\\mathrm (%3.2f \\pm",tmp,sgn*base);
+  if(base!=0) sprintf(text,"${\\mathrm (%3.2f \\cdot 10^{%d} \\pm",tmp,sgn*base);
   else sprintf(text,"${\\mathrm  %3.2f $",tmp);
   string result;
   result.append(text);

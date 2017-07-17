@@ -399,8 +399,7 @@ void HTTHistograms::defineHistograms(){
 }
 /////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////
-void HTTHistograms::finalizeHistograms(const std::string & myDecayMode,
-                                       const std::vector<const HTTAnalysis::eventCategory*> & aCategoryRejester){
+void HTTHistograms::finalizeHistograms(const std::vector<const HTTAnalysis::eventCategory*> & aCategoryRejester){
 
         std::cout<<"HTTHistograms::finalizeHistograms() START"<<std::endl;
 
@@ -413,7 +412,7 @@ void HTTHistograms::finalizeHistograms(const std::string & myDecayMode,
                                                       //"inclusive","btag","nobtag"
         };
 
-        if(myDecayMode=="MuTau"){
+        if(myChannel_=="MuTau"){
           mainCategoryNames.push_back("antiIso_0jet");
           mainCategoryNames.push_back("antiIso_boosted");
           mainCategoryNames.push_back("antiIso_vbf");
@@ -421,7 +420,7 @@ void HTTHistograms::finalizeHistograms(const std::string & myDecayMode,
           mainCategoryNames.push_back("boosted_W");
           mainCategoryNames.push_back("vbf_W");
         }
-        if(myDecayMode=="TauTau"){
+        if(myChannel_=="TauTau"){
           mainCategoryNames.push_back("0jet_QCD");
           mainCategoryNames.push_back("boosted_QCD");
           mainCategoryNames.push_back("vbf_QCD");

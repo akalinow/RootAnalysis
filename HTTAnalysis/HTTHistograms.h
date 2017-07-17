@@ -21,8 +21,7 @@ HTTHistograms(TDirectory *myDir, const std::vector<std::string> & flavours, std:
 
 virtual ~HTTHistograms();
 
-void finalizeHistograms(const std::string & myDecayMode,
-                        const std::vector<const HTTAnalysis::eventCategory*> & aCategoryRejester);
+void finalizeHistograms(const std::vector<const HTTAnalysis::eventCategory*> & aCategoryRejester);
 
 using AnalysisHistograms::get1DHistogram;
 

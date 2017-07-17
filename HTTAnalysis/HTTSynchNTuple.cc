@@ -80,7 +80,7 @@ void HTTSynchNTuple::initialize(TDirectory* aDir,
   ///The histograms for this analyzer will be saved into "HTTSynchNTuple"
   ///directory of the ROOT file
   ///NOTE: due to a bug hists land in the Summary directory
-  myHistos_ = new HTTHistograms(aDir, selectionFlavours_);
+  myHistos_ = new HTTHistograms(aDir, selectionFlavours_, decayMode_);
 
   idMasks_ = new std::map<std::string,int>;
 }
@@ -88,7 +88,7 @@ void HTTSynchNTuple::initialize(TDirectory* aDir,
 //////////////////////////////////////////////////////////////////////////////
 void HTTSynchNTuple::finalize(){
 
-  myHistos_->finalizeHistograms(decayMode_, std::vector<const HTTAnalysis::eventCategory*>());
+  myHistos_->finalizeHistograms(std::vector<const HTTAnalysis::eventCategory*>());
 
 }
 //////////////////////////////////////////////////////////////////////////////

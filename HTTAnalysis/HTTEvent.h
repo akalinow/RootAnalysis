@@ -267,6 +267,9 @@ class HTTParticle{
                                                         (unsigned int)getProperty(PropertyEnum::FilterFired)& (1<<(unsigned int)index);}
  private:
 
+  ///Return four-momentum modified according DATA/MC energy scale factors.
+  const TLorentzVector & getNominalShiftedP4() const;
+
   ///Return four-momentum modified according to given systematic effect.
   ///The method recognises particle type, e.g. muons are not affected by
   ///TES variations etc.
@@ -274,7 +277,7 @@ class HTTParticle{
 
   ///Return four-momentum shifted with scale.
   ///Shift modifies three-momentum transverse part only, leaving mass constant.
-  const TLorentzVector & getShiftedP4(float scale) const;
+  const TLorentzVector & getShiftedP4(float scale, bool preserveMass=true) const;
 
   ///Nominal (as recontructed) four-momentum
   TLorentzVector p4;
@@ -295,6 +298,13 @@ class HTTParticle{
   ///LLR ntuple format
   std::vector<Double_t> properties;
 
+  static constexpr float TES_1p=-0.005;
+  static constexpr float TES_1ppi0=0.011;
+  static constexpr float TES_3p=0.006;
+  static constexpr float TES = 0.012;
+  static constexpr float EES = 0.03;
+  static constexpr float MES = 0.03;
+  
 };
 ///////////////////////////////////////////////////
 ///////////////////////////////////////////////////
