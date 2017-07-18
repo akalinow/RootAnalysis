@@ -191,7 +191,7 @@ bool HZZAnalyzer::analyze(const EventProxyBase& iEvent){
         aEntry.massZ2 = p4Z2.M();
 
         aEntry.nMuonsPlus = myMuonsPlus.size();
-        aEntry.nMuonsMinus = myMuonsMinus.size();        
+        aEntry.nMuonsMinus = myMuonsMinus.size();
 
         if(myMuons.size()>0){
           aEntry.muon1Pt = myMuons[0]->getP4().Perp();
