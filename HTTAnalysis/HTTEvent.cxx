@@ -67,13 +67,13 @@ void HTTParticle::clear(){
 ////////////////////////////////////////////////
 ////////////////////////////////////////////////
 const TLorentzVector & HTTParticle::getNominalShiftedP4() const{
-  
+
   //Corrections of nominal tau-scale: https://twiki.cern.ch/twiki/bin/view/CMS/TauIDRecommendation13TeV#Tau_energy_scale
   float TES_1p=-0.005, TES_1ppi0=0.011, TES_3p=0.006;
 
   //correct nominal scale of genuine taus
-  if(std::abs(getPDGid())==15 && getProperty(PropertyEnum::mc_match)==5){    
-    int dm = getProperty(PropertyEnum::decayMode);    
+  if(std::abs(getPDGid())==15 && getProperty(PropertyEnum::mc_match)==5){
+    int dm = getProperty(PropertyEnum::decayMode);
     if(dm==0) //1-prong
       return getShiftedP4(1+TES_1p,true);
     else if(dm==1 || dm==2) //1-prong+pi0s
@@ -89,15 +89,21 @@ const TLorentzVector & HTTParticle::getNominalShiftedP4() const{
 ////////////////////////////////////////////////
 const TLorentzVector & HTTParticle::getSystScaleP4(HTTAnalysis::sysEffects type) const{
 
-  if(type==HTTAnalysis::DUMMY_SYS) return p4;
-  else if(type==HTTAnalysis::NOMINAL) return getNominalShiftedP4();          
+  if(type==HTTAnalysis::DUMMY_SYS) {
+    lastSystEffect = type;
+    return p4;
+  }
+  else if(type==HTTAnalysis::NOMINAL){
+    lastSystEffect = type;
+    return getNominalShiftedP4();
+  }
   else if(lastSystEffect==type) return p4Cache;
 
   lastSystEffect = type;
 
-  if(std::abs(getPDGid())==15 && getProperty(PropertyEnum::mc_match)==5){    
-    ///True taus    
-    if(type!=HTTAnalysis::TESUp && type!=HTTAnalysis::TESDown) return getNominalShiftedP4();    
+  if(std::abs(getPDGid())==15 && getProperty(PropertyEnum::mc_match)==5){
+    ///True taus
+    if(type!=HTTAnalysis::TESUp && type!=HTTAnalysis::TESDown) return getNominalShiftedP4();
     float direction = 1;
     if(type==HTTAnalysis::TESDown) direction*=-1;
     float nominalShift = 1.0;
@@ -205,19 +211,19 @@ const TVector2 & HTTPair::getSystScaleMET(HTTAnalysis::sysEffects type) const{
     lastSystEffect = type;
     if( (std::abs(leg1.getPDGid())==15 && leg1.getProperty(PropertyEnum::mc_match)==5) ||
 	(std::abs(leg2.getPDGid())==15 && leg2.getProperty(PropertyEnum::mc_match)==5) ){
-      
+
       double metX = met.X();
       metX+=leg1.getP4(HTTAnalysis::DUMMY_SYS).X(); //uncor
       metX+=leg2.getP4(HTTAnalysis::DUMMY_SYS).X(); //uncor
       metX-=leg1.getP4(HTTAnalysis::NOMINAL).X();
       metX-=leg2.getP4(HTTAnalysis::NOMINAL).X();
-      
+
       double metY = met.Y();
       metY+=leg1.getP4(HTTAnalysis::DUMMY_SYS).Y();
       metY+=leg2.getP4(HTTAnalysis::DUMMY_SYS).Y();
       metY-=leg1.getP4(HTTAnalysis::NOMINAL).Y();
       metY-=leg2.getP4(HTTAnalysis::NOMINAL).Y();
-      
+
       metCache.SetX(metX);
       metCache.SetY(metY);
       return metCache;
