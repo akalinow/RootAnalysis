@@ -30,13 +30,14 @@ class TLorentzVector;
   ///Variables saved into a TTree
   float mass4Mu;
   float massZ1, massZ2;
-  float nMuons, trigger;
+  float nMuonsPlus, nMuonsMinus;
   float muon1Pt, muon2Pt, muon3Pt, muon4Pt;
   float muon1Eta, muon2Eta, muon3Eta, muon4Eta;
   float muon1Phi, muon2Phi, muon3Phi, muon4Phi;
+  float muon1Dxy, muon2Dxy, muon3Dxy, muon4Dxy;
+  float muon1Dz, muon2Dz, muon3Dz, muon4Dz;
   float muon1SIP, muon2SIP, muon3SIP, muon4SIP;
   float muon1Isol, muon2Isol, muon3Isol, muon4Isol;
-  float muon1ID, muon2ID, muon3ID, muon4ID;
   } ENTRY;
 
 
