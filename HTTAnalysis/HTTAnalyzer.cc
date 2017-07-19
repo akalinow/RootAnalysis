@@ -70,9 +70,8 @@ void HTTAnalyzer::initialize(TDirectory* aDir,
 //////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////
 void HTTAnalyzer::finalize(){
-
-        std::string myDecayMode = myChannelSpecifics->getDecayModeName();
-        myHistos_->finalizeHistograms(myDecayMode, myChannelSpecifics->getCategoryRejester());
+       
+        myHistos_->finalizeHistograms(myChannelSpecifics->getCategoryRejester());
 }
 //////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////
@@ -85,7 +84,8 @@ std::vector<HTTParticle> HTTAnalyzer::getSeparatedJets(const EventProxyHTT & myE
                 float dRLeg2 = aJet.getP4().DeltaR(aLeg2.getP4());
                 float dRLeg1 = aJet.getP4().DeltaR(aLeg1.getP4());
                 bool loosePFJetID = aJet.getProperty(PropertyEnum::PFjetID)>=1;
-                if(dRLeg1>deltaR && dRLeg2>deltaR && loosePFJetID) separatedJets.push_back(aJet);
+                bool jetEtaCut = std::abs(aJet.getP4().Eta())<4.7;
+                if(dRLeg1>deltaR && dRLeg2>deltaR && loosePFJetID && jetEtaCut) separatedJets.push_back(aJet);
         }
         return separatedJets;
 }
