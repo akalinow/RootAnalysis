@@ -274,7 +274,7 @@ class HTTParticle{
 
   ///Return four-momentum shifted with scale.
   ///Shift modifies three-momentum transverse part only, leaving mass constant.
-  const TLorentzVector & getShiftedP4(float scale) const;
+  const TLorentzVector & getShiftedP4(float scale, bool preserveMass=true) const;
 
   ///Nominal (as recontructed) four-momentum
   TLorentzVector p4;

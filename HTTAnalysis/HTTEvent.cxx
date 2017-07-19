@@ -68,40 +68,69 @@ void HTTParticle::clear(){
 ////////////////////////////////////////////////
 const TLorentzVector & HTTParticle::getSystScaleP4(HTTAnalysis::sysEffects type) const{
 
+  //Corrections of nominal tau-scale: https://twiki.cern.ch/twiki/bin/view/CMS/TauIDRecommendation13TeV#Tau_energy_scale
+  float TES_1p=-0.005, TES_1ppi0=0.011, TES_3p=0.006;
   if(type==HTTAnalysis::NOMINAL) {
     lastSystEffect = type;
+    //correct nominal scale of genuine taus
+    if(std::abs(getPDGid())==15 && getProperty(PropertyEnum::mc_match)==5){
+      int dm = getProperty(PropertyEnum::decayMode);
+      if(dm==0) //1-prong
+	return getShiftedP4(1+TES_1p,true);
+      else if(dm==1 || dm==2) //1-prong+pi0s
+	return getShiftedP4(1+TES_1ppi0,false);
+      else if(dm==10) //3-prongs
+	return getShiftedP4(1+TES_3p,false);
+      else //others
+	return p4;
+    }
     return p4;
   }
   else if(lastSystEffect==type) return p4Cache;
 
   lastSystEffect = type;
 
-  if(abs(getPDGid())==15 && getProperty(PropertyEnum::mc_match)==5){
+  if(std::abs(getPDGid())==15 && getProperty(PropertyEnum::mc_match)==5){
     ///True taus
-    if(type!=HTTAnalysis::TESUp && type!=HTTAnalysis::TESDown) return p4;
-    float TES = 0.03;
+    
+    if(type!=HTTAnalysis::TESUp && type!=HTTAnalysis::TESDown) {
+      if(type==HTTAnalysis::DUMMY_SYS)
+	return p4;//return RAW uncorrected p4. FIXME: is it correct or DUMMY_SYS is sometimes used
+      else{//apply nominal corrections as above, ugly code duplication
+	int dm = getProperty(PropertyEnum::decayMode);
+	if(dm==0) //1-prong
+	  return getShiftedP4(1+TES_1p,true);
+	else if(dm==1 || dm==2) //1-prong+pi0s
+	  return getShiftedP4(1+TES_1ppi0,false);
+	else if(dm==10) //3-prongs
+	  return getShiftedP4(1+TES_3p,false);
+	else //others
+	  return p4;	
+      }
+    }
+    float TES = 0.012;
     if(type==HTTAnalysis::TESDown) TES*=-1;
-    return getShiftedP4(1+TES);
+    return getShiftedP4(1+TES,getProperty(PropertyEnum::decayMode)==0);
   }
-  if(abs(getPDGid())==15 && getProperty(PropertyEnum::mc_match)==3){
+  if(std::abs(getPDGid())==15 && getProperty(PropertyEnum::mc_match)==3){
     ///Fake e->tau
     if(type!=HTTAnalysis::E2TUp && type!=HTTAnalysis::E2TDown) return p4;
     float EES = 0.03;
     if(type==HTTAnalysis::E2TDown) EES*=-1;
-    return getShiftedP4(1+EES);
+    return getShiftedP4(1+EES,getProperty(PropertyEnum::decayMode)==0);
   }
-  if(abs(getPDGid())==15 && getProperty(PropertyEnum::mc_match)==4){
+  if(std::abs(getPDGid())==15 && getProperty(PropertyEnum::mc_match)==4){
     ///Fake mu->tau
     if(type!=HTTAnalysis::M2TUp && type!=HTTAnalysis::M2TDown) return p4;
     float MES = 0.03;
     if(type==HTTAnalysis::M2TDown) MES*=-1;
-    return getShiftedP4(1+MES);
+    return getShiftedP4(1+MES,getProperty(PropertyEnum::decayMode)==0);
   }
-  if(abs(getPDGid())==98){
+  if(std::abs(getPDGid())==98){
     if(type!=HTTAnalysis::JESUp && type!=HTTAnalysis::JESDown) return p4;
     float JES = getProperty(PropertyEnum::jecUnc);
     if(type==HTTAnalysis::JESDown) JES*=-1;
-    return getShiftedP4(1+JES);
+    return getShiftedP4(1+JES,false);
   }
 
   p4Cache = p4;
@@ -109,7 +138,12 @@ const TLorentzVector & HTTParticle::getSystScaleP4(HTTAnalysis::sysEffects type)
 }
 ////////////////////////////////////////////////
 ////////////////////////////////////////////////
-const TLorentzVector & HTTParticle::getShiftedP4(float scale) const{
+const TLorentzVector & HTTParticle::getShiftedP4(float scale, bool preserveMass) const{
+
+  if(!preserveMass){
+    p4Cache = scale*p4;
+    return p4Cache;
+  }
 
   double pt = p4.Perp();
   double energy =  p4.E();
@@ -173,6 +207,25 @@ const TVector2 & HTTPair::getSystScaleMET(HTTAnalysis::sysEffects type) const{
   if(type==HTTAnalysis::NOMINAL ||
   (unsigned int)type>(unsigned int)HTTAnalysis::DUMMY_SYS) {
     lastSystEffect = type;
+    if( (std::abs(leg1.getPDGid())==15 && leg1.getProperty(PropertyEnum::mc_match)==5) ||
+	(std::abs(leg2.getPDGid())==15 && leg2.getProperty(PropertyEnum::mc_match)==5) ){
+      
+      double metX = met.X();
+      metX+=leg1.getP4(HTTAnalysis::DUMMY_SYS).X(); //uncor
+      metX+=leg2.getP4(HTTAnalysis::DUMMY_SYS).X(); //uncor
+      metX-=leg1.getP4(HTTAnalysis::NOMINAL).X();
+      metX-=leg2.getP4(HTTAnalysis::NOMINAL).X();
+      
+      double metY = met.Y();
+      metY+=leg1.getP4(HTTAnalysis::DUMMY_SYS).Y();
+      metY+=leg2.getP4(HTTAnalysis::DUMMY_SYS).Y();
+      metY-=leg1.getP4(HTTAnalysis::NOMINAL).Y();
+      metY-=leg2.getP4(HTTAnalysis::NOMINAL).Y();
+      
+      metCache.SetX(met.X());
+      metCache.SetY(met.Y());
+      return metCache;
+    }
     return met;
   }
   else if(lastSystEffect==type) return metCache;
