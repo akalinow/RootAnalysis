@@ -116,6 +116,7 @@ void TauTauSpecifics::testAllCategories(const HTTAnalysis::sysEffects & aSystEff
         unsigned int mcMask = dataMask - (1<<6) - (1<<7);
         bool metFilterDecision = (metFilters & mcMask) == mcMask;
         if(myAnalyzer->sampleName=="Data") metFilterDecision = (metFilters & dataMask) == dataMask;
+        metFilterDecision = true;//AP 07_07
 
         if(!tau1Kinematics || !tau1ID || !tau2Kinematics || !tau2ID || !relaxedIso || !trigger || !metFilterDecision) return;
 
