@@ -34,8 +34,13 @@ float getLumi(){
                         run2016FReReco + run2016GReReco +
                         run2016HPromptReco_v2 + run2016HPromptReco_v3;
 
+	
+
+	float run2017 = 18.1*1E3*1E6;
+
         run2016 = 35.87*1E3*1E6; //Updated Run2016 luminosity
-        return run2016*1E-6; //pb-1 data for NTUPLES_05_12_2016
+        //return run2016*1E-6; //pb-1 data for NTUPLES_05_12_2016
+	return run2017*1E-6; //pb-1 data for NTUPLES_08_10_2017
 }
 //////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////

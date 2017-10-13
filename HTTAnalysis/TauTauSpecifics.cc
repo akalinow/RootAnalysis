@@ -97,20 +97,14 @@ void TauTauSpecifics::testAllCategories(const HTTAnalysis::sysEffects & aSystEff
         bool relaxedIso = (tau1IsoM && tau2IsoL) || (tau2IsoM && tau1IsoL);
         bool antiIso = (tau1IsoM && tau2IsoL && !tau2IsoT) || (tau2IsoM && tau1IsoL && !tau1IsoT);
 
-        bool mediumIsoTrigger = myAnalyzer->aLeg1.hasTriggerMatch(TriggerEnum::HLT_DoubleMediumIsoPFTau35_Trk1_eta2p1_Reg) &&
-                                myAnalyzer->aLeg2.hasTriggerMatch(TriggerEnum::HLT_DoubleMediumIsoPFTau35_Trk1_eta2p1_Reg);
+        bool trigger1 = myAnalyzer->aLeg1.hasTriggerMatch(TriggerEnum::HLT_DoubleMediumChargedIsoPFTau35_Trk1_eta2p1_Reg) &&
+	               myAnalyzer->aLeg2.hasTriggerMatch(TriggerEnum::HLT_DoubleMediumChargedIsoPFTau35_Trk1_eta2p1_Reg);
 
-        bool mediumCombinedIsoTrigger = myAnalyzer->aLeg1.hasTriggerMatch(TriggerEnum::HLT_DoubleMediumCombinedIsoPFTau35_Trk1_eta2p1_Reg) &&
-                                        myAnalyzer->aLeg2.hasTriggerMatch(TriggerEnum::HLT_DoubleMediumCombinedIsoPFTau35_Trk1_eta2p1_Reg);
+        bool trigger2 = myAnalyzer->aLeg1.hasTriggerMatch(TriggerEnum::HLT_DoubleMediumChargedIsoPFTau35_Trk1_TightID_eta2p1_Reg) &&
+                              myAnalyzer->aLeg2.hasTriggerMatch(TriggerEnum::HLT_DoubleMediumChargedIsoPFTau35_Trk1_TightID_eta2p1_Reg);
 
-        bool trigger = mediumIsoTrigger || mediumCombinedIsoTrigger;
-
-        if(myAnalyzer->aEvent.getRunId()>280385) {
-                trigger = mediumCombinedIsoTrigger;
-        } else if(myAnalyzer->aEvent.getRunId()>1) {
-                trigger = mediumIsoTrigger;
-        }
-
+        bool trigger = trigger1 || trigger2;
+      
         unsigned int metFilters = myAnalyzer->aEvent.getMETFilterDecision();
         unsigned int dataMask = (1<<8) -1;
         unsigned int mcMask = dataMask - (1<<6) - (1<<7);
