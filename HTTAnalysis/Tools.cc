@@ -33,12 +33,26 @@ float getLumi(){
                         run2016DReReco + run2016EReReco +
                         run2016FReReco + run2016GReReco +
                         run2016HPromptReco_v2 + run2016HPromptReco_v3;
+	run2016 = 35.87*1E3*1E6; //Updated Run2016 luminosity
 
-	
+	float run2017BPromptv1 = 4.0*1E3*1E6;
+        float run2017BPromptv2 = 0.7*1E3*1E6;
+        float run2017CPromptv1 = 1.3*1E3*1E6;
+        float run2017CPromptv2 = 4.1*1E3*1E6;
+        float run2017CPromptv3 = 4.3*1E3*1E6;
+        float run2017DPromptv1 = 4.3*1E3*1E6;
+        float run2017EPromptv1 = 9.1*1E3*1E6;
 
-	float run2017 = 35.9*1E3*1E6;
+        float run2017B12SepReReco = 2.1*1E3*1E6;
+        float run2017C12SepReReco = 5.4*1E3*1E6;
 
-        run2016 = 35.87*1E3*1E6; //Updated Run2016 luminosity
+	/*run2017BPromptv1+run2017BPromptv2*/
+        float run2017 = run2017B12SepReReco
+                      + run2017C12SepReReco
+                      + run2017CPromptv3
+                      + run2017DPromptv1
+                      + run2017EPromptv1;//data for NTUPLES_08_10_2017
+	        
         //return run2016*1E-6; //pb-1 data for NTUPLES_05_12_2016
 	return run2017*1E-6; //pb-1 data for NTUPLES_08_10_2017
 }
