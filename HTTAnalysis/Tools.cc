@@ -36,7 +36,7 @@ float getLumi(){
 
 	
 
-	float run2017 = 18.1*1E3*1E6;
+	float run2017 = 35.9*1E3*1E6;
 
         run2016 = 35.87*1E3*1E6; //Updated Run2016 luminosity
         //return run2016*1E-6; //pb-1 data for NTUPLES_05_12_2016
