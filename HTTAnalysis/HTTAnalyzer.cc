@@ -22,7 +22,7 @@ HTTAnalyzer::HTTAnalyzer(const std::string & aName, const std::string & aDecayMo
                 TFile::SetCacheFileDir("/tmp/");
 
                 //std::string dataPUFileName = "http://akalinow.web.cern.ch/akalinow/Data_Pileup_2016_271036-284044_13TeVMoriond17_23Sep2016ReReco_69p2mbMinBiasXS.root";
-		std::string dataPUFileName = "http://akalinow.web.cern.ch/akalinow/MyDataPileupHistogram_Cert_294927-302663_13TeV_PromptReco_Collisions17_69mb.root";
+		std::string dataPUFileName = "http://akalinow.web.cern.ch/akalinow/Data-MC_Pileup_B-C-12Sep_D-E-Prompt_Cert_294927-305185_13TeV_PromptReco_Collisions17_69mb.root";
 
                 puDataFile_ = TFile::Open(dataPUFileName.c_str(),"CACHEREAD");
 
