@@ -4,7 +4,6 @@ from ROOT import *
 import array
 import numpy
 
-WAW_fileName = "/cms/cms/akalinow/CMS/HiggsCP/Data/NTUPLES_28_03_2017/Histograms/24_04_2017/RootAnalysis_AnalysisMuTau.root"
 WAW_fileName = "RootAnalysis_AnalysisMuTau.root"
 
 channel="mt"
@@ -353,9 +352,6 @@ for iCategory in xrange(0,len(categoryCombineNames)):
 ##########################################################
 ######### tauH-tauH channel###############################
 ##########################################################
-
-
-WAW_fileName = "/cms/cms/akalinow/CMS/HiggsCP/Data/NTUPLES_28_03_2017/Histograms/24_04_2017/RootAnalysis_AnalysisTT.root"
 WAW_fileName = "RootAnalysis_AnalysisTT.root"
 
 channel="tt"
@@ -451,7 +447,7 @@ categoryDirMade = False
 
 hData = 0
 
-open("histogramSearchMT.txt","w").write("Looking for histograms for Combine \n")
+open("histogramSearchTT.txt","w").write("Looking for histograms for Combine \n")
 
 print "MAIN REGION\n\n\n\n\n"
 

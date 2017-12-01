@@ -435,9 +435,9 @@ void HTTHistograms::finalizeHistograms(const std::vector<const HTTAnalysis::even
 
         gErrorIgnoreLevel = kBreak;
         //////////////
-        ///Control regions plots
+        ///Control regions plots	
         for(auto iCategory: mainCategoriesRejester) {
-
+	  
                 //plotCPhistograms(iCategory);
 
                 plotStack(iCategory, "MassSV");
@@ -485,22 +485,23 @@ void HTTHistograms::finalizeHistograms(const std::vector<const HTTAnalysis::even
         }
 
         ///Make systematic effect histos.
-/*        for(unsigned int iSystEffect = (unsigned int)HTTAnalysis::NOMINAL;
+	bool doPlot = false;
+        for(unsigned int iSystEffect = (unsigned int)HTTAnalysis::NOMINAL;
             iSystEffect<=(unsigned int)HTTAnalysis::ZmumuDown; ++iSystEffect) {
                 if(iSystEffect==(unsigned int)HTTAnalysis::DUMMY_SYS) continue;
                 for(auto iCategory: mainCategoriesRejester) {
-                        plotStack(iCategory, "MassSV", iSystEffect);
-                        plotStack(iCategory, "MassTrans", iSystEffect);
-                        plotStack(iCategory, "MassVis", iSystEffect);
-                        plotStack(iCategory, "UnRollTauPtMassVis", iSystEffect);
-                        plotStack(iCategory, "UnRollTauDMMassVis", iSystEffect);
-                        plotStack(iCategory, "UnRollHiggsPtMassSV", iSystEffect);
-                        plotStack(iCategory, "UnRollGammaSumMassSV", iSystEffect);
-                        plotStack(iCategory, "UnRollMjjMassSV", iSystEffect);
-                        plotStack(iCategory, "UnRollMassSVPhiCP", iSystEffect);
-                        plotStack(iCategory, "UnRollMassSVYCP", iSystEffect);
+		  plotStack(iCategory, "MassSV", iSystEffect, doPlot);			
+		  plotStack(iCategory, "MassTrans", iSystEffect, doPlot);			
+		  plotStack(iCategory, "MassVis", iSystEffect, doPlot);			
+		  plotStack(iCategory, "UnRollTauPtMassVis", iSystEffect, doPlot);			
+		  plotStack(iCategory, "UnRollTauDMMassVis", iSystEffect, doPlot);
+		  plotStack(iCategory, "UnRollHiggsPtMassSV", iSystEffect, doPlot);
+		  plotStack(iCategory, "UnRollGammaSumMassSV", iSystEffect, doPlot);
+		  plotStack(iCategory, "UnRollMjjMassSV", iSystEffect, doPlot);
+		  plotStack(iCategory, "UnRollMassSVPhiCP", iSystEffect, doPlot);
+		  plotStack(iCategory, "UnRollMassSVYCP", iSystEffect, doPlot);	  						
                 }
-        }*/
+        }
 
         ofstream eventCountFile("eventCount.txt",ios::out | ios::app);
         outputStream<<"HTTHistograms compilation time: "<<__TIMESTAMP__<<std::endl;
@@ -958,7 +959,7 @@ void HTTHistograms::plotSingleHistogram(std::string hName){
 /////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////
 THStack*  HTTHistograms::plotStack(unsigned int iCategory,
-                                   std::string varName, unsigned int iSystEffect){
+                                   std::string varName, unsigned int iSystEffect, bool doPlot){
 
         std::string hName = "h1D"+varName;
         std::string categoryName = myCategoryRejester[iCategory]->name();
@@ -1336,6 +1337,9 @@ THStack*  HTTHistograms::plotStack(unsigned int iCategory,
         hWHiggs130->SetDirectory(hSoup->GetDirectory());
         hWHiggs140->SetDirectory(hSoup->GetDirectory());
         /////////////////////////////////////////////////////
+	///Get histograms only. Skip plotting, as it takes time.
+	if(!doPlot) return 0;
+	/////////////////////////////////////////////////////
 
         hHiggs->Add(hggHiggs125);
         hHiggs->Add(hqqHiggs125);
@@ -1528,9 +1532,10 @@ THStack*  HTTHistograms::plotStack(unsigned int iCategory,
 
         c1->Print(plotName.c_str());
 
-        if(hName.find_last_of("/")<string::npos) plotName = "fig_C/" + hName.substr(hName.find_last_of("/")) + ".C";
-        else plotName = "fig_C/hTree_"+hName+Form("_%s",hNameSuffix.c_str())+".C";
-        c1->Print(plotName.c_str());
+	///THStack changes histogram name when saving into .C
+        //if(hName.find_last_of("/")<string::npos) plotName = "fig_C/" + hName.substr(hName.find_last_of("/")) + ".C";
+        //else plotName = "fig_C/hTree_"+hName+Form("_%s",hNameSuffix.c_str())+".C";
+        //c1->Print(plotName.c_str());
 
         pad1->SetLogy(1);
         if(hName.find_last_of("/")<string::npos) plotName = "fig_png/" + hName.substr(hName.find_last_of("/")) + "_LogY.png";
