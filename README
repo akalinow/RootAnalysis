@@ -7,12 +7,8 @@ automake --add-missing
 autoreconf
 ./configure 
 make
-cd OTFAnalysis
-./test otf.ini
 
 
-NOTE: File otf.ini contains a path to the data file. Please update it before running the code.
-NOTE: for non standard location of ROOT or BOOST see ./configure --help
 
 
 
