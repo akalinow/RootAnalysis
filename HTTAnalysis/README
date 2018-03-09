@@ -9,13 +9,8 @@ autoconf
 make -j 4
 cd HTTAnalysis
 
-#Update the input files paths in htt.ini
-#IMPORTANT: copy/link the official files with PU histograms: MC_Spring15_PU25_Startup.root Data_Pileup_2015D_Feb02.root
-#Those files should be present in NTUPELS_XX_YY_2016 directories provided by AK
-#Set number of threads to be used in the MT (multi thread) mode.
-#WARNING: with nThreads>1 there are occasional crashes due to MT reading of the input ROOT files.
-#Run the analysis:
+#Update input files paths in htt_MuTau.ini
 
-./test htt.ini 
+./test htt_MuTau.ini 
 
 
