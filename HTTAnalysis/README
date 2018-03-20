@@ -1,11 +1,6 @@
 git clone https://github.com/akalinow/RootAnalysis
 cd RootAnalysis
-git checkout relevant_tag
-libtoolize
-aclocal
-automake --add-missing
-autoconf
-./configure
+cmake ./
 make -j 4
 cd HTTAnalysis
 
