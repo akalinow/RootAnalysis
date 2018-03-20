@@ -6,7 +6,7 @@
 namespace HTTAnalysis {
 
 float getLumi(){
-
+  /*
         //./.local/bin/brilcalc lumi --normtag ~lumipro/public/normtag_file/OfflineNormtagV2.json -i lumiSummary_Run2015C_16Dec2015_v1.json
         float run2015C = 17225935.728*1E-6;
         float run2015D = 2114239169.533*1E-6;
@@ -34,18 +34,18 @@ float getLumi(){
                         run2016FReReco + run2016GReReco +
                         run2016HPromptReco_v2 + run2016HPromptReco_v3;
 	run2016 = 35.87*1E3*1E6; //Updated Run2016 luminosity
-
+  
 	float run2017BPromptv1 = 4.0*1E3*1E6;
-        float run2017BPromptv2 = 0.7*1E3*1E6;
+	float run2017BPromptv2 = 0.7*1E3*1E6;
         float run2017CPromptv1 = 1.3*1E3*1E6;
         float run2017CPromptv2 = 4.1*1E3*1E6;
+	*/
         float run2017CPromptv3 = 4.3*1E3*1E6;
         float run2017DPromptv1 = 4.3*1E3*1E6;
         float run2017EPromptv1 = 9.1*1E3*1E6;
 
         float run2017B12SepReReco = 2.1*1E3*1E6;
         float run2017C12SepReReco = 5.4*1E3*1E6;
-
 	/*run2017BPromptv1+run2017BPromptv2*/
         float run2017 = run2017B12SepReReco
                       + run2017C12SepReReco

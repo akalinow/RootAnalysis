@@ -21,7 +21,6 @@
 #include "boost/functional/hash.hpp"
 #include "boost/property_tree/ptree.hpp"
 #include "boost/property_tree/ini_parser.hpp"
-#include "boost/tokenizer.hpp"
 
 #include "TROOT.h"
 #include "TObject.h"
@@ -44,8 +43,6 @@ int main(int argc, char ** argv) {
 
 	boost::property_tree::ptree pt;
 	boost::property_tree::ini_parser::read_ini(cfgFileName, pt);
-
-	typedef boost::tokenizer<boost::char_separator<char> > tokenizer;
 	std::string processName = pt.get<std::string>("TreeAnalyzer.processName","Test");
 
 	//Tell Root we want to be multi-threaded

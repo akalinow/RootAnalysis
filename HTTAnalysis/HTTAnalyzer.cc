@@ -245,7 +245,7 @@ bool HTTAnalyzer::passCategory(unsigned int iCategory){
 //////////////////////////////////////////////////////////////////////////////
 bool HTTAnalyzer::analyze(const EventProxyBase& iEvent){
 
-        bool runSystematics = true;
+        bool runSystematics = false;
 
         const EventProxyHTT & myEventProxy = static_cast<const EventProxyHTT&>(iEvent);
         sampleName = getSampleName(myEventProxy);
@@ -269,7 +269,7 @@ bool HTTAnalyzer::analyze(const EventProxyBase& iEvent){
 
         std::pair<bool, bool> goodDecayModes = myChannelSpecifics->checkTauDecayMode(myEventProxy);
         bool goodGenDecayMode = goodDecayModes.first;
-        bool goodRecoDecayMode = goodDecayModes.second;
+        //bool goodRecoDecayMode = goodDecayModes.second;
 
         if(goodGenDecayMode) fillGenDecayPlaneAngle(sampleName+"_GenNoOfflineSel", eventWeight);
 

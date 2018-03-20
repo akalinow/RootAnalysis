@@ -23,7 +23,7 @@ public:
 
 ChannelSpecifics(HTTAnalyzer *aAnalyzer);
 
-~ChannelSpecifics();
+virtual ~ChannelSpecifics();
 
 virtual void setAnalysisObjects(const EventProxyHTT & myEventProxy) = 0;
 
