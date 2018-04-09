@@ -24,7 +24,7 @@ AC_CONFIG_FILES(Makefile
                 src/Makefile
                 OTFAnalysis/Makefile
 		CPwithPytia8/Makefile
-		HTTAnalysis/Makefile)
+		HTTAnalysis/Makefile
+    SVFitAnalysis/Makefile)
 
 AC_OUTPUT
-

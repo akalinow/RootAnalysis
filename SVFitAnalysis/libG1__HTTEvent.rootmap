@@ -1,0 +1,15 @@
+{ decls }
+namespace std {  }
+
+[ libG1__HTTEvent.so ]
+# List of selected classes
+class HTTEvent
+class HTTPair
+class HTTParticle
+class vector<HTTPair>
+class vector<HTTParticle>
+class vector<LongDouble_t>
+class vector<TLorentzVector>
+class vector<TVector2>
+class vector<long double>
+header HTTEvent.h
