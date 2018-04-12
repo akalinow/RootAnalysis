@@ -208,7 +208,7 @@ int TreeAnalyzer::loop(){
   nEventsAnalyzed_ = 0;
   nEventsSkipped_ = 0;
   if(nEventsToAnalyze_<0 || nEventsToAnalyze_>myProxy_->size()) nEventsToAnalyze_ = myProxy_->size();
- 
+
   myProxiesThread_[0]->toBegin();
 
   unsigned int eventCount[nThreads_] {0};

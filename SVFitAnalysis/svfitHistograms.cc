@@ -46,8 +46,11 @@ std::string svfitHistograms::getTemplateName(const std::string& name){
         if(name.find("hProf")!=std::string::npos && name.find("VsMag")!=std::string::npos) templateName = "hProfVsMagTemplate";
         else if(name.find("h1DFlightPath")!=std::string::npos) templateName = "h1DFlightPathTemplate";
         else if(name.find("h1DMass")!=std::string::npos) templateName = "h1DMassTemplate";
+        else if(name.find("h1DDeltaR")!=std::string::npos) templateName = "h1DDeltaRTemplate";
+        else if(name.find("h1DLLH")!=std::string::npos) templateName = "h1DLLHTemplate";
 
         else if(name.find("h2DFlightPathVsDeltaR")!=std::string::npos) templateName = "h2DFlightPathVsDeltaRTemplate";
+        else if(name.find("h2DDelta")!=std::string::npos) templateName = "h2DDeltaTemplate";
 
         return templateName;
 }
@@ -61,8 +64,13 @@ void svfitHistograms::defineHistograms(){
                 add1DHistogram("h1DStatsTemplate","",21,-0.5,20.5,file_);
                 add1DHistogram("h1DMassTemplate",";mass [GeV/c^{2}]; Events",35,0,350,file_);
                 add1DHistogram("h1DFlightPathTemplate",";flight path [cm]; Events",100,0,0.1,file_);
+                add1DHistogram("h1DDeltaRTemplate","",21,-6.0,6.0,file_);
+
+                add1DHistogram("h1DLLHTemplate","",200,-0.1,3,file_);
 
                 add2DHistogram("h2DFlightPathVsDeltaRTemplate",";flight path [cm]; #Delta R",20,0,4, 50,0,0.05,file_);
+                add2DHistogram("h2DDeltaTemplate","",20,-3.0,3.0, 20, -1.0, 1.0, file_);
+
         }
 }
 /////////////////////////////////////////////////////////
@@ -73,14 +81,28 @@ void svfitHistograms::finalizeHistograms(const std::vector<const HTTAnalysis::ev
 
   AnalysisHistograms::finalizeHistograms();
 
-  std::vector<std::string> names = {"ggHTT125", "ggHTT140", "DYAllJetsMatchT"};
+  std::vector<std::string> names = {"ggHTT125", "ggHTT140", "ggHTT200",
+                                    "ggHTT250", "ggHTT500", "ggHTT1000",
+                                    "DYAllJetsMatchT"};
 
-  for(int i=0;i<3;++i){
+  plotSingleHistogram("h1DDeltaR_1");
+  plotSingleHistogram("h1DDeltaR_2");
+  plotSingleHistogram("h1DDeltaR_3");
+  plotSingleHistogram("h1DDeltaR_4");
+  plotSingleHistogram("h1DLLH_1");
+  plotSingleHistogram("h1DLLH_2");
+  plotSingleHistogram("h1DLLH_3");
+  plotSingleHistogram("h1DLLH_4");
+
+  plotSingleHistogram2D("h2DDelta_1");
+  plotSingleHistogram2D("h2DDelta_2");
+
+  for(int i=0;i<7;++i){
     std::string hNameSuffix = names[i];
 
     plotSingleHistogram("h1DMassSV"+hNameSuffix);
-
     plotSingleHistogram("h1DMassSVRecalculated"+hNameSuffix);
+    /*
     plotSingleHistogram("h1DFlightPathRec"+hNameSuffix);
     plotSingleHistogram("h1DFlightPathPCARec"+hNameSuffix);
     plotSingleHistogram("h1DFlightPathPCARecLeg1"+hNameSuffix);
@@ -88,6 +110,7 @@ void svfitHistograms::finalizeHistograms(const std::vector<const HTTAnalysis::ev
     plotSingleHistogram("h1DFlightPathPCAGen"+hNameSuffix);
 
     plotSingleHistogram2D("h2DFlightPathVsDeltaRGen"+hNameSuffix);
+    */
   }
   std::cout<<"svfitHistograms::finalizeHistograms() END"<<std::endl;
 }

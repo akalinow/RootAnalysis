@@ -37,7 +37,7 @@
 namespace std {} using namespace std;
 
 // Header files passed as explicit arguments
-#include "/scratch_local/akalinow/CMS/SVFit/RootAnalysis/SVFitAnalysis/HTTEvent.h"
+#include "HTTEvent.h"
 
 // Header files passed via #pragma extra_include
 
@@ -254,7 +254,7 @@ namespace ROOT {
       vector<long double> *ptr = 0;
       static ::TVirtualIsAProxy* isa_proxy = new ::TIsAProxy(typeid(vector<long double>));
       static ::ROOT::TGenericClassInfo 
-         instance("vector<long double>", -2, "vector", 216,
+         instance("vector<long double>", -2, "vector", 214,
                   typeid(vector<long double>), ::ROOT::Internal::DefineBehavior(ptr, ptr),
                   &vectorlElongsPdoublegR_Dictionary, isa_proxy, 4,
                   sizeof(vector<long double>) );
@@ -317,7 +317,7 @@ namespace ROOT {
       vector<float> *ptr = 0;
       static ::TVirtualIsAProxy* isa_proxy = new ::TIsAProxy(typeid(vector<float>));
       static ::ROOT::TGenericClassInfo 
-         instance("vector<float>", -2, "vector", 216,
+         instance("vector<float>", -2, "vector", 214,
                   typeid(vector<float>), ::ROOT::Internal::DefineBehavior(ptr, ptr),
                   &vectorlEfloatgR_Dictionary, isa_proxy, 0,
                   sizeof(vector<float>) );
@@ -380,7 +380,7 @@ namespace ROOT {
       vector<double> *ptr = 0;
       static ::TVirtualIsAProxy* isa_proxy = new ::TIsAProxy(typeid(vector<double>));
       static ::ROOT::TGenericClassInfo 
-         instance("vector<double>", -2, "vector", 216,
+         instance("vector<double>", -2, "vector", 214,
                   typeid(vector<double>), ::ROOT::Internal::DefineBehavior(ptr, ptr),
                   &vectorlEdoublegR_Dictionary, isa_proxy, 0,
                   sizeof(vector<double>) );
@@ -443,7 +443,7 @@ namespace ROOT {
       vector<TVector2> *ptr = 0;
       static ::TVirtualIsAProxy* isa_proxy = new ::TIsAProxy(typeid(vector<TVector2>));
       static ::ROOT::TGenericClassInfo 
-         instance("vector<TVector2>", -2, "vector", 216,
+         instance("vector<TVector2>", -2, "vector", 214,
                   typeid(vector<TVector2>), ::ROOT::Internal::DefineBehavior(ptr, ptr),
                   &vectorlETVector2gR_Dictionary, isa_proxy, 4,
                   sizeof(vector<TVector2>) );
@@ -506,7 +506,7 @@ namespace ROOT {
       vector<TLorentzVector> *ptr = 0;
       static ::TVirtualIsAProxy* isa_proxy = new ::TIsAProxy(typeid(vector<TLorentzVector>));
       static ::ROOT::TGenericClassInfo 
-         instance("vector<TLorentzVector>", -2, "vector", 216,
+         instance("vector<TLorentzVector>", -2, "vector", 214,
                   typeid(vector<TLorentzVector>), ::ROOT::Internal::DefineBehavior(ptr, ptr),
                   &vectorlETLorentzVectorgR_Dictionary, isa_proxy, 4,
                   sizeof(vector<TLorentzVector>) );
@@ -569,7 +569,7 @@ namespace ROOT {
       vector<HTTParticle> *ptr = 0;
       static ::TVirtualIsAProxy* isa_proxy = new ::TIsAProxy(typeid(vector<HTTParticle>));
       static ::ROOT::TGenericClassInfo 
-         instance("vector<HTTParticle>", -2, "vector", 216,
+         instance("vector<HTTParticle>", -2, "vector", 214,
                   typeid(vector<HTTParticle>), ::ROOT::Internal::DefineBehavior(ptr, ptr),
                   &vectorlEHTTParticlegR_Dictionary, isa_proxy, 4,
                   sizeof(vector<HTTParticle>) );
@@ -632,7 +632,7 @@ namespace ROOT {
       vector<HTTPair> *ptr = 0;
       static ::TVirtualIsAProxy* isa_proxy = new ::TIsAProxy(typeid(vector<HTTPair>));
       static ::ROOT::TGenericClassInfo 
-         instance("vector<HTTPair>", -2, "vector", 216,
+         instance("vector<HTTPair>", -2, "vector", 214,
                   typeid(vector<HTTPair>), ::ROOT::Internal::DefineBehavior(ptr, ptr),
                   &vectorlEHTTPairgR_Dictionary, isa_proxy, 4,
                   sizeof(vector<HTTPair>) );
@@ -687,10 +687,10 @@ namespace {
 0
     };
     static const char* includePaths[] = {
-"/usr/local/root-6.12.04/include",
+"/usr/local/root-6.10.00/include",
 "/scratch_local/akalinow/CMS/SVFit/development",
-"/scratch_local/akalinow/CMS/SVFit/RootAnalysis/SVFitAnalysis",
-"/usr/local/root-6.12.04/include",
+"/home/akalinow/scratch/CMS/SVFit/RootAnalysis/SVFitAnalysis",
+"/usr/local/root-6.10.00/include",
 "/scratch_local/akalinow/CMS/SVFit/RootAnalysis/SVFitAnalysis/",
 0
     };

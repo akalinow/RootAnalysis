@@ -4,6 +4,7 @@
 #include "RooAbsReal.h"
 #include "RooRealVar.h"
 #include "RooFormulaVar.h"
+#include "TF1.h"
 
 #include "svfitAnalyzer.h"
 #include "svfitHistograms.h"
@@ -12,6 +13,27 @@
 #include "Tools.h"
 
 #include "TauAnalysis/ClassicSVfit/interface/ClassicSVfit.h"
+//////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////////
+Double_t likelihoodFunc(Double_t *x, Double_t *par)
+{
+   Float_t mH =x[0];
+   Double_t mVis = par[0];
+   Double_t mVisLeg1 = par[1];
+   Double_t mVisLeg2 = par[2];
+   Double_t coeff1 = par[3];
+   Double_t scale = par[4];
+
+   Double_t mTau = 1.77685;
+
+   Double_t x1Min = std::min(1.0, std::pow(mVisLeg1/mTau,2));
+   Double_t x2Min = std::max(std::pow(mVisLeg2/mTau,2), std::pow(mVis/mH,2));
+   Double_t x2Max = std::min(1.0, std::pow(mVis/mH,2)/x1Min);
+
+   Double_t value = 2.0*std::pow(mVis,2)*std::pow(mH,-coeff1)*(log(x2Max)-log(x2Min) + std::pow(mVis/mH,2)*(1 - std::pow(x2Min,-1)));
+   if(mH<mVis) return 0.0;
+   return scale*value;
+}
 //////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////
 svfitAnalyzer::svfitAnalyzer(const std::string & aName, const std::string & aDecayMode) : Analyzer(aName){
@@ -26,11 +48,14 @@ svfitAnalyzer::svfitAnalyzer(const std::string & aName, const std::string & aDec
           ntupleFile_ = 0;
 
           //TEST svFitAlgo.addLogM_fixed(true, 4.0);
-          svFitAlgo.addLogM_fixed(false, 4.0);
+          svFitAlgo.addLogM_fixed(true, 4.0);
           svFitAlgo.setLikelihoodFileName("");
           svFitAlgo.setMaxObjFunctionCalls(100000);
           svFitAlgo.setVerbosity(1);
         }
+
+        fLikelihood = new TF1("likelihood",likelihoodFunc,0,5000,5);
+        fLikelihood->SetParNames("mVis","mVisLeg1","mVisLeg2", "coefficient","scale");
 }
 //////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////
@@ -120,6 +145,10 @@ TLorentzVector svfitAnalyzer::runFastSVFitAlgo(const TLorentzVector & leg1P4,
 
   double x1 = 0.0;
   double x2 = 0.0;
+
+  double x1Max = 0.0;
+  double x2Max = 0.0;
+
   TLorentzVector tau1P4, tau2P4;
   TLorentzVector nuP4;
   TLorentzVector met1;
@@ -128,46 +157,132 @@ TLorentzVector svfitAnalyzer::runFastSVFitAlgo(const TLorentzVector & leg1P4,
   double llh = 0.0;
   double mH = 0.0;
   double mVis = (leg1P4 + leg2P4).M();
+  double mVisLeg1 = leg1P4.M();
   double mVisLeg2 = leg2P4.M();
+  if(mVisLeg2>1.5) mVisLeg2 = 0.6;
+  mVisLeg2 = 0.3;
   double x2Min = 0.0;
 
-    for(int iX2 = 1; iX2<100;++iX2){
+  TLorentzVector nuP4Max;
+  TLorentzVector nunuGen = aGenLeg1.getP4() + aGenLeg2.getP4() -
+                              leg1P4  - leg2P4;
 
-      x2 = iX2/100.0;
-      if(mVisLeg2>1.5) mVisLeg2 = 1.5;
+  double x1True =  leg1P4.E()/aGenLeg1.getP4().E();
+  double x2True =  leg2P4.E()/aGenLeg2.getP4().E();
+
+  fLikelihood->FixParameter(0,mVis);
+  fLikelihood->FixParameter(1,mVisLeg1);
+  fLikelihood->FixParameter(2,mVisLeg2);
+  fLikelihood->FixParameter(3,4);
+  fLikelihood->FixParameter(4,1.0);
+
+  int nGridPoints = 100;
+
+    for(int iX2 = 1; iX2<nGridPoints;++iX2){
+    //for(int iX2 = 1; iX2<2;++iX2){
+
+      x2 = (double)iX2/nGridPoints;
+      //x2 = x2True;
+
       x2Min = std::pow(mVisLeg2/1.77685,2);
-      if(x2<x2Min) continue;
+      if(x2<-x2Min) continue; //TEST "-"
+
       tau2P4 = leg2P4*(1.0/x2);
+      tau2P4.SetVectM(tau2P4.Vect(),1.77685);
 
-      for(int iX1 = 1; iX1<100;++iX1){
+      for(int iX1 = 1; iX1<nGridPoints;++iX1){
+      //for(int iX1 = 1; iX1<2;++iX1){
 
-      x1 = iX1/100.0;
+      x1 = (double)iX1/nGridPoints;
+
+      //x1 = std::pow(mVis,2)/std::pow(123.0,2)/x2;
+      //x1 = x1True;
+
 
     tau1P4 = leg1P4*(1.0/x1);
+    tau1P4.SetVectM(tau1P4.Vect(),1.77685);
 
-    nuP4 = tau1P4 - aLeg1.getP4();
-    nuP4 += tau2P4 - aLeg2.getP4();
+    TLorentzVector nu1P4 = tau1P4 - leg1P4;
+    TLorentzVector nu2P4 = tau2P4 - leg2P4;
+    nuP4 = nu1P4 + nu2P4;
 
     mH = (tau1P4+tau2P4).M();
     x2Min = std::max(std::pow(mVisLeg2/1.77685,2), std::pow(mVis/mH,2));
-    if(x2<x2Min) continue;
+    //if(x2<x2Min) continue; TEST
 
     llh = EvalMET_TF(metP4, nuP4, covMET);
     //llh *= std::pow(mVis,2)*std::pow(mH,-3)*(2*log(mH/mVis) + std::pow(mVis/mH,2)*(1 - std::pow(mH/mVis,2)));
+    //llh *= std::pow(mVis,2)*std::pow(mH,-3)*(-log(x2Min) + std::pow(mVis/mH,2)*(1 - std::pow(x2Min,-1)));
+    //llh *= std::pow(mVis,2)*std::pow(mH,-4)*(-log(x2Min) + std::pow(mVis/mH,2)*(1 - std::pow(x2Min,-1)));
+    llh *= fLikelihood->Eval(mH);
+    //std::cout<<" EvalMET_TF(metP4, nuP4, covMET); "<<EvalMET_TF(metP4, nuP4, covMET)
+    //<<" fLikelihood->Eval(mH): "<<fLikelihood->Eval(mH)
+    //<<" llh: "<<llh<<std::endl;
 
-    llh *= std::pow(mVis,2)*std::pow(mH,-3)*(-log(x2Min) + std::pow(mVis/mH,2)*(1 - std::pow(x2Min,-1)));
-    //std::cout<<"llh: "<<llh<<std::endl;
     if(llh>maxLLH){
       maxLLH = llh;
-      p4SVFit = tau1P4 + tau2P4;
+      p4SVFit = (tau1P4 + tau2P4);
+      nuP4Max = nuP4;
+      x1Max = x1;
+      x2Max = x2;
     }
   }
   }
-  if(p4SVFit.M()>20000){
+
+  myHistos_->fill1DHistogram("h1DLLH_1",x1Max/x1True);
+  myHistos_->fill1DHistogram("h1DLLH_2",x2Max/x2True);
+
+  double delta = leg2P4.E() - aGenLeg2.getChargedP4().E();
+  delta /= aGenLeg2.getChargedP4().E();
+  myHistos_->fill1DHistogram("h1DLLH_3",delta);
+
+  delta = leg1P4.E() - aGenLeg1.getChargedP4().E();
+  delta /= aGenLeg1.getChargedP4().E();
+  myHistos_->fill1DHistogram("h1DLLH_4",delta);
+
+
+  myHistos_->fill2DHistogram("h2DDelta_1",
+  (metP4.Vect().DeltaPhi(nunuGen.Vect())),
+  (metP4.Vect().Mag() - nunuGen.Vect().Mag())/nunuGen.Vect().Mag());
+
+  myHistos_->fill2DHistogram("h2DDelta_2",
+  (x1Max - x1True)/x1True,
+  (x2Max - x2True)/x2True);
+
+
+  if(delta>0.05){
+
+    //std::cout<<aLeg2.getP4().M()<<std::endl;
+
+/*
     std::cout<<"fast Mass: "<<p4SVFit.M()
              <<" classic mass: "<<computeSvFit().M()
              <<std::endl;
- }
+    std::cout<<" aGenLeg1.DeltaR(tau1P4): "<<aGenLeg1.getP4().DeltaR(tau1P4)
+             <<" aGenLeg2.DeltaR(tau2P4): "<<aGenLeg2.getP4().DeltaR(tau2P4)
+             <<std::endl;
+
+              std::cout<<" nunuGen.DeltaR(nuP4): "<< nunuGen.DeltaR(nuP4)
+                       <<" nunuGen.DeltaR(met): "<< nunuGen.DeltaR(metP4)
+                       <<" m: "<<(aGenLeg1.getP4() + aGenLeg2.getP4()).M()
+              <<std::endl;
+
+      std::cout<<"mNuNu2: "<<(tau1P4 - aLeg1.getP4()).M2()
+               <<" x1: "<<x1Max<<" x2: "<<x2Max
+               <<" true x1: "<<x1True<<" true  x2: "<<x2True
+               <<std::endl;
+               */
+
+
+      double deltaR1 = nunuGen.DeltaPhi(metP4);
+      deltaR1 = nunuGen.DeltaPhi(nuP4Max);
+
+      //deltaR1 = nunuGen.E()/nuP4Max.E();
+      deltaR1 = nunuGen.E()/metP4.E();
+
+      myHistos_->fill1DHistogram("h1DDeltaR_1",deltaR1);
+           }
+
   ////
   return p4SVFit;
   }
@@ -246,6 +361,13 @@ TLorentzVector svfitAnalyzer::computeSvFit(){
                 if(decay2==0) mass2 = 0.13957; //pi+/- mass
                 type2 = classic_svFit::MeasuredTauLepton::kTauToHadDecay;
         }
+        ///TEST
+        //decay1 = aLeg2.getProperty(PropertyEnum::decayMode);
+        //mass1 = 0.13957;
+        //type1 = classic_svFit::MeasuredTauLepton::kTauToHadDecay;
+        ///////
+
+
         //Leptons for SVFit
         std::vector<classic_svFit::MeasuredTauLepton> measuredTauLeptons;
         measuredTauLeptons.push_back(classic_svFit::MeasuredTauLepton(type1, aLeg1.getP4().Pt(), aLeg1.getP4().Eta(),
@@ -270,10 +392,11 @@ TLorentzVector svfitAnalyzer::computeSvFit(){
 TLorentzVector svfitAnalyzer::runSVFitAlgo(const std::vector<classic_svFit::MeasuredTauLepton> & measuredTauLeptons,
                                            const TVector2 &aMET, const TMatrixD &covMET){
 
-    svFitAlgo.setVerbosity(0);
-    svFitAlgo.setMaxObjFunctionCalls(10000);
-    //svFitAlgo.setLikelihoodFileName("testClassicSVfit.root");
-    //svFitAlgo.setTreeFileName("markovChainTree.root");
+    svFitAlgo.setVerbosity(1);
+    svFitAlgo.addLogM_fixed(true, 4.0);
+    svFitAlgo.setMaxObjFunctionCalls(10000000);
+    svFitAlgo.setLikelihoodFileName("testClassicSVfit.root");
+    svFitAlgo.setTreeFileName("markovChainTree.root");
     TVector3 recPV = aEvent.getRefittedPV();
     TVector3 svLeg2 = aLeg2.getSV();
     svLeg2 -=recPV;
@@ -322,7 +445,17 @@ void svfitAnalyzer::fillControlHistos(const std::string & hNameSuffix){
         covMET[1][0] = aPair.getMETMatrix().at(2);
         covMET[1][1] = aPair.getMETMatrix().at(3);
 
+
+        TLorentzVector nunuGen = aGenLeg1.getP4() + aGenLeg2.getP4() -
+                                 aGenLeg1.getChargedP4() - aGenLeg2.getChargedP4();
+        /*
+        std::cout<<"mVis: "<<(aLeg1.getP4() + aLeg2.getP4()).M()<<std::endl;
+        std::cout<<"mVisLeg2: "<<aLeg2.getP4().M()<<std::endl;
+        TLorentzVector test = computeSvFit();
+        std::cout<<"Mass: "<<test.M()<<std::endl;
+        */
         TLorentzVector svFitP4 = runFastSVFitAlgo(aLeg1.getP4(), aLeg2.getP4(), aMET.getP4(), covMET);
+        //TLorentzVector svFitP4 = runFastSVFitAlgo(aLeg1.getP4(), aLeg2.getP4(), nunuGen, covMET);
         myHistos_->fill1DHistogram("h1DMassSVRecalculated"+hNameSuffix,svFitP4.M());
         ////
 
@@ -348,9 +481,6 @@ void svfitAnalyzer::fillControlHistos(const std::string & hNameSuffix){
         //bool isSeparated = aGenLeg2.getP4().DeltaR(aGenLeg2.getP4())>0.4;
         //bool isSeparated = aGenLeg2.getP4().DeltaR(aLeg2.getP4())>0.4;
 
-        bool isGoodReco = aGenLeg2.getP4().DeltaR(aLeg2.getP4())<0.4;
-        bool goodGenTau = aGenLeg2.getP4().E()>1.0;
-
         double sinThetaReco = (aGenLeg2.getSV() - genPV).Unit()*aLeg2.getChargedP4().Vect().Unit();
         sinThetaReco = sqrt(1.0 - std::pow(sinThetaReco, 2));
         double sinThetaGen = (genSV - genPV).Unit()*aGenLeg2.getChargedP4().Vect().Unit();
@@ -363,7 +493,7 @@ void svfitAnalyzer::fillControlHistos(const std::string & hNameSuffix){
         //svFitP4 = computeSvFit();
         //myHistos_->fill1DHistogram("h1DMassSVRecalculated"+hNameSuffix,svFitP4.M());
         //isOneProng = false;
-        if(!isOneProng && goodGenTau && isGoodReco){
+        if(!isOneProng){
 
           flightPathRec = (recSV - recPV).Mag();
           flightPathRec /= aGenLeg2.getP4().Gamma();
@@ -413,7 +543,18 @@ bool svfitAnalyzer::analyze(const EventProxyBase& iEvent){
         if(!myEventProxy.pairs->size()) return true;
         setAnalysisObjects(myEventProxy);
 
+       bool isGoodReco = aGenLeg2.getP4().DeltaR(aLeg2.getP4())<0.4;
+       bool goodGenTau = aGenLeg2.getP4().E()>1.0;
+       //isGoodReco = true;
+       //goodGenTau  = true;
+
+       double delta = aLeg2.getP4().E() - aGenLeg2.getChargedP4().E();
+       delta /= aGenLeg2.getChargedP4().E();
+       //isGoodReco &= std::abs(delta)<0.05;
+
+       if(isGoodReco && goodGenTau){
         fillControlHistos(hNameSuffix);
+      }
 
         return true;
 }

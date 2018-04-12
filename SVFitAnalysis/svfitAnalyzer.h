@@ -29,6 +29,7 @@ class TH1F;
 class TH2F;
 class TH3F;
 class TLorentzVector;
+class TF1;
 
 class svfitAnalyzer: public Analyzer{
 
@@ -145,6 +146,8 @@ class svfitAnalyzer: public Analyzer{
   unsigned int myNumberOfCategories;
 
   ClassicSVfit svFitAlgo;
+
+  TF1 *fLikelihood;
 
 };
 

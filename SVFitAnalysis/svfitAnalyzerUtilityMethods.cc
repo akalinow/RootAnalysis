@@ -42,6 +42,9 @@ std::string svfitAnalyzer::getSampleNameFromFileName(const EventProxyHTT & myEve
         else if(fileName.find("GluGluHToTauTauM130")!=std::string::npos) sampleName =  "ggHTT130";
         else if(fileName.find("GluGluHToTauTauM140")!=std::string::npos) sampleName =  "ggHTT140";
 
+        else if(fileName.find("SUSYGluGluToBBHToTauTauM140")!=std::string::npos) sampleName =  "ggHTT140";
+        else if(fileName.find("SUSYGluGluToBBHToTauTauM250")!=std::string::npos) sampleName =  "ggHTT250";
+
         else if(fileName.find("VBFHToTauTauM110")!=std::string::npos) sampleName =  "qqHTT110";
         else if(fileName.find("VBFHToTauTauM120")!=std::string::npos) sampleName =  "qqHTT120";
         else if(fileName.find("VBFHToTauTauM125")!=std::string::npos) sampleName =  "qqHTT125";
@@ -113,7 +116,7 @@ std::string svfitAnalyzer::getDYSampleName(const EventProxyHTT & myEventProxy){
         //else if(fileName.find("DYJetsToLLM50")!=std::string::npos && myEventProxy.event->getLHEnOutPartons()==3) jetsName =  "3JetsIncl";
         //else if(fileName.find("DYJetsToLLM50")!=std::string::npos && myEventProxy.event->getLHEnOutPartons()==4) jetsName =  "4JetsIncl";
         else if(fileName.find("DYJetsToLLM50")!=std::string::npos) jetsName =  "AllJets";
-        
+
         int leg1MCMatch = 6, leg2MCMatch = 6;
         if(myEventProxy.pairs->size()) {
                 HTTPair aPair = (*myEventProxy.pairs)[0];
