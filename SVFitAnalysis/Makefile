@@ -212,6 +212,33 @@ EventProxyHTT.cc.s:
 	cd /home/akalinow/scratch/CMS/SVFit/RootAnalysis && $(MAKE) -f SVFitAnalysis/CMakeFiles/SVFitAnalysis.dir/build.make SVFitAnalysis/CMakeFiles/SVFitAnalysis.dir/EventProxyHTT.cc.s
 .PHONY : EventProxyHTT.cc.s
 
+FastMTT.o: FastMTT.cc.o
+
+.PHONY : FastMTT.o
+
+# target to build an object file
+FastMTT.cc.o:
+	cd /home/akalinow/scratch/CMS/SVFit/RootAnalysis && $(MAKE) -f SVFitAnalysis/CMakeFiles/SVFitAnalysis.dir/build.make SVFitAnalysis/CMakeFiles/SVFitAnalysis.dir/FastMTT.cc.o
+.PHONY : FastMTT.cc.o
+
+FastMTT.i: FastMTT.cc.i
+
+.PHONY : FastMTT.i
+
+# target to preprocess a source file
+FastMTT.cc.i:
+	cd /home/akalinow/scratch/CMS/SVFit/RootAnalysis && $(MAKE) -f SVFitAnalysis/CMakeFiles/SVFitAnalysis.dir/build.make SVFitAnalysis/CMakeFiles/SVFitAnalysis.dir/FastMTT.cc.i
+.PHONY : FastMTT.cc.i
+
+FastMTT.s: FastMTT.cc.s
+
+.PHONY : FastMTT.s
+
+# target to generate assembly for a file
+FastMTT.cc.s:
+	cd /home/akalinow/scratch/CMS/SVFit/RootAnalysis && $(MAKE) -f SVFitAnalysis/CMakeFiles/SVFitAnalysis.dir/build.make SVFitAnalysis/CMakeFiles/SVFitAnalysis.dir/FastMTT.cc.s
+.PHONY : FastMTT.cc.s
+
 G1__HTTEvent.o: G1__HTTEvent.cxx.o
 
 .PHONY : G1__HTTEvent.o
@@ -472,6 +499,9 @@ help:
 	@echo "... EventProxyHTT.o"
 	@echo "... EventProxyHTT.i"
 	@echo "... EventProxyHTT.s"
+	@echo "... FastMTT.o"
+	@echo "... FastMTT.i"
+	@echo "... FastMTT.s"
 	@echo "... G1__HTTEvent.o"
 	@echo "... G1__HTTEvent.i"
 	@echo "... G1__HTTEvent.s"

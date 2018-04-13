@@ -12,6 +12,8 @@
 #include "TauTauSpecifics.h"
 #include "Tools.h"
 
+#include "FastMTT.h"
+
 #include "TauAnalysis/ClassicSVfit/interface/ClassicSVfit.h"
 //////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////
@@ -177,7 +179,7 @@ TLorentzVector svfitAnalyzer::runFastSVFitAlgo(const TLorentzVector & leg1P4,
   fLikelihood->FixParameter(4,1.0);
 
   int nGridPoints = 100;
-
+  int nCalls = 0;
     for(int iX2 = 1; iX2<nGridPoints;++iX2){
     //for(int iX2 = 1; iX2<2;++iX2){
 
@@ -199,6 +201,9 @@ TLorentzVector svfitAnalyzer::runFastSVFitAlgo(const TLorentzVector & leg1P4,
       //x1 = x1True;
 
 
+    x1 = 0.5;
+    x2 = 0.954621;
+
     tau1P4 = leg1P4*(1.0/x1);
     tau1P4.SetVectM(tau1P4.Vect(),1.77685);
 
@@ -211,7 +216,8 @@ TLorentzVector svfitAnalyzer::runFastSVFitAlgo(const TLorentzVector & leg1P4,
     //if(x2<x2Min) continue; TEST
 
     llh = EvalMET_TF(metP4, nuP4, covMET);
-    //llh *= fLikelihood->Eval(mH/1.17);
+    llh *= fLikelihood->Eval(mH/1.17);
+    ++nCalls;
 
     if(llh>maxLLH){
       maxLLH = llh;
@@ -222,6 +228,13 @@ TLorentzVector svfitAnalyzer::runFastSVFitAlgo(const TLorentzVector & leg1P4,
     }
   }
   }
+
+  std::cout<<" nCalls: "<<nCalls
+           <<" x1Max: "<<x1Max
+           <<" x2Max: "<<x2Max
+           <<" max LLH: "<<maxLLH
+           <<std::endl;
+
 
   myHistos_->fill1DHistogram("h1DLLH_1",x1Max/x1True);
   myHistos_->fill1DHistogram("h1DLLH_2",x2Max/x2True);
@@ -448,6 +461,10 @@ void svfitAnalyzer::fillControlHistos(const std::string & hNameSuffix){
         TLorentzVector test = computeSvFit();
         std::cout<<"Mass: "<<test.M()<<std::endl;
         */
+
+        FastMTT testMinimizer;
+        testMinimizer.minimize(aLeg1.getP4(), aLeg2.getP4(), aMET.getP4(), covMET, 1, 1);
+
         TLorentzVector svFitP4 = runFastSVFitAlgo(aLeg1.getP4(), aLeg2.getP4(), aMET.getP4(), covMET);
         //TLorentzVector svFitP4 = runFastSVFitAlgo(aGenLeg1.getChargedP4(), aGenLeg2.getChargedP4(), nunuGen, covMET);
         //TLorentzVector svFitP4 = runFastSVFitAlgo(aLeg1.getP4(), aLeg2.getP4(), nunuGen, covMET);
