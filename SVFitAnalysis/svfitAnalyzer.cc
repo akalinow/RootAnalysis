@@ -173,7 +173,7 @@ TLorentzVector svfitAnalyzer::runFastSVFitAlgo(const TLorentzVector & leg1P4,
   fLikelihood->FixParameter(0,mVis);
   fLikelihood->FixParameter(1,mVisLeg1);
   fLikelihood->FixParameter(2,mVisLeg2);
-  fLikelihood->FixParameter(3,4);
+  fLikelihood->FixParameter(3,6);
   fLikelihood->FixParameter(4,1.0);
 
   int nGridPoints = 100;
@@ -211,13 +211,7 @@ TLorentzVector svfitAnalyzer::runFastSVFitAlgo(const TLorentzVector & leg1P4,
     //if(x2<x2Min) continue; TEST
 
     llh = EvalMET_TF(metP4, nuP4, covMET);
-    //llh *= std::pow(mVis,2)*std::pow(mH,-3)*(2*log(mH/mVis) + std::pow(mVis/mH,2)*(1 - std::pow(mH/mVis,2)));
-    //llh *= std::pow(mVis,2)*std::pow(mH,-3)*(-log(x2Min) + std::pow(mVis/mH,2)*(1 - std::pow(x2Min,-1)));
-    //llh *= std::pow(mVis,2)*std::pow(mH,-4)*(-log(x2Min) + std::pow(mVis/mH,2)*(1 - std::pow(x2Min,-1)));
-    llh *= fLikelihood->Eval(mH);
-    //std::cout<<" EvalMET_TF(metP4, nuP4, covMET); "<<EvalMET_TF(metP4, nuP4, covMET)
-    //<<" fLikelihood->Eval(mH): "<<fLikelihood->Eval(mH)
-    //<<" llh: "<<llh<<std::endl;
+    //llh *= fLikelihood->Eval(mH/1.17);
 
     if(llh>maxLLH){
       maxLLH = llh;
@@ -455,6 +449,7 @@ void svfitAnalyzer::fillControlHistos(const std::string & hNameSuffix){
         std::cout<<"Mass: "<<test.M()<<std::endl;
         */
         TLorentzVector svFitP4 = runFastSVFitAlgo(aLeg1.getP4(), aLeg2.getP4(), aMET.getP4(), covMET);
+        //TLorentzVector svFitP4 = runFastSVFitAlgo(aGenLeg1.getChargedP4(), aGenLeg2.getChargedP4(), nunuGen, covMET);
         //TLorentzVector svFitP4 = runFastSVFitAlgo(aLeg1.getP4(), aLeg2.getP4(), nunuGen, covMET);
         myHistos_->fill1DHistogram("h1DMassSVRecalculated"+hNameSuffix,svFitP4.M());
         ////

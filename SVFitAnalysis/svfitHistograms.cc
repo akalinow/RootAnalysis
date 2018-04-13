@@ -62,7 +62,7 @@ void svfitHistograms::defineHistograms(){
 
         if(!histosInitialized_) {
                 add1DHistogram("h1DStatsTemplate","",21,-0.5,20.5,file_);
-                add1DHistogram("h1DMassTemplate",";mass [GeV/c^{2}]; Events",35,0,350,file_);
+                add1DHistogram("h1DMassTemplate",";mass [GeV/c^{2}]; Events",72,0,360,file_);                
                 add1DHistogram("h1DFlightPathTemplate",";flight path [cm]; Events",100,0,0.1,file_);
                 add1DHistogram("h1DDeltaRTemplate","",21,-6.0,6.0,file_);
 
