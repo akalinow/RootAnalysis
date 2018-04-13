@@ -49,7 +49,6 @@ svfitAnalyzer::svfitAnalyzer(const std::string & aName, const std::string & aDec
 
           ntupleFile_ = 0;
 
-          //TEST svFitAlgo.addLogM_fixed(true, 4.0);
           svFitAlgo.addLogM_fixed(true, 4.0);
           svFitAlgo.setLikelihoodFileName("");
           svFitAlgo.setMaxObjFunctionCalls(100000);
@@ -198,11 +197,7 @@ TLorentzVector svfitAnalyzer::runFastSVFitAlgo(const TLorentzVector & leg1P4,
       x1 = (double)iX1/nGridPoints;
 
       //x1 = std::pow(mVis,2)/std::pow(123.0,2)/x2;
-      //x1 = x1True;
-
-
-    x1 = 0.5;
-    x2 = 0.954621;
+      //x1 = x1True;    
 
     tau1P4 = leg1P4*(1.0/x1);
     tau1P4.SetVectM(tau1P4.Vect(),1.77685);
@@ -216,7 +211,7 @@ TLorentzVector svfitAnalyzer::runFastSVFitAlgo(const TLorentzVector & leg1P4,
     //if(x2<x2Min) continue; TEST
 
     llh = EvalMET_TF(metP4, nuP4, covMET);
-    llh *= fLikelihood->Eval(mH/1.17);
+    //llh *= fLikelihood->Eval(mH/1.17);
     ++nCalls;
 
     if(llh>maxLLH){
@@ -226,15 +221,15 @@ TLorentzVector svfitAnalyzer::runFastSVFitAlgo(const TLorentzVector & leg1P4,
       x1Max = x1;
       x2Max = x2;
     }
+      }      
   }
-  }
-
+    /* 
   std::cout<<" nCalls: "<<nCalls
            <<" x1Max: "<<x1Max
            <<" x2Max: "<<x2Max
            <<" max LLH: "<<maxLLH
            <<std::endl;
-
+    */
 
   myHistos_->fill1DHistogram("h1DLLH_1",x1Max/x1True);
   myHistos_->fill1DHistogram("h1DLLH_2",x2Max/x2True);
@@ -258,28 +253,6 @@ TLorentzVector svfitAnalyzer::runFastSVFitAlgo(const TLorentzVector & leg1P4,
 
 
   if(delta>0.05){
-
-    //std::cout<<aLeg2.getP4().M()<<std::endl;
-
-/*
-    std::cout<<"fast Mass: "<<p4SVFit.M()
-             <<" classic mass: "<<computeSvFit().M()
-             <<std::endl;
-    std::cout<<" aGenLeg1.DeltaR(tau1P4): "<<aGenLeg1.getP4().DeltaR(tau1P4)
-             <<" aGenLeg2.DeltaR(tau2P4): "<<aGenLeg2.getP4().DeltaR(tau2P4)
-             <<std::endl;
-
-              std::cout<<" nunuGen.DeltaR(nuP4): "<< nunuGen.DeltaR(nuP4)
-                       <<" nunuGen.DeltaR(met): "<< nunuGen.DeltaR(metP4)
-                       <<" m: "<<(aGenLeg1.getP4() + aGenLeg2.getP4()).M()
-              <<std::endl;
-
-      std::cout<<"mNuNu2: "<<(tau1P4 - aLeg1.getP4()).M2()
-               <<" x1: "<<x1Max<<" x2: "<<x2Max
-               <<" true x1: "<<x1True<<" true  x2: "<<x2True
-               <<std::endl;
-               */
-
 
       double deltaR1 = nunuGen.DeltaPhi(metP4);
       deltaR1 = nunuGen.DeltaPhi(nuP4Max);
@@ -462,12 +435,18 @@ void svfitAnalyzer::fillControlHistos(const std::string & hNameSuffix){
         std::cout<<"Mass: "<<test.M()<<std::endl;
         */
 
+	std::vector<double> shapeParams = {6, 1/1.17};
         FastMTT testMinimizer;
-        testMinimizer.minimize(aLeg1.getP4(), aLeg2.getP4(), aMET.getP4(), covMET, 1, 1);
+	testMinimizer.setLikelihoodParams(shapeParams);
+	testMinimizer.minimize(aLeg1.getP4(), aLeg2.getP4(), aMET.getP4(), covMET, 1, 1);
+	//testMinimizer.minimize(aLeg1.getP4(), aLeg2.getP4(), nunuGen, covMET, 1, 1);
+        TLorentzVector svFitP4 = testMinimizer.getBestP4();       
+        //TLorentzVector svFitP4 = runFastSVFitAlgo(aLeg1.getP4(), aLeg2.getP4(), aMET.getP4(), covMET);
 
-        TLorentzVector svFitP4 = runFastSVFitAlgo(aLeg1.getP4(), aLeg2.getP4(), aMET.getP4(), covMET);
-        //TLorentzVector svFitP4 = runFastSVFitAlgo(aGenLeg1.getChargedP4(), aGenLeg2.getChargedP4(), nunuGen, covMET);
-        //TLorentzVector svFitP4 = runFastSVFitAlgo(aLeg1.getP4(), aLeg2.getP4(), nunuGen, covMET);
+	//std::cout<<"minimizer mass: "<<test.M()<<" scan mass: "<<svFitP4.M()<<std::endl;
+	
+        //TLorentzVector svFitP4 = runFastSVFitAlgo(aGenLeg1.getChargedP4(), aLeg2.getP4(), nunuGen, covMET);
+        //TLorentzVector svFitP4 = runFastSVFitAlgo(aLeg1.getP4(), aLeg2.getP4(), aMET.getP4(), covMET);
         myHistos_->fill1DHistogram("h1DMassSVRecalculated"+hNameSuffix,svFitP4.M());
         ////
 
@@ -562,7 +541,7 @@ bool svfitAnalyzer::analyze(const EventProxyBase& iEvent){
 
        double delta = aLeg2.getP4().E() - aGenLeg2.getChargedP4().E();
        delta /= aGenLeg2.getChargedP4().E();
-       //isGoodReco &= std::abs(delta)<0.05;
+       isGoodReco &= std::abs(delta)<0.1;
 
        if(isGoodReco && goodGenTau){
         fillControlHistos(hNameSuffix);

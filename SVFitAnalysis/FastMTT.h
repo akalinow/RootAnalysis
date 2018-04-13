@@ -82,6 +82,12 @@ class FastMTT {
                 int leg1DecayType,
                 int leg2DecayType);
 
+  ///Set likelihood shape parameters.
+  void setLikelihoodParams(const std::vector<double> & aPars);
+
+  ///Retrieve the four momentum corresponding to the likelihood maximum
+  const TLorentzVector & getBestP4() const { return bestP4; }
+
  private:
 
    // Minimizer types and algorithms.
@@ -117,6 +123,8 @@ class FastMTT {
   ROOT::Math::Functor *likelihoodFunctor;
 
   Likelihood myLikelihood;
+
+  TLorentzVector bestP4;
 
 };
 

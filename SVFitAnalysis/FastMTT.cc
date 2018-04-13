@@ -48,27 +48,27 @@ void Likelihood::setMETInputs(const TLorentzVector & aMET,
 ///////////////////////////////////////////////////////////////////
 void Likelihood::setParameters(const std::vector<double> & aPars){
 
-parameters = {6.0, 1.0/1.17};
+  parameters = aPars;
 
 }
 ///////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////
 double Likelihood::massLikelihood(const double & m) const{
 
-   double coeff1 = parameters[0];
-   double coeff2 = parameters[1];
-   double mShift = m/coeff2;
+  double coeff1 = parameters[0];
+  double coeff2 = parameters[1];
+  double mShift = m*coeff2;
 
-   double mTau = 1.77685;
+  double mTau = 1.77685;
 
-   double x1Min = std::min(1.0, std::pow(mVisLeg1/mTau,2));
-   double x2Min = std::max(std::pow(mVisLeg2/mTau,2), std::pow(mVis/mShift,2));
-   double x2Max = std::min(1.0, std::pow(mVis/mShift,2)/x1Min);
+  double x1Min = std::min(1.0, std::pow(mVisLeg1/mTau,2));
+  double x2Min = std::max(std::pow(mVisLeg2/mTau,2), std::pow(mVis/mShift,2));
+  double x2Max = std::min(1.0, std::pow(mVis/mShift,2)/x1Min);
 
-   double value = 2.0*std::pow(mVis,2)*std::pow(mShift,-coeff1)*(log(x2Max)-log(x2Min) + std::pow(mVis/mShift,2)*(1 - std::pow(x2Min,-1)));
-   if(mShift<mVis) return 0.0;
+  double value = 2.0*std::pow(mVis,2)*std::pow(mShift,-coeff1)*(log(x2Max)-log(x2Min) + std::pow(mVis/mShift,2)*(1 - std::pow(x2Min,-1)));
+  if(mShift<mVis) return 0.0;
    
-   return value;
+  return value*1E12;
 }
 ///////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////x
@@ -87,8 +87,8 @@ double Likelihood::metTF(const TLorentzVector & metP4,
 
   if( std::abs(covDet)<1E-10){
     std::cerr << "Error: Cannot invert MET covariance Matrix (det=0) !!"
-    <<"METx: "<<aMETy<<" METy: "<<aMETy
-    << std::endl;
+	      <<"METx: "<<aMETy<<" METy: "<<aMETy
+	      << std::endl;
     return 0;
   }
   double const_MET = 1./(2.*TMath::Pi()*TMath::Sqrt(covDet));
@@ -97,21 +97,20 @@ double Likelihood::metTF(const TLorentzVector & metP4,
   double residualY = aMETy - (nuP4.Y());
 
   double pull2 = residualX*(invCovMETxx*residualX + invCovMETxy*residualY) +
-  residualY*(invCovMETyx*residualX + invCovMETyy*residualY);
+    residualY*(invCovMETyx*residualX + invCovMETyy*residualY);
   pull2/=covDet;
 
   return const_MET*TMath::Exp(-0.5*pull2);
 }
 //////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////
-double Likelihood::value(const double *x) const {
+double Likelihood::value(const double *x) const{
 
-    TLorentzVector testP4 = leg1P4*(1/x[0]) + leg2P4*(1/x[1]);
-    TLorentzVector testMET = leg1P4*(1.0/x[0] - 1) + leg2P4*(1.0/x[1] - 1);
+  TLorentzVector testP4 = leg1P4*(1/x[0]) + leg2P4*(1/x[1]);
+  TLorentzVector testMET = leg1P4*(1.0/x[0] - 1) + leg2P4*(1.0/x[1] - 1);
 
-    double value = metTF(recoMET, testMET, covMET);
-    value *= massLikelihood(testP4.M());
-
+  double value = metTF(recoMET, testMET, covMET);
+  value *= massLikelihood(testP4.M());
 
   return -value;
 }
@@ -121,15 +120,6 @@ FastMTT::FastMTT(){
 
   minimizerName = "Minuit2";
   minimizerAlgorithm = "Migrad";
-
-  varNames = {"x1", "x2"};
-  nVariables = varNames.size();
-  double stepSize = 0.01;
-  variables.resize(nVariables);
-  stepSizes.resize(nVariables);
-  minimalizationResult.resize(nVariables);
-  std::fill(stepSizes.begin(), stepSizes.end(), stepSize);
-
   initialize();
 }
 ///////////////////////////////////////////////////////////////////
@@ -144,21 +134,29 @@ void FastMTT::initialize(){
 
   minimizer = ROOT::Math::Factory::CreateMinimizer(minimizerName, minimizerAlgorithm);
   minimizer->SetMaxFunctionCalls(10000);
-  minimizer->SetMaxIterations(100000);
+  minimizer->SetMaxIterations(10000);
   minimizer->SetTolerance(0.001);
 
   std::vector<std::string> varNames = {"x1", "x2"};
-  std::vector<double> initialValues(nVariables,0.5);
+  nVariables = varNames.size();
+  std::vector<double> initialValues(nVariables,0.5);  
   std::vector<double> stepSizes(nVariables, 0.01);
 
   for(unsigned int iVar=0; iVar<nVariables; ++iVar){
     minimizer->SetVariable(iVar, varNames[iVar].c_str(), initialValues[iVar], stepSizes[iVar]);
   }
 
-  std::vector<double> parameters(2);
-  myLikelihood.setParameters(parameters);
+  std::vector<double> shapeParams = {6, 1.0/1.15};
+  setLikelihoodParams(shapeParams);
   likelihoodFunctor = new ROOT::Math::Functor(&myLikelihood, &Likelihood::value, nVariables);
   minimizer->SetFunction(*likelihoodFunctor);
+}
+///////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////
+void FastMTT::setLikelihoodParams(const std::vector<double> & aPars){
+
+   myLikelihood.setParameters(aPars);
+  
 }
 ///////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////
@@ -176,15 +174,23 @@ void FastMTT::minimize(const TLorentzVector & aLeg1P4,
   minimizer->SetVariableLimits(1, 0.0 ,1.0);
   minimizer->Minimize();
 
-   const double *theMinimum = minimizer->X();
-   //minimalizationResult
+  const double *theMinimum = minimizer->X();
+ 
+  bestP4 = aLeg1P4*(1.0/theMinimum[0]) + aLeg2P4*(1.0/theMinimum[1]);
 
-   std::cout <<" Addr: "<<theMinimum
-             << " Minimum: f(" << theMinimum[0] << "," << theMinimum[1] << "): "
-             << minimizer->MinValue()
-             << " number of calls: "<<minimizer->NCalls()
-             << std::endl;
-
+   if(false){     
+  std::cout<<" minimizer "
+	   <<" nCalls: "<<minimizer->NCalls()
+    	   <<" nIterations: "<<minimizer->NIterations() 
+           <<" x1Max: "<<theMinimum[0]
+           <<" x2Max: "<<theMinimum[1]
+	   <<" x3Max: "<<theMinimum[2]
+           <<" max LLH: "<<minimizer->MinValue()
+	   <<" m: "<<bestP4.M()
+           <<std::endl;
+  }
+ 
 }
 ///////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////
+
