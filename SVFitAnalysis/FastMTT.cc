@@ -65,7 +65,7 @@ double Likelihood::massLikelihood(const double & m) const{
   double x2Min = std::max(std::pow(mVisLeg2/mTau,2), std::pow(mVis/mShift,2));
   double x2Max = std::min(1.0, std::pow(mVis/mShift,2)/x1Min);
 
-  double value = 2.0*std::pow(mVis,2)*std::pow(mShift,-coeff1)*(log(x2Max)-log(x2Min) + std::pow(mVis/mShift,2)*(1 - std::pow(x2Min,-1)));
+  double value = 2.0*std::pow(mVis,2)*std::pow(mShift,-coeff1)*(log(x2Max)-log(x2Min) + std::pow(mVis/mShift,2)*(std::pow(x2Max,-1) - std::pow(x2Min,-1)));
   if(mShift<mVis) return 0.0;
 
   return value*1E12;
