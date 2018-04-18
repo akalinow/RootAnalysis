@@ -67,7 +67,7 @@ double Likelihood::massLikelihood(const double & m) const{
 
   double value = 2.0*std::pow(mVis,2)*std::pow(mShift,-coeff1)*(log(x2Max)-log(x2Min) + std::pow(mVis/mShift,2)*(1 - std::pow(x2Min,-1)));
   if(mShift<mVis) return 0.0;
-   
+
   return value*1E12;
 }
 ///////////////////////////////////////////////////////////////////
@@ -139,7 +139,7 @@ void FastMTT::initialize(){
 
   std::vector<std::string> varNames = {"x1", "x2"};
   nVariables = varNames.size();
-  std::vector<double> initialValues(nVariables,0.5);  
+  std::vector<double> initialValues(nVariables,0.5);
   std::vector<double> stepSizes(nVariables, 0.01);
 
   for(unsigned int iVar=0; iVar<nVariables; ++iVar){
@@ -156,7 +156,7 @@ void FastMTT::initialize(){
 void FastMTT::setLikelihoodParams(const std::vector<double> & aPars){
 
    myLikelihood.setParameters(aPars);
-  
+
 }
 ///////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////
@@ -167,6 +167,11 @@ void FastMTT::minimize(const TLorentzVector & aLeg1P4,
                        int aLeg1DecayType,
                        int aLeg2DecayType){
 
+  clock.Reset();
+  clock.Start("minimize");
+
+  for(int iTest = 0; iTest<1; ++iTest){
+
   myLikelihood.setLeptonInputs(aLeg1P4, aLeg2P4, aLeg1DecayType, aLeg2DecayType);
   myLikelihood.setMETInputs(aMET, aCovMET);
 
@@ -175,13 +180,13 @@ void FastMTT::minimize(const TLorentzVector & aLeg1P4,
   minimizer->Minimize();
 
   const double *theMinimum = minimizer->X();
- 
+
   bestP4 = aLeg1P4*(1.0/theMinimum[0]) + aLeg2P4*(1.0/theMinimum[1]);
 
-   if(false){     
+   if(false){
   std::cout<<" minimizer "
 	   <<" nCalls: "<<minimizer->NCalls()
-    	   <<" nIterations: "<<minimizer->NIterations() 
+    	   <<" nIterations: "<<minimizer->NIterations()
            <<" x1Max: "<<theMinimum[0]
            <<" x2Max: "<<theMinimum[1]
 	   <<" x3Max: "<<theMinimum[2]
@@ -189,8 +194,66 @@ void FastMTT::minimize(const TLorentzVector & aLeg1P4,
 	   <<" m: "<<bestP4.M()
            <<std::endl;
   }
- 
+}
+  clock.Stop("minimize");
 }
 ///////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////
+void FastMTT::scan(const TLorentzVector & aLeg1P4,
+                       const TLorentzVector & aLeg2P4,
+                       const TLorentzVector & aMET,
+                       const TMatrixD & aCovMET,
+                       int aLeg1DecayType,
+                       int aLeg2DecayType){
 
+  clock.Reset();
+  clock.Start("scan");
+
+  for(int iTest = 0; iTest<1; ++iTest){
+
+  myLikelihood.setLeptonInputs(aLeg1P4, aLeg2P4, aLeg1DecayType, aLeg2DecayType);
+  myLikelihood.setMETInputs(aMET, aCovMET);
+
+  double lh = 0.0;
+  double maxLH = -99.0;
+
+  double x[2] = {0.5, 0.5};
+  double theMinimum[2] = {0.5, 0.5};
+  int nGridPoints = 100;
+  int nCalls = 0;
+    for(int iX2 = 1; iX2<nGridPoints;++iX2){
+      x[1] = (double)iX2/nGridPoints;
+      for(int iX1 = 1; iX1<nGridPoints;++iX1){
+        x[0] = (double)iX1/nGridPoints;
+
+         lh = - myLikelihood.value(x);
+        ++nCalls;
+
+    if(lh>maxLH){
+      maxLH = lh;
+      theMinimum[0] = x[0];
+      theMinimum[1] = x[1];
+    }
+  }
+}
+
+  bestP4 = aLeg1P4*(1.0/theMinimum[0]) + aLeg2P4*(1.0/theMinimum[1]);
+}
+  clock.Stop("scan");
+}
+///////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////
+double FastMTT::getCpuTime(const std::string & method){
+
+  return clock.GetCpuTime(method.c_str());
+
+}
+///////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////
+double FastMTT::getRealTime(const std::string & method){
+
+  return clock.GetRealTime(method.c_str());
+
+}
+///////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////

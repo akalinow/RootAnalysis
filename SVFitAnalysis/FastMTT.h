@@ -16,6 +16,7 @@ class TVector2;
 
 #include "TMatrixD.h"
 #include "TLorentzVector.h"
+#include "TBenchmark.h"
 
 namespace fastMTT {
   double likelihoodFunc(double *x, double *par);
@@ -82,11 +83,33 @@ class FastMTT {
                 int leg1DecayType,
                 int leg2DecayType);
 
+  ///Run a scan over x1 and x2 [0,1] rectangle for given inputs.
+  ///Results are stored in internal variables accesed by
+  ///relevant get methods.
+  void scan(const TLorentzVector & aLeg1P4,
+                const TLorentzVector & aLeg2P4,
+                const TLorentzVector & aMET,
+                const TMatrixD & aCovMET,
+                int leg1DecayType,
+                int leg2DecayType);
+
   ///Set likelihood shape parameters.
   void setLikelihoodParams(const std::vector<double> & aPars);
 
   ///Retrieve the four momentum corresponding to the likelihood maximum
   const TLorentzVector & getBestP4() const { return bestP4; }
+
+  ///Retrieve the CPU timing for given methods
+  ///Possible values:
+  /// scan
+  /// minimize
+  double getCpuTime(const std::string & method);
+
+  ///Retrieve the CPU timing for given methods
+  ///Possible values:
+  /// scan
+  /// minimize
+  double getRealTime(const std::string & method);
 
  private:
 
@@ -125,6 +148,8 @@ class FastMTT {
   Likelihood myLikelihood;
 
   TLorentzVector bestP4;
+
+  TBenchmark clock;
 
 };
 
