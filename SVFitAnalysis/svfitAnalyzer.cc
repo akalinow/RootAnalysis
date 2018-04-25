@@ -471,7 +471,10 @@ void svfitAnalyzer::fillControlHistos(const std::string & hNameSuffix){
   std::vector<double> shapeParams = {6, 1/1.17};
   FastMTT testMinimizer;
   testMinimizer.setLikelihoodParams(shapeParams);
-  testMinimizer.scan(aLeg1.getP4(), aLeg2.getP4(), aMET.getP4(), covMET, 1, 1);
+
+  //testMinimizer.scan(aLeg1.getP4(), aLeg2.getP4(), aMET.getP4(), covMET, 1, 1);
+  testMinimizer.minimize(aLeg1.getP4(), aLeg2.getP4(), aMET.getP4(), covMET, 1, 1);
+  
   //testMinimizer.scan(aLeg1.getP4(), aLeg2.getP4(), aMET.getP4(), covMET, 1, 1);
   //testMinimizer.scan(aGenLeg1.getChargedP4(), aGenLeg2.getChargedP4(), nunuGen, covMET, 1, 1);
   //testMinimizer.scan(aLeg1.getP4(), aLeg2.getP4(), nunuGen, covMET, 1, 1);
@@ -488,7 +491,7 @@ void svfitAnalyzer::fillControlHistos(const std::string & hNameSuffix){
   delta = svFitP4.Vect().DeltaPhi(tautauGen.Vect());
   myHistos_->fill1DHistogram("h1DDeltaPhiFast"+hNameSuffix,delta);
 
-  delta = (svFitP4.Perp() - tautauGen.Perp())/tautauGen.Perp();
+  delta = (svFitP4.Perp() - tautauGen.Perp())/tautauGen.Perp(); 
   myHistos_->fill1DHistogram("h1DDeltaPtFast"+hNameSuffix,delta);
   ////
   /*
@@ -599,6 +602,11 @@ bool svfitAnalyzer::analyze(const EventProxyBase& iEvent){
   double delta = aLeg2.getP4().E() - aGenLeg2.getChargedP4().E();
   delta /= aGenLeg2.getChargedP4().E();
   //isGoodReco &= std::abs(delta)<0.1;
+
+  if(sampleName=="WAllJets"){
+    goodGenTau = true;
+    isGoodReco = true;
+  }
 
   if(isGoodReco && goodGenTau){
     fillControlHistos(hNameSuffix);

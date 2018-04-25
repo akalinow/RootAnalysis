@@ -133,9 +133,9 @@ FastMTT::~FastMTT(){
 void FastMTT::initialize(){
 
   minimizer = ROOT::Math::Factory::CreateMinimizer(minimizerName, minimizerAlgorithm);
-  minimizer->SetMaxFunctionCalls(10000);
-  minimizer->SetMaxIterations(10000);
-  minimizer->SetTolerance(0.001);
+  minimizer->SetMaxFunctionCalls(100000);
+  minimizer->SetMaxIterations(100000);
+  minimizer->SetTolerance(0.01);
 
   std::vector<std::string> varNames = {"x1", "x2"};
   nVariables = varNames.size();
@@ -183,17 +183,18 @@ void FastMTT::minimize(const TLorentzVector & aLeg1P4,
 
   bestP4 = aLeg1P4*(1.0/theMinimum[0]) + aLeg2P4*(1.0/theMinimum[1]);
 
-   if(false){
-  std::cout<<" minimizer "
-	   <<" nCalls: "<<minimizer->NCalls()
-    	   <<" nIterations: "<<minimizer->NIterations()
-           <<" x1Max: "<<theMinimum[0]
-           <<" x2Max: "<<theMinimum[1]
-	   <<" x3Max: "<<theMinimum[2]
-           <<" max LLH: "<<minimizer->MinValue()
-	   <<" m: "<<bestP4.M()
-           <<std::endl;
-  }
+   if(minimizer->Status()!=0){
+     std::cout<<" minimizer "
+	      <<" Status: "<<minimizer->Status()
+	      <<" nCalls: "<<minimizer->NCalls()
+	      <<" nIterations: "<<minimizer->NIterations()
+	      <<" x1Max: "<<theMinimum[0]
+	      <<" x2Max: "<<theMinimum[1]
+	      <<" x3Max: "<<theMinimum[2]
+	      <<" max LLH: "<<minimizer->MinValue()
+	      <<" m: "<<bestP4.M()
+	      <<std::endl;
+   }
 }
   clock.Stop("minimize");
 }

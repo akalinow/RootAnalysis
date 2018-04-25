@@ -87,7 +87,7 @@ void svfitHistograms::finalizeHistograms(const std::vector<const HTTAnalysis::ev
 
   std::vector<std::string> names = {"ggHTT125", "ggHTT140", "ggHTT200",
                                     "ggHTT250", "ggHTT500", "ggHTT1000",
-                                    "DYAllJetsMatchT"};
+                                    "DYAllJetsMatchT","WAllJets"};
 
   plotSingleHistogram("h1DDeltaR_1");
   plotSingleHistogram("h1DDeltaR_2");
@@ -101,7 +101,7 @@ void svfitHistograms::finalizeHistograms(const std::vector<const HTTAnalysis::ev
   plotSingleHistogram2D("h2DDelta_1");
   plotSingleHistogram2D("h2DDelta_2");
 
-  for(int i=0;i<7;++i){
+  for(unsigned int i=0;i<names.size();++i){
     std::string hNameSuffix = names[i];
 
     plotSingleHistogram("h1DMassSVCA"+hNameSuffix);
