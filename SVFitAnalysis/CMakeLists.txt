@@ -1,8 +1,8 @@
 project(SVFitAnalysis LANGUAGES CXX)
 
 ##Add SVFit library
-set (ClassicSVfit_PATH "/scratch_local/akalinow/CMS/SVFit/development/")
-set (ClassicSVfitLib_PATH "/scratch_local/akalinow/CMS/SVFit/development/")
+set (ClassicSVfit_PATH "/scratch_local/akalinow/CMS/SVFit/master_fastMTT/")
+set (ClassicSVfitLib_PATH "/scratch_local/akalinow/CMS/SVFit/master_fastMTT/")
 
 include_directories(${ClassicSVfit_PATH})
 link_directories(${ClassicSVfitLib_PATH})
@@ -12,8 +12,7 @@ ROOT_GENERATE_DICTIONARY(G1__HTTEvent HTTEvent.h LINKDEF LinkDef.h)
 
 add_library(SVFitAnalysis SHARED ChannelSpecifics.cc  EventProxyHTT.cc svfitAnalyzer.cc
   svfitAnalyzerUtilityMethods.cc svfitHistograms.cc
-  MuTauSpecifics.cc TauTauSpecifics.cc Tools.cc  HTTEvent.cxx
-  FastMTT.cc
+  MuTauSpecifics.cc TauTauSpecifics.cc Tools.cc  HTTEvent.cxx  
   G1__HTTEvent.cxx)
 
 # Define headers for this library. PUBLIC headers are used for

@@ -22,6 +22,7 @@
 #include "AnalysisEnums.h"
 
 #include "TauAnalysis/ClassicSVfit/interface/ClassicSVfit.h"
+#include "TauAnalysis/ClassicSVfit/interface/FastMTT.h"
 
 class svfitHistograms;
 
@@ -101,18 +102,13 @@ class svfitAnalyzer: public Analyzer{
 
   void setHistos(svfitHistograms *histos) { myHistos_ = histos;};
 
-  TLorentzVector computeSvFit();
+  TLorentzVector computeMTT(const std::string & algoName);
+  
   TLorentzVector runSVFitAlgo(const std::vector<classic_svFit::MeasuredTauLepton> & measuredTauLeptons,
                               const TVector2 &aMET, const TMatrixD &covMET);
 
-  TLorentzVector runFastSVFitAlgo(const TLorentzVector & leg1P4,
-                                  const TLorentzVector & leg2P4,
-                                  const TLorentzVector &metP4,
-                                  const TMatrixD &covMET);
-
-  double EvalMET_TF(const TLorentzVector & metP4,
-                                 const TLorentzVector & nuP4,
-                                 const TMatrixD& covMET);
+  TLorentzVector runFastMTTAlgo(const std::vector<classic_svFit::MeasuredTauLepton> & measuredTauLeptons,
+				const TVector2 &aMET, const TMatrixD &covMET);
 
   ///Parts of code specific to give decay channel.
   ///In particular category and object selection.
@@ -146,6 +142,7 @@ class svfitAnalyzer: public Analyzer{
   unsigned int myNumberOfCategories;
 
   ClassicSVfit svFitAlgo;
+  FastMTT fastMTTAlgo;
 
   TF1 *fLikelihood;
 
