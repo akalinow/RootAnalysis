@@ -11,29 +11,9 @@
 #include "svfitHistograms.h"
 #include "MuTauSpecifics.h"
 #include "TauTauSpecifics.h"
+#include "MuMuSpecifics.h"
 #include "Tools.h"
 
-//////////////////////////////////////////////////////////////////////////////
-//////////////////////////////////////////////////////////////////////////////
-Double_t likelihoodFunc(Double_t *x, Double_t *par)
-{
-  Float_t mH =x[0];
-  Double_t mVis = par[0];
-  Double_t mVisLeg1 = par[1];
-  Double_t mVisLeg2 = par[2];
-  Double_t coeff1 = par[3];
-  Double_t scale = par[4];
-
-  Double_t mTau = 1.77685;
-
-  Double_t x1Min = std::min(1.0, std::pow(mVisLeg1/mTau,2));
-  Double_t x2Min = std::max(std::pow(mVisLeg2/mTau,2), std::pow(mVis/mH,2));
-  Double_t x2Max = std::min(1.0, std::pow(mVis/mH,2)/x1Min);
-
-  Double_t value = 2.0*std::pow(mVis,2)*std::pow(mH,-coeff1)*(log(x2Max)-log(x2Min) + std::pow(mVis/mH,2)*(1 - std::pow(x2Min,-1)));
-  if(mH<mVis) return 0.0;
-  return scale*value;
-}
 //////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////
 svfitAnalyzer::svfitAnalyzer(const std::string & aName, const std::string & aDecayMode) : Analyzer(aName){
@@ -42,6 +22,7 @@ svfitAnalyzer::svfitAnalyzer(const std::string & aName, const std::string & aDec
   {
     if(aDecayMode=="MuTau") myChannelSpecifics = new MuTauSpecifics(this);
     else if (aDecayMode=="TauTau") myChannelSpecifics = new TauTauSpecifics(this);
+    else if (aDecayMode=="MuMu") myChannelSpecifics = new MuMuSpecifics(this);
     myNumberOfCategories = myChannelSpecifics->getCategoryRejester().size();
     categoryDecisions.resize(myNumberOfCategories);
 
@@ -52,9 +33,6 @@ svfitAnalyzer::svfitAnalyzer(const std::string & aName, const std::string & aDec
     svFitAlgo.setMaxObjFunctionCalls(100000);
     svFitAlgo.setVerbosity(1);
   }
-
-  fLikelihood = new TF1("likelihood",likelihoodFunc,0,5000,5);
-  fLikelihood->SetParNames("mVis","mVisLeg1","mVisLeg2", "coefficient","scale");
 }
 //////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////
@@ -176,12 +154,19 @@ TLorentzVector svfitAnalyzer::computeMTT(const std::string & algoName){
     if(decay2==0) mass2 = 0.13957; //pi+/- mass
     type2 = classic_svFit::MeasuredTauLepton::kTauToHadDecay;
   }
-  ///TEST
-  //decay1 = aLeg2.getProperty(PropertyEnum::decayMode);
+  ///TEST 
+  //mass1 = 0.51100e-3;
+  //type1 = classic_svFit::MeasuredTauLepton::kTauToElecDecay;
+
+  //decay2 = 0;
+  //mass2 = 0.51100e-3;
+  //type2 = classic_svFit::MeasuredTauLepton::kTauToElecDecay;
+
+  //decay1 = 0;
   //mass1 = 0.13957;
   //type1 = classic_svFit::MeasuredTauLepton::kTauToHadDecay;
   ///////
-
+  
 
   //Leptons for SVFit
   std::vector<classic_svFit::MeasuredTauLepton> measuredTauLeptons;
@@ -223,7 +208,12 @@ TLorentzVector svfitAnalyzer::runSVFitAlgo(const std::vector<classic_svFit::Meas
                                            const TVector2 &aMET, const TMatrixD &covMET){
 
   svFitAlgo.setVerbosity(0);
+
   svFitAlgo.addLogM_fixed(true, 4.0);
+  if(myChannelSpecifics->getDecayModeName()=="MuTau") svFitAlgo.addLogM_fixed(true, 4.0);
+  else if(myChannelSpecifics->getDecayModeName()=="TauTau") svFitAlgo.addLogM_fixed(true, 5.0);
+  else if(myChannelSpecifics->getDecayModeName()=="MuMu") svFitAlgo.addLogM_fixed(true, 3.0);
+  
   svFitAlgo.setMaxObjFunctionCalls(100000);
   //svFitAlgo.setLikelihoodFileName("testClassicSVfit.root");
   //svFitAlgo.setTreeFileName("markovChainTree.root");
@@ -310,12 +300,12 @@ void svfitAnalyzer::fillControlHistos(const std::string & hNameSuffix){
   */
   
   /*
-    std::cout<<"mVis: "<<(aLeg1.getP4() + aLeg2.getP4()).M()<<std::endl;
-    std::cout<<"mVisLeg2: "<<aLeg2.getP4().M()<<std::endl;
-    TLorentzVector test = computeSvFit();
-    std::cout<<"Mass: "<<test.M()<<std::endl;
+  std::cout<<"mVis: "<<(aLeg1.getP4() + aLeg2.getP4()).M()<<std::endl;
+  std::cout<<"mVisLeg1: "<<aLeg1.getP4().M()<<std::endl;
+  std::cout<<"mVisLeg2: "<<aLeg2.getP4().M()<<std::endl;
   */
   TLorentzVector svFitP4 = computeMTT("fastMTT");
+  
   myHistos_->fill1DHistogram("h1DMassSVFast"+hNameSuffix,svFitP4.M());
   myHistos_->fill1DHistogram("h1DCpuTimeFast"+hNameSuffix,fastMTTAlgo.getCpuTime("scan"));
 
@@ -327,15 +317,13 @@ void svfitAnalyzer::fillControlHistos(const std::string & hNameSuffix){
 
   delta = (svFitP4.Perp() - tautauGen.Perp())/tautauGen.Perp(); 
   myHistos_->fill1DHistogram("h1DDeltaPtFast"+hNameSuffix,delta);
-  ////
-  /*
-    svFitP4 = computeMTT("svfit");
-    myHistos_->fill1DHistogram("h1DMassSVClassic"+hNameSuffix,svFitP4.M());
-    myHistos_->fill1DHistogram("h1DCpuTimeClassic"+hNameSuffix,svFitAlgo.getComputingTime_cpu());
-    delta = (svFitP4.Perp() - tautauGen.Perp())/tautauGen.Perp();
-    myHistos_->fill1DHistogram("h1DDeltaPtClassic"+hNameSuffix,delta);
-  */
-
+    
+  svFitP4 = computeMTT("svfit");
+  myHistos_->fill1DHistogram("h1DMassSVClassic"+hNameSuffix,svFitP4.M());
+  myHistos_->fill1DHistogram("h1DCpuTimeClassic"+hNameSuffix,svFitAlgo.getComputingTime_cpu());
+  delta = (svFitP4.Perp() - tautauGen.Perp())/tautauGen.Perp();
+  myHistos_->fill1DHistogram("h1DDeltaPtClassic"+hNameSuffix,delta);
+  
   svFitP4 = aPair.getP4();
   delta = svFitP4.Eta() - tautauGen.Eta();
   myHistos_->fill1DHistogram("h1DDeltaEtaStandalone"+hNameSuffix,delta);
@@ -377,9 +365,6 @@ void svfitAnalyzer::fillControlHistos(const std::string & hNameSuffix){
   //isGoodReco &= recPCA.Mag()>0.05;
   //isGoodReco &= std::abs(recPCA.Mag() - genPCA.Mag())/genPCA.Mag() < 0.1;
   //isGoodReco &= std::abs(sinThetaReco - sinThetaGen)/sinThetaGen<0.1;
-
-  //svFitP4 = computeSvFit();
-  //myHistos_->fill1DHistogram("h1DMassSVRecalculated"+hNameSuffix,svFitP4.M());
   //isOneProng = false;
   if(!isOneProng){
 
@@ -431,10 +416,18 @@ bool svfitAnalyzer::analyze(const EventProxyBase& iEvent){
   if(!myEventProxy.pairs->size()) return true;
   setAnalysisObjects(myEventProxy);
 
-  bool isGoodReco = aGenLeg2.getP4().DeltaR(aLeg2.getP4())<0.4;
-  bool goodGenTau = aGenLeg2.getP4().E()>1.0;
-  double delta = aLeg2.getP4().E() - aGenLeg2.getChargedP4().E();
-  delta /= aGenLeg2.getChargedP4().E();
+  bool isGoodReco = aGenLeg1.getP4().DeltaR(aLeg1.getP4())<0.4 &&
+		    aGenLeg2.getP4().DeltaR(aLeg2.getP4())<0.4;
+
+
+  isGoodReco |= aGenLeg2.getP4().DeltaR(aLeg1.getP4())<0.4 &&
+		aGenLeg1.getP4().DeltaR(aLeg2.getP4())<0.4;
+  
+  bool goodGenTau = aGenLeg1.getP4().E()>1.0 && aGenLeg2.getP4().E()>1.0;
+
+ 
+  //double delta = aLeg2.getP4().E() - aGenLeg2.getChargedP4().E();
+  //delta /= aGenLeg2.getChargedP4().E();
   //isGoodReco &= std::abs(delta)<0.1;
 
   if(sampleName=="WAllJets"){
