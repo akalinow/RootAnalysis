@@ -5,6 +5,7 @@
 #include <string>
 #include <vector>
 #include <map>
+#include <tuple>
 
 #include "ObjectMessenger.h"
 #include "EventProxyBase.h"
@@ -109,6 +110,8 @@ class svfitAnalyzer: public Analyzer{
 
   TLorentzVector runFastMTTAlgo(const std::vector<classic_svFit::MeasuredTauLepton> & measuredTauLeptons,
 				const TVector2 &aMET, const TMatrixD &covMET);
+
+  std::tuple<double, double> getTauMomentum(const TLorentzVector & visP4, const double &cosGJ);
 
   ///Parts of code specific to give decay channel.
   ///In particular category and object selection.

@@ -120,6 +120,12 @@ void svfitHistograms::finalizeHistograms(const std::vector<const HTTAnalysis::ev
     plotSingleHistogram("h1DDeltaEtaStandalone"+hNameSuffix);
     plotSingleHistogram("h1DDeltaPtStandalone"+hNameSuffix);
     plotSingleHistogram("h1DDeltaPtClassic"+hNameSuffix);
+
+    plotSingleHistogram("h1DDeltaCosGJ"+hNameSuffix);
+    plotSingleHistogram("h1DDeltaMA1"+hNameSuffix);
+    plotSingleHistogram("h1DDeltaPA1"+hNameSuffix);
+    plotSingleHistogram("h1DDeltaSolution1"+hNameSuffix);
+    plotSingleHistogram("h1DDeltaSolution2"+hNameSuffix);
     /*
     plotSingleHistogram("h1DFlightPathRec"+hNameSuffix);
     plotSingleHistogram("h1DFlightPathPCARec"+hNameSuffix);

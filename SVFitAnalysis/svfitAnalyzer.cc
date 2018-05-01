@@ -243,6 +243,43 @@ TLorentzVector svfitAnalyzer::runSVFitAlgo(const std::vector<classic_svFit::Meas
 }
 //////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////
+std::tuple<double, double> svfitAnalyzer::getTauMomentum(const TLorentzVector & visP4, const double &cosGJ){
+
+  double mTau = 1.77685;
+  double mTau2 = std::pow(mTau,2);
+  
+  double mVis =  visP4.M();
+  double mVis2 = std::pow(mVis,2);
+  double pVis =  visP4.P();
+  double pVis2 = std::pow(pVis,2);
+  double cosGJ2 = std::pow(cosGJ,2);
+  double sinGJ2 = 1.0 - cosGJ2;
+
+  double b2 = (mVis2 + mTau2)*pVis*cosGJ;
+
+  double delta = (mVis2 + pVis2)*(std::pow(mVis2 - mTau2, 2) - 4.0*mTau2*pVis2*sinGJ2);
+  if(delta<0){
+    //std::cout<<"mVis2: "<<mVis2<<std::endl;
+    return  std::tuple<double, double>(0, 0);
+  }
+
+  double twoA = 2.0*(mVis2 + pVis2*sinGJ2);
+  
+  double solution1 = (b2 - sqrt(delta))/twoA;
+
+  double solution2 = (b2 + sqrt(delta))/twoA;
+  /*
+  std::cout<<" decayMode: "<<aGenLeg2.getProperty(PropertyEnum::decayMode)
+           <<" solution1: "<<solution1
+	   <<" solution2: "<<solution2
+	   <<" true value: "<<aGenLeg2.getP4().P()
+	   <<std::endl;
+  */
+
+  return std::tuple<double, double>(solution1, solution2);
+}
+//////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////////
 void svfitAnalyzer::fillControlHistos(const std::string & hNameSuffix){
 
   const TLorentzVector & aVisSum = aLeg1.getP4() + aLeg2.getP4();
@@ -318,7 +355,7 @@ void svfitAnalyzer::fillControlHistos(const std::string & hNameSuffix){
   delta = (svFitP4.Perp() - tautauGen.Perp())/tautauGen.Perp(); 
   myHistos_->fill1DHistogram("h1DDeltaPtFast"+hNameSuffix,delta);
     
-  svFitP4 = computeMTT("svfit");
+  //svFitP4 = computeMTT("svfit");
   myHistos_->fill1DHistogram("h1DMassSVClassic"+hNameSuffix,svFitP4.M());
   myHistos_->fill1DHistogram("h1DCpuTimeClassic"+hNameSuffix,svFitAlgo.getComputingTime_cpu());
   delta = (svFitP4.Perp() - tautauGen.Perp())/tautauGen.Perp();
@@ -336,63 +373,47 @@ void svfitAnalyzer::fillControlHistos(const std::string & hNameSuffix){
   /////
 
 
-  double sinThetaGenReco = (aGenLeg1.getSV() - genPV).Unit()*aLeg1.getChargedP4().Vect().Unit();
-  sinThetaGenReco = sqrt(1.0 - std::pow(sinThetaGenReco, 2));
-  double flightPathRec = aLeg1.getPCARefitPV().Mag()/sinThetaGenReco;
-  flightPathRec /= aGenLeg1.getP4().Gamma();
-  flightPathRec /= aGenLeg1.getP4().Beta();
-
-  if(aGenLeg1.getP4().DeltaR(aLeg1.getP4())<0.4 && aGenLeg1.getP4().E()>1.0){
-    myHistos_->fill1DHistogram("h1DFlightPathPCARecLeg1"+hNameSuffix,flightPathRec);
-  }
 
   TVector3 genSV = aGenLeg2.getSV();
-  TVector3 genPCA = aGenLeg2.getPCA();
+  TLorentzVector a1P4 = aGenLeg2.getChargedP4() + aGenLeg2.getNeutralP4();
+  double cosGJGen = (genSV - genPV).Unit()*a1P4.Vect().Unit();
 
-  TVector3 recSV = aLeg2.getSV();
-  TVector3 recPCA = aLeg2.getPCARefitPV();
+  TVector3 recSV = aLeg2.getSV();  
+  double cosGJReco = (recSV - recPV).Unit()*aLeg2.getP4().Vect().Unit();
 
-  //std::cout<<hNameSuffix<<std::endl;
-  bool isOneProng = HTTAnalysis::isOneProng(aLeg2.getProperty(PropertyEnum::decayMode));
-  //bool isSeparated = aGenLeg2.getP4().DeltaR(aGenLeg2.getP4())>0.4;
-  //bool isSeparated = aGenLeg2.getP4().DeltaR(aLeg2.getP4())>0.4;
+  bool isThreeProng = aLeg2.getProperty(PropertyEnum::decayMode)>=HTTAnalysis::hadronicTauDecayModes::tauDecay3ChargedPion0PiZero &&
+                      aLeg2.getProperty(PropertyEnum::decayMode)<HTTAnalysis::hadronicTauDecayModes::tauDecayMuon;
 
-  double sinThetaReco = (aGenLeg2.getSV() - genPV).Unit()*aLeg2.getChargedP4().Vect().Unit();
-  sinThetaReco = sqrt(1.0 - std::pow(sinThetaReco, 2));
-  double sinThetaGen = (genSV - genPV).Unit()*aGenLeg2.getChargedP4().Vect().Unit();
-  sinThetaGen = sqrt(1.0 - std::pow(sinThetaGen, 2));
+  if(isThreeProng){
+ 
+    std::tuple<double, double> gen = getTauMomentum(a1P4, cosGJGen);
+    std::tuple<double, double> reco = getTauMomentum(aLeg2.getP4(), cosGJReco);
 
-  //isGoodReco &= recPCA.Mag()>0.05;
-  //isGoodReco &= std::abs(recPCA.Mag() - genPCA.Mag())/genPCA.Mag() < 0.1;
-  //isGoodReco &= std::abs(sinThetaReco - sinThetaGen)/sinThetaGen<0.1;
-  //isOneProng = false;
-  if(!isOneProng){
+    if(std::get<0>(reco)<1E-3){
+      delta = (aLeg2.getP4().M() - a1P4.M())/a1P4.M();
+      myHistos_->fill1DHistogram("h1DDeltaMA1"+hNameSuffix,delta);
 
-    flightPathRec = (recSV - recPV).Mag();
-    flightPathRec /= aGenLeg2.getP4().Gamma();
-    flightPathRec /= aGenLeg2.getP4().Beta();
-    //std::cout<<" flightPathRec: "<<flightPathRec<<std::endl;
-    myHistos_->fill1DHistogram("h1DFlightPathRec"+hNameSuffix,flightPathRec);
+      delta = (aLeg2.getP4().P() - a1P4.P())/a1P4.P();
+      myHistos_->fill1DHistogram("h1DDeltaPA1"+hNameSuffix,delta);
 
-    flightPathRec = recPCA.Mag()/sinThetaReco;
-    flightPathRec /= aGenLeg2.getP4().Gamma();
-    flightPathRec /= aGenLeg2.getP4().Beta();
-    myHistos_->fill1DHistogram("h1DFlightPathPCARec"+hNameSuffix,flightPathRec);
-    //std::cout<<" flightPathRec PCA: "<<flightPathRec;
+      delta = (std::pow(cosGJReco,2) - std::pow(cosGJGen,2))/(1 - std::pow(cosGJGen,2));
+      delta *= 0.5;    
+      myHistos_->fill1DHistogram("h1DDeltaCosGJ"+hNameSuffix,delta);  
+    }
 
-    double flightPathGen = (genSV - genPV).Mag();
-    flightPathGen /= aGenLeg2.getP4().Gamma();
-    flightPathGen /= aGenLeg2.getP4().Beta();
-    myHistos_->fill1DHistogram("h1DFlightPathGen"+hNameSuffix,flightPathGen);
-    //std::cout<<" flightPathGen PCA: "<<flightPathGen<<std::endl;
 
-    double deltaR = (recPCA.Mag() - genPCA.Mag())/genPCA.Mag();
-    myHistos_->fill2DHistogram("h2DFlightPathVsDeltaRGen"+hNameSuffix, deltaR, flightPathGen);
+    double genTmp = std::max(std::get<0>(gen), std::get<1>(gen));
+    double recoTmp = std::max(std::get<0>(reco), std::get<1>(reco));  
+    
+    delta = (recoTmp - genTmp)/genTmp;   
+    myHistos_->fill1DHistogram("h1DDeltaSolution1"+hNameSuffix,delta);
 
-    double flightPathGenPCA = genPCA.Mag()/sinThetaGen;
-    flightPathGenPCA /= aGenLeg2.getP4().Gamma();
-    flightPathGenPCA /= aGenLeg2.getP4().Beta();
-    myHistos_->fill1DHistogram("h1DFlightPathPCAGen"+hNameSuffix,flightPathGenPCA);
+    genTmp = std::min(std::get<0>(gen), std::get<1>(gen));
+    recoTmp = std::min(std::get<0>(reco), std::get<1>(reco));  
+    
+    delta = (recoTmp - genTmp)/genTmp;   
+    myHistos_->fill1DHistogram("h1DDeltaSolution2"+hNameSuffix,delta);
+    
   }
 }
 //////////////////////////////////////////////////////////////////////////////
