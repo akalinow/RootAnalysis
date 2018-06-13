@@ -16,7 +16,3 @@ automake --add-missing
 autoreconf
 ./configure 
 make
-cd OTFAnalysis
-./test otf.ini
-
-
