@@ -1,9 +1,22 @@
 git clone https://github.com/akalinow/RootAnalysis
 cd RootAnalysis
+git checkout relevant_tag
 cmake ./
 make -j 4
 
+In case problewm with cmake use alternative building procedure with configure:
 
 
+git clone https://github.com/akalinow/RootAnalysis
+cd RootAnalysis
+git checkout relevant_tag
+libtoolize
+aclocal
+automake --add-missing
+autoreconf
+./configure 
+make
+cd OTFAnalysis
+./test otf.ini
 
 
