@@ -13,7 +13,7 @@ list(APPEND CMAKE_PREFIX_PATH $ENV{ROOTSYS})
 find_package(ROOT REQUIRED COMPONENTS RIO GenVector Physics)
 include(${ROOT_USE_FILE})
 
-SET( CMAKE_CXX_FLAGS "${ROOT_CXX_FLAGS} -Wall -Werror -O3 -std=c++11 -fopenmp")
+SET( CMAKE_CXX_FLAGS "${ROOT_CXX_FLAGS} -Wall -Werror -O3 -std=c++14 -fopenmp")
 
 add_subdirectory(src)
 add_subdirectory(HTTAnalysis)
