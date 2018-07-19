@@ -16,4 +16,6 @@ include(${ROOT_USE_FILE})
 SET( CMAKE_CXX_FLAGS "${ROOT_CXX_FLAGS} -Wall -Werror -O3 -std=c++14 -fopenmp")
 
 add_subdirectory(src)
-add_subdirectory(HTTAnalysis)
+#add_subdirectory(HTTAnalysis)
+add_subdirectory(Pythia8Interface)
+add_subdirectory(SVFitAnalysis)
