@@ -176,14 +176,14 @@ void ChannelSpecifics::initializeLeptonCorrections(){
                             binsForTauTrg.addUniform(1340, 330, 1000);
                  */
                 h2DTauTrgGenuineCorrections = (TH2F*)tau_trg_genuine_efficiency_proj->createHistogram("h2DTauTrgGenuineCorrections",
-                                                                                                      *scaleWorkspace->var("t_pt"),RooFit::Binning(5000,0,1000),
+                                                                                                      *scaleWorkspace->var("t_pt"),RooFit::Binning(1000,0,1000),
                                                                                                       //*scaleWorkspace->var("t_pt"),RooFit::Binning(binsForTauTrg),
                                                                                                       RooFit::YVar(*scaleWorkspace->var("t_dm"),RooFit::Binning(11,-0.5,10.5)),//MB proper binning (3->11) for DMs==0,1(2),10
                                                                                                       RooFit::Extended(kFALSE),
                                                                                                       RooFit::Scaling(kFALSE));
 
                 h2DTauTrgFakeCorrections = (TH2F*)tau_trg_fake_efficiency_proj->createHistogram("h2DTauTrgFakeCorrections",
-                                                                                                *scaleWorkspace->var("t_pt"),RooFit::Binning(5000,0,1000),
+                                                                                                *scaleWorkspace->var("t_pt"),RooFit::Binning(1000,0,1000),
                                                                                                 //*scaleWorkspace->var("t_pt"),RooFit::Binning(binsForTauTrg),
                                                                                                 RooFit::YVar(*scaleWorkspace->var("t_dm"),RooFit::Binning(11,-0.5,10.5)),//MB proper binning (3->11) for DMs==0,1(2),10
                                                                                                 RooFit::Extended(kFALSE),
@@ -212,13 +212,13 @@ void ChannelSpecifics::initializeLeptonCorrections(){
                 const RooAbsReal * tau_xtrg_fake_efficiency_proj = tau_xtrg_fake_efficiency->createPlotProjection(dependentVarsForMT,projectedVarsForMT);
 
                 h2DTauXTrgGenuineCorrections = (TH2F*)tau_xtrg_genuine_efficiency_proj->createHistogram("h2DTauXTrgGenuineCorrections",
-											                *scaleWorkspace_b->var("t_pt"),RooFit::Binning(5000,0,1000),
+											                *scaleWorkspace_b->var("t_pt"),RooFit::Binning(1000,0,1000),
 											                RooFit::YVar(*scaleWorkspace_b->var("t_eta"),RooFit::Binning(4,-2.5,2.5)),//MB binning in eta: barrel/endcaps, i.e. <1.5
 											                RooFit::Extended(kFALSE),
 											                RooFit::Scaling(kFALSE));
 
                 h2DTauXTrgFakeCorrections = (TH2F*)tau_xtrg_fake_efficiency_proj->createHistogram("h2DTauXTrgFakeCorrections",
-										                  *scaleWorkspace_b->var("t_pt"),RooFit::Binning(5000,0,1000),
+										                  *scaleWorkspace_b->var("t_pt"),RooFit::Binning(1000,0,1000),
 										                  RooFit::YVar(*scaleWorkspace_b->var("t_eta"),RooFit::Binning(4,-2.5,2.5)),//MB binning in eta: barrel/endcaps, i.e. <1.5
 										                  RooFit::Extended(kFALSE),
 										                  RooFit::Scaling(kFALSE));
@@ -417,7 +417,9 @@ float ChannelSpecifics::getDYReweight(const std::string & categoryName, const HT
 /////////////////////////////////////////////////////////////////
 float ChannelSpecifics::getTauIDSF(float eta, int mc_match){
 
-        if(mc_match == 5) return 0.95;
+  //https://twiki.cern.ch/twiki/bin/view/CMS/TauIDRecommendation13TeV#2017v2_discriminators
+  if(mc_match == 5) return 0.89;
+	
         if(mc_match == 2 || mc_match == 4){
           int iBin = tauID_FRSF_mu->FindBin(std::abs(eta));
           return tauID_FRSF_mu->GetBinContent(iBin);

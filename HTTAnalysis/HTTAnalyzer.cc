@@ -254,9 +254,9 @@ bool HTTAnalyzer::analyze(const EventProxyBase& iEvent){
         float puWeight = getPUWeight(myEventProxy);
         float genWeight = getGenWeight(myEventProxy);
         float ptReweight = 1.0;
-        if(sampleName.find("DY")!=std::string::npos ||
-           sampleName.find("TTbar")!=std::string::npos)
-                ptReweight = myEventProxy.event->getPtReWeight();
+        //if(sampleName.find("DY")!=std::string::npos ||
+        //   sampleName.find("TTbar")!=std::string::npos)
+        //        ptReweight = myEventProxy.event->getPtReWeight();
         float eventWeight = puWeight*genWeight*ptReweight;
 
         //Fill bookkeeping histogram. Bin 1 holds sum of weights.
@@ -286,6 +286,7 @@ bool HTTAnalyzer::analyze(const EventProxyBase& iEvent){
 
                 float leg1ScaleFactor = myChannelSpecifics->getLeg1Correction(aSystEffect);
                 float leg2ScaleFactor = myChannelSpecifics->getLeg2Correction(aSystEffect);
+		
                 float weightSyst = getSystWeight(aSystEffect);
 
                 float eventWeightWithSyst=eventWeight*weightSyst*leg1ScaleFactor*leg2ScaleFactor;
@@ -299,12 +300,12 @@ bool HTTAnalyzer::analyze(const EventProxyBase& iEvent){
 
                 for(unsigned int iCategory = 0; iCategory<myNumberOfCategories; ++iCategory) {
 
-                        if(!passCategory(iCategory)) continue;
+		  //TEST if(!passCategory(iCategory)) continue;
                         categorySuffix = aCategoryRejester[iCategory]->name();
 
                         float reweightDY = 1.0;
                         if(sampleName.find("DY")!=std::string::npos &&
-                           sampleName.find("MatchT")!=std::string::npos) reweightDY = myChannelSpecifics->getDYReweight(categorySuffix, aSystEffect);
+			   sampleName.find("MatchT")!=std::string::npos) reweightDY = myChannelSpecifics->getDYReweight(categorySuffix, aSystEffect);
 
                         systEffectName = HTTAnalysis::systEffectName(iCategory, iSystEffect, aCategoryRejester);
                         hNameSuffix = sampleName+"_"+categorySuffix+systEffectName;
