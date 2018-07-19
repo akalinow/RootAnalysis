@@ -150,7 +150,7 @@ std::string HTTAnalyzer::getDYSampleName(const EventProxyHTT & myEventProxy){
         else if(fileName.find("DYJetsToLLM50")!=std::string::npos && myEventProxy.event->getLHEnOutPartons()==4) jetsName =  "4JetsIncl";
         //else if(fileName.find("DYJetsToLLM50")!=std::string::npos && myEventProxy.event->getLHEnOutPartons()>0) jetsName =  "AllJets";
 
-        int decayModeBoson = myEventProxy.event->getDecayModeBoson();
+        //int decayModeBoson = myEventProxy.event->getDecayModeBoson();
         int leg1MCMatch = 6, leg2MCMatch = 6;
         if(myEventProxy.pairs->size()) {
                 HTTPair aPair = (*myEventProxy.pairs)[0];
@@ -221,12 +221,12 @@ float HTTAnalyzer::getPUWeight(const EventProxyHTT & myEventProxy){
                 TH1F *hPUData = (TH1F*)puDataFile_->Get(hName.c_str());
                 TH1F *hPUSample = (TH1F*)puMCFile_->Get(hName.c_str());
                 ///Normalise both histograms.
-                //TEST hPUData->Scale(1.0/hPUData->Integral(0,hPUData->GetNbinsX()+1));
+                hPUData->Scale(1.0/hPUData->Integral(0,hPUData->GetNbinsX()+1));
                 hPUSample->Scale(1.0/hPUSample->Integral(0,hPUSample->GetNbinsX()+1));
                 ///
                 hPUData->SetDirectory(0);
                 hPUSample->SetDirectory(0);
-                //TEST hPUData->Divide(hPUSample);
+                hPUData->Divide(hPUSample);
                 hPUData->SetName(("h1DPUWeight"+getSampleName(myEventProxy)).c_str());
                 hPUVec_[0] =  hPUData;
         }

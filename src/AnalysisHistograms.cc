@@ -468,7 +468,7 @@ void AnalysisHistograms::init(TDirectory *myDir,
 void AnalysisHistograms::finalizeHistograms(){
 
 ///Add histograms missing in thread 0 map.
-        for(unsigned int iThread = 1; iThread<omp_get_max_threads(); ++iThread) {
+        for(int iThread = 1; iThread<omp_get_max_threads(); ++iThread) {
                 for(auto it:my1Dhistograms_[iThread]) {
                         if(my1Dhistograms_[0].find(it.first)==my1Dhistograms_[0].end()) {
                                 TH1F *hEmpty = (TH1F*)it.second->Clone();
@@ -504,7 +504,7 @@ void AnalysisHistograms::finalizeHistograms(){
         std::cout<<"3D histogram size: "<<my3Dhistograms_[0].size()<<std::endl;
         std::cout<<"TProfile size: "<<myProfiles_[0].size()<<std::endl;
 
-        for(unsigned int iThread = 1; iThread<omp_get_max_threads(); ++iThread) {
+        for(int iThread = 1; iThread<omp_get_max_threads(); ++iThread) {
                 if(my1Dhistograms_[0].size()!=my1Dhistograms_[iThread].size()) {
                         std::cout<<"1D histogram size mismatch. "
                                  <<" thread 0: "<<my1Dhistograms_[0].size()

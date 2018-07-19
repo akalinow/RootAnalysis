@@ -20,12 +20,16 @@ HTTAnalyzer::HTTAnalyzer(const std::string & aName, const std::string & aDecayMo
                 //--inputLumiJSON /afs/cern.ch/cms/CAF/CMSCOMM/COMM_DQM/certification/Collisions16/13TeV/PileUp/pileup_latest.txt
                 //--calcMode true --minBiasXsec 69200 --maxPileupBin 60 --numPileupBins 600 Data_Pileup_Cert_271036-277148.root
                 TFile::SetCacheFileDir("/tmp/");
-                //std::string dataPUFileName = "http://akalinow.web.cern.ch/akalinow/Data_Pileup_2016_BCDEFG_v26.root";
-                std::string dataPUFileName = "http://akalinow.web.cern.ch/akalinow/Data_Pileup_2016_271036-284044_13TeVMoriond17_23Sep2016ReReco_69p2mbMinBiasXS.root";
+
+                //std::string dataPUFileName = "http://akalinow.web.cern.ch/akalinow/Data_Pileup_2016_271036-284044_13TeVMoriond17_23Sep2016ReReco_69p2mbMinBiasXS.root";
+		std::string dataPUFileName = "http://akalinow.web.cern.ch/akalinow/Data-MC_Pileup_B-C-12Sep_D-E-Prompt_Cert_294927-305185_13TeV_PromptReco_Collisions17_69mb.root";
+
                 puDataFile_ = TFile::Open(dataPUFileName.c_str(),"CACHEREAD");
 
                 //std::string mcPUFileName = "http://akalinow.web.cern.ch/akalinow/MC_Spring16_PU25ns_V1.root";
-                std::string mcPUFileName = "http://akalinow.web.cern.ch/akalinow/MC_Moriond17_PU25ns_V1.root";
+                //std::string mcPUFileName = "http://akalinow.web.cern.ch/akalinow/MC_Moriond17_PU25ns_V1.root";
+		std::string mcPUFileName = "http://akalinow.web.cern.ch/akalinow/MC_Pileup_2017MCv1_800bins.root";
+		
                 puMCFile_ = TFile::Open(mcPUFileName.c_str(),"CACHEREAD");
 
                 if(aDecayMode=="MuTau") myChannelSpecifics = new MuTauSpecifics(this);
@@ -136,7 +140,7 @@ void HTTAnalyzer::fillControlHistos(const std::string & hNameSuffix, float event
         float higgsPt =  (aVisSum + aMET.getP4(aSystEffect)).Pt();
         float jetsMass = 0;
         if(nJets30>1) jetsMass = (aJet1.getP4(aSystEffect)+aJet2.getP4(aSystEffect)).M();
-
+	
         myHistos_->fill1DHistogram("h1DMassSV"+hNameSuffix,aPair.getP4(aSystEffect).M(),eventWeight);
         myHistos_->fill1DHistogram("h1DMassVis"+hNameSuffix, visMass, eventWeight);
         myHistos_->fill1DHistogram("h1DMassTrans"+hNameSuffix,aPair.getMTMuon(aSystEffect),eventWeight);
@@ -265,7 +269,7 @@ bool HTTAnalyzer::analyze(const EventProxyBase& iEvent){
 
         std::pair<bool, bool> goodDecayModes = myChannelSpecifics->checkTauDecayMode(myEventProxy);
         bool goodGenDecayMode = goodDecayModes.first;
-        bool goodRecoDecayMode = goodDecayModes.second;
+        //bool goodRecoDecayMode = goodDecayModes.second;
 
         if(goodGenDecayMode) fillGenDecayPlaneAngle(sampleName+"_GenNoOfflineSel", eventWeight);
 

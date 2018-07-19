@@ -105,7 +105,7 @@ void ChannelSpecifics::initializeLeptonCorrections(){
                 RooAbsReal *muon_iso_scalefactor = scaleWorkspace->function("m_iso_binned_ratio");
                 RooAbsReal *muon_trg_scalefactor = scaleWorkspace->function("m_trgOR4_binned_ratio");//MB 24->22
                 RooAbsReal *muon_xtrg_scalefactor_iso  = scaleWorkspace->function("m_trgMu19leg_eta2p1_desy_ratio");//mu-iso<0.15?
-                RooAbsReal *muon_xtrg_scalefactor_aiso = scaleWorkspace->function("m_trgMu19leg_eta2p1_aiso0p15to0p3_desy_ratio");//0.15<mu-iso<0.3?
+                //RooAbsReal *muon_xtrg_scalefactor_aiso = scaleWorkspace->function("m_trgMu19leg_eta2p1_aiso0p15to0p3_desy_ratio");//0.15<mu-iso<0.3?
                 RooAbsReal *muon_trk_scalefactor = scaleWorkspace->function("m_trk_ratio");//MB not in HTTAnalysis
                 RooAbsReal *tau_trg_genuine_efficiency = scaleWorkspace->function("t_genuine_TightIso_tt_ratio");//MB data->ratio
                 RooAbsReal *tau_trg_fake_efficiency = scaleWorkspace->function("t_fake_TightIso_tt_ratio");//MB data->ratio
@@ -151,11 +151,13 @@ void ChannelSpecifics::initializeLeptonCorrections(){
                 for(int iX=0; iX<1980; ++iX){
                   for(int iY=0; iY<48; ++iY){
                     float binContent = h2DMuonXTrgCorrections_iso->GetBinContent(iX+1,iY+1);
-                    for(int iZ=0; iZ<4; ++iZ)//bins 1-4 correspond with iso<0.15
+                    for(int iZ=0; iZ<4; ++iZ){//bins 1-4 correspond with iso<0.15
                       h3DMuonXTrgCorrections->SetBinContent(iX+1,iY+1,iZ+1,binContent);
-                      binContent = h2DMuonXTrgCorrections_aiso->GetBinContent(iX+1,iY+1);
-                    for(int iZ=4; iZ<8; ++iZ)//bins 4-8 correspond with 0.15<iso<0.3
+		    }
+		    binContent = h2DMuonXTrgCorrections_aiso->GetBinContent(iX+1,iY+1);
+		    for(int iZ=4; iZ<8; ++iZ){//bins 4-8 correspond with 0.15<iso<0.3
                       h3DMuonXTrgCorrections->SetBinContent(iX+1,iY+1,iZ+1,binContent);
+		    }
                   }
                 }
                 

@@ -569,10 +569,9 @@ void HTTSynchNTuple::fillLegsSpecific(const HTTParticle &leg1, const HTTParticle
     iBin = h1DMuonTrkCorrections->FindBin(eta_1);
     trackingweight_1 = h1DMuonTrkCorrections->GetBinContent(iBin);
     //trigger
-    trg_singlemuon = ( leg1.hasTriggerMatch(TriggerEnum::HLT_IsoMu22) ||
-		       leg1.hasTriggerMatch(TriggerEnum::HLT_IsoTkMu22) ||
-		       leg1.hasTriggerMatch(TriggerEnum::HLT_IsoMu22_eta2p1) ||
-		       leg1.hasTriggerMatch(TriggerEnum::HLT_IsoTkMu22_eta2p1) );
+    trg_singlemuon =  leg1.hasTriggerMatch(TriggerEnum::HLT_IsoMu27) ||
+                      leg1.hasTriggerMatch(TriggerEnum::HLT_IsoMu24_eta2p1) ||
+	              leg1.hasTriggerMatch(TriggerEnum::HLT_IsoMu20_eta2p1_LooseChargedIsoPFTau27_eta2p1_CrossL1);
 
     //Leg2: tau
     iso_2 = leg2.getProperty(PropertyEnum::byIsolationMVArun2v1DBoldDMwLTraw);
@@ -628,8 +627,8 @@ void HTTSynchNTuple::fillLegsSpecific(const HTTParticle &leg1, const HTTParticle
     }
     idisoweight_2 = (gen_match_2==5 ? 0.95 : 1); //0.95 for genuine tau, otherwise 1
     trackingweight_2 = 1; //1 for tau
-    trg_singletau_1 = leg2.hasTriggerMatch(TriggerEnum::HLT_VLooseIsoPFTau120_Trk50_eta2p1);
-    trg_singletau_2 = leg2.hasTriggerMatch(TriggerEnum::HLT_VLooseIsoPFTau140_Trk50_eta2p1);
+    trg_singletau_1 = leg2.hasTriggerMatch(TriggerEnum::HLT_DoubleMediumChargedIsoPFTau35_Trk1_eta2p1_Reg);
+    trg_singletau_2 = leg2.hasTriggerMatch(TriggerEnum::HLT_DoubleMediumChargedIsoPFTau35_Trk1_eta2p1_Reg);
 
     return;
   }
@@ -747,14 +746,10 @@ void HTTSynchNTuple::fillLegsSpecific(const HTTParticle &leg1, const HTTParticle
     }
     trackingweight_2 = 1;//1 for tau
     //triggers
-    trg_singletau_1 = (leg1.hasTriggerMatch(TriggerEnum::HLT_VLooseIsoPFTau120_Trk50_eta2p1) ||
-		       leg2.hasTriggerMatch(TriggerEnum::HLT_VLooseIsoPFTau120_Trk50_eta2p1) );
-    trg_singletau_2 = (leg1.hasTriggerMatch(TriggerEnum::HLT_VLooseIsoPFTau140_Trk50_eta2p1) ||
-		       leg2.hasTriggerMatch(TriggerEnum::HLT_VLooseIsoPFTau140_Trk50_eta2p1) );
-    trg_doubletau = ( (leg1.hasTriggerMatch(TriggerEnum::HLT_DoubleMediumIsoPFTau35_Trk1_eta2p1_Reg) &&
-		       leg2.hasTriggerMatch(TriggerEnum::HLT_DoubleMediumIsoPFTau35_Trk1_eta2p1_Reg) ) ||
-		      (leg1.hasTriggerMatch(TriggerEnum::HLT_DoubleMediumCombinedIsoPFTau35_Trk1_eta2p1_Reg) &&
-		       leg2.hasTriggerMatch(TriggerEnum::HLT_DoubleMediumCombinedIsoPFTau35_Trk1_eta2p1_Reg) ) );
+    trg_singletau_1 = leg1.hasTriggerMatch(TriggerEnum::HLT_DoubleMediumChargedIsoPFTau35_Trk1_eta2p1_Reg); 		     
+    trg_singletau_2 = leg1.hasTriggerMatch(TriggerEnum::HLT_DoubleMediumChargedIsoPFTau35_Trk1_eta2p1_Reg); 		     
+    trg_doubletau = leg1.hasTriggerMatch(TriggerEnum::HLT_DoubleMediumChargedIsoPFTau35_Trk1_eta2p1_Reg);
+		     
 
 
     return;
@@ -967,7 +962,7 @@ void HTTSynchNTuple::initializeCorrections(){
   RooAbsReal *muon_iso_scalefactor = scaleWorkspace->function("m_iso_binned_ratio");
   RooAbsReal *muon_trg_scalefactor = scaleWorkspace->function("m_trgOR4_binned_ratio");//MB 24->22
   RooAbsReal *muon_xtrg_scalefactor_iso  = scaleWorkspace->function("m_trgMu19leg_eta2p1_desy_ratio");//mu-iso<0.15?
-  RooAbsReal *muon_xtrg_scalefactor_aiso = scaleWorkspace->function("m_trgMu19leg_eta2p1_aiso0p15to0p3_desy_ratio");//0.15<mu-iso<0.3?
+  //RooAbsReal *muon_xtrg_scalefactor_aiso = scaleWorkspace->function("m_trgMu19leg_eta2p1_aiso0p15to0p3_desy_ratio");//0.15<mu-iso<0.3?
   RooAbsReal *muon_trk_scalefactor = scaleWorkspace->function("m_trk_ratio");//MB not in HTTAnalysis
   RooAbsReal *tau_trg_genuine_efficiency = scaleWorkspace->function("t_genuine_TightIso_tt_ratio");//MB data->ratio
   RooAbsReal *tau_trg_fake_efficiency = scaleWorkspace->function("t_fake_TightIso_tt_ratio");//MB data->ratio

@@ -224,6 +224,8 @@ TGraph *grEffToRej(TGraph *grEff){
 ////////////////////////////////////////////////////
 TGraph* getSgnVsBkg(TH1F *hSgn, TH1F *hBkg, int opt){
 
+  return 0;
+  /*
   float x[10000], ex[10000];
   float y[10000], ey[10000];
   float y1[10000], ey1[10000];
@@ -283,6 +285,7 @@ TGraph* getSgnVsBkg(TH1F *hSgn, TH1F *hBkg, int opt){
 
   if(opt==1) return aGraph;
   return aGraph1;
+  */
 }
 ////////////////////////////////////////////////////
 ////////////////////////////////////////////////////

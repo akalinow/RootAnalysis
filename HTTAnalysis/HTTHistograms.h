@@ -66,9 +66,10 @@ std::vector<std::string> selectionFlavours_;
 ///iSystEffect - systematic effect type to be plotted
 ///selName - secondary type of selection (OS/SS/mt) used for background estimation
 //varName - name of variable to be plotted,
+///doPlot - switch for enabling plot making. If false histograms are normalised for further use, but not plotted.
 THStack* plotStack(unsigned int iCategory,
                    std::string varName,
-                   unsigned int iSystEffect = (unsigned int) HTTAnalysis::NOMINAL);
+                   unsigned int iSystEffect = (unsigned int) HTTAnalysis::NOMINAL, bool doPlot = true);
 
 void plotnPCA(const std::string & type);
 
