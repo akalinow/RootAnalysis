@@ -69,7 +69,7 @@ std::string HTTAnalyzer::getSampleNameFromFileName(const EventProxyHTT & myEvent
         else if(fileName.find("WJetsToLNu")!=std::string::npos && myEventProxy.event->getLHEnOutPartons()==4) sampleName = "W4JetsIncl";
         //else if(fileName.find("WJetsToLNu")!=std::string::npos && myEventProxy.event->getLHEnOutPartons()>0) sampleName = "WAllJets";
 
-        else if(fileName.find("SingleMuonRun201")!=std::string::npos) sampleName =  "Data";//FIX!
+        else if(fileName.find("Run201")!=std::string::npos) sampleName =  "Data";
         else if(fileName.find("SUSYGluGluToHToTauTau")!=std::string::npos) sampleName =  "ATT";
 
         else if(fileName.find("GluGluHToTauTauM110")!=std::string::npos) sampleName =  "ggHTT110";
@@ -83,12 +83,6 @@ std::string HTTAnalyzer::getSampleNameFromFileName(const EventProxyHTT & myEvent
         else if(fileName.find("VBFHToTauTauM125")!=std::string::npos) sampleName =  "qqHTT125";
         else if(fileName.find("VBFHToTauTauM130")!=std::string::npos) sampleName =  "qqHTT130";
         else if(fileName.find("VBFHToTauTauM140")!=std::string::npos) sampleName =  "qqHTT140";
-
-	else if(fileName.find("ttHToTauTauM110")!=std::string::npos) sampleName =  "ttHTT110";
-        else if(fileName.find("ttHToTauTauM120")!=std::string::npos) sampleName =  "ttHTT120";
-        else if(fileName.find("ttHToTauTauM125")!=std::string::npos) sampleName =  "ttHTT125";
-        else if(fileName.find("ttHToTauTauM130")!=std::string::npos) sampleName =  "ttHTT130";
-        else if(fileName.find("ttHToTauTauM140")!=std::string::npos) sampleName =  "ttHTT140";
 
         else if(fileName.find("WplusHToTauTauM110")!=std::string::npos) sampleName =  "WplusHTT110";
         else if(fileName.find("WplusHToTauTauM120")!=std::string::npos) sampleName =  "WplusHTT120";
@@ -115,11 +109,9 @@ std::string HTTAnalyzer::getSampleNameFromFileName(const EventProxyHTT & myEvent
         else if(fileName.find("ZZTo2L2Q")!=std::string::npos) sampleName =  "ZZTo2L2Q";
         else if(fileName.find("ZZTo4L")!=std::string::npos) sampleName =  "ZZTo4L";
         else if(fileName.find("WZTo1L3Nu")!=std::string::npos) sampleName =  "WZTo1L3Nu";
-	else if(fileName.find("WZTo3LNu")!=std::string::npos) sampleName =  "WZTo3LNu";	
         else if(fileName.find("WZJToLLLNu")!=std::string::npos) sampleName =  "WZJToLLLNu";
         else if(fileName.find("WWTo1L1Nu2Q")!=std::string::npos) sampleName =  "WWTo1L1Nu2Q";
-        else if(fileName.find("WWToLNuQQ")!=std::string::npos) sampleName =  "WWTo1L1Nu2Q";	
-	///else if(fileName.find("WWTo2L2Nu")!=std::string::npos) sampleName =  "WWTo2L2Nu";	
+        else if(fileName.find("WWToLNuQQ")!=std::string::npos) sampleName =  "WWTo1L1Nu2Q";
         else if(fileName.find("WZTo1L1Nu2Q")!=std::string::npos) sampleName =  "WZTo1L1Nu2Q";
         else if(fileName.find("VVTo2L2Nu")!=std::string::npos) sampleName =  "VVTo2L2Nu";
         else if(fileName.find("WZTo2L2Q")!=std::string::npos) sampleName =  "WZTo2L2Q";
@@ -129,11 +121,7 @@ std::string HTTAnalyzer::getSampleNameFromFileName(const EventProxyHTT & myEvent
         else if(fileName.find("EWKZ2JetsZToNuNu")!=std::string::npos) sampleName =  "EWKZ2JetsZToNuNu";
         else if(fileName.find("QCD")!=std::string::npos) sampleName =  "QCD_MC";
         else if(fileName.find("DY")!=std::string::npos) sampleName =  getDYSampleName(myEventProxy);
-	else if(fileName.find("TTTo2L2Nu")!=std::string::npos) sampleName =  "TTTo2L2Nu";
-	else if(fileName.find("TTToHadronic")!=std::string::npos) sampleName =  "TTToHadronic";
-	else if(fileName.find("TTToSemiLeptonic")!=std::string::npos) sampleName =  "TTToSemiLeptonic";
-	else if(fileName.find("TTTune")!=std::string::npos) sampleName =  "TTbar";
-	
+        else if(fileName.find("TTTune")!=std::string::npos) sampleName =  "TTbar";
         std::string matchingMode = getMatchingName(myEventProxy);
 
         if(sampleName=="Unknown") std::cout<<"Unkwown sample type. "<<fileName<<std::endl;
@@ -189,7 +177,7 @@ std::string HTTAnalyzer::getDYSampleName(const EventProxyHTT & myEventProxy){
 std::string HTTAnalyzer::getMatchingName(const EventProxyHTT & myEventProxy){
 
         std::string fileName = myEventProxy.getTTree()->GetCurrentFile()->GetName();
-        std::vector<std::string> sampleNames = {"TTTune", "TTTo2L2Nu", "TTToHadronic", "TTToSemiLeptonic", "ZZTo2L2Q", "ZZTo4L","WZTo1L3Nu", "WZTo3LNu", "WZJToLLLNu", "WWTo1L1Nu2Q", "WZTo1L1Nu2Q", "VVTo2L2Nu", "WZTo2L2Q"};
+        std::vector<std::string> sampleNames = {"TTTune", "ZZTo2L2Q", "ZZTo4L","WZTo1L3Nu", "WZJToLLLNu", "WWTo1L1Nu2Q", "WZTo1L1Nu2Q", "VVTo2L2Nu", "WZTo2L2Q"};
 
         bool sampleToAnalyze = false;
         for(auto sampleName : sampleNames) {
@@ -219,13 +207,6 @@ std::string HTTAnalyzer::getMatchingName(const EventProxyHTT & myEventProxy){
 //////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////
 float HTTAnalyzer::getPUWeight(const EventProxyHTT & myEventProxy){
-
-  if(getSampleName(myEventProxy)=="Data") return 1.0;
-
-  ///A HACK
-  if(myEventProxy.event->getNPU()<5) return 0;
-  else return 1.0; //FIXME
-  //////
 
         if(getSampleName(myEventProxy)=="Data") return 1.0;
 
@@ -257,7 +238,7 @@ float HTTAnalyzer::getPUWeight(const EventProxyHTT & myEventProxy){
 //////////////////////////////////////////////////////////////////////////////
 float HTTAnalyzer::getGenWeight(const EventProxyHTT & myEventProxy){
 
-        ///MC weights can be quite large, but are always +-const.
+        ///MC weights cab be quite large, but are always +-const.
         ///to avoid counter overflow we keep only sign.
         return myEventProxy.event->getMCWeight()/fabs(myEventProxy.event->getMCWeight());
 }

@@ -2,6 +2,9 @@
 #include <fstream>
 #include <iterator>
 #include <string>
+#include <exception>
+#include <stdexcept>
+
 #include <omp.h>
 #include "TreeAnalyzer.h"
 #include "SummaryAnalyzer.h"
@@ -23,6 +26,11 @@
 
 //////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////
+void TreeAnalyzer::setObjectMessenger(ObjectMessenger* mess)
+{
+  myObjMessenger_=mess;
+}
+
 TreeAnalyzer::TreeAnalyzer(const std::string & aName,
 			   const std::string & cfgFileName,
 			   EventProxyBase *aProxy,
@@ -62,7 +70,7 @@ TreeAnalyzer::TreeAnalyzer(const std::string & aName,
 
   myStrSelections_ = new pat::strbitset();
 
-  myObjMessenger_ = new ObjectMessenger("ObjMessenger");
+  myObjMessenger_ = new ObjectMessenger("Default ObjMessenger Created In TreeAnalyzer.h");
 
   myProxy_ = aProxy;
   mySummary_ = 0;
@@ -78,6 +86,7 @@ TreeAnalyzer::~TreeAnalyzer(){
   if(store_) {
     store_->Write();
     delete store_;
+  //TODO: delete myObjMessenger ???
   }
 
   std::cout<<"TreeAnalyzer::~TreeAnalyzer() Done"<<std::endl;
@@ -168,11 +177,20 @@ void TreeAnalyzer::init(std::vector<Analyzer*> myAnalyzers){
     myAnalyzers_.push_back(mySummary_);
   }
 
-  for(unsigned int i=0; i<myAnalyzers_.size(); ++i) {
-    std::string analyzerName = myAnalyzers_[i]->name();
-    TDirectory *analyzerDir = store_->mkdir(analyzerName.c_str());
-    myAnalyzers_[i]->initialize(analyzerDir, myStrSelections_);
+  try
+  {
+    for(unsigned int i=0; i<myAnalyzers_.size(); ++i) 
+    {
+      std::string analyzerName = myAnalyzers_[i]->name();
+      TDirectory *analyzerDir = store_->mkdir(analyzerName.c_str());
+      myAnalyzers_[i]->initialize(analyzerDir, myStrSelections_);
+    }
   }
+  catch(const std::exception& e)
+  {
+     std::throw_with_nested(std::runtime_error("[ERROR] UNKNOWN ERROR IN TreeAnalyzer::init! PROBABLY SOMETHING WRONG WITH THE NAME OF ANALYZER!"));
+  }
+
 
 
   for(int iThread=0; iThread<omp_get_max_threads(); ++iThread) {

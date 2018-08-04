@@ -264,7 +264,7 @@ TH1F* HTTHistograms::get1D_SumPattern_Histogram(const std::string& name, const s
 /////////////////////////////////////////////////////////
 TH1F* HTTHistograms::get1D_VV_Histogram(const std::string& name, std::string tauMatchSuffix){
 
-  std::vector<std::string> sampleNamesVV = {"ZZTo2L2Q", "ZZTo4L","WZTo1L3Nu", "WZTo3LNu", "WZJToLLLNu", "WWTo1L1Nu2Q", "WZTo1L1Nu2Q", "VVTo2L2Nu", "WZTo2L2Q"};
+        std::vector<std::string> sampleNamesVV = {"ZZTo2L2Q", "ZZTo4L","WZTo1L3Nu", "WZJToLLLNu", "WWTo1L1Nu2Q", "WZTo1L1Nu2Q", "VVTo2L2Nu", "WZTo2L2Q"};
         return get1D_SumPattern_Histogram(name, "DiBoson", sampleNamesVV, tauMatchSuffix);
 
 }
@@ -280,8 +280,8 @@ TH1F* HTTHistograms::get1D_ST_Histogram(const std::string& name){
 /////////////////////////////////////////////////////////
 TH1F* HTTHistograms::get1D_TT_Histogram(const std::string& name, std::string tauMatchSuffix){
 
-  std::vector<std::string> sampleNamesTT = {"TTTo2L2Nu", "TTToHadronic", "TTToSemiLeptonic"};
-  return get1D_SumPattern_Histogram(name, "TTbar", sampleNamesTT, tauMatchSuffix);
+        std::vector<std::string> sampleNamesTT = {"TTbar"};
+        return get1D_SumPattern_Histogram(name, "TTbar", sampleNamesTT, tauMatchSuffix);
 
 }
 /////////////////////////////////////////////////////////
@@ -440,7 +440,6 @@ void HTTHistograms::finalizeHistograms(const std::vector<const HTTAnalysis::even
                 //plotCPhistograms(iCategory);
 
                 plotStack(iCategory, "MassSV");
-		return; //TEST
                 plotStack(iCategory, "MassVis");
                 plotStack(iCategory, "MassTrans");
                 plotStack(iCategory, "UnRollTauPtMassVis");
@@ -965,31 +964,6 @@ THStack*  HTTHistograms::plotStack(unsigned int iCategory,
         std::string categoryName = myCategoryRejester[iCategory]->name();
         std::string systEffectName = HTTAnalysis::systEffectName(iCategory, iSystEffect, myCategoryRejester);
         std::string hNameSuffix = "_"+categoryName+systEffectName;
-
-	TH1F *h11 = get1D_TT_Histogram((hName+"TTbar"+hNameSuffix),"MatchJ");
-	TH1F *h22 = get1D_TT_Histogram((hName+"TTbar"+hNameSuffix),"MatchT");
-
-	h11->Print();
-	h22->Print();
-
-	TH1F *h1 = get1DHistogram(hName+"TTTo2L2NuMatchJ"+hNameSuffix);
-	TH1F *h2 = get1DHistogram(hName+"TTToHadronicMatchJ"+hNameSuffix);
-	TH1F *h3 = get1DHistogram(hName+"TTToSemiLeptonicMatchJ"+hNameSuffix);
-
-	if(h1) h1->Print();
-	if(h2) h2->Print();
-	if(h3) h3->Print();
-
-	h1 = get1DHistogram(hName+"TTTo2L2NuMatchT"+hNameSuffix);
-	h2 = get1DHistogram(hName+"TTToHadronicMatchT"+hNameSuffix);
-	h3 = get1DHistogram(hName+"TTToSemiLeptonicMatchT"+hNameSuffix);
-
-	if(h1) h1->Print();
-	if(h2) h2->Print();
-	if(h3) h3->Print();
-
-
-	return 0;
 
         TH1F *hggHiggs110 = get1DHistogram((hName+"ggHTT110"+hNameSuffix));
         TH1F *hggHiggs120 = get1DHistogram((hName+"ggHTT120"+hNameSuffix));
