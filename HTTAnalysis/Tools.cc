@@ -7,15 +7,54 @@ namespace HTTAnalysis {
 
 float getLumi(){
   /*
-        //./.local/bin/brilcalc lumi --normtag /afs/cern.ch/user/l/lumipro/public/normtag_file/normtag_DATACERT.json -i processedLumis_SingleMuon.json       
-	float run2016 = 35.87*1E3; //Updated Run2016 luminosity
-        return run2016; //pb-1 data for NTUPLES_05_12_2016
-  */
+        //./.local/bin/brilcalc lumi --normtag ~lumipro/public/normtag_file/OfflineNormtagV2.json -i lumiSummary_Run2015C_16Dec2015_v1.json
+        float run2015C = 17225935.728*1E-6;
+        float run2015D = 2114239169.533*1E-6;
+
+        //./.local/bin/brilcalc lumi --normtag /afs/cern.ch/user/l/lumipro/public/normtag_file/normtag_DATACERT.json -i processedLumis_SingleMuon.json
+
+        float run2016BPromptReco = 5923961370.727;
+        float run2016BReReco = 5933308579.501;
+
+        float run2016CPromptReco = 2645968083.093;
+        float run2016CReReco = 2645968083.093;
+
+        float run2016DPromptReco = 4353448810.554;
+        float run2016DReReco = 4353448810.554;
+
+        float run2016EReReco = 4049255306.406;
+        float run2016FReReco = 3160088401.247;
+        float run2016GReReco = 7554453635.136;
+
+        float run2016HPromptReco_v2 = 8545039541.475;
+        float run2016HPromptReco_v3 = 216782873.203;
+
+        float run2016 = run2016BReReco + run2016CReReco +
+                        run2016DReReco + run2016EReReco +
+                        run2016FReReco + run2016GReReco +
+                        run2016HPromptReco_v2 + run2016HPromptReco_v3;
+	run2016 = 35.87*1E3*1E6; //Updated Run2016 luminosity
   
-	/* Run2017X-31Mar2018-v1/MINIAOD */
-        float run2017 = 41.501*1E3; //pb-1 data for NTUPLES_12_07_2018
-		        
-	return run2017;
+	float run2017BPromptv1 = 4.0*1E3*1E6;
+	float run2017BPromptv2 = 0.7*1E3*1E6;
+        float run2017CPromptv1 = 1.3*1E3*1E6;
+        float run2017CPromptv2 = 4.1*1E3*1E6;
+	*/
+        float run2017CPromptv3 = 4.3*1E3*1E6;
+        float run2017DPromptv1 = 4.3*1E3*1E6;
+        float run2017EPromptv1 = 9.1*1E3*1E6;
+
+        float run2017B12SepReReco = 2.1*1E3*1E6;
+        float run2017C12SepReReco = 5.4*1E3*1E6;
+	/*run2017BPromptv1+run2017BPromptv2*/
+        float run2017 = run2017B12SepReReco
+                      + run2017C12SepReReco
+                      + run2017CPromptv3
+                      + run2017DPromptv1
+                      + run2017EPromptv1;//data for NTUPLES_08_10_2017
+	        
+        //return run2016*1E-6; //pb-1 data for NTUPLES_05_12_2016
+	return run2017*1E-6; //pb-1 data for NTUPLES_08_10_2017
 }
 //////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////
@@ -39,21 +78,11 @@ float getCrossSection(const std::string & sampleName){
                 crossSection = 3*20508.9;
         }
         if(sampleName.find("TTbar")!=std::string::npos) {
+                //https://twiki.cern.ch/twiki/bin/viewauth/CMS/KlubTwikiRun2
                 //https://twiki.cern.ch/twiki/bin/viewauth/CMS/StandardModelCrossSectionsat13TeVInclusive
-	  crossSection = 831.76;
+                crossSection = 831.76;
         }
-	if(sampleName.find("TTTo2L2Nu")!=std::string::npos) {
-	  ///Inclusive TT*BR(WW->2L2Nu)
-	  crossSection = 831.76*0.1086*0.1086;
-	}
-	if(sampleName.find("TTToHadronic")!=std::string::npos) {
-	  ///Inclusive TT*BR(WW->hadronic)
-	  crossSection = 831.76*(1-0.1086)*(1-0.1086);
-	}
-	if(sampleName.find("TTToSemiLeptonic")!=std::string::npos) {
-	  ///Inclusive TT*BR(WW->SemiLeptonic)
-	  crossSection = 831.76*(1-0.1086)*0.1086*2;
-	}
+
         //https://twiki.cern.ch/twiki/pub/LHCPhysics/LHCHXSWG/Higgs_XSBR_YR4_update.xlsx
         //https://twiki.cern.ch/twiki/bin/view/LHCPhysics/CERNYellowReportPageBR2014#Higgs_2_fermions
         //https://twiki.cern.ch/twiki/bin/view/LHCPhysics/CERNYellowReportPageAt1314TeV2014
@@ -90,17 +119,10 @@ float getCrossSection(const std::string & sampleName){
         if(sampleName=="ZHTT130") crossSection = 0.790*0.0541;
         if(sampleName=="ZHTT140") crossSection = 0.6514*3.60E-02; //Analysis Note
 
-	if(sampleName=="ttHTT110") crossSection = 0E+00*7.95E-02; //FIXME
-        if(sampleName=="ttHTT120") crossSection = 0.5697E+00*6.98E-02; //CERNYellowReportPageAt13TeV*CERNYellowReportPageBR
-        if(sampleName=="ttHTT125") crossSection = 0.5071E+00*6.27E-02; //CERNYellowReportPageAt13TeV*CERNYellowReportPageBR
-        if(sampleName=="ttHTT130") crossSection = 0.4539E+00*5.41E-02; //CERNYellowReportPageAt13TeV*CERNYellowReportPageBR
-        if(sampleName=="ttHTT140") crossSection = 0E+00*3.60E-02; //FIXME
-
         ///https://twiki.cern.ch/twiki/bin/view/CMS/HiggsToTauTauWorking2016#MC_and_data_samples
         if(sampleName.find("ZZTo2L2Q")!=std::string::npos) crossSection = 3.22;
         if(sampleName.find("ZZTo4L")!=std::string::npos) crossSection = 1.212;
         if(sampleName.find("WZTo1L3Nu")!=std::string::npos) crossSection = 3.05;
-	if(sampleName.find("WZTo3LNu")!=std::string::npos) crossSection = 3.05/0.2*3*0.0337;//WZTo1L3Nu/BR(Z->nunu)*BR(Z->ll)	
         if(sampleName.find("WZJToLLLNu")!=std::string::npos) crossSection = 4.708;
         if(sampleName.find("WWTo1L1Nu2Q")!=std::string::npos) crossSection = 49.997;
         if(sampleName.find("WZTo1L1Nu2Q")!=std::string::npos) crossSection = 10.71;
