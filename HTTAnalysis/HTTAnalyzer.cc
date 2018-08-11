@@ -10,6 +10,9 @@
 #include "MuTauSpecifics.h"
 #include "TauTauSpecifics.h"
 #include "Tools.h"
+
+#include "MLObjectMessenger.h"
+
 //////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////
 HTTAnalyzer::HTTAnalyzer(const std::string & aName, const std::string & aDecayMode) : Analyzer(aName){
@@ -127,7 +130,7 @@ void HTTAnalyzer::setAnalysisObjects(const EventProxyHTT & myEventProxy){
 }
 //////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////
-void HTTAnalyzer::addBranch(TTree *tree){ /*tree->Branch("muonPt",&muonPt);*/}
+void HTTAnalyzer::addBranch(TTree *tree){ tree->Branch("nJets30",&nJets30);}
 //////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////
 void HTTAnalyzer::fillControlHistos(const std::string & hNameSuffix, float eventWeight,
@@ -243,7 +246,8 @@ bool HTTAnalyzer::passCategory(unsigned int iCategory){
 }
 //////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////
-bool HTTAnalyzer::analyze(const EventProxyBase& iEvent){
+bool HTTAnalyzer::analyze(const EventProxyBase& iEvent, ObjectMessenger *aMessenger)
+{
 
         bool runSystematics = false;
 
@@ -297,7 +301,8 @@ bool HTTAnalyzer::analyze(const EventProxyBase& iEvent){
 
                 myChannelSpecifics->testAllCategories(aSystEffect);
 
-                for(unsigned int iCategory = 0; iCategory<myNumberOfCategories; ++iCategory) {
+                for(unsigned int iCategory = 0; iCategory<myNumberOfCategories; ++iCategory)
+                {
 
                         if(!passCategory(iCategory)) continue;
                         categorySuffix = aCategoryRejester[iCategory]->name();
@@ -309,9 +314,39 @@ bool HTTAnalyzer::analyze(const EventProxyBase& iEvent){
                         systEffectName = HTTAnalysis::systEffectName(iCategory, iSystEffect, aCategoryRejester);
                         hNameSuffix = sampleName+"_"+categorySuffix+systEffectName;
                         fillControlHistos(hNameSuffix, eventWeightWithSyst*reweightDY, aSystEffect);
+                        // Data being put to MLObjectMessenger
+                        
+                }
+                if(aMessenger and std::string("MLObjectMessenger").compare((aMessenger->name()).substr(0,17))==0 ) // if NULL it will do nothing
+                {
+                    // Putting data to MLObjectMessenger
+                    try
+                    {
+                        MLObjectMessenger* mess = (MLObjectMessenger*)aMessenger;
+                        mess->putObjectVector(const_cast <const HTTParticle*>(&aJet1), "jets");
+                        mess->putObjectVector(const_cast <const HTTParticle*>(&aJet2), "jets");
+                        mess->putObjectVector(const_cast <const HTTParticle*>(&aLeg1), "legs");
+                        mess->putObjectVector(const_cast <const HTTParticle*>(&aLeg2), "legs");
+                        mess->putObject(const_cast <const HTTParticle*>(&aMET), "amet");
+                        mess->putObject(const_cast <const HTTAnalysis::sysEffects*>(&aSystEffect), "systEffect");
+                        mess->putObject(nJets30, "nJets30");
+                        float beta_score = aBJet1.getProperty(PropertyEnum::bCSVscore);
+                        mess->putObject(beta_score, "beta_score");
+                        float higgs_mass_trans = aPair.getMTMuon(aSystEffect);
+                        mess->putObject(higgs_mass_trans, "higgs_mass_trans");
+                    }
+                    catch(const std::exception& e)
+                    {
+                        std::throw_with_nested(std::runtime_error("[ERROR] UNKNOWN ERROR IN HTTAnalyzer::analyze WHEN PUTTING DATA TO MLObjectMessenger!"));
+                    }                    
                 }
         }
         return true;
 }
 //////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////
+
+bool HTTAnalyzer::analyze(const EventProxyBase& iEvent)
+{
+    return analyze(iEvent, NULL);
+}
