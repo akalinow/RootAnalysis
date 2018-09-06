@@ -1,8 +1,8 @@
 project(SVFitAnalysis LANGUAGES CXX)
 
 ##Add SVFit library
-set (ClassicSVfit_PATH "/scratch_local/akalinow/CMS/SVFit/development_fastMTT/")
-set (ClassicSVfitLib_PATH "/scratch_local/akalinow/CMS/SVFit/development_fastMTT/")
+set (ClassicSVfit_PATH "/scratch_local/akalinow/CMS/SVFit/development/")
+set (ClassicSVfitLib_PATH "/scratch_local/akalinow/CMS/SVFit/development/")
 
 include_directories(${ClassicSVfit_PATH})
 link_directories(${ClassicSVfitLib_PATH})

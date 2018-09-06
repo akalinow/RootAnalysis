@@ -43,6 +43,7 @@ std::string svfitAnalyzer::getSampleNameFromFileName(const EventProxyHTT & myEve
         else if(fileName.find("GluGluHToTauTauM140")!=std::string::npos) sampleName =  "ggHTT140";
 
         else if(fileName.find("SUSYGluGluToBBHToTauTauM140")!=std::string::npos) sampleName =  "ggHTT140";
+	else if(fileName.find("SUSYGluGluToBBHToTauTauM200")!=std::string::npos) sampleName =  "ggHTT200";
         else if(fileName.find("SUSYGluGluToBBHToTauTauM250")!=std::string::npos) sampleName =  "ggHTT250";
 
         else if(fileName.find("VBFHToTauTauM110")!=std::string::npos) sampleName =  "qqHTT110";
@@ -135,6 +136,9 @@ std::string svfitAnalyzer::getDYSampleName(const EventProxyHTT & myEventProxy){
                 if(leg1MCMatch==5 && leg2MCMatch==5) decayName = "T";
                 else if(leg1MCMatch<6 && leg2MCMatch<6) decayName = "L";
                 else decayName = "J";
+        }
+	if(fileName.find("MM_")!=std::string::npos) {
+                if(leg1MCMatch==2 && leg2MCMatch==2) decayName = "L";
         }
         return "DY"+jetsName+"Match"+decayName;
 }

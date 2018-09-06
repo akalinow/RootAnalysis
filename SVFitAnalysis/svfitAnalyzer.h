@@ -17,6 +17,7 @@
 //ROOT includes
 #include "TTree.h"
 #include "TList.h"
+#include "TRandom3.h"
 
 #include "Analyzer.h"
 #include "ChannelSpecifics.h"
@@ -111,7 +112,7 @@ class svfitAnalyzer: public Analyzer{
   TLorentzVector runFastMTTAlgo(const std::vector<classic_svFit::MeasuredTauLepton> & measuredTauLeptons,
 				const TVector2 &aMET, const TMatrixD &covMET);
 
-  std::tuple<double, double> getTauMomentum(const TLorentzVector & visP4, const double &cosGJ);
+  std::tuple<double, double> getTauMomentum(const TLorentzVector & visP4, double cosGJ);
 
   ///Parts of code specific to give decay channel.
   ///In particular category and object selection.
@@ -148,6 +149,11 @@ class svfitAnalyzer: public Analyzer{
   FastMTT fastMTTAlgo;
 
   TF1 *fLikelihood;
+
+  TRandom3 aRndm;
+  ///UGLY
+  TLorentzVector svFitLeg1P4, svFitLeg2P4;
+  /////////
 
 };
 
