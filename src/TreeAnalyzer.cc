@@ -229,7 +229,8 @@ int TreeAnalyzer::loop(){
  
   myProxiesThread_[0]->toBegin();
 
-  unsigned int eventCount[nThreads_] {0};
+  unsigned int eventCount[nThreads_];
+  for(unsigned int i=0;i<nThreads_;++i) eventCount[i] = 0;
 
 #pragma omp parallel for schedule(dynamic,500)
   for(int aEvent=0; aEvent<nEventsToAnalyze_; ++aEvent) {
