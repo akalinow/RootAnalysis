@@ -13,6 +13,8 @@
 
 #include "EventProxyHTT.h"
 #include "svfitAnalyzer.h"
+#include "MLAnalyzer.h"
+#include "MLObjectMessenger.h"
 
 #include "TFile.h"
 #include "TStopwatch.h"
@@ -43,6 +45,7 @@ int main(int argc, char ** argv) {
 	boost::property_tree::ptree pt;
 	boost::property_tree::ini_parser::read_ini(cfgFileName, pt);
 	std::string processName = pt.get<std::string>("TreeAnalyzer.processName","Test");
+	unsigned noOfThreads = pt.get("TreeAnalyzer.threads",1);
 
 	//Tell Root we want to be multi-threaded
 	ROOT::EnableThreadSafety();
@@ -62,8 +65,11 @@ int main(int argc, char ** argv) {
 	   return 1;
 	 }
 
-	 if(processName.find("Analysis")!=std::string::npos)
+	 if(processName.find("Analysis")!=std::string::npos) {
 	   myAnalyzers.push_back(new svfitAnalyzer("svfitAnalyzer",decayModeName));
+				if(noOfThreads==1) 
+					myAnalyzers.push_back(new MLAnalyzer("MLAnalyzer",decayModeName));
+   }
 	 else{
 	   std::cout<<"Incorrect process name: "<<processName<<std::endl;
 	   return 1;
