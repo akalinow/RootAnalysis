@@ -14,6 +14,7 @@
 
 #include "svfitAnalyzer.h"
 #include "svfitHistograms.h"
+#include "MLObjectMessenger.h"
 #include "MuTauSpecifics.h"
 #include "TauTauSpecifics.h"
 #include "MuMuSpecifics.h"
@@ -136,6 +137,8 @@ TLorentzVector svfitAnalyzer::computeMTT(const std::string & algoName){
   }
   else{//tau->hadrs.
     decay1 = aLeg1.getProperty(PropertyEnum::decayMode);
+		//std::cout<<aLeg1.getProperty(PropertyEnum::charge)<<std::endl;
+		//std::cout<<aLeg1.getProperty(PropertyEnum::PDGId)<<std::endl;
     mass1 = aLeg1.getP4().M();
     if(decay1==0)
       mass1 = 0.13957; //pi+/- mass
@@ -192,13 +195,14 @@ TLorentzVector svfitAnalyzer::computeMTT(const std::string & algoName){
   measuredTauLeptons.push_back(aLepton2);
   
   //MET
-  TVector2 aMET = aPair.getMET();
+	TVector2 aMET = aPair.getMET();
   TMatrixD covMET(2, 2);
   covMET[0][0] = aPair.getMETMatrix().at(0);
   covMET[0][1] = aPair.getMETMatrix().at(1);
   covMET[1][0] = aPair.getMETMatrix().at(2);
   covMET[1][1] = aPair.getMETMatrix().at(3); 
   if(covMET[0][0]==0 && covMET[1][0]==0 && covMET[0][1]==0 && covMET[1][1]==0) return TLorentzVector(); //singular covariance matrix
+	else std::cout<<"non zero covMET"<<std::endl;
 
   TLorentzVector aResult;
   if(algoName=="svfit") aResult = runSVFitAlgo(measuredTauLeptons, aMET, covMET);
@@ -392,7 +396,7 @@ void svfitAnalyzer::fillControlHistos(const std::string & hNameSuffix){
   delta = (svFitP4.E() - tautauGen.E())/tautauGen.E();
   myHistos_->fill1DHistogram("h1DDeltaEClassic"+hNameSuffix,delta);
   
-  //svFitP4 = computeMTT("fastMTT");  
+  svFitP4 = computeMTT("fastMTT");  
   myHistos_->fill1DHistogram("h1DMassSVFast"+hNameSuffix,svFitP4.M());
   myHistos_->fill1DHistogram("h1DCpuTimeFast"+hNameSuffix,fastMTTAlgo.getCpuTime("scan"));
   
@@ -671,7 +675,7 @@ bool svfitAnalyzer::passCategory(unsigned int iCategory){
 }
 //////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////
-bool svfitAnalyzer::analyze(const EventProxyBase& iEvent){
+bool svfitAnalyzer::analyze(const EventProxyBase& iEvent, ObjectMessenger *aMessenger){
 
   const EventProxyHTT & myEventProxy = static_cast<const EventProxyHTT&>(iEvent);
   sampleName = getSampleName(myEventProxy);
@@ -705,6 +709,32 @@ bool svfitAnalyzer::analyze(const EventProxyBase& iEvent){
   if(isGoodReco && goodGenTau){
     fillControlHistos(hNameSuffix);
   }
+	aVisSumM = (aLeg1.getP4() + aLeg2.getP4()).M();
+	aGenSumM = (aGenLeg1.getP4() + aGenLeg2.getP4()).M();
+	if(aMessenger and std::string("MLObjectMessenger").compare((aMessenger->name()).substr(0,17))==0 ) // if NULL it will do nothing
+	{
+		// Putting data to MLObjectMessenger
+		try
+		{
+			MLObjectMessenger* mess = (MLObjectMessenger*)aMessenger;
+			mess->putObjectVector(const_cast <const HTTParticle*>(&aLeg1), "legs");
+			mess->putObjectVector(const_cast <const HTTParticle*>(&aLeg2), "legs");
+			mess->putObject(const_cast <const HTTParticle*>(&aMET), "amet");
+			mess->putObject(&aPair.getMETMatrix().at(0), "covMET00");
+			mess->putObject(&aPair.getMETMatrix().at(1), "covMET01");
+			mess->putObject(&aPair.getMETMatrix().at(2), "covMET10");
+			mess->putObject(&aPair.getMETMatrix().at(3), "covMET11");
+			//float beta_score = aBJet1.getProperty(PropertyEnum::bCSVscore);
+			//mess->putObject(beta_score, "beta_score");
+			mess->putObject(&aVisSumM, "visible_mass");
+			mess->putObject(&aGenSumM, "gen_visible_mass");
+			//mess->putObject(&aPair.getMTMuon(), "higgs_mass_trans");
+		}
+		catch(const std::exception& e)
+		{
+			std::throw_with_nested(std::runtime_error("[ERROR] UNKNOWN ERROR IN "+std::string( __func__ )+ " WHEN PUTTING DATA TO MLObjectMessenger!"));
+		}                    
+	}
 
   return true;
 }

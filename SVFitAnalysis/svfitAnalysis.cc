@@ -31,11 +31,11 @@ int main(int argc, char ** argv) {
 
 	std::string cfgFileName = "cfg.ini";
 
-	  if(argc<2){
-	    std::cout<<"Usage: readEvents cfg.init"<<std::endl;
-	    return 1;
-	  }
-	  else cfgFileName = argv[1];
+	if(argc<2){
+	  std::cout<<"Usage: readEvents cfg.init"<<std::endl;
+	  return 1;
+	}
+	else cfgFileName = argv[1];
 
 
 	std::cout<<"Start"<<std::endl;
@@ -53,48 +53,53 @@ int main(int argc, char ** argv) {
 	TObject::SetObjectStat(false);
 
 	//----------------------------------------------------------
-	 std::vector<Analyzer*> myAnalyzers;
-	 EventProxyHTT *myEvent = new EventProxyHTT();
+	std::vector<Analyzer*> myAnalyzers;
+	EventProxyHTT *myEvent = new EventProxyHTT();
 
-	 std::string decayModeName;
-	 if(processName=="AnalysisMuTau") decayModeName = "MuTau";
-	 else if(processName=="AnalysisTauTau") decayModeName = "TauTau";
-	 else if(processName=="AnalysisMuMu") decayModeName = "MuMu";
-	 else{
-	   std::cout<<"Incorrect process name: "<<processName<<std::endl;
-	   return 1;
-	 }
+	std::string decayModeName;
+	if(processName=="AnalysisMuTau") decayModeName = "MuTau";
+	else if(processName=="AnalysisTauTau") decayModeName = "TauTau";
+	else if(processName=="AnalysisMuMu") decayModeName = "MuMu";
+	else{
+	  std::cout<<"Incorrect process name: "<<processName<<std::endl;
+	  return 1;
+	}
 
-	 if(processName.find("Analysis")!=std::string::npos) {
-	   myAnalyzers.push_back(new svfitAnalyzer("svfitAnalyzer",decayModeName));
-				if(noOfThreads==1) 
-					myAnalyzers.push_back(new MLAnalyzer("MLAnalyzer",decayModeName));
-   }
-	 else{
-	   std::cout<<"Incorrect process name: "<<processName<<std::endl;
-	   return 1;
-	 }
+	if(processName.find("Analysis")!=std::string::npos) {
+	  myAnalyzers.push_back(new svfitAnalyzer("svfitAnalyzer",decayModeName));
+	 		if(noOfThreads==1) 
+	 			myAnalyzers.push_back(new MLAnalyzer("MLAnalyzer",decayModeName));
+  }
+	else{
+	  std::cout<<"Incorrect process name: "<<processName<<std::endl;
+	  return 1;
+	}
 
-	 TreeAnalyzer *tree = new TreeAnalyzer("TreeAnalyzer",cfgFileName, myEvent);
-	 tree->init(myAnalyzers);
-	 int nEventsAnalysed = tree->loop();
-	 tree->finalize();
+	TreeAnalyzer *tree = new TreeAnalyzer("TreeAnalyzer",cfgFileName, myEvent);
 
-	 timer.Stop();
-	 Double_t rtime = timer.RealTime();
-	 Double_t ctime = timer.CpuTime();
-	 printf("Analysed events: %d \n",nEventsAnalysed);
-	 printf("RealTime=%f seconds, CpuTime=%f seconds\n",rtime,ctime);
-	 printf("%4.2f events / RealTime second .\n", nEventsAnalysed/rtime);
-	 printf("%4.2f events / CpuTime second .\n", nEventsAnalysed/ctime);
+	ObjectMessenger* OMess = nullptr;
+	if(noOfThreads==1)
+		OMess = new MLObjectMessenger("MLObjectMessenger created in HTTAnalysis.cc");
+	tree->setObjectMessenger(OMess);
+	tree->init(myAnalyzers);
+	int nEventsAnalysed = tree->loop();
+	tree->finalize();
 
-	 tree->scaleHistograms();
-	 for(unsigned int i=0;i<myAnalyzers.size();++i) delete myAnalyzers[i];
-	 delete tree;
-	 delete myEvent;
+	timer.Stop();
+	Double_t rtime = timer.RealTime();
+	Double_t ctime = timer.CpuTime();
+	printf("Analysed events: %d \n",nEventsAnalysed);
+	printf("RealTime=%f seconds, CpuTime=%f seconds\n",rtime,ctime);
+	printf("%4.2f events / RealTime second .\n", nEventsAnalysed/rtime);
+	printf("%4.2f events / CpuTime second .\n", nEventsAnalysed/ctime);
 
-	 std::cout<<"Done"<<std::endl;
-	 return 0;
+	tree->scaleHistograms();
+	for(unsigned int i=0;i<myAnalyzers.size();++i) delete myAnalyzers[i];
+	delete tree;
+	delete myEvent;
+
+	std::cout<<"Done"<<std::endl;
+	return 0;
 }
 /////////////////////////////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////////////////////////////

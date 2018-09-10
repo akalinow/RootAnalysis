@@ -51,9 +51,9 @@ class svfitAnalyzer: public Analyzer{
   virtual void initialize(TDirectory* aDir,
 			  pat::strbitset *aSelections);
 
-  virtual bool analyze(const EventProxyBase& iEvent);
+  virtual bool analyze(const EventProxyBase& iEvent, ObjectMessenger *aMessenger);
 
-  virtual bool analyze(const EventProxyBase& iEvent, ObjectMessenger *aMessenger){return analyze(iEvent); }
+  virtual bool analyze(const EventProxyBase& iEvent){return analyze(iEvent, nullptr); }
 
   virtual void finalize();
 
@@ -137,7 +137,10 @@ class svfitAnalyzer: public Analyzer{
 
   HTTParticle aLeg2, aLeg1, aMET;
   HTTParticle aGenLeg1, aGenLeg2;
+  float aVisSumM;
+  float aGenSumM;
   HTTParticle aJet1, aJet2, aBJet1;
+	TMatrixD _covMET;
   std::vector<HTTParticle> aSeparatedJets;
   int nJets30;
   int nJetsInGap30;
