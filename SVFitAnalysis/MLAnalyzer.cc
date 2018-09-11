@@ -439,11 +439,11 @@ void MLAnalyzer::globalsHTT(const MLObjectMessenger* mess, const std::vector<con
 	}
 	catch(const std::logic_error& e)
 	{
-		throw;//std::throw_with_nested(std::runtime_error("[ERROR] CANNOT FILL FIELDS IN MLAnalyzer::globalsHTT!"));
+		std::throw_with_nested(std::runtime_error("[ERROR] CANNOT FILL FIELDS IN MLAnalyzer::globalsHTT!"));
 	}
 	catch(const std::exception& e)
 	{
-	     throw;//std::throw_with_nested(std::runtime_error("[ERROR] UNKNOWN ERROR IN MLAnalyzer::globalsHTT!"));
+	     std::throw_with_nested(std::runtime_error("[ERROR] UNKNOWN ERROR IN MLAnalyzer::globalsHTT!"));
 	} 
 }
 
@@ -509,8 +509,7 @@ void MLAnalyzer::performAnalysis(const EventProxyBase& iEvent, ObjectMessenger *
 	}
 	catch(const std::exception& e)
 	{
-		//std::throw_with_nested(std::runtime_error("[ERROR] UNKNOWN ERROR IN MLAnalyzer::performAnalysis!"));
-		throw;
+		std::throw_with_nested(std::runtime_error("[ERROR] UNKNOWN ERROR IN MLAnalyzer::performAnalysis!"));
 	}
 }
 
