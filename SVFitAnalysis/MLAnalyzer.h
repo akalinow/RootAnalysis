@@ -88,7 +88,6 @@ class MLAnalyzer : public Analyzer
   std::map<std::string, std::set<unsigned>> params_jets_; /*!< which jets have which params */
 
   //! global parameters of the analylis
-  int nJets30_; /*!< How many interesting jets were present in an event */
   float visMass_; 
 	float genVisMass_;
   float higgsPT_;

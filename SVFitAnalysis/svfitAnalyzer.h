@@ -26,8 +26,6 @@
 #include "TauAnalysis/ClassicSVfit/interface/ClassicSVfit.h"
 #include "TauAnalysis/ClassicSVfit/interface/FastMTT.h"
 
-class svfitHistograms;
-
 class TH1F;
 class TH2F;
 class TH3F;
@@ -85,10 +83,6 @@ class svfitAnalyzer: public Analyzer{
   //Return name sample name suffix for different particles matched to reconstructed tau
   std::string getMatchingName(const EventProxyHTT & myEventProxy);
 
-  ///Fill histograms for all control plots.
-  ///Histogram names will end with hNameSuffix
-  void fillControlHistos(const std::string & hNameSuffix);
-
   ///Get jets separated by deltaR from tau an muon.
   std::vector<HTTParticle> getSeparatedJets(const EventProxyHTT & myEventProxy,
     float deltaR);
@@ -101,8 +95,6 @@ class svfitAnalyzer: public Analyzer{
   std::vector<std::string> selectionFlavours_;
 
  private:
-
-  void setHistos(svfitHistograms *histos) { myHistos_ = histos;};
 
   TLorentzVector computeMTT(const std::string & algoName);
   
@@ -118,12 +110,6 @@ class svfitAnalyzer: public Analyzer{
   ///In particular category and object selection.
   ChannelSpecifics *myChannelSpecifics;
 
-  ///Histograms storage.
-  svfitHistograms *myHistos_;
-
-  ///ROOT file containing current TTree
-  TFile *ntupleFile_;
-
   //should this HTTAnalyzer be able to filter events
   bool filterEvent_;
 
@@ -137,8 +123,8 @@ class svfitAnalyzer: public Analyzer{
 
   HTTParticle aLeg2, aLeg1, aMET;
   HTTParticle aGenLeg1, aGenLeg2;
-  float aVisSumM;
   float aGenSumM;
+  float higgs_mass_trans;
   HTTParticle aJet1, aJet2, aBJet1;
 	TMatrixD _covMET;
   std::vector<HTTParticle> aSeparatedJets;

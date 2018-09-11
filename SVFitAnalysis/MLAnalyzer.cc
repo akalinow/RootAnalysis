@@ -192,15 +192,13 @@ void MLAnalyzer::addBranch(TTree *tree)
 			MLTree_ = tree;
 			std::cout<<"[ML]\tAdding global parameter branches for ML analysis."<<std::endl;
 			tree->Branch("visMass", &visMass_);
-			tree->Branch("gen_visible_mass", &genVisMass_);
+			tree->Branch("genMass", &genVisMass_);
 			tree->Branch("higgsMassTrans", &higgsMassTrans_);
 			tree->Branch("higgsPT", &higgsPT_);
 			tree->Branch("covMET00", &covMET_[0][0]);
 			tree->Branch("covMET01", &covMET_[0][1]);
 			tree->Branch("covMET10", &covMET_[1][0]);
 			tree->Branch("covMET11", &covMET_[1][1]);
-			//tree->Branch("BJetBetaScore", &betaScore_);
-			//tree->Branch("nJets30", &nJets30_);
 		}
 		else
 			std::cerr<<"[ML][WARNING] No tree to write to!"<<std::endl;
@@ -411,11 +409,16 @@ void MLAnalyzer::globalsHTT(const MLObjectMessenger* mess, const std::vector<con
 		void* p = NULL;
 		const HTTParticle* aMET = mess->getObject(static_cast<HTTParticle*>(p), std::string("amet"));
 		//const float* bs = nullptr;//mess->getObject(static_cast<float*>(p), "beta_score");
-		//const float* higgs_mass = mess->getObject(static_cast<float*>(p), "higgs_mass_trans");
+		const float* higgs_mass_trans = mess->getObject(static_cast<float*>(p), "higgs_mass_trans");
 		covMET_[0][0] = *mess->getObject(static_cast<float*>(p), "covMET00");
 		covMET_[0][1] = *mess->getObject(static_cast<float*>(p), "covMET01");
 		covMET_[1][0] = *mess->getObject(static_cast<float*>(p), "covMET10");
 		covMET_[1][1] = *mess->getObject(static_cast<float*>(p), "covMET11"); 
+		
+		//TODO: remove when covMET contains real values
+		covMET_[0][0] = 1.;
+		covMET_[1][1] = 1.;
+
 		//const int* nJets = nullptr;//mess ->getObject(static_cast<int*>(p), "nJets30");
 
 		const HTTParticle* leg1 = legs->at(0);
@@ -425,11 +428,10 @@ void MLAnalyzer::globalsHTT(const MLObjectMessenger* mess, const std::vector<con
 		//	throw std::logic_error("[ERROR] NULL POINTERS PRESENT!");
 		// Calculation and assignement of global parameters
 		const TLorentzVector & aVisSum = leg1->getP4() + leg2->getP4();
-	  genVisMass_ = *mess->getObject(static_cast<float*>(p),"gen_visible_mass");
-	  higgsPT_ =  (aVisSum + aMET->getP4()).Pt();
-	  //betaScore_ = *bs;
-	  higgsMassTrans_ = 0;//*higgs_mass;
-	  //nJets30_ = *nJets;
+		genVisMass_ = *mess->getObject(static_cast<float*>(p),"gen_visible_mass");
+		visMass_ = aVisSum.M();
+		higgsPT_ =  (aVisSum + aMET->getP4()).Pt();
+		higgsMassTrans_ = *higgs_mass_trans;
 	}
 	catch(const std::out_of_range& e)
 	{
