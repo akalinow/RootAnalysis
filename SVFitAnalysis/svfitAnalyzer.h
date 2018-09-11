@@ -105,7 +105,7 @@ class svfitAnalyzer: public Analyzer{
   bool filterEvent_;
 
 	//decayMode
-	std::string decayMode;
+	const std::string decayMode;
   ///Map from file name to sample name.
   std::map<std::string, std::string> fileName2sampleName;
 
@@ -122,7 +122,7 @@ class svfitAnalyzer: public Analyzer{
   HTTParticle aGenLeg1, aGenLeg2;
   float aGenSumM;
   float higgs_mass_trans;
-  HTTParticle aJet1, aJet2, aBJet1;
+  HTTParticle aJet1, aJet2;
   std::vector<HTTParticle> aSeparatedJets;
   int nJets30;
   int nJetsInGap30;

@@ -1,31 +1,22 @@
-#include <sstream>
 #include <bitset>
 
-#include "RooAbsReal.h"
-#include "RooRealVar.h"
-#include "RooFormulaVar.h"
-#include "TF1.h"
 #include "Math/LorentzVector.h"
-#include "Math/WrappedTF1.h"
-#include "Math/RootFinder.h"
-#include "Math/Boost.h"
-#include "Math/Rotation3D.h"
-#include "Math/AxisAngle.h"
 
 #include "svfitAnalyzer.h"
 #include "MLObjectMessenger.h"
 #include "MuTauSpecifics.h"
 #include "TauTauSpecifics.h"
 #include "MuMuSpecifics.h"
-#include "Tools.h"
 
 //////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////
-svfitAnalyzer::svfitAnalyzer(const std::string & aName, const std::string & aDecayMode) : Analyzer(aName), aCovMET(2,2){
+svfitAnalyzer::svfitAnalyzer(
+	const std::string & aName,
+	const std::string & aDecayMode)
+ : Analyzer(aName), decayMode(aDecayMode), aCovMET(2,2){
 
 #pragma omp critical
   {
-		decayMode = aDecayMode;
     if(aDecayMode=="MuTau") myChannelSpecifics = new MuTauSpecifics(this);
     else if (aDecayMode=="TauTau") myChannelSpecifics = new TauTauSpecifics(this);
     else if (aDecayMode=="MuMu") myChannelSpecifics = new MuMuSpecifics(this);
@@ -49,8 +40,7 @@ svfitAnalyzer::~svfitAnalyzer(){
 //////////////////////////////////////////////////////////////////////////////
 Analyzer* svfitAnalyzer::clone() const {
 
-  std::string myDecayMode = decayMode;
-  svfitAnalyzer* clone = new svfitAnalyzer(name(),myDecayMode);
+  svfitAnalyzer* clone = new svfitAnalyzer(name(),decayMode);
   return clone;
 
 };
@@ -91,14 +81,6 @@ void svfitAnalyzer::setAnalysisObjects(const EventProxyHTT & myEventProxy){
   aSeparatedJets = getSeparatedJets(myEventProxy, 0.5);
   aJet1 = aSeparatedJets.size() ? aSeparatedJets[0] : HTTParticle();
   aJet2 = aSeparatedJets.size()>1 ? aSeparatedJets[1] : HTTParticle();
-  aBJet1 = HTTParticle();
-  for(auto itJet: aSeparatedJets) {
-    if(std::abs(itJet.getP4().Eta())<2.4 &&
-       itJet.getProperty(PropertyEnum::bCSVscore)>0.8484){
-      aBJet1 = itJet;
-      break;
-    }
-  }
 }
 //////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////
