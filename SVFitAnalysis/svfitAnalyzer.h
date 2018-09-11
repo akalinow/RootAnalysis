@@ -87,13 +87,6 @@ class svfitAnalyzer: public Analyzer{
   std::vector<HTTParticle> getSeparatedJets(const EventProxyHTT & myEventProxy,
     float deltaR);
 
- protected:
-
-  pat::strbitset *mySelections_;
-
-  ///Types of the selection flow
-  std::vector<std::string> selectionFlavours_;
-
  private:
 
   TLorentzVector computeMTT(const std::string & algoName);
