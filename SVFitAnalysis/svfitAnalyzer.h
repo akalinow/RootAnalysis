@@ -91,11 +91,9 @@ class svfitAnalyzer: public Analyzer{
 
   TLorentzVector computeMTT(const std::string & algoName);
   
-  TLorentzVector runSVFitAlgo(const std::vector<classic_svFit::MeasuredTauLepton> & measuredTauLeptons,
-                              const TVector2 &aMET, const TMatrixD &covMET);
+  TLorentzVector runSVFitAlgo(const std::vector<classic_svFit::MeasuredTauLepton> & measuredTauLeptons);
 
-  TLorentzVector runFastMTTAlgo(const std::vector<classic_svFit::MeasuredTauLepton> & measuredTauLeptons,
-				const TVector2 &aMET, const TMatrixD &covMET);
+  TLorentzVector runFastMTTAlgo(const std::vector<classic_svFit::MeasuredTauLepton> & measuredTauLeptons);
 
   std::tuple<double, double> getTauMomentum(const TLorentzVector & visP4, double cosGJ);
 
@@ -106,6 +104,8 @@ class svfitAnalyzer: public Analyzer{
   //should this HTTAnalyzer be able to filter events
   bool filterEvent_;
 
+	//decayMode
+	std::string decayMode;
   ///Map from file name to sample name.
   std::map<std::string, std::string> fileName2sampleName;
 
@@ -114,12 +114,15 @@ class svfitAnalyzer: public Analyzer{
   HTTPair aPair;
   std::string sampleName;
 
-  HTTParticle aLeg2, aLeg1, aMET;
+  HTTParticle aLeg2, aLeg1;
+
+	HTTParticle aMET;
+	TMatrixD aCovMET;
+
   HTTParticle aGenLeg1, aGenLeg2;
   float aGenSumM;
   float higgs_mass_trans;
   HTTParticle aJet1, aJet2, aBJet1;
-	TMatrixD _covMET;
   std::vector<HTTParticle> aSeparatedJets;
   int nJets30;
   int nJetsInGap30;

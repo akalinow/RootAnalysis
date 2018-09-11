@@ -410,10 +410,10 @@ void MLAnalyzer::globalsHTT(const MLObjectMessenger* mess, const std::vector<con
 		const HTTParticle* aMET = mess->getObject(static_cast<HTTParticle*>(p), std::string("amet"));
 		//const float* bs = nullptr;//mess->getObject(static_cast<float*>(p), "beta_score");
 		const float* higgs_mass_trans = mess->getObject(static_cast<float*>(p), "higgs_mass_trans");
-		covMET_[0][0] = *mess->getObject(static_cast<float*>(p), "covMET00");
-		covMET_[0][1] = *mess->getObject(static_cast<float*>(p), "covMET01");
-		covMET_[1][0] = *mess->getObject(static_cast<float*>(p), "covMET10");
-		covMET_[1][1] = *mess->getObject(static_cast<float*>(p), "covMET11"); 
+		covMET_[0][0] = *mess->getObject(static_cast<double*>(p), "covMET00");
+		covMET_[0][1] = *mess->getObject(static_cast<double*>(p), "covMET01");
+		covMET_[1][0] = *mess->getObject(static_cast<double*>(p), "covMET10");
+		covMET_[1][1] = *mess->getObject(static_cast<double*>(p), "covMET11"); 
 		
 		//TODO: remove when covMET contains real values
 		covMET_[0][0] = 1.;
@@ -439,7 +439,7 @@ void MLAnalyzer::globalsHTT(const MLObjectMessenger* mess, const std::vector<con
 	}
 	catch(const std::logic_error& e)
 	{
-		std::throw_with_nested(std::runtime_error("[ERROR] CANNOT FILL FIELDS IN MLAnalyzer::globalsHTT!"));
+		throw;//std::throw_with_nested(std::runtime_error("[ERROR] CANNOT FILL FIELDS IN MLAnalyzer::globalsHTT!"));
 	}
 	catch(const std::exception& e)
 	{

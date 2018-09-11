@@ -21,10 +21,11 @@
 
 //////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////
-svfitAnalyzer::svfitAnalyzer(const std::string & aName, const std::string & aDecayMode) : Analyzer(aName){
+svfitAnalyzer::svfitAnalyzer(const std::string & aName, const std::string & aDecayMode) : Analyzer(aName), aCovMET(2,2){
 
 #pragma omp critical
   {
+		decayMode = aDecayMode;
     if(aDecayMode=="MuTau") myChannelSpecifics = new MuTauSpecifics(this);
     else if (aDecayMode=="TauTau") myChannelSpecifics = new TauTauSpecifics(this);
     else if (aDecayMode=="MuMu") myChannelSpecifics = new MuMuSpecifics(this);
@@ -48,7 +49,7 @@ svfitAnalyzer::~svfitAnalyzer(){
 //////////////////////////////////////////////////////////////////////////////
 Analyzer* svfitAnalyzer::clone() const {
 
-  std::string myDecayMode = myChannelSpecifics->getDecayModeName();
+  std::string myDecayMode = decayMode;
   svfitAnalyzer* clone = new svfitAnalyzer(name(),myDecayMode);
   return clone;
 
@@ -74,9 +75,17 @@ void svfitAnalyzer::setAnalysisObjects(const EventProxyHTT & myEventProxy){
 		       aPair.getMET().Y(),
 		       0,
 		       aPair.getMET().Mod());
+	aMET.setP4(met4v);
+  //TLorentzVector nunuGen = aGenLeg1.getP4() + aGenLeg2.getP4() -
+  //  aGenLeg1.getChargedP4() - aGenLeg2.getChargedP4() -
+  //  aGenLeg1.getNeutralP4() - aGenLeg2.getNeutralP4();
+	//aMET.setP4(nunuGen);
+	
+  aCovMET[0][0] = aPair.getMETMatrix().at(0);
+  aCovMET[0][1] = aPair.getMETMatrix().at(1);
+  aCovMET[1][0] = aPair.getMETMatrix().at(2);
+  aCovMET[1][1] = aPair.getMETMatrix().at(3);
 
-  aMET = HTTParticle();
-  aMET.setP4(met4v);
   myChannelSpecifics->setAnalysisObjects(myEventProxy);
 
   aSeparatedJets = getSeparatedJets(myEventProxy, 0.5);
@@ -186,27 +195,19 @@ TLorentzVector svfitAnalyzer::computeMTT(const std::string & algoName){
   measuredTauLeptons.push_back(aLepton2);
   
   //MET
-	TVector2 aMET = aPair.getMET();
-  TMatrixD covMET(2, 2);
-  covMET[0][0] = aPair.getMETMatrix().at(0);
-  covMET[0][1] = aPair.getMETMatrix().at(1);
-  covMET[1][0] = aPair.getMETMatrix().at(2);
-  covMET[1][1] = aPair.getMETMatrix().at(3); 
-  if(covMET[0][0]==0 && covMET[1][0]==0 && covMET[0][1]==0 && covMET[1][1]==0) return TLorentzVector(); //singular covariance matrix
-	else std::cout<<"non zero covMET"<<std::endl;
+  if(aCovMET[0][0]==0 && aCovMET[1][0]==0 && aCovMET[0][1]==0 && aCovMET[1][1]==0) return TLorentzVector(); //singular covariance matrix
 
   TLorentzVector aResult;
-  if(algoName=="svfit") aResult = runSVFitAlgo(measuredTauLeptons, aMET, covMET);
-  if(algoName=="fastMTT") aResult = runFastMTTAlgo(measuredTauLeptons, aMET, covMET);
+  if(algoName=="svfit") aResult = runSVFitAlgo(measuredTauLeptons);
+  if(algoName=="fastMTT") aResult = runFastMTTAlgo(measuredTauLeptons);
   
   return aResult;
 }
 /////////////////////////////////////////////////
 /////////////////////////////////////////////////
-TLorentzVector svfitAnalyzer::runFastMTTAlgo(const std::vector<classic_svFit::MeasuredTauLepton> & measuredTauLeptons,
-                                           const TVector2 &aMET, const TMatrixD &covMET){
+TLorentzVector svfitAnalyzer::runFastMTTAlgo(const std::vector<classic_svFit::MeasuredTauLepton> & measuredTauLeptons){
 
-  fastMTTAlgo.run(measuredTauLeptons, aMET.X(), aMET.Y(), covMET);
+  fastMTTAlgo.run(measuredTauLeptons, aMET.getP4().X(), aMET.getP4().Y(), aCovMET);
   ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<double> > aP4 = fastMTTAlgo.getBestP4();
   
   TLorentzVector p4SVFit(aP4.X(), aP4.Y(), aP4.Z(), aP4.E());
@@ -221,15 +222,14 @@ TLorentzVector svfitAnalyzer::runFastMTTAlgo(const std::vector<classic_svFit::Me
 }
 /////////////////////////////////////////////////
 /////////////////////////////////////////////////
-TLorentzVector svfitAnalyzer::runSVFitAlgo(const std::vector<classic_svFit::MeasuredTauLepton> & measuredTauLeptons,
-                                           const TVector2 &aMET, const TMatrixD &covMET){
+TLorentzVector svfitAnalyzer::runSVFitAlgo(const std::vector<classic_svFit::MeasuredTauLepton> & measuredTauLeptons){
 
   svFitAlgo.setVerbosity(0);
 
   svFitAlgo.addLogM_fixed(true, 4.0);
-  if(myChannelSpecifics->getDecayModeName()=="MuTau") svFitAlgo.addLogM_fixed(true, 4.0);
-  else if(myChannelSpecifics->getDecayModeName()=="TauTau") svFitAlgo.addLogM_fixed(true, 5.0);
-  else if(myChannelSpecifics->getDecayModeName()=="MuMu") svFitAlgo.addLogM_fixed(true, 3.0);
+  if     (decayMode=="MuTau" ) svFitAlgo.addLogM_fixed(true, 4.0);
+  else if(decayMode=="TauTau") svFitAlgo.addLogM_fixed(true, 5.0);
+  else if(decayMode=="MuMu"  ) svFitAlgo.addLogM_fixed(true, 3.0);
   
   svFitAlgo.setMaxObjFunctionCalls(100000);
   //svFitAlgo.setLikelihoodFileName("testClassicSVfit.root");
@@ -241,7 +241,7 @@ TLorentzVector svfitAnalyzer::runSVFitAlgo(const std::vector<classic_svFit::Meas
   TVector3 svLeg1 = aGenLeg1.getSV();
   svLeg1 -=recPV;
 
-  svFitAlgo.integrate(measuredTauLeptons, aMET.X(), aMET.Y(), covMET);
+  svFitAlgo.integrate(measuredTauLeptons, aMET.getP4().X(), aMET.getP4().Y(), aCovMET);
   classic_svFit::DiTauSystemHistogramAdapter* diTauAdapter = static_cast<classic_svFit::DiTauSystemHistogramAdapter*>(svFitAlgo.getHistogramAdapter());
   float mcMass = diTauAdapter->getMass();
 
@@ -295,10 +295,6 @@ bool svfitAnalyzer::analyze(const EventProxyBase& iEvent, ObjectMessenger *aMess
   }
 
 	aGenSumM = (aGenLeg1.getP4() + aGenLeg2.getP4()).M();
-  TLorentzVector nunuGen = aGenLeg1.getP4() + aGenLeg2.getP4() -
-    aGenLeg1.getChargedP4() - aGenLeg2.getChargedP4() -
-    aGenLeg1.getNeutralP4() - aGenLeg2.getNeutralP4();
-	aMET.setP4(nunuGen);
 	higgs_mass_trans = aPair.getMTMuon();
 
 	if(aMessenger and std::string("MLObjectMessenger").compare((aMessenger->name()).substr(0,17))==0 ) // if NULL it will do nothing
@@ -310,12 +306,10 @@ bool svfitAnalyzer::analyze(const EventProxyBase& iEvent, ObjectMessenger *aMess
 			mess->putObjectVector(const_cast <const HTTParticle*>(&aLeg1), "legs");
 			mess->putObjectVector(const_cast <const HTTParticle*>(&aLeg2), "legs");
 			mess->putObject(const_cast <const HTTParticle*>(&aMET), "amet");
-			mess->putObject(&aPair.getMETMatrix().at(0), "covMET00");
-			mess->putObject(&aPair.getMETMatrix().at(1), "covMET01");
-			mess->putObject(&aPair.getMETMatrix().at(2), "covMET10");
-			mess->putObject(&aPair.getMETMatrix().at(3), "covMET11");
-			//float beta_score = aBJet1.getProperty(PropertyEnum::bCSVscore);
-			//mess->putObject(beta_score, "beta_score");
+			mess->putObject(&aCovMET[0][0], "covMET00");
+			mess->putObject(&aCovMET[0][1], "covMET01");
+			mess->putObject(&aCovMET[1][0], "covMET10");
+			mess->putObject(&aCovMET[1][1], "covMET11");
 			mess->putObject(&aGenSumM, "gen_visible_mass");
 			mess->putObject(higgs_mass_trans, "higgs_mass_trans");
 		}
