@@ -223,7 +223,7 @@ float ChannelSpecifics::getLeptonCorrection(float eta, float pt, float iso,
                                             HTTAnalysis::hadronicTauDecayModes tauDecayMode,
                                             bool useTauTrigger, int mc_match, bool useXTrigger){
 
-        if(myAnalyzer->sampleName.find("Data")!=std::string::npos) return 1.0;
+        if(myAnalyzer->sampleName_.find("Data")!=std::string::npos) return 1.0;
 
         if(!h2DMuonIdCorrections) initializeLeptonCorrections();
 
@@ -288,7 +288,7 @@ float ChannelSpecifics::getDYReweight(const std::string & categoryName, const HT
         if(categoryName.find("0jet")!=std::string::npos) { weight = 1.02;}
         else if(categoryName.find("boosted")!=std::string::npos) {
 
-                float higgsPt =  (myAnalyzer->aLeg1.getP4(aSystEffect) + myAnalyzer->aLeg2.getP4(aSystEffect) + myAnalyzer->aMET.getP4(aSystEffect)).Pt();
+                float higgsPt =  (myAnalyzer->leg1_.getP4(aSystEffect) + myAnalyzer->leg2_.getP4(aSystEffect) + myAnalyzer->MET_.getP4(aSystEffect)).Pt();
 
                 if(higgsPt<100) weight = 1.02;
                 else if (higgsPt>100 && higgsPt<200) weight = 1.0;
@@ -297,7 +297,7 @@ float ChannelSpecifics::getDYReweight(const std::string & categoryName, const HT
         }
         else if(categoryName.find("vbf")!=std::string::npos) {
 
-                float jetsMass = (myAnalyzer->aJet1.getP4(aSystEffect)+myAnalyzer->aJet2.getP4(aSystEffect)).M();
+                float jetsMass = (myAnalyzer->jet1_.getP4(aSystEffect)+myAnalyzer->jet2_.getP4(aSystEffect)).M();
 
                 if(jetsMass<700) weight = 1.15;
                 else if (jetsMass>700 && jetsMass<1100) weight = 1.0;

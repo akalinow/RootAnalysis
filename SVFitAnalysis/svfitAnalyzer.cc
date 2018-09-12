@@ -1,8 +1,7 @@
-#include <bitset>
+#include "svfitAnalyzer.h"
 
 #include "Math/LorentzVector.h"
 
-#include "svfitAnalyzer.h"
 #include "MLObjectMessenger.h"
 #include "MuTauSpecifics.h"
 #include "TauTauSpecifics.h"
@@ -13,34 +12,34 @@
 svfitAnalyzer::svfitAnalyzer(
 	const std::string & aName,
 	const std::string & aDecayMode)
- : Analyzer(aName), decayMode(aDecayMode), aCovMET(2,2){
+ : Analyzer(aName), decayMode_(aDecayMode), covMET_(2,2){
 
 #pragma omp critical
   {
-    if(aDecayMode=="MuTau") myChannelSpecifics = new MuTauSpecifics(this);
-    else if (aDecayMode=="TauTau") myChannelSpecifics = new TauTauSpecifics(this);
-    else if (aDecayMode=="MuMu") myChannelSpecifics = new MuMuSpecifics(this);
-    myNumberOfCategories = myChannelSpecifics->getCategoryRejester().size();
-    categoryDecisions.resize(myNumberOfCategories);
+    if(aDecayMode=="MuTau") channelSpecifics_ = new MuTauSpecifics(this);
+    else if (aDecayMode=="TauTau") channelSpecifics_ = new TauTauSpecifics(this);
+    else if (aDecayMode=="MuMu") channelSpecifics_ = new MuMuSpecifics(this);
+    numberOfCategories_ = channelSpecifics_->getCategoryRejester().size();
+    categoryDecisions_.resize(numberOfCategories_);
 
 
-    svFitAlgo.addLogM_fixed(true, 4.0);
-    svFitAlgo.setLikelihoodFileName("");
-    svFitAlgo.setMaxObjFunctionCalls(100000);
-    svFitAlgo.setVerbosity(1);
+    svFitAlgo_.addLogM_fixed(true, 4.0);
+    svFitAlgo_.setLikelihoodFileName("");
+    svFitAlgo_.setMaxObjFunctionCalls(100000);
+    svFitAlgo_.setVerbosity(1);
   }
 }
 //////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////
 svfitAnalyzer::~svfitAnalyzer(){
 
-  if(myChannelSpecifics) delete myChannelSpecifics;
+  if(channelSpecifics_) delete channelSpecifics_;
 }
 //////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////
 Analyzer* svfitAnalyzer::clone() const {
 
-  svfitAnalyzer* clone = new svfitAnalyzer(name(),decayMode);
+  svfitAnalyzer* clone = new svfitAnalyzer(name(),decayMode_);
   return clone;
 
 };
@@ -48,29 +47,29 @@ Analyzer* svfitAnalyzer::clone() const {
 //////////////////////////////////////////////////////////////////////////////
 void svfitAnalyzer::setAnalysisObjects(const EventProxyHTT & myEventProxy){
 
-  aEvent = *myEventProxy.event;
-  aPair = (*myEventProxy.pairs)[0];
+  event_ = *myEventProxy.event;
+  pair_ = (*myEventProxy.pairs)[0];
 
-  TLorentzVector met4v(aPair.getMET().X(),
-		       aPair.getMET().Y(),
+  TLorentzVector met4v(pair_.getMET().X(),
+		       pair_.getMET().Y(),
 		       0,
-		       aPair.getMET().Mod());
-	aMET.setP4(met4v);
-  //TLorentzVector nunuGen = aGenLeg1.getP4() + aGenLeg2.getP4() -
-  //  aGenLeg1.getChargedP4() - aGenLeg2.getChargedP4() -
-  //  aGenLeg1.getNeutralP4() - aGenLeg2.getNeutralP4();
-	//aMET.setP4(nunuGen);
+		       pair_.getMET().Mod());
+	MET_.setP4(met4v);
+  //TLorentzVector nunuGen = genLeg1_.getP4() + genLeg2_.getP4() -
+  //  genLeg1_.getChargedP4() - genLeg2_.getChargedP4() -
+  //  genLeg1_.getNeutralP4() - genLeg2_.getNeutralP4();
+	//MET_.setP4(nunuGen);
 	
-  aCovMET[0][0] = aPair.getMETMatrix().at(0);
-  aCovMET[0][1] = aPair.getMETMatrix().at(1);
-  aCovMET[1][0] = aPair.getMETMatrix().at(2);
-  aCovMET[1][1] = aPair.getMETMatrix().at(3);
+  covMET_[0][0] = pair_.getMETMatrix().at(0);
+  covMET_[0][1] = pair_.getMETMatrix().at(1);
+  covMET_[1][0] = pair_.getMETMatrix().at(2);
+  covMET_[1][1] = pair_.getMETMatrix().at(3);
 
-  myChannelSpecifics->setAnalysisObjects(myEventProxy);
+  channelSpecifics_->setAnalysisObjects(myEventProxy);
 
-  aSeparatedJets = getSeparatedJets(myEventProxy, 0.5);
-  aJet1 = aSeparatedJets.size() ? aSeparatedJets[0] : HTTParticle();
-  aJet2 = aSeparatedJets.size()>1 ? aSeparatedJets[1] : HTTParticle();
+  separatedJets_ = getSeparatedJets(myEventProxy, 0.5);
+  jet1_ = separatedJets_.size() ? separatedJets_[0] : HTTParticle();
+  jet2_ = separatedJets_.size()>1 ? separatedJets_[1] : HTTParticle();
 }
 //////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////
@@ -80,8 +79,8 @@ std::vector<HTTParticle> svfitAnalyzer::getSeparatedJets(const EventProxyHTT & m
   std::vector<HTTParticle> separatedJets;
 
   for(auto aJet : *myEventProxy.jets) {
-    float dRLeg2 = aJet.getP4().DeltaR(aLeg2.getP4());
-    float dRLeg1 = aJet.getP4().DeltaR(aLeg1.getP4());
+    float dRLeg2 = aJet.getP4().DeltaR(leg2_.getP4());
+    float dRLeg1 = aJet.getP4().DeltaR(leg1_.getP4());
     bool loosePFJetID = aJet.getProperty(PropertyEnum::PFjetID)>=1;
     bool jetEtaCut = std::abs(aJet.getP4().Eta())<4.7;
     if(dRLeg1>deltaR && dRLeg2>deltaR && loosePFJetID && jetEtaCut) separatedJets.push_back(aJet);
@@ -96,19 +95,19 @@ TLorentzVector svfitAnalyzer::computeMTT(const std::string & algoName){
   double mass1;
   int decay1 = -1;
   classic_svFit::MeasuredTauLepton::kDecayType type1;
-  if(std::abs(aLeg1.getPDGid())==11) {
+  if(std::abs(leg1_.getPDGid())==11) {
     mass1 = 0.51100e-3; //electron mass
     type1 = classic_svFit::MeasuredTauLepton::kTauToElecDecay;
   }
-  else if(std::abs(aLeg1.getPDGid())==13) {
+  else if(std::abs(leg1_.getPDGid())==13) {
     mass1 = 0.10566; //muon mass
     type1 = classic_svFit::MeasuredTauLepton::kTauToMuDecay;
   }
   else{//tau->hadrs.
-    decay1 = aLeg1.getProperty(PropertyEnum::decayMode);
-		//std::cout<<aLeg1.getProperty(PropertyEnum::charge)<<std::endl;
-		//std::cout<<aLeg1.getProperty(PropertyEnum::PDGId)<<std::endl;
-    mass1 = aLeg1.getP4().M();
+    decay1 = leg1_.getProperty(PropertyEnum::decayMode);
+		//std::cout<<leg1_.getProperty(PropertyEnum::charge)<<std::endl;
+		//std::cout<<leg1_.getProperty(PropertyEnum::PDGId)<<std::endl;
+    mass1 = leg1_.getP4().M();
     if(decay1==0)
       mass1 = 0.13957; //pi+/- mass
     type1 = classic_svFit::MeasuredTauLepton::kTauToHadDecay;
@@ -117,44 +116,44 @@ TLorentzVector svfitAnalyzer::computeMTT(const std::string & algoName){
   double mass2;
   int decay2 = -1;
   classic_svFit::MeasuredTauLepton::kDecayType type2;
-  if(std::abs(aLeg2.getPDGid())==11) {
+  if(std::abs(leg2_.getPDGid())==11) {
     mass2 = 0.51100e-3; //electron mass
     type2 = classic_svFit::MeasuredTauLepton::kTauToElecDecay;
   }
-  else if(std::abs(aLeg2.getPDGid())==13) {
+  else if(std::abs(leg2_.getPDGid())==13) {
     mass2 = 0.10566; //muon mass
     type2 = classic_svFit::MeasuredTauLepton::kTauToMuDecay;
   }
   else{//tau->hadrs.
-    decay2 = aLeg2.getProperty(PropertyEnum::decayMode);
-    mass2 = aLeg2.getP4().M();
+    decay2 = leg2_.getProperty(PropertyEnum::decayMode);
+    mass2 = leg2_.getP4().M();
     if(decay2==0) mass2 = 0.13957; //pi+/- mass
     type2 = classic_svFit::MeasuredTauLepton::kTauToHadDecay;
   }
  
   //Leptons for SVFit
-  TVector3 recPV = aEvent.getRefittedPV();
-  TVector3 recSV = aLeg1.getSV();  
-  double cosGJReco = (recSV - recPV).Unit()*aLeg1.getP4().Vect().Unit();
-  classic_svFit::MeasuredTauLepton aLepton1(type1, aLeg1.getP4().Pt(), aLeg1.getP4().Eta(),
-					    aLeg1.getP4().Phi(), mass1, decay1);
+  TVector3 recPV = event_.getRefittedPV();
+  TVector3 recSV = leg1_.getSV();  
+  double cosGJReco = (recSV - recPV).Unit()*leg1_.getP4().Vect().Unit();
+  classic_svFit::MeasuredTauLepton aLepton1(type1, leg1_.getP4().Pt(), leg1_.getP4().Eta(),
+					    leg1_.getP4().Phi(), mass1, decay1);
 
-  TVector3 genPV = aEvent.getGenPV();
-  TVector3 genSV = aGenLeg1.getSV();
-  TLorentzVector aP4 = aGenLeg1.getChargedP4();  
-  double ip3D = aLeg1.getPCA().Mag();
+  TVector3 genPV = event_.getGenPV();
+  TVector3 genSV = genLeg1_.getSV();
+  TLorentzVector aP4 = genLeg1_.getChargedP4();  
+  double ip3D = leg1_.getPCA().Mag();
  
   aLepton1.setCosGJ(cosGJReco);
   aLepton1.setIP3D(ip3D);
 
-  classic_svFit::MeasuredTauLepton aLepton2(type2, aLeg2.getP4().Pt(), aLeg2.getP4().Eta(),
-					    aLeg2.getP4().Phi(), mass2, decay2);
-  recSV = aLeg2.getSV();  
-  cosGJReco = (recSV - recPV).Unit()*aLeg2.getP4().Vect().Unit();
-  ip3D = aLeg2.getPCA().Mag();
+  classic_svFit::MeasuredTauLepton aLepton2(type2, leg2_.getP4().Pt(), leg2_.getP4().Eta(),
+					    leg2_.getP4().Phi(), mass2, decay2);
+  recSV = leg2_.getSV();  
+  cosGJReco = (recSV - recPV).Unit()*leg2_.getP4().Vect().Unit();
+  ip3D = leg2_.getPCA().Mag();
 
-  genSV = aGenLeg2.getSV();
-  aP4 = aGenLeg2.getChargedP4();
+  genSV = genLeg2_.getSV();
+  aP4 = genLeg2_.getChargedP4();
    
   aLepton2.setCosGJ(cosGJReco);
   aLepton2.setIP3D(ip3D);
@@ -164,7 +163,7 @@ TLorentzVector svfitAnalyzer::computeMTT(const std::string & algoName){
   measuredTauLeptons.push_back(aLepton2);
   
   //MET
-  if(aCovMET[0][0]==0 && aCovMET[1][0]==0 && aCovMET[0][1]==0 && aCovMET[1][1]==0) return TLorentzVector(); //singular covariance matrix
+  if(covMET_[0][0]==0 && covMET_[1][0]==0 && covMET_[0][1]==0 && covMET_[1][1]==0) return TLorentzVector(); //singular covariance matrix
 
   TLorentzVector aResult;
   if(algoName=="svfit") aResult = runSVFitAlgo(measuredTauLeptons);
@@ -176,16 +175,10 @@ TLorentzVector svfitAnalyzer::computeMTT(const std::string & algoName){
 /////////////////////////////////////////////////
 TLorentzVector svfitAnalyzer::runFastMTTAlgo(const std::vector<classic_svFit::MeasuredTauLepton> & measuredTauLeptons){
 
-  fastMTTAlgo.run(measuredTauLeptons, aMET.getP4().X(), aMET.getP4().Y(), aCovMET);
-  ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<double> > aP4 = fastMTTAlgo.getBestP4();
+  fastMTTAlgo_.run(measuredTauLeptons, MET_.getP4().X(), MET_.getP4().Y(), covMET_);
+  ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<double> > aP4 = fastMTTAlgo_.getBestP4();
   
   TLorentzVector p4SVFit(aP4.X(), aP4.Y(), aP4.Z(), aP4.E());
-
-  aP4 = fastMTTAlgo.getTau1P4();
-  svFitLeg1P4 = TLorentzVector(aP4.X(), aP4.Y(), aP4.Z(), aP4.E());
-  
-  aP4 = fastMTTAlgo.getTau2P4();
-  svFitLeg2P4 = TLorentzVector(aP4.X(), aP4.Y(), aP4.Z(), aP4.E());
   
   return p4SVFit;
 }
@@ -193,29 +186,29 @@ TLorentzVector svfitAnalyzer::runFastMTTAlgo(const std::vector<classic_svFit::Me
 /////////////////////////////////////////////////
 TLorentzVector svfitAnalyzer::runSVFitAlgo(const std::vector<classic_svFit::MeasuredTauLepton> & measuredTauLeptons){
 
-  svFitAlgo.setVerbosity(0);
+  svFitAlgo_.setVerbosity(0);
 
-  svFitAlgo.addLogM_fixed(true, 4.0);
-  if     (decayMode=="MuTau" ) svFitAlgo.addLogM_fixed(true, 4.0);
-  else if(decayMode=="TauTau") svFitAlgo.addLogM_fixed(true, 5.0);
-  else if(decayMode=="MuMu"  ) svFitAlgo.addLogM_fixed(true, 3.0);
+  svFitAlgo_.addLogM_fixed(true, 4.0);
+  if     (decayMode_=="MuTau" ) svFitAlgo_.addLogM_fixed(true, 4.0);
+  else if(decayMode_=="TauTau") svFitAlgo_.addLogM_fixed(true, 5.0);
+  else if(decayMode_=="MuMu"  ) svFitAlgo_.addLogM_fixed(true, 3.0);
   
-  svFitAlgo.setMaxObjFunctionCalls(100000);
-  //svFitAlgo.setLikelihoodFileName("testClassicSVfit.root");
-  //svFitAlgo.setTreeFileName("markovChainTree.root");
-  TVector3 recPV = aEvent.getRefittedPV();
-  TVector3 svLeg2 = aLeg2.getSV();
+  svFitAlgo_.setMaxObjFunctionCalls(100000);
+  //svFitAlgo_.setLikelihoodFileName("testClassicSVfit.root");
+  //svFitAlgo_.setTreeFileName("markovChainTree.root");
+  TVector3 recPV = event_.getRefittedPV();
+  TVector3 svLeg2 = leg2_.getSV();
   svLeg2 -=recPV;
 
-  TVector3 svLeg1 = aGenLeg1.getSV();
+  TVector3 svLeg1 = genLeg1_.getSV();
   svLeg1 -=recPV;
 
-  svFitAlgo.integrate(measuredTauLeptons, aMET.getP4().X(), aMET.getP4().Y(), aCovMET);
-  classic_svFit::DiTauSystemHistogramAdapter* diTauAdapter = static_cast<classic_svFit::DiTauSystemHistogramAdapter*>(svFitAlgo.getHistogramAdapter());
+  svFitAlgo_.integrate(measuredTauLeptons, MET_.getP4().X(), MET_.getP4().Y(), covMET_);
+  classic_svFit::DiTauSystemHistogramAdapter* diTauAdapter = static_cast<classic_svFit::DiTauSystemHistogramAdapter*>(svFitAlgo_.getHistogramAdapter());
   float mcMass = diTauAdapter->getMass();
 
   TLorentzVector p4SVFit;
-  if(svFitAlgo.isValidSolution() )
+  if(svFitAlgo_.isValidSolution() )
     {//Get solution
       p4SVFit.SetPtEtaPhiM(diTauAdapter->getPt(),
 			   diTauAdapter->getEta(),
@@ -230,30 +223,30 @@ TLorentzVector svfitAnalyzer::runSVFitAlgo(const std::vector<classic_svFit::Meas
 bool svfitAnalyzer::analyze(const EventProxyBase& iEvent, ObjectMessenger *aMessenger){
 
   const EventProxyHTT & myEventProxy = static_cast<const EventProxyHTT&>(iEvent);
-  sampleName = getSampleName(myEventProxy);
+  sampleName_ = getSampleName(myEventProxy);
 
-  std::string hNameSuffix = sampleName;
+  std::string hNameSuffix = sampleName_;
 
   if(!myEventProxy.pairs->size()) return true;
   setAnalysisObjects(myEventProxy);
 
-  bool isGoodReco = aGenLeg1.getP4().DeltaR(aLeg1.getP4())<0.4 &&
-		    aGenLeg2.getP4().DeltaR(aLeg2.getP4())<0.4;
+  bool isGoodReco = genLeg1_.getP4().DeltaR(leg1_.getP4())<0.4 &&
+		    genLeg2_.getP4().DeltaR(leg2_.getP4())<0.4;
   
-  isGoodReco |= aGenLeg2.getP4().DeltaR(aLeg1.getP4())<0.4 &&
-		aGenLeg1.getP4().DeltaR(aLeg2.getP4())<0.4;
+  isGoodReco |= genLeg2_.getP4().DeltaR(leg1_.getP4())<0.4 &&
+		genLeg1_.getP4().DeltaR(leg2_.getP4())<0.4;
   
-  bool goodGenTau = aGenLeg1.getP4().E()>1.0 && aGenLeg2.getP4().E()>1.0;							   
+  bool goodGenTau = genLeg1_.getP4().E()>1.0 && genLeg2_.getP4().E()>1.0;							   
 
-  isGoodReco = aGenLeg2.getP4().DeltaR(aLeg2.getP4())<0.4;
-  goodGenTau = aGenLeg2.getP4().E()>1.0;
+  isGoodReco = genLeg2_.getP4().DeltaR(leg2_.getP4())<0.4;
+  goodGenTau = genLeg2_.getP4().E()>1.0;
 
-  if(sampleName=="WAllJets"){
+  if(sampleName_=="WAllJets"){
     goodGenTau = true;
     isGoodReco = true;
   }
   
-  if(sampleName=="DYAllJetsMatchL"){
+  if(sampleName_=="DYAllJetsMatchL"){
     goodGenTau = true;
     isGoodReco = true;
   }
@@ -263,8 +256,8 @@ bool svfitAnalyzer::analyze(const EventProxyBase& iEvent, ObjectMessenger *aMess
 		computeMTT("fastMTT");  
   }
 
-	aGenSumM = (aGenLeg1.getP4() + aGenLeg2.getP4()).M();
-	higgs_mass_trans = aPair.getMTMuon();
+	genSumM_ = (genLeg1_.getP4() + genLeg2_.getP4()).M();
+	higgsMassTrans_ = pair_.getMTMuon();
 
 	if(aMessenger and std::string("MLObjectMessenger").compare((aMessenger->name()).substr(0,17))==0 ) // if NULL it will do nothing
 	{
@@ -272,15 +265,15 @@ bool svfitAnalyzer::analyze(const EventProxyBase& iEvent, ObjectMessenger *aMess
 		try
 		{
 			MLObjectMessenger* mess = (MLObjectMessenger*)aMessenger;
-			mess->putObjectVector(const_cast <const HTTParticle*>(&aLeg1), "legs");
-			mess->putObjectVector(const_cast <const HTTParticle*>(&aLeg2), "legs");
-			mess->putObject(const_cast <const HTTParticle*>(&aMET), "amet");
-			mess->putObject(&aCovMET[0][0], "covMET00");
-			mess->putObject(&aCovMET[0][1], "covMET01");
-			mess->putObject(&aCovMET[1][0], "covMET10");
-			mess->putObject(&aCovMET[1][1], "covMET11");
-			mess->putObject(&aGenSumM, "gen_visible_mass");
-			mess->putObject(higgs_mass_trans, "higgs_mass_trans");
+			mess->putObjectVector(const_cast <const HTTParticle*>(&leg1_), "legs");
+			mess->putObjectVector(const_cast <const HTTParticle*>(&leg2_), "legs");
+			mess->putObject(const_cast <const HTTParticle*>(&MET_), "met");
+			mess->putObject(&covMET_[0][0], "covMET00");
+			mess->putObject(&covMET_[0][1], "covMET01");
+			mess->putObject(&covMET_[1][0], "covMET10");
+			mess->putObject(&covMET_[1][1], "covMET11");
+			mess->putObject(&genSumM_, "gen_mass");
+			mess->putObject(higgsMassTrans_, "higgs_mass_trans");
 		}
 		catch(const std::exception& e)
 		{

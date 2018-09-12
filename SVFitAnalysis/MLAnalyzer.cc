@@ -407,7 +407,7 @@ void MLAnalyzer::globalsHTT(const MLObjectMessenger* mess, const std::vector<con
 	try
 	{
 		void* p = NULL;
-		const HTTParticle* aMET = mess->getObject(static_cast<HTTParticle*>(p), std::string("amet"));
+		const HTTParticle* aMET = mess->getObject(static_cast<HTTParticle*>(p), std::string("met"));
 		//const float* bs = nullptr;//mess->getObject(static_cast<float*>(p), "beta_score");
 		const float* higgs_mass_trans = mess->getObject(static_cast<float*>(p), "higgs_mass_trans");
 		covMET_[0][0] = *mess->getObject(static_cast<double*>(p), "covMET00");
@@ -428,7 +428,7 @@ void MLAnalyzer::globalsHTT(const MLObjectMessenger* mess, const std::vector<con
 		//	throw std::logic_error("[ERROR] NULL POINTERS PRESENT!");
 		// Calculation and assignement of global parameters
 		const TLorentzVector & aVisSum = leg1->getP4() + leg2->getP4();
-		genVisMass_ = *mess->getObject(static_cast<float*>(p),"gen_visible_mass");
+		genVisMass_ = *mess->getObject(static_cast<float*>(p),"gen_mass");
 		visMass_ = aVisSum.M();
 		higgsPT_ =  (aVisSum + aMET->getP4()).Pt();
 		higgsMassTrans_ = *higgs_mass_trans;

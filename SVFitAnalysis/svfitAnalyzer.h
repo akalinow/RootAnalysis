@@ -11,7 +11,6 @@
 #include "EventProxyBase.h"
 #include "EventProxyHTT.h"
 
-#include "strbitset.h"
 #include "TDirectory.h"
 
 //ROOT includes
@@ -45,7 +44,7 @@ class svfitAnalyzer: public Analyzer{
 
   virtual bool analyze(const EventProxyBase& iEvent) override {return analyze(iEvent, nullptr); }
 
-  Analyzer* clone() override const;
+  Analyzer* clone() const override;
 
   ///Check it the event passes given category selections.
   bool passCategory(unsigned int iCategory);
@@ -83,44 +82,37 @@ class svfitAnalyzer: public Analyzer{
 
   ///Parts of code specific to give decay channel.
   ///In particular category and object selection.
-  ChannelSpecifics *myChannelSpecifics;
+  ChannelSpecifics *channelSpecifics_;
 
 	//decayMode
-	const std::string decayMode;
-  ///Map from file name to sample name.
-  std::map<std::string, std::string> fileName2sampleName;
+	const std::string decayMode_;
 
   ///Reconstructed objects selected for given event.
-  HTTEvent aEvent;
-  HTTPair aPair;
-  std::string sampleName;
+  HTTEvent event_;
+  HTTPair pair_;
+  std::string sampleName_;
 
-  HTTParticle aLeg2, aLeg1;
+  HTTParticle leg2_;
+	HTTParticle leg1_;
 
-	HTTParticle aMET;
-	TMatrixD aCovMET;
+	HTTParticle MET_;
+	TMatrixD covMET_;
 
-  HTTParticle aGenLeg1, aGenLeg2;
-  float aGenSumM;
-  float higgs_mass_trans;
-  HTTParticle aJet1, aJet2;
-  std::vector<HTTParticle> aSeparatedJets;
-  int nJets30;
-  int nJetsInGap30;
+  HTTParticle genLeg1_;
+	HTTParticle genLeg2_;
+  float genSumM_;
+  float higgsMassTrans_;
+  HTTParticle jet1_;
+	HTTParticle jet2_;
+  std::vector<HTTParticle> separatedJets_;
+  int nJets30_; //TODO remove their usage in ChannelSpecifics
+  int nJetsInGap30_;
 
-  std::vector<bool> categoryDecisions;
-  unsigned int myNumberOfCategories;
+  std::vector<bool> categoryDecisions_;
+  unsigned int numberOfCategories_;
 
-  ClassicSVfit svFitAlgo;
-  FastMTT fastMTTAlgo;
-
-  TF1 *fLikelihood;
-
-  TRandom3 aRndm;
-  ///UGLY
-  TLorentzVector svFitLeg1P4, svFitLeg2P4;
-  /////////
-
+  ClassicSVfit svFitAlgo_;
+  FastMTT fastMTTAlgo_;
 };
 
 #endif

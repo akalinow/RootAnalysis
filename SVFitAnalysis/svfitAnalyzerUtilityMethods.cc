@@ -17,9 +17,6 @@ std::string svfitAnalyzer::getSampleNameFromFileName(const EventProxyHTT & myEve
 
         std::string fileName = myEventProxy.getTTree()->GetCurrentFile()->GetName();
 
-        //std::map<std::string, std::string>::const_iterator sampleNameIt = fileName2sampleName.find(fileName);
-        //if(sampleNameIt!=fileName2sampleName.end()) return sampleNameIt->second;
-
         std::string sampleName = "Unknown";
 
         if(fileName.find("W1JetsToLNu")!=std::string::npos) sampleName = "W1Jets";
@@ -95,7 +92,6 @@ std::string svfitAnalyzer::getSampleNameFromFileName(const EventProxyHTT & myEve
         if(sampleName=="Unknown") std::cout<<"Unkwown sample type. "<<fileName<<std::endl;
 
         sampleName += matchingMode;
-        fileName2sampleName[fileName] = sampleName;
 
         return sampleName;
 }
