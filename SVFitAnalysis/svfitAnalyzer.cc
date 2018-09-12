@@ -70,6 +70,9 @@ void svfitAnalyzer::setAnalysisObjects(const EventProxyHTT & myEventProxy){
   separatedJets_ = getSeparatedJets(myEventProxy, 0.5);
   jet1_ = separatedJets_.size() ? separatedJets_[0] : HTTParticle();
   jet2_ = separatedJets_.size()>1 ? separatedJets_[1] : HTTParticle();
+
+	genSumM_ = (genLeg1_.getP4() + genLeg2_.getP4()).M();
+	higgsMassTrans_ = pair_.getMTMuon();
 }
 //////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////
@@ -225,8 +228,6 @@ bool svfitAnalyzer::analyze(const EventProxyBase& iEvent, ObjectMessenger *aMess
   const EventProxyHTT & myEventProxy = static_cast<const EventProxyHTT&>(iEvent);
   sampleName_ = getSampleName(myEventProxy);
 
-  std::string hNameSuffix = sampleName_;
-
   if(!myEventProxy.pairs->size()) return true;
   setAnalysisObjects(myEventProxy);
 
@@ -256,8 +257,6 @@ bool svfitAnalyzer::analyze(const EventProxyBase& iEvent, ObjectMessenger *aMess
 		computeMTT("fastMTT");  
   }
 
-	genSumM_ = (genLeg1_.getP4() + genLeg2_.getP4()).M();
-	higgsMassTrans_ = pair_.getMTMuon();
 
 	if(aMessenger and std::string("MLObjectMessenger").compare((aMessenger->name()).substr(0,17))==0 ) // if NULL it will do nothing
 	{

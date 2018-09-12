@@ -94,25 +94,27 @@ class svfitAnalyzer: public Analyzer{
 
   HTTParticle leg2_;
 	HTTParticle leg1_;
+  HTTParticle genLeg1_;
+	HTTParticle genLeg2_;
+
+  HTTParticle jet1_;
+	HTTParticle jet2_;
+  std::vector<HTTParticle> separatedJets_;
 
 	HTTParticle MET_;
 	TMatrixD covMET_;
 
-  HTTParticle genLeg1_;
-	HTTParticle genLeg2_;
   float genSumM_;
   float higgsMassTrans_;
-  HTTParticle jet1_;
-	HTTParticle jet2_;
-  std::vector<HTTParticle> separatedJets_;
-  int nJets30_; //TODO remove their usage in ChannelSpecifics
-  int nJetsInGap30_;
-
-  std::vector<bool> categoryDecisions_;
-  unsigned int numberOfCategories_;
 
   ClassicSVfit svFitAlgo_;
   FastMTT fastMTTAlgo_;
+
+	//TODO used only by channelSpecifics_, consider removing
+  int nJets30_;
+  int nJetsInGap30_;
+  std::vector<bool> categoryDecisions_;
+  unsigned int numberOfCategories_;
 };
 
 #endif
