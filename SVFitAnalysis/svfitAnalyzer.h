@@ -11,7 +11,6 @@
 #include "EventProxyBase.h"
 #include "EventProxyHTT.h"
 
-#include "strbitset.h"
 #include "TDirectory.h"
 
 //ROOT includes
@@ -26,13 +25,7 @@
 #include "TauAnalysis/ClassicSVfit/interface/ClassicSVfit.h"
 #include "TauAnalysis/ClassicSVfit/interface/FastMTT.h"
 
-class svfitHistograms;
-
-class TH1F;
-class TH2F;
-class TH3F;
 class TLorentzVector;
-class TF1;
 
 class svfitAnalyzer: public Analyzer{
 
@@ -41,31 +34,17 @@ class svfitAnalyzer: public Analyzer{
   friend class TauTauSpecifics;
   friend class MuMuSpecifics;
 
- public:
+  public:
 
   svfitAnalyzer(const std::string & aName, const std::string & aDecayMode = "None");
 
   virtual ~svfitAnalyzer();
 
-  ///Initialize the analyzer
-  virtual void initialize(TDirectory* aDir,
-			  pat::strbitset *aSelections);
+  virtual bool analyze(const EventProxyBase& iEvent, ObjectMessenger *aMessenger) override;
 
-  virtual bool analyze(const EventProxyBase& iEvent);
+  virtual bool analyze(const EventProxyBase& iEvent) override {return analyze(iEvent, nullptr); }
 
-  virtual bool analyze(const EventProxyBase& iEvent, ObjectMessenger *aMessenger){return analyze(iEvent); }
-
-  virtual void finalize();
-
-  virtual void clear(){;};
-
-  virtual void addBranch(TTree *);
-
-  Analyzer* clone() const;
-
-  bool filter() const{ return filterEvent_;};
-
-  void setAnalysisObjects(const EventProxyHTT & myEventProxy);
+  Analyzer* clone() const override;
 
   ///Check it the event passes given category selections.
   bool passCategory(unsigned int iCategory);
@@ -85,76 +64,57 @@ class svfitAnalyzer: public Analyzer{
   //Return name sample name suffix for different particles matched to reconstructed tau
   std::string getMatchingName(const EventProxyHTT & myEventProxy);
 
-  ///Fill histograms for all control plots.
-  ///Histogram names will end with hNameSuffix
-  void fillControlHistos(const std::string & hNameSuffix);
-
   ///Get jets separated by deltaR from tau an muon.
   std::vector<HTTParticle> getSeparatedJets(const EventProxyHTT & myEventProxy,
-    float deltaR);
+      float deltaR);
 
- protected:
+  private:
 
-  pat::strbitset *mySelections_;
-
-  ///Types of the selection flow
-  std::vector<std::string> selectionFlavours_;
-
- private:
-
-  void setHistos(svfitHistograms *histos) { myHistos_ = histos;};
+  void setAnalysisObjects(const EventProxyHTT & myEventProxy);
 
   TLorentzVector computeMTT(const std::string & algoName);
-  
-  TLorentzVector runSVFitAlgo(const std::vector<classic_svFit::MeasuredTauLepton> & measuredTauLeptons,
-                              const TVector2 &aMET, const TMatrixD &covMET);
 
-  TLorentzVector runFastMTTAlgo(const std::vector<classic_svFit::MeasuredTauLepton> & measuredTauLeptons,
-				const TVector2 &aMET, const TMatrixD &covMET);
+  TLorentzVector runSVFitAlgo(const std::vector<classic_svFit::MeasuredTauLepton> & measuredTauLeptons);
+
+  TLorentzVector runFastMTTAlgo(const std::vector<classic_svFit::MeasuredTauLepton> & measuredTauLeptons);
 
   std::tuple<double, double> getTauMomentum(const TLorentzVector & visP4, double cosGJ);
 
   ///Parts of code specific to give decay channel.
   ///In particular category and object selection.
-  ChannelSpecifics *myChannelSpecifics;
+  ChannelSpecifics *channelSpecifics_;
 
-  ///Histograms storage.
-  svfitHistograms *myHistos_;
-
-  ///ROOT file containing current TTree
-  TFile *ntupleFile_;
-
-  //should this HTTAnalyzer be able to filter events
-  bool filterEvent_;
-
-  ///Map from file name to sample name.
-  std::map<std::string, std::string> fileName2sampleName;
+  //decayMode
+  const std::string decayMode_;
 
   ///Reconstructed objects selected for given event.
-  HTTEvent aEvent;
-  HTTPair aPair;
-  std::string sampleName;
+  HTTEvent event_;
+  HTTPair pair_;
+  std::string sampleName_;
 
-  HTTParticle aLeg2, aLeg1, aMET;
-  HTTParticle aGenLeg1, aGenLeg2;
-  HTTParticle aJet1, aJet2, aBJet1;
-  std::vector<HTTParticle> aSeparatedJets;
-  int nJets30;
-  int nJetsInGap30;
+  HTTParticle leg2_;
+  HTTParticle leg1_;
+  HTTParticle genLeg1_;
+  HTTParticle genLeg2_;
 
-  std::vector<bool> categoryDecisions;
-  unsigned int myNumberOfCategories;
+  HTTParticle jet1_;
+  HTTParticle jet2_;
+  std::vector<HTTParticle> separatedJets_;
 
-  ClassicSVfit svFitAlgo;
-  FastMTT fastMTTAlgo;
+  HTTParticle MET_;
+  TMatrixD covMET_;
 
-  TF1 *fLikelihood;
+  float genSumM_;
+  float higgsMassTrans_;
 
-  TRandom3 aRndm;
-  ///UGLY
-  TLorentzVector svFitLeg1P4, svFitLeg2P4;
-  /////////
+  ClassicSVfit svFitAlgo_;
+  FastMTT fastMTTAlgo_;
 
+  //TODO used only by channelSpecifics_, consider removing
+  int nJets30_;
+  int nJetsInGap30_;
+  std::vector<bool> categoryDecisions_;
+  unsigned int numberOfCategories_;
 };
 
 #endif

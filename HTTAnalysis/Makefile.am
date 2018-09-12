@@ -17,12 +17,15 @@ bin_PROGRAMS=httAnalysis
 
 # Sources for the a.out
 httAnalysis_SOURCES= HTTAnalysis.cc EventProxyHTT.cc \
+			PropertyEnum.cc \
 	            HTTAnalyzer.cc HTTAnalyzerCPmethods.cc HTTAnalyzerUtilityMethods.cc \
 							ChannelSpecifics.cc MuTauSpecifics.cc TauTauSpecifics.cc \
 							Tools.cc \
-              HTTSynchNTuple.cc \
+	      HTTSynchNTuple.cc \
               BTagCalibrationStandalone.cpp \
-              HTTHistograms.cc HTTEvent.cxx DictCint.cxx
+              HTTHistograms.cc HTTEvent.cxx \
+	      MLAnalyzer.cc\
+	      DictCint.cxx 
 
 
 # Linker options for a.out
