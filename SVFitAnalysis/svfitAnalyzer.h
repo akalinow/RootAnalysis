@@ -34,7 +34,7 @@ class svfitAnalyzer: public Analyzer{
   friend class TauTauSpecifics;
   friend class MuMuSpecifics;
 
- public:
+  public:
 
   svfitAnalyzer(const std::string & aName, const std::string & aDecayMode = "None");
 
@@ -66,14 +66,14 @@ class svfitAnalyzer: public Analyzer{
 
   ///Get jets separated by deltaR from tau an muon.
   std::vector<HTTParticle> getSeparatedJets(const EventProxyHTT & myEventProxy,
-    float deltaR);
+      float deltaR);
 
- private:
+  private:
 
   void setAnalysisObjects(const EventProxyHTT & myEventProxy);
 
   TLorentzVector computeMTT(const std::string & algoName);
-  
+
   TLorentzVector runSVFitAlgo(const std::vector<classic_svFit::MeasuredTauLepton> & measuredTauLeptons);
 
   TLorentzVector runFastMTTAlgo(const std::vector<classic_svFit::MeasuredTauLepton> & measuredTauLeptons);
@@ -84,8 +84,8 @@ class svfitAnalyzer: public Analyzer{
   ///In particular category and object selection.
   ChannelSpecifics *channelSpecifics_;
 
-	//decayMode
-	const std::string decayMode_;
+  //decayMode
+  const std::string decayMode_;
 
   ///Reconstructed objects selected for given event.
   HTTEvent event_;
@@ -93,16 +93,16 @@ class svfitAnalyzer: public Analyzer{
   std::string sampleName_;
 
   HTTParticle leg2_;
-	HTTParticle leg1_;
+  HTTParticle leg1_;
   HTTParticle genLeg1_;
-	HTTParticle genLeg2_;
+  HTTParticle genLeg2_;
 
   HTTParticle jet1_;
-	HTTParticle jet2_;
+  HTTParticle jet2_;
   std::vector<HTTParticle> separatedJets_;
 
-	HTTParticle MET_;
-	TMatrixD covMET_;
+  HTTParticle MET_;
+  TMatrixD covMET_;
 
   float genSumM_;
   float higgsMassTrans_;
@@ -110,7 +110,7 @@ class svfitAnalyzer: public Analyzer{
   ClassicSVfit svFitAlgo_;
   FastMTT fastMTTAlgo_;
 
-	//TODO used only by channelSpecifics_, consider removing
+  //TODO used only by channelSpecifics_, consider removing
   int nJets30_;
   int nJetsInGap30_;
   std::vector<bool> categoryDecisions_;
