@@ -17,6 +17,7 @@
 class Analyzer{
 
  public:
+  Analyzer(){}
 
   Analyzer(const std::string & aName);
 
