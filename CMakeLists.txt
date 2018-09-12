@@ -10,7 +10,7 @@ set_property(TARGET boost PROPERTY
 
 ##https://root.cern.ch/how/integrate-root-my-project-cmake
 list(APPEND CMAKE_PREFIX_PATH $ENV{ROOTSYS})
-find_package(ROOT REQUIRED COMPONENTS RIO GenVector Physics)
+find_package(ROOT REQUIRED COMPONENTS RIO GenVector Physics RooFitCore RooFit)
 include(${ROOT_USE_FILE})
 
 if ("${CMAKE_CXX_COMPILER_VERSION}" VERSION_LESS 6.0.0)
@@ -21,7 +21,14 @@ else()
   MESSAGE("Using -std=c++14 for compiler newer or equal to 6.0.0")
 endif()
 
-add_subdirectory(src)
-add_subdirectory(HTTAnalysis)
-add_subdirectory(Pythia8Interface)
-#add_subdirectory(SVFitAnalysis)
+if(CMAKE_INSTALL_PREFIX_INITIALIZED_TO_DEFAULT)
+  set(CMAKE_INSTALL_PREFIX $ENV{PWD}  CACHE PATH "..." FORCE)
+endif()
+
+set(CMAKE_INSTALL_RPATH_USE_LINK_PATH TRUE)
+
+ MESSAGE("Installation prefix set to " ${CMAKE_INSTALL_PREFIX} )
+
+add_subdirectory(Core/src)
+add_subdirectory(HTauTau)
+

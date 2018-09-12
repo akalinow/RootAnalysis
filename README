@@ -1,18 +1,16 @@
+## Installation instructions:
+
+``` 
 git clone https://github.com/akalinow/RootAnalysis
 cd RootAnalysis
 git checkout relevant_tag
-cmake ./
-make -j 4
+mkdir build; cd build
+cmake ../
+make install -j 4
+```
+## Run instructions:
 
-In case problewm with cmake use alternative building procedure with configure:
-
-
-git clone https://github.com/akalinow/RootAnalysis
-cd RootAnalysis
-git checkout relevant_tag
-libtoolize
-aclocal
-automake --add-missing
-autoreconf
-./configure 
-make
+```
+cd RootAnalysis/build
+bin/httAnalysis config/htt_MuTau.ini
+```
