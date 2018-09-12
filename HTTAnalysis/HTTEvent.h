@@ -13,6 +13,7 @@
 #include "TriggerEnum.h"
 #include "SelectionBitsEnum.h"
 #include "AnalysisEnums.h"
+
 ///////////////////////////////////////////////////
 ///////////////////////////////////////////////////
 class HTTEvent{
@@ -242,6 +243,8 @@ class HTTParticle{
 
   void setPCAGenPV(const TVector3 &aV3) {pcaGenPV = aV3;}
 
+  void setSV(const TVector3 &aSV) {sv = aSV;}
+
   void setProperties(const std::vector<Double_t> & aProperties) { properties = aProperties;}
 
   ///Data member getters.
@@ -256,6 +259,8 @@ class HTTParticle{
   const TVector3 & getPCARefitPV() const {return pcaRefitPV;}
 
   const TVector3 & getPCAGenPV() const {return pcaGenPV;}
+
+  const TVector3 & getSV() const {return sv;}
 
   int getPDGid() const {return getProperty(PropertyEnum::PDGId);}
 
@@ -292,6 +297,9 @@ class HTTParticle{
   ///Vectors from primary vertex to point of closest approach (PCA)
   ///calculated with respect to AOD vertex, refitted and generated vertex.
   TVector3 pca, pcaRefitPV, pcaGenPV;
+
+  ///Decay vertex
+  TVector3 sv;
 
   ///Vector of vaious particle properties.
   ///Index generated automatically during conversion from

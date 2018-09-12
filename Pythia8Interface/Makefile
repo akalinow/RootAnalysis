@@ -51,10 +51,10 @@ RM = /usr/local/bin/cmake -E remove -f
 EQUALS = =
 
 # The top-level source directory on which CMake was run.
-CMAKE_SOURCE_DIR = /home/akalinow/scratch/CMS/SVFit/ToyMC/RootAnalysis
+CMAKE_SOURCE_DIR = /home/akalinow/scratch/ProgrammingProjects/RootAnalysis
 
 # The top-level build directory on which CMake was run.
-CMAKE_BINARY_DIR = /home/akalinow/scratch/CMS/SVFit/ToyMC/RootAnalysis
+CMAKE_BINARY_DIR = /home/akalinow/scratch/ProgrammingProjects/RootAnalysis
 
 #=============================================================================
 # Targets provided globally by CMake.
@@ -72,8 +72,8 @@ rebuild_cache/fast: rebuild_cache
 
 # Special rule for the target edit_cache
 edit_cache:
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --cyan "Running CMake cache editor..."
-	/usr/bin/ccmake -H$(CMAKE_SOURCE_DIR) -B$(CMAKE_BINARY_DIR)
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --cyan "No interactive CMake dialog available..."
+	/usr/local/bin/cmake -E echo No\ interactive\ CMake\ dialog\ available.
 .PHONY : edit_cache
 
 # Special rule for the target edit_cache
@@ -83,14 +83,14 @@ edit_cache/fast: edit_cache
 
 # The main all target
 all: cmake_check_build_system
-	cd /home/akalinow/scratch/CMS/SVFit/ToyMC/RootAnalysis && $(CMAKE_COMMAND) -E cmake_progress_start /home/akalinow/scratch/CMS/SVFit/ToyMC/RootAnalysis/CMakeFiles /home/akalinow/scratch/CMS/SVFit/ToyMC/RootAnalysis/Pythia8Interface/CMakeFiles/progress.marks
-	cd /home/akalinow/scratch/CMS/SVFit/ToyMC/RootAnalysis && $(MAKE) -f CMakeFiles/Makefile2 Pythia8Interface/all
-	$(CMAKE_COMMAND) -E cmake_progress_start /home/akalinow/scratch/CMS/SVFit/ToyMC/RootAnalysis/CMakeFiles 0
+	cd /home/akalinow/scratch/ProgrammingProjects/RootAnalysis && $(CMAKE_COMMAND) -E cmake_progress_start /home/akalinow/scratch/ProgrammingProjects/RootAnalysis/CMakeFiles /home/akalinow/scratch/ProgrammingProjects/RootAnalysis/Pythia8Interface/CMakeFiles/progress.marks
+	cd /home/akalinow/scratch/ProgrammingProjects/RootAnalysis && $(MAKE) -f CMakeFiles/Makefile2 Pythia8Interface/all
+	$(CMAKE_COMMAND) -E cmake_progress_start /home/akalinow/scratch/ProgrammingProjects/RootAnalysis/CMakeFiles 0
 .PHONY : all
 
 # The main clean target
 clean:
-	cd /home/akalinow/scratch/CMS/SVFit/ToyMC/RootAnalysis && $(MAKE) -f CMakeFiles/Makefile2 Pythia8Interface/clean
+	cd /home/akalinow/scratch/ProgrammingProjects/RootAnalysis && $(MAKE) -f CMakeFiles/Makefile2 Pythia8Interface/clean
 .PHONY : clean
 
 # The main clean target
@@ -100,52 +100,22 @@ clean/fast: clean
 
 # Prepare targets for installation.
 preinstall: all
-	cd /home/akalinow/scratch/CMS/SVFit/ToyMC/RootAnalysis && $(MAKE) -f CMakeFiles/Makefile2 Pythia8Interface/preinstall
+	cd /home/akalinow/scratch/ProgrammingProjects/RootAnalysis && $(MAKE) -f CMakeFiles/Makefile2 Pythia8Interface/preinstall
 .PHONY : preinstall
 
 # Prepare targets for installation.
 preinstall/fast:
-	cd /home/akalinow/scratch/CMS/SVFit/ToyMC/RootAnalysis && $(MAKE) -f CMakeFiles/Makefile2 Pythia8Interface/preinstall
+	cd /home/akalinow/scratch/ProgrammingProjects/RootAnalysis && $(MAKE) -f CMakeFiles/Makefile2 Pythia8Interface/preinstall
 .PHONY : preinstall/fast
 
 # clear depends
 depend:
-	cd /home/akalinow/scratch/CMS/SVFit/ToyMC/RootAnalysis && $(CMAKE_COMMAND) -H$(CMAKE_SOURCE_DIR) -B$(CMAKE_BINARY_DIR) --check-build-system CMakeFiles/Makefile.cmake 1
+	cd /home/akalinow/scratch/ProgrammingProjects/RootAnalysis && $(CMAKE_COMMAND) -H$(CMAKE_SOURCE_DIR) -B$(CMAKE_BINARY_DIR) --check-build-system CMakeFiles/Makefile.cmake 1
 .PHONY : depend
 
 # Convenience name for target.
-Pythia8Interface/CMakeFiles/G__HTTEvent.dir/rule:
-	cd /home/akalinow/scratch/CMS/SVFit/ToyMC/RootAnalysis && $(MAKE) -f CMakeFiles/Makefile2 Pythia8Interface/CMakeFiles/G__HTTEvent.dir/rule
-.PHONY : Pythia8Interface/CMakeFiles/G__HTTEvent.dir/rule
-
-# Convenience name for target.
-G__HTTEvent: Pythia8Interface/CMakeFiles/G__HTTEvent.dir/rule
-
-.PHONY : G__HTTEvent
-
-# fast build rule for target.
-G__HTTEvent/fast:
-	cd /home/akalinow/scratch/CMS/SVFit/ToyMC/RootAnalysis && $(MAKE) -f Pythia8Interface/CMakeFiles/G__HTTEvent.dir/build.make Pythia8Interface/CMakeFiles/G__HTTEvent.dir/build
-.PHONY : G__HTTEvent/fast
-
-# Convenience name for target.
-Pythia8Interface/CMakeFiles/Pythia8Interface.dir/rule:
-	cd /home/akalinow/scratch/CMS/SVFit/ToyMC/RootAnalysis && $(MAKE) -f CMakeFiles/Makefile2 Pythia8Interface/CMakeFiles/Pythia8Interface.dir/rule
-.PHONY : Pythia8Interface/CMakeFiles/Pythia8Interface.dir/rule
-
-# Convenience name for target.
-Pythia8Interface: Pythia8Interface/CMakeFiles/Pythia8Interface.dir/rule
-
-.PHONY : Pythia8Interface
-
-# fast build rule for target.
-Pythia8Interface/fast:
-	cd /home/akalinow/scratch/CMS/SVFit/ToyMC/RootAnalysis && $(MAKE) -f Pythia8Interface/CMakeFiles/Pythia8Interface.dir/build.make Pythia8Interface/CMakeFiles/Pythia8Interface.dir/build
-.PHONY : Pythia8Interface/fast
-
-# Convenience name for target.
 Pythia8Interface/CMakeFiles/generateEvents.dir/rule:
-	cd /home/akalinow/scratch/CMS/SVFit/ToyMC/RootAnalysis && $(MAKE) -f CMakeFiles/Makefile2 Pythia8Interface/CMakeFiles/generateEvents.dir/rule
+	cd /home/akalinow/scratch/ProgrammingProjects/RootAnalysis && $(MAKE) -f CMakeFiles/Makefile2 Pythia8Interface/CMakeFiles/generateEvents.dir/rule
 .PHONY : Pythia8Interface/CMakeFiles/generateEvents.dir/rule
 
 # Convenience name for target.
@@ -155,89 +125,23 @@ generateEvents: Pythia8Interface/CMakeFiles/generateEvents.dir/rule
 
 # fast build rule for target.
 generateEvents/fast:
-	cd /home/akalinow/scratch/CMS/SVFit/ToyMC/RootAnalysis && $(MAKE) -f Pythia8Interface/CMakeFiles/generateEvents.dir/build.make Pythia8Interface/CMakeFiles/generateEvents.dir/build
+	cd /home/akalinow/scratch/ProgrammingProjects/RootAnalysis && $(MAKE) -f Pythia8Interface/CMakeFiles/generateEvents.dir/build.make Pythia8Interface/CMakeFiles/generateEvents.dir/build
 .PHONY : generateEvents/fast
 
-EventProxyHTT.o: EventProxyHTT.cc.o
+# Convenience name for target.
+Pythia8Interface/CMakeFiles/Pythia8Interface.dir/rule:
+	cd /home/akalinow/scratch/ProgrammingProjects/RootAnalysis && $(MAKE) -f CMakeFiles/Makefile2 Pythia8Interface/CMakeFiles/Pythia8Interface.dir/rule
+.PHONY : Pythia8Interface/CMakeFiles/Pythia8Interface.dir/rule
 
-.PHONY : EventProxyHTT.o
+# Convenience name for target.
+Pythia8Interface: Pythia8Interface/CMakeFiles/Pythia8Interface.dir/rule
 
-# target to build an object file
-EventProxyHTT.cc.o:
-	cd /home/akalinow/scratch/CMS/SVFit/ToyMC/RootAnalysis && $(MAKE) -f Pythia8Interface/CMakeFiles/Pythia8Interface.dir/build.make Pythia8Interface/CMakeFiles/Pythia8Interface.dir/EventProxyHTT.cc.o
-.PHONY : EventProxyHTT.cc.o
+.PHONY : Pythia8Interface
 
-EventProxyHTT.i: EventProxyHTT.cc.i
-
-.PHONY : EventProxyHTT.i
-
-# target to preprocess a source file
-EventProxyHTT.cc.i:
-	cd /home/akalinow/scratch/CMS/SVFit/ToyMC/RootAnalysis && $(MAKE) -f Pythia8Interface/CMakeFiles/Pythia8Interface.dir/build.make Pythia8Interface/CMakeFiles/Pythia8Interface.dir/EventProxyHTT.cc.i
-.PHONY : EventProxyHTT.cc.i
-
-EventProxyHTT.s: EventProxyHTT.cc.s
-
-.PHONY : EventProxyHTT.s
-
-# target to generate assembly for a file
-EventProxyHTT.cc.s:
-	cd /home/akalinow/scratch/CMS/SVFit/ToyMC/RootAnalysis && $(MAKE) -f Pythia8Interface/CMakeFiles/Pythia8Interface.dir/build.make Pythia8Interface/CMakeFiles/Pythia8Interface.dir/EventProxyHTT.cc.s
-.PHONY : EventProxyHTT.cc.s
-
-G__HTTEvent.o: G__HTTEvent.cxx.o
-
-.PHONY : G__HTTEvent.o
-
-# target to build an object file
-G__HTTEvent.cxx.o:
-	cd /home/akalinow/scratch/CMS/SVFit/ToyMC/RootAnalysis && $(MAKE) -f Pythia8Interface/CMakeFiles/Pythia8Interface.dir/build.make Pythia8Interface/CMakeFiles/Pythia8Interface.dir/G__HTTEvent.cxx.o
-.PHONY : G__HTTEvent.cxx.o
-
-G__HTTEvent.i: G__HTTEvent.cxx.i
-
-.PHONY : G__HTTEvent.i
-
-# target to preprocess a source file
-G__HTTEvent.cxx.i:
-	cd /home/akalinow/scratch/CMS/SVFit/ToyMC/RootAnalysis && $(MAKE) -f Pythia8Interface/CMakeFiles/Pythia8Interface.dir/build.make Pythia8Interface/CMakeFiles/Pythia8Interface.dir/G__HTTEvent.cxx.i
-.PHONY : G__HTTEvent.cxx.i
-
-G__HTTEvent.s: G__HTTEvent.cxx.s
-
-.PHONY : G__HTTEvent.s
-
-# target to generate assembly for a file
-G__HTTEvent.cxx.s:
-	cd /home/akalinow/scratch/CMS/SVFit/ToyMC/RootAnalysis && $(MAKE) -f Pythia8Interface/CMakeFiles/Pythia8Interface.dir/build.make Pythia8Interface/CMakeFiles/Pythia8Interface.dir/G__HTTEvent.cxx.s
-.PHONY : G__HTTEvent.cxx.s
-
-HTTEvent.o: HTTEvent.cxx.o
-
-.PHONY : HTTEvent.o
-
-# target to build an object file
-HTTEvent.cxx.o:
-	cd /home/akalinow/scratch/CMS/SVFit/ToyMC/RootAnalysis && $(MAKE) -f Pythia8Interface/CMakeFiles/Pythia8Interface.dir/build.make Pythia8Interface/CMakeFiles/Pythia8Interface.dir/HTTEvent.cxx.o
-.PHONY : HTTEvent.cxx.o
-
-HTTEvent.i: HTTEvent.cxx.i
-
-.PHONY : HTTEvent.i
-
-# target to preprocess a source file
-HTTEvent.cxx.i:
-	cd /home/akalinow/scratch/CMS/SVFit/ToyMC/RootAnalysis && $(MAKE) -f Pythia8Interface/CMakeFiles/Pythia8Interface.dir/build.make Pythia8Interface/CMakeFiles/Pythia8Interface.dir/HTTEvent.cxx.i
-.PHONY : HTTEvent.cxx.i
-
-HTTEvent.s: HTTEvent.cxx.s
-
-.PHONY : HTTEvent.s
-
-# target to generate assembly for a file
-HTTEvent.cxx.s:
-	cd /home/akalinow/scratch/CMS/SVFit/ToyMC/RootAnalysis && $(MAKE) -f Pythia8Interface/CMakeFiles/Pythia8Interface.dir/build.make Pythia8Interface/CMakeFiles/Pythia8Interface.dir/HTTEvent.cxx.s
-.PHONY : HTTEvent.cxx.s
+# fast build rule for target.
+Pythia8Interface/fast:
+	cd /home/akalinow/scratch/ProgrammingProjects/RootAnalysis && $(MAKE) -f Pythia8Interface/CMakeFiles/Pythia8Interface.dir/build.make Pythia8Interface/CMakeFiles/Pythia8Interface.dir/build
+.PHONY : Pythia8Interface/fast
 
 Pythia8Interface.o: Pythia8Interface.cc.o
 
@@ -245,7 +149,7 @@ Pythia8Interface.o: Pythia8Interface.cc.o
 
 # target to build an object file
 Pythia8Interface.cc.o:
-	cd /home/akalinow/scratch/CMS/SVFit/ToyMC/RootAnalysis && $(MAKE) -f Pythia8Interface/CMakeFiles/Pythia8Interface.dir/build.make Pythia8Interface/CMakeFiles/Pythia8Interface.dir/Pythia8Interface.cc.o
+	cd /home/akalinow/scratch/ProgrammingProjects/RootAnalysis && $(MAKE) -f Pythia8Interface/CMakeFiles/Pythia8Interface.dir/build.make Pythia8Interface/CMakeFiles/Pythia8Interface.dir/Pythia8Interface.cc.o
 .PHONY : Pythia8Interface.cc.o
 
 Pythia8Interface.i: Pythia8Interface.cc.i
@@ -254,7 +158,7 @@ Pythia8Interface.i: Pythia8Interface.cc.i
 
 # target to preprocess a source file
 Pythia8Interface.cc.i:
-	cd /home/akalinow/scratch/CMS/SVFit/ToyMC/RootAnalysis && $(MAKE) -f Pythia8Interface/CMakeFiles/Pythia8Interface.dir/build.make Pythia8Interface/CMakeFiles/Pythia8Interface.dir/Pythia8Interface.cc.i
+	cd /home/akalinow/scratch/ProgrammingProjects/RootAnalysis && $(MAKE) -f Pythia8Interface/CMakeFiles/Pythia8Interface.dir/build.make Pythia8Interface/CMakeFiles/Pythia8Interface.dir/Pythia8Interface.cc.i
 .PHONY : Pythia8Interface.cc.i
 
 Pythia8Interface.s: Pythia8Interface.cc.s
@@ -263,7 +167,7 @@ Pythia8Interface.s: Pythia8Interface.cc.s
 
 # target to generate assembly for a file
 Pythia8Interface.cc.s:
-	cd /home/akalinow/scratch/CMS/SVFit/ToyMC/RootAnalysis && $(MAKE) -f Pythia8Interface/CMakeFiles/Pythia8Interface.dir/build.make Pythia8Interface/CMakeFiles/Pythia8Interface.dir/Pythia8Interface.cc.s
+	cd /home/akalinow/scratch/ProgrammingProjects/RootAnalysis && $(MAKE) -f Pythia8Interface/CMakeFiles/Pythia8Interface.dir/build.make Pythia8Interface/CMakeFiles/Pythia8Interface.dir/Pythia8Interface.cc.s
 .PHONY : Pythia8Interface.cc.s
 
 generateEvents.o: generateEvents.cc.o
@@ -272,7 +176,7 @@ generateEvents.o: generateEvents.cc.o
 
 # target to build an object file
 generateEvents.cc.o:
-	cd /home/akalinow/scratch/CMS/SVFit/ToyMC/RootAnalysis && $(MAKE) -f Pythia8Interface/CMakeFiles/generateEvents.dir/build.make Pythia8Interface/CMakeFiles/generateEvents.dir/generateEvents.cc.o
+	cd /home/akalinow/scratch/ProgrammingProjects/RootAnalysis && $(MAKE) -f Pythia8Interface/CMakeFiles/generateEvents.dir/build.make Pythia8Interface/CMakeFiles/generateEvents.dir/generateEvents.cc.o
 .PHONY : generateEvents.cc.o
 
 generateEvents.i: generateEvents.cc.i
@@ -281,7 +185,7 @@ generateEvents.i: generateEvents.cc.i
 
 # target to preprocess a source file
 generateEvents.cc.i:
-	cd /home/akalinow/scratch/CMS/SVFit/ToyMC/RootAnalysis && $(MAKE) -f Pythia8Interface/CMakeFiles/generateEvents.dir/build.make Pythia8Interface/CMakeFiles/generateEvents.dir/generateEvents.cc.i
+	cd /home/akalinow/scratch/ProgrammingProjects/RootAnalysis && $(MAKE) -f Pythia8Interface/CMakeFiles/generateEvents.dir/build.make Pythia8Interface/CMakeFiles/generateEvents.dir/generateEvents.cc.i
 .PHONY : generateEvents.cc.i
 
 generateEvents.s: generateEvents.cc.s
@@ -290,7 +194,7 @@ generateEvents.s: generateEvents.cc.s
 
 # target to generate assembly for a file
 generateEvents.cc.s:
-	cd /home/akalinow/scratch/CMS/SVFit/ToyMC/RootAnalysis && $(MAKE) -f Pythia8Interface/CMakeFiles/generateEvents.dir/build.make Pythia8Interface/CMakeFiles/generateEvents.dir/generateEvents.cc.s
+	cd /home/akalinow/scratch/ProgrammingProjects/RootAnalysis && $(MAKE) -f Pythia8Interface/CMakeFiles/generateEvents.dir/build.make Pythia8Interface/CMakeFiles/generateEvents.dir/generateEvents.cc.s
 .PHONY : generateEvents.cc.s
 
 # Help Target
@@ -300,19 +204,9 @@ help:
 	@echo "... clean"
 	@echo "... depend"
 	@echo "... rebuild_cache"
-	@echo "... G__HTTEvent"
-	@echo "... Pythia8Interface"
-	@echo "... edit_cache"
 	@echo "... generateEvents"
-	@echo "... EventProxyHTT.o"
-	@echo "... EventProxyHTT.i"
-	@echo "... EventProxyHTT.s"
-	@echo "... G__HTTEvent.o"
-	@echo "... G__HTTEvent.i"
-	@echo "... G__HTTEvent.s"
-	@echo "... HTTEvent.o"
-	@echo "... HTTEvent.i"
-	@echo "... HTTEvent.s"
+	@echo "... edit_cache"
+	@echo "... Pythia8Interface"
 	@echo "... Pythia8Interface.o"
 	@echo "... Pythia8Interface.i"
 	@echo "... Pythia8Interface.s"
@@ -330,6 +224,6 @@ help:
 # No rule that depends on this can have commands that come from listfiles
 # because they might be regenerated.
 cmake_check_build_system:
-	cd /home/akalinow/scratch/CMS/SVFit/ToyMC/RootAnalysis && $(CMAKE_COMMAND) -H$(CMAKE_SOURCE_DIR) -B$(CMAKE_BINARY_DIR) --check-build-system CMakeFiles/Makefile.cmake 0
+	cd /home/akalinow/scratch/ProgrammingProjects/RootAnalysis && $(CMAKE_COMMAND) -H$(CMAKE_SOURCE_DIR) -B$(CMAKE_BINARY_DIR) --check-build-system CMakeFiles/Makefile.cmake 0
 .PHONY : cmake_check_build_system
 
