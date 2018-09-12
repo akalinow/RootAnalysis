@@ -26,11 +26,7 @@
 #include "TauAnalysis/ClassicSVfit/interface/ClassicSVfit.h"
 #include "TauAnalysis/ClassicSVfit/interface/FastMTT.h"
 
-class TH1F;
-class TH2F;
-class TH3F;
 class TLorentzVector;
-class TF1;
 
 class svfitAnalyzer: public Analyzer{
 
@@ -45,25 +41,11 @@ class svfitAnalyzer: public Analyzer{
 
   virtual ~svfitAnalyzer();
 
-  ///Initialize the analyzer
-  virtual void initialize(TDirectory* aDir,
-			  pat::strbitset *aSelections);
+  virtual bool analyze(const EventProxyBase& iEvent, ObjectMessenger *aMessenger) override;
 
-  virtual bool analyze(const EventProxyBase& iEvent, ObjectMessenger *aMessenger);
+  virtual bool analyze(const EventProxyBase& iEvent) override {return analyze(iEvent, nullptr); }
 
-  virtual bool analyze(const EventProxyBase& iEvent){return analyze(iEvent, nullptr); }
-
-  virtual void finalize();
-
-  virtual void clear(){;};
-
-  virtual void addBranch(TTree *);
-
-  Analyzer* clone() const;
-
-  bool filter() const{ return filterEvent_;};
-
-  void setAnalysisObjects(const EventProxyHTT & myEventProxy);
+  Analyzer* clone() override const;
 
   ///Check it the event passes given category selections.
   bool passCategory(unsigned int iCategory);
@@ -89,6 +71,8 @@ class svfitAnalyzer: public Analyzer{
 
  private:
 
+  void setAnalysisObjects(const EventProxyHTT & myEventProxy);
+
   TLorentzVector computeMTT(const std::string & algoName);
   
   TLorentzVector runSVFitAlgo(const std::vector<classic_svFit::MeasuredTauLepton> & measuredTauLeptons);
@@ -100,9 +84,6 @@ class svfitAnalyzer: public Analyzer{
   ///Parts of code specific to give decay channel.
   ///In particular category and object selection.
   ChannelSpecifics *myChannelSpecifics;
-
-  //should this HTTAnalyzer be able to filter events
-  bool filterEvent_;
 
 	//decayMode
 	const std::string decayMode;
