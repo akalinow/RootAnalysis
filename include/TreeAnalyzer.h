@@ -66,6 +66,9 @@ public :
   ///Now only the histograms in Summary directory are normalised.
   void scaleHistograms();
 
+  //sets ObjectMessenger allowing to use derived class objects
+  void setObjectMessenger(ObjectMessenger* mess);
+
  private:
 
    ///Method parsing the inpout cfg.py file.

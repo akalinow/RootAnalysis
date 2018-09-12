@@ -1,0 +1,16 @@
+git clone https://github.com/akalinow/RootAnalysis
+cd RootAnalysis
+git checkout relevant_tag
+libtoolize
+aclocal
+automake --add-missing
+autoconf
+./configure
+make -j 4
+cd HTTAnalysis
+
+#Update input files paths in htt_MuTau.ini
+
+./test htt_MuTau.ini 
+
+

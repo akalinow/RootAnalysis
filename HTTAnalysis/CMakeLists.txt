@@ -3,9 +3,11 @@ project(HTTAnalysis LANGUAGES CXX)
 include_directories(${CMAKE_CURRENT_SOURCE_DIR})
 ROOT_GENERATE_DICTIONARY(G__HTTEvent HTTEvent.h LINKDEF LinkDef.h)
 
-add_library(HTTAnalysis SHARED ChannelSpecifics.cc  EventProxyHTT.cc HTTAnalyzer.cc
+add_library(HTTAnalysis SHARED ChannelSpecifics.cc  EventProxyHTT.cc 
+  HTTAnalyzer.cc PropertyEnum.cc
   HTTAnalyzerCPmethods.cc HTTAnalyzerUtilityMethods.cc HTTHistograms.cc HTTSynchNTuple.cc
   MuTauSpecifics.cc TauTauSpecifics.cc Tools.cc BTagCalibrationStandalone.cpp HTTEvent.cxx
+  MLAnalyzer.cc
   G__HTTEvent.cxx)
 
 # Define headers for this library. PUBLIC headers are used for

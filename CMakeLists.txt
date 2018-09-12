@@ -18,8 +18,14 @@ if ("${CMAKE_CXX_COMPILER_VERSION}" VERSION_LESS 6.0.0)
   MESSAGE("Using -std=c++11 for compiler older than 6.0.0")
 else()
   SET( CMAKE_CXX_FLAGS "${ROOT_CXX_FLAGS} -Wall -Werror -O3 -std=c++14 -fopenmp")
+<<<<<<< HEAD
   MESSAGE("Using -std=c++14 for compiler newer or equalt to 6.0.0")
+=======
+  MESSAGE("Using -std=c++14 for compiler newer or equal to 6.0.0")
+>>>>>>> Pythia8
 endif()
 
 add_subdirectory(src)
-add_subdirectory(HTTAnalysis)
+#add_subdirectory(HTTAnalysis)
+add_subdirectory(Pythia8Interface)
+add_subdirectory(SVFitAnalysis)

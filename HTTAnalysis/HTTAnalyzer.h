@@ -5,7 +5,6 @@
 #include <vector>
 #include <map>
 
-#include "ObjectMessenger.h"
 #include "EventProxyBase.h"
 #include "EventProxyHTT.h"
 
@@ -19,7 +18,7 @@
 #include "Analyzer.h"
 #include "ChannelSpecifics.h"
 #include "AnalysisEnums.h"
-
+#include "ObjectMessenger.h"
 class HTTHistograms;
 
 class TH1F;
@@ -46,7 +45,7 @@ class HTTAnalyzer: public Analyzer{
 
   virtual bool analyze(const EventProxyBase& iEvent);
 
-  virtual bool analyze(const EventProxyBase& iEvent, ObjectMessenger *aMessenger){return analyze(iEvent); }
+  virtual bool analyze(const EventProxyBase& iEvent, ObjectMessenger *aMessenger);
 
   virtual void finalize();
 
