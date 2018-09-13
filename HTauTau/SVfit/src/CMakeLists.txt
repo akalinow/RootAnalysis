@@ -9,9 +9,8 @@ include_directories(${CMAKE_SOURCE_DIR}/HTauTau/DataFormats/include)
 include_directories(${CMAKE_SOURCE_DIR}/HTauTau/Analysis/include)
 include_directories(${ROOTINCDIR})
 
-add_library(SVfitTF SHARED ${ClassicSVfit_PATH}/TauAnalysis/SVfitTF/src/crystalBall.cc)
-
 if (EXISTS ${ClassicSVfit_PATH}/TauAnalysis/SVfitTF/src/crystalBall.cc AND EXISTS ${ClassicSVfit_PATH}/TauAnalysis/ClassicSVfit/src/ClassicSVfit.cc)
+  add_library(SVfitTF SHARED ${ClassicSVfit_PATH}/TauAnalysis/SVfitTF/src/crystalBall.cc)
   add_library(ClassicSVfit SHARED ${ClassicSVfit_PATH}/TauAnalysis/ClassicSVfit/src/ClassicSVfit.cc
     ${ClassicSVfit_PATH}/TauAnalysis/ClassicSVfit/src/ClassicSVfitIntegrand.cc
     ${ClassicSVfit_PATH}/TauAnalysis/ClassicSVfit/src/MeasuredTauLepton.cc

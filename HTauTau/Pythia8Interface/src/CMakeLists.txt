@@ -7,8 +7,8 @@ include_directories(${ROOTINCDIR})
 if (EXISTS $ENV{PYTHIA8_DIR}/include/Pythia8/Pythia.h)
 
   add_library(Pythia8Interface SHARED Pythia8Interface.cc)
-
   add_library(Pythia8 SHARED IMPORTED)
+  
   set_property(TARGET Pythia8 PROPERTY IMPORTED_LOCATION $ENV{PYTHIA8_DIR}/lib/libpythia8.so)
   
   # Depend on a library that we defined in the top-level file
