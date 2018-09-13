@@ -77,9 +77,9 @@ void TauTauSpecifics::testAllCategories(const HTTAnalysis::sysEffects & aSystEff
         int tauIDmask=0, tauIsoTmask=0, tauIsoMmask=0, tauIsoLmask=0;
 
         for(unsigned int iBit=0; iBit<myAnalyzer->aEvent.ntauIds; iBit++) {
-                if(myAnalyzer->aEvent.tauIDStrings[iBit]=="byTightIsolationMVArun2v1DBoldDMwLT") tauIsoTmask |= (1<<iBit);
-                if(myAnalyzer->aEvent.tauIDStrings[iBit]=="byMediumIsolationMVArun2v1DBoldDMwLT") tauIsoMmask |= (1<<iBit);
-                if(myAnalyzer->aEvent.tauIDStrings[iBit]=="byLooseIsolationMVArun2v1DBoldDMwLT") tauIsoLmask |= (1<<iBit);
+                if(myAnalyzer->aEvent.tauIDStrings[iBit]=="byTightIsolationMVArun2v1DBoldDMwLT2017v2") tauIsoTmask |= (1<<iBit);
+                if(myAnalyzer->aEvent.tauIDStrings[iBit]=="byMediumIsolationMVArun2v1DBoldDMwLT2017v2") tauIsoMmask |= (1<<iBit);
+                if(myAnalyzer->aEvent.tauIDStrings[iBit]=="byLooseIsolationMVArun2v1DBoldDMwLT2017v2") tauIsoLmask |= (1<<iBit);
                 if(myAnalyzer->aEvent.tauIDStrings[iBit]=="againstMuonLoose3") tauIDmask |= (1<<iBit);
                 if(myAnalyzer->aEvent.tauIDStrings[iBit]=="againstElectronVLooseMVA6") tauIDmask |= (1<<iBit);
         }
