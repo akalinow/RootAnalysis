@@ -82,22 +82,6 @@ void HTTAnalyzer::finalize(){
 }
 //////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////
-std::vector<HTTParticle> HTTAnalyzer::getSeparatedJets(const EventProxyHTT & myEventProxy,
-                                                       float deltaR){
-
-        std::vector<HTTParticle> separatedJets;
-
-        for(auto aJet : *myEventProxy.jets) {
-                float dRLeg2 = aJet.getP4().DeltaR(aLeg2.getP4());
-                float dRLeg1 = aJet.getP4().DeltaR(aLeg1.getP4());
-                bool loosePFJetID = aJet.getProperty(PropertyEnum::PFjetID)>=1;
-                bool jetEtaCut = std::abs(aJet.getP4().Eta())<4.7;
-                if(dRLeg1>deltaR && dRLeg2>deltaR && loosePFJetID && jetEtaCut) separatedJets.push_back(aJet);
-        }
-        return separatedJets;
-}
-//////////////////////////////////////////////////////////////////////////////
-//////////////////////////////////////////////////////////////////////////////
 void HTTAnalyzer::setAnalysisObjects(const EventProxyHTT & myEventProxy){
 
         aEvent = *myEventProxy.event;
@@ -113,7 +97,7 @@ void HTTAnalyzer::setAnalysisObjects(const EventProxyHTT & myEventProxy){
 
         myChannelSpecifics->setAnalysisObjects(myEventProxy);
 
-        aSeparatedJets = getSeparatedJets(myEventProxy, 0.5);
+        aSeparatedJets = HTTAnalysis::getSeparatedJets(myEventProxy, aLeg1, aLeg2, 0.5);
         aJet1 = aSeparatedJets.size() ? aSeparatedJets[0] : HTTParticle();
         aJet2 = aSeparatedJets.size()>1 ? aSeparatedJets[1] : HTTParticle();
 	aBJet1 = HTTParticle();
@@ -130,7 +114,78 @@ void HTTAnalyzer::setAnalysisObjects(const EventProxyHTT & myEventProxy){
 }
 //////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////
-void HTTAnalyzer::addBranch(TTree *tree){ tree->Branch("nJets30",&nJets30);}
+float HTTAnalyzer::getSystWeight(const HTTAnalysis::sysEffects & aSystEffect){
+
+        if(aSystEffect==HTTAnalysis::NOMINAL) return 1.0;
+
+        if(aSystEffect==HTTAnalysis::ZPtUp && sampleName.find("DYJets")!=std::string::npos) return aEvent.getPtReWeight();
+        else if(aSystEffect==HTTAnalysis::ZPtDown && sampleName.find("DYJets")!=std::string::npos) return 1.0/aEvent.getPtReWeight();
+        else if(aSystEffect==HTTAnalysis::TTUp && sampleName.find("TTbar")!=std::string::npos) return aEvent.getPtReWeight();
+        else if(aSystEffect==HTTAnalysis::TTDown && sampleName.find("TTbar")!=std::string::npos) return 1.0/aEvent.getPtReWeight();
+        else if((aSystEffect==HTTAnalysis::J2TUp || aSystEffect==HTTAnalysis::J2TDown)
+                && aLeg2.getProperty(PropertyEnum::mc_match)==6) {
+                float delta = 0.2*aLeg2.getP4().Perp()/100.0;
+                if(aLeg2.getP4().Perp()>200) delta = 0.4;
+                if(aSystEffect==HTTAnalysis::J2TDown) delta*=-1;
+                return 1-delta;
+        }
+        else return 1.0;
+}
+//////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////////
+void HTTAnalyzer::getPreselectionEff(const EventProxyHTT & myEventProxy){
+
+        if(true || ntupleFile_!=myEventProxy.getTTree()->GetCurrentFile()) {
+                ntupleFile_ = myEventProxy.getTTree()->GetCurrentFile();
+                if(hStatsFromFile) delete hStatsFromFile;
+                hStatsFromFile = (TH1F*)ntupleFile_->Get("hStats");
+
+                std::string hName = "h1DStats"+sampleName;
+                TH1F *hStats = myHistos_->get1DHistogram(hName,true);
+
+                float genWeight = HTTAnalysis::getGenWeight(myEventProxy);
+
+                hStats->SetBinContent(2,std::abs(hStatsFromFile->GetBinContent(hStatsFromFile->FindBin(1))*genWeight));
+                hStats->SetBinContent(3,std::abs(hStatsFromFile->GetBinContent(hStatsFromFile->FindBin(3))*genWeight));
+        }
+}
+//////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////////
+float HTTAnalyzer::getPUWeight(const EventProxyHTT & myEventProxy){
+
+  if(sampleName=="Data") return 1.0;
+
+  ///A HACK
+  if(myEventProxy.event->getNPU()<5) return 0;
+  else return 1.0; //FIXME
+  //////
+
+  if(sampleName=="Data") return 1.0;
+
+        if(!puDataFile_ || !puMCFile_ ||
+           puDataFile_->IsZombie() ||
+           puMCFile_->IsZombie()) { return 1.0; }
+
+        if(!hPUVec_.size()) hPUVec_.resize(1);
+
+        if(!hPUVec_[0]) {
+                std::string hName = "pileup";
+                TH1F *hPUData = (TH1F*)puDataFile_->Get(hName.c_str());
+                TH1F *hPUSample = (TH1F*)puMCFile_->Get(hName.c_str());
+                ///Normalise both histograms.
+                hPUData->Scale(1.0/hPUData->Integral(0,hPUData->GetNbinsX()+1));
+                hPUSample->Scale(1.0/hPUSample->Integral(0,hPUSample->GetNbinsX()+1));
+                ///
+                hPUData->SetDirectory(0);
+                hPUSample->SetDirectory(0);
+                hPUData->Divide(hPUSample);
+                hPUData->SetName(("h1DPUWeight"+sampleName).c_str());
+                hPUVec_[0] =  hPUData;
+        }
+
+        int iBinPU = hPUVec_[0]->FindBin(myEventProxy.event->getNPU());
+        return hPUVec_[0]->GetBinContent(iBinPU);
+}
 //////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////
 void HTTAnalyzer::fillControlHistos(const std::string & hNameSuffix, float eventWeight,
@@ -252,11 +307,11 @@ bool HTTAnalyzer::analyze(const EventProxyBase& iEvent, ObjectMessenger *aMessen
         bool runSystematics = false;
 
         const EventProxyHTT & myEventProxy = static_cast<const EventProxyHTT&>(iEvent);
-        sampleName = getSampleName(myEventProxy);
+        sampleName = HTTAnalysis::getSampleName(myEventProxy);
 
         std::string hNameSuffix = sampleName;
         float puWeight = getPUWeight(myEventProxy);
-        float genWeight = getGenWeight(myEventProxy);
+        float genWeight = HTTAnalysis::getGenWeight(myEventProxy);
         float ptReweight = 1.0;
         //if(sampleName.find("DY")!=std::string::npos ||
         //   sampleName.find("TTbar")!=std::string::npos)
@@ -266,7 +321,7 @@ bool HTTAnalyzer::analyze(const EventProxyBase& iEvent, ObjectMessenger *aMessen
         //Fill bookkeeping histogram. Bin 1 holds sum of weights.
         myHistos_->fill1DHistogram("h1DStats"+sampleName,0,eventWeight);
         myHistos_->fill1DHistogram("h1DNPartons"+hNameSuffix+"_",myEventProxy.event->getLHEnOutPartons(),eventWeight);
-        getPreselectionEff(myEventProxy);
+	getPreselectionEff(myEventProxy);
 
         if(!myEventProxy.pairs->size()) return true;
         setAnalysisObjects(myEventProxy);
@@ -346,8 +401,9 @@ bool HTTAnalyzer::analyze(const EventProxyBase& iEvent, ObjectMessenger *aMessen
 }
 //////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////
-
 bool HTTAnalyzer::analyze(const EventProxyBase& iEvent)
 {
     return analyze(iEvent, NULL);
 }
+//////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////////

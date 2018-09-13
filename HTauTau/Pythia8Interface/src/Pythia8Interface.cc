@@ -11,9 +11,7 @@
 
 //////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////
-Pythia8Interface::Pythia8Interface(const std::string & aName) : Analyzer(aName){
-
-}
+Pythia8Interface::Pythia8Interface(const std::string & aName) : Analyzer(aName){ }
 //////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////
 Pythia8Interface::~Pythia8Interface(){
@@ -58,9 +56,6 @@ void Pythia8Interface::initialize(TDirectory* aDir,
 void Pythia8Interface::finalize(){ }
 //////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////
-void Pythia8Interface::addBranch(TTree *tree){ /*tree->Branch("muonPt",&muonPt);*/}
-//////////////////////////////////////////////////////////////////////////////
-//////////////////////////////////////////////////////////////////////////////
 void Pythia8Interface::initializePythia(double mH, int decayMode){
 
   pythia8.ReadString("Init:showChangedSettings = off");
@@ -75,8 +70,7 @@ void Pythia8Interface::initializePythia(double mH, int decayMode){
     pythia8.ReadString("36:onIfMatch =  15 15"); //switch back on Higgs -> tau tau
   */
 
-  std::string massString = "25:m0 = " + std::to_string(2.0*mH);
-  std::cout<<massString<<std::endl;
+  std::string massString = "25:m0 = " + std::to_string(mH);
   pythia8.ReadString("HiggsSM:gg2H = on"); //Higgs production by gluon-gluon fusion
   pythia8.ReadString(massString.c_str());       //Higgs mass
   pythia8.ReadString("25:onMode = no");    //switch off all Higgs decay channels
@@ -389,14 +383,16 @@ HTTPair Pythia8Interface::makePair(const HTTParticle & aTau1, const HTTParticle 
 }
 //////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////
-bool Pythia8Interface::analyze(const EventProxyBase& iEvent){
+bool Pythia8Interface::analyze(const EventProxyBase& iEvent, ObjectMessenger *aMessenger){
 
   double mH = 125;
-  unsigned int long eventsToGenerate = 2000;
+  double tmp = 0;
+
+  unsigned int long eventsToGenerate = *aMessenger->getObject(&tmp,"eventsToGenerate");  
   int pairDecayMode = HTTAnalysis::hadronicTauDecayModes::tauDecayMuon;
 
   for(int iMass=0;iMass<100;++iMass){
-    mH = (60 + 2*iMass)*0.5;
+    mH = 60 + 2*iMass;
     std::cout<<"Generating mass: "<<mH<<std::endl;
     initializePythia(mH, pairDecayMode);
     for(unsigned int long eventNumber=0;eventNumber<eventsToGenerate;++eventNumber){

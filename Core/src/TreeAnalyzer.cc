@@ -17,6 +17,7 @@
 #include "boost/property_tree/ini_parser.hpp"
 #include "boost/tokenizer.hpp"
 #include "boost/functional/hash.hpp"
+#include <boost/optional/optional.hpp>
 
 #include "TFile.h"
 #include "TH1D.h"
@@ -30,7 +31,8 @@ void TreeAnalyzer::setObjectMessenger(ObjectMessenger* mess)
 {
   myObjMessenger_=mess;
 }
-
+//////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////////
 TreeAnalyzer::TreeAnalyzer(const std::string & aName,
 			   const std::string & cfgFileName,
 			   EventProxyBase *aProxy,
@@ -40,8 +42,6 @@ TreeAnalyzer::TreeAnalyzer(const std::string & aName,
   nEventsToAnalyze_ = 0;
 
   cfgFileName_ = cfgFileName;
-
-  parseCfg(cfgFileName_);
 
   if(proofFile) {
     proofFile->SetOutputFileName((filePath_+"/RootAnalysis_"+sampleName_+".root").c_str());
@@ -71,10 +71,9 @@ TreeAnalyzer::TreeAnalyzer(const std::string & aName,
   myStrSelections_ = new pat::strbitset();
 
   myObjMessenger_ = new ObjectMessenger("Default ObjMessenger Created In TreeAnalyzer.h");
-
+ 
   myProxy_ = aProxy;
   mySummary_ = 0;
-
 }
 //////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////
@@ -137,6 +136,12 @@ void TreeAnalyzer::parseCfg(const std::string & cfgFileName){
   boost::property_tree::ptree pt;
   boost::property_tree::ini_parser::read_ini(cfgFileName, pt);
 
+  boost::optional< boost::property_tree::ptree& > child = pt.get_child_optional( "TreeAnalyzer.eventsToGenerate" );
+  if(child){
+     double nEventsToGenerate = pt.get("TreeAnalyzer.eventsToGenerate",1);
+     myObjMessenger_->putObject(&nEventsToGenerate, "eventsToGenerate");
+  }
+
   typedef boost::tokenizer<boost::char_separator<char> > tokenizer;
   boost::char_separator<char> sep(", ");
   std::string str = pt.get<std::string>("TreeAnalyzer.inputFiles");
@@ -169,6 +174,7 @@ void TreeAnalyzer::parseCfg(const std::string & cfgFileName){
 //////////////////////////////////////////////////////////////////////////////
 void TreeAnalyzer::init(std::vector<Analyzer*> myAnalyzers){
 
+  parseCfg(cfgFileName_);
   myProxy_->init(fileNames_);
   myAnalyzers_ = myAnalyzers;
 
@@ -190,8 +196,6 @@ void TreeAnalyzer::init(std::vector<Analyzer*> myAnalyzers){
   {
      std::throw_with_nested(std::runtime_error("[ERROR] UNKNOWN ERROR IN TreeAnalyzer::init! PROBABLY SOMETHING WRONG WITH THE NAME OF ANALYZER!"));
   }
-
-
 
   for(int iThread=0; iThread<omp_get_max_threads(); ++iThread) {
     myProxiesThread_[iThread] = myProxy_->clone();

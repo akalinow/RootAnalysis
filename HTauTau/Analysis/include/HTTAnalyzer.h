@@ -51,8 +51,6 @@ class HTTAnalyzer: public Analyzer{
 
   virtual void clear(){;};
 
-  virtual void addBranch(TTree *);
-
   Analyzer* clone() const;
 
   bool filter() const{ return filterEvent_;};
@@ -61,22 +59,7 @@ class HTTAnalyzer: public Analyzer{
 
   ///Check it the event passes given category selections.
   bool passCategory(unsigned int iCategory);
-
-  ///Return human readable sample name (Data, WJets, etc).
-  std::string getSampleName(const EventProxyHTT & myEventProxy);
-
-  ///Return human readable sample name (Data, WJets, etc).
-  ///Make the methos static, so other modules can use it.
-  ///Method used when sample coding in TTree is not present.
-  ///In this case a ROOT file name is used to decode the sample type.
-  std::string getSampleNameFromFileName(const EventProxyHTT & myEventProxy);
-
-  ///Return sample name for DY. Name encoded jet bin, and decay mode.
-  std::string getDYSampleName(const EventProxyHTT & myEventProxy);
-
-  //Return name sample name suffix for different particles matched to reconstructed tau
-  std::string getMatchingName(const EventProxyHTT & myEventProxy);
-
+  
   ///Return pileup reweighting weight.
   ///Weight is calculatedon fly using the ration of nPU
   ///histograms for data and analyased sample.
@@ -86,12 +69,11 @@ class HTTAnalyzer: public Analyzer{
   ///implemented by a global event weight.
   float getSystWeight(const HTTAnalysis::sysEffects & aSystEffect=HTTAnalysis::NOMINAL);
 
+  //Put efficiency of the preselection performed at miniAOD processing on the grid int othe statistics histogram.
+  void getPreselectionEff(const EventProxyHTT & myEventProxy);
+
   ///Fill pulls between generator and various reco vertices.
   bool fillVertices(const std::string & sysType, float eventWeight);
-
-  ///Return generator weight. Most samples have large values of weights
-  ///which are constant up to + or - sign. We normalise those weights to +-1.
-  float getGenWeight(const EventProxyHTT & myEventProxy);
 
   ///Fill histograms for all control plots.
   ///Histogram names will end with hNameSuffix
@@ -115,11 +97,7 @@ class HTTAnalyzer: public Analyzer{
   std::pair<float,float> angleBetweenPlanes(const TLorentzVector& tau1, const TLorentzVector& tau1Daughter,
 					    const TLorentzVector& tau2, const TLorentzVector& tau2Daughter,
 					    bool sgn=true);
-
-  ///Get jets separated by deltaR from tau an muon.
-  std::vector<HTTParticle> getSeparatedJets(const EventProxyHTT & myEventProxy,
-					    float deltaR);
-
+  
  protected:
 
   pat::strbitset *mySelections_;
@@ -128,8 +106,6 @@ class HTTAnalyzer: public Analyzer{
   std::vector<std::string> selectionFlavours_;
 
  private:
-
-  void getPreselectionEff(const EventProxyHTT & myEventProxy);
 
   void setHistos(HTTHistograms *histos) { myHistos_ = histos;};
 

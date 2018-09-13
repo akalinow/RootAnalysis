@@ -40,15 +40,13 @@ class Pythia8Interface: public Analyzer{
   virtual void initialize(TDirectory* aDir,
 			  pat::strbitset *aSelections);
 
-  virtual bool analyze(const EventProxyBase& iEvent);
+  virtual bool analyze(const EventProxyBase& iEvent) {return analyze(iEvent, NULL);}
 
-  virtual bool analyze(const EventProxyBase& iEvent, ObjectMessenger *aMessenger){return analyze(iEvent); }
+  virtual bool analyze(const EventProxyBase& iEvent, ObjectMessenger *aMessenger);
 
   virtual void finalize();
 
   virtual void clear(){;};
-
-  virtual void addBranch(TTree *);
 
   Analyzer* clone() const;
 

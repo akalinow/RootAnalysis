@@ -17,7 +17,9 @@ add_executable(generateEvents generateEvents.cc)
 
 target_link_libraries(generateEvents Pythia8Interface Core DataFormats ${Boost_REGEX_LIBRARY} ${ROOT_LIBRARIES} ${PYTHIA8_LIBRARY} Proof RooFitCore RooFit EG EGPythia8 Pythia8)
 
+set(CMAKE_INSTALL_RPATH $ENV{PYTHIA8_DIR}/lib)
+
 install(TARGETS generateEvents Pythia8Interface
         RUNTIME DESTINATION bin
         LIBRARY DESTINATION lib)
-
+install(FILES $<1:${PROJECT_SOURCE_DIR}/../config/> DESTINATION config)

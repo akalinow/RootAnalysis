@@ -6,7 +6,7 @@ set( CMAKE_VERBOSE_MAKEFILE on )
 find_package(Boost REQUIRED COMPONENTS regex)
 add_library(boost INTERFACE IMPORTED)
 set_property(TARGET boost PROPERTY
-    INTERFACE_INCLUDE_DIRECTORIES ${Boost_INCLUDE_DIR})
+  INTERFACE_INCLUDE_DIRECTORIES ${Boost_INCLUDE_DIR})
 
 ##https://root.cern.ch/how/integrate-root-my-project-cmake
 list(APPEND CMAKE_PREFIX_PATH $ENV{ROOTSYS})
@@ -25,9 +25,10 @@ if(CMAKE_INSTALL_PREFIX_INITIALIZED_TO_DEFAULT)
   set(CMAKE_INSTALL_PREFIX $ENV{PWD}  CACHE PATH "..." FORCE)
 endif()
 
+set(CMAKE_INSTALL_RPATH "${CMAKE_INSTALL_PREFIX}/lib")
 set(CMAKE_INSTALL_RPATH_USE_LINK_PATH TRUE)
 
- MESSAGE("Installation prefix set to " ${CMAKE_INSTALL_PREFIX} )
+MESSAGE("Installation prefix set to " ${CMAKE_INSTALL_PREFIX} )
 
 add_subdirectory(Core/src)
 add_subdirectory(HTauTau)
