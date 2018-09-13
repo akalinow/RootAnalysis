@@ -1,4 +1,4 @@
-project(HTauTau_SVFItAnalysis LANGUAGES CXX)
+project(HTauTau_SVfitAnalysis LANGUAGES CXX)
 
 ##Add SVfit library
 set (ClassicSVfit_PATH ${CMAKE_SOURCE_DIR}/../)
@@ -10,6 +10,16 @@ include_directories(${CMAKE_SOURCE_DIR}/HTauTau/Analysis/include)
 include_directories(${ROOTINCDIR})
 
 add_library(SVfitTF SHARED ${ClassicSVfit_PATH}/TauAnalysis/SVfitTF/src/crystalBall.cc)
+
+if (NOT EXISTS ${ClassicSVfit_PATH}/TauAnalysis/SVfitTF/src/crystalBall.cc)
+  MESSAGE(WARNING "SVfitTF not present. SVfitAnalysis will not be compiled")
+  return()
+endif()
+
+if (NOT EXISTS ${ClassicSVfit_PATH}/TauAnalysis/ClassicSVfit/src/ClassicSVfit.cc)
+  MESSAGE(WARNING "SVfitTF not present. SVfitAnalysis will not be compiled")
+  return()
+endif() 
 
 add_library(ClassicSVfit SHARED ${ClassicSVfit_PATH}/TauAnalysis/ClassicSVfit/src/ClassicSVfit.cc
   ${ClassicSVfit_PATH}/TauAnalysis/ClassicSVfit/src/ClassicSVfitIntegrand.cc

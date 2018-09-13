@@ -4,6 +4,11 @@ include_directories(${PROJECT_SOURCE_DIR}/../include ${CMAKE_SOURCE_DIR}/Core/in
 include_directories($ENV{PYTHIA8_DIR}/include)
 include_directories(${ROOTINCDIR})
 
+if (NOT EXISTS $ENV{PYTHIA8_DIR}/include/Pythia8/Pythia.h)
+  MESSAGE(WARNING "Pythia8 not present. Pythia8Interface will not be compiled.")
+  return()
+endif()
+
 add_library(Pythia8Interface SHARED Pythia8Interface.cc)
 
 add_library(Pythia8 SHARED IMPORTED)
