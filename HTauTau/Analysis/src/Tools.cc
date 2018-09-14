@@ -193,7 +193,7 @@ std::string getSampleNameFromFileName(const EventProxyHTT & myEventProxy){
         //else if(fileName.find("WJetsToLNu")!=std::string::npos && myEventProxy.event->getLHEnOutPartons()>0) sampleName = "WAllJets";
 
         else if(fileName.find("SingleMuonRun201")!=std::string::npos) sampleName =  "Data";
-	else if(fileName.find("SingleTauRun201")!=std::string::npos) sampleName =  "Data";
+	else if(fileName.find("TauRun201")!=std::string::npos) sampleName =  "Data";
 	
         else if(fileName.find("SUSYGluGluToHToTauTau")!=std::string::npos) sampleName =  "ATT";
 
