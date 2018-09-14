@@ -77,7 +77,7 @@ void HTTAnalyzer::initialize(TDirectory* aDir,
 //////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////
 void HTTAnalyzer::finalize(){
-       
+
         myHistos_->finalizeHistograms(myChannelSpecifics->getCategoryRejester());
 }
 //////////////////////////////////////////////////////////////////////////////
@@ -212,7 +212,7 @@ void HTTAnalyzer::fillControlHistos(const std::string & hNameSuffix, float event
         myHistos_->fill2DUnrolledHistogram("h1DUnRollMjjMassSV"+hNameSuffix, aPair.getP4(aSystEffect).M(), jetsMass, eventWeight);
         myHistos_->fill1DHistogram("h1DIso"+hNameSuffix,aLeg1.getProperty(PropertyEnum::combreliso),eventWeight);
         if(aSystEffect!=HTTAnalysis::NOMINAL) return;
-
+	
         fillDecayPlaneAngle(hNameSuffix, eventWeight, aSystEffect);
         fillGenDecayPlaneAngle(hNameSuffix+"_Gen", eventWeight);
         fillDecayPlaneAngle(hNameSuffix+"_RefitPV", eventWeight);
@@ -301,8 +301,7 @@ bool HTTAnalyzer::passCategory(unsigned int iCategory){
 }
 //////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////
-bool HTTAnalyzer::analyze(const EventProxyBase& iEvent, ObjectMessenger *aMessenger)
-{
+bool HTTAnalyzer::analyze(const EventProxyBase& iEvent, ObjectMessenger *aMessenger){
 
         bool runSystematics = false;
 
@@ -356,11 +355,11 @@ bool HTTAnalyzer::analyze(const EventProxyBase& iEvent, ObjectMessenger *aMessen
                 aMET.setP4(met4v);
 
                 myChannelSpecifics->testAllCategories(aSystEffect);
-
+		
                 for(unsigned int iCategory = 0; iCategory<myNumberOfCategories; ++iCategory)
                 {
 
-		  //TEST if(!passCategory(iCategory)) continue;
+		        if(!passCategory(iCategory)) continue;
                         categorySuffix = aCategoryRejester[iCategory]->name();
 
                         float reweightDY = 1.0;
@@ -370,9 +369,8 @@ bool HTTAnalyzer::analyze(const EventProxyBase& iEvent, ObjectMessenger *aMessen
                         systEffectName = HTTAnalysis::systEffectName(iCategory, iSystEffect, aCategoryRejester);
                         hNameSuffix = sampleName+"_"+categorySuffix+systEffectName;
                         fillControlHistos(hNameSuffix, eventWeightWithSyst*reweightDY, aSystEffect);
-                        // Data being put to MLObjectMessenger
-                        
-                }
+                        // Data being put to MLObjectMessenger                        
+                }		
                 if(aMessenger and std::string("MLObjectMessenger").compare((aMessenger->name()).substr(0,17))==0 ) // if NULL it will do nothing
                 {
                     // Putting data to MLObjectMessenger
@@ -395,15 +393,15 @@ bool HTTAnalyzer::analyze(const EventProxyBase& iEvent, ObjectMessenger *aMessen
                     {
                         std::throw_with_nested(std::runtime_error("[ERROR] UNKNOWN ERROR IN HTTAnalyzer::analyze WHEN PUTTING DATA TO MLObjectMessenger!"));
                     }                    
-                }
+                }		
         }
         return true;
 }
 //////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////
-bool HTTAnalyzer::analyze(const EventProxyBase& iEvent)
-{
-    return analyze(iEvent, NULL);
+bool HTTAnalyzer::analyze(const EventProxyBase& iEvent){
+
+  return analyze(iEvent, 0);
 }
 //////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////

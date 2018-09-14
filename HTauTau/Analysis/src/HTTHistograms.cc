@@ -440,7 +440,6 @@ void HTTHistograms::finalizeHistograms(const std::vector<const HTTAnalysis::even
                 //plotCPhistograms(iCategory);
 
                 plotStack(iCategory, "MassSV");
-		return; //TEST
                 plotStack(iCategory, "MassVis");
                 plotStack(iCategory, "MassTrans");
                 plotStack(iCategory, "UnRollTauPtMassVis");
@@ -965,32 +964,7 @@ THStack*  HTTHistograms::plotStack(unsigned int iCategory,
         std::string categoryName = myCategoryRejester[iCategory]->name();
         std::string systEffectName = HTTAnalysis::systEffectName(iCategory, iSystEffect, myCategoryRejester);
         std::string hNameSuffix = "_"+categoryName+systEffectName;
-
-	TH1F *h11 = get1D_TT_Histogram((hName+"TTbar"+hNameSuffix),"MatchJ");
-	TH1F *h22 = get1D_TT_Histogram((hName+"TTbar"+hNameSuffix),"MatchT");
-
-	h11->Print();
-	h22->Print();
-
-	TH1F *h1 = get1DHistogram(hName+"TTTo2L2NuMatchJ"+hNameSuffix);
-	TH1F *h2 = get1DHistogram(hName+"TTToHadronicMatchJ"+hNameSuffix);
-	TH1F *h3 = get1DHistogram(hName+"TTToSemiLeptonicMatchJ"+hNameSuffix);
-
-	if(h1) h1->Print();
-	if(h2) h2->Print();
-	if(h3) h3->Print();
-
-	h1 = get1DHistogram(hName+"TTTo2L2NuMatchT"+hNameSuffix);
-	h2 = get1DHistogram(hName+"TTToHadronicMatchT"+hNameSuffix);
-	h3 = get1DHistogram(hName+"TTToSemiLeptonicMatchT"+hNameSuffix);
-
-	if(h1) h1->Print();
-	if(h2) h2->Print();
-	if(h3) h3->Print();
-
-
-	return 0;
-
+	
         TH1F *hggHiggs110 = get1DHistogram((hName+"ggHTT110"+hNameSuffix));
         TH1F *hggHiggs120 = get1DHistogram((hName+"ggHTT120"+hNameSuffix));
         TH1F *hggHiggs125 = get1DHistogram((hName+"ggHTT125"+hNameSuffix));

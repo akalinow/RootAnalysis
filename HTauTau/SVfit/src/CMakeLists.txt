@@ -36,5 +36,5 @@ if (EXISTS ${ClassicSVfit_PATH}/TauAnalysis/SVfitTF/src/crystalBall.cc AND EXIST
   install(FILES $<1:${PROJECT_SOURCE_DIR}/../config/> DESTINATION config)
 
 else()
-  MESSAGE(WARNING "SVfitTF not present. SVfitAnalysis will not be compiled")
+  MESSAGE(WARNING "SVfitTF not present. SVfitAnalysis will not be compiled.")
 endif()

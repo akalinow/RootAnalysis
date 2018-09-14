@@ -29,8 +29,7 @@ public :
   ///optional: pointer to the PROOF outputfile
   TreeAnalyzer(const std::string & name, 
 		     const std::string & cfgFileName,
-		     EventProxyBase *aProxy,
-		     TProofOutputFile * proofFile=0);
+		     EventProxyBase *aProxy);
 
   ///Default destructor
   ~TreeAnalyzer();

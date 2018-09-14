@@ -35,38 +35,10 @@ void TreeAnalyzer::setObjectMessenger(ObjectMessenger* mess)
 //////////////////////////////////////////////////////////////////////////////
 TreeAnalyzer::TreeAnalyzer(const std::string & aName,
 			   const std::string & cfgFileName,
-			   EventProxyBase *aProxy,
-			   TProofOutputFile * proofFile) : Analyzer(aName){
+			   EventProxyBase *aProxy) : Analyzer(aName){
 
-  ///Analysis control
   nEventsToAnalyze_ = 0;
-
   cfgFileName_ = cfgFileName;
-
-  if(proofFile) {
-    proofFile->SetOutputFileName((filePath_+"/RootAnalysis_"+sampleName_+".root").c_str());
-    store_ = proofFile->OpenFile("RECREATE");
-  }
-  else{
-    // Create histogram store
-    std::string fullPath = filePath_+"/RootAnalysis_"+sampleName_+".root";
-    store_ = new TFile(fullPath.c_str(),"RECREATE");
-  }
-
-  ///Histogram with processing statistics. Necessary for the PROOF based analysis
-  hStats_ = new TH1D("hStats","Various statistics",21,-0.5,20.5);
-  hStats_->GetXaxis()->SetBinLabel(1,"Xsection");
-  hStats_->GetXaxis()->SetBinLabel(2,"external scaling factor");
-  hStats_->GetXaxis()->SetBinLabel(3,"number of runs");
-  hStats_->GetXaxis()->SetBinLabel(4,"number of parrarel nodes");
-  hStats_->GetXaxis()->SetBinLabel(5,"number of event analyzed");
-  hStats_->GetXaxis()->SetBinLabel(6,"number of event skipped");
-  hStats_->GetXaxis()->SetBinLabel(7,"generator preselection eff.");
-  hStats_->GetXaxis()->SetBinLabel(8,"number of events processed at RECO/AOD");
-  hStats_->GetXaxis()->SetBinLabel(9,"number of events saved from RECO/AOD");
-  hStats_->GetXaxis()->SetBinLabel(10,"reco preselection eff.");
-  TDirectory *aDir = store_->mkdir("Statistics");
-  hStats_->SetDirectory(aDir);
 
   myStrSelections_ = new pat::strbitset();
 
@@ -177,6 +149,24 @@ void TreeAnalyzer::init(std::vector<Analyzer*> myAnalyzers){
   parseCfg(cfgFileName_);
   myProxy_->init(fileNames_);
   myAnalyzers_ = myAnalyzers;
+
+  std::string fullPath = filePath_+"/RootAnalysis_"+sampleName_+".root";
+  store_ = new TFile(fullPath.c_str(),"RECREATE");
+  
+  ///Histogram with processing statistics. Necessary for the PROOF based analysis
+  hStats_ = new TH1D("hStats","Various statistics",21,-0.5,20.5);
+  hStats_->GetXaxis()->SetBinLabel(1,"Xsection");
+  hStats_->GetXaxis()->SetBinLabel(2,"external scaling factor");
+  hStats_->GetXaxis()->SetBinLabel(3,"number of runs");
+  hStats_->GetXaxis()->SetBinLabel(4,"number of parrarel nodes");
+  hStats_->GetXaxis()->SetBinLabel(5,"number of event analyzed");
+  hStats_->GetXaxis()->SetBinLabel(6,"number of event skipped");
+  hStats_->GetXaxis()->SetBinLabel(7,"generator preselection eff.");
+  hStats_->GetXaxis()->SetBinLabel(8,"number of events processed at RECO/AOD");
+  hStats_->GetXaxis()->SetBinLabel(9,"number of events saved from RECO/AOD");
+  hStats_->GetXaxis()->SetBinLabel(10,"reco preselection eff.");
+  TDirectory *aDir = store_->mkdir("Statistics");
+  hStats_->SetDirectory(aDir);
 
   if(nThreads_==1) {
     mySummary_ = new SummaryAnalyzer("Summary");

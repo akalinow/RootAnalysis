@@ -98,14 +98,17 @@ float getCrossSection(const std::string & sampleName){
 
         ///https://twiki.cern.ch/twiki/bin/view/CMS/HiggsToTauTauWorking2016#MC_and_data_samples
         if(sampleName.find("ZZTo2L2Q")!=std::string::npos) crossSection = 3.22;
+	if(sampleName.find("ZZTo2L2Nu")!=std::string::npos) crossSection = 0.5644;//https://cms-gen-dev.cern.ch/xsdb/?searchQuery=DAS=ZZTo2L2Nu_13TeV_powheg_pythia8	
         if(sampleName.find("ZZTo4L")!=std::string::npos) crossSection = 1.212;
         if(sampleName.find("WZTo1L3Nu")!=std::string::npos) crossSection = 3.05;
-	if(sampleName.find("WZTo3LNu")!=std::string::npos) crossSection = 3.05/0.2*3*0.0337;//WZTo1L3Nu/BR(Z->nunu)*BR(Z->ll)	
+	if(sampleName.find("WZTo3LNu")!=std::string::npos) crossSection = 5.052;//https://cms-gen-dev.cern.ch/xsdb/?searchQuery=DAS=WZTo3LNu_TuneCP5_13TeV-amcatnloFXFX-pythia8
         if(sampleName.find("WZJToLLLNu")!=std::string::npos) crossSection = 4.708;
-        if(sampleName.find("WWTo1L1Nu2Q")!=std::string::npos) crossSection = 49.997;
         if(sampleName.find("WZTo1L1Nu2Q")!=std::string::npos) crossSection = 10.71;
-        if(sampleName.find("VVTo2L2Nu")!=std::string::npos) crossSection = 11.95;
-        if(sampleName.find("WZTo2L2Q")!=std::string::npos) crossSection = 5.595;
+	if(sampleName.find("WZTo2L2Q")!=std::string::npos) crossSection = 6.331;//https://cms-gen-dev.cern.ch/xsdb/?searchQuery=DAS=WZTo2L2Q_13TeV_amcatnloFXFX_madspin_pythia8
+	if(sampleName.find("VVTo2L2Nu")!=std::string::npos) crossSection = 11.95;        
+	if(sampleName.find("WWTo1L1Nu2Q")!=std::string::npos) crossSection = 49.997;
+	if(sampleName.find("WWTo2L2Nu")!=std::string::npos) crossSection = 11.08;//https://cms-gen-dev.cern.ch/xsdb/?searchQuery=DAS=WWTo2L2Nu_NNPDF31_TuneCP5_PSweights_13TeV-powheg-pythia8
+	if(sampleName.find("WWTo4Q")!=std::string::npos) crossSection = 47.73;//https://cms-gen-dev.cern.ch/xsdb/?searchQuery=DAS=WWTo4Q_NNPDF31_TuneCP5_13TeV-powheg-pythia8
 
         ///https://twiki.cern.ch/twiki/bin/view/CMS/HiggsToTauTauWorking2016#MC_and_data_samples
         if(sampleName=="Wantitop") crossSection = 35.6;
@@ -235,16 +238,18 @@ std::string getSampleNameFromFileName(const EventProxyHTT & myEventProxy){
         else if(fileName.find("STtchannel__antitop")!=std::string::npos) sampleName =  "t-channel_antitop";
         else if(fileName.find("STtchannel__top")!=std::string::npos) sampleName =  "t-channel_top";
         else if(fileName.find("ZZTo2L2Q")!=std::string::npos) sampleName =  "ZZTo2L2Q";
-        else if(fileName.find("ZZTo4L")!=std::string::npos) sampleName =  "ZZTo4L";
+        else if(fileName.find("ZZTo2L2Nu")!=std::string::npos) sampleName =  "ZZTo2L2Nu";
+        else if(fileName.find("ZZTo4L")!=std::string::npos) sampleName =  "ZZTo4L";	
         else if(fileName.find("WZTo1L3Nu")!=std::string::npos) sampleName =  "WZTo1L3Nu";
 	else if(fileName.find("WZTo3LNu")!=std::string::npos) sampleName =  "WZTo3LNu";	
         else if(fileName.find("WZJToLLLNu")!=std::string::npos) sampleName =  "WZJToLLLNu";
-        else if(fileName.find("WWTo1L1Nu2Q")!=std::string::npos) sampleName =  "WWTo1L1Nu2Q";
-        else if(fileName.find("WWToLNuQQ")!=std::string::npos) sampleName =  "WWTo1L1Nu2Q";	
-	///else if(fileName.find("WWTo2L2Nu")!=std::string::npos) sampleName =  "WWTo2L2Nu";	
         else if(fileName.find("WZTo1L1Nu2Q")!=std::string::npos) sampleName =  "WZTo1L1Nu2Q";
-        else if(fileName.find("VVTo2L2Nu")!=std::string::npos) sampleName =  "VVTo2L2Nu";
         else if(fileName.find("WZTo2L2Q")!=std::string::npos) sampleName =  "WZTo2L2Q";
+	else if(fileName.find("WWTo1L1Nu2Q")!=std::string::npos) sampleName =  "WWTo1L1Nu2Q";
+        else if(fileName.find("WWToLNuQQ")!=std::string::npos) sampleName =  "WWTo1L1Nu2Q";	
+	else if(fileName.find("WWTo2L2Nu")!=std::string::npos) sampleName =  "WWTo2L2Nu";
+	else if(fileName.find("WWTo4Q")!=std::string::npos) sampleName =  "WWTo4Q";	
+        else if(fileName.find("VVTo2L2Nu")!=std::string::npos) sampleName =  "VVTo2L2Nu";
         else if(fileName.find("EWKWMinus")!=std::string::npos) sampleName =  "EWKWMinus";
         else if(fileName.find("EWKWPlus")!=std::string::npos) sampleName =  "EWKWPlus";
         else if(fileName.find("EWKZ2JetsZToLL")!=std::string::npos) sampleName =  "EWKZ2JetsZToLL";

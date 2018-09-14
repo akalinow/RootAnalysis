@@ -29,7 +29,6 @@ ChannelSpecifics::ChannelSpecifics(HTTAnalyzer *aAnalyzer){
         h2DTauXTrgFakeCorrections = 0;
         h3DTauCorrections = 0;
 
-        //initializeLeptonCorrections();
         initializeBTagCorrections();
         defineCategories();
 
@@ -110,8 +109,11 @@ void ChannelSpecifics::initializeLeptonCorrections(){
                 RooAbsReal *tau_trg_genuine_efficiency = scaleWorkspace->function("t_genuine_TightIso_tt_ratio");//MB data->ratio
                 RooAbsReal *tau_trg_fake_efficiency = scaleWorkspace->function("t_fake_TightIso_tt_ratio");//MB data->ratio
 
+		int nPtParametrisationBins = 1980;
+		nPtParametrisationBins = 990; //TEST
+
                 h2DMuonIdCorrections = (TH2F*)muon_id_scalefactor->createHistogram("h2DMuonIdCorrections",
-                                                                                   *scaleWorkspace->var("m_pt"),RooFit::Binning(1980,10,1000),
+                                                                                   *scaleWorkspace->var("m_pt"),RooFit::Binning(nPtParametrisationBins,10,1000),
                                                                                    RooFit::YVar(*scaleWorkspace->var("m_eta"),RooFit::Binning(48,-2.4,2.4)),//MB m_abs_eta->m_eta
                                                                                    RooFit::Extended(kFALSE),
                                                                                    RooFit::Scaling(kFALSE));
@@ -120,14 +122,14 @@ void ChannelSpecifics::initializeLeptonCorrections(){
                 RooArgSet projectedVarsForMu;
                 const RooAbsReal *muon_iso_scalefactor_proj = muon_iso_scalefactor->createPlotProjection(dependentVarsForMu,projectedVarsForMu);
                 h3DMuonIsoCorrections = (TH3F*)muon_iso_scalefactor_proj->createHistogram("h3DMuonIsoCorrections",
-                                                                                          *scaleWorkspace->var("m_pt"),RooFit::Binning(1980,10,1000),
+                                                                                          *scaleWorkspace->var("m_pt"),RooFit::Binning(nPtParametrisationBins,10,1000),
                                                                                           RooFit::YVar(*scaleWorkspace->var("m_eta"),RooFit::Binning(48,-2.4,2.4)),
                                                                                           RooFit::ZVar(*scaleWorkspace->var("m_iso"),RooFit::Binning(12,-0.05,0.55)),
                                                                                           RooFit::Extended(kFALSE),
                                                                                           RooFit::Scaling(kFALSE));
                 const RooAbsReal *muon_trg_scalefactor_proj = muon_trg_scalefactor->createPlotProjection(dependentVarsForMu,projectedVarsForMu);
                 h3DMuonTrgCorrections = (TH3F*)muon_trg_scalefactor_proj->createHistogram("h3DMuonTrgCorrections",
-                                                                                          *scaleWorkspace->var("m_pt"),RooFit::Binning(1980,10,1000),
+                                                                                          *scaleWorkspace->var("m_pt"),RooFit::Binning(nPtParametrisationBins,10,1000),
                                                                                           RooFit::YVar(*scaleWorkspace->var("m_eta"),RooFit::Binning(48,-2.4,2.4)),
                                                                                           RooFit::ZVar(*scaleWorkspace->var("m_iso"),RooFit::Binning(12,-0.05,0.55)),
                                                                                           RooFit::Extended(kFALSE),
@@ -138,16 +140,16 @@ void ChannelSpecifics::initializeLeptonCorrections(){
                                                                                      RooFit::Scaling(kFALSE));
                 //Uwaga: ponizsze korekcje sa 2d, do wlozenia w 3d
                 TH2F *h2DMuonXTrgCorrections_iso = (TH2F*)muon_xtrg_scalefactor_iso->createHistogram("h2DMuonXTrgCorrections_iso",
-									                       *scaleWorkspace->var("m_pt"),RooFit::Binning(1980,10,1000),
+									                       *scaleWorkspace->var("m_pt"),RooFit::Binning(nPtParametrisationBins,10,1000),
 									                       RooFit::YVar(*scaleWorkspace->var("m_eta"),RooFit::Binning(48,-2.4,2.4)),//MB m_abs_eta->m_eta
 									                       RooFit::Extended(kFALSE),
 									                       RooFit::Scaling(kFALSE));
                 TH2F *h2DMuonXTrgCorrections_aiso = (TH2F*)muon_xtrg_scalefactor_iso->createHistogram("h2DMuonXTrgCorrections_aiso",
-									                       *scaleWorkspace->var("m_pt"),RooFit::Binning(1980,10,1000),
+									                       *scaleWorkspace->var("m_pt"),RooFit::Binning(nPtParametrisationBins,10,1000),
 									                       RooFit::YVar(*scaleWorkspace->var("m_eta"),RooFit::Binning(48,-2.4,2.4)),//MB m_abs_eta->m_eta
 									                       RooFit::Extended(kFALSE),
 									                       RooFit::Scaling(kFALSE));
-                h3DMuonXTrgCorrections = new TH3F("h3DMuonXTrgCorrections","",1980,10,1000,48,-2.4,2.4,8,-0.05,0.35);//less iso-bins than for id/single-trg due to different range
+                h3DMuonXTrgCorrections = new TH3F("h3DMuonXTrgCorrections","",nPtParametrisationBins,10,1000,48,-2.4,2.4,8,-0.05,0.35);//less iso-bins than for id/single-trg due to different range
                 for(int iX=0; iX<1980; ++iX){
                   for(int iY=0; iY<48; ++iY){
                     float binContent = h2DMuonXTrgCorrections_iso->GetBinContent(iX+1,iY+1);
@@ -176,14 +178,14 @@ void ChannelSpecifics::initializeLeptonCorrections(){
                             binsForTauTrg.addUniform(1340, 330, 1000);
                  */
                 h2DTauTrgGenuineCorrections = (TH2F*)tau_trg_genuine_efficiency_proj->createHistogram("h2DTauTrgGenuineCorrections",
-                                                                                                      *scaleWorkspace->var("t_pt"),RooFit::Binning(1000,0,1000),
+                                                                                                      *scaleWorkspace->var("t_pt"),RooFit::Binning(nPtParametrisationBins,10,1000),
                                                                                                       //*scaleWorkspace->var("t_pt"),RooFit::Binning(binsForTauTrg),
                                                                                                       RooFit::YVar(*scaleWorkspace->var("t_dm"),RooFit::Binning(11,-0.5,10.5)),//MB proper binning (3->11) for DMs==0,1(2),10
                                                                                                       RooFit::Extended(kFALSE),
                                                                                                       RooFit::Scaling(kFALSE));
 
                 h2DTauTrgFakeCorrections = (TH2F*)tau_trg_fake_efficiency_proj->createHistogram("h2DTauTrgFakeCorrections",
-                                                                                                *scaleWorkspace->var("t_pt"),RooFit::Binning(1000,0,1000),
+                                                                                                *scaleWorkspace->var("t_pt"),RooFit::Binning(nPtParametrisationBins,10,1000),
                                                                                                 //*scaleWorkspace->var("t_pt"),RooFit::Binning(binsForTauTrg),
                                                                                                 RooFit::YVar(*scaleWorkspace->var("t_dm"),RooFit::Binning(11,-0.5,10.5)),//MB proper binning (3->11) for DMs==0,1(2),10
                                                                                                 RooFit::Extended(kFALSE),
@@ -212,13 +214,13 @@ void ChannelSpecifics::initializeLeptonCorrections(){
                 const RooAbsReal * tau_xtrg_fake_efficiency_proj = tau_xtrg_fake_efficiency->createPlotProjection(dependentVarsForMT,projectedVarsForMT);
 
                 h2DTauXTrgGenuineCorrections = (TH2F*)tau_xtrg_genuine_efficiency_proj->createHistogram("h2DTauXTrgGenuineCorrections",
-											                *scaleWorkspace_b->var("t_pt"),RooFit::Binning(1000,0,1000),
+											                *scaleWorkspace_b->var("t_pt"),RooFit::Binning(nPtParametrisationBins,10,1000),
 											                RooFit::YVar(*scaleWorkspace_b->var("t_eta"),RooFit::Binning(4,-2.5,2.5)),//MB binning in eta: barrel/endcaps, i.e. <1.5
 											                RooFit::Extended(kFALSE),
 											                RooFit::Scaling(kFALSE));
 
                 h2DTauXTrgFakeCorrections = (TH2F*)tau_xtrg_fake_efficiency_proj->createHistogram("h2DTauXTrgFakeCorrections",
-										                  *scaleWorkspace_b->var("t_pt"),RooFit::Binning(1000,0,1000),
+										                  *scaleWorkspace_b->var("t_pt"),RooFit::Binning(nPtParametrisationBins,10,1000),
 										                  RooFit::YVar(*scaleWorkspace_b->var("t_eta"),RooFit::Binning(4,-2.5,2.5)),//MB binning in eta: barrel/endcaps, i.e. <1.5
 										                  RooFit::Extended(kFALSE),
 										                  RooFit::Scaling(kFALSE));
