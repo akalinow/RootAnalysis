@@ -44,15 +44,15 @@ float getCrossSection(const std::string & sampleName){
         }
 	if(sampleName.find("TTTo2L2Nu")!=std::string::npos) {
 	  ///Inclusive TT*BR(WW->2L2Nu)
-	  crossSection = 831.76*0.1086*0.1086;
+	  crossSection = 831.76*3*0.1086*3*0.1086;
 	}
 	if(sampleName.find("TTToHadronic")!=std::string::npos) {
 	  ///Inclusive TT*BR(WW->hadronic)
-	  crossSection = 831.76*(1-0.1086)*(1-0.1086);
+	  crossSection = 831.76*(1-3*0.1086)*(1-3*0.1086);
 	}
 	if(sampleName.find("TTToSemiLeptonic")!=std::string::npos) {
 	  ///Inclusive TT*BR(WW->SemiLeptonic)
-	  crossSection = 831.76*(1-0.1086)*0.1086*2;
+	  crossSection = 831.76*(1-3*0.1086)*3*0.1086*2;
 	}
         //https://twiki.cern.ch/twiki/pub/LHCPhysics/LHCHXSWG/Higgs_XSBR_YR4_update.xlsx
         //https://twiki.cern.ch/twiki/bin/view/LHCPhysics/CERNYellowReportPageBR2014#Higgs_2_fermions
