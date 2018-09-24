@@ -26,3 +26,8 @@ Convert the plain ROOT TTRee into python numpy array
 python python/root2pickle.py RootAnalysis_SVfitAnalysisMuTau.root
 ```
 
+Train the NN (requires TensorFlow)
+
+```
+python python/neuralnetwork_svfit.py
+```
