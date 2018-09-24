@@ -19,4 +19,5 @@ install(TARGETS Analysis httAnalysis
         RUNTIME DESTINATION bin
         LIBRARY DESTINATION lib)
 install(FILES $<1:${PROJECT_SOURCE_DIR}/../config/> DESTINATION config)
+install(FILES $<1:${PROJECT_SOURCE_DIR}/../python/> DESTINATION python)
 install(DIRECTORY DESTINATION fig_png)
