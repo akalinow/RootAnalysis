@@ -4,6 +4,7 @@
 #include <string>
 #include <vector>
 #include <map>
+#include <tuple>
 
 #include "ObjectMessenger.h"
 #include "EventProxyBase.h"
@@ -19,6 +20,7 @@
 #include "TClonesArray.h"
 #include "TParticle.h"
 #include "TRandom3.h"
+#include "TMatrixD.h"
 
 #include "Analyzer.h"
 
@@ -74,7 +76,10 @@ class Pythia8Interface: public Analyzer{
 
   HTTParticle makeTau(const TParticle & aTau);
 
-  HTTPair makePair(const HTTParticle & aTau1, const HTTParticle & aTau2);
+  void makeMET(const HTTParticle & aTau1, const HTTParticle & aTau2);
+
+  HTTPair makePair(const HTTParticle & aTau1, const HTTParticle & aTau2,
+		   const TVector2 & met, const TMatrixD & covMET);
 
   void makeRecoTaus(const TParticle & aTau1, const TParticle & aTau2);
 
@@ -82,6 +87,8 @@ class Pythia8Interface: public Analyzer{
   TPythia8 pythia8;
   TClonesArray myParticles;
 
+  TVector2 myMET;
+  TMatrixD covMET;
   TParticle myTauPlus, myTauMinus;
   TParticle mySmearedLeg1, mySmearedLeg2; 
 

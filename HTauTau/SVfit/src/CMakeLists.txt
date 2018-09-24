@@ -19,7 +19,7 @@ if (EXISTS ${ClassicSVfit_PATH}/TauAnalysis/SVfitTF/src/crystalBall.cc AND EXIST
     ${ClassicSVfit_PATH}/TauAnalysis/ClassicSVfit/src/SVfitIntegratorMarkovChain.cc
     ${ClassicSVfit_PATH}/TauAnalysis/ClassicSVfit/src/FastMTT.cc)
 
-  add_library(SVfitAnalysis SHARED SVfitAnalyzer.cc)
+  add_library(SVfitAnalysis SHARED SVfitAnalyzer.cc MLAnalyzer.cc SVfitHistograms.cc)
 
   # Depend on a library that we defined in the top-level file
   target_link_libraries(SVfitAnalysis Core DataFormats Analysis ClassicSVfit SVfitTF ${ROOT_LIBRARIES})

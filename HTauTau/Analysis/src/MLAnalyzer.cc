@@ -482,6 +482,7 @@ void MLAnalyzer::performAnalysis(const EventProxyBase& iEvent, ObjectMessenger *
 			std::for_each(jets->begin(), jets->end(), [&](const HTTParticle* jet)
 			{
 				extractP4(jet->getP4(*aSystEffect), std::string("jets"), no); // copy P4 to bufors
+				no++;
 			});
 
 			// Extract values of properties defined in PropertyEnum.h and selected in external file

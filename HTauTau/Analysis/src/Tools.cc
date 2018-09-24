@@ -260,6 +260,8 @@ std::string getSampleNameFromFileName(const EventProxyHTT & myEventProxy){
 	else if(fileName.find("TTToHadronic")!=std::string::npos) sampleName =  "TTToHadronic";
 	else if(fileName.find("TTToSemiLeptonic")!=std::string::npos) sampleName =  "TTToSemiLeptonic";
 	else if(fileName.find("TTTune")!=std::string::npos) sampleName =  "TTbar";
+
+	else if(fileName.find("Pythia8")!=std::string::npos) sampleName =  "Pythia8";
 	
         std::string matchingMode = getMatchingName(myEventProxy);
 

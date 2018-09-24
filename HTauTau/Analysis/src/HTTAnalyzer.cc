@@ -44,16 +44,17 @@ HTTAnalyzer::HTTAnalyzer(const std::string & aName, const std::string & aDecayMo
 
                 ntupleFile_ = 0;
                 hStatsFromFile = 0;
+		myHistos_ = 0;
         }
 }
 //////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////
 HTTAnalyzer::~HTTAnalyzer(){
 
-        if(myHistos_) delete myHistos_;
-        if(puDataFile_) delete puDataFile_;
-        if(puMCFile_) delete puMCFile_;
-        if(myChannelSpecifics) delete myChannelSpecifics;
+  if(myHistos_) delete myHistos_;
+  if(puDataFile_) delete puDataFile_;
+  if(puMCFile_) delete puMCFile_;
+  if(myChannelSpecifics) delete myChannelSpecifics;
 }
 //////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////

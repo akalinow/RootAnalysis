@@ -10,73 +10,73 @@
 #include "EventProxyBase.h"
 #include "EventProxyHTT.h"
 
+#include "strbitset.h"
 #include "TDirectory.h"
 
 //ROOT includes
 #include "TTree.h"
 
-#include "Analyzer.h"
+#include "HTTAnalyzer.h"
+#include "ChannelSpecifics.h"
+#include "AnalysisEnums.h"
 
 #include "TauAnalysis/ClassicSVfit/interface/ClassicSVfit.h"
 #include "TauAnalysis/ClassicSVfit/interface/FastMTT.h"
 
+class SVfitHistograms;
+
+class TH1F;
+class TH2F;
+class TH3F;
 class TLorentzVector;
+class TF1;
 
-class SVfitAnalyzer: public Analyzer{
+class SVfitAnalyzer: public HTTAnalyzer{
 
-  public:
+ public:
 
   SVfitAnalyzer(const std::string & aName, const std::string & aDecayMode = "None");
 
   virtual ~SVfitAnalyzer();
 
-  virtual bool analyze(const EventProxyBase& iEvent, ObjectMessenger *aMessenger) override;
+  ///Initialize the analyzer
+  virtual void initialize(TDirectory* aDir,
+			  pat::strbitset *aSelections);
 
-  virtual bool analyze(const EventProxyBase& iEvent) override {return analyze(iEvent, nullptr); }
+  virtual void setAnalysisObjects(const EventProxyHTT & myEventProxy);
 
-  Analyzer* clone() const override;
+  virtual bool analyze(const EventProxyBase& iEvent) {return analyze(iEvent, 0); }
 
-  ///Get jets separated by deltaR from tau an muon.
-  std::vector<HTTParticle> getSeparatedJets(const EventProxyHTT & myEventProxy,
-      float deltaR);
+  virtual bool analyze(const EventProxyBase& iEvent, ObjectMessenger *aMessenger);
 
-  private:
+  virtual void finalize();
 
-  void setAnalysisObjects(const EventProxyHTT & myEventProxy);
+  virtual void fillControlHistos(const std::string & hNameSuffix);
+
+ private:
 
   TLorentzVector computeMTT(const std::string & algoName);
+  
+  TLorentzVector runSVFitAlgo(const std::vector<classic_svFit::MeasuredTauLepton> & measuredTauLeptons,
+                              const HTTParticle &aMET, const TMatrixD &covMET);
 
-  TLorentzVector runSVfitAlgo(const std::vector<classic_svFit::MeasuredTauLepton> & measuredTauLeptons);
-
-  TLorentzVector runFastMTTAlgo(const std::vector<classic_svFit::MeasuredTauLepton> & measuredTauLeptons);
+  TLorentzVector runFastMTTAlgo(const std::vector<classic_svFit::MeasuredTauLepton> & measuredTauLeptons,
+				const HTTParticle &aMET, const TMatrixD &covMET);
 
   std::tuple<double, double> getTauMomentum(const TLorentzVector & visP4, double cosGJ);
 
-  //decayMode
-  const std::string decayMode_;
+  ///Histograms storage.
+  SVfitHistograms *myHistos_;
 
-  ///Reconstructed objects selected for given event.
-  HTTEvent event_;
-  HTTPair pair_;
-  std::string sampleName_;
+  ///ROOT file containing current TTree
+  TFile *ntupleFile_;
 
-  HTTParticle leg2_;
-  HTTParticle leg1_;
-  HTTParticle genLeg1_;
-  HTTParticle genLeg2_;
+  ClassicSVfit SVFitAlgo;
+  FastMTT fastMTTAlgo;
 
-  HTTParticle jet1_;
-  HTTParticle jet2_;
-  std::vector<HTTParticle> separatedJets_;
-
-  HTTParticle MET_;
-  TMatrixD covMET_;
-
-  float genSumM_;
-  float higgsMassTrans_;
-
-  ClassicSVfit SVfitAlgo_;
-  FastMTT fastMTTAlgo_;
+  TMatrixD aCovMET;
+  TLorentzVector SVFitLeg1P4, SVFitLeg2P4;
+  /////////
 
 };
 

@@ -191,10 +191,8 @@ void MLAnalyzer::addBranch(TTree *tree)
 			// Adding branches for global parameters and saving the address of TTree
 			MLTree_ = tree;
 			std::cout<<"[ML]\tAdding global parameter branches for ML analysis."<<std::endl;
-			tree->Branch("visMass", &visMass_);
-			tree->Branch("genMass", &genVisMass_);
-			tree->Branch("higgsMassTrans", &higgsMassTrans_);
-			tree->Branch("higgsPT", &higgsPT_);
+			tree->Branch("genMass", &genMass_);
+			tree->Branch("fastMTTMass", &fastMTTMass_);
 			tree->Branch("covMET00", &covMET_[0][0]);
 			tree->Branch("covMET01", &covMET_[0][1]);
 			tree->Branch("covMET10", &covMET_[1][0]);
@@ -407,31 +405,16 @@ void MLAnalyzer::globalsHTT(const MLObjectMessenger* mess, const std::vector<con
 	try
 	{
 		void* p = NULL;
-		const HTTParticle* aMET = mess->getObject(static_cast<HTTParticle*>(p), std::string("met"));
-		//const float* bs = nullptr;//mess->getObject(static_cast<float*>(p), "beta_score");
-		const float* higgs_mass_trans = mess->getObject(static_cast<float*>(p), "higgs_mass_trans");
 		covMET_[0][0] = *mess->getObject(static_cast<double*>(p), "covMET00");
 		covMET_[0][1] = *mess->getObject(static_cast<double*>(p), "covMET01");
 		covMET_[1][0] = *mess->getObject(static_cast<double*>(p), "covMET10");
 		covMET_[1][1] = *mess->getObject(static_cast<double*>(p), "covMET11"); 
 		
-		//TODO: remove when covMET contains real values
-		covMET_[0][0] = 1.;
-		covMET_[1][1] = 1.;
-
-		//const int* nJets = nullptr;//mess ->getObject(static_cast<int*>(p), "nJets30");
-
-		const HTTParticle* leg1 = legs->at(0);
-		const HTTParticle* leg2 = legs->at(1);
-
 		//if(!(leg1 && leg2 && aMET && aSystEffect && bs && higgs_mass && nJets))
 		//	throw std::logic_error("[ERROR] NULL POINTERS PRESENT!");
 		// Calculation and assignement of global parameters
-		const TLorentzVector & aVisSum = leg1->getP4() + leg2->getP4();
-		genVisMass_ = *mess->getObject(static_cast<float*>(p),"gen_mass");
-		visMass_ = aVisSum.M();
-		higgsPT_ =  (aVisSum + aMET->getP4()).Pt();
-		higgsMassTrans_ = *higgs_mass_trans;
+		genMass_ = *mess->getObject(static_cast<double*>(p),"genMass");
+		fastMTTMass_ = *mess->getObject(static_cast<double*>(p),"fastMTTMass");
 	}
 	catch(const std::out_of_range& e)
 	{
@@ -465,7 +448,6 @@ void MLAnalyzer::performAnalysis(const EventProxyBase& iEvent, ObjectMessenger *
 		const auto sE = HTTAnalysis::NOMINAL;
 		const HTTAnalysis::sysEffects* aSystEffect = &sE;//mess->getObject(static_cast< HTTAnalysis::sysEffects*>(p), std::string("systEffect"));
 
-
 		if(mess && legs && jets)
 		{
 			if(execution_counter_ == 0) // will execute only once at the beginning
@@ -496,6 +478,7 @@ void MLAnalyzer::performAnalysis(const EventProxyBase& iEvent, ObjectMessenger *
 			std::for_each(jets->begin(), jets->end(), [&](const HTTParticle* jet)
 			{
 				extractP4(jet->getP4(), std::string("jets"), no); // copy P4 to bufors
+				no++;
 			});
 
 			// Extract values of properties defined in PropertyEnum.h and selected in external file

@@ -20,8 +20,6 @@
 #include <exception>
 #include <typeinfo>
 
-
-
 class ObjectMessenger{
 
  public:

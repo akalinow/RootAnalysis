@@ -11,7 +11,7 @@
 
 //////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////
-Pythia8Interface::Pythia8Interface(const std::string & aName) : Analyzer(aName){ }
+Pythia8Interface::Pythia8Interface(const std::string & aName) : Analyzer(aName), covMET(2,2){ }
 //////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////
 Pythia8Interface::~Pythia8Interface(){
@@ -37,7 +37,7 @@ void Pythia8Interface::initialize(TDirectory* aDir,
 
   myParticles.SetClass("TParticle", 2000);
 
-  std::string fileName = "SVFitData.root";
+  std::string fileName = "Pythia8_SVFitData.root";
   myFile = new TFile(fileName.c_str(),"RECREATE");
   httEvent = new HTTEvent();
   myTree = new TTree("HTauTauTree","");
@@ -303,9 +303,9 @@ HTTParticle Pythia8Interface::makeTau(const TParticle & aTau){
   TLorentzVector p4Charged = getChargedComponent(aTau);
   TLorentzVector p4Neutral = getNeutralComponent(aTau);
   TVector3 pv(aTau.Vx(), aTau.Vy(), aTau.Vz());
-  pv *= 0.1;//convet mm [Pythia] to cm [CMSSW]
+  pv *= 0.1;//convert mm [Pythia] to cm [CMSSW]
   TVector3 sv(aDaughter->Vx(), aDaughter->Vy(), aDaughter->Vz());
-  sv *= 0.1;//convet mm [Pythia] to cm [CMSSW]
+  sv *= 0.1;//convert mm [Pythia] to cm [CMSSW]
   TVector3 pca = get3DImpactPoint(p4, p4Charged, sv);
   
   HTTParticle aLepton;
@@ -326,6 +326,23 @@ HTTParticle Pythia8Interface::makeTau(const TParticle & aTau){
   aLepton.setProperties(aProperties);
   
   return aLepton;
+}
+//////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////////
+void Pythia8Interface::makeMET(const HTTParticle & aTau1, const HTTParticle & aTau2){
+  
+  TLorentzVector nunuGen = aTau1.getP4() + aTau2.getP4() -
+    aTau1.getChargedP4() - aTau2.getChargedP4() -
+    aTau1.getNeutralP4() - aTau2.getNeutralP4();
+
+  myMET.SetX(nunuGen.X());
+  myMET.SetY(nunuGen.Y());
+
+  covMET[0][0] = 1.0;
+  covMET[0][1] = 0.0;
+  covMET[1][0] = 0.0;
+  covMET[1][1] = 1.0;
+      
 }
 //////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////
@@ -361,11 +378,10 @@ void Pythia8Interface::makeRecoTaus(const TParticle & aTau1, const TParticle & a
 }
 //////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////
-HTTPair Pythia8Interface::makePair(const HTTParticle & aTau1, const HTTParticle & aTau2){
+HTTPair Pythia8Interface::makePair(const HTTParticle & aTau1, const HTTParticle & aTau2,
+				   const TVector2 & met, const TMatrixD & covMET){
 
   TLorentzVector p4 = aTau1.getP4() + aTau2.getP4();
-
-  TVector2 met(0,0);//FIXME
 
   double mTLeg1 = 0.0;//FIXME
   double mTLeg2 = 0.0;//FIXME
@@ -373,7 +389,7 @@ HTTPair Pythia8Interface::makePair(const HTTParticle & aTau1, const HTTParticle 
   HTTPair aHTTpair;
   aHTTpair.setP4(p4);
   aHTTpair.setMET(met);
-  aHTTpair.setMETMatrix(0.0, 0.0, 0.0, 0.0);//FIXME
+  aHTTpair.setMETMatrix(covMET[0][0], covMET[0][1], covMET[1][0], covMET[1][1]);
   aHTTpair.setMTLeg1(mTLeg1);
   aHTTpair.setMTLeg2(mTLeg2);
   aHTTpair.setLeg1(aTau1);
@@ -412,6 +428,7 @@ bool Pythia8Interface::analyze(const EventProxyBase& iEvent, ObjectMessenger *aM
       httGenLeptonCollection.clear();
       HTTParticle aGenTau1 = makeTau(myTauPlus);
       HTTParticle aGenTau2 = makeTau(myTauMinus);
+      makeMET(aGenTau1, aGenTau2);
       httGenLeptonCollection.push_back(aGenTau1);
       httGenLeptonCollection.push_back(aGenTau2);
 
@@ -422,7 +439,7 @@ bool Pythia8Interface::analyze(const EventProxyBase& iEvent, ObjectMessenger *aM
       httLeptonCollection.push_back(aLeg2);
 
       httPairCollection.clear();
-      httPairCollection.push_back(makePair(aLeg1, aLeg2));
+      httPairCollection.push_back(makePair(aLeg1, aLeg2, myMET, covMET));
       
       myTree->Fill();
       hStats->Fill(0);      

@@ -89,7 +89,8 @@ class MLAnalyzer : public Analyzer
 
   //! global parameters of the analylis
   float visMass_; 
-	float genVisMass_;
+  float genMass_;
+  float fastMTTMass_;
   float higgsPT_;
   float betaScore_; /*!< Beta score of B-jet */
   float higgsMassTrans_; /*!< Transverse mass of Higgs */
