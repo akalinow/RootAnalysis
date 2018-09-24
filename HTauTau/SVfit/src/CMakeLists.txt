@@ -34,7 +34,7 @@ if (EXISTS ${ClassicSVfit_PATH}/TauAnalysis/SVfitTF/src/crystalBall.cc AND EXIST
     RUNTIME DESTINATION bin
     LIBRARY DESTINATION lib)
   install(FILES $<1:${PROJECT_SOURCE_DIR}/../config/> DESTINATION config)
-
+  install(FILES $<1:${PROJECT_SOURCE_DIR}/../python/> DESTINATION python)
 else()
   MESSAGE(WARNING "SVfitTF not present. SVfitAnalysis will not be compiled.")
 endif()

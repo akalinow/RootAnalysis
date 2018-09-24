@@ -414,6 +414,7 @@ void MLAnalyzer::globalsHTT(const MLObjectMessenger* mess, const std::vector<con
 		//	throw std::logic_error("[ERROR] NULL POINTERS PRESENT!");
 		// Calculation and assignement of global parameters
 		genMass_ = *mess->getObject(static_cast<double*>(p),"genMass");
+		visMass_ = *mess->getObject(static_cast<double*>(p),"visMass");
 		fastMTTMass_ = *mess->getObject(static_cast<double*>(p),"fastMTTMass");
 	}
 	catch(const std::out_of_range& e)

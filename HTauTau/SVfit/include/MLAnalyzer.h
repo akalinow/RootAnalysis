@@ -94,7 +94,7 @@ class MLAnalyzer : public Analyzer
   float higgsPT_;
   float betaScore_; /*!< Beta score of B-jet */
   float higgsMassTrans_; /*!< Transverse mass of Higgs */
-	TMatrixD covMET_;
+  TMatrixD covMET_;
 
   void extractP4(const TLorentzVector& v, const std::string destination, const unsigned no); /*!< copy p4 of jets and legs into jets_p4_ and legs_p4_ */
   void prepareVariables(const std::vector<const HTTParticle*>* legs, const std::vector<const HTTParticle*>* jets); /*!< Prepare vars that will be used for saving to TTree */

@@ -306,6 +306,9 @@ bool SVfitAnalyzer::analyze(const EventProxyBase& iEvent, ObjectMessenger *aMess
 	    double genMass = (aGenLeg1.getP4() + aGenLeg2.getP4()).M();      
 	    mess->putObject(&genMass, "genMass");
 
+	    double visMass = (aLeg1.getP4() + aLeg2.getP4()).M();      
+	    mess->putObject(&visMass, "visMass");
+
 	    TLorentzVector fastMTTP4 = computeMTT("fastMTT");
 	    double fastMTTMass = fastMTTP4.M();
 	    mess->putObject(&fastMTTMass, "fastMTTMass");

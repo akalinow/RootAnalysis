@@ -19,3 +19,10 @@ Before running update path to the data files in the svfit_MuTau.ini file.
 cd RootAnalysis/build
 ./bin/svfitAnalysis config/svfit_MuTau.ini
 ```
+
+Convert the plain ROOT TTRee into python numpy array
+
+```
+python python/root2pickle.py RootAnalysis_SVfitAnalysisMuTau.root
+```
+
