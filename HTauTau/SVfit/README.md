@@ -13,7 +13,7 @@ cmake ../
 make install -j 4
 ```
 ## Run instructions:
-Before running update path to the data files in the svfit_MuTau.ini file.
+Before running update path to the data files in the config/svfit_MuTau.ini file.
 
 ```
 cd RootAnalysis/build

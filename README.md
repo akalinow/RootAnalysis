@@ -10,7 +10,6 @@ make install -j 4
 ```
 ## Run instructions:
 
-```
-cd RootAnalysis/build
-bin/httAnalysis config/htt_MuTau.ini
-```
+For running check the instruction in relevant analysis pacakge, i.e. HTauTau/Analysis
+
+
