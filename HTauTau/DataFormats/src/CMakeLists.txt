@@ -13,9 +13,9 @@ add_library(DataFormats SHARED HTTEvent.cc EventProxyHTT.cc PropertyEnum.cc G__H
 target_include_directories(DataFormats PUBLIC ${ROOTINCDIR}  ${CMAKE_SOURCE_DIR}/Core/include)
   
 # Depend on a library that we defined in the top-level file
-target_link_libraries(DataFormats ${ROOT_LIBRARIES})
+target_link_libraries(DataFormats)
 
 install(TARGETS DataFormats LIBRARY DESTINATION lib)
-
+install(FILES libHTTEvent_rdict.pcm libHTTEvent.rootmap DESTINATION lib)
 
 

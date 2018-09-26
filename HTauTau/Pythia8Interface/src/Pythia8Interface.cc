@@ -33,7 +33,7 @@ Analyzer* Pythia8Interface::clone() const {
 void Pythia8Interface::initialize(TDirectory* aDir,
                              pat::strbitset *aSelections){
 
-  initializePythia(125, HTTAnalysis::hadronicTauDecayModes::tauDecayMuon);
+  //initializePythia(125, HTTAnalysis::hadronicTauDecayModes::tauDecayMuon);
 
   myParticles.SetClass("TParticle", 2000);
 
@@ -58,8 +58,9 @@ void Pythia8Interface::finalize(){ }
 //////////////////////////////////////////////////////////////////////////////
 void Pythia8Interface::initializePythia(double mH, int decayMode){
 
-  pythia8.ReadString("Init:showChangedSettings = off");
-  pythia8.ReadString("Init:showChangedParticleData = off");
+  pythia8.Pythia8()->settings.resetAll();
+  //pythia8.ReadString("Init:showChangedSettings = off");
+  //pythia8.ReadString("Init:showChangedParticleData = off");
   pythia8.ReadString("Init:showProcesses = off");
   pythia8.ReadString("Init:showMultipartonInteractions = off");
   /*
@@ -71,6 +72,7 @@ void Pythia8Interface::initializePythia(double mH, int decayMode){
   */
 
   std::string massString = "25:m0 = " + std::to_string(mH);
+  std::cout<<"h0 massString: "<<massString<<std::endl;
   pythia8.ReadString("HiggsSM:gg2H = on"); //Higgs production by gluon-gluon fusion
   pythia8.ReadString(massString.c_str());       //Higgs mass
   pythia8.ReadString("25:onMode = no");    //switch off all Higgs decay channels
@@ -408,15 +410,14 @@ bool Pythia8Interface::analyze(const EventProxyBase& iEvent, ObjectMessenger *aM
   int pairDecayMode = HTTAnalysis::hadronicTauDecayModes::tauDecayMuon;
 
   for(int iMass=0;iMass<100;++iMass){
-    mH = 60 + 2*iMass;
+    mH = 50 + 2*iMass;
     std::cout<<"Generating mass: "<<mH<<std::endl;
     initializePythia(mH, pairDecayMode);
     for(unsigned int long eventNumber=0;eventNumber<eventsToGenerate;++eventNumber){
       
       pythia8.GenerateEvent();
       //pythia8.EventListing(); 
-      pythia8.ImportParticles(&myParticles,"All");
-      
+      pythia8.ImportParticles(&myParticles,"All");      
       getGenTaus();
       bool isCorrectPairDecayMode = checkDecayMode(myTauPlus, myTauMinus, pairDecayMode);
       if(!isCorrectPairDecayMode) continue;
