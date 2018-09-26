@@ -11,13 +11,10 @@ if (EXISTS $ENV{PYTHIA8_DIR}/include/Pythia8/Pythia.h)
   
   set_property(TARGET Pythia8 PROPERTY IMPORTED_LOCATION $ENV{PYTHIA8_DIR}/lib/libpythia8.so)
   
-  # Depend on a library that we defined in the top-level file
-  target_link_libraries(Pythia8Interface Core DataFormats ${ROOT_LIBRARIES})
-
   # Define an executable
   add_executable(generateEvents generateEvents.cc)
 
-  target_link_libraries(generateEvents Pythia8Interface Core DataFormats ${Boost_REGEX_LIBRARY} ${ROOT_LIBRARIES} ${PYTHIA8_LIBRARY} Proof RooFitCore RooFit EG EGPythia8 Pythia8)
+  target_link_libraries(generateEvents Pythia8Interface FrameworkCore DataFormats ${Boost_REGEX_LIBRARY} ${ROOT_LIBRARIES} ${PYTHIA8_LIBRARY} Proof RooFitCore RooFit EG EGPythia8 Pythia8)
 
   set(CMAKE_INSTALL_RPATH $ENV{PYTHIA8_DIR}/lib)
 

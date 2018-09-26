@@ -17,6 +17,7 @@ Before running update path to the data files in the config/svfit_MuTau.ini file.
 
 ```
 cd RootAnalysis/build
+ln -s config/ml_Properties.ini ml_Properties.ini
 ./bin/svfitAnalysis config/svfit_MuTau.ini
 ```
 

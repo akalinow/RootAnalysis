@@ -7,13 +7,10 @@ add_library(Analysis SHARED ChannelSpecifics.cc HTTAnalyzer.cc
   HTTAnalyzerCPmethods.cc HTTHistograms.cc HTTSynchNTuple.cc
   MuTauSpecifics.cc TauTauSpecifics.cc Tools.cc BTagCalibrationStandalone.cpp MLAnalyzer.cc)
 
-# Depend on a library that we defined in the top-level file
-target_link_libraries(Analysis Core DataFormats ${ROOT_LIBRARIES})
-
 # Define an executable
 add_executable(httAnalysis HTTAnalysis.cc)
 
-target_link_libraries(httAnalysis Analysis Core DataFormats ${Boost_REGEX_LIBRARY} ${ROOT_LIBRARIES} Proof RooFitCore RooFit)
+target_link_libraries(httAnalysis Analysis ${Boost_REGEX_LIBRARY} ${ROOT_LIBRARIES} Proof RooFitCore RooFit FrameworkCore DataFormats)
 
 install(TARGETS Analysis httAnalysis 
         RUNTIME DESTINATION bin
