@@ -409,8 +409,8 @@ bool Pythia8Interface::analyze(const EventProxyBase& iEvent, ObjectMessenger *aM
   unsigned int long eventsToGenerate = *aMessenger->getObject(&tmp,"eventsToGenerate");  
   int pairDecayMode = HTTAnalysis::hadronicTauDecayModes::tauDecayMuon;
 
-  for(int iMass=0;iMass<10;++iMass){
-    mH = 60 + 2*iMass;
+  for(int iMass=0;iMass<100;++iMass){
+    mH = 50 + 2*iMass;
     std::cout<<"Generating mass: "<<mH<<std::endl;
     initializePythia(mH, pairDecayMode);
     for(unsigned int long eventNumber=0;eventNumber<eventsToGenerate;++eventNumber){
