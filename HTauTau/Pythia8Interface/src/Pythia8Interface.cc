@@ -58,7 +58,6 @@ void Pythia8Interface::finalize(){ }
 //////////////////////////////////////////////////////////////////////////////
 void Pythia8Interface::initializePythia(double mH, int decayMode){
 
-  pythia8.Pythia8()->settings.resetAll();
   //pythia8.ReadString("Init:showChangedSettings = off");
   //pythia8.ReadString("Init:showChangedParticleData = off");
   pythia8.ReadString("Init:showProcesses = off");
@@ -71,10 +70,14 @@ void Pythia8Interface::initializePythia(double mH, int decayMode){
     pythia8.ReadString("36:onIfMatch =  15 15"); //switch back on Higgs -> tau tau
   */
 
-  std::string massString = "25:m0 = " + std::to_string(mH);
-  std::cout<<"h0 massString: "<<massString<<std::endl;
-  pythia8.ReadString("HiggsSM:gg2H = on"); //Higgs production by gluon-gluon fusion
-  pythia8.ReadString(massString.c_str());       //Higgs mass
+  std::string tmpString = "25:m0 = " + std::to_string(mH);
+  pythia8.ReadString(tmpString.c_str());       //Higgs mass
+  tmpString = "25:mMin = " + std::to_string(mH-5.0);
+  pythia8.ReadString(tmpString.c_str());       //Higgs Breit-Wigner range lower edge
+  tmpString = "25:mMax = " + std::to_string(mH+5.0);
+  pythia8.ReadString(tmpString.c_str());       //Higgs Breit-Wigner range upper edge
+
+  pythia8.ReadString("HiggsSM:gg2H = on"); //Higgs production by gluon-gluon fusion  
   pythia8.ReadString("25:onMode = no");    //switch off all Higgs decay channels
   pythia8.ReadString("25:onIfMatch = 15 -15"); //switch back on Higgs -> tau tau
 

@@ -16,6 +16,8 @@ target_include_directories(DataFormats PUBLIC ${ROOTINCDIR}  ${CMAKE_SOURCE_DIR}
 target_link_libraries(DataFormats)
 
 install(TARGETS DataFormats LIBRARY DESTINATION lib)
-install(FILES libHTTEvent_rdict.pcm libHTTEvent.rootmap DESTINATION lib)
 
+if(EXISTS libHTTEvent_rdict.pcm)
+  install(FILES libHTTEvent_rdict.pcm libHTTEvent.rootmap DESTINATION lib)
+endif()
 

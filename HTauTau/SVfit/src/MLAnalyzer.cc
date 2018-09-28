@@ -192,6 +192,7 @@ void MLAnalyzer::addBranch(TTree *tree)
 			MLTree_ = tree;
 			std::cout<<"[ML]\tAdding global parameter branches for ML analysis."<<std::endl;
 			tree->Branch("genMass", &genMass_);
+			tree->Branch("visMass", &visMass_);
 			tree->Branch("fastMTTMass", &fastMTTMass_);
 			tree->Branch("covMET00", &covMET_[0][0]);
 			tree->Branch("covMET01", &covMET_[0][1]);
