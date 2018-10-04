@@ -193,6 +193,7 @@ void MLAnalyzer::addBranch(TTree *tree)
 			std::cout<<"[ML]\tAdding global parameter branches for ML analysis."<<std::endl;
 			tree->Branch("genMass", &genMass_);
 			tree->Branch("visMass", &visMass_);
+			tree->Branch("caMass", &caMass_);
 			tree->Branch("fastMTTMass", &fastMTTMass_);
 			tree->Branch("covMET00", &covMET_[0][0]);
 			tree->Branch("covMET01", &covMET_[0][1]);
@@ -416,6 +417,7 @@ void MLAnalyzer::globalsHTT(const MLObjectMessenger* mess, const std::vector<con
 		// Calculation and assignement of global parameters
 		genMass_ = *mess->getObject(static_cast<double*>(p),"genMass");
 		visMass_ = *mess->getObject(static_cast<double*>(p),"visMass");
+		caMass_ = *mess->getObject(static_cast<double*>(p),"caMass");
 		fastMTTMass_ = *mess->getObject(static_cast<double*>(p),"fastMTTMass");
 	}
 	catch(const std::out_of_range& e)

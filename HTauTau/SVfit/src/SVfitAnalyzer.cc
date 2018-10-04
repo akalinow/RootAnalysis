@@ -204,6 +204,40 @@ TLorentzVector SVfitAnalyzer::runSVFitAlgo(const std::vector<classic_svFit::Meas
 }
 //////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////
+double SVfitAnalyzer::runCAAlgo(const HTTParticle & aLeg1, const HTTParticle & aLeg2,
+				const HTTParticle & aMET){
+
+  TMatrixD A(2,2);
+  A[0][0] = sin(aLeg1.getChargedP4().Theta())*
+    cos(aLeg1.getChargedP4().Phi());
+  
+  A[1][1] = sin(aLeg2.getChargedP4().Theta())*
+    sin(aLeg2.getChargedP4().Phi());
+  
+  A[0][1] = sin(aLeg2.getChargedP4().Theta())*
+    cos(aLeg2.getChargedP4().Phi());
+
+  A[1][0] = sin(aLeg1.getChargedP4().Theta())*
+    sin(aLeg1.getChargedP4().Phi());
+
+  TMatrixD invA = A.Invert();
+
+  double e1 = invA[0][0]*aMET.getP4().Px() +
+    invA[0][1]*aMET.getP4().Py();
+
+  double e2 = invA[1][0]*aMET.getP4().Px() +
+    invA[1][1]*aMET.getP4().Py();
+  
+  double x1 =  aLeg1.getChargedP4().E()/(aLeg1.getP4().E() + e1);
+  double x2 =  aLeg2.getChargedP4().E()/(aLeg2.getP4().E() + e2);
+
+  if(x1<0 || x2<0) return 0.0;
+  double caMass = (aLeg1.getChargedP4() + aLeg2.getChargedP4()).M()/std::sqrt(x1*x2);
+
+  return caMass;
+}
+//////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////////
 std::tuple<double, double> SVfitAnalyzer::getTauMomentum(const TLorentzVector & visP4, double cosGJ){
 
   double mTau = 1.77685;
@@ -241,15 +275,37 @@ void SVfitAnalyzer::fillControlHistos(const std::string & hNameSuffix){
 
   const TLorentzVector & aVisSum = aLeg1.getP4() + aLeg2.getP4();
   TLorentzVector tautauGen = aGenLeg1.getP4() + aGenLeg2.getP4();
+  TLorentzVector nunuGen = tautauGen - 
+    aGenLeg1.getChargedP4() - aGenLeg2.getChargedP4() -
+    aGenLeg1.getNeutralP4() - aGenLeg2.getNeutralP4();
   TLorentzVector SVFitP4 = computeMTT("fastMTT");  
   float visMass = aVisSum.M();
   double delta = (SVFitP4.M() - tautauGen.M())/tautauGen.M();
 
+  double massCA = runCAAlgo(aLeg1, aLeg2, aMET);
+
+  double recoX1 = 0.0, recoX2 = 0.0;
+  std::tie(recoX1, recoX2) = fastMTTAlgo.getBestX();
+
   myHistos_->fill1DHistogram("h1DMassVis"+hNameSuffix, visMass);
   myHistos_->fill1DHistogram("h1DMassGen"+hNameSuffix,tautauGen.M());
   myHistos_->fill1DHistogram("h1DMassFastMTT"+hNameSuffix,SVFitP4.M());
+  myHistos_->fill1DHistogram("h1DMassCA"+hNameSuffix, massCA);
   myHistos_->fill1DHistogram("h1DDeltaFastMTT"+hNameSuffix,delta);
-  myHistos_->fill1DHistogram("h1DCpuTimeFast"+hNameSuffix,fastMTTAlgo.getCpuTime("scan"));  
+
+  delta = (massCA - tautauGen.M())/tautauGen.M();
+  myHistos_->fill1DHistogram("h1DDeltaCA"+hNameSuffix,delta);
+  myHistos_->fill1DHistogram("h1DCpuTimeFast"+hNameSuffix,fastMTTAlgo.getCpuTime("scan"));
+
+  delta = (aMET.getP4().X() - nunuGen.X())/nunuGen.X();
+  myHistos_->fill1DHistogram("h1DDeltaMET_X_Res"+hNameSuffix, delta);
+
+  delta = (aMET.getP4().Y() - nunuGen.Y())/nunuGen.Y();
+  myHistos_->fill1DHistogram("h1DDeltaMET_Y_Res"+hNameSuffix, delta);
+
+  myHistos_->fill2DHistogram("h2DDeltaMET_X_Res_Vs_Mass"+hNameSuffix, nunuGen.Perp(), delta);
+
+  
 }
 //////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////
@@ -308,6 +364,9 @@ bool SVfitAnalyzer::analyze(const EventProxyBase& iEvent, ObjectMessenger *aMess
 
 	    double visMass = (aLeg1.getP4() + aLeg2.getP4()).M();      
 	    mess->putObject(&visMass, "visMass");
+
+	    double caMass = runCAAlgo(aLeg1, aLeg2, aMET);
+	    mess->putObject(&caMass, "caMass");
 
 	    TLorentzVector fastMTTP4 = computeMTT("fastMTT");
 	    double fastMTTMass = fastMTTP4.M();

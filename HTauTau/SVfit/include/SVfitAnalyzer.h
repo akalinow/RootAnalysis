@@ -63,6 +63,9 @@ class SVfitAnalyzer: public HTTAnalyzer{
   TLorentzVector runFastMTTAlgo(const std::vector<classic_svFit::MeasuredTauLepton> & measuredTauLeptons,
 				const HTTParticle &aMET, const TMatrixD &covMET);
 
+  double runCAAlgo(const HTTParticle & aLeg1, const HTTParticle & aLeg2,
+		   const HTTParticle & aMET);
+
   std::tuple<double, double> getTauMomentum(const TLorentzVector & visP4, double cosGJ);
 
   ///Histograms storage.

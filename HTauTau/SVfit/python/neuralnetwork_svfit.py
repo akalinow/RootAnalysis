@@ -20,7 +20,7 @@ import matplotlib.pyplot as plt
 import pickle
 
 def load_data():
-    with open("htt_features.pkl", "rb") as input:
+    with open("htt_features_train.pkl", "rb") as input:
         legs, jets, global_params, properties =pickle.load(input)
     print("no of legs: ", len(legs))
     print("no of jets: ", len(jets))
@@ -48,8 +48,10 @@ def prepare_data(legs, jets, global_params, properties, to_predict):
                 data.append(properties[key])
     add_legs()
     add_jets()
-    add_globals(global_params.keys())
-    add_properties(properties.keys())
+    global_features = global_params.keys()  - ["caMass"]
+    print("global_features:",global_features)
+    add_globals(global_features)
+    add_properties(properties.keys())    
     data = np.array(data)
     data = np.transpose(data)
     
@@ -85,9 +87,10 @@ def plot_preds(x_train, x_val, y_train, y_val, model):
     plt.xlabel("target mass")
     plt.ylabel("predicted mass")
     plt.show()
-    
-    error = (y_val_pred[0] - y_val)/y_val
-    plt.hist(error, bins=60, range=(-2,2))
+
+    y_val_pred = np.reshape(y_val_pred, y_val.shape)
+    error = (y_val_pred - y_val)/y_val
+    plt.hist(error, bins=60, range=(-0.5,0.5))
     plt.xlabel("(y_pred - y_target)/y_target")
     plt.show()
 

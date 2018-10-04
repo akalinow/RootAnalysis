@@ -47,6 +47,7 @@ std::string SVfitHistograms::getTemplateName(const std::string& name){
         else if(name.find("h1DMass")!=std::string::npos) templateName = "h1DMassTemplate";
         else if(name.find("h1DDelta")!=std::string::npos) templateName = "h1DDeltaTemplate";
         else if(name.find("h1DCpuTime")!=std::string::npos) templateName = "h1DCpuTimeTemplate";
+	else if(name.find("h2DDelta")!=std::string::npos) templateName = "h2DDeltaTemplate";
         return templateName;
 }
 /////////////////////////////////////////////////////////
@@ -60,6 +61,8 @@ void SVfitHistograms::defineHistograms(){
                 add1DHistogram("h1DMassTemplate",";mass [GeV/c^{2}]; Events",100,0,500,file_);
                 add1DHistogram("h1DDeltaTemplate","",201,-5,5,file_);
                 add1DHistogram("h1DCpuTimeTemplate","",200,0.0,0.01,file_);
+
+		add2DHistogram("h2DDeltaTemplate","",10,0,100, 41,-10,10,file_);
         }
 }
 /////////////////////////////////////////////////////////
@@ -70,7 +73,7 @@ void SVfitHistograms::finalizeHistograms(const std::vector<const HTTAnalysis::ev
 
   AnalysisHistograms::finalizeHistograms();
 
-  std::vector<std::string> names = {"Pythia8"};
+  std::vector<std::string> names = {"Pythia8","ggHTT125", "DY0Jets"};
 
   for(unsigned int i=0;i<names.size();++i){
     std::string hNameSuffix = names[i];
@@ -78,8 +81,14 @@ void SVfitHistograms::finalizeHistograms(const std::vector<const HTTAnalysis::ev
     plotSingleHistogram("h1DMassVis"+hNameSuffix);
     plotSingleHistogram("h1DMassGen"+hNameSuffix);
     plotSingleHistogram("h1DMassFastMTT"+hNameSuffix);
+    plotSingleHistogram("h1DMassCA"+hNameSuffix);
     plotSingleHistogram("h1DDeltaFastMTT"+hNameSuffix);
+    plotSingleHistogram("h1DDeltaCA"+hNameSuffix);
     plotSingleHistogram("h1DCpuTimeFast"+hNameSuffix);
+    plotSingleHistogram("h1DDeltaMET_X_Res"+hNameSuffix);
+    plotSingleHistogram("h1DDeltaMET_Y_Res"+hNameSuffix);
+
+    plotSingleHistogram2D("h2DDeltaMET_X_Res_Vs_Mass"+hNameSuffix);
   }
   std::cout<<"SVfitHistograms::finalizeHistograms() END"<<std::endl;
 }
