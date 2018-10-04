@@ -31,8 +31,10 @@ python python/root2pickle.py --input RootAnalysis_SVfitAnalysisMuTau_ggH125.root
 python python/root2pickle.py --input RootAnalysis_SVfitAnalysisMuTau_DY.root --output htt_features_DY.pkl
 ```
 
-Train the NN (requires TensorFlow)
+Train a simple NN (requires TensorFlow)
 
 ```
-python python/neuralnetwork_svfit.py
+python neuralnetwork_svfit.py
 ```
+
+For more elaborate ML code see the [MachineLearning](https://github.com/akalinow/MachineLearning) repository
