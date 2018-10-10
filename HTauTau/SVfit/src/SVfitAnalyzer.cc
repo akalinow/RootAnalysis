@@ -273,6 +273,11 @@ std::tuple<double, double> SVfitAnalyzer::getTauMomentum(const TLorentzVector & 
 //////////////////////////////////////////////////////////////////////////////
 void SVfitAnalyzer::fillControlHistos(const std::string & hNameSuffix){
 
+  std::cout<<"byIsolationMVArun2v1DBoldDMwLTraw: "<<aLeg2.getProperty(PropertyEnum::byIsolationMVArun2v1DBoldDMwLTraw)
+	   <<" byIsolationMVArun2v1DBoldDMwLTraw2017v2: "<<aLeg2.getProperty(PropertyEnum::byIsolationMVArun2v1DBoldDMwLTraw2017v2)
+	   <<std::endl;
+
+
   const TLorentzVector & aVisSum = aLeg1.getP4() + aLeg2.getP4();
   TLorentzVector tautauGen = aGenLeg1.getP4() + aGenLeg2.getP4();
   TLorentzVector nunuGen = tautauGen - 
@@ -305,7 +310,25 @@ void SVfitAnalyzer::fillControlHistos(const std::string & hNameSuffix){
 
   myHistos_->fill2DHistogram("h2DDeltaMET_X_Res_Vs_Mass"+hNameSuffix, nunuGen.Perp(), delta);
 
-  
+  delta = aLeg2.getP4().E() - aGenLeg2.getChargedP4().E() - aGenLeg2.getNeutralP4().E();
+  delta /= aGenLeg2.getChargedP4().E() + aGenLeg2.getNeutralP4().E();
+  myHistos_->fill1DHistogram("h1DDeltaLeg2_E_Res"+hNameSuffix, delta);
+
+  delta = aLeg2.getP4().X() - aGenLeg2.getChargedP4().X() - aGenLeg2.getNeutralP4().X();
+  delta /= aGenLeg2.getChargedP4().X() + aGenLeg2.getNeutralP4().X();
+  myHistos_->fill1DHistogram("h1DDeltaLeg2_PX_Res"+hNameSuffix, delta);
+
+  delta = aLeg2.getP4().Y() - aGenLeg2.getChargedP4().Y() - aGenLeg2.getNeutralP4().Y();
+  delta /= aGenLeg2.getChargedP4().Y() + aGenLeg2.getNeutralP4().Y();
+  myHistos_->fill1DHistogram("h1DDeltaLeg2_PY_Res"+hNameSuffix, delta);
+
+  delta = aLeg2.getP4().Z() - aGenLeg2.getChargedP4().Z() - aGenLeg2.getNeutralP4().Z();
+  delta /= aGenLeg2.getChargedP4().Z() + aGenLeg2.getNeutralP4().Z();
+  myHistos_->fill1DHistogram("h1DDeltaLeg2_PZ_Res"+hNameSuffix, delta);
+
+  delta = aLeg1.getP4().E() - aGenLeg1.getChargedP4().E() - aGenLeg1.getNeutralP4().E();
+  delta /= aGenLeg1.getChargedP4().E() + aGenLeg1.getNeutralP4().E();
+  myHistos_->fill1DHistogram("h1DDeltaLeg1_E_Res"+hNameSuffix, delta);
 }
 //////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////
@@ -348,9 +371,18 @@ bool SVfitAnalyzer::analyze(const EventProxyBase& iEvent, ObjectMessenger *aMess
 	// Putting data to MLObjectMessenger
 	try
 	  {
+
+	    aGenLeg1_vis = aGenLeg1;
+	    aGenLeg1_vis.setP4(aGenLeg1.getChargedP4() + aGenLeg1.getNeutralP4());
+
+	    aGenLeg2_vis = aGenLeg2;
+	    aGenLeg2_vis.setP4(aGenLeg2.getChargedP4() + aGenLeg2.getNeutralP4());
+	    
 	    MLObjectMessenger* mess = (MLObjectMessenger*)aMessenger;
 	    mess->putObjectVector(const_cast <const HTTParticle*>(&aLeg1), "legs");
 	    mess->putObjectVector(const_cast <const HTTParticle*>(&aLeg2), "legs");
+	    mess->putObjectVector(const_cast <const HTTParticle*>(&aGenLeg1_vis), "legs");
+	    mess->putObjectVector(const_cast <const HTTParticle*>(&aGenLeg2_vis), "legs");
 	    mess->putObjectVector(const_cast <const HTTParticle*>(&aMET), "jets");
 	    mess->putObjectVector(const_cast <const HTTParticle*>(&aJet1), "jets");
 	    mess->putObjectVector(const_cast <const HTTParticle*>(&aJet2), "jets");
