@@ -79,6 +79,8 @@ class SVfitAnalyzer: public HTTAnalyzer{
 
   TMatrixD aCovMET;
   TLorentzVector SVFitLeg1P4, SVFitLeg2P4;
+
+  HTTParticle aGenLeg1_vis, aGenLeg2_vis;
   /////////
 
 };

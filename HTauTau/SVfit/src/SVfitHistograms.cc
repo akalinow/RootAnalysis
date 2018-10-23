@@ -87,6 +87,11 @@ void SVfitHistograms::finalizeHistograms(const std::vector<const HTTAnalysis::ev
     plotSingleHistogram("h1DCpuTimeFast"+hNameSuffix);
     plotSingleHistogram("h1DDeltaMET_X_Res"+hNameSuffix);
     plotSingleHistogram("h1DDeltaMET_Y_Res"+hNameSuffix);
+    plotSingleHistogram("h1DDeltaLeg1_E_Res"+hNameSuffix);
+    plotSingleHistogram("h1DDeltaLeg2_E_Res"+hNameSuffix);
+    plotSingleHistogram("h1DDeltaLeg2_PX_Res"+hNameSuffix);
+    plotSingleHistogram("h1DDeltaLeg2_PY_Res"+hNameSuffix);
+    plotSingleHistogram("h1DDeltaLeg2_PZ_Res"+hNameSuffix);
 
     plotSingleHistogram2D("h2DDeltaMET_X_Res_Vs_Mass"+hNameSuffix);
   }

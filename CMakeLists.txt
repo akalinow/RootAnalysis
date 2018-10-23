@@ -8,6 +8,8 @@ add_library(boost INTERFACE IMPORTED)
 set_property(TARGET boost PROPERTY
   INTERFACE_INCLUDE_DIRECTORIES ${Boost_INCLUDE_DIR})
 
+MESSAGE("Boost directory: " ${Boost_LIBRARY_DIRS})
+
 ##https://root.cern.ch/how/integrate-root-my-project-cmake
 list(APPEND CMAKE_PREFIX_PATH $ENV{ROOTSYS})
 find_package(ROOT REQUIRED COMPONENTS RIO GenVector Physics RooFitCore RooFit)
