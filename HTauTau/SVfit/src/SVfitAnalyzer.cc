@@ -273,11 +273,6 @@ std::tuple<double, double> SVfitAnalyzer::getTauMomentum(const TLorentzVector & 
 //////////////////////////////////////////////////////////////////////////////
 void SVfitAnalyzer::fillControlHistos(const std::string & hNameSuffix){
 
-  std::cout<<"byIsolationMVArun2v1DBoldDMwLTraw: "<<aLeg2.getProperty(PropertyEnum::byIsolationMVArun2v1DBoldDMwLTraw)
-	   <<" byIsolationMVArun2v1DBoldDMwLTraw2017v2: "<<aLeg2.getProperty(PropertyEnum::byIsolationMVArun2v1DBoldDMwLTraw2017v2)
-	   <<std::endl;
-
-
   const TLorentzVector & aVisSum = aLeg1.getP4() + aLeg2.getP4();
   TLorentzVector tautauGen = aGenLeg1.getP4() + aGenLeg2.getP4();
   TLorentzVector nunuGen = tautauGen - 
