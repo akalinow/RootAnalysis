@@ -74,7 +74,8 @@ void MLAnalyzer::clear()
 */
 void MLAnalyzer::parseCfg(const std::string & cfgFileName)
 {
-  std::cout<<"[ML]\tParsing external file with particle properties selections."<<std::endl;
+  std::cout<<"[ML]\tParsing external file "<<cfgFileName
+	   <<" with particle properties selections."<<std::endl;
   boost::property_tree::ptree pt;
   boost::property_tree::ini_parser::read_ini(cfgFileName, pt);
 
