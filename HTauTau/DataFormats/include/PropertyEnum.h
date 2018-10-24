@@ -1,19 +1,5 @@
-//! File containing an enum type of particle properties and an interface to get them using std::string names.
-/*!
-  \author Rafal Maselek && Artur Kalinowski
-  \date May 2018
-  
-  This file contains an enum type declaration, which enumerates 29 different properties of particles defined
-  by HTTParticle object type. In order to access them via parsing an external file, class PropertyEnumString
-  was added with a static member std::map -- an interface to get PropertyEnum by using std::string name of
-  property. 
-  See also PropertyEnum.cc
-*/
-
-
-#include <map>
-
-enum class PropertyEnum { PDGId = 0, 
+enum class PropertyEnum {
+PDGId = 0, 
 charge = 1, 
 decayMode = 2, 
 discriminator = 3, 
@@ -41,13 +27,33 @@ Flavour = 24,
 bDiscriminator = 25, 
 bCSVscore = 26, 
 PFjetID = 27, 
-NONE = 28
+deepTau2017v1tauVSe = 28, 
+deepTau2017v1tauVSmu = 29, 
+deepTau2017v1tauVSjet = 30, 
+deepTau2017v1tauVSall = 31, 
+DPFTau_2016_v0tauVSall = 32, 
+DPFTau_2016_v1tauVSall = 33, 
+chargedIsoPtSum = 34, 
+neutralIsoPtSum = 35, 
+puCorrPtSum = 36, 
+photonPtSumOutsideSignalCone = 37, 
+nPhoton = 38, 
+ptWeightedDetaStrip = 39, 
+ptWeightedDphiStrip = 40, 
+ptWeightedDrSignal = 41, 
+ptWeightedDrIsolation = 42, 
+eRatio = 43, 
+dxy_Sig = 44, 
+ip3d = 45, 
+hasSecondaryVertex = 46, 
+decayDistMag = 47, 
+flightLengthSig = 48, 
+gjAngleDiff = 49, 
+NONE = 50
 };
 
-// Defined in PropertyEnum.cc
-class PropertyEnumString
-{
-	public:
-    	static const std::map<std::string, PropertyEnum> enumMap;
+#include <map>
+class PropertyEnumString { 
+public:
+static const std::map<std::string, PropertyEnum> enumMap;
 };
-

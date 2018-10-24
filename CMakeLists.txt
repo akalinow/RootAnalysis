@@ -5,9 +5,6 @@ set( CMAKE_VERBOSE_MAKEFILE on )
 # Include Boost as an imported target
 find_package(Boost REQUIRED COMPONENTS regex)
 add_library(boost INTERFACE IMPORTED)
-set_property(TARGET boost PROPERTY
-  INTERFACE_INCLUDE_DIRECTORIES ${Boost_INCLUDE_DIR})
-
 MESSAGE("Boost directory: " ${Boost_LIBRARY_DIRS})
 
 ##https://root.cern.ch/how/integrate-root-my-project-cmake

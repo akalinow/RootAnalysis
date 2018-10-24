@@ -348,6 +348,16 @@ bool SVfitAnalyzer::analyze(const EventProxyBase& iEvent, ObjectMessenger *aMess
   isGoodReco = aGenLeg2.getP4().DeltaR(aLeg2.getP4())<0.4;
   goodGenTau = aGenLeg2.getP4().E()>1.0;
 
+  int tauIDmask = 0;
+  for(unsigned int iBit=0; iBit<myEventProxy.event->ntauIds; iBit++) {
+    if(myEventProxy.event->tauIDStrings[iBit]=="byVLooseIsolationMVArun2v1DBoldDMwLT") tauIDmask |= (1<<iBit);
+    if(myEventProxy.event->tauIDStrings[iBit]=="againstMuonLoose3") tauIDmask |= (1<<iBit);
+    if(myEventProxy.event->tauIDStrings[iBit]=="againstElectronVLooseMVA6") tauIDmask |= (1<<iBit);
+  }
+  bool passTauPreselection = aLeg2.getP4().Perp()>30;
+  passTauPreselection &= ( (int)aLeg2.getProperty(PropertyEnum::tauID) & tauIDmask) == tauIDmask;
+  passTauPreselection = true;//HACK
+
   if(sampleName=="WAllJets"){
     goodGenTau = true;
     isGoodReco = true;
@@ -358,7 +368,7 @@ bool SVfitAnalyzer::analyze(const EventProxyBase& iEvent, ObjectMessenger *aMess
     isGoodReco = true;
   }
   
-  if(isGoodReco && goodGenTau){
+  if(passTauPreselection && isGoodReco && goodGenTau){
     fillControlHistos(hNameSuffix);
   
     if(aMessenger and std::string("MLObjectMessenger").compare((aMessenger->name()).substr(0,17))==0 ) // if NULL it will do nothing
