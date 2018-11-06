@@ -18,6 +18,7 @@
 #include "TLatex.h"
 #include "TStyle.h"
 #include "THStack.h"
+#include "TProfile2D.h"
 
 
 /////////////////////////////////////////////////////////
@@ -48,6 +49,7 @@ std::string SVfitHistograms::getTemplateName(const std::string& name){
         else if(name.find("h1DDelta")!=std::string::npos) templateName = "h1DDeltaTemplate";
         else if(name.find("h1DCpuTime")!=std::string::npos) templateName = "h1DCpuTimeTemplate";
 	else if(name.find("h2DDelta")!=std::string::npos) templateName = "h2DDeltaTemplate";
+	else if(name.find("h3DDelta")!=std::string::npos) templateName = "h3DDeltaTemplate";
         return templateName;
 }
 /////////////////////////////////////////////////////////
@@ -61,8 +63,10 @@ void SVfitHistograms::defineHistograms(){
                 add1DHistogram("h1DMassTemplate",";mass [GeV/c^{2}]; Events",100,0,500,file_);
                 add1DHistogram("h1DDeltaTemplate","",201,-5,5,file_);
                 add1DHistogram("h1DCpuTimeTemplate","",200,0.0,0.01,file_);
-
+		///
 		add2DHistogram("h2DDeltaTemplate","",10,0,100, 41,-10,10,file_);
+		///
+		add3DHistogram("h3DDeltaTemplate","",20,-0.5,0.5,30,-3,3,30, 20, 100, file_);
         }
 }
 /////////////////////////////////////////////////////////
@@ -77,7 +81,7 @@ void SVfitHistograms::finalizeHistograms(const std::vector<const HTTAnalysis::ev
 
   for(unsigned int i=0;i<names.size();++i){
     std::string hNameSuffix = names[i];
-
+    
     plotSingleHistogram("h1DMassVis"+hNameSuffix);
     plotSingleHistogram("h1DMassGen"+hNameSuffix);
     plotSingleHistogram("h1DMassFastMTT"+hNameSuffix);
@@ -94,6 +98,8 @@ void SVfitHistograms::finalizeHistograms(const std::vector<const HTTAnalysis::ev
     plotSingleHistogram("h1DDeltaLeg2_PZ_Res"+hNameSuffix);
 
     plotSingleHistogram2D("h2DDeltaMET_X_Res_Vs_Mass"+hNameSuffix);
+    
+    plot3DProfile("h3DDeltaLeg2_E_Res_Vs_Eta_Vs_E"+hNameSuffix,"yz");
   }
   std::cout<<"SVfitHistograms::finalizeHistograms() END"<<std::endl;
 }
@@ -153,6 +159,24 @@ void SVfitHistograms::plotSingleHistogram2D(std::string hName){
                 h2D->Draw("colz");
                 c->Print(TString::Format("fig_png/%s.png",hName.c_str()).Data());
         }
+}
+/////////////////////////////////////////////////////////
+/////////////////////////////////////////////////////////
+void SVfitHistograms::plot3DProfile(std::string hName, std::string option){
+
+        TH3F* h3D = get3DHistogram(hName);
+        if(!h3D) return;
+
+        h3D->SetDirectory(myDirCopy);
+
+        TCanvas* c = new TCanvas("AnyHistogram","AnyHistogram",
+                                 460,500);
+	
+	TProfile2D *h2DProf = h3D->Project3DProfile(option.c_str());
+	h2DProf->SetStats(kFALSE);
+	h2DProf->Draw("colz");
+	c->Print(TString::Format("fig_png/%s.png",hName.c_str()).Data());
+
 }
 /////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////

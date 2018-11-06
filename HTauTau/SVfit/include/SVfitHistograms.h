@@ -42,6 +42,9 @@ void plotSingleHistogram(std::string hName);
 //histogram name, e.g. including h2D prefix.
 void plotSingleHistogram2D(std::string hName);
 
+
+ void plot3DProfile(std::string hName, std::string option = "xy");
+
 std::vector<const HTTAnalysis::eventCategory*> myCategoryRejester;
 
 std::stringstream outputStream;
