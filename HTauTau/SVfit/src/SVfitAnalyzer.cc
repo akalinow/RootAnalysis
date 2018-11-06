@@ -308,7 +308,8 @@ void SVfitAnalyzer::fillControlHistos(const std::string & hNameSuffix){
   delta = aLeg2.getP4().E() - aGenLeg2.getChargedP4().E() - aGenLeg2.getNeutralP4().E();
   delta /= aGenLeg2.getChargedP4().E() + aGenLeg2.getNeutralP4().E();
   myHistos_->fill1DHistogram("h1DDeltaLeg2_E_Res"+hNameSuffix, delta);
-
+  myHistos_->fill3DHistogram("h3DDeltaLeg2_E_Res_Vs_Eta_Vs_E"+hNameSuffix, delta,  aLeg2.getP4().Eta(), aLeg2.getP4().E());
+                              
   delta = aLeg2.getP4().X() - aGenLeg2.getChargedP4().X() - aGenLeg2.getNeutralP4().X();
   delta /= aGenLeg2.getChargedP4().X() + aGenLeg2.getNeutralP4().X();
   myHistos_->fill1DHistogram("h1DDeltaLeg2_PX_Res"+hNameSuffix, delta);
