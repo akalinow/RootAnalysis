@@ -8,5 +8,7 @@ add_library(FrameworkCore SHARED EventProxyBase.cc AnalysisHistograms.cc Analyze
   TH1AddDirectorySentry.cc TreeAnalyzer.cc SummaryAnalyzer.cc
   commonUtils.cc)
 
+target_link_libraries(FrameworkCore boost)
+
 install(TARGETS FrameworkCore
         LIBRARY DESTINATION lib)
