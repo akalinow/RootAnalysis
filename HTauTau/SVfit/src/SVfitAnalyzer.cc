@@ -56,6 +56,17 @@ void SVfitAnalyzer::setAnalysisObjects(const EventProxyHTT & myEventProxy){
 
   HTTAnalyzer::setAnalysisObjects(myEventProxy);
 
+  ///A temorary hack
+  if(aPair.getLeg1().getProperty(PropertyEnum::decayMode) == HTTAnalysis::hadronicTauDecayModes::tauDecayMuon){
+    aLeg1 = aPair.getLeg1();
+    aLeg2 = aPair.getLeg2();
+  }
+  else if(aPair.getLeg2().getProperty(PropertyEnum::decayMode) == HTTAnalysis::hadronicTauDecayModes::tauDecayMuon){
+    aLeg1 = aPair.getLeg2();
+    aLeg2 = aPair.getLeg1();
+  }
+  /////
+    
   aCovMET[0][0] = aPair.getMETMatrix().at(0);
   aCovMET[0][1] = aPair.getMETMatrix().at(1);
   aCovMET[1][0] = aPair.getMETMatrix().at(2);
@@ -220,6 +231,8 @@ double SVfitAnalyzer::runCAAlgo(const HTTParticle & aLeg1, const HTTParticle & a
   A[1][0] = sin(aLeg1.getChargedP4().Theta())*
     sin(aLeg1.getChargedP4().Phi());
 
+  if(std::abs(A.Determinant())<1E-16) return 0.0;
+
   TMatrixD invA = A.Invert();
 
   double e1 = invA[0][0]*aMET.getP4().Px() +
@@ -231,7 +244,12 @@ double SVfitAnalyzer::runCAAlgo(const HTTParticle & aLeg1, const HTTParticle & a
   double x1 =  aLeg1.getChargedP4().E()/(aLeg1.getP4().E() + e1);
   double x2 =  aLeg2.getChargedP4().E()/(aLeg2.getP4().E() + e2);
 
-  if(x1<0 || x2<0) return 0.0;
+  //double x1True =  aLeg1.getChargedP4().E()/aGenLeg1.getP4().E();
+  //double x2True =  aLeg2.getChargedP4().E()/aGenLeg2.getP4().E();
+
+  if(x1<0 || x2<0){   
+    return 0.0;
+  }
   double caMass = (aLeg1.getChargedP4() + aLeg2.getChargedP4()).M()/std::sqrt(x1*x2);
 
   return caMass;
@@ -278,6 +296,7 @@ void SVfitAnalyzer::fillControlHistos(const std::string & hNameSuffix){
   TLorentzVector nunuGen = tautauGen - 
     aGenLeg1.getChargedP4() - aGenLeg2.getChargedP4() -
     aGenLeg1.getNeutralP4() - aGenLeg2.getNeutralP4();
+
   TLorentzVector SVFitP4 = computeMTT("fastMTT");  
   float visMass = aVisSum.M();
   double delta = (SVFitP4.M() - tautauGen.M())/tautauGen.M();
@@ -346,8 +365,8 @@ bool SVfitAnalyzer::analyze(const EventProxyBase& iEvent, ObjectMessenger *aMess
   
   bool goodGenTau = aGenLeg1.getP4().E()>1.0 && aGenLeg2.getP4().E()>1.0;							   
 
-  isGoodReco = aGenLeg2.getP4().DeltaR(aLeg2.getP4())<0.4;
-  goodGenTau = aGenLeg2.getP4().E()>1.0;
+  //isGoodReco = aGenLeg2.getP4().DeltaR(aLeg2.getP4())<0.4;
+  //goodGenTau = aGenLeg2.getP4().E()>1.0;
 
   int tauIDmask = 0;
   for(unsigned int iBit=0; iBit<myEventProxy.event->ntauIds; iBit++) {
