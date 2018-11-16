@@ -3,6 +3,8 @@ project (RootAnalysis)
 set( CMAKE_VERBOSE_MAKEFILE on )
 
 # Include Boost as an imported target
+#On lxplus one needs a newer boost version thant available by default
+#set(BOOST_ROOT /cvmfs/cms.cern.ch/slc7_amd64_gcc630/external/boost/1.63.0)
 find_package(Boost REQUIRED COMPONENTS regex)
 add_library(boost INTERFACE IMPORTED)
 set_property(TARGET boost PROPERTY
