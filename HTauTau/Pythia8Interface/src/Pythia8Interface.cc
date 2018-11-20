@@ -325,8 +325,8 @@ HTTParticle Pythia8Interface::makeTau(const TParticle & aTau){
   int decayMode = getDetailedTauDecayMode(aTau);
 
   int pdgId = 15;
-  if(HTTAnalysis::hadronicTauDecayModes::tauDecaysElectron) pdgId = 11;
-  else if(HTTAnalysis::hadronicTauDecayModes::tauDecayMuon) pdgId = 16;
+  if(decayMode == HTTAnalysis::hadronicTauDecayModes::tauDecaysElectron) pdgId = 11;
+  else if(decayMode == HTTAnalysis::hadronicTauDecayModes::tauDecayMuon) pdgId = 16;
   else pdgId = 15;
   
   aProperties.push_back(pdgId);
