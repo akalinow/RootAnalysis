@@ -18,6 +18,7 @@
 #include "TLatex.h"
 #include "TStyle.h"
 #include "THStack.h"
+#include "TMVA/ROCCalc.h"
 
 
 /////////////////////////////////////////////////////////
@@ -47,7 +48,8 @@ std::string SVfitHistograms::getTemplateName(const std::string& name){
         else if(name.find("h1DMass")!=std::string::npos) templateName = "h1DMassTemplate";
         else if(name.find("h1DDelta")!=std::string::npos) templateName = "h1DDeltaTemplate";
         else if(name.find("h1DCpuTime")!=std::string::npos) templateName = "h1DCpuTimeTemplate";
-	else if(name.find("h2DDelta")!=std::string::npos) templateName = "h2DDeltaTemplate";
+	else if(name.find("h1DTauID")!=std::string::npos) templateName = "h1DTauIDTemplate";
+	else if(name.find("h2DDelta")!=std::string::npos) templateName = "h2DDeltaTemplate";	
         return templateName;
 }
 /////////////////////////////////////////////////////////
@@ -61,6 +63,7 @@ void SVfitHistograms::defineHistograms(){
                 add1DHistogram("h1DMassTemplate",";mass [GeV/c^{2}]; Events",100,0,500,file_);
                 add1DHistogram("h1DDeltaTemplate","",201,-5,5,file_);
                 add1DHistogram("h1DCpuTimeTemplate","",200,0.0,0.01,file_);
+		add1DHistogram("h1DTauIDTemplate","",200,-1, 1,file_);
 
 		add2DHistogram("h2DDeltaTemplate","",10,0,100, 41,-10,10,file_);
         }
@@ -95,7 +98,39 @@ void SVfitHistograms::finalizeHistograms(const std::vector<const HTTAnalysis::ev
 
     plotSingleHistogram2D("h2DDeltaMET_X_Res_Vs_Mass"+hNameSuffix);
   }
+
+  names = {"DPFTau_2016_v1tauVSall", "deepTau2017v1tauVSjet", "MVArun2v1DBoldDMwLTraw2017v2"};
+  for(unsigned int i=0;i<names.size();++i){
+    std::string hNamePrefix = "h1DTauID_"+names[i];
+    plotSingleHistogram(hNamePrefix+"ggHTT125");
+    plotSingleHistogram(hNamePrefix+"QCD_MC");
+  }
+  plotROC("h1DTauID_DPFTau", "ggHTT125", "QCD_MC");
+  
+  
   std::cout<<"SVfitHistograms::finalizeHistograms() END"<<std::endl;
+}
+/////////////////////////////////////////////////////////
+/////////////////////////////////////////////////////////
+void SVfitHistograms::plotROC(std::string hName, std::string signal, std::string background){
+
+  std::string tmpName = hName+signal;
+  TH1F* h1DSignal = get1DHistogram(tmpName);
+  if(!h1DSignal) return;
+
+  hName = hName+background;
+  TH1F* h1DBackground = get1DHistogram(tmpName);
+  if(!h1DBackground) return;
+
+  TMVA::ROCCalc aROCCalculator(h1DSignal, h1DBackground);
+  TH1D * h1DROC = aROCCalculator.GetROC();
+
+  TCanvas* c = new TCanvas("AnyHistogram","AnyHistogram",
+			   460,500);
+  h1DROC->Draw();
+  tmpName = "fig_png/"+hName+"_"+signal+"_"+background+".png";
+  c->Print(tmpName.c_str());
+  
 }
 /////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////

@@ -192,6 +192,7 @@ void MLAnalyzer::addBranch(TTree *tree)
 			// Adding branches for global parameters and saving the address of TTree
 			MLTree_ = tree;
 			std::cout<<"[ML]\tAdding global parameter branches for ML analysis."<<std::endl;
+			tree->Branch("sampleType", &sampleType_);
 			tree->Branch("genMass", &genMass_);
 			tree->Branch("visMass", &visMass_);
 			tree->Branch("caMass", &caMass_);
@@ -416,6 +417,7 @@ void MLAnalyzer::globalsHTT(const MLObjectMessenger* mess, const std::vector<con
 		//if(!(leg1 && leg2 && aMET && aSystEffect && bs && higgs_mass && nJets))
 		//	throw std::logic_error("[ERROR] NULL POINTERS PRESENT!");
 		// Calculation and assignement of global parameters
+		sampleType_ = *mess->getObject(static_cast<double*>(p),"sampleType");
 		genMass_ = *mess->getObject(static_cast<double*>(p),"genMass");
 		visMass_ = *mess->getObject(static_cast<double*>(p),"visMass");
 		caMass_ = *mess->getObject(static_cast<double*>(p),"caMass");

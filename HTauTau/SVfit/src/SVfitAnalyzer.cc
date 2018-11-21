@@ -153,6 +153,8 @@ TLorentzVector SVfitAnalyzer::computeMTT(const std::string & algoName){
 TLorentzVector SVfitAnalyzer::runFastMTTAlgo(const std::vector<classic_svFit::MeasuredTauLepton> & measuredTauLeptons,
                                            const HTTParticle &aMET, const TMatrixD &covMET){
 
+  fastMTTAlgo.disableComponent(fastMTT::PX);
+  fastMTTAlgo.disableComponent(fastMTT::PY);
   fastMTTAlgo.run(measuredTauLeptons, aMET.getP4().X(), aMET.getP4().Y(), covMET);
   ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<double> > aP4 = fastMTTAlgo.getBestP4();
   
@@ -278,7 +280,7 @@ void SVfitAnalyzer::fillControlHistos(const std::string & hNameSuffix){
   TLorentzVector nunuGen = tautauGen - 
     aGenLeg1.getChargedP4() - aGenLeg2.getChargedP4() -
     aGenLeg1.getNeutralP4() - aGenLeg2.getNeutralP4();
-  TLorentzVector SVFitP4 = computeMTT("fastMTT");  
+  TLorentzVector SVFitP4;//TEST = computeMTT("fastMTT");  
   float visMass = aVisSum.M();
   double delta = (SVFitP4.M() - tautauGen.M())/tautauGen.M();
 
@@ -324,6 +326,16 @@ void SVfitAnalyzer::fillControlHistos(const std::string & hNameSuffix){
   delta = aLeg1.getP4().E() - aGenLeg1.getChargedP4().E() - aGenLeg1.getNeutralP4().E();
   delta /= aGenLeg1.getChargedP4().E() + aGenLeg1.getNeutralP4().E();
   myHistos_->fill1DHistogram("h1DDeltaLeg1_E_Res"+hNameSuffix, delta);
+
+  double tauIDRaw = aLeg2.getProperty(PropertyEnum::DPFTau_2016_v1tauVSall);
+  myHistos_->fill1DHistogram("h1DTauID_DPFTau_2016_v1tauVSall"+hNameSuffix, tauIDRaw);
+
+  tauIDRaw = aLeg2.getProperty(PropertyEnum::deepTau2017v1tauVSjet);
+  myHistos_->fill1DHistogram("h1DTauID_deepTau2017v1tauVSjet"+hNameSuffix, tauIDRaw);
+
+  tauIDRaw = aLeg2.getProperty(PropertyEnum::byIsolationMVArun2v1DBoldDMwLTraw2017v2);
+  myHistos_->fill1DHistogram("h1DTauID_MVArun2v1DBoldDMwLTraw2017v2"+hNameSuffix, tauIDRaw);
+  
 }
 //////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////
@@ -333,6 +345,12 @@ bool SVfitAnalyzer::analyze(const EventProxyBase& iEvent, ObjectMessenger *aMess
   sampleName = HTTAnalysis::getSampleName(myEventProxy);
 
   std::string hNameSuffix = sampleName;
+  double sampleType = 0;
+  if(sampleName.find("TT")!=std::string::npos &&
+     sampleName.find("TTTo")==std::string::npos &&
+     sampleName.find("TTbar")==std::string::npos
+     ) sampleType = 0;
+  else sampleType = 1;
 
   if(!myEventProxy.pairs->size()) return true;
   setAnalysisObjects(myEventProxy);
@@ -350,27 +368,24 @@ bool SVfitAnalyzer::analyze(const EventProxyBase& iEvent, ObjectMessenger *aMess
 
   int tauIDmask = 0;
   for(unsigned int iBit=0; iBit<myEventProxy.event->ntauIds; iBit++) {
-    if(myEventProxy.event->tauIDStrings[iBit]=="byVLooseIsolationMVArun2v1DBoldDMwLT") tauIDmask |= (1<<iBit);
+    //if(myEventProxy.event->tauIDStrings[iBit]=="byVLooseIsolationMVArun2v1DBoldDMwLT") tauIDmask |= (1<<iBit);
     if(myEventProxy.event->tauIDStrings[iBit]=="againstMuonLoose3") tauIDmask |= (1<<iBit);
     if(myEventProxy.event->tauIDStrings[iBit]=="againstElectronVLooseMVA6") tauIDmask |= (1<<iBit);
   }
   bool passTauPreselection = aLeg2.getP4().Perp()>30;
+  passTauPreselection &= aLeg2.getP4().DeltaR(aLeg1.getP4())>0.4;
   passTauPreselection &= ( (int)aLeg2.getProperty(PropertyEnum::tauID) & tauIDmask) == tauIDmask;
-  passTauPreselection = true;//HACK
+  //passTauPreselection = true;//HACK
 
-  if(sampleName=="WAllJets"){
-    goodGenTau = true;
-    isGoodReco = true;
-  }
-  
-  if(sampleName=="DYAllJetsMatchL"){
+  if(sampleName=="WAllJets" || sampleName=="QCD_MC" || sampleName=="DYAllJetsMatchL"){
     goodGenTau = true;
     isGoodReco = true;
   }
   
   if(passTauPreselection && isGoodReco && goodGenTau){
     fillControlHistos(hNameSuffix);
-  
+    return true;//TEST
+
     if(aMessenger and std::string("MLObjectMessenger").compare((aMessenger->name()).substr(0,17))==0 ) // if NULL it will do nothing
       {
 	// Putting data to MLObjectMessenger
@@ -395,6 +410,8 @@ bool SVfitAnalyzer::analyze(const EventProxyBase& iEvent, ObjectMessenger *aMess
 	    mess->putObject(&aCovMET[0][1], "covMET01");
 	    mess->putObject(&aCovMET[1][0], "covMET10");
 	    mess->putObject(&aCovMET[1][1], "covMET11");
+
+	    mess->putObject(&sampleType, "sampleType");
 
 	    double genMass = (aGenLeg1.getP4() + aGenLeg2.getP4()).M();      
 	    mess->putObject(&genMass, "genMass");
