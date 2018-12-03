@@ -5,6 +5,7 @@
 #include <map>
 #include <vector>
 
+#define MAX_CAND 16
 
 class HSCPEvent;
 
@@ -15,11 +16,13 @@ class HSCPParticle{
 
   public:
 
-  HSCPParticle(){ clear();}
+  HSCPParticle(const HSCPEvent *aEvent);
 
   ~HSCPParticle(){}
 
   void clear();
+
+  void init(int index);
 
   const float & getPt() const {return pt;}
 
@@ -29,6 +32,7 @@ class HSCPParticle{
 
  protected:
 
+  const HSCPEvent *myEvent;
   float pt, eta, phi;
   
 };
@@ -37,6 +41,7 @@ class HSCPParticle{
 class HSCPEvent{
 
   friend class EventProxyHSCP;
+  friend class HSCPParticle;
 
  public:
 
@@ -57,16 +62,18 @@ class HSCPEvent{
 
   unsigned long int getEventId() const {return eventId;}
 
-  const HSCPParticle & getCandidate(unsigned int i) const;
+  int getNumberOfCandidates() const {return numberOfCandidates;}
+
+  HSCPParticle getCandidate(unsigned int i) const;
 
  protected:
 
   ///Event run and number
   int runId;
   int eventId;
+  int numberOfCandidates;
 
-  std::vector<HSCPParticle> candidates;
-  HSCPParticle dummyCandidate;
+  Double_t pt[MAX_CAND], eta[MAX_CAND], phi[MAX_CAND]; 
 
 };
 ///////////////////////////////////////////////////

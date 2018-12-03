@@ -23,17 +23,13 @@ void EventProxyHSCP::init(std::vector<std::string> const& iFileNames){
 
   EventProxyBase::init(iFileNames);
 
-  fChain->SetBranchAddress("event_nr",&event.eventId);
-  fChain->SetBranchAddress("run_nr",&event.runId);
+  fChain->SetBranchAddress("event_num",&event.eventId);
+  fChain->SetBranchAddress("run_num",&event.runId);
   
-  fChain->SetBranchAddress("pt_1",&event.candidates[0].pt);
-  fChain->SetBranchAddress("eta_1",&event.candidates[0].eta);
-  fChain->SetBranchAddress("phi_1",&event.candidates[0].phi);
-
-  fChain->SetBranchAddress("pt_2",&event.candidates[1].pt);
-  fChain->SetBranchAddress("eta_2",&event.candidates[1].eta);
-  fChain->SetBranchAddress("phi_2",&event.candidates[1].phi);
-  
+  fChain->SetBranchAddress("NHSCPs",&event.numberOfCandidates);
+  fChain->SetBranchAddress("hscp_pt_trkref",&event.pt);
+  fChain->SetBranchAddress("hscp_track_eta",&event.eta);
+  fChain->SetBranchAddress("hscp_track_phi",&event.phi);
 
   fChain->SetBranchStatus("*",1);
 

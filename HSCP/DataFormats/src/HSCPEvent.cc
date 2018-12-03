@@ -5,9 +5,6 @@
 ////////////////////////////////////////////////
 HSCPEvent::HSCPEvent(){
 
-  candidates.push_back(HSCPParticle());
-  candidates.push_back(HSCPParticle());
-  
 }
 ////////////////////////////////////////////////
 ////////////////////////////////////////////////
@@ -16,16 +13,33 @@ void HSCPEvent::clear(){
   runId = 0;
   eventId = 0;
 
-  std::for_each(candidates.begin(), candidates.end(), [](HSCPParticle & aPart){ aPart.clear(); });	   
-
 }
 ////////////////////////////////////////////////
 ////////////////////////////////////////////////
-const HSCPParticle & HSCPEvent::getCandidate(unsigned int i) const{
+HSCPParticle::HSCPParticle(const HSCPEvent *aEvent){
 
-  if(i>=candidates.size()) return dummyCandidate;
+  clear();
+  myEvent = aEvent;
 
-  return candidates[i];
+}
+////////////////////////////////////////////////                                                                                                                                            ////////////////////////////////////////////////                                                                                                                                           
+void HSCPParticle::init(int index){
+
+  pt = myEvent->pt[index];
+  eta = myEvent->eta[index];
+  eta = myEvent->phi[index];
+
+}
+////////////////////////////////////////////////                                                                                                                                            ////////////////////////////////////////////////
+HSCPParticle HSCPEvent::getCandidate(unsigned int index) const{
+
+  HSCPParticle aCandidate(this);
+  aCandidate.clear();
+  if((int)index>=numberOfCandidates) return aCandidate;
+
+  aCandidate.init(index);
+
+  return aCandidate;
 }
 ////////////////////////////////////////////////
 ////////////////////////////////////////////////

@@ -65,6 +65,7 @@ bool HSCPAnalyzer::analyze(const EventProxyBase& iEvent, ObjectMessenger *aMesse
 
 
   std::cout<<"eventID: "<<eventID
+	   <<" number of candidates: "<<myEvent.getNumberOfCandidates()
 	   <<" pt1: "<<pt1<<" pt2: "<<pt2
 	   <<std::endl;
 
