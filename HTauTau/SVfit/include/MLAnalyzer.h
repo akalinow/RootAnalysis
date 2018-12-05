@@ -88,6 +88,7 @@ class MLAnalyzer : public Analyzer
   std::map<std::string, std::set<unsigned>> params_jets_; /*!< which jets have which params */
 
   //! global parameters of the analylis
+  float sampleType_;
   float visMass_;
   float caMass_; 
   float genMass_;

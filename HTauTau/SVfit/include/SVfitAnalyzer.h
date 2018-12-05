@@ -39,6 +39,8 @@ class SVfitAnalyzer: public HTTAnalyzer{
 
   virtual ~SVfitAnalyzer();
 
+  Analyzer* clone() const;
+
   ///Initialize the analyzer
   virtual void initialize(TDirectory* aDir,
 			  pat::strbitset *aSelections);
@@ -67,6 +69,8 @@ class SVfitAnalyzer: public HTTAnalyzer{
 		   const HTTParticle & aMET);
 
   std::tuple<double, double> getTauMomentum(const TLorentzVector & visP4, double cosGJ);
+
+  virtual void setHistos(SVfitHistograms *histos) { myHistos_ = histos;};
 
   ///Histograms storage.
   SVfitHistograms *myHistos_;

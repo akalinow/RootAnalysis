@@ -34,6 +34,13 @@ virtual void defineHistograms();
 ///Types of the selection flow
 std::vector<std::string> selectionFlavours_;
 
+///Plot the ROC curve for given variable(hName) and signal and background processes. 
+TH1D* plotROC(std::string hName, std::string signal, std::string background);
+
+///Draw the ROC curves for many discriminators on a single plot and signal and background processes. 
+void plotROC(std::string signal, std::string background);
+ 
+
 //Plot a single 1D histogram. One has to provide the full
 //histogram name, e.g. including h1D prefix.
 void plotSingleHistogram(std::string hName);

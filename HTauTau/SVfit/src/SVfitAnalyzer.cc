@@ -29,6 +29,7 @@ SVfitAnalyzer::SVfitAnalyzer(const std::string & aName, const std::string & aDec
     SVFitAlgo.setLikelihoodFileName("");
     SVFitAlgo.setMaxObjFunctionCalls(100000);
     SVFitAlgo.setVerbosity(1);
+    myHistos_ = 0;
   }
 }
 //////////////////////////////////////////////////////////////////////////////
@@ -41,6 +42,16 @@ SVfitAnalyzer::~SVfitAnalyzer(){
   myHistos_ = 0;
   myChannelSpecifics = 0;  
 }
+//////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////////
+Analyzer* SVfitAnalyzer::clone() const {
+
+  std::string myDecayMode = myChannelSpecifics->getDecayModeName();
+  SVfitAnalyzer* clone = new SVfitAnalyzer(name(),myDecayMode);
+  clone->setHistos(myHistos_);
+  return clone;
+
+};
 //////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////
 void SVfitAnalyzer::initialize(TDirectory* aDir,
@@ -164,6 +175,8 @@ TLorentzVector SVfitAnalyzer::computeMTT(const std::string & algoName){
 TLorentzVector SVfitAnalyzer::runFastMTTAlgo(const std::vector<classic_svFit::MeasuredTauLepton> & measuredTauLeptons,
                                            const HTTParticle &aMET, const TMatrixD &covMET){
 
+  fastMTTAlgo.disableComponent(fastMTT::PX);
+  fastMTTAlgo.disableComponent(fastMTT::PY);
   fastMTTAlgo.run(measuredTauLeptons, aMET.getP4().X(), aMET.getP4().Y(), covMET);
   ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<double> > aP4 = fastMTTAlgo.getBestP4();
   
@@ -296,8 +309,8 @@ void SVfitAnalyzer::fillControlHistos(const std::string & hNameSuffix){
   TLorentzVector nunuGen = tautauGen - 
     aGenLeg1.getChargedP4() - aGenLeg2.getChargedP4() -
     aGenLeg1.getNeutralP4() - aGenLeg2.getNeutralP4();
+  TLorentzVector SVFitP4;//TEST = computeMTT("fastMTT");  
 
-  TLorentzVector SVFitP4 = computeMTT("fastMTT");  
   float visMass = aVisSum.M();
   double delta = (SVFitP4.M() - tautauGen.M())/tautauGen.M();
 
@@ -344,6 +357,55 @@ void SVfitAnalyzer::fillControlHistos(const std::string & hNameSuffix){
   delta = aLeg1.getP4().E() - aGenLeg1.getChargedP4().E() - aGenLeg1.getNeutralP4().E();
   delta /= aGenLeg1.getChargedP4().E() + aGenLeg1.getNeutralP4().E();
   myHistos_->fill1DHistogram("h1DDeltaLeg1_E_Res"+hNameSuffix, delta);
+
+  double tauIDRaw = 1 - aLeg2.getProperty(PropertyEnum::DPFTau_2016_v1tauVSall);//inverted signal convention for deepTau2017v1tauVSjet
+  if(tauIDRaw>1) tauIDRaw = 0;//events with original DPFTau=-1 go to 0 instead of 2
+  myHistos_->fill1DHistogram("h1DTauID_DPFTau_2016_v1tauVSall"+hNameSuffix, tauIDRaw);
+
+  tauIDRaw = aLeg2.getProperty(PropertyEnum::DPFTau_2016_v0tauVSall);
+  //if(tauIDRaw>1) tauIDRaw = 0;//events with original DPFTau=-1 go to 0 instead of 2
+  myHistos_->fill1DHistogram("h1DTauID_DPFTau_2016_v0tauVSall"+hNameSuffix, tauIDRaw);
+
+  tauIDRaw = aLeg2.getProperty(PropertyEnum::deepTau2017v1tauVSjet);
+  myHistos_->fill1DHistogram("h1DTauID_deepTau2017v1tauVSjet"+hNameSuffix, tauIDRaw);   
+
+  tauIDRaw = aLeg2.getProperty(PropertyEnum::deepTau2017v1tauVSall);
+  myHistos_->fill1DHistogram("h1DTauID_deepTau2017v1tauVSall"+hNameSuffix, tauIDRaw);
+
+  tauIDRaw = aLeg2.getProperty(PropertyEnum::byIsolationMVArun2v1DBnewDMwLTraw2017v2);
+  tauIDRaw = 0.5 + 0.5*tauIDRaw;
+  myHistos_->fill1DHistogram("h1DTauID_MVArun2v1DBnewDMwLTraw2017v2"+hNameSuffix, tauIDRaw);
+
+  double DPFTau_2016_v1 = 1 - aLeg2.getProperty(PropertyEnum::DPFTau_2016_v1tauVSall);//inverted signal convention for deepTau2017v1tauVSjet
+  if(DPFTau_2016_v1>1) DPFTau_2016_v1 = 0.0;//events with original DPFTau=-1 go to -0.25 instead of 2
+
+  double MVArun2 = 0.5 + 0.5*aLeg2.getProperty(PropertyEnum::byIsolationMVArun2v1DBnewDMwLTraw2017v2);//Rescale to 0-1 range
+  double deepTau2017v1tauVSall = aLeg2.getProperty(PropertyEnum::deepTau2017v1tauVSall);
+  double deepTau2017v1tauVSjet = aLeg2.getProperty(PropertyEnum::deepTau2017v1tauVSall);
+
+  //deepTau2017v1tauVSall = 0.5;
+  //deepTau2017v1tauVSjet = 0.5;
+  //MVArun2 = 0.5;
+  
+  double features[4] = {deepTau2017v1tauVSall,
+			MVArun2,
+			deepTau2017v1tauVSjet,
+			DPFTau_2016_v1};
+
+  double weights[4] = {0.31786388, 0.31036836, 0.33565497, 0.8189471};
+  double bias = -0.19871855;
+  double output_weight = 1.1938922;
+  double output_bias = -0.9771929;
+  double logit = 0.0;
+  for(int i=0;i<4;++i) logit+=features[i]*weights[i];
+  logit += bias;
+
+  logit*=output_weight;
+  logit+=output_bias;
+  
+  float result = exp(logit)/(1 + exp(logit));
+  myHistos_->fill1DHistogram("h1DTauID_training"+hNameSuffix, result);
+
 }
 //////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////
@@ -353,44 +415,59 @@ bool SVfitAnalyzer::analyze(const EventProxyBase& iEvent, ObjectMessenger *aMess
   sampleName = HTTAnalysis::getSampleName(myEventProxy);
 
   std::string hNameSuffix = sampleName;
+  double sampleType = 0;
+  if(sampleName.find("TT")!=std::string::npos &&
+     sampleName.find("TTTo")==std::string::npos &&
+     sampleName.find("TTbar")==std::string::npos
+     ) sampleType = 1;
+  else sampleType = 0;
 
   if(!myEventProxy.pairs->size()) return true;
   setAnalysisObjects(myEventProxy);
 
-  bool isGoodReco = aGenLeg1.getP4().DeltaR(aLeg1.getP4())<0.4 &&
-		    aGenLeg2.getP4().DeltaR(aLeg2.getP4())<0.4;
+  bool isGoodReco = aGenLeg1.getP4().DeltaR(aLeg1.getP4())<0.2 &&
+		    aGenLeg2.getP4().DeltaR(aLeg2.getP4())<0.2;
   
-  isGoodReco |= aGenLeg2.getP4().DeltaR(aLeg1.getP4())<0.4 &&
-		aGenLeg1.getP4().DeltaR(aLeg2.getP4())<0.4;
+  TLorentzVector genVisP4 =  aGenLeg2.getChargedP4() + aGenLeg2.getNeutralP4();
+  bool goodGenTau = aGenLeg1.getP4().E()>1.0 && aGenLeg2.getP4().E()>1.0;
+  bool isTauHad = aGenLeg2.getProperty(PropertyEnum::decayMode)!=HTTAnalysis::tauDecayMuon &&
+                  aGenLeg2.getProperty(PropertyEnum::decayMode)!=HTTAnalysis::tauDecaysElectron;
   
-  bool goodGenTau = aGenLeg1.getP4().E()>1.0 && aGenLeg2.getP4().E()>1.0;							   
+  goodGenTau &= genVisP4.Perp()>10 && std::abs(genVisP4.Eta())<2.3;
+  goodGenTau &= isTauHad;
+  
+  isGoodReco &= aGenLeg2.getP4().DeltaR(aLeg2.getP4())<0.2;
+  isGoodReco &= aLeg2.getP4().Perp()>18 && std::abs(aLeg2.getP4().Eta())<2.3;
+  isGoodReco &= aLeg2.getP4().Perp()>30;
 
-  //isGoodReco = aGenLeg2.getP4().DeltaR(aLeg2.getP4())<0.4;
-  //goodGenTau = aGenLeg2.getP4().E()>1.0;
-
+  TLorentzVector matchObjectP4 = aGenLeg2.getChargedP4() + aGenLeg2.getNeutralP4();
+  
   int tauIDmask = 0;
   for(unsigned int iBit=0; iBit<myEventProxy.event->ntauIds; iBit++) {
-    if(myEventProxy.event->tauIDStrings[iBit]=="byVLooseIsolationMVArun2v1DBoldDMwLT") tauIDmask |= (1<<iBit);
-    if(myEventProxy.event->tauIDStrings[iBit]=="againstMuonLoose3") tauIDmask |= (1<<iBit);
-    if(myEventProxy.event->tauIDStrings[iBit]=="againstElectronVLooseMVA6") tauIDmask |= (1<<iBit);
+    //if(myEventProxy.event->tauIDStrings[iBit]=="byVLooseIsolationMVArun2v1DBnewDMwLT2017v2") tauIDmask |= (1<<iBit);
+    //if(myEventProxy.event->tauIDStrings[iBit]=="againstMuonLoose3") tauIDmask |= (1<<iBit);
+    //if(myEventProxy.event->tauIDStrings[iBit]=="againstElectronVLooseMVA6") tauIDmask |= (1<<iBit);
   }
-  bool passTauPreselection = aLeg2.getP4().Perp()>30;
+  bool passTauPreselection = true;
+  passTauPreselection &= aLeg2.getP4().DeltaR(aLeg1.getP4())>0.4;
   passTauPreselection &= ( (int)aLeg2.getProperty(PropertyEnum::tauID) & tauIDmask) == tauIDmask;
-  passTauPreselection = true;//HACK
 
-  if(sampleName=="WAllJets"){
+  if(sampleName=="WAllJets" || sampleName=="QCD_MC" || sampleName=="DYAllJetsMatchL"){
+    isGoodReco = false;
     goodGenTau = true;
-    isGoodReco = true;
+    for(auto aJet : *myEventProxy.jets) {      
+      if(aJet.getP4().Perp()<10 || std::abs(aJet.getP4().Eta())>2.5) continue;      
+      float dRLeg2 = aJet.getP4().DeltaR(aLeg2.getP4());
+      if(dRLeg2<0.4) {
+	matchObjectP4 = aJet.getP4();
+	isGoodReco = true;
+      }
+    }
   }
-  
-  if(sampleName=="DYAllJetsMatchL"){
-    goodGenTau = true;
-    isGoodReco = true;
-  }
-  
+
   if(passTauPreselection && isGoodReco && goodGenTau){
     fillControlHistos(hNameSuffix);
-  
+
     if(aMessenger and std::string("MLObjectMessenger").compare((aMessenger->name()).substr(0,17))==0 ) // if NULL it will do nothing
       {
 	// Putting data to MLObjectMessenger
@@ -415,6 +492,8 @@ bool SVfitAnalyzer::analyze(const EventProxyBase& iEvent, ObjectMessenger *aMess
 	    mess->putObject(&aCovMET[0][1], "covMET01");
 	    mess->putObject(&aCovMET[1][0], "covMET10");
 	    mess->putObject(&aCovMET[1][1], "covMET11");
+
+	    mess->putObject(&sampleType, "sampleType");
 
 	    double genMass = (aGenLeg1.getP4() + aGenLeg2.getP4()).M();      
 	    mess->putObject(&genMass, "genMass");

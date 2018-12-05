@@ -35,7 +35,7 @@ class HTTEvent{
 
   ///Copy from LLRHiggsTauTau/NtupleProducer/plugins/HTauTauNtuplizer.cc
   // Initialzation of tauIDStrings[] moved to HTTEvent.cxx
-  static const int ntauIds = 24;
+  static const int ntauIds = 31;
   static const TString tauIDStrings[ntauIds];
 
   HTTEvent(){clear();}

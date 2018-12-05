@@ -25,7 +25,7 @@ if (EXISTS ${ClassicSVfit_PATH}/TauAnalysis/SVfitTF/src/crystalBall.cc AND EXIST
   add_executable(svfitAnalysis SVfitAnalysis.cc)
 
   target_link_libraries(svfitAnalysis SVfitAnalysis FrameworkCore DataFormats Analysis ClassicSVfit SVfitTF
-    ${Boost_REGEX_LIBRARY} ${ROOT_LIBRARIES} Proof RooFitCore RooFit)
+    ${Boost_REGEX_LIBRARY} ${ROOT_LIBRARIES} Proof RooFitCore RooFit TMVA)
 
   install(TARGETS SVfitAnalysis ClassicSVfit SVfitTF svfitAnalysis
     RUNTIME DESTINATION bin

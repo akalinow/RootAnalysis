@@ -68,6 +68,7 @@ try {
 	//----------------------------------------------------------
 	std::vector<Analyzer*> myAnalyzers;
 	EventProxyHTT *myEvent = new EventProxyHTT();
+	ObjectMessenger* OMess = nullptr;
 
 	std::string decayModeName;
 	if(processName.find("MuTau")!=std::string::npos) decayModeName = "MuTau";
@@ -80,18 +81,17 @@ try {
 
 	if(processName.find("Analysis")!=std::string::npos) {
 	  myAnalyzers.push_back(new SVfitAnalyzer("SVfitAnalyzer",decayModeName));
-	 		if(noOfThreads==1) 
-	 			myAnalyzers.push_back(new MLAnalyzer("MLAnalyzer",decayModeName));
-  }
+	  if(noOfThreads==1 && processName.find("MLAnalysis")!=std::string::npos){ 
+	    myAnalyzers.push_back(new MLAnalyzer("MLAnalyzer",decayModeName));
+	    OMess = new MLObjectMessenger("MLObjectMessenger created in HTTAnalysis.cc");
+	  }
+	}
 	else{
 	  std::cout<<"Incorrect process name: "<<processName<<std::endl;
 	  return 1;
 	}
 
-	TreeAnalyzer *tree = new TreeAnalyzer("TreeAnalyzer",cfgFileName, myEvent);
-
-	ObjectMessenger* OMess = nullptr;
-	if(noOfThreads==1) OMess = new MLObjectMessenger("MLObjectMessenger created in HTTAnalysis.cc");
+	TreeAnalyzer *tree = new TreeAnalyzer("TreeAnalyzer",cfgFileName, myEvent);       
 	tree->setObjectMessenger(OMess);
 	tree->init(myAnalyzers);
 	int nEventsAnalysed = tree->loop();
@@ -115,7 +115,7 @@ try {
 } catch(const std::exception& e) {
 	print_exception(e);
 	return EXIT_FAILURE;
-}
+ }
 }
 /////////////////////////////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////////////////////////////
