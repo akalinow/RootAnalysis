@@ -105,7 +105,7 @@ class HTTAnalyzer: public Analyzer{
   ///Types of the selection flow
   std::vector<std::string> selectionFlavours_;
 
-  void setHistos(HTTHistograms *histos) { myHistos_ = histos;};
+  virtual void setHistos(HTTHistograms *histos) { myHistos_ = histos;};
 
   ///Parts of code specific to give decay channel.
   ///In particular category and object selection.

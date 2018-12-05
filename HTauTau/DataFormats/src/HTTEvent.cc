@@ -1,9 +1,4 @@
-#ifdef PROJECT_NAME
-#include "m2n/HTTDataFormats/interface/HTTEvent.h"
-#include "m2n/HTT/interface/GenInfoHelper.h"
-#else
 #include "HTTEvent.h"
-#endif
 
 ////////////////////////////////////////////////
 ////////////////////////////////////////////////
@@ -37,6 +32,14 @@ const TString HTTEvent::tauIDStrings[ntauIds] = {
    "byTightIsolationMVArun2v1DBoldDMwLT2017v2",
    "byVTightIsolationMVArun2v1DBoldDMwLT2017v2",
    "byVVTightIsolationMVArun2v1DBoldDMwLT2017v2",
+
+   "byVVLooseIsolationMVArun2v1DBnewDMwLT2017v2",
+   "byVLooseIsolationMVArun2v1DBnewDMwLT2017v2",
+   "byLooseIsolationMVArun2v1DBnewDMwLT2017v2",
+   "byMediumIsolationMVArun2v1DBnewDMwLT2017v2",
+   "byTightIsolationMVArun2v1DBnewDMwLT2017v2",
+   "byVTightIsolationMVArun2v1DBnewDMwLT2017v2",
+   "byVVTightIsolationMVArun2v1DBnewDMwLT2017v2",
 };
 
 ////////////////////////////////////////////////

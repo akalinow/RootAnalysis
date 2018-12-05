@@ -9,6 +9,7 @@ const std::map<std::string, PropertyEnum> PropertyEnumString::enumMap={
 {"byCombinedIsolationDeltaBetaCorrRaw3Hits", PropertyEnum::byCombinedIsolationDeltaBetaCorrRaw3Hits},
 {"byIsolationMVArun2v1DBoldDMwLTraw", PropertyEnum::byIsolationMVArun2v1DBoldDMwLTraw},
 {"byIsolationMVArun2v1DBoldDMwLTraw2017v2", PropertyEnum::byIsolationMVArun2v1DBoldDMwLTraw2017v2},
+{"byIsolationMVArun2v1DBnewDMwLTraw2017v2", PropertyEnum::byIsolationMVArun2v1DBnewDMwLTraw2017v2},
 {"dxy", PropertyEnum::dxy},
 {"dz", PropertyEnum::dz},
 {"SIP", PropertyEnum::SIP},

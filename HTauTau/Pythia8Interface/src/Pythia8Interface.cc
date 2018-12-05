@@ -323,9 +323,14 @@ HTTParticle Pythia8Interface::makeTau(const TParticle & aTau){
 
   std::vector<Double_t> aProperties;
   int decayMode = getDetailedTauDecayMode(aTau);
+
+  int pdgId = 15;
+  if(decayMode == HTTAnalysis::hadronicTauDecayModes::tauDecaysElectron) pdgId = 11;
+  else if(decayMode == HTTAnalysis::hadronicTauDecayModes::tauDecayMuon) pdgId = 16;
+  else pdgId = 15;
   
-  aProperties.push_back(aTau.GetPdgCode());
-  aProperties.push_back(aTau.GetPdgCode());
+  aProperties.push_back(pdgId);
+  aProperties.push_back(aTau.GetPDG()->Charge());
   aProperties.push_back(decayMode);
 
   aLepton.setProperties(aProperties);
