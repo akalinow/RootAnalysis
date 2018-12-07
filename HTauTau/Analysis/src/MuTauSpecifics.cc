@@ -110,7 +110,9 @@ void MuTauSpecifics::testAllCategories(const HTTAnalysis::sysEffects & aSystEffe
 
 	bool passMVA = (0.5 + 0.5*myAnalyzer->aLeg2.getProperty(PropertyEnum::byIsolationMVArun2v1DBnewDMwLTraw2017v2))>0.921731;
 	bool passDeepTau = myAnalyzer->aLeg2.getProperty(PropertyEnum::deepTau2017v1tauVSjet)>0.934318;
-	//bool passDPF = myAnalyzer->aLeg2.getProperty(PropertyEnum::DPFTau_2016_v1tauVSall)>0.637972;
+	double DPFTau_2016_v1 = 1 - aTau.getProperty(PropertyEnum::DPFTau_2016_v1tauVSall);//inverted signal convention for DPFTau_2016_v1tauVSall
+	if(DPFTau_2016_v1>1) DPFTau_2016_v1 = 0.0;
+	bool passDPF = DPFTau_2016_v1>0.637972;
 	bool passTraining = getTrainedTauID(myAnalyzer->aLeg2)>0.59456;
 
         unsigned int muonIDmask = (1<<7);
