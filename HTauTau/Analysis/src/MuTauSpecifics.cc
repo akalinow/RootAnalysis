@@ -108,10 +108,10 @@ void MuTauSpecifics::testAllCategories(const HTTAnalysis::sysEffects & aSystEffe
         }
         bool tauID = ( (int)myAnalyzer->aLeg2.getProperty(PropertyEnum::tauID) & tauIDmask) == tauIDmask;
 
-	bool passMVA = myAnalyzer->aLeg2.getProperty(PropertyEnum::byIsolationMVArun2v1DBnewDMwLTraw2017v2)>0.921731;
-	bool passDeepTau = myAnalyzer->aLeg2.getProperty(PropertyEnum::deepTau2017v1tauVSall)>0.934318;
+	bool passMVA = (0.5 + 0.5*myAnalyzer->aLeg2.getProperty(PropertyEnum::byIsolationMVArun2v1DBnewDMwLTraw2017v2))>0.921731;
+	bool passDeepTau = myAnalyzer->aLeg2.getProperty(PropertyEnum::deepTau2017v1tauVSjet)>0.934318;
 	//bool passDPF = myAnalyzer->aLeg2.getProperty(PropertyEnum::DPFTau_2016_v1tauVSall)>0.637972;
-	bool passTraining = getTrainedTauID(myAnalyzer->aLeg2)>0.590483;
+	bool passTraining = getTrainedTauID(myAnalyzer->aLeg2)>0.59456;
 
         unsigned int muonIDmask = (1<<7);
         bool muonID = true;
