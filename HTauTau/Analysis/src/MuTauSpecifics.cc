@@ -108,7 +108,7 @@ void MuTauSpecifics::testAllCategories(const HTTAnalysis::sysEffects & aSystEffe
         }
         bool tauID = ( (int)myAnalyzer->aLeg2.getProperty(PropertyEnum::tauID) & tauIDmask) == tauIDmask;
 
-	bool passMVA = myAnalyzer->aLeg2.getProperty(PropertyEnum::deepTau2017v1tauVSall)>0.921731;
+	bool passMVA = myAnalyzer->aLeg2.getProperty(PropertyEnum::byIsolationMVArun2v1DBnewDMwLTraw2017v2)>0.921731;
 	bool passDeepTau = myAnalyzer->aLeg2.getProperty(PropertyEnum::deepTau2017v1tauVSall)>0.934318;
 	//bool passDPF = myAnalyzer->aLeg2.getProperty(PropertyEnum::DPFTau_2016_v1tauVSall)>0.637972;
 	bool passTraining = getTrainedTauID(myAnalyzer->aLeg2)>0.590483;
@@ -185,7 +185,7 @@ void MuTauSpecifics::testAllCategories(const HTTAnalysis::sysEffects & aSystEffe
         bool nobtag = myAnalyzer->nBJets==0;
 
 	///HACK
-	bool original = vbf;
+	bool original = jet0;
 	jet0 = original & passMVA;
 	boosted = original & passDeepTau;
 	vbf = original & passTraining;
