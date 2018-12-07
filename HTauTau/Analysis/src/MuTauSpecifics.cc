@@ -5,6 +5,39 @@
 #include "EventProxyHTT.h"
 #include "Tools.h"
 
+
+double getTrainedTauID(const HTTParticle & aTau){
+
+  double MVArun2 = 0.5 + 0.5*aTau.getProperty(PropertyEnum::byIsolationMVArun2v1DBnewDMwLTraw2017v2);//Rescale to 0-1 range
+  double deepTau2017v1tauVSall = aTau.getProperty(PropertyEnum::deepTau2017v1tauVSall);
+  double deepTau2017v1tauVSjet = aTau.getProperty(PropertyEnum::deepTau2017v1tauVSall);
+  double DPFTau_2016_v1 = 1 - aTau.getProperty(PropertyEnum::DPFTau_2016_v1tauVSall);//inverted signal convention for deepTau2017v1tauVSjet
+  if(DPFTau_2016_v1>1) DPFTau_2016_v1 = 0.0;//events with original DPFTau=-1 go to -0.25 instead of 2
+
+  double features[4] = {deepTau2017v1tauVSall,
+			MVArun2,
+			deepTau2017v1tauVSjet,
+			DPFTau_2016_v1};
+
+  double weights[4] = {0.31786388, 0.31036836, 0.33565497, 0.8189471};
+  double bias = -0.19871855;
+  double output_weight = 1.1938922;
+  double output_bias = -0.9771929;
+  double logit = 0.0;
+  for(int i=0;i<4;++i) logit+=features[i]*weights[i];
+  logit += bias;
+
+  logit*=output_weight;
+  logit+=output_bias;
+  
+  float result = exp(logit)/(1 + exp(logit));
+
+  return result;
+}
+/////////////////////////////////////////////////////////////////
+/////////////////////////////////////////////////////////////////
+
+
 /////////////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////////////
 MuTauSpecifics::MuTauSpecifics(HTTAnalyzer * aAnalyzer) : ChannelSpecifics(aAnalyzer){
@@ -69,11 +102,16 @@ void MuTauSpecifics::testAllCategories(const HTTAnalysis::sysEffects & aSystEffe
 
         int tauIDmask = 0;
         for(unsigned int iBit=0; iBit<myAnalyzer->aEvent.ntauIds; iBit++) {
-                if(myAnalyzer->aEvent.tauIDStrings[iBit]=="byTightIsolationMVArun2v1DBoldDMwLT2017v2") tauIDmask |= (1<<iBit);
+	  //TEST if(myAnalyzer->aEvent.tauIDStrings[iBit]=="byTightIsolationMVArun2v1DBnewDMwLT2017v2") tauIDmask |= (1<<iBit);
                 if(myAnalyzer->aEvent.tauIDStrings[iBit]=="againstMuonTight3") tauIDmask |= (1<<iBit);
                 if(myAnalyzer->aEvent.tauIDStrings[iBit]=="againstElectronVLooseMVA6") tauIDmask |= (1<<iBit);
         }
         bool tauID = ( (int)myAnalyzer->aLeg2.getProperty(PropertyEnum::tauID) & tauIDmask) == tauIDmask;
+
+	bool passMVA = myAnalyzer->aLeg2.getProperty(PropertyEnum::deepTau2017v1tauVSall)>0.921731;
+	bool passDeepTau = myAnalyzer->aLeg2.getProperty(PropertyEnum::deepTau2017v1tauVSall)>0.934318;
+	//bool passDPF = myAnalyzer->aLeg2.getProperty(PropertyEnum::DPFTau_2016_v1tauVSall)>0.637972;
+	bool passTraining = getTrainedTauID(myAnalyzer->aLeg2)>0.590483;
 
         unsigned int muonIDmask = (1<<7);
         bool muonID = true;
@@ -145,6 +183,13 @@ void MuTauSpecifics::testAllCategories(const HTTAnalysis::sysEffects & aSystEffe
         //b-tag categories
         bool btag = myAnalyzer->nBJets>=1 && myAnalyzer->nJets30<=1;
         bool nobtag = myAnalyzer->nBJets==0;
+
+	///HACK
+	bool original = vbf;
+	jet0 = original & passMVA;
+	boosted = original & passDeepTau;
+	vbf = original & passTraining;
+	///////
 
         //Main categories
         myAnalyzer->categoryDecisions[ChannelSpecifics::jet0->id()] = os && muonIso && mtSelection && jet0;

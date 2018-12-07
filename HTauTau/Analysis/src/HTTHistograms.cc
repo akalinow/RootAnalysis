@@ -1396,7 +1396,10 @@ THStack*  HTTHistograms::plotStack(unsigned int iCategory,
         hMCSum->Add(hQCD);
         hMCSum->Add(hEWK2Jets);
 
-        outputStream<<"Event count summary for selecion name: "<<hNameSuffix<<std::endl;
+	hSoup->Print();
+	hSoup->Print("all");
+        outputStream<<"Event count summary for selecion: "<<hNameSuffix
+		    <<" variable: "<<hName<<std::endl;
         outputStream<<"         Data: "<<hSoup->Integral(0,hSoup->GetNbinsX()+1)<<std::endl;
         outputStream<<"MC (no Higgs): "<<hMCSum->Integral(0,hMCSum->GetNbinsX()+1)<<std::endl;
         outputStream<<"       W->l: "<<hWJets->Integral(0,hWJets->GetNbinsX()+1)<<std::endl;

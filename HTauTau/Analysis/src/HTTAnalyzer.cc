@@ -308,7 +308,7 @@ bool HTTAnalyzer::analyze(const EventProxyBase& iEvent, ObjectMessenger *aMessen
 
         const EventProxyHTT & myEventProxy = static_cast<const EventProxyHTT&>(iEvent);
         sampleName = HTTAnalysis::getSampleName(myEventProxy);
-
+	
         std::string hNameSuffix = sampleName;
         float puWeight = getPUWeight(myEventProxy);
         float genWeight = HTTAnalysis::getGenWeight(myEventProxy);
