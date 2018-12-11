@@ -164,6 +164,16 @@ TH1D* SVfitHistograms::plotROC(std::string hName, std::string signal, std::strin
   if(!h1DBackground) return 0;
 
   TMVA::ROCCalc aROCCalculator(h1DSignal, h1DBackground);
+
+  double effS, effSError;
+  std::cout<<"Discriminator: "<<hName<<std::endl;
+  effS = aROCCalculator.GetEffSForEffBof(1E-3, effSError);	
+  std::cout<<"60% S efficiency threshold: "<<aROCCalculator.Root(0.6)
+	   <<" S efficiency: "<<effS<<std::endl;
+  effS = aROCCalculator.GetEffSForEffBof(2E-3, effSError);
+  std::cout<<"70% S efficiency threshold: "<<aROCCalculator.Root(0.7)
+	   <<" S efficiency: "<<effS<<std::endl;
+  
   TH1D * h1DROC = aROCCalculator.GetROC();
   h1DROC->SetName((hName+"_ROC").c_str());
   h1DROC->SetDirectory(myDirCopy);

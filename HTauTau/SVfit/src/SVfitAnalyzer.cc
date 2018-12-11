@@ -381,12 +381,8 @@ void SVfitAnalyzer::fillControlHistos(const std::string & hNameSuffix){
 
   double MVArun2 = 0.5 + 0.5*aLeg2.getProperty(PropertyEnum::byIsolationMVArun2v1DBnewDMwLTraw2017v2);//Rescale to 0-1 range
   double deepTau2017v1tauVSall = aLeg2.getProperty(PropertyEnum::deepTau2017v1tauVSall);
-  double deepTau2017v1tauVSjet = aLeg2.getProperty(PropertyEnum::deepTau2017v1tauVSall);
+  double deepTau2017v1tauVSjet = aLeg2.getProperty(PropertyEnum::deepTau2017v1tauVSjet);
 
-  //deepTau2017v1tauVSall = 0.5;
-  //deepTau2017v1tauVSjet = 0.5;
-  //MVArun2 = 0.5;
-  
   double features[4] = {deepTau2017v1tauVSall,
 			MVArun2,
 			deepTau2017v1tauVSjet,
@@ -440,8 +436,6 @@ bool SVfitAnalyzer::analyze(const EventProxyBase& iEvent, ObjectMessenger *aMess
   isGoodReco &= aLeg2.getP4().Perp()>18 && std::abs(aLeg2.getP4().Eta())<2.3;
   isGoodReco &= aLeg2.getP4().Perp()>30;
 
-  TLorentzVector matchObjectP4 = aGenLeg2.getChargedP4() + aGenLeg2.getNeutralP4();
-  
   int tauIDmask = 0;
   for(unsigned int iBit=0; iBit<myEventProxy.event->ntauIds; iBit++) {
     //if(myEventProxy.event->tauIDStrings[iBit]=="byVLooseIsolationMVArun2v1DBnewDMwLT2017v2") tauIDmask |= (1<<iBit);
@@ -459,7 +453,6 @@ bool SVfitAnalyzer::analyze(const EventProxyBase& iEvent, ObjectMessenger *aMess
       if(aJet.getP4().Perp()<10 || std::abs(aJet.getP4().Eta())>2.5) continue;      
       float dRLeg2 = aJet.getP4().DeltaR(aLeg2.getP4());
       if(dRLeg2<0.4) {
-	matchObjectP4 = aJet.getP4();
 	isGoodReco = true;
       }
     }
