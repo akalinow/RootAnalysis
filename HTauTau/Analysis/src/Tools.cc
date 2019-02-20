@@ -14,6 +14,7 @@ float getLumi(){
   
 	/* Run2017X-31Mar2018-v1/MINIAOD */
         float run2017 = 41.501*1E3; //pb-1 data for NTUPLES_12_07_2018
+	//float run2017D = 4.252*1E3;
 		        
 	return run2017;
 }

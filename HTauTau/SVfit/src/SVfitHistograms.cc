@@ -64,7 +64,7 @@ void SVfitHistograms::defineHistograms(){
                 add1DHistogram("h1DStatsTemplate","",21,-0.5,20.5,file_);
                 add1DHistogram("h1DMassTemplate",";mass [GeV/c^{2}]; Events",100,0,500,file_);
                 add1DHistogram("h1DDeltaTemplate","",201,-5,5,file_);
-                add1DHistogram("h1DCpuTimeTemplate","",200,0.0,0.01,file_);
+                add1DHistogram("h1DCpuTimeTemplate","",10,0.0,0.2,file_);
 		add1DHistogram("h1DTauIDTemplate","",200,-1, 1,file_);
 		///
 		add2DHistogram("h2DDeltaTemplate","",10,0,100, 41,-10,10,file_);
@@ -80,7 +80,7 @@ void SVfitHistograms::finalizeHistograms(const std::vector<const HTTAnalysis::ev
 
   AnalysisHistograms::finalizeHistograms();
 
-  std::vector<std::string> names = {"Pythia8","ggHTT125", "DY0Jets"};
+  std::vector<std::string> names = {"Pythia8","ggHTT125", "DY0Jets", "DY0JetsMatchT"};
 
   for(unsigned int i=0;i<names.size();++i){
     std::string hNameSuffix = names[i];
@@ -88,10 +88,13 @@ void SVfitHistograms::finalizeHistograms(const std::vector<const HTTAnalysis::ev
     plotSingleHistogram("h1DMassVis"+hNameSuffix);
     plotSingleHistogram("h1DMassGen"+hNameSuffix);
     plotSingleHistogram("h1DMassFastMTT"+hNameSuffix);
+    plotSingleHistogram("h1DMassSVClassic"+hNameSuffix);
     plotSingleHistogram("h1DMassCA"+hNameSuffix);
-    plotSingleHistogram("h1DDeltaFastMTT"+hNameSuffix);
-    plotSingleHistogram("h1DDeltaCA"+hNameSuffix);
-    plotSingleHistogram("h1DCpuTimeFast"+hNameSuffix);
+    plotSingleHistogram("h1DDeltaMFastMTT"+hNameSuffix);
+    plotSingleHistogram("h1DDeltaMCA"+hNameSuffix);
+    plotSingleHistogram("h1DDeltaMSVClassic"+hNameSuffix);
+    plotSingleHistogram("h1DCpuTimeFastMTT"+hNameSuffix);
+    plotSingleHistogram("h1DCpuTimeSVClassic"+hNameSuffix);
     plotSingleHistogram("h1DDeltaMET_X_Res"+hNameSuffix);
     plotSingleHistogram("h1DDeltaMET_Y_Res"+hNameSuffix);
     plotSingleHistogram("h1DDeltaLeg1_E_Res"+hNameSuffix);
@@ -99,6 +102,12 @@ void SVfitHistograms::finalizeHistograms(const std::vector<const HTTAnalysis::ev
     plotSingleHistogram("h1DDeltaLeg2_PX_Res"+hNameSuffix);
     plotSingleHistogram("h1DDeltaLeg2_PY_Res"+hNameSuffix);
     plotSingleHistogram("h1DDeltaLeg2_PZ_Res"+hNameSuffix);
+    plotSingleHistogram("h1DDeltaPhiFastMTT"+hNameSuffix);
+    plotSingleHistogram("h1DDeltaEtaFastMTT"+hNameSuffix);
+    plotSingleHistogram("h1DDeltaPtFastMTT"+hNameSuffix);    
+    plotSingleHistogram("h1DDeltaPhiClassic"+hNameSuffix);
+    plotSingleHistogram("h1DDeltaEtaClassic"+hNameSuffix);
+    plotSingleHistogram("h1DDeltaPtClassic"+hNameSuffix);
 
     plotSingleHistogram2D("h2DDeltaMET_X_Res_Vs_Mass"+hNameSuffix);
     
@@ -128,6 +137,7 @@ void SVfitHistograms::plotROC(std::string signal, std::string background){
   
   TCanvas* c = new TCanvas("ROC","AnyHistogram", 460,500);
   c->SetLogy();
+  c->SetGrid();
   h1->SetLineColor(1);
   h2->SetLineColor(2);
   h3->SetLineColor(3);

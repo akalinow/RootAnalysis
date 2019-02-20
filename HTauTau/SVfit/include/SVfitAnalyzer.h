@@ -59,7 +59,7 @@ class SVfitAnalyzer: public HTTAnalyzer{
 
   TLorentzVector computeMTT(const std::string & algoName);
   
-  TLorentzVector runSVFitAlgo(const std::vector<classic_svFit::MeasuredTauLepton> & measuredTauLeptons,
+  TLorentzVector runsvFitAlgo(const std::vector<classic_svFit::MeasuredTauLepton> & measuredTauLeptons,
                               const HTTParticle &aMET, const TMatrixD &covMET);
 
   TLorentzVector runFastMTTAlgo(const std::vector<classic_svFit::MeasuredTauLepton> & measuredTauLeptons,
@@ -78,7 +78,7 @@ class SVfitAnalyzer: public HTTAnalyzer{
   ///ROOT file containing current TTree
   TFile *ntupleFile_;
 
-  ClassicSVfit SVFitAlgo;
+  ClassicSVfit svFitAlgo;
   FastMTT fastMTTAlgo;
 
   TMatrixD aCovMET;

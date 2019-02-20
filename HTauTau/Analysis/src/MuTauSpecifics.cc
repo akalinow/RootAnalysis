@@ -187,10 +187,18 @@ void MuTauSpecifics::testAllCategories(const HTTAnalysis::sysEffects & aSystEffe
         bool nobtag = myAnalyzer->nBJets==0;
 
 	///HACK
-	bool original = vbf;
-	jet0 = original & passMVA;
-	boosted = original & passDeepTau;
-	vbf = original & passTraining;
+	bool original = jet0;
+	jet0 = original && passMVA;
+	boosted = original && passDeepTau;
+	vbf = original && passTraining;
+	cpPi = original && passDPF;
+
+	//const TLorentzVector & aVisSum =  myAnalyzer->aLeg1.getP4(aSystEffect) +  myAnalyzer->aLeg2.getP4(aSystEffect);
+        //float visMass = aVisSum.M();
+	cpRho = original && myAnalyzer->aLeg1.getP4(aSystEffect).Pt()<50
+			 && myAnalyzer->aLeg1.getProperty(PropertyEnum::combreliso)<0.15
+			 && myAnalyzer->aLeg1.getPCARefitPV().Mag()>0.005;							    
+	  //&& visMass>30 && visMass<90;																    ;
 	///////
 
         //Main categories

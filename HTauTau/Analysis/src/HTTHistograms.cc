@@ -407,7 +407,7 @@ void HTTHistograms::finalizeHistograms(const std::vector<const HTTAnalysis::even
 
         myCategoryRejester  = aCategoryRejester;
      
-        std::vector<std::string> mainCategoryNames = {"0jet","boosted", "vbf",
+        std::vector<std::string> mainCategoryNames = {"0jet","boosted", "vbf", "mu_pi", "mu_rho"
                                                       //"inclusive","btag","nobtag"
         };
 

@@ -25,10 +25,10 @@ SVfitAnalyzer::SVfitAnalyzer(const std::string & aName, const std::string & aDec
 
 #pragma omp critical
   {  
-    SVFitAlgo.addLogM_fixed(true, 4.0);
-    SVFitAlgo.setLikelihoodFileName("");
-    SVFitAlgo.setMaxObjFunctionCalls(100000);
-    SVFitAlgo.setVerbosity(1);
+    svFitAlgo.addLogM_fixed(true, 4.0);
+    svFitAlgo.setLikelihoodFileName("");
+    svFitAlgo.setMaxObjFunctionCalls(100000);
+    svFitAlgo.setVerbosity(1);
     myHistos_ = 0;
   }
 }
@@ -66,17 +66,6 @@ void SVfitAnalyzer::initialize(TDirectory* aDir,
 void SVfitAnalyzer::setAnalysisObjects(const EventProxyHTT & myEventProxy){
 
   HTTAnalyzer::setAnalysisObjects(myEventProxy);
-
-  ///A temorary hack
-  if(aPair.getLeg1().getProperty(PropertyEnum::decayMode) == HTTAnalysis::hadronicTauDecayModes::tauDecayMuon){
-    aLeg1 = aPair.getLeg1();
-    aLeg2 = aPair.getLeg2();
-  }
-  else if(aPair.getLeg2().getProperty(PropertyEnum::decayMode) == HTTAnalysis::hadronicTauDecayModes::tauDecayMuon){
-    aLeg1 = aPair.getLeg2();
-    aLeg2 = aPair.getLeg1();
-  }
-  /////
     
   aCovMET[0][0] = aPair.getMETMatrix().at(0);
   aCovMET[0][1] = aPair.getMETMatrix().at(1);
@@ -134,29 +123,29 @@ TLorentzVector SVfitAnalyzer::computeMTT(const std::string & algoName){
   //Leptons for SVFit
   TVector3 recPV = aEvent.getRefittedPV();
   TVector3 recSV = aLeg1.getSV();  
-  double cosGJReco = (recSV - recPV).Unit()*aLeg1.getP4().Vect().Unit();
+  //double cosGJReco = (recSV - recPV).Unit()*aLeg1.getP4().Vect().Unit();
   classic_svFit::MeasuredTauLepton aLepton1(type1, aLeg1.getP4().Pt(), aLeg1.getP4().Eta(),
 					    aLeg1.getP4().Phi(), mass1, decay1);
 
   TVector3 genPV = aEvent.getGenPV();
   TVector3 genSV = aGenLeg1.getSV();
   TLorentzVector aP4 = aGenLeg1.getChargedP4();  
-  double ip3D = aLeg1.getPCA().Mag();
+  //double ip3D = aLeg1.getPCA().Mag();
  
-  aLepton1.setCosGJ(cosGJReco);
-  aLepton1.setIP3D(ip3D);
+  //aLepton1.setCosGJ(cosGJReco);
+  //aLepton1.setIP3D(ip3D);
 
   classic_svFit::MeasuredTauLepton aLepton2(type2, aLeg2.getP4().Pt(), aLeg2.getP4().Eta(),
 					    aLeg2.getP4().Phi(), mass2, decay2);
   recSV = aLeg2.getSV();  
-  cosGJReco = (recSV - recPV).Unit()*aLeg2.getP4().Vect().Unit();
-  ip3D = aLeg2.getPCA().Mag();
+  //cosGJReco = (recSV - recPV).Unit()*aLeg2.getP4().Vect().Unit();
+  //ip3D = aLeg2.getPCA().Mag();
 
   genSV = aGenLeg2.getSV();
   aP4 = aGenLeg2.getChargedP4();
    
-  aLepton2.setCosGJ(cosGJReco);
-  aLepton2.setIP3D(ip3D);
+  //aLepton2.setCosGJ(cosGJReco);
+  //aLepton2.setIP3D(ip3D);
 
   std::vector<classic_svFit::MeasuredTauLepton> measuredTauLeptons;
   measuredTauLeptons.push_back(aLepton1);
@@ -165,7 +154,7 @@ TLorentzVector SVfitAnalyzer::computeMTT(const std::string & algoName){
   if(aCovMET[0][0]==0 && aCovMET[1][0]==0 && aCovMET[0][1]==0 && aCovMET[1][1]==0) return TLorentzVector(); //singular covariance matrix
 
   TLorentzVector aResult;
-  if(algoName=="SVfit") aResult = runSVFitAlgo(measuredTauLeptons, aMET, aCovMET);
+  if(algoName=="svFit") aResult = runsvFitAlgo(measuredTauLeptons, aMET, aCovMET);
   if(algoName=="fastMTT") aResult = runFastMTTAlgo(measuredTauLeptons, aMET, aCovMET);
   
   return aResult;
@@ -175,8 +164,6 @@ TLorentzVector SVfitAnalyzer::computeMTT(const std::string & algoName){
 TLorentzVector SVfitAnalyzer::runFastMTTAlgo(const std::vector<classic_svFit::MeasuredTauLepton> & measuredTauLeptons,
                                            const HTTParticle &aMET, const TMatrixD &covMET){
 
-  fastMTTAlgo.disableComponent(fastMTT::PX);
-  fastMTTAlgo.disableComponent(fastMTT::PY);
   fastMTTAlgo.run(measuredTauLeptons, aMET.getP4().X(), aMET.getP4().Y(), covMET);
   ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<double> > aP4 = fastMTTAlgo.getBestP4();
   
@@ -192,32 +179,26 @@ TLorentzVector SVfitAnalyzer::runFastMTTAlgo(const std::vector<classic_svFit::Me
 }
 /////////////////////////////////////////////////
 /////////////////////////////////////////////////
-TLorentzVector SVfitAnalyzer::runSVFitAlgo(const std::vector<classic_svFit::MeasuredTauLepton> & measuredTauLeptons,
+TLorentzVector SVfitAnalyzer::runsvFitAlgo(const std::vector<classic_svFit::MeasuredTauLepton> & measuredTauLeptons,
                                            const HTTParticle &aMET, const TMatrixD &covMET){
 
-  SVFitAlgo.setVerbosity(0);
+  svFitAlgo.setVerbosity(0);
 
-  SVFitAlgo.addLogM_fixed(true, 4.0);
-  if(myChannelSpecifics->getDecayModeName()=="MuTau") SVFitAlgo.addLogM_fixed(true, 4.0);
-  else if(myChannelSpecifics->getDecayModeName()=="TauTau") SVFitAlgo.addLogM_fixed(true, 5.0);
-  else if(myChannelSpecifics->getDecayModeName()=="MuMu") SVFitAlgo.addLogM_fixed(true, 3.0);
+  svFitAlgo.addLogM_fixed(true, 4.0);
+  if(myChannelSpecifics->getDecayModeName()=="MuTau") svFitAlgo.addLogM_fixed(true, 4.0);
+  else if(myChannelSpecifics->getDecayModeName()=="TauTau") svFitAlgo.addLogM_fixed(true, 5.0);
+  else if(myChannelSpecifics->getDecayModeName()=="MuMu") svFitAlgo.addLogM_fixed(true, 3.0);
   
-  SVFitAlgo.setMaxObjFunctionCalls(100000);
-  //SVFitAlgo.setLikelihoodFileName("testClassicSVfit.root");
-  //SVFitAlgo.setTreeFileName("markovChainTree.root");
-  TVector3 recPV = aEvent.getRefittedPV();
-  TVector3 SVLeg2 = aLeg2.getSV();
-  SVLeg2 -=recPV;
+  svFitAlgo.setMaxObjFunctionCalls(100000);
+  //svFitAlgo.setLikelihoodFileName("testClassicSVfit.root");
+  //svFitAlgo.setTreeFileName("markovChainTree.root");
 
-  TVector3 SVLeg1 = aGenLeg1.getSV();
-  SVLeg1 -=recPV;
-
-  SVFitAlgo.integrate(measuredTauLeptons, aMET.getP4().X(), aMET.getP4().Y(), covMET);
-  classic_svFit::DiTauSystemHistogramAdapter* diTauAdapter = static_cast<classic_svFit::DiTauSystemHistogramAdapter*>(SVFitAlgo.getHistogramAdapter());
+  svFitAlgo.integrate(measuredTauLeptons, aMET.getP4().X(), aMET.getP4().Y(), covMET);
+  classic_svFit::DiTauSystemHistogramAdapter* diTauAdapter = static_cast<classic_svFit::DiTauSystemHistogramAdapter*>(svFitAlgo.getHistogramAdapter());
   float mcMass = diTauAdapter->getMass();
 
   TLorentzVector p4SVFit;
-  if(SVFitAlgo.isValidSolution() )
+  if(svFitAlgo.isValidSolution() )
     {//Get solution
       p4SVFit.SetPtEtaPhiM(diTauAdapter->getPt(),
 			   diTauAdapter->getEta(),
@@ -304,30 +285,59 @@ std::tuple<double, double> SVfitAnalyzer::getTauMomentum(const TLorentzVector & 
 //////////////////////////////////////////////////////////////////////////////
 void SVfitAnalyzer::fillControlHistos(const std::string & hNameSuffix){
 
+  double delta = 0.0;
+
   const TLorentzVector & aVisSum = aLeg1.getP4() + aLeg2.getP4();
   TLorentzVector tautauGen = aGenLeg1.getP4() + aGenLeg2.getP4();
+  
   TLorentzVector nunuGen = tautauGen - 
     aGenLeg1.getChargedP4() - aGenLeg2.getChargedP4() -
     aGenLeg1.getNeutralP4() - aGenLeg2.getNeutralP4();
-  TLorentzVector SVFitP4;//TEST = computeMTT("fastMTT");  
 
-  float visMass = aVisSum.M();
-  double delta = (SVFitP4.M() - tautauGen.M())/tautauGen.M();
+  TLorentzVector svFitP4 = computeMTT("svFit");
+  //TLorentzVector svFitP4 = aPair.getP4();
+   myHistos_->fill1DHistogram("h1DMassSVClassic"+hNameSuffix,svFitP4.M());
+   myHistos_->fill1DHistogram("h1DCpuTimeSVClassic"+hNameSuffix,svFitAlgo.getComputingTime_cpu());
 
-  double massCA = runCAAlgo(aLeg1, aLeg2, aMET);
+   delta = (svFitP4.M() - tautauGen.M())/tautauGen.M();
+   myHistos_->fill1DHistogram("h1DDeltaMSVClassic"+hNameSuffix,delta);
 
-  double recoX1 = 0.0, recoX2 = 0.0;
-  std::tie(recoX1, recoX2) = fastMTTAlgo.getBestX();
+   delta = svFitP4.Eta() - tautauGen.Eta();
+   myHistos_->fill1DHistogram("h1DDeltaEtaSVClassic"+hNameSuffix,delta);
+   
+   delta = svFitP4.Vect().DeltaPhi(tautauGen.Vect());
+   myHistos_->fill1DHistogram("h1DDeltaPhiSVClassic"+hNameSuffix,delta);
+  
+   delta = (svFitP4.Perp() - tautauGen.Perp())/tautauGen.Perp();
+   myHistos_->fill1DHistogram("h1DDeltaPtSVClassic"+hNameSuffix,delta);
+   
+   TLorentzVector fastMTTP4 = computeMTT("fastMTT");  
+   myHistos_->fill1DHistogram("h1DMassFastMTT"+hNameSuffix,fastMTTP4.M());
+   myHistos_->fill1DHistogram("h1DCpuTimeFastMTT"+hNameSuffix,fastMTTAlgo.getCpuTime("scan"));
+   
+   delta = fastMTTP4.Eta() - tautauGen.Eta();
+   myHistos_->fill1DHistogram("h1DDeltaEtaFastMTT"+hNameSuffix,delta);
+   
+   delta = fastMTTP4.Vect().DeltaPhi(tautauGen.Vect());
+   myHistos_->fill1DHistogram("h1DDeltaPhiFastMTT"+hNameSuffix,delta);
+  
+   delta = (fastMTTP4.Perp() - tautauGen.Perp())/tautauGen.Perp();
+   myHistos_->fill1DHistogram("h1DDeltaPtFastMTT"+hNameSuffix,delta);
+
+   float visMass = aVisSum.M(); 
+   double massCA = runCAAlgo(aLeg1, aLeg2, aMET);
+
+   double recoX1 = 0.0, recoX2 = 0.0;
+   std::tie(recoX1, recoX2) = fastMTTAlgo.getBestX();
 
   myHistos_->fill1DHistogram("h1DMassVis"+hNameSuffix, visMass);
   myHistos_->fill1DHistogram("h1DMassGen"+hNameSuffix,tautauGen.M());
-  myHistos_->fill1DHistogram("h1DMassFastMTT"+hNameSuffix,SVFitP4.M());
   myHistos_->fill1DHistogram("h1DMassCA"+hNameSuffix, massCA);
-  myHistos_->fill1DHistogram("h1DDeltaFastMTT"+hNameSuffix,delta);
+  delta = (fastMTTP4.M() - tautauGen.M())/tautauGen.M();
+  myHistos_->fill1DHistogram("h1DDeltaMFastMTT"+hNameSuffix,delta);
 
   delta = (massCA - tautauGen.M())/tautauGen.M();
-  myHistos_->fill1DHistogram("h1DDeltaCA"+hNameSuffix,delta);
-  myHistos_->fill1DHistogram("h1DCpuTimeFast"+hNameSuffix,fastMTTAlgo.getCpuTime("scan"));
+  myHistos_->fill1DHistogram("h1DDeltaMCA"+hNameSuffix,delta);
 
   delta = (aMET.getP4().X() - nunuGen.X())/nunuGen.X();
   myHistos_->fill1DHistogram("h1DDeltaMET_X_Res"+hNameSuffix, delta);
@@ -416,28 +426,41 @@ bool SVfitAnalyzer::analyze(const EventProxyBase& iEvent, ObjectMessenger *aMess
      sampleName.find("TTTo")==std::string::npos &&
      sampleName.find("TTbar")==std::string::npos
      ) sampleType = 1;
+  else if(sampleName.find("MatchT")!=std::string::npos){
+    sampleType = 1;
+  }
   else sampleType = 0;
+
+  if(sampleType==0) return true;
 
   if(!myEventProxy.pairs->size()) return true;
   setAnalysisObjects(myEventProxy);
 
   bool isGoodReco = aGenLeg1.getP4().DeltaR(aLeg1.getP4())<0.2 &&
 		    aGenLeg2.getP4().DeltaR(aLeg2.getP4())<0.2;
-  
+
   TLorentzVector genVisP4 =  aGenLeg2.getChargedP4() + aGenLeg2.getNeutralP4();
   bool goodGenTau = aGenLeg1.getP4().E()>1.0 && aGenLeg2.getP4().E()>1.0;
   bool isTauHad = aGenLeg2.getProperty(PropertyEnum::decayMode)!=HTTAnalysis::tauDecayMuon &&
                   aGenLeg2.getProperty(PropertyEnum::decayMode)!=HTTAnalysis::tauDecaysElectron;
-  
-  goodGenTau &= genVisP4.Perp()>10 && std::abs(genVisP4.Eta())<2.3;
+    
   goodGenTau &= isTauHad;
   
-  isGoodReco &= aGenLeg2.getP4().DeltaR(aLeg2.getP4())<0.2;
-  isGoodReco &= aLeg2.getP4().Perp()>18 && std::abs(aLeg2.getP4().Eta())<2.3;
-  isGoodReco &= aLeg2.getP4().Perp()>30;
+  if(myChannelSpecifics->getDecayModeName()=="TauTau"){
+    isTauHad = aGenLeg1.getProperty(PropertyEnum::decayMode)!=HTTAnalysis::tauDecayMuon &&
+               aGenLeg1.getProperty(PropertyEnum::decayMode)!=HTTAnalysis::tauDecaysElectron;
+    goodGenTau &= isTauHad;
+
+    isGoodReco = (aGenLeg1.getP4().DeltaR(aLeg1.getP4())<0.2 &&
+     aGenLeg2.getP4().DeltaR(aLeg2.getP4())<0.2) ||
+    (aGenLeg2.getP4().DeltaR(aLeg1.getP4())<0.2 &&
+     aGenLeg1.getP4().DeltaR(aLeg2.getP4())<0.2);
+  }
 
   int tauIDmask = 0;
   for(unsigned int iBit=0; iBit<myEventProxy.event->ntauIds; iBit++) {
+    if(myEventProxy.event->tauIDStrings[iBit]=="byTightIsolationMVArun2v1DBnewDMwLT2017v2") tauIDmask |= (1<<iBit);
+    if(myEventProxy.event->tauIDStrings[iBit]=="againstMuonTight3") tauIDmask |= (1<<iBit);
     //if(myEventProxy.event->tauIDStrings[iBit]=="byVLooseIsolationMVArun2v1DBnewDMwLT2017v2") tauIDmask |= (1<<iBit);
     //if(myEventProxy.event->tauIDStrings[iBit]=="againstMuonLoose3") tauIDmask |= (1<<iBit);
     //if(myEventProxy.event->tauIDStrings[iBit]=="againstElectronVLooseMVA6") tauIDmask |= (1<<iBit);
