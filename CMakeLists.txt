@@ -23,7 +23,7 @@ elseif("${CMAKE_CXX_COMPILER_VERSION}" VERSION_LESS 7.3.0)
   SET( CMAKE_CXX_FLAGS "${ROOT_CXX_FLAGS} -Wall -Werror -O3 -std=c++14 -fopenmp")
   MESSAGE("Using -std=c++14 for compiler older than 7.3.0")
 else()
-  SET( CMAKE_CXX_FLAGS "${ROOT_CXX_FLAGS} -Wall -Werror -O3 -std=c++17 -fopenmp")
+  SET( CMAKE_CXX_FLAGS "${ROOT_CXX_FLAGS} -Wall -Werror -O3 -std=c++14 -fopenmp")
   MESSAGE("Using -std=c++17 for compiler newer or equal 7.3.0")
 endif()
 
@@ -38,4 +38,5 @@ MESSAGE("Installation prefix set to " ${CMAKE_INSTALL_PREFIX} )
 
 add_subdirectory(Core/src)
 add_subdirectory(HTauTau)
+add_subdirectory(OMTF)
 
