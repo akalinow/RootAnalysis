@@ -7,7 +7,11 @@
 #include "OMTFHistograms.h"
 #include "Analyzer.h"
 
+#include "EventObj.h"
+#include "GenObjColl.h"
 #include "L1ObjColl.h"
+
+#include "TVector3.h"
 
 class TriggerHistograms;
 
@@ -26,8 +30,6 @@ class OMTFAnalyzer:public Analyzer{
 
   void finalize();
 
-  void addBranch(TTree *tree);
-
   Analyzer* clone() const;
 
   void setHistos(OMTFHistograms *histos) { myHistos_ = histos;};
@@ -37,30 +39,17 @@ class OMTFAnalyzer:public Analyzer{
   void fillTurnOnCurve(const int & ptCut, const std::string & sysType,
 		               const std::string & selType);
 
-  void fillRateHisto(const std::string & sysType,
-  			         const std::string & selType);
-
-  void fillGhostHisto(const std::string & sysType,
-		      const std::string & selType);
-  
-  bool passQuality(std::vector<L1Obj> * myL1Coll,
-		   const std::string & sysType, 
-		   unsigned int iCand);
-
-  void registerCuts();
-  bool checkSelections(const std::string & type);
-  void clear();
+  bool passQuality(const L1Obj & aL1Cand,
+		   const std::string & sysType);
 
   ///Histograms for this analysis
   OMTFHistograms *myHistos_;
 
-  ///Variables stored in the TTree
-  std::map<std::string,float> treeVariables_;
+  const EventObj  *myEventId;
+  const GenObjColl *myGenObjColl;
+  const L1ObjColl  *myL1ObjColl;
 
-  //TriggerHistograms *myHistos_;
-  float eventWeight_;
-
-  std::map<int, float> tmpMap;
+  TVector3 genMuMom;
   
 };
 

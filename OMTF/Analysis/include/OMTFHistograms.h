@@ -4,8 +4,8 @@
 #include "AnalysisHistograms.h"
 
 class OMTFHistograms: public AnalysisHistograms {
-   public:
-  void pieceHistogramsTogether();
+public:
+
   OMTFHistograms(std::string fileName="Histos.root", int opt=0);
 
   OMTFHistograms(TDirectory *myDir);
@@ -14,22 +14,18 @@ class OMTFHistograms: public AnalysisHistograms {
 
   virtual ~OMTFHistograms(); 
 
-  void finalizeHistograms(int nRuns, float weight=1.0);
-  
   virtual void finalizeHistograms();
-
-  void finalizeDiMuonHistograms(int nRuns, float weight=1.0);
 
   virtual std::string getTemplateName(const std::string& name);
 
   static const int color[6];
   static const int ptCutsGmt[4];
-  static const int ptCutsOtf[4];
-  static const int ptCutsOtfHigh[4];
+  static const int ptCutsOMTF[4];
+  static const int ptCutsOMTFHigh[4];
   static const unsigned int nPtBins;
   static const float ptBins[33];
     
-   private:
+private:
 
   virtual void defineHistograms();
 
@@ -51,7 +47,7 @@ class OMTFHistograms: public AnalysisHistograms {
 	       const std::string & varName);
 
 
-  void plotOtfVsGmt(int iPt, std::string sysType="Gmt");
+  void plotOMTFVsGmt(int iPt, std::string sysType="Gmt");
 
   TH2F* makeRateWeights(TH2 *hOrig);
   TH1* getRateHisto(std::string sysType = "Vx",

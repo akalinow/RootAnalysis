@@ -15,3 +15,4 @@ install(TARGETS OMTFAnalysis omtfAnalysis
         LIBRARY DESTINATION lib)
 install(FILES $<1:${PROJECT_SOURCE_DIR}/../config/> DESTINATION config)
 install(DIRECTORY DESTINATION fig_png)
+install(DIRECTORY DESTINATION fig_eps)

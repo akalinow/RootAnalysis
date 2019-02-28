@@ -24,7 +24,15 @@
       void init(std::vector<std::string> const& iFileNames);
 
       virtual EventProxyBase* clone() const;
-      
+
+     const EventObj  *getEventId() const {return myEvent;};
+
+     const GenObjColl *getGenObjColl() const {return myGenObjColl;};
+
+     const L1ObjColl  *getL1ObjColl() const { return myL1ObjColl;};
+
+   private:
+     
       // Declaration of leaf types
       EventObj       *myEvent;
       GenObjColl     *myGenObjColl;
