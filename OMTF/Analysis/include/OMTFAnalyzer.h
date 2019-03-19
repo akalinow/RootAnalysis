@@ -36,8 +36,13 @@ class OMTFAnalyzer:public Analyzer{
 
  private:
 
+  void fillHistosForGenMuon();
+
   void fillTurnOnCurve(const int & ptCut, const std::string & sysType,
 		               const std::string & selType);
+
+  void fillRateHisto(const std::string & sysType,
+		     const std::string & selType);
 
   bool passQuality(const L1Obj & aL1Cand,
 		   const std::string & sysType);
@@ -50,6 +55,8 @@ class OMTFAnalyzer:public Analyzer{
   const L1ObjColl  *myL1ObjColl;
 
   TVector3 genMuMom;
+
+  std::map<int, int> hitsPatterns;
   
 };
 

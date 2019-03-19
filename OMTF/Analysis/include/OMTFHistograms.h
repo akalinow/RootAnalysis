@@ -5,9 +5,9 @@
 
 class OMTFHistograms: public AnalysisHistograms {
 public:
-
+  
   OMTFHistograms(std::string fileName="Histos.root", int opt=0);
-
+  
   OMTFHistograms(TDirectory *myDir);
 
   OMTFHistograms(TDirectory *myDir, const std::vector<std::string> & flavours);
@@ -36,7 +36,7 @@ private:
                    const char * name="DivideErr",
                    const char * optErr ="");
 
-  void plotEffPanel(const std::string & sysType);
+  void plotEffPanel(const std::string & sysType, bool doHigh=false);
 
   void plotEffVsEta(const std::string & sysType);
 
@@ -47,7 +47,11 @@ private:
 	       const std::string & varName);
 
 
-  void plotOMTFVsGmt(int iPt, std::string sysType="Gmt");
+  void plotOMTFVsOther(int iPt, std::string sysType="BMTF");
+
+  void plotSingleHistogram(std::string hName);
+
+  void plotLLH();
 
   TH2F* makeRateWeights(TH2 *hOrig);
   TH1* getRateHisto(std::string sysType = "Vx",
