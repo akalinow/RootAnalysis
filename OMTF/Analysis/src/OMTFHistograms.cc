@@ -176,8 +176,8 @@ void OMTFHistograms::finalizeHistograms(){
   plotSingleHistogram("h1DDeltaEta_Low");
   plotSingleHistogram("h1DDeltaEta_High");
 
-  plotSingleHistogram("h1DDeltaEta_Low_RefLayer");
-  plotSingleHistogram("h1DDeltaEta_High_RefLayer");
+  plotSingleHistogram("h1DHitsPattern_Low_RefLayer");
+  plotSingleHistogram("h1DHitsPattern_High_RefLayer");
   
 }
 /////////////////////////////////////////////////////////

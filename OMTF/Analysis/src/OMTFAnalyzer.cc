@@ -80,8 +80,8 @@ hits: 30723 000000111100000000011 index: 1
 
 */
   if(sysType.find("OMTF")!=std::string::npos){
-    return aL1Cand.type==L1Obj::OMTF_emu &&
-    aL1Cand.q==12 && aL1Cand.bx==0;
+    //return aL1Cand.type==L1Obj::OMTF_emu &&
+    //aL1Cand.q==12 && aL1Cand.bx==0;
     
     bool lowPtVeto =  aL1Cand.disc<220 && (aL1Cand.hits==1027 || aL1Cand.hits==3075 ||
 					   aL1Cand.hits==4108 || aL1Cand.hits==8204 ||
@@ -138,7 +138,8 @@ void OMTFAnalyzer::fillTurnOnCurve(const int & iPtCut,
   for(auto aCand: myL1Coll){
     bool pass = passQuality(aCand ,sysType);
     if(!pass) continue;
-    tmpR = pow(genMuMom.Eta()-aCand.etaValue(),2); //Only eta used, as phi is not propageted
+    double deltaEta = std::abs(genMuMom.Eta()-aCand.etaValue());    
+    tmpR = deltaEta;
     if(tmpR<deltaR){
       deltaR = tmpR;
       selectedCand = aCand;
@@ -163,7 +164,7 @@ void OMTFAnalyzer::fillTurnOnCurve(const int & iPtCut,
     int index = hitsPatterns[selectedCand.hits];
     myHistos_->fill1DHistogram("h1DHitsPattern_Low",index);
     myHistos_->fill1DHistogram("h1DDeltaEta_Low", selectedCand.etaValue());
-    myHistos_->fill1DHistogram("h1DDeltaEta_Low_RefLayer", selectedCand.refLayer);    
+    myHistos_->fill1DHistogram("h1DHitsPattern_Low_RefLayer", selectedCand.refLayer);    
   }
   if(genMuMom.Pt()>20 && selectedCand.ptValue()>=20 && sysType=="OMTF"){
     myHistos_->fill1DHistogram("h1DLLH_High", selectedCand.disc);
@@ -172,7 +173,7 @@ void OMTFAnalyzer::fillTurnOnCurve(const int & iPtCut,
       myHistos_->fill1DHistogram("h1DHitsPattern_High",index);
     }
       myHistos_->fill1DHistogram("h1DDeltaEta_High", selectedCand.etaValue());
-      myHistos_->fill1DHistogram("h1DDeltaEta_High_RefLayer", selectedCand.refLayer);    
+      myHistos_->fill1DHistogram("h1DHitsPattern_High_RefLayer", selectedCand.refLayer);    
   }
   
   ///Fill histos for eff vs eta/phi only for events at the plateau.
@@ -214,6 +215,11 @@ void OMTFAnalyzer::fillHistosForGenMuon(){
   
   bool isBMTFAcceptance = fabs(genMuMom.Eta())<0.83;
   if(!isBMTFAcceptance) return;
+
+  ////
+  //fillTurnOnCurve(20, "OMTF", "");
+  //return;
+  ////
 
   fillRateHisto("Vx","Tot");
   fillRateHisto("OMTF","Tot");
@@ -265,6 +271,7 @@ bool OMTFAnalyzer::analyze(const EventProxyBase& iEvent){
   if(genObjVec.empty()) return false;
 
   for(auto aGenObj: genObjVec){
+    if(std::abs(aGenObj.pdgId())!=13) continue;
     genMuMom.SetPtEtaPhi(aGenObj.pt(),
 			 aGenObj.eta(),
 			 aGenObj.phi());
