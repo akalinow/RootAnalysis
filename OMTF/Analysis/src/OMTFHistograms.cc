@@ -10,6 +10,7 @@
 #include "TGraph.h"
 #include "TMarker.h"
 #include "TRandom3.h"
+#include "TGaxis.h"
 
 #include "utilsL1RpcStyle.h"
 
@@ -108,7 +109,7 @@ void OMTFHistograms::defineHistograms(){
  add2DHistogram("h2DEtaVxTemplate","",40,-1.6,1.6,2,-0.5,1.5,file_);
  add2DHistogram("h2DPhiVxTemplate","",4*32,-0.2,3.2,2,-0.5,1.5,file_);
 
- add2DHistogram("h2DQualityTemplate","",1000,1.5,1001.5,2,-0.5,1.5,file_);
+ add2DHistogram("h2DQualityTemplate","",201,-0.5,200.5,2,-0.5,1.5,file_);
 
  //Rate histos
  add2DHistogram("h2DRateTotTemplate","",400,1,201,142,0,142,file_);
@@ -119,7 +120,7 @@ void OMTFHistograms::defineHistograms(){
 
  add2DHistogram("h2DRateVsPtTemplate","",400,1,201,100,0,50,file_);
  
- add2DHistogram("h2DRateVsQualityTemplate","",400,1,201,17,1.5,18.5,file_);
+ add2DHistogram("h2DRateVsQualityTemplate","",400,1,201,201,-0.5,200.5,file_);
  add2DHistogram("h2DGhostsVsProcessorTemplate","",6,-0.5,5.5,5,-0.5,4.5,file_);
 
  //Likelihood histos
@@ -139,8 +140,8 @@ void OMTFHistograms::finalizeHistograms(){
   utilsL1RpcStyle()->cd();
 
   plotRate("Tot");
-  plotRate("VsEta");
-  plotRate("VsPt");
+  //plotRate("VsEta");
+  //plotRate("VsPt");
   //plotRate("VsQuality");
 
   plotEffPanel("OMTF");
@@ -667,8 +668,41 @@ void OMTFHistograms::plotRate(std::string type){
     hRatekBMTF->Draw();
     hRateOMTF->Draw("same");
   }
+  if(type=="VsQuality"){
+    c->SetLogy(0);
+    c->SetLeftMargin(0.2);
+    c->SetRightMargin(0.3);
+    
+    TH2F *hEff20 = get2DHistogram("h2DOMTFQuality20");
+    TH1F *hRateValues = sortRateHisto((TH1F*)hRateOMTF, hEff20, "rate");
+    TH1F *hEffValues = sortRateHisto((TH1F*)hRateOMTF, hEff20, "eff");
+    hRateValues->SetAxisRange(0,10);
+    hRateValues->GetYaxis()->SetTitleOffset(1.7);
+    hRateValues->GetYaxis()->SetTitle("Rate [arbitrary units]");
+    hRateValues->Draw();
+    c->Update();
+    
+    Float_t rightmax = 0.2;//1.1*hEffValues->GetMaximum();
+    Float_t scale = gPad->GetUymax()/rightmax;
+    hEffValues->SetLineColor(kRed);
+    hEffValues->Scale(scale);
+    hEffValues->Draw("same hist");
+    //draw an axis on the right side
+    std::cout<<"gPad->GetUxmax(): "<<gPad->GetUxmax()<<std::endl;
+    TGaxis *axis = new TGaxis(gPad->GetUxmax(),gPad->GetUymin(),
+			      gPad->GetUxmax(), gPad->GetUymax(),0,rightmax,510,"+L");
+    axis->SetTitle("Efficiency for p_{T}^{cut}=20 GeV/c @ p_{T}^{gen}>40 GeV/c");
+    axis->SetTitleOffset(1.7);
+    axis->SetTitleColor(kRed);
+    axis->SetLineColor(kRed);
+    axis->SetLabelColor(kRed);
+    axis->Draw();
+
+    c->Print(("fig_eps/Rate"+type+".eps").c_str());
+    c->Print(("fig_png/Rate"+type+".png").c_str());
+    return;
+  }
  
-  
   leg->AddEntry(hRatekBMTF,"kBMTF");
   leg->AddEntry(hRateOMTF,"OMTF");
   leg->Draw();
@@ -901,4 +935,48 @@ void OMTFHistograms::plotLLH(){
 }
 ////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////
+TH1F * OMTFHistograms::sortRateHisto(TH1F *h1DRate, TH2F *h2DEff, std::string by){
+
+  if(!h1DRate || !h2DEff) return 0;
+
+  TH1F *hRateSorted = (TH1F*)h1DRate->Clone("hRateSorted");    
+  hRateSorted->Clear();
+  ///Calculate efficiency
+  TH1D *hNum = h2DEff->ProjectionX("hNum",2,2);
+  TH1D *hDenom = h2DEff->ProjectionX("hDenom",1,1);
+  hDenom->Add(hNum);
+  hNum->Scale(1.0/hDenom->Integral());
+  TH1D* hEff = hNum;
+  ////
+  std::map<float,std::string> rateMap;
+  std::map<float,int> rateMapBin;
+  ///Fill map with key = rate, value = bin label. The map will be sorted automatically by the rate value.
+  ///Second map has bin number as value. Needed to extract efficiency values.
+  TRandom3 aRndm;
+
+  for(int iBin=1;iBin<h1DRate->GetXaxis()->GetNbins();++iBin){
+    float rate = h1DRate->GetBinContent(iBin);
+    rate+=0.001*aRndm.Uniform();///Randomize rate values, to avoid having two same keys.
+    rateMap[rate] = h1DRate->GetXaxis()->GetBinLabel(iBin);
+    rateMapBin[rate] = iBin;
+  }
+  ///Fill histo copy with sorted values
+  unsigned int iBin = 1;
+  for (auto it = rateMap.rbegin(); it!= rateMap.rend(); ++it){
+    if(iBin<20){
+      std::cout<<"iBin: "<<iBin
+	       <<" Quality: "<<it->second
+	       <<" rate: "<<it->first
+	       <<" efficiency: "<<hEff->GetBinContent(rateMapBin[it->first])
+	       <<std::endl;
+    }
+    if(by=="rate") hRateSorted->SetBinContent(iBin, it->first);
+    if(by=="eff")  hRateSorted->SetBinContent(iBin, hEff->GetBinContent(rateMapBin[it->first]));
+    hRateSorted->GetXaxis()->SetBinLabel(iBin, it->second.c_str());
+    ++iBin;
+  }
   
+  return hRateSorted;
+}
+////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////

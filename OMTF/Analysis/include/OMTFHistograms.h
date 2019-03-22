@@ -62,6 +62,8 @@ private:
 		       const std::string & type);
   
   float getEfficiency(TH2F *h2D, float ptCut);
+
+  TH1F *sortRateHisto(TH1F *h1DRate, TH2F *h2DEff, std::string by);
  
   ///Types of the selection flow
   std::vector<std::string> selectionFlavours_;

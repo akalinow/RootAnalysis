@@ -47,6 +47,8 @@ class OMTFAnalyzer:public Analyzer{
   bool passQuality(const L1Obj & aL1Cand,
 		   const std::string & sysType);
 
+  void fixQualityHistos();
+
   ///Histograms for this analysis
   OMTFHistograms *myHistos_;
 
@@ -56,7 +58,7 @@ class OMTFAnalyzer:public Analyzer{
 
   TVector3 genMuMom;
 
-  std::map<int, int> hitsPatterns;
+  std::map<unsigned long, int> quality_index_map;
   
 };
 
