@@ -116,7 +116,7 @@ hits: 30723 000000111100000000011 index: 1
   */
 
   std::map<int,bool> hitsMask; 
-
+  /*
  hitsMask[1027] = true;
  hitsMask[3075] = true;
  hitsMask[4108] = true;
@@ -134,7 +134,7 @@ hits: 30723 000000111100000000011 index: 1
  hitsMask[13324] = true;
  hitsMask[30732] = true;
  hitsMask[28684] = true;
- 
+  */
   /*
   iBin: 1 Quality: 000000000111000001100 3596 rate: 645.541 efficiency: 0.000212619
   iBin: 2 Quality: 000000000100000001100 2060 rate: 456.883 efficiency: 0.000558125
@@ -148,7 +148,7 @@ hits: 30723 000000111100000000011 index: 1
   iBin: 6 Quality: 000000000100000111100 2108 rate: 15.5961 efficiency: 0.000578932
   iBin: 13 Quality: 000000011100011111100 14588 rate: 7.41043 efficiency: 0.00692087
   */
- /*
+  /*
   hitsMask[3596] = true;
   hitsMask[2060] = true;
   hitsMask[4144] = true;
@@ -159,12 +159,39 @@ hits: 30723 000000111100000000011 index: 1
   hitsMask[3343] = true;
   hitsMask[2108] = true;
   hitsMask[14588] = true;
- */
+  */
+  /*
+iBin: 1 Quality: 000000000000000110001 49 rate: 2750.36 efficiency: 0
+iBin: 2 Quality: 000000000000000110011 51 rate: 2346.63 efficiency: 1.51628e-05
+iBin: 3 Quality: 000000000000001110101 117 rate: 612.185 efficiency: 0.000313753
+iBin: 5 Quality: 000000000000101000001 321 rate: 333.398 efficiency: 1.16637e-05
+iBin: 7 Quality: 000000000000101011001 345 rate: 321.971 efficiency: 0.000121302
+iBin: 8 Quality: 000000000000001100101 101 rate: 279.821 efficiency: 5.59858e-05
+iBin: 10 Quality: 000000000000100011001 281 rate: 268.755 efficiency: 2.33274e-05
+iBin: 11 Quality: 000000000000101001101 333 rate: 237.734 efficiency: 0.00193967
+iBin: 12 Quality: 000000000000101001100 332 rate: 205.777 efficiency: 0.00199449
+iBin: 15 Quality: 000000000000000011001 25 rate: 179.79 efficiency: 9.33096e-06
+  */
+
+  hitsMask[49] = true;
+  hitsMask[51] = true;
+  hitsMask[117] = true;
+  hitsMask[321] = true;
+  hitsMask[345] = true;
+  hitsMask[101] = true;
+  hitsMask[281] = true;
+  hitsMask[333] = true;
+  hitsMask[332] = true;
+  hitsMask[25] = true;
+  
+  if(std::abs(aL1Cand.etaValue())>1.6 || std::abs(aL1Cand.etaValue())<1.23) return false;
   
   if(sysType.find("OMTF")!=std::string::npos){
-    //return aL1Cand.type==L1Obj::OMTF_emu &&
-    //aL1Cand.q==12 && aL1Cand.bx==0;
-    
+
+    //default OMTF
+    //return aL1Cand.type==L1Obj::OMTF_emu && aL1Cand.q==12 && aL1Cand.bx==0;
+
+    ///OMTF in barrel
     bool lowPtVeto = aL1Cand.disc<250 &&
 				  (hitsMask[aL1Cand.hits] ||
 				   aL1Cand.refLayer==2 ||
@@ -172,17 +199,22 @@ hits: 30723 000000111100000000011 index: 1
 				   aL1Cand.refLayer==4 ||
 				   aL1Cand.refLayer==5);
 
-    //bool lowPtVeto = aL1Cand.disc<250 && hitsMask[aL1Cand.hits];
-    lowPtVeto |= aL1Cand.disc<140;
-      
-    return aL1Cand.type==L1Obj::OMTF_emu &&
-    	   aL1Cand.q>0 && aL1Cand.bx==0 && !lowPtVeto;       
+    //OMTF in endcap up to eta=1.6
+    lowPtVeto = aL1Cand.disc<300 &&
+			     (hitsMask[aL1Cand.hits] ||
+			      aL1Cand.refLayer>3);
+    lowPtVeto |= aL1Cand.disc<200;
+    
+    return aL1Cand.type==L1Obj::OMTF_emu && aL1Cand.bx==0 && !lowPtVeto;       
   }
   else if(sysType.find("kBMTF")!=std::string::npos){    
     return aL1Cand.type==L1Obj::BMTF && aL1Cand.q>0 && aL1Cand.bx==0;
   }
-  else if(sysType.find("BMTF")!=std::string::npos){    
+  else if(sysType.find("EMTF")!=std::string::npos){    
     return aL1Cand.type==L1Obj::EMTF && aL1Cand.q>0 && aL1Cand.bx==0;
+  }
+  else if(sysType.find("BMTF")!=std::string::npos){    
+    return aL1Cand.type==L1Obj::BMTF && aL1Cand.q>0 && aL1Cand.bx==0;
   }
   else if(sysType.find("Vx")!=std::string::npos){
     return true;
@@ -206,6 +238,9 @@ void OMTFAnalyzer::fillTurnOnCurve(const int & iPtCut,
   }
   if(sysType=="BMTF") {   
     hName = "h2DBMTF"+selType;
+  }
+  if(sysType=="EMTF") {   
+    hName = "h2DEMTF"+selType;
   }
   if(sysType=="kBMTF") {   
     hName = "h2DkBMTF"+selType;
@@ -236,7 +271,7 @@ void OMTFAnalyzer::fillTurnOnCurve(const int & iPtCut,
   tmpName = hName+"PtRecVsPtGen";
   myHistos_->fill2DHistogram(tmpName, genMuMom.Pt(), selectedCand.ptValue());
 
-  if(genMuMom.Pt()<5 && selectedCand.ptValue()>=20 && sysType=="OMTF"){
+  if(genMuMom.Pt()<10 && selectedCand.ptValue()>=20 && sysType=="OMTF"){
     /*
     std::cout<<" genMuMom.Pt(): "<<genMuMom.Pt()
 	     <<" genMuMom.Eta(): "<<genMuMom.Eta()
@@ -304,12 +339,16 @@ void OMTFAnalyzer::fillHistosForGenMuon(){
   //bool isOMTFAcceptance = fabs(genMuMom.Eta())>0.83 && fabs(genMuMom.Eta())<1.24;
   //if(!isOMTFAcceptance) return;
   
-  bool isBMTFAcceptance = fabs(genMuMom.Eta())<0.83;
-  if(!isBMTFAcceptance) return;
+  //bool isBMTFAcceptance = fabs(genMuMom.Eta())<0.83;
+  //if(!isBMTFAcceptance) return;
+
+  bool isEMTFAcceptance = fabs(genMuMom.Eta())>1.24 && fabs(genMuMom.Eta())<1.6;
+  if(!isEMTFAcceptance) return;
 
   std::string selType = "";
   for(int iCut=0;iCut<22;++iCut){
     fillTurnOnCurve(iCut, "OMTF", selType);
+    fillTurnOnCurve(iCut, "EMTF", selType);
     fillTurnOnCurve(iCut, "kBMTF", selType);
     fillTurnOnCurve(iCut, "BMTF", selType);
   }
@@ -325,6 +364,7 @@ void OMTFAnalyzer::fillHistosForGenMuon(){
     
     selType = std::string(TString::Format("Type%d",iType));
     fillTurnOnCurve(iCut, "OMTF", selType);
+    fillTurnOnCurve(iCut, "EMTF", selType);
     fillTurnOnCurve(iCut, "BMTF", selType);
     fillTurnOnCurve(iCut, "kBMTF", selType);
   }
@@ -355,6 +395,7 @@ bool OMTFAnalyzer::analyze(const EventProxyBase& iEvent){
 
   fillRateHisto("Vx","Tot");
   fillRateHisto("OMTF","Tot");
+  fillRateHisto("EMTF","Tot");
   fillRateHisto("kBMTF","Tot");
 
   fillRateHisto("Vx","VsPt");

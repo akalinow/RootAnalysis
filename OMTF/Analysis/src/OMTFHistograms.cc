@@ -107,7 +107,7 @@ void OMTFHistograms::defineHistograms(){
  add2DHistogram("h2DPhiHitTemplate","",5*32,-M_PI,M_PI,2,-0.5,1.5,file_);
 
  add2DHistogram("h2DEtaVxTemplate","",40,-1.6,1.6,2,-0.5,1.5,file_);
- add2DHistogram("h2DPhiVxTemplate","",4*32,-0.2,3.2,2,-0.5,1.5,file_);
+ add2DHistogram("h2DPhiVxTemplate","",4*32,-3.2,3.2,2,-0.5,1.5,file_);
 
  add2DHistogram("h2DQualityTemplate","",201,-0.5,200.5,2,-0.5,1.5,file_);
 
@@ -142,7 +142,7 @@ void OMTFHistograms::finalizeHistograms(){
   plotRate("Tot");
   //plotRate("VsEta");
   //plotRate("VsPt");
-  //plotRate("VsQuality");
+  plotRate("VsQuality");
 
   plotEffPanel("OMTF");
   plotEffPanel("kBMTF");
@@ -153,6 +153,7 @@ void OMTFHistograms::finalizeHistograms(){
   plotEffPanel("BMTF", doHigh);
   plotEffPanel("kBMTF", doHigh);
   plotEffVsEta("OMTF");
+  plotEffVsEta("EMTF");
   plotEffVsEta("BMTF");
   plotEffVsEta("kBMTF");
   plotEffVsVar("OMTF","EtaVx");
@@ -166,6 +167,11 @@ void OMTFHistograms::finalizeHistograms(){
   plotOMTFVsOther(19,"kBMTF");
   plotOMTFVsOther(20,"kBMTF");
   plotOMTFVsOther(20,"BMTF");
+
+  plotOMTFVsOther(16,"EMTF");
+  plotOMTFVsOther(18,"EMTF");
+  plotOMTFVsOther(19,"EMTF");
+  plotOMTFVsOther(20,"EMTF");
 
   plotSingleHistogram("h1DLLH_Low");
   plotSingleHistogram("h1DLLH_High");
@@ -209,6 +215,7 @@ TH1* OMTFHistograms::Integrate(TH1 * histoD) {
    }
   delete [] cont;
   delete [] errs;
+
   return histoI;
 }
 /////////////////////////////////////////////////////////
@@ -562,14 +569,15 @@ TH1* OMTFHistograms::getRateHisto(std::string sysType,
 
   std::string hName = "h2D"+sysType+"Rate"+type;
 
-  if(!this->get2DHistogram(hName)) return 0;
-  TH2F* h2D = (TH2F*)this->get2DHistogram(hName)->Clone("h2D");
-
+  TH2F* h2D_original = (TH2F*)this->get2DHistogram(hName);
+  if(! h2D_original) return 0;
+  TH2F* h2D = (TH2F*)h2D_original->Clone("h2D");
   if(!h2D) return 0;
+  
   //TH2F *hWeights = makeRateWeights(h2D);
   //h2D->Multiply(hWeights);
 
-  TH1D *hRate = h2D->ProjectionY("hRate");
+  TH1D *hRate = h2D->ProjectionY(("hRate"+sysType).c_str());
   if(sysType=="Vx") hRate = h2D->ProjectionX("hRate");
 
   hRate->SetYTitle("Arbitrary units");
@@ -674,6 +682,7 @@ void OMTFHistograms::plotRate(std::string type){
     c->SetRightMargin(0.3);
     
     TH2F *hEff20 = get2DHistogram("h2DOMTFQuality20");
+    if(!hEff20) return;
     TH1F *hRateValues = sortRateHisto((TH1F*)hRateOMTF, hEff20, "rate");
     TH1F *hEffValues = sortRateHisto((TH1F*)hRateOMTF, hEff20, "eff");
     hRateValues->SetAxisRange(0,10);
