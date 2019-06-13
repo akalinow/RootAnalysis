@@ -30,8 +30,9 @@ TauLFVHistograms::~TauLFVHistograms(){ }
 /////////////////////////////////////////////////////////
 std::string TauLFVHistograms::getTemplateName(const std::string& name){
 
-        std::string templateName = "TemplateNotFound: "+name;
+        std::string templateName = "TemplateNotFound: "+name;	
         if(name.find("h1DMass")!=std::string::npos) templateName = "h1DMassTemplate";
+	else if(name.find("h1DStats")!=std::string::npos) templateName = "h1DStatsTemplate";
 
         return templateName;
 }
@@ -42,7 +43,8 @@ void TauLFVHistograms::defineHistograms(){
         using namespace std;
 
         if(!histosInitialized_) {
-                add1DHistogram("h1DMassTemplate",";mass [GeV/c^{2}]; Events",20,0,5,file_);
+                add1DHistogram("h1DMassTemplate",";mass [GeV/c^{2}]; Events",50,0,5,file_);
+		add1DHistogram("h1DStatsTemplate","",21,-0.5,20.5,file_);
         }
 }
 /////////////////////////////////////////////////////////
@@ -54,16 +56,38 @@ void TauLFVHistograms::finalizeHistograms(){
         AnalysisHistograms::finalizeHistograms();
 
 	plotSingleHistogram("h1DMass3Mu_DsToTau");
+	getSamplePreselection("DsToTau");
 
         std::cout<<"TauLFVHistograms::finalizeHistograms() END"<<std::endl;
 
 }
 /////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////
+float TauLFVHistograms::getSamplePreselection(const std::string& sampleName){
+
+  TH1F *hStats = get1DHistogram("h1DStats_"+sampleName);
+  if(!hStats) return 0;
+
+  int nNtupleEvents = hStats->GetBinContent(3);
+  int nDatasetEvents = hStats->GetBinContent(1);
+
+  std::cout<<"Number of events read from dataset: "<<nDatasetEvents
+	   <<" number of event passing preselection: "<<nNtupleEvents
+	   <<std::endl;
+  
+  return (float)nDatasetEvents/nNtupleEvents;
+}
+/////////////////////////////////////////////////////////
+/////////////////////////////////////////////////////////
 void TauLFVHistograms::plotSingleHistogram(std::string hName){
 
-  TH2F* h2D = get2DHistogram(hName);
-  TH1F* h1D = get1DHistogram(hName);
+  
+  TH2F* h2D = 0;
+  TH1F* h1D = 0;
+
+  if(hName.find("1D")!=std::string::npos)  h1D = get1DHistogram(hName);
+  else if(hName.find("2D")!=std::string::npos)  h2D = get2DHistogram(hName);
+  
   if(!h2D && !h1D) return;
 	
   TCanvas* c = new TCanvas("AnyHistogram","AnyHistogram",

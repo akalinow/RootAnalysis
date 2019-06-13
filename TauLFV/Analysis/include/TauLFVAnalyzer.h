@@ -27,7 +27,7 @@ class TauLFVAnalyzer: public Analyzer{
 
  public:
 
-  TauLFVAnalyzer(const std::string & aName);
+  TauLFVAnalyzer(const std::string & aName): Analyzer(aName){};
 
   virtual ~TauLFVAnalyzer();
 
@@ -45,11 +45,17 @@ class TauLFVAnalyzer: public Analyzer{
 
   bool filter() const{ return filterEvent_;};
 
+  ///Find reconstructed objectd interesting for this analysis,
+  ///for example the three muons.
   void setAnalysisObjects(const EventProxyHTT & myEventProxy);
 
   ///Fill histograms for all control plots.
   ///Histogram names will end with hNameSuffix
   void fillControlHistos(const std::string & hNameSuffix, float eventWeight);
+
+  ///Fill the bookkeeping histograms with number of events
+  ///after the preselection.
+  void getPreselectionEff(const EventProxyHTT & myEventProxy);
 			 
   
  protected:

@@ -15,21 +15,26 @@ class THStack;
 class TauLFVHistograms : public AnalysisHistograms {
 public:
 
-TauLFVHistograms(TDirectory *myDir);
+  TauLFVHistograms(TDirectory *myDir);
 
-virtual ~TauLFVHistograms();
+  virtual ~TauLFVHistograms();
 
-void finalizeHistograms();
+  void finalizeHistograms();
 
-std::string getTemplateName(const std::string& name);
+  std::string getTemplateName(const std::string& name);
 
 private:
 
-virtual void defineHistograms();
+  virtual void defineHistograms();
 
-//Plot a single histogram. One has to provide the full
-//histogram name, e.g. including h1D prefix.
-void plotSingleHistogram(std::string hName);
+  //Plot a single histogram. One has to provide the full
+  //histogram name, e.g. including h1D prefix.
+  void plotSingleHistogram(std::string hName);
+
+  ///Calculate the preselection efficiency. The preselection
+  ///efficiency is a ratino of events saved to the ntuple
+  ///to number of read from a dataset.
+  float getSamplePreselection(const std::string& sampleName);
 
 };
 

@@ -7,11 +7,11 @@ include_directories(${ROOTINCDIR})
 add_library(Analysis SHARED TauLFVAnalyzer.cc TauLFVHistograms.cc Tools.cc)
 
 # Define an executable
-add_executable(lfvAnalysis TauLFVAnalysis.cc)
+add_executable(tauLFVAnalysis TauLFVAnalysis.cc)
 
-target_link_libraries(lfvAnalysis Analysis ${Boost_REGEX_LIBRARY} ${ROOT_LIBRARIES} Proof RooFitCore RooFit FrameworkCore DataFormats)
+target_link_libraries(tauLFVAnalysis Analysis ${Boost_REGEX_LIBRARY} ${ROOT_LIBRARIES} Proof RooFitCore RooFit FrameworkCore DataFormats)
 
-install(TARGETS Analysis lfvAnalysis 
+install(TARGETS Analysis tauLFVAnalysis 
         RUNTIME DESTINATION bin
         LIBRARY DESTINATION lib)
 install(FILES $<1:${PROJECT_SOURCE_DIR}/TauLFV/Analysis/config/> DESTINATION config)
