@@ -67,7 +67,7 @@ int main(int argc, char ** argv)
       std::string processName = pt.get<std::string>("TreeAnalyzer.processName","Test");
       unsigned noOfThreads = pt.get("TreeAnalyzer.threads",1);
       if(noOfThreads != 1)
-	std::cerr<<"[WARNING] Number of threads != 1. TTree output is available only in single thread mode."<<std::endl;
+	std::cerr<<"\033[1;31m [WARNING] \033[0m Number of threads != 1. TTree output is available only in single thread mode."<<std::endl;
       //Tell Root we want to be multi-threaded
       ROOT::EnableThreadSafety();
       ROOT::DisableImplicitMT();

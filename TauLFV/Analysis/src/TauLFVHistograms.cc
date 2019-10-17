@@ -55,7 +55,10 @@ void TauLFVHistograms::finalizeHistograms(){
 
         AnalysisHistograms::finalizeHistograms();
 
-	plotSingleHistogram("h1DMass3Mu_DsToTau");
+	plotSingleHistogram("h1DMass3Mu_DsToTauTo3Mu");
+	plotSingleHistogram("h1DMass3Mu_BuToTauTo3Mu");
+	plotSingleHistogram("h1DMass3Mu_BdToTauTo3Mu");
+	plotSingleHistogram("h1DMass3Mu_Data");
 	getSamplePreselection("DsToTau");
 
         std::cout<<"TauLFVHistograms::finalizeHistograms() END"<<std::endl;

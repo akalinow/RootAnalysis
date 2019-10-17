@@ -37,9 +37,9 @@ std::string getSampleNameFromFileName(const EventProxyHTT & myEventProxy){
         std::string fileName = myEventProxy.getTTree()->GetCurrentFile()->GetName();
         std::string sampleName = "Unknown";
 
-        if(fileName.find("DsToTau_To3Mu_MuFilter")!=std::string::npos) sampleName = "DsToTau";
-        else if(fileName.find("BuToTau_To3Mu")!=std::string::npos) sampleName = "BuToTau_To3Mu";
-	else if(fileName.find("BuToTau_To3Mu")!=std::string::npos) sampleName = "DsToPhiPi_ToMuMu";
+        if(fileName.find("DsToTauTo3Mu")!=std::string::npos) sampleName = "DsToTauTo3Mu";
+        else if(fileName.find("BuToTauTo3Mu")!=std::string::npos) sampleName = "BuToTauTo3Mu";
+	else if(fileName.find("BdToTauTo3Mu")!=std::string::npos) sampleName = "BdToTauTo3Mu";
 	else if(fileName.find("DoubleMuonLowMass")!=std::string::npos) sampleName = "Data";
  
         return sampleName;

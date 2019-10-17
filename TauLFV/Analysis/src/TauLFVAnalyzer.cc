@@ -47,6 +47,9 @@ void TauLFVAnalyzer::getPreselectionEff(const EventProxyHTT & myEventProxy){
   ///Bin 3 holds number of events saved to the ntuple.
   hStats->SetBinContent(3, hStatsFromFile->GetBinContent(hStatsFromFile->FindBin(3)));
 
+  delete ntupleFile;
+  delete hStatsFromFile;
+
 }
 //////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////
@@ -65,10 +68,8 @@ void TauLFVAnalyzer::setAnalysisObjects(const EventProxyHTT & myEventProxy){
 
   clear();
   
-  aEvent = *myEventProxy.event;
+  aEvent = myEventProxy.event;
 
-  //std::cout<<"-------------"<<std::endl;
-  
   for(auto aLepton : *myEventProxy.leptons) {
     bool isMuon = std::abs(aLepton.getPDGid())==13;
     bool hasTriggerMach = aLepton.hasTriggerMatch(TriggerEnum::HLT_DoubleMu3_Trk_Tau3mu);
@@ -84,11 +85,12 @@ void TauLFVAnalyzer::setAnalysisObjects(const EventProxyHTT & myEventProxy){
 //////////////////////////////////////////////////////////////////////////////
 void TauLFVAnalyzer::fillControlHistos(const std::string & hNameSuffix, float eventWeight){
        
-  const TLorentzVector & the3Mu = aMuon1.getP4() + aMuon2.getP4() + aMuon3.getP4();
+  TLorentzVector the3Mu = aMuon1.getP4() + aMuon2.getP4() + aMuon3.getP4();
 	
   myHistos_->fill1DHistogram("h1DMass3Mu_"+hNameSuffix, the3Mu.M(), eventWeight);
 
-  //std::cout<<"3Mu mass: "<<the3Mu.M()<<std::endl;
+  //std::cout<<"hNameSuffix: "<<hNameSuffix
+  //	   <<" 3Mu mass: "<<the3Mu.M()<<std::endl;
 
 }
 //////////////////////////////////////////////////////////////////////////////
@@ -98,15 +100,15 @@ bool TauLFVAnalyzer::analyze(const EventProxyBase& iEvent){
   const EventProxyHTT & myEventProxy = static_cast<const EventProxyHTT&>(iEvent);
   setAnalysisObjects(myEventProxy);
   sampleName = TauLFVAnalysis::getSampleName(myEventProxy);
-  getPreselectionEff(myEventProxy);
+  //getPreselectionEff(myEventProxy);
 
   std::string hNameSuffix = sampleName;
   float eventWeight = 1.0;
 
   bool has3Mu = false;
-  if(aMuon1.getP4().E()>0 && aMuon2.getP4().E()>0 && aMuon3.getP4().E()>0) has3Mu =true;
+  if(aMuon1.getP4().E()>0 && aMuon2.getP4().E()>0 && aMuon3.getP4().E()>0) has3Mu =true;  
   if(!has3Mu) return true;
-
+  
   fillControlHistos(hNameSuffix, eventWeight);
 
   return true;

@@ -71,7 +71,7 @@ class TauLFVAnalyzer: public Analyzer{
   bool filterEvent_;
 
   ///Reconstructed objects selected for given event.
-  HTTEvent aEvent;
+  HTTEvent * aEvent;
   std::string sampleName;
 
   HTTParticle aMuon1, aMuon2, aMuon3;
