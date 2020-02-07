@@ -14,6 +14,7 @@
 #include "TVector3.h"
 
 class TriggerHistograms;
+class OMTFHit;
 
 class OMTFAnalyzer:public Analyzer{
 
@@ -45,9 +46,18 @@ class OMTFAnalyzer:public Analyzer{
 		     const std::string & selType);
 
   bool passQuality(const L1Obj & aL1Cand,
-		   const std::string & sysType);
+		   const std::string & sysType,
+		   const std::string & selType = "");
 
   void fixQualityHistos();
+
+  void fillBendingHistos(const std::string & sysType);
+
+  bool passRotatedVeto(const L1Obj & aL1Cand);
+
+  std::pair<double, double> getRotatedPair(double phiB, double deltaPhi, int iLayer);
+
+  std::pair<double, double> getPtProfile();
 
   ///Histograms for this analysis
   OMTFHistograms *myHistos_;
@@ -55,6 +65,11 @@ class OMTFAnalyzer:public Analyzer{
   const EventObj  *myEventId;
   const GenObjColl *myGenObjColl;
   const L1ObjColl  *myL1ObjColl;
+  GenObj myGenObj;
+  std::vector<OMTFHit> myHits;
+
+  TH3F *hGoldenPatterns;
+  TH1D *hPtProfile;
 
   TVector3 genMuMom;
 

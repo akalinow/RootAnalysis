@@ -13,6 +13,16 @@
 
 #include "TBranch.h"
 
+struct OMTFHit{
+  
+public:
+  
+  int iPhi, iLayer, iHit, iQuality;
+  
+};
+
+std::ostream& operator<< (std::ostream& stream, const OMTFHit& aHit); 
+
 
    class EventProxyOMTF: public EventProxyBase{
 
@@ -31,12 +41,17 @@
 
      const L1ObjColl  *getL1ObjColl() const { return myL1ObjColl;};
 
+     std::vector<OMTFHit> getHits() const;
+     
    private:
      
-      // Declaration of leaf types
-      EventObj       *myEvent;
-      GenObjColl     *myGenObjColl;
-      L1ObjColl      *myL1ObjColl;
+     // Declaration of leaf types
+     EventObj       *myEvent;
+     GenObjColl     *myGenObjColl;
+     L1ObjColl      *myL1ObjColl;
+     std::vector<int> *hits;
+     std::vector<int> *hitsQuality;
+     
 
 };
 #endif
