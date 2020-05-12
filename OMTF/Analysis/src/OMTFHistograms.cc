@@ -15,11 +15,11 @@
 #include "utilsL1RpcStyle.h"
 
 int nPtBins = 32;
-const float OMTFHistograms::ptBins[33]={0., 0.1,
+const float OMTFHistograms::ptBins[35]={0., 0.1,
   		 1.5, 2., 2.5, 3., 3.5, 4., 4.5, 5., 6., 7., 8.,
-  		 10., 12., 14., 16., 18., 20., 25., 30., 35., 40., 45.,
+		 10., 12., 14., 16., 18., 20., 23, 26, 30., 35., 40., 45.,
   		 50., 60., 70., 80., 90., 100., 120., 140.,
-  		 160. };
+		 160., 200};
 
 const int OMTFHistograms::color[6] = {kBlack, kBlue, kRed, kMagenta, kTeal, kGreen};
 //Single mu
@@ -153,18 +153,22 @@ void OMTFHistograms::finalizeHistograms(){
   plotRate("VsPt");
   plotRate("VsQuality");
 
-  plotEffVsRate(18);
-  plotEffVsRate(19);
+  std::vector<int> ptCuts = {10, 15, 16, 18, 19, 20, 21, 22, 23};
+  for(auto iCut: ptCuts){
+    plotEffVsRate(iCut);
+  }
   plotRate("VsEta_quality");
   plotEffVsEtaVsQuality();
 
   plotEffPanel("OMTF");
   plotEffPanel("BMTF");
   plotEffPanel("EMTF");
+  /*
   plotEffPanel("BMTF_quality0");
   plotEffPanel("BMTF_quality1");
   plotEffPanel("BMTF_quality2");
   plotEffPanel("BMTF_quality3");
+  */
     
   bool doHigh = true;
   plotEffPanel("OMTF", doHigh);
@@ -180,18 +184,15 @@ void OMTFHistograms::finalizeHistograms(){
   plotSingleHistogram("h2DEMTFPtRecVsPtGen");
   plotSingleHistogram("h2DBMTFPtRecVsPtGen");
 
-
-  plotOMTFVsOther(18,"EMTF");
-  for(int iPtCode=1;iPtCode<=26;++iPtCode)   plotOMTFVsOther(iPtCode,"BMTF");
-  /*
-  plotOMTFVsOther(12,"EMTF");
-  plotOMTFVsOther(16,"EMTF");
-  plotOMTFVsOther(18,"EMTF");
-  plotOMTFVsOther(19,"EMTF");
-  plotOMTFVsOther(20,"EMTF");
-  plotOMTFVsOther(22,"EMTF");
-  plotOMTFVsOther(26,"EMTF");
-  */
+  for(int iPtCode=1;iPtCode<=30;++iPtCode){
+    plotOMTFVsOther(iPtCode,"BMTF");
+    //plotOMTFVsOther(iPtCode,"EMTF");
+  }
+  
+  //plotOMTFVsOther(20,"EMTF");
+  //plotOMTFVsOther(22,"EMTF");
+  //plotOMTFVsOther(26,"EMTF");
+  
   plotSingleHistogram("h1DLLH_Low");
   plotSingleHistogram("h1DLLH_High");
   plotLLH();
@@ -582,8 +583,8 @@ TH1* OMTFHistograms::getRateHisto(std::string sysType,
   TH2F* h2D = (TH2F*)h2D_original->Clone("h2D");
   if(!h2D) return 0;
   
-  TH2F *hWeights = makeRateWeights(h2D);
-  h2D->Multiply(hWeights);
+  //TEST TH2F *hWeights = makeRateWeights(h2D);
+  //TEST h2D->Multiply(hWeights);
 
   TH1D *hRate = h2D->ProjectionY(("hRate"+sysType).c_str());
   if(sysType=="Vx") hRate = h2D->ProjectionX("hRate");
@@ -669,7 +670,7 @@ void OMTFHistograms::plotRate(std::string type){
     pad2->Draw();
     pad2->cd();
     
-    hRateBMTF->SetYTitle("Upgrade/Run2");
+    hRateBMTF->SetYTitle("Parametrisation/Run2");
     hRateBMTF->GetXaxis()->SetLabelSize(0.09);
     hRateBMTF->GetYaxis()->SetLabelSize(0.09);
     hRateBMTF->GetYaxis()->SetTitleSize(0.09);
@@ -678,6 +679,9 @@ void OMTFHistograms::plotRate(std::string type){
     hRateBMTF->SetMaximum(1.5);
     hRateBMTF->SetMinimum(0.5);
     hRateBMTF->DrawCopy();
+
+    hRateEMTF->Divide(hRateOMTF);
+    hRateEMTF->DrawCopy("same");
     TLine *aLine = new TLine(0,0,0,0);
     aLine->SetLineWidth(2);
     aLine->SetLineColor(2);
@@ -761,6 +765,7 @@ void OMTFHistograms::plotRate(std::string type){
     leg->AddEntry(hRateOMTF,"Run2");
     leg->AddEntry(hRateEMTF,"byLLH");
     leg->AddEntry(hRateBMTF,"byNhitsByLLH");
+    //leg->AddEntry(hRateBMTF,"Param.");//TEST
   }
   leg->Draw();
 
@@ -771,9 +776,9 @@ void OMTFHistograms::plotRate(std::string type){
 ////////////////////////////////////////////////////////////////
 void OMTFHistograms::plotEffVsRate(int iPtCut){
 
-  int ptCut = OMTFHistograms::ptBins[iPtCut];
+  double ptCut = OMTFHistograms::ptBins[iPtCut];
   double xMin = 9999.0, xMax = -999.0;
-  double yMin = 9999.0, yMax = -999.0;
+  double yMin = 1E8, yMax = -999.0;
 
   TGraph *aGraph = new TGraph();
   aGraph->SetMarkerSize(1.3);
@@ -783,8 +788,8 @@ void OMTFHistograms::plotEffVsRate(int iPtCut){
     for(int iQuality=0;iQuality<4;++iQuality){
       std::string selType = std::string(TString::Format("quality%d",iQuality));      
       TH1 *hRate = getRateHisto(sysType,"Tot_"+selType);
-      if(!hRate) return;    
-      std::string hName = "h2D"+sysType+selType+"Pt"+std::to_string(ptCut);
+      if(!hRate) return;
+      std::string hName = "h2D"+sysType+selType+"Pt"+std::to_string((int)ptCut);
       TH2F* hEff = this->get2DHistogram(hName);
       if(!hEff) return;
       float efficiency = getEfficiency(hEff, ptCut);
@@ -824,7 +829,7 @@ void OMTFHistograms::plotEffVsRate(int iPtCut){
   hFrame->GetYaxis()->SetTitleOffset(1.7);
   hFrame->GetYaxis()->SetLabelSize(0.04);
   hFrame->GetXaxis()->SetLabelSize(0.04);
-  hFrame->SetXTitle(TString::Format("Efficiency for %d < p_{T}^{gen} < %d GeV/c",(int)ptBins[iPtCut], (int)ptBins[iPtCut]+50));
+  hFrame->SetXTitle(TString::Format("Efficiency for %d < p_{T}^{gen} < 100",(int)ptBins[iPtCut]));
 
   TCanvas* c = new TCanvas("cEffVsRate","EffVsRate",460,500);
   c->SetGrid(1,1);
@@ -944,7 +949,7 @@ float  OMTFHistograms::getEfficiency(TH2F *h2D, float ptCut){
   TH1D* hEffTmp =DivideErr(hNum,hDenom,"hEffTmp","B");
   //Mean eff above pt cut
   int binLow = hEffTmp->FindBin(ptCut);
-  int binHigh = hEffTmp->FindBin(ptCut+50);
+  int binHigh = hEffTmp->FindBin(100);
   float range = hEffTmp->GetBinLowEdge(binHigh+1) - hEffTmp->GetBinLowEdge(binLow);
   float eff = hEffTmp->Integral(binLow,binHigh,"width")/range;
   return eff;
@@ -954,8 +959,10 @@ float  OMTFHistograms::getEfficiency(TH2F *h2D, float ptCut){
 TH1D * OMTFHistograms::getEfficiencyHisto(const std::string & hName){
 
   TH2F* h2D = this->get2DHistogram(hName);
+  if(!h2D) return 0;
+  
   TH1D *hNum = h2D->ProjectionX("hNum",2,2);
-  TH1D *hDenom = h2D->ProjectionX("hDenom",1,1);
+  TH1D *hDenom = h2D->ProjectionX("hDenom",1,1);  
   hDenom->Add(hNum);
   TH1D* hEffTmp =DivideErr(hNum,hDenom,"hEffTmp","B");
   return hEffTmp;
@@ -1040,8 +1047,8 @@ void OMTFHistograms::plotLLH(){
    h2->Draw("");
    h1->Draw("same");
 
-   l.AddEntry(h1,"p_{T}^{GEN}<4 AND p_{T}^{REC}>20 GeV/c");
-   l.AddEntry(h2,"p_{T}^{GEN}>20 AND p_{T}^{REC}>20 GeV/c");
+   l.AddEntry(h1,"p_{T}^{GEN}<10 AND p_{T}^{REC} #geq 20 GeV/c");
+   l.AddEntry(h2,"p_{T}^{GEN}>20 AND p_{T}^{REC} #geq 20 GeV/c");
    l.Draw();
    
    c->Print("fig_png/LLH_values.png");
@@ -1156,19 +1163,21 @@ void OMTFHistograms::plotQuantiles(const std::string & hName){
   l.SetFillColor(10);
 
   double xQ[1], yQ[1];
-  xQ[0] = 0.75;
+  xQ[0] = 0.20;
 
-  TH1D *h1D = h2D->ProjectionY();
-  h1D->SetXTitle("p_{T}^{REC}");
-  h1D->SetYTitle(TString::Format("p_{T}^{GEN}@ CL %d",(int)(xQ[0]*100)));
+  TH1D *h1D = h2D->ProjectionX();
+  h1D->SetXTitle("p_{T}^{GEN}");
+  h1D->SetYTitle(TString::Format("p_{T}^{REC}@ CL %d",(int)(xQ[0]*100)));
   h1D->Reset();
 
-  for(int iBinY=1;iBinY<h2D->GetNbinsY();++iBinY){
-    TH1D *hPtRec = h2D->ProjectionX("hPtRec",iBinY,iBinY);
+  for(int iBinX=1;iBinX<h2D->GetNbinsX();++iBinX){
+    TH1D *hPtRec = h2D->ProjectionY("hPtRec",iBinX,iBinX);
     if(hPtRec->Integral()<1) continue;	
     hPtRec->GetQuantiles(1, yQ, xQ);
-    h1D->SetBinContent(iBinY, yQ[0]);
+    h1D->SetBinContent(iBinX, yQ[0]);
   }
+
+  h1D->GetXaxis()->SetRangeUser(0,30);
   h1D->Draw();
   h1D->SetDirectory(myDirCopy);  
   std::cout<<"Fit range: 0-10"<<std::endl;
@@ -1177,8 +1186,8 @@ void OMTFHistograms::plotQuantiles(const std::string & hName){
   h1D->Fit("pol1","W","",10, 10);
   std::cout<<"Fit range: 20-50"<<std::endl;
   h1D->Fit("pol1","W","",20, 50);
-  std::cout<<"Fit range: 5-50"<<std::endl;
-  h1D->Fit("pol1","W","",5, 50);
+  std::cout<<"Fit range: 5-40"<<std::endl;
+  h1D->Fit("pol2","W","",5, 40);
 
   c->Print(TString::Format("fig_png/Quantile%d_%s.png",(int)(xQ[0]*100), hName.c_str()));
 }

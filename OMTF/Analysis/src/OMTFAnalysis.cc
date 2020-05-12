@@ -38,7 +38,7 @@ int main(int argc, char ** argv) {
   std::vector<Analyzer*> myAnalyzers;
   EventProxyOMTF *myEvent = new EventProxyOMTF();
   
-  if(processName=="EMUL") myAnalyzers.push_back(new OMTFAnalyzer("EMULAnalyzer"));
+  myAnalyzers.push_back(new OMTFAnalyzer(processName+"Analyzer"));
   
   TreeAnalyzer *tree = new TreeAnalyzer("TreeAnalyzer",cfgFileName, myEvent);
   tree->init(myAnalyzers);
