@@ -30,33 +30,23 @@ std::vector<double> ptRanges = {0.,   1.,   2.,   3.,   4.,
 //////////////////////////////////////////////////////////////////////////////
 double rescaledPt(const double & ptRaw){
 
-  return 1.2*ptRaw;
+  return ptRaw;
 
-  if(ptRaw<16) return 1.236*ptRaw;
-  else return 1.236*ptRaw-1.2;
-  
-  /*
-  if(ptRaw<5) return ptRaw+0.5;
-  else if(ptRaw<8) return ptRaw+1.0;
-  else if(ptRaw<20) return ptRaw+2.0;
-  else if(ptRaw<50) return ptRaw+5.0;
-  else if(ptRaw<120) return ptRaw+10.0;
-  else return ptRaw + 20.0;
-  */
+  if(ptRaw>40) return ptRaw+30;
+  if(ptRaw>60) return ptRaw+40;
+  if(ptRaw<15) return 1.3*ptRaw;
+  double a = -0.0042;
+  double b = 0.90;
+  double c = 0.15;
 
-  if(ptRaw<20) return ptRaw+2.0;
-  if(ptRaw<40) return ptRaw+4.0;
-  else if(ptRaw<40) return ptRaw+6.0;
-  else return ptRaw + 20.0;		     
-  /*
-  else if(ptRaw<15) return ptRaw+2.0;
-  else if(ptRaw<30) return ptRaw+4.0;
-  else if(ptRaw<45) return ptRaw+4.0;
-  else if(ptRaw<50) return ptRaw+5.0;
-  else if(ptRaw<80) return ptRaw+10.0;
-  else if(ptRaw<100) return ptRaw+30.0;
-  else return ptRaw + 30;		     
-  */
+  //double a = -0.0048;
+  //double b = 0.92;
+  //double c = -0.36;
+  double delta = std::pow(b,2)-4*a*(c-ptRaw);
+  double x = -b+sqrt(delta);
+  x/=(2*a);
+  return x;
+
 }
 //////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////
@@ -64,6 +54,7 @@ OMTFAnalyzer::OMTFAnalyzer(const std::string & aName):Analyzer(aName){
 
   hGoldenPatterns = 0;
   hPtProfile = 0;
+  selectionFlavours_.push_back(aName);
 
 }
 //////////////////////////////////////////////////////////////////////////////
@@ -208,7 +199,7 @@ bool OMTFAnalyzer::passQuality(const L1Obj & aL1Cand,
    if(selType.find("quality1")!=std::string::npos) lowPtVeto = (aL1Cand.refLayer==1 && hitsWord.count()==3);
    if(selType.find("quality2")!=std::string::npos) lowPtVeto = (hitsWord.count()==3);
    if(selType.find("quality3")!=std::string::npos) lowPtVeto = (aL1Cand.refLayer==1 && hitsWord.count()<5);
-    
+
    if(sysType.find("BMTF")!=std::string::npos){
      return aL1Cand.type==L1Obj::BMTF && aL1Cand.q>=12 && aL1Cand.bx==0 && !lowPtVeto;
    }
@@ -265,7 +256,8 @@ void OMTFAnalyzer::fillTurnOnCurve(const int & iPtCut,
   std::bitset<18> hitsWord(selectedCand.hits);
   bool passPtCut = selectedCand.ptValue()>=ptCut;
   if(sysType=="BMTF" || sysType=="EMTF") {   
-    passPtCut = rescaledPt( selectedCand.ptValue())>=ptCut && selectedCand.ptValue()>0;  
+    passPtCut = rescaledPt( selectedCand.ptValue())>=ptCut && selectedCand.ptValue()>0;
+    //passPtCut =  selectedCand.ptValue()>=rescaledPt(ptCut) && selectedCand.ptValue()>0;
   }
 
   std::string tmpName = hName+"Pt"+std::to_string(ptCut);
@@ -291,13 +283,13 @@ void OMTFAnalyzer::fillTurnOnCurve(const int & iPtCut,
     std::cout<<"-------"<<std::endl;
   }
 
-  if(selectedCand.ptValue()>0 && myGenObj.pt()<10 && selectedCand.ptValue()>=20 && sysType=="EMTF"){
+  if(selectedCand.ptValue()>0 && myGenObj.pt()<10 && selectedCand.ptValue()>=20 && sysType=="BMTF"){
     myHistos_->fill1DHistogram("h1DLLH_Low", 10*selectedCand.disc/hitsWord.count());    
     myHistos_->fill1DHistogram("h1DHitsPattern_Low_HitCount", (int)hitsWord.count()*10);
     myHistos_->fill1DHistogram("h1DHitsPattern_Low_RefLayer",selectedCand.refLayer*10);    
     myHistos_->fill1DHistogram("h1DHitsPattern_Low_RefPhi",selectedCand.phi);    
   }
-  if(selectedCand.ptValue()>0 && myGenObj.pt()>20 && selectedCand.ptValue()>=20 && sysType=="EMTF"){
+  if(selectedCand.ptValue()>0 && myGenObj.pt()>20 && selectedCand.ptValue()>=20 && sysType=="BMTF"){
     myHistos_->fill1DHistogram("h1DLLH_High", 10*selectedCand.disc/hitsWord.count());   
     myHistos_->fill1DHistogram("h1DHitsPattern_High_HitCount", (int)hitsWord.count()*10);
     myHistos_->fill1DHistogram("h1DHitsPattern_High_RefLayer",selectedCand.refLayer*10);    
@@ -319,6 +311,8 @@ void OMTFAnalyzer::fillTurnOnCurve(const int & iPtCut,
 //////////////////////////////////////////////////////////////////////////////
 void OMTFAnalyzer::fillRateHisto(const std::string & sysType,
 				 const std::string & selType){
+
+  if(name()=="NU_RATEAnalyzer" && myGenObj.pt()>0.0) return;    
 
   const std::vector<L1Obj> & myL1Coll = myL1ObjColl->getL1Objs();
   std::string hName = "h2D"+sysType+"Rate"+selType;
@@ -364,13 +358,6 @@ void OMTFAnalyzer::fillHistosForGenMuon(){
       fillTurnOnCurve(iCut, "OMTF", selType);
       fillTurnOnCurve(iCut, "BMTF", selType);
       fillTurnOnCurve(iCut, "EMTF", selType);
-  }
-
-  for(int iQuality=0;iQuality<4;++iQuality){
-    selType = std::string(TString::Format("_quality%d",iQuality));
-    for(int iCut=0;iCut<31;++iCut){
-      fillTurnOnCurve(iCut, "BMTF", selType);
-    }
   }
 
   int iCut = 19;
@@ -596,6 +583,27 @@ bool OMTFAnalyzer::analyze(const EventProxyBase& iEvent){
     fillBendingHistos("OMTF");
   }
 
+  std::vector<int> ptCuts = {10, 15, 16, 18, 19, 20, 21, 22, 23};
+  for(int iQuality=0;iQuality<4;++iQuality){
+    std::string selType = std::string(TString::Format("quality%d",iQuality));
+    fillRateHisto("OMTF","Tot_"+selType);
+    fillRateHisto("BMTF","Tot_"+selType);
+    fillRateHisto("EMTF","Tot_"+selType);
+
+    fillRateHisto("Vx","VsEta_"+selType);
+    fillRateHisto("OMTF","VsEta_"+selType);
+    fillRateHisto("BMTF","VsEta_"+selType);
+    fillRateHisto("EMTF","VsEta_"+selType);
+
+    for(auto iCut: ptCuts){
+      bool isOMTFAcceptance = fabs(myGenObj.eta())>0.83 && fabs(myGenObj.eta())<1.24;
+      if(!isOMTFAcceptance) continue;
+      fillTurnOnCurve(iCut, "OMTF", selType);
+      fillTurnOnCurve(iCut, "BMTF", selType);
+      fillTurnOnCurve(iCut, "EMTF", selType);
+    } 
+  }
+
   fillRateHisto("Vx","Tot");
   fillRateHisto("OMTF","Tot");
   fillRateHisto("BMTF","Tot");
@@ -615,27 +623,6 @@ bool OMTFAnalyzer::analyze(const EventProxyBase& iEvent){
   fillRateHisto("OMTF","VsQuality");
   fillRateHisto("BMTF","VsQuality");
   fillRateHisto("EMTF","VsQuality");
-
-  for(int iQuality=0;iQuality<4;++iQuality){
-    std::string selType = std::string(TString::Format("quality%d",iQuality));
-    fillRateHisto("OMTF","Tot_"+selType);
-    fillRateHisto("BMTF","Tot_"+selType);
-    fillRateHisto("EMTF","Tot_"+selType);
-
-    fillRateHisto("Vx","VsEta_"+selType);
-    fillRateHisto("OMTF","VsEta_"+selType);
-    fillRateHisto("BMTF","VsEta_"+selType);
-    fillRateHisto("EMTF","VsEta_"+selType);
-
-    int iCut = 18;
-    fillTurnOnCurve(iCut, "OMTF", selType);
-    fillTurnOnCurve(iCut, "BMTF", selType);
-    fillTurnOnCurve(iCut, "EMTF", selType);
-    iCut = 19;
-    fillTurnOnCurve(iCut, "OMTF", selType);
-    fillTurnOnCurve(iCut, "BMTF", selType);
-    fillTurnOnCurve(iCut, "EMTF", selType);
-  }
   
   return true;
 }
