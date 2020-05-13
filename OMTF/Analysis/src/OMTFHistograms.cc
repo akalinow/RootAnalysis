@@ -685,6 +685,7 @@ void OMTFHistograms::plotRate(std::string type){
 
     hRateEMTF->Divide(hRateOMTF);
     //TEST hRateEMTF->DrawCopy("same");
+    hRateEMTF->DrawCopy("same");
     TLine *aLine = new TLine(0,0,0,0);
     aLine->SetLineWidth(2);
     aLine->SetLineColor(2);
