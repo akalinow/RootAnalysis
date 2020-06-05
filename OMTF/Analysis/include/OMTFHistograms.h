@@ -23,7 +23,7 @@ public:
   static const int ptCutsOMTF[4];
   static const int ptCutsOMTFHigh[4];
   static const unsigned int nPtBins;
-  static const float ptBins[35];
+  static const float ptBins[36];
     
 private:
 

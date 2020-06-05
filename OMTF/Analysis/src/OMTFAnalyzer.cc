@@ -32,21 +32,6 @@ double rescaledPt(const double & ptRaw){
 
   return ptRaw;
 
-  if(ptRaw>40) return ptRaw+30;
-  if(ptRaw>60) return ptRaw+40;
-  if(ptRaw<15) return 1.3*ptRaw;
-  double a = -0.0042;
-  double b = 0.90;
-  double c = 0.15;
-
-  //double a = -0.0048;
-  //double b = 0.92;
-  //double c = -0.36;
-  double delta = std::pow(b,2)-4*a*(c-ptRaw);
-  double x = -b+sqrt(delta);
-  x/=(2*a);
-  return x;
-
 }
 //////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////
@@ -102,7 +87,7 @@ void OMTFAnalyzer::fixQualityHistos(){
     std::cout<<"quality_index_map.size(): "<<quality_index_map.size()<<std::endl;
 
     std::ostringstream stringStr;
-    TH2F *h = myHistos_->get2DHistogram("h2DOMTFRateVsQuality",true);
+    TH2F *h = myHistos_->get2DHistogram("h2DEMTFRateVsQuality",true);
     if(h){
       for(int iBin=1;iBin<h->GetYaxis()->GetNbins();++iBin){
 	stringStr.str("");
@@ -137,64 +122,15 @@ bool OMTFAnalyzer::passQuality(const L1Obj & aL1Cand,
   std::map<int,bool> hitsMaskRefLayer;
   std::map<int,bool> hitsMaskRefLayer4hits;
  
-  /*
-  hitsMaskRefLayer[1027] = true;
-  hitsMaskRefLayer[3075] = true;
-  hitsMaskRefLayer[2051] = true;
-  hitsMaskRefLayer[1664] = true;
-  
-  hitsMaskRefLayer[12300] = true;
-  hitsMaskRefLayer[36940] = true;
-  hitsMaskRefLayer[45132] = true;
-  */
-
-  /*
-  hitsMaskRefLayer[1539] = true;
-  hitsMaskRefLayer[515] = true;
-  hitsMaskRefLayer[1664] = true;
-  hitsMaskRefLayer[13312] = true;
-  */
-  //hitsMaskRefLayer[131968] = true;
-  //hitsMaskRefLayer[65920] = true;
-  
-
-  
-  //double phiB = 0.0;
-  bool hasHits = false;
-  for(auto aHit : myHits){
-    if(aHit.iLayer==1) {
-      //phiB = aHit.iPhi;
-      hasHits = true;
-    }
-    if(aHit.iLayer==3){
-      //deltaPhi = (aHit.iPhi-phiB)*aL1Cand.chargeValue();
-      hasHits &= true;
-    }
-  }
-
   std::bitset<18> hitsWord(aL1Cand.hits);
 
-  /*
-  if(sysType=="BMTF" && aL1Cand.q==12 && hitsWord.test(0) && hitsWord.test(2)) {
-    std::cout<<"aL1Cand.pt: "<<aL1Cand.pt<<" hasHits: "<<hasHits<<" "<<hitsWord<<" myHits.size(): "<<myHits.size()<<std::endl;
-     for(auto aHit : myHits){
-       std::cout<<"iLayer: "<<aHit.iLayer<<std::endl;
-     }
-  }
-  */
-   bool lowPtVeto = false;
-
-   
-   //lowPtVeto |= aL1Cand.refLayer!=0;
-    
-   //default OMTF
-   //lowPtVeto |= (hitsMaskRefLayer[aL1Cand.hits]) && aL1Cand.pt>120;
-   //lowPtVeto |= (!hitsWord.test(0) && aL1Cand.phi<20 && aL1Cand.refLayer==1);
-   //lowPtVeto |= (hitsWord.count()<4 && !hitsMaskRefLayer4hits[aL1Cand.hits]);
-   //lowPtVeto |= (hitsWord.count()<4);
-   //lowPtVeto |= (aL1Cand.refLayer==1 && hitsWord.count()==3);
-   //lowPtVeto |= (hitsWord.count()==3);
-   //lowPtVeto |= !passRotatedVeto(aL1Cand);
+  hitsMaskRefLayer[196992] = true;
+  hitsMaskRefLayer[131456] = true;
+  hitsMaskRefLayer[98432] = true;
+  hitsMaskRefLayer[65920] = true;
+  
+  bool lowPtVeto = false;
+  //lowPtVeto |= (hitsMaskRefLayer[aL1Cand.hits]);
    if(selType.find("quality0")!=std::string::npos) lowPtVeto = false;
    if(selType.find("quality1")!=std::string::npos) lowPtVeto = (aL1Cand.refLayer==1 && hitsWord.count()==3);
    if(selType.find("quality2")!=std::string::npos) lowPtVeto = (hitsWord.count()==3);
@@ -204,6 +140,7 @@ bool OMTFAnalyzer::passQuality(const L1Obj & aL1Cand,
      return aL1Cand.type==L1Obj::BMTF && aL1Cand.q>=12 && aL1Cand.bx==0 && !lowPtVeto;
    }
    else if(sysType.find("EMTF")!=std::string::npos){
+
      return aL1Cand.type==L1Obj::EMTF && aL1Cand.q>=12 && aL1Cand.bx==0 && !lowPtVeto;
    }
    else if(sysType.find("OMTF")!=std::string::npos){    
@@ -256,8 +193,7 @@ void OMTFAnalyzer::fillTurnOnCurve(const int & iPtCut,
   std::bitset<18> hitsWord(selectedCand.hits);
   bool passPtCut = selectedCand.ptValue()>=ptCut;
   if(sysType=="BMTF" || sysType=="EMTF") {   
-    passPtCut = rescaledPt( selectedCand.ptValue())>=ptCut && selectedCand.ptValue()>0;
-    //passPtCut =  selectedCand.ptValue()>=rescaledPt(ptCut) && selectedCand.ptValue()>0;
+    passPtCut = rescaledPt(selectedCand.ptValue())>=ptCut && selectedCand.ptValue()>0;
   }
 
   std::string tmpName = hName+"Pt"+std::to_string(ptCut);
@@ -332,13 +268,13 @@ void OMTFAnalyzer::fillRateHisto(const std::string & sysType,
   if(selType.find("VsEta")!=std::string::npos) myHistos_->fill2DHistogram(hName,myGenObj.pt(),pass*myGenObj.eta()+(!pass)*99);
   if(selType.find("VsPt")!=std::string::npos) myHistos_->fill2DHistogram(hName,myGenObj.pt(),pass*myGenObj.pt()+(!pass)*(-100));
 
-  if(sysType.find("BMTF")!=std::string::npos && selType=="VsQuality"){
+  if(sysType.find("EMTF")!=std::string::npos && selType=="VsQuality"){
     unsigned long hits = selectedCand.hits;
     if(quality_index_map.find(hits)==quality_index_map.end()) quality_index_map[hits] = quality_index_map.size();
     int val = quality_index_map[hits];
-    if(myGenObj.pt()<5) myHistos_->fill2DHistogram(hName, myGenObj.pt(), pass*val+(!pass)*(-10));
+    if(myGenObj.pt()<10) myHistos_->fill2DHistogram(hName, myGenObj.pt(), pass*val+(!pass)*(-10));
     hName = "h2D"+sysType+"Quality20";    
-    if(myGenObj.pt()>30) {
+    if(myGenObj.pt()>20) {
       myHistos_->fill2DHistogram(hName, val, pass);
     }
   }

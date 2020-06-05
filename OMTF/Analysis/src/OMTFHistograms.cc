@@ -15,9 +15,9 @@
 #include "utilsL1RpcStyle.h"
 
 int nPtBins = 32;
-const float OMTFHistograms::ptBins[35]={0., 0.1,
+const float OMTFHistograms::ptBins[36]={0., 0.1,
   		 1.5, 2., 2.5, 3., 3.5, 4., 4.5, 5., 6., 7., 8.,
-		 10., 12., 14., 16., 18., 20., 23, 26, 30., 35., 40., 45.,
+		 10., 12., 14., 16., 18., 20., 22,  24, 26, 30., 35., 40., 45.,
   		 50., 60., 70., 80., 90., 100., 120., 140.,
 		 160., 200};
 
@@ -142,9 +142,8 @@ void OMTFHistograms::defineHistograms(){
 void OMTFHistograms::finalizeHistograms(){
 
   AnalysisHistograms::finalizeHistograms();
-
   utilsL1RpcStyle()->cd();
-
+  
   finaliseGoldenPatterns("h3DBending");
   finaliseGoldenPatterns("h3DBendingRotated");
 
@@ -186,7 +185,7 @@ void OMTFHistograms::finalizeHistograms(){
 
   for(int iPtCode=1;iPtCode<=30;++iPtCode){
     plotOMTFVsOther(iPtCode,"BMTF");
-    //plotOMTFVsOther(iPtCode,"EMTF");
+    plotOMTFVsOther(iPtCode,"EMTF");
   }
   
   //plotOMTFVsOther(20,"EMTF");
@@ -663,7 +662,7 @@ void OMTFHistograms::plotRate(std::string type){
     pad1->SetGrid(1,0);
     hRateVx->Draw();
     hRateBMTF->DrawCopy("same");
-    //TEST hRateEMTF->DrawCopy("same");
+    hRateEMTF->DrawCopy("same");
     hRateOMTF->DrawCopy("same");
 
     std::cout<<"Rate OMTF @ 20 GeV: "<< hRateOMTF->GetBinContent(hRateOMTF->FindBin(20-0.01))<<std::endl;
@@ -684,7 +683,6 @@ void OMTFHistograms::plotRate(std::string type){
     hRateBMTF->DrawCopy();
 
     hRateEMTF->Divide(hRateOMTF);
-    //TEST hRateEMTF->DrawCopy("same");
     hRateEMTF->DrawCopy("same");
     TLine *aLine = new TLine(0,0,0,0);
     aLine->SetLineWidth(2);
@@ -728,14 +726,16 @@ void OMTFHistograms::plotRate(std::string type){
     c->SetLogy(0);
     c->SetLeftMargin(0.2);
     c->SetRightMargin(0.3);
+    c->SetBottomMargin(0.15);
     
-    TH2F *hEff20 = get2DHistogram("h2DOMTFQuality20");    
+    TH2F *hEff20 = get2DHistogram("h2DEMTFQuality20");    
     if(!hEff20) return;
-    TH1F *hRateValues = sortRateHisto((TH1F*)hRateOMTF, hEff20, "rate");
-    TH1F *hEffValues = sortRateHisto((TH1F*)hRateOMTF, hEff20, "eff");
+    TH1F *hRateValues = sortRateHisto((TH1F*)hRateEMTF, hEff20, "rate");
+    TH1F *hEffValues = sortRateHisto((TH1F*)hRateEMTF, hEff20, "eff");
     hRateValues->SetAxisRange(0,10);
     hRateValues->GetYaxis()->SetTitleOffset(1.7);
     hRateValues->GetYaxis()->SetTitle("Rate [arbitrary units]");
+    hRateValues->SetLineColor(kBlack);
     hRateValues->Draw();
     c->Update();
     
@@ -747,8 +747,8 @@ void OMTFHistograms::plotRate(std::string type){
     //draw an axis on the right side
     TGaxis *axis = new TGaxis(gPad->GetUxmax(),gPad->GetUymin(),
 			      gPad->GetUxmax(), gPad->GetUymax(),0,rightmax,510,"+L");
-    axis->SetTitle("Efficiency for p_{T}^{cut}=20 GeV/c @ p_{T}^{gen}>40 GeV/c");
-    axis->SetTitleOffset(1.7);
+    axis->SetTitle("Efficiency for p_{T}^{cut}=20 GeV/c @ p_{T}^{gen}>20 GeV/c");
+    axis->SetTitleOffset(2.0);
     axis->SetTitleColor(kRed);
     axis->SetLineColor(kRed);
     axis->SetLabelColor(kRed);
@@ -767,9 +767,8 @@ void OMTFHistograms::plotRate(std::string type){
   }
   else{
     leg->AddEntry(hRateOMTF,"Run2");
-    //TEST leg->AddEntry(hRateEMTF,"byLLH");
-    //leg->AddEntry(hRateBMTF,"byNhitsByLLH");
-    leg->AddEntry(hRateBMTF,"param. GPs");//TEST
+    leg->AddEntry(hRateEMTF,"new GPs <#varphi_{dist}> #bullet= 1.08");
+    leg->AddEntry(hRateBMTF,"new GPs");
   }
   leg->Draw();
 
@@ -787,7 +786,7 @@ void OMTFHistograms::plotEffVsRate(int iPtCut){
   TGraph *aGraph = new TGraph();
   aGraph->SetMarkerSize(1.3);
   std::map<std::string, TGraph*> sysGraphs;
-  std::string sysTypes[3] = {"OMTF", "BMTF", "EMTF"};
+  std::vector<std::string >sysTypes = {"OMTF", "BMTF", "EMTF"};
   for(auto && sysType: sysTypes){
     for(int iQuality=0;iQuality<4;++iQuality){
       std::string selType = std::string(TString::Format("quality%d",iQuality));      
@@ -841,7 +840,7 @@ void OMTFHistograms::plotEffVsRate(int iPtCut){
   hFrame->Draw();
   sysGraphs["OMTF"]->Draw("P");
   sysGraphs["BMTF"]->Draw("P");
-  //TEST sysGraphs["EMTF"]->Draw("P");
+  sysGraphs["EMTF"]->Draw("P");
 
   TLegend *leg = new TLegend(0.2149123,0.6716102,0.4539474,0.8644068,NULL,"brNDC");
   leg->SetTextSize(0.05);
@@ -850,8 +849,8 @@ void OMTFHistograms::plotEffVsRate(int iPtCut){
   leg->SetFillColor(10);
   leg->SetHeader(TString::Format("p_{T}^{REC} #geq %d GeV/c", (int)ptBins[iPtCut]));
   //TEST leg->AddEntry(sysGraphs["BMTF"],"new GPs byNhitsByLLH","p");
-  leg->AddEntry(sysGraphs["BMTF"],"param. GPs","p");
-  //TEST leg->AddEntry(sysGraphs["EMTF"],"new GPs byLLH","p");
+  leg->AddEntry(sysGraphs["BMTF"],"new GPs","p");
+  leg->AddEntry(sysGraphs["EMTF"],"new GPs <#varphi_{dist}>#bullet=1.08","p");
   leg->AddEntry(sysGraphs["OMTF"],"Run2","p");
   leg->Draw();
 
