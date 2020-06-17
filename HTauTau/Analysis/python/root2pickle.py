@@ -39,6 +39,6 @@ if __name__ == "__main__":
                             help='Full path to the TTree inside the input file.')
 
         FLAGS, unparsed = parser.parse_known_args()
-	root2pickle(FLAGS.input, FLAGS.output, FLAGS.tree)
+        root2pickle(FLAGS.input, FLAGS.output, FLAGS.tree)
 		
 	

@@ -76,7 +76,7 @@ class Pythia8Interface: public Analyzer{
 
   HTTParticle makeTau(const TParticle & aTau);
 
-  void makeMET(const HTTParticle & aTau1, const HTTParticle & aTau2);
+  void makeMET(const HTTParticle & aTau1, const HTTParticle & aTau2, double sigmaX, double sigmaY);
 
   HTTPair makePair(const HTTParticle & aTau1, const HTTParticle & aTau2,
 		   const TVector2 & met, const TMatrixD & covMET);

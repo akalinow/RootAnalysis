@@ -14,6 +14,7 @@ make install -j 4
 ```
 ## Run instructions:
 Before running update path to the data files in the config/svfit_MuTau.ini file.
+See Pythias8Interface/README for instructions hot to generate events with Pythia8.
 
 ```
 cd RootAnalysis/build
@@ -26,9 +27,9 @@ ln -s config/ml_Properties.ini ml_Properties.ini
 Convert the plain ROOT TTRee into python numpy array
 
 ```
-python python/root2pickle.py --input RootAnalysis_SVfitAnalysisMuTauTrain.root --output htt_features_train.pkl
-python python/root2pickle.py --input RootAnalysis_SVfitAnalysisMuTau_ggH125.root --output htt_features_ggH125.pkl
-python python/root2pickle.py --input RootAnalysis_SVfitAnalysisMuTau_DY.root --output htt_features_DY.pkl
+python python/root2pickle.py --input RootAnalysis_SVfitMLAnalysisMuTauTrain.root --output htt_features_train.pkl
+python python/root2pickle.py --input RootAnalysis_SVfitMLAnalysisMuTau_ggH125.root --output htt_features_ggH125.pkl
+python python/root2pickle.py --input RootAnalysis_SVfitMLAnalysisMuTau_DY.root --output htt_features_DY.pkl
 ```
 
 Train a simple NN (requires TensorFlow)

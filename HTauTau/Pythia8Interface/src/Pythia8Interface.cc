@@ -1,5 +1,6 @@
 #include <sstream>
 #include <bitset>
+#include <random>
 
 #include "TFile.h"
 #include "TTree.h"
@@ -339,20 +340,20 @@ HTTParticle Pythia8Interface::makeTau(const TParticle & aTau){
 }
 //////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////
-void Pythia8Interface::makeMET(const HTTParticle & aTau1, const HTTParticle & aTau2){
+void Pythia8Interface::makeMET(const HTTParticle & aTau1, const HTTParticle & aTau2,
+			       double sigmaX, double sigmaY){
   
   TLorentzVector nunuGen = aTau1.getP4() + aTau2.getP4() -
     aTau1.getChargedP4() - aTau2.getChargedP4() -
     aTau1.getNeutralP4() - aTau2.getNeutralP4();
 
-  myMET.SetX(nunuGen.X());
-  myMET.SetY(nunuGen.Y());
-
-  covMET[0][0] = 1.0;
+  covMET[0][0] = sigmaX;
   covMET[0][1] = 0.0;
   covMET[1][0] = 0.0;
-  covMET[1][1] = 1.0;
-      
+  covMET[1][1] = sigmaY;
+
+  myMET.SetX(nunuGen.X()*myRandGenerator.Gaus(1.0,sigmaX));
+  myMET.SetY(nunuGen.Y()*myRandGenerator.Gaus(1.0,sigmaY));
 }
 //////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////
@@ -412,13 +413,20 @@ HTTPair Pythia8Interface::makePair(const HTTParticle & aTau1, const HTTParticle 
 bool Pythia8Interface::analyze(const EventProxyBase& iEvent, ObjectMessenger *aMessenger){
 
   double mH = 125;
+  double minMass = 50;
+  double maxMass = 300;
   double tmp = 0;
 
-  unsigned int long eventsToGenerate = *aMessenger->getObject(&tmp,"eventsToGenerate");  
+  unsigned int long eventsToGenerate = *aMessenger->getObject(&tmp,"eventsToGenerate");
+  double sigmaX = 100.0;
+  double sigmaY = 100.0;
+
   int pairDecayMode = HTTAnalysis::hadronicTauDecayModes::tauDecayMuon;
 
-  for(int iMass=0;iMass<100;++iMass){
-    mH = 50 + 2*iMass;
+  std::minstd_rand0 randomGenerator;
+
+  for(int iMass=0;iMass<100;++iMass){    
+    mH = minMass + myRandGenerator.Rndm()*(maxMass-minMass);
     std::cout<<"Generating mass: "<<mH<<std::endl;
     initializePythia(mH, pairDecayMode);
     for(unsigned int long eventNumber=0;eventNumber<eventsToGenerate;++eventNumber){
@@ -437,7 +445,7 @@ bool Pythia8Interface::analyze(const EventProxyBase& iEvent, ObjectMessenger *aM
       httGenLeptonCollection.clear();
       HTTParticle aGenTau1 = makeTau(myTauPlus);
       HTTParticle aGenTau2 = makeTau(myTauMinus);
-      makeMET(aGenTau1, aGenTau2);
+      makeMET(aGenTau1, aGenTau2, sigmaX, sigmaY);
       httGenLeptonCollection.push_back(aGenTau1);
       httGenLeptonCollection.push_back(aGenTau2);
 

@@ -431,8 +431,6 @@ bool SVfitAnalyzer::analyze(const EventProxyBase& iEvent, ObjectMessenger *aMess
   }
   else sampleType = 0;
 
-  if(sampleType==0) return true;
-
   if(!myEventProxy.pairs->size()) return true;
   setAnalysisObjects(myEventProxy);
 
