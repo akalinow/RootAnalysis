@@ -292,8 +292,8 @@ void SVfitAnalyzer::fillControlHistos(const std::string & hNameSuffix){
     aGenLeg1.getChargedP4() - aGenLeg2.getChargedP4() -
     aGenLeg1.getNeutralP4() - aGenLeg2.getNeutralP4();
 
-  TLorentzVector svFitP4 = computeMTT("svFit");
-  //TLorentzVector svFitP4 = aPair.getP4();
+  //TLorentzVector svFitP4 = computeMTT("svFit");
+  TLorentzVector svFitP4 = aPair.getP4();
    myHistos_->fill1DHistogram("h1DMassSVClassic"+hNameSuffix,svFitP4.M());
    myHistos_->fill1DHistogram("h1DCpuTimeSVClassic"+hNameSuffix,svFitAlgo.getComputingTime_cpu());
 
