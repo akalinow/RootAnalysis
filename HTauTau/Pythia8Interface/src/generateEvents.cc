@@ -53,7 +53,7 @@ int main(int argc, char ** argv) {
 	 std::vector<Analyzer*> myAnalyzers;
 	 EventProxyHTT *myEvent = new EventProxyHTT();
 	 
-	 myAnalyzers.push_back(new Pythia8Interface("Pythia8Interface"));
+	 myAnalyzers.push_back(new Pythia8Interface(processName));
 
 	 TreeAnalyzer *tree = new TreeAnalyzer("TreeAnalyzer",cfgFileName, myEvent);
 	 tree->init(myAnalyzers);

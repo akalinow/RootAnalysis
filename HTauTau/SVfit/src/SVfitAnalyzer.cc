@@ -97,8 +97,7 @@ TLorentzVector SVfitAnalyzer::computeMTT(const std::string & algoName){
   else{//tau->hadrs.
     decay1 = aLeg1.getProperty(PropertyEnum::decayMode);
     mass1 = aLeg1.getP4().M();
-    if(decay1==0)
-      mass1 = 0.13957; //pi+/- mass
+    if(decay1==0) mass1 = 0.13957; //pi+/- mass
     type1 = classic_svFit::MeasuredTauLepton::kTauToHadDecay;
   }
 
@@ -156,7 +155,6 @@ TLorentzVector SVfitAnalyzer::computeMTT(const std::string & algoName){
   TLorentzVector aResult;
   if(algoName=="svFit") aResult = runsvFitAlgo(measuredTauLeptons, aMET, aCovMET);
   if(algoName=="fastMTT") aResult = runFastMTTAlgo(measuredTauLeptons, aMET, aCovMET);
-  
   return aResult;
 }
 /////////////////////////////////////////////////
@@ -441,7 +439,7 @@ bool SVfitAnalyzer::analyze(const EventProxyBase& iEvent, ObjectMessenger *aMess
   bool goodGenTau = aGenLeg1.getP4().E()>1.0 && aGenLeg2.getP4().E()>1.0;
   bool isTauHad = aGenLeg2.getProperty(PropertyEnum::decayMode)!=HTTAnalysis::tauDecayMuon &&
                   aGenLeg2.getProperty(PropertyEnum::decayMode)!=HTTAnalysis::tauDecaysElectron;
-    
+
   goodGenTau &= isTauHad;
   
   if(myChannelSpecifics->getDecayModeName()=="TauTau"){

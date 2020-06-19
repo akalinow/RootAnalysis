@@ -20,6 +20,7 @@ See Pythias8Interface/README for instructions hot to generate events with Pythia
 cd RootAnalysis/build
 ln -s config/ml_Properties.ini ml_Properties.ini
 ./bin/svfitAnalysis config/svfit_MuTau_train.ini >& train.out &
+./bin/svfitAnalysis config/svfit_MuTau_train_smearMET.ini >& train.out &
 ./bin/svfitAnalysis config/svfit_MuTau_test_ggH125.ini >& ggH125.out &
 ./bin/svfitAnalysis config/svfit_MuTau_test_DY.ini >& DY.out &	
 ```
