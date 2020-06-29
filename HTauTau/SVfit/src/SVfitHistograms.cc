@@ -97,6 +97,14 @@ void SVfitHistograms::finalizeHistograms(const std::vector<const HTTAnalysis::ev
     plotSingleHistogram("h1DCpuTimeSVClassic"+hNameSuffix);
     plotSingleHistogram("h1DDeltaMET_X_Res"+hNameSuffix);
     plotSingleHistogram("h1DDeltaMET_Y_Res"+hNameSuffix);
+    plotSingleHistogram("h1DDeltaMET_Mag_Res"+hNameSuffix);
+    plotSingleHistogram("h1DDeltaMET_Phi"+hNameSuffix);
+    plotSingleHistogram("h1DDeltaMET_sigma_X"+hNameSuffix);
+    plotSingleHistogram("h1DDeltaMET_sigma_Y"+hNameSuffix);
+    plotSingleHistogram("h1DDeltaMET_covRotation"+hNameSuffix);
+    plotSingleHistogram("h1DDeltaMET_leg1_covRotation"+hNameSuffix);
+    plotSingleHistogram("h1DDeltaMET_leg2_covRotation"+hNameSuffix);
+    plotSingleHistogram("h1DDeltaMET_min_leg12_covRotation"+hNameSuffix);
     plotSingleHistogram("h1DDeltaLeg1_E_Res"+hNameSuffix);
     plotSingleHistogram("h1DDeltaLeg2_E_Res"+hNameSuffix);
     plotSingleHistogram("h1DDeltaLeg2_PX_Res"+hNameSuffix);
@@ -109,7 +117,12 @@ void SVfitHistograms::finalizeHistograms(const std::vector<const HTTAnalysis::ev
     plotSingleHistogram("h1DDeltaEtaClassic"+hNameSuffix);
     plotSingleHistogram("h1DDeltaPtClassic"+hNameSuffix);
 
-    plotSingleHistogram2D("h2DDeltaMET_X_Res_Vs_Mass"+hNameSuffix);
+    plotSingleHistogram("h1DDeltaMET_x1"+hNameSuffix);
+    plotSingleHistogram("h1DDeltaMET_x2"+hNameSuffix);
+
+    plotSingleHistogram2D("h2DDeltaMFastMTT_Vs_MET"+hNameSuffix);
+    plotSingleHistogram2D("h2DDeltaMFastMTT_x2_vs_x1"+hNameSuffix);
+    
     
     plot3DProfile("h3DDeltaLeg2_E_Res_Vs_Eta_Vs_E"+hNameSuffix,"yz");
   }

@@ -76,13 +76,14 @@ class Pythia8Interface: public Analyzer{
 
   HTTParticle makeTau(const TParticle & aTau);
 
-  void makeMET(const HTTParticle & aTau1, const HTTParticle & aTau2, double sigmaX, double sigmaY);
+  void makeMET(const HTTParticle & aTau1, const HTTParticle & aTau2, bool doSmear);
 
   HTTPair makePair(const HTTParticle & aTau1, const HTTParticle & aTau2,
 		   const TVector2 & met, const TMatrixD & covMET);
 
   void makeRecoTaus(const TParticle & aTau1, const TParticle & aTau2);
 
+  TH1F *hMETPhi, *hMETMag;
   TRandom3 myRandGenerator;
   TPythia8 pythia8;
   TClonesArray myParticles;

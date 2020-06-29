@@ -11,6 +11,7 @@
 #include "Math/Boost.h"
 #include "Math/Rotation3D.h"
 #include "Math/AxisAngle.h"
+#include "TVectorT.h"
 
 #include "SVfitAnalyzer.h"
 #include "SVfitHistograms.h"
@@ -66,11 +67,57 @@ void SVfitAnalyzer::initialize(TDirectory* aDir,
 void SVfitAnalyzer::setAnalysisObjects(const EventProxyHTT & myEventProxy){
 
   HTTAnalyzer::setAnalysisObjects(myEventProxy);
-    
+   
   aCovMET[0][0] = aPair.getMETMatrix().at(0);
   aCovMET[0][1] = aPair.getMETMatrix().at(1);
   aCovMET[1][0] = aPair.getMETMatrix().at(2);
   aCovMET[1][1] = aPair.getMETMatrix().at(3);
+
+
+  TVectorT<double > eigenValues;
+  TMatrixT<double> eigenVectors =  aCovMET.EigenVectors(eigenValues);
+  double determinant = eigenVectors[0][0]*eigenVectors[1][1] - eigenVectors[1][0]*eigenVectors[0][1];
+  TMatrixT<double> eigenVectors_inverted =  eigenVectors;
+  eigenVectors_inverted[0][0] = eigenVectors[1][1]/determinant;
+  eigenVectors_inverted[0][1] = -eigenVectors[0][1]/determinant;
+  eigenVectors_inverted[1][0] = -eigenVectors[1][0]/determinant;
+  eigenVectors_inverted[1][1] = eigenVectors[0][0]/determinant;
+  TMatrixT<double> diagonalCovariance = eigenVectors_inverted;
+  diagonalCovariance*=aCovMET;
+  diagonalCovariance*=eigenVectors;
+  double phi = acos(eigenVectors[0][0]);
+  double phi_leg1 = phi-aLeg1.getP4().Phi();
+  double phi_leg2 = phi-aLeg2.getP4().Phi();
+
+  if(phi_leg1>M_PI) phi_leg1-=2*M_PI;
+  if(phi_leg2>M_PI) phi_leg2-=2*M_PI;
+  
+  /*
+  std::cout<<"------------ BEGIN ----------"<<std::endl;  
+  std::cout<<"Initial coviariance matrix: "<<std::endl;
+  aCovMET.Print();
+  std::cout<<"Diagonal coviariance matrix: "<<std::endl;
+  diagonalCovariance.Print();
+  std::cout<<"Eigen vectors matrix: "<<std::endl;
+  eigenVectors.Print();
+  std::cout<<"phi/pi: "<<phi/M_PI
+	   <<" phi - leg1: "<<(phi-aLeg1.getP4().Phi())/M_PI
+	   <<" phi - leg2: "<<(phi-aLeg2.getP4().Phi())/M_PI
+	   <<std::endl;
+  //eigenVectors_inverted.Print();
+  //eigenVectors_inverted*=eigenVectors;
+  //eigenVectors_inverted.Print();
+  std::cout<<"Eigen values: "<<std::endl;
+  eigenValues.Print();
+  std::cout<<"------------ END ----------"<<std::endl;
+  */
+  myHistos_->fill1DHistogram("h1DDeltaMET_covRotationggHTT125", phi/M_PI);
+  myHistos_->fill1DHistogram("h1DDeltaMET_leg1_covRotationggHTT125",phi_leg1/M_PI); 
+  myHistos_->fill1DHistogram("h1DDeltaMET_leg2_covRotationggHTT125", phi_leg2/M_PI);
+
+  double delta = phi_leg1/M_PI;
+  if(std::abs(phi_leg1/M_PI) > std::abs(phi_leg2/M_PI)) delta = phi_leg2/M_PI;
+  myHistos_->fill1DHistogram("h1DDeltaMET_min_leg12_covRotationggHTT125", delta);
 }
 //////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////
@@ -186,7 +233,7 @@ TLorentzVector SVfitAnalyzer::runsvFitAlgo(const std::vector<classic_svFit::Meas
   if(myChannelSpecifics->getDecayModeName()=="MuTau") svFitAlgo.addLogM_fixed(true, 4.0);
   else if(myChannelSpecifics->getDecayModeName()=="TauTau") svFitAlgo.addLogM_fixed(true, 5.0);
   else if(myChannelSpecifics->getDecayModeName()=="MuMu") svFitAlgo.addLogM_fixed(true, 3.0);
-  
+
   svFitAlgo.setMaxObjFunctionCalls(100000);
   //svFitAlgo.setLikelihoodFileName("testClassicSVfit.root");
   //svFitAlgo.setTreeFileName("markovChainTree.root");
@@ -285,15 +332,17 @@ void SVfitAnalyzer::fillControlHistos(const std::string & hNameSuffix){
 
   double delta = 0.0;
 
-  const TLorentzVector & aVisSum = aLeg1.getP4() + aLeg2.getP4();
+  TLorentzVector aVisSum = aLeg1.getP4() + aLeg2.getP4();
   TLorentzVector tautauGen = aGenLeg1.getP4() + aGenLeg2.getP4();
-  
   TLorentzVector nunuGen = tautauGen - 
     aGenLeg1.getChargedP4() - aGenLeg2.getChargedP4() -
     aGenLeg1.getNeutralP4() - aGenLeg2.getNeutralP4();
 
+  double genX1 = (aGenLeg1.getChargedP4()+aGenLeg1.getNeutralP4()).E()/aGenLeg1.getP4().E();
+  double genX2 = (aGenLeg2.getChargedP4()+aGenLeg2.getNeutralP4()).E()/aGenLeg2.getP4().E();
+
   //TLorentzVector svFitP4 = computeMTT("svFit");
-  TLorentzVector svFitP4 = aPair.getP4();
+   TLorentzVector svFitP4 = aPair.getP4();
    myHistos_->fill1DHistogram("h1DMassSVClassic"+hNameSuffix,svFitP4.M());
    myHistos_->fill1DHistogram("h1DCpuTimeSVClassic"+hNameSuffix,svFitAlgo.getComputingTime_cpu());
 
@@ -312,7 +361,23 @@ void SVfitAnalyzer::fillControlHistos(const std::string & hNameSuffix){
    TLorentzVector fastMTTP4 = computeMTT("fastMTT");  
    myHistos_->fill1DHistogram("h1DMassFastMTT"+hNameSuffix,fastMTTP4.M());
    myHistos_->fill1DHistogram("h1DCpuTimeFastMTT"+hNameSuffix,fastMTTAlgo.getCpuTime("scan"));
-   
+   /*
+   std::cout<<" fastMTTP4.M(): "<<fastMTTP4.M()
+	    <<" svFitP4.M(): "<<svFitP4.M()
+	    <<" aLeg1.getProperty(PropertyEnum::decayMode): "<<aLeg1.getProperty(PropertyEnum::decayMode)
+	    <<" aLeg2.getProperty(PropertyEnum::decayMode): "<<aLeg2.getProperty(PropertyEnum::decayMode)
+	    <<std::endl<<" \t"
+	    <<" tautauGen.X(): "<<tautauGen.X()
+     	    <<" tautauGen.Y(): "<<tautauGen.Y()
+	    <<" aMET.getP4().X(): "<<aMET.getP4().X()
+     	    <<" aMET.getP4().Y(): "<<aMET.getP4().Y()
+	    <<std::endl
+	    <<" \t aCovMET[0][0]: "<<aCovMET[0][0]
+     	    <<" aCovMET[0][1]: "<<aCovMET[0][1]
+	    <<" aCovMET[1][0]: "<<aCovMET[1][0]
+     	    <<" aCovMET[1][1]: "<<aCovMET[1][1]
+	    <<std::endl;
+   */
    delta = fastMTTP4.Eta() - tautauGen.Eta();
    myHistos_->fill1DHistogram("h1DDeltaEtaFastMTT"+hNameSuffix,delta);
    
@@ -327,6 +392,9 @@ void SVfitAnalyzer::fillControlHistos(const std::string & hNameSuffix){
 
    double recoX1 = 0.0, recoX2 = 0.0;
    std::tie(recoX1, recoX2) = fastMTTAlgo.getBestX();
+   myHistos_->fill1DHistogram("h1DDeltaMET_x1"+hNameSuffix, recoX1 - genX1);
+   myHistos_->fill1DHistogram("h1DDeltaMET_x2"+hNameSuffix, recoX2 - genX2);
+   myHistos_->fill2DHistogram("h2DDeltaMFastMTT_x2_vs_x1"+hNameSuffix, 80*recoX1, 8*recoX2);
 
   myHistos_->fill1DHistogram("h1DMassVis"+hNameSuffix, visMass);
   myHistos_->fill1DHistogram("h1DMassGen"+hNameSuffix,tautauGen.M());
@@ -343,7 +411,21 @@ void SVfitAnalyzer::fillControlHistos(const std::string & hNameSuffix){
   delta = (aMET.getP4().Y() - nunuGen.Y())/nunuGen.Y();
   myHistos_->fill1DHistogram("h1DDeltaMET_Y_Res"+hNameSuffix, delta);
 
-  myHistos_->fill2DHistogram("h2DDeltaMET_X_Res_Vs_Mass"+hNameSuffix, nunuGen.Perp(), delta);
+  delta = (aMET.getP4() - nunuGen).Phi();
+  myHistos_->fill1DHistogram("h1DDeltaMET_Phi"+hNameSuffix, delta);
+
+  delta = (aMET.getP4() - nunuGen).Perp()/nunuGen.Perp();
+  myHistos_->fill1DHistogram("h1DDeltaMET_Mag_Res"+hNameSuffix, delta);
+
+  delta = sqrt(aCovMET[0][0])/std::abs(nunuGen.X());    
+  myHistos_->fill1DHistogram("h1DDeltaMET_sigma_X"+hNameSuffix, delta);
+
+  delta = sqrt(aCovMET[1][1])/std::abs(nunuGen.Y());    
+  myHistos_->fill1DHistogram("h1DDeltaMET_sigma_Y"+hNameSuffix, delta);
+
+  delta = (fastMTTP4.M() - tautauGen.M())/nunuGen.Perp();
+  delta*=10;
+  myHistos_->fill2DHistogram("h2DDeltaMFastMTT_Vs_MET"+hNameSuffix, nunuGen.Perp(), delta);
 
   delta = aLeg2.getP4().E() - aGenLeg2.getChargedP4().E() - aGenLeg2.getNeutralP4().E();
   delta /= aGenLeg2.getChargedP4().E() + aGenLeg2.getNeutralP4().E();
@@ -452,7 +534,7 @@ bool SVfitAnalyzer::analyze(const EventProxyBase& iEvent, ObjectMessenger *aMess
     (aGenLeg2.getP4().DeltaR(aLeg1.getP4())<0.2 &&
      aGenLeg1.getP4().DeltaR(aLeg2.getP4())<0.2);
   }
-
+  
   int tauIDmask = 0;
   for(unsigned int iBit=0; iBit<myEventProxy.event->ntauIds; iBit++) {
     if(myEventProxy.event->tauIDStrings[iBit]=="byTightIsolationMVArun2v1DBnewDMwLT2017v2") tauIDmask |= (1<<iBit);
@@ -464,6 +546,10 @@ bool SVfitAnalyzer::analyze(const EventProxyBase& iEvent, ObjectMessenger *aMess
   bool passTauPreselection = true;
   passTauPreselection &= aLeg2.getP4().DeltaR(aLeg1.getP4())>0.4;
   passTauPreselection &= ( (int)aLeg2.getProperty(PropertyEnum::tauID) & tauIDmask) == tauIDmask;
+  if(myChannelSpecifics->getDecayModeName()=="MuTau"){
+    passTauPreselection &= aLeg1.getP4().Perp()>19 && std::abs(aLeg1.getP4().Eta())<2.4;
+    passTauPreselection &= aLeg2.getP4().Perp()>15 && std::abs(aLeg2.getP4().Eta())<2.3;
+  }
 
   if(sampleName=="WAllJets" || sampleName=="QCD_MC" || sampleName=="DYAllJetsMatchL"){
     isGoodReco = false;

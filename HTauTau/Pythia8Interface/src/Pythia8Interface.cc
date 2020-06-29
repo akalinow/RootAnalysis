@@ -51,6 +51,12 @@ void Pythia8Interface::initialize(TDirectory* aDir,
   hStats = new TH1F("hStats","Bookkeeping histogram",11,-0.5,10.5);
   hStats->SetDirectory(myFile);
 
+
+  TFile file("RootAnalysis_SVfitMLAnalysisMuTau_ggH125_METsigma.root");
+  hMETPhi = (TH1F*)file.Get("SVfitAnalyzer/h1DDeltaMET_PhiggHTT125");
+  hMETMag = (TH1F*)file.Get("SVfitAnalyzer/h1DDeltaMET_Mag_ResggHTT125");
+  hMETPhi->SetDirectory(0);
+  hMETMag->SetDirectory(0);
 }
 //////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////
@@ -63,6 +69,11 @@ void Pythia8Interface::initializePythia(double mH, int decayMode){
   //pythia8.ReadString("Init:showChangedParticleData = off");
   pythia8.ReadString("Init:showProcesses = off");
   pythia8.ReadString("Init:showMultipartonInteractions = off");
+  pythia8.ReadString("PartonLevel:FSRinResonances = off");
+  pythia8.ReadString("TauDecays:externalMode = 0");
+  pythia8.ReadString("TauDecays:mode = 2");
+
+  
   /*
     pythia8.ReadString("Higgs:useBSM  = on");
     pythia8.ReadString("HiggsBSM:gg2A3 = on"); //Higgs production by gluon-gluon fusion
@@ -85,7 +96,7 @@ void Pythia8Interface::initializePythia(double mH, int decayMode){
   //pythia8.ReadString("15:onMode = no");    //switch off all tau decay channels
   //pythia8.ReadString("15:onIfMatch =  211 16"); //switch back on tau -> pi nu
 
-  pythia8.ReadString("15:offIfAny = 11");//switch off tau -> e nu
+  //pythia8.ReadString("15:offIfAny = 11");//switch off tau -> e nu
 
   if(decayMode!=HTTAnalysis::hadronicTauDecayModes::tauDecayMuon){
     pythia8.ReadString("15:offIfAny = 13");//switch off tau -> mu nu
@@ -210,7 +221,6 @@ int Pythia8Interface::getDetailedTauDecayMode(const TParticle & aTau) const{
 void Pythia8Interface::getGenTaus(){
 
   int numberOfParticles = myParticles.GetEntriesFast();
-  
   TParticle* aPart = 0;
   for (int iParticle=0;iParticle<numberOfParticles;++iParticle){
     aPart = (TParticle*) myParticles.At(iParticle);
@@ -226,7 +236,7 @@ TLorentzVector Pythia8Interface::getChargedComponent(const TParticle & aTau) con
   TLorentzVector aP4;
   TParticle* daughter = 0;
   int charge = 0;
-  
+
   for(int iDaughter=aTau.GetFirstDaughter();
       iDaughter<=aTau.GetLastDaughter(); ++iDaughter){
     daughter = (TParticle*) myParticles.At(iDaughter);
@@ -341,19 +351,60 @@ HTTParticle Pythia8Interface::makeTau(const TParticle & aTau){
 //////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////
 void Pythia8Interface::makeMET(const HTTParticle & aTau1, const HTTParticle & aTau2,
-			       double sigmaX, double sigmaY){
+			       bool doSmear){
   
   TLorentzVector nunuGen = aTau1.getP4() + aTau2.getP4() -
     aTau1.getChargedP4() - aTau2.getChargedP4() -
     aTau1.getNeutralP4() - aTau2.getNeutralP4();
 
-  covMET[0][0] = std::abs(sigmaX*nunuGen.X());
-  covMET[0][1] = 0.0;
-  covMET[1][0] = 0.0;
-  covMET[1][1] = std::abs(sigmaY*nunuGen.Y());
+  double deltaX = 0.0;
+  double deltaY = 0.0;
+  /*
+  double landauMPV = 0.18;
+  double landauSigma = 0.45;
+  double scale = myRandGenerator.Landau(landauMPV, landauSigma);
+  double norm = (1+scale)*nunuGen.Perp();
+  */
+  if(doSmear){
+    double sigma1 = std::abs(nunuGen.X())*myRandGenerator.Landau(0.8, 0.35); 
+    double sigma2 = std::abs(nunuGen.Y())*myRandGenerator.Landau(0.8, 0.35);
+    double phi = myRandGenerator.Uniform(0.0,M_PI);
+    ///TEST
+    phi = myRandGenerator.Gaus(0.0,0.6);
+    phi = aTau2.getP4().Phi()+phi;
+    phi = 0.0;
+    ///TEST
+    double delta1 = sigma1*myRandGenerator.Gaus(0.228, 1.0);
+    double delta2 = sigma2*myRandGenerator.Gaus(-0.181, 1.0);
+    deltaX = cos(phi)*delta1 + sin(phi)*delta2;
+    deltaY = -sin(phi)*delta1 + cos(phi)*delta2;
+    TMatrixD rotation(2,2);
+    rotation[0][0] = cos(phi);
+    rotation[0][1] = sin(phi);
+    rotation[1][0] = -sin(phi);
+    rotation[1][1] = cos(phi);
 
-  myMET.SetX(nunuGen.X() + myRandGenerator.Gaus(0.0,nunuGen.X()*sigmaX));
-  myMET.SetY(nunuGen.Y() + myRandGenerator.Gaus(0.0,nunuGen.Y()*sigmaY));
+    covMET[0][0] = std::pow(sigma1,2);
+    covMET[0][1] = 0.0;
+    covMET[1][0] = 0.0;
+    covMET[1][1] = std::pow(sigma2,2);
+
+    TMatrixD covMET_rotated = rotation;
+    covMET_rotated*=covMET;
+    covMET_rotated*=rotation.Transpose(rotation);
+    //std::cout<<"phi: "<<phi<<std::endl;
+    //covMET_rotated.Print();
+    covMET = covMET_rotated;
+  }
+  else{
+    covMET[0][0] = 0.01;
+    covMET[0][1] = 0.0;
+    covMET[1][0] = 0.0;
+    covMET[1][1] = 0.01;
+  }
+
+  myMET.SetX(nunuGen.X() + deltaX);
+  myMET.SetY(nunuGen.Y() + deltaY);
 }
 //////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////
@@ -385,7 +436,7 @@ void Pythia8Interface::makeRecoTaus(const TParticle & aTau1, const TParticle & a
   mySmearedLeg1.SetMomentum(p4Vis);
 
   p4Vis = getChargedComponent(mySmearedLeg2) + getNeutralComponent(mySmearedLeg2);
-  mySmearedLeg2.SetMomentum(p4Vis);  
+  mySmearedLeg2.SetMomentum(p4Vis);
 }
 //////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////
@@ -418,12 +469,7 @@ bool Pythia8Interface::analyze(const EventProxyBase& iEvent, ObjectMessenger *aM
   double tmp = 0;
 
   unsigned int long eventsToGenerate = *aMessenger->getObject(&tmp,"eventsToGenerate");
-  double sigmaX = 0.01;
-  double sigmaY = 0.01;
-  if(name().find("smearMET")!=std::string::npos){
-    sigmaX = 0.2;
-    sigmaY = 0.22;
-  }
+  bool doSmear = (name().find("smearMET")!=std::string::npos);
 
   int pairDecayMode = HTTAnalysis::hadronicTauDecayModes::tauDecayMuon;
 
@@ -434,6 +480,7 @@ bool Pythia8Interface::analyze(const EventProxyBase& iEvent, ObjectMessenger *aM
     initializePythia(mH, pairDecayMode);
     std::cout<<"Generating mass: "<<mH<<std::endl;
     for(unsigned int long eventNumber=0;eventNumber<eventsToGenerate;++eventNumber){
+
       pythia8.GenerateEvent();
       //pythia8.EventListing(); 
       pythia8.ImportParticles(&myParticles,"All");      
@@ -448,7 +495,7 @@ bool Pythia8Interface::analyze(const EventProxyBase& iEvent, ObjectMessenger *aM
       httGenLeptonCollection.clear();
       HTTParticle aGenTau1 = makeTau(myTauPlus);
       HTTParticle aGenTau2 = makeTau(myTauMinus);
-      makeMET(aGenTau1, aGenTau2, sigmaX, sigmaY);
+      makeMET(aGenTau1, aGenTau2, doSmear);
       httGenLeptonCollection.push_back(aGenTau1);
       httGenLeptonCollection.push_back(aGenTau2);
 
