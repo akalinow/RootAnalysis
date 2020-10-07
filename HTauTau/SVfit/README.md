@@ -14,7 +14,7 @@ make install -j 4
 ```
 ## Run instructions:
 Before running update path to the data files in the config/svfit_MuTau.ini file.
-See Pythias8Interface/README for instructions hot to generate events with Pythia8.
+See Pythia8Interface/README for instructions hot to generate events with Pythia8.
 
 ```
 cd RootAnalysis/build

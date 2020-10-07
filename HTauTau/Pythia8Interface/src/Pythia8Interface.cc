@@ -51,12 +51,13 @@ void Pythia8Interface::initialize(TDirectory* aDir,
   hStats = new TH1F("hStats","Bookkeeping histogram",11,-0.5,10.5);
   hStats->SetDirectory(myFile);
 
-
+  /*
   TFile file("RootAnalysis_SVfitMLAnalysisMuTau_ggH125_METsigma.root");
   hMETPhi = (TH1F*)file.Get("SVfitAnalyzer/h1DDeltaMET_PhiggHTT125");
   hMETMag = (TH1F*)file.Get("SVfitAnalyzer/h1DDeltaMET_Mag_ResggHTT125");
   hMETPhi->SetDirectory(0);
   hMETMag->SetDirectory(0);
+  */
 }
 //////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////
@@ -69,10 +70,7 @@ void Pythia8Interface::initializePythia(double mH, int decayMode){
   //pythia8.ReadString("Init:showChangedParticleData = off");
   pythia8.ReadString("Init:showProcesses = off");
   pythia8.ReadString("Init:showMultipartonInteractions = off");
-  pythia8.ReadString("PartonLevel:FSRinResonances = off");
-  pythia8.ReadString("TauDecays:externalMode = 0");
-  pythia8.ReadString("TauDecays:mode = 2");
-
+  //pythia8.ReadString("PartonLevel:FSRinResonances = off");
   
   /*
     pythia8.ReadString("Higgs:useBSM  = on");
@@ -368,14 +366,9 @@ void Pythia8Interface::makeMET(const HTTParticle & aTau1, const HTTParticle & aT
   if(doSmear){
     double sigma1 = std::abs(nunuGen.X())*myRandGenerator.Landau(0.8, 0.35); 
     double sigma2 = std::abs(nunuGen.Y())*myRandGenerator.Landau(0.8, 0.35);
-    double phi = myRandGenerator.Uniform(0.0,M_PI);
-    ///TEST
-    phi = myRandGenerator.Gaus(0.0,0.6);
-    phi = aTau2.getP4().Phi()+phi;
-    phi = 0.0;
-    ///TEST
-    double delta1 = sigma1*myRandGenerator.Gaus(0.228, 1.0);
-    double delta2 = sigma2*myRandGenerator.Gaus(-0.181, 1.0);
+    double phi = 0.0;//myRandGenerator.Uniform(0.0,M_PI);   
+    double delta1 = sigma1*myRandGenerator.Gaus(0.0, 1.0);
+    double delta2 = sigma2*myRandGenerator.Gaus(0.0, 1.0);
     deltaX = cos(phi)*delta1 + sin(phi)*delta2;
     deltaY = -sin(phi)*delta1 + cos(phi)*delta2;
     TMatrixD rotation(2,2);
@@ -485,6 +478,7 @@ bool Pythia8Interface::analyze(const EventProxyBase& iEvent, ObjectMessenger *aM
       //pythia8.EventListing(); 
       pythia8.ImportParticles(&myParticles,"All");      
       getGenTaus();
+ 
       bool isCorrectPairDecayMode = checkDecayMode(myTauPlus, myTauMinus, pairDecayMode);
       if(!isCorrectPairDecayMode) continue;
       
@@ -495,6 +489,7 @@ bool Pythia8Interface::analyze(const EventProxyBase& iEvent, ObjectMessenger *aM
       httGenLeptonCollection.clear();
       HTTParticle aGenTau1 = makeTau(myTauPlus);
       HTTParticle aGenTau2 = makeTau(myTauMinus);
+
       makeMET(aGenTau1, aGenTau2, doSmear);
       httGenLeptonCollection.push_back(aGenTau1);
       httGenLeptonCollection.push_back(aGenTau2);
@@ -504,6 +499,12 @@ bool Pythia8Interface::analyze(const EventProxyBase& iEvent, ObjectMessenger *aM
       HTTParticle aLeg2 = makeTau(mySmearedLeg2);
       httLeptonCollection.push_back(aLeg1);
       httLeptonCollection.push_back(aLeg2);
+
+      bool passTauPreselection = true;
+      passTauPreselection &= aLeg2.getP4().DeltaR(aLeg1.getP4())>0.4;
+      passTauPreselection &= aLeg1.getP4().Perp()>19 && std::abs(aLeg1.getP4().Eta())<2.4;
+      passTauPreselection &= aLeg2.getP4().Perp()>15 && std::abs(aLeg2.getP4().Eta())<2.3;
+      if(!passTauPreselection) continue;
 
       httPairCollection.clear();
       httPairCollection.push_back(makePair(aLeg1, aLeg2, myMET, covMET));
