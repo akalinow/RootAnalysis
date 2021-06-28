@@ -53,10 +53,6 @@ class OMTFAnalyzer:public Analyzer{
 
   void fillBendingHistos(const std::string & sysType);
 
-  bool passRotatedVeto(const L1Obj & aL1Cand);
-
-  std::pair<double, double> getRotatedPair(double phiB, double deltaPhi, int iLayer);
-
   std::pair<double, double> getPtProfile();
 
   ///Histograms for this analysis

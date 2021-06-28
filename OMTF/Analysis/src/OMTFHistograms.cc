@@ -143,7 +143,7 @@ void OMTFHistograms::finalizeHistograms(){
 
   AnalysisHistograms::finalizeHistograms();
   utilsL1RpcStyle()->cd();
-  
+
   finaliseGoldenPatterns("h3DBending");
   finaliseGoldenPatterns("h3DBendingRotated");
 
@@ -152,7 +152,7 @@ void OMTFHistograms::finalizeHistograms(){
   plotRate("VsPt");
   plotRate("VsQuality");
 
-  std::vector<int> ptCuts = {10, 15, 16, 18, 19, 20, 21, 22, 23};
+  std::vector<int> ptCuts = {10, 13, 15, 16, 18, 19, 20, 21, 22, 23};
   for(auto iCut: ptCuts){
     plotEffVsRate(iCut);
   }
@@ -162,36 +162,26 @@ void OMTFHistograms::finalizeHistograms(){
   plotEffPanel("OMTF");
   plotEffPanel("BMTF");
   plotEffPanel("EMTF");
-  /*
-  plotEffPanel("BMTF_quality0");
-  plotEffPanel("BMTF_quality1");
-  plotEffPanel("BMTF_quality2");
-  plotEffPanel("BMTF_quality3");
-  */
     
   bool doHigh = true;
   plotEffPanel("OMTF", doHigh);
   plotEffPanel("BMTF", doHigh);
   plotEffPanel("EMTF", doHigh);
   plotEffVsEta("OMTF");
-  plotEffVsEta("BMTF");
+  plotEffVsEta("EMTF");
   plotEffVsVar("OMTF","EtaVx");
   plotEffVsVar("OMTF","PhiVx");
-  plotEffVsVar("BMTF","PhiVx");
+  plotEffVsVar("EMTF","EtaVx");
   plotEffVsVar("EMTF","PhiVx");
   plotSingleHistogram("h2DOMTFPtRecVsPtGen");
   plotSingleHistogram("h2DEMTFPtRecVsPtGen");
   plotSingleHistogram("h2DBMTFPtRecVsPtGen");
 
   for(int iPtCode=1;iPtCode<=30;++iPtCode){
-    plotOMTFVsOther(iPtCode,"BMTF");
+    //plotOMTFVsOther(iPtCode,"BMTF");
     plotOMTFVsOther(iPtCode,"EMTF");
   }
-  
-  //plotOMTFVsOther(20,"EMTF");
-  //plotOMTFVsOther(22,"EMTF");
-  //plotOMTFVsOther(26,"EMTF");
-  
+   
   plotSingleHistogram("h1DLLH_Low");
   plotSingleHistogram("h1DLLH_High");
   plotLLH();
@@ -298,10 +288,7 @@ void OMTFHistograms::plotEffPanel(const std::string & sysType, bool doHigh){
 
   TString hName("");
   const int *ptCuts = ptCutsOMTF;
-  if(sysType.find("Gmt")!=std::string::npos ||
-     sysType=="Rpc" ||
-     sysType=="Other") ptCuts = ptCutsGmt;
-
+ 
   for (int icut=0; icut <=3;++icut){
     float ptCut = OMTFHistograms::ptBins[ptCuts[icut]];
     hName = "h2D"+sysType+"Pt"+std::to_string((int)ptCut);
@@ -378,10 +365,8 @@ void OMTFHistograms::plotEffVsVar(const std::string & sysType,
 
   TString hName("");
   const int *ptCuts = ptCutsOMTF;
-  if(sysType=="Gmt") ptCuts = ptCutsGmt;
-
-  for (int icut=0; icut <=2;++icut){
-    if(icut==1) continue;
+ 
+  for (int icut=0; icut<2;++icut){
     float ptCut = OMTFHistograms::ptBins[ptCuts[icut]];
     hName = "h2D"+sysType+varName+std::to_string((int)ptCut);
     TH2F* h2D = this->get2DHistogram(hName.Data());
@@ -398,18 +383,10 @@ void OMTFHistograms::plotEffVsVar(const std::string & sysType,
     hEff->SetXTitle(varName.c_str());
     hEff->SetYTitle("Efficiency");
 
-    if(sysType=="OMTFDi" && hName.Contains("DeltaPt")){
-      hEff->SetMinimum(1E-2);
-      c->SetLogy();
-    }
-
     if (icut==0)hEff->DrawCopy("E0");
     else hEff->DrawCopy("same E0");
-    std::string nameCut = std::to_string((int)OMTFHistograms::ptBins[ptCuts[icut]])+" GeV/c";
+    std::string nameCut = std::to_string((int)ptCut)+" GeV/c";
     if (icut==0) nameCut = "no p_{T} cut";
-    if(sysType=="OMTFDi" && icut>0) nameCut = "opposite sign";
-    if(sysType=="OMTFDi" && icut==0) nameCut = "same sign";
-
     l.AddEntry(hEff,nameCut.c_str());
   }
   l.DrawClone();
@@ -433,7 +410,7 @@ void OMTFHistograms::plotEffVsEta(const std::string & sysType){
   c->SetLeftMargin(0.1);
   c->SetRightMargin(0.35);
 
-  int iCut = 19;
+  int iCut = 18;
   std::string hName = "";
   for (int iType=0; iType<3;++iType){
     float ptCut = OMTFHistograms::ptBins[iCut];
@@ -527,11 +504,11 @@ void OMTFHistograms::plotOMTFVsOther(int iPtCut,
   l.AddEntry((TObject*)0, TString::Format(tmp.c_str(),ptCut).Data(), "");
   l.AddEntry((TObject*)0, "", "");
   tmp = sysType;
-  if(sysType=="BMTF") tmp = "byNhitsByLLH";
-  if(sysType=="EMTF") tmp = "byLLH";
+  if(sysType=="BMTF") tmp = "Phase 2";
+  if(sysType=="EMTF") tmp = "TF NN";
   l.AddEntry(hEffOther, tmp.c_str());
   l.AddEntry((TObject*)0, "", "");
-  l.AddEntry(hEffOMTF, "Run2");
+  l.AddEntry(hEffOMTF, "Phase1");
   l.DrawClone();
 
   TLine aLine(0,0,0,0);
@@ -550,7 +527,7 @@ void OMTFHistograms::plotOMTFVsOther(int iPtCut,
 ////////////////////////////////////////////////////////////////
 TH2F* OMTFHistograms::makeRateWeights(TH2 *hOrig){
 
-  TF1 *fIntVxMuRate = new TF1("fIntVxMuRate","TMath::Power(x,[0]*TMath::Log(x))*TMath::Power(x,[1])*TMath::Exp([2])",1,1000);
+  TF1 *fIntVxMuRate = new TF1("fIntVxMuRate","0.1*TMath::Power(x,[0]*TMath::Log(x))*TMath::Power(x,[1])*TMath::Exp([2])",1,1000);
   fIntVxMuRate->SetParameters(-0.235801, -2.82346, 17.162);
 
   TH2F *hWeights = (TH2F*)hOrig->Clone("hWeights");
@@ -672,7 +649,7 @@ void OMTFHistograms::plotRate(std::string type){
     pad2->Draw();
     pad2->cd();
     
-    hRateBMTF->SetYTitle("Parametrisation/Run2");
+    hRateBMTF->SetYTitle("new model/Phase1");
     hRateBMTF->GetXaxis()->SetLabelSize(0.09);
     hRateBMTF->GetYaxis()->SetLabelSize(0.09);
     hRateBMTF->GetYaxis()->SetTitleSize(0.09);
@@ -766,9 +743,9 @@ void OMTFHistograms::plotRate(std::string type){
     leg->AddEntry(hRateEMTF,"Q=3");
   }
   else{
-    leg->AddEntry(hRateOMTF,"Run2");
-    leg->AddEntry(hRateEMTF,"new GPs <#varphi_{dist}> #bullet= 1.08");
-    leg->AddEntry(hRateBMTF,"new GPs");
+    leg->AddEntry(hRateOMTF,"Phase1");
+    leg->AddEntry(hRateBMTF,"Phase 2");
+    leg->AddEntry(hRateEMTF,"NN");
   }
   leg->Draw();
 
@@ -832,6 +809,7 @@ void OMTFHistograms::plotEffVsRate(int iPtCut){
   hFrame->GetYaxis()->SetTitleOffset(1.7);
   hFrame->GetYaxis()->SetLabelSize(0.04);
   hFrame->GetXaxis()->SetLabelSize(0.04);
+  hFrame->GetXaxis()->SetNdivisions(505);
   hFrame->SetXTitle(TString::Format("Efficiency for %d < p_{T}^{gen} < 100",(int)ptBins[iPtCut]));
 
   TCanvas* c = new TCanvas("cEffVsRate","EffVsRate",460,500);
@@ -848,10 +826,9 @@ void OMTFHistograms::plotEffVsRate(int iPtCut){
   leg->SetBorderSize(0);
   leg->SetFillColor(10);
   leg->SetHeader(TString::Format("p_{T}^{REC} #geq %d GeV/c", (int)ptBins[iPtCut]));
-  //TEST leg->AddEntry(sysGraphs["BMTF"],"new GPs byNhitsByLLH","p");
-  leg->AddEntry(sysGraphs["BMTF"],"new GPs","p");
-  leg->AddEntry(sysGraphs["EMTF"],"new GPs <#varphi_{dist}>#bullet=1.08","p");
-  leg->AddEntry(sysGraphs["OMTF"],"Run2","p");
+  leg->AddEntry(sysGraphs["OMTF"],"Phase1","p");
+  leg->AddEntry(sysGraphs["BMTF"],"Phase2","p");
+  leg->AddEntry(sysGraphs["EMTF"],"TF NN","p");
   leg->Draw();
 
   c->Print(TString::Format("fig_eps/RateVsEff_%d.eps",(int)ptBins[iPtCut]).Data());
@@ -992,7 +969,7 @@ void OMTFHistograms::plotSingleHistogram(std::string hName){
     std::cout<<"myDirCopy: "<<myDirCopy<<std::endl;
     h2D->SetDirectory(myDirCopy);
     h2D->SetLineWidth(3);
-    h2D->Scale(1.0/h2D->Integral(0,h2D->GetNbinsX()+1));
+    h2D->Scale(1.0/h2D->Integral());
     h2D->SetXTitle("p_{T}^{GEN}");
     h2D->SetYTitle("p_{T}^{REC}");
     h2D->GetYaxis()->SetTitleOffset(1.4);
@@ -1048,8 +1025,10 @@ void OMTFHistograms::plotLLH(){
    h1->SetYTitle("Candidate LLH");
    h1->GetYaxis()->SetTitleOffset(1.4);
    h1->SetStats(kFALSE);
-   h2->Draw("");
-   h1->Draw("same");
+   double histoMax = std::max(h1->GetMaximum(), h2->GetMaximum());
+   h1->SetMaximum(1.2*histoMax);
+   h1->Draw("");
+   h2->Draw("same");
 
    l.AddEntry(h1,"p_{T}^{GEN}<10 AND p_{T}^{REC} #geq 20 GeV/c");
    l.AddEntry(h2,"p_{T}^{GEN}>20 AND p_{T}^{REC} #geq 20 GeV/c");

@@ -118,29 +118,13 @@ void OMTFAnalyzer::fixQualityHistos(){
 bool OMTFAnalyzer::passQuality(const L1Obj & aL1Cand,
 			       const std::string & sysType,
 			       const std::string & selType){
-
-  std::map<int,bool> hitsMaskRefLayer;
-  std::map<int,bool> hitsMaskRefLayer4hits;
- 
-  std::bitset<18> hitsWord(aL1Cand.hits);
-
-  hitsMaskRefLayer[196992] = true;
-  hitsMaskRefLayer[131456] = true;
-  hitsMaskRefLayer[98432] = true;
-  hitsMaskRefLayer[65920] = true;
   
   bool lowPtVeto = false;
-  //lowPtVeto |= (hitsMaskRefLayer[aL1Cand.hits]);
-   if(selType.find("quality0")!=std::string::npos) lowPtVeto = false;
-   if(selType.find("quality1")!=std::string::npos) lowPtVeto = (aL1Cand.refLayer==1 && hitsWord.count()==3);
-   if(selType.find("quality2")!=std::string::npos) lowPtVeto = (hitsWord.count()==3);
-   if(selType.find("quality3")!=std::string::npos) lowPtVeto = (aL1Cand.refLayer==1 && hitsWord.count()<5);
 
    if(sysType.find("BMTF")!=std::string::npos){
      return aL1Cand.type==L1Obj::BMTF && aL1Cand.q>=12 && aL1Cand.bx==0 && !lowPtVeto;
    }
    else if(sysType.find("EMTF")!=std::string::npos){
-
      return aL1Cand.type==L1Obj::EMTF && aL1Cand.q>=12 && aL1Cand.bx==0 && !lowPtVeto;
    }
    else if(sysType.find("OMTF")!=std::string::npos){    
@@ -192,9 +176,6 @@ void OMTFAnalyzer::fillTurnOnCurve(const int & iPtCut,
 
   std::bitset<18> hitsWord(selectedCand.hits);
   bool passPtCut = selectedCand.ptValue()>=ptCut;
-  if(sysType=="BMTF" || sysType=="EMTF") {   
-    passPtCut = rescaledPt(selectedCand.ptValue())>=ptCut && selectedCand.ptValue()>0;
-  }
 
   std::string tmpName = hName+"Pt"+std::to_string(ptCut);
   myHistos_->fill2DHistogram(tmpName, myGenObj.pt(), passPtCut);
@@ -219,36 +200,34 @@ void OMTFAnalyzer::fillTurnOnCurve(const int & iPtCut,
     std::cout<<"-------"<<std::endl;
   }
 
-  if(selectedCand.ptValue()>0 && myGenObj.pt()<10 && selectedCand.ptValue()>=20 && sysType=="BMTF"){
-    myHistos_->fill1DHistogram("h1DLLH_Low", 10*selectedCand.disc/hitsWord.count());    
+  if(selectedCand.ptValue()>0 && myGenObj.pt()<10 && selectedCand.ptValue()>=20 && sysType=="EMTF"){
+    myHistos_->fill1DHistogram("h1DLLH_Low", selectedCand.disc);    
     myHistos_->fill1DHistogram("h1DHitsPattern_Low_HitCount", (int)hitsWord.count()*10);
     myHistos_->fill1DHistogram("h1DHitsPattern_Low_RefLayer",selectedCand.refLayer*10);    
     myHistos_->fill1DHistogram("h1DHitsPattern_Low_RefPhi",selectedCand.phi);    
   }
-  if(selectedCand.ptValue()>0 && myGenObj.pt()>20 && selectedCand.ptValue()>=20 && sysType=="BMTF"){
-    myHistos_->fill1DHistogram("h1DLLH_High", 10*selectedCand.disc/hitsWord.count());   
+  if(selectedCand.ptValue()>0 && myGenObj.pt()>20 && myGenObj.pt()<30
+     && selectedCand.ptValue()>=20 && sysType=="EMTF"){
+    myHistos_->fill1DHistogram("h1DLLH_High", selectedCand.disc);   
     myHistos_->fill1DHistogram("h1DHitsPattern_High_HitCount", (int)hitsWord.count()*10);
     myHistos_->fill1DHistogram("h1DHitsPattern_High_RefLayer",selectedCand.refLayer*10);    
     myHistos_->fill1DHistogram("h1DHitsPattern_High_RefPhi",selectedCand.phi);    
   }
-  
-  ///Fill histos for eff vs eta/phi only for events at the plateau.
-  if(selType.size()==0) return;
-  if(myGenObj.pt()<ptCut || myGenObj.pt()<ptCut+50) return; 
+
+  //Generic eff vs eta/phi calculated for muons on plateau
+  if(!selType.size() && myGenObj.pt()<ptCut+20) return;
   tmpName = hName+"EtaVx"+std::to_string(ptCut);
   myHistos_->fill2DHistogram(tmpName, myGenObj.eta(), passPtCut);
 
-  if(myGenObj.pt()<100){
-  tmpName = hName+selType+"PhiVx"+std::to_string(ptCut);
+  tmpName = hName+"PhiVx"+std::to_string(ptCut);
   myHistos_->fill2DHistogram(tmpName, myGenObj.phi(), passPtCut);
-  }
 }
 //////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////
 void OMTFAnalyzer::fillRateHisto(const std::string & sysType,
 				 const std::string & selType){
 
-  if(name()=="NU_RATEAnalyzer" && myGenObj.pt()>0.0) return;    
+  if(name()=="NU_RATEAnalyzer" && myGenObj.pt()>0.0) return;
 
   const std::vector<L1Obj> & myL1Coll = myL1ObjColl->getL1Objs();
   std::string hName = "h2D"+sysType+"Rate"+selType;
@@ -262,7 +241,7 @@ void OMTFAnalyzer::fillRateHisto(const std::string & sysType,
   float val = selectedCand.ptValue();
   if(sysType.find("BMTF")!=std::string::npos ||
      sysType.find("EMTF")!=std::string::npos) val = rescaledPt(selectedCand.ptValue());
-  bool pass = val>=25;
+  bool pass = val>=20;
 
   if(selType.find("Tot")!=std::string::npos) myHistos_->fill2DHistogram(hName,myGenObj.pt(),val);
   if(selType.find("VsEta")!=std::string::npos) myHistos_->fill2DHistogram(hName,myGenObj.pt(),pass*myGenObj.eta()+(!pass)*99);
@@ -296,13 +275,14 @@ void OMTFAnalyzer::fillHistosForGenMuon(){
       fillTurnOnCurve(iCut, "EMTF", selType);
   }
 
-  int iCut = 19;
+  int iCut = 18;
   bool pass = false;
   for(int iType=0;iType<=3;++iType){
-    float ptCut = OMTFHistograms::ptBins[19];    
+    float ptCut = OMTFHistograms::ptBins[iCut];
+    
     if(iType==0) pass = myGenObj.pt()>ptCut + 20;
-    if(iType==1) pass = myGenObj.pt()>ptCut && myGenObj.pt()<(ptCut+5);
-    if(iType==2) pass = myGenObj.pt()<10;
+    else if(iType==1) pass = myGenObj.pt()>ptCut && myGenObj.pt()<(ptCut+5);
+    else if(iType==2) pass = myGenObj.pt()<10;
     if(!pass) continue;
     
     selType = std::string(TString::Format("Type%d",iType));
@@ -310,27 +290,6 @@ void OMTFAnalyzer::fillHistosForGenMuon(){
     fillTurnOnCurve(iCut, "BMTF", selType);
     fillTurnOnCurve(iCut, "EMTF", selType);
   }
-}
-//////////////////////////////////////////////////////////////////////////////
-//////////////////////////////////////////////////////////////////////////////
-bool OMTFAnalyzer::passRotatedVeto(const L1Obj & aL1Cand){
-
-  int refHit = -999;
-  int phiB = -999;
-  int delta = -999;
-  double x1, y1;
-  for(auto aHit : myHits){
-    if(aHit.iLayer==0) refHit = aHit.iPhi*aL1Cand.chargeValue();
-    if(aHit.iLayer==1) phiB = aHit.iPhi*aL1Cand.chargeValue();
-    delta = aHit.iPhi*aL1Cand.chargeValue() - refHit;
-    std::tie(x1, y1) = getRotatedPair(phiB, delta, aHit.iLayer);
-    if(refHit<-990) continue;
-    if(aHit.iLayer==2 || aHit.iLayer==10 || aHit.iLayer==11 || aHit.iLayer==12 || aHit.iLayer==13){
-      bool pass = x1>-20;
-      return pass;
-    }
-  }
-  return true;  
 }
 //////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////
@@ -365,8 +324,6 @@ void OMTFAnalyzer::fillBendingHistos(const std::string & sysType){
 
   std::bitset<18> hitsWord(selectedCand.hits);
 
-  if(goodReco) return;//TEST
-
   double phiB = 9999.0;
   double deltaMB2 = 9999.0;
   double deltaRB1In = 9999.0;
@@ -380,7 +337,7 @@ void OMTFAnalyzer::fillBendingHistos(const std::string & sysType){
    int deltaPhi = (aHit.iPhi-refHit)*myGenObj.charge();
    int iLayer = aHit.iLayer;
    if(iLayer==1) phiB = aHit.iPhi;
-   //if(iLayer==3) phiB = deltaPhi;//TEST  
+   if(iLayer==3) phiB = deltaPhi;
    if(iLayer==1 || iLayer==3 || iLayer==5) deltaPhi +=refHit*myGenObj.charge();
    if(iLayer==1 || iLayer==3 || iLayer==5) deltaPhi = (aHit.iPhi-phiB)*myGenObj.charge();
 
@@ -391,9 +348,6 @@ void OMTFAnalyzer::fillBendingHistos(const std::string & sysType){
    if(iLayer==12) deltaRB2In = deltaPhi;
    if(iLayer==13) deltaRB2Out = deltaPhi;
    if(iLayer==16) deltaRE23 = deltaPhi;
-   std::tie(x1, y1) = getRotatedPair(phiB, deltaPhi, iLayer);
-   myHistos_->fill3DHistogram("h3DBendingRotated", myGenObj.pt(), x1, iLayer);
-   myHistos_->fill3DHistogram("h3DBendingRotated", myGenObj.pt(), y1, iLayer+4);
 
    x1 = phiB;
    y1 = deltaMB2;
@@ -408,35 +362,6 @@ void OMTFAnalyzer::fillBendingHistos(const std::string & sysType){
  myHistos_->fill2DHistogram("h2DDeltaVsDelta_RB2In",phiB, deltaRB2In);
  myHistos_->fill2DHistogram("h2DDeltaVsDelta_RB2Out",phiB, deltaRB2Out);
  myHistos_->fill2DHistogram("h2DDeltaVsDelta_RE23",phiB, deltaRE23);
-}
-//////////////////////////////////////////////////////////////////////////////
-//////////////////////////////////////////////////////////////////////////////
-std::pair<double, double> OMTFAnalyzer::getRotatedPair(double phiB, double deltaPhi, int iLayer){
-
-  int index = -1;
-  if(iLayer==3) index = 0;
-  /*
-  else if(iLayer==11) index = 1;
-  else if(iLayer==2) index = 2;
-  else if(iLayer==12) index = 3;
-  else if(iLayer==13) index = 4;
-  else if(iLayer==16) index = 5;
-  */
-  else return  std::pair<double, double>(-999, -999);
-  
-  std::vector<double> p0 = {-0.478105, -0.534923, -0.0552107, 0.0916314, -0.562927, -0.641144};
-  std::vector<double> p1 = {-0.0689445, 0.0577801, 0.217325, 0.189808, 0.246022, 0.297808};
-
-  p0[0]= {-2.8734};
-  p1[0] = {0.460671};
-  
-  double angle = atan(p1.at(index));  
-  double x = phiB;
-  double y = (deltaPhi-p0.at(index));
-  double x1 = x*cos(angle) + y*sin(angle);
-  double y1 = -x*sin(angle) + y*cos(angle);
-
-  return std::pair<double, double>(x1, y1);
 }
 //////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////
@@ -507,6 +432,7 @@ bool OMTFAnalyzer::analyze(const EventProxyBase& iEvent){
   myGenObjColl = myProxy.getGenObjColl();
   myL1ObjColl = myProxy.getL1ObjColl();
   myHits = myProxy.getHits();
+  myGenObj = GenObj();
 
   const std::vector<GenObj> genObjVec = myGenObjColl->data();  
   if(genObjVec.empty()) return false;
@@ -516,10 +442,9 @@ bool OMTFAnalyzer::analyze(const EventProxyBase& iEvent){
     if(std::abs(aGenObj.status())!=1) continue;
     myGenObj = aGenObj;
     fillHistosForGenMuon();
-    fillBendingHistos("OMTF");
+    //fillBendingHistos("OMTF");
   }
-
-  std::vector<int> ptCuts = {10, 15, 16, 18, 19, 20, 21, 22, 23};
+  std::vector<int> ptCuts = {0, 10, 13, 15, 16, 18, 19, 20, 21, 22, 23};
   for(int iQuality=0;iQuality<4;++iQuality){
     std::string selType = std::string(TString::Format("quality%d",iQuality));
     fillRateHisto("OMTF","Tot_"+selType);
