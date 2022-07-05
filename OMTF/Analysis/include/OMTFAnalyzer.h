@@ -55,6 +55,11 @@ class OMTFAnalyzer:public Analyzer{
 
   std::pair<double, double> getPtProfile();
 
+  double calibratedPt(const std::string & sysType, const double & ptRaw);
+
+  TFile *calibrationFile{0};
+  TH1F *hCalibationHisto{0};
+  TF1 *calibrationFunc{0};
   ///Histograms for this analysis
   OMTFHistograms *myHistos_;
 

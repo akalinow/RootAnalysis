@@ -10,6 +10,8 @@
 #include "OMTFAnalyzer.h"
 #include "EventProxyOMTF.h"
 
+#include "TF1.h"
+
 std::vector<double> ptRanges = {0.,   1.,   2.,   3.,   4.,   
                                   5.,   6.,   7.,   8.,   9., 
                                   10.,  11.,  12.,  13.,  14.,
@@ -28,10 +30,21 @@ std::vector<double> ptRanges = {0.,   1.,   2.,   3.,   4.,
 
 //////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////
-double rescaledPt(const double & ptRaw){
+double OMTFAnalyzer::calibratedPt(const std::string & sysType, const double & ptRaw){
 
+  if(sysType!="BMTF") return ptRaw;
+
+  if(!calibrationFunc){
+    //calibrationFile = new TFile("PtCalibration_v34.root");
+    //hCalibationHisto = (TH1F*)calibrationFile->Get("ptCalibrationPSumInter035_ptToPtCalib");
+    calibrationFunc = new TF1("f1","-1.042+1.037*x-0.0063*x*x", 0,100);
+  }
+  else if(calibrationFunc && ptRaw>0){    
+    return 2*ptRaw - calibrationFunc->Eval(ptRaw);
+    int iBin = hCalibationHisto->FindBin(ptRaw);
+    return hCalibationHisto->GetBinContent(iBin);
+  }
   return ptRaw;
-
 }
 //////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////
@@ -125,6 +138,7 @@ bool OMTFAnalyzer::passQuality(const L1Obj & aL1Cand,
      return aL1Cand.type==L1Obj::BMTF && aL1Cand.q>=12 && aL1Cand.bx==0 && !lowPtVeto;
    }
    else if(sysType.find("EMTF")!=std::string::npos){
+     lowPtVeto = aL1Cand.disc/10>6;
      return aL1Cand.type==L1Obj::EMTF && aL1Cand.q>=12 && aL1Cand.bx==0 && !lowPtVeto;
    }
    else if(sysType.find("OMTF")!=std::string::npos){    
@@ -175,7 +189,8 @@ void OMTFAnalyzer::fillTurnOnCurve(const int & iPtCut,
   }
 
   std::bitset<18> hitsWord(selectedCand.hits);
-  bool passPtCut = selectedCand.ptValue()>=ptCut;
+  float val = calibratedPt(sysType, selectedCand.ptValue());
+  bool passPtCut = val>=ptCut;
 
   std::string tmpName = hName+"Pt"+std::to_string(ptCut);
   myHistos_->fill2DHistogram(tmpName, myGenObj.pt(), passPtCut);
@@ -184,7 +199,7 @@ void OMTFAnalyzer::fillTurnOnCurve(const int & iPtCut,
   myHistos_->fill2DHistogram(tmpName, myGenObj.pt(), passPtCut);
 
   tmpName = hName+"PtRecVsPtGen";
-  myHistos_->fill2DHistogram(tmpName, myGenObj.pt(), selectedCand.ptValue());
+  myHistos_->fill2DHistogram(tmpName, myGenObj.pt(), val);
 
   if(false && iPtCut==0 && sysType=="EMTF" &&  myGenObj.pt()<10 && selectedCand.ptValue()>=20){
     std::cout<<myGenObj<<std::endl;
@@ -201,14 +216,14 @@ void OMTFAnalyzer::fillTurnOnCurve(const int & iPtCut,
   }
 
   if(selectedCand.ptValue()>0 && myGenObj.pt()<10 && selectedCand.ptValue()>=20 && sysType=="EMTF"){
-    myHistos_->fill1DHistogram("h1DLLH_Low", selectedCand.disc);    
+    myHistos_->fill1DHistogram("h1DLLH_Low", selectedCand.disc/10.0);    
     myHistos_->fill1DHistogram("h1DHitsPattern_Low_HitCount", (int)hitsWord.count()*10);
     myHistos_->fill1DHistogram("h1DHitsPattern_Low_RefLayer",selectedCand.refLayer*10);    
     myHistos_->fill1DHistogram("h1DHitsPattern_Low_RefPhi",selectedCand.phi);    
   }
   if(selectedCand.ptValue()>0 && myGenObj.pt()>20 && myGenObj.pt()<30
      && selectedCand.ptValue()>=20 && sysType=="EMTF"){
-    myHistos_->fill1DHistogram("h1DLLH_High", selectedCand.disc);   
+    myHistos_->fill1DHistogram("h1DLLH_High", selectedCand.disc/10.0);   
     myHistos_->fill1DHistogram("h1DHitsPattern_High_HitCount", (int)hitsWord.count()*10);
     myHistos_->fill1DHistogram("h1DHitsPattern_High_RefLayer",selectedCand.refLayer*10);    
     myHistos_->fill1DHistogram("h1DHitsPattern_High_RefPhi",selectedCand.phi);    
@@ -238,9 +253,7 @@ void OMTFAnalyzer::fillRateHisto(const std::string & sysType,
     if(pass && selectedCand.ptValue()<aCand.ptValue()) selectedCand = aCand;
   }
 
-  float val = selectedCand.ptValue();
-  if(sysType.find("BMTF")!=std::string::npos ||
-     sysType.find("EMTF")!=std::string::npos) val = rescaledPt(selectedCand.ptValue());
+  float val = calibratedPt(sysType, selectedCand.ptValue());
   bool pass = val>=20;
 
   if(selType.find("Tot")!=std::string::npos) myHistos_->fill2DHistogram(hName,myGenObj.pt(),val);
@@ -319,8 +332,8 @@ void OMTFAnalyzer::fillBendingHistos(const std::string & sysType){
 
   bool badReco = false;
   bool goodReco = false;
-  if(myGenObj.pt()<10 && rescaledPt(selectedCand.ptValue())>=20) badReco = true;
-  else if(myGenObj.pt()>20 && rescaledPt(selectedCand.ptValue())>=20) goodReco = true;
+  if(myGenObj.pt()<10 && calibratedPt(sysType, selectedCand.ptValue())>=20) badReco = true;
+  else if(myGenObj.pt()>20 && calibratedPt(sysType, selectedCand.ptValue())>=20) goodReco = true;
 
   std::bitset<18> hitsWord(selectedCand.hits);
 

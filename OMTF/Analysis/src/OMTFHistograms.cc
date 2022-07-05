@@ -125,7 +125,7 @@ void OMTFHistograms::defineHistograms(){
  add2DHistogram("h2DGhostsVsProcessorTemplate","",6,-0.5,5.5,5,-0.5,4.5,file_);
 
  //Likelihood histos
- add1DHistogram("h1DLLHTemplate","",100,0,1000,file_);
+ add1DHistogram("h1DLLHTemplate","",40,0,20,file_);
  add1DHistogram("h1DHitsPatternTemplate","",101,-0.5,100.5,file_);
 
  //Pattern histos
@@ -169,6 +169,7 @@ void OMTFHistograms::finalizeHistograms(){
   plotEffPanel("EMTF", doHigh);
   plotEffVsEta("OMTF");
   plotEffVsEta("EMTF");
+  plotEffVsEta("BMTF");
   plotEffVsVar("OMTF","EtaVx");
   plotEffVsVar("OMTF","PhiVx");
   plotEffVsVar("EMTF","EtaVx");
@@ -178,7 +179,7 @@ void OMTFHistograms::finalizeHistograms(){
   plotSingleHistogram("h2DBMTFPtRecVsPtGen");
 
   for(int iPtCode=1;iPtCode<=30;++iPtCode){
-    //plotOMTFVsOther(iPtCode,"BMTF");
+    plotOMTFVsOther(iPtCode,"BMTF");
     plotOMTFVsOther(iPtCode,"EMTF");
   }
    
@@ -504,7 +505,7 @@ void OMTFHistograms::plotOMTFVsOther(int iPtCut,
   l.AddEntry((TObject*)0, TString::Format(tmp.c_str(),ptCut).Data(), "");
   l.AddEntry((TObject*)0, "", "");
   tmp = sysType;
-  if(sysType=="BMTF") tmp = "Phase 2";
+  if(sysType=="BMTF") tmp = "LUT NN";
   if(sysType=="EMTF") tmp = "TF NN";
   l.AddEntry(hEffOther, tmp.c_str());
   l.AddEntry((TObject*)0, "", "");
@@ -602,11 +603,11 @@ void OMTFHistograms::plotRate(std::string type){
 
   hRateVx->SetLineColor(1);
   hRateBMTF->SetLineColor(2);
-  hRateEMTF->SetLineColor(9);
+  hRateEMTF->SetLineColor(kGreen-2);
   hRateOMTF->SetLineColor(4);
 
   hRateBMTF->SetLineStyle(2);
-  hRateEMTF->SetLineStyle(3);
+  hRateEMTF->SetLineStyle(1);
 
   TCanvas* c = new TCanvas("cRate","Rate",1.5*420,1.5*500);
   c->SetLogy(1);
@@ -656,7 +657,7 @@ void OMTFHistograms::plotRate(std::string type){
     hRateBMTF->GetYaxis()->SetTitleOffset(0.5);
     hRateBMTF->Divide(hRateOMTF);
     hRateBMTF->SetMaximum(1.5);
-    hRateBMTF->SetMinimum(0.5);
+    hRateBMTF->SetMinimum(0.2);
     hRateBMTF->DrawCopy();
 
     hRateEMTF->Divide(hRateOMTF);
@@ -743,9 +744,9 @@ void OMTFHistograms::plotRate(std::string type){
     leg->AddEntry(hRateEMTF,"Q=3");
   }
   else{
-    leg->AddEntry(hRateOMTF,"Phase1");
-    leg->AddEntry(hRateBMTF,"Phase 2");
-    leg->AddEntry(hRateEMTF,"NN");
+    leg->AddEntry(hRateOMTF,"Phase 1");
+    leg->AddEntry(hRateBMTF,"LUT NN");
+    leg->AddEntry(hRateEMTF,"TF NN");
   }
   leg->Draw();
 
@@ -798,7 +799,7 @@ void OMTFHistograms::plotEffVsRate(int iPtCut){
     sysGraphs[sysType] = (TGraph*)aGraph->Clone(sysType.c_str());
   }
   
-  xMin-=0.02;
+  xMin-=0.04;
   xMax+=0.02;
   yMin*=0.95;
   yMax*=1.05;
@@ -826,8 +827,8 @@ void OMTFHistograms::plotEffVsRate(int iPtCut){
   leg->SetBorderSize(0);
   leg->SetFillColor(10);
   leg->SetHeader(TString::Format("p_{T}^{REC} #geq %d GeV/c", (int)ptBins[iPtCut]));
-  leg->AddEntry(sysGraphs["OMTF"],"Phase1","p");
-  leg->AddEntry(sysGraphs["BMTF"],"Phase2","p");
+  leg->AddEntry(sysGraphs["OMTF"],"Phase 1","p");
+  leg->AddEntry(sysGraphs["BMTF"],"LUT NN","p");
   leg->AddEntry(sysGraphs["EMTF"],"TF NN","p");
   leg->Draw();
 
@@ -1021,12 +1022,12 @@ void OMTFHistograms::plotLLH(){
    h1->GetXaxis()->SetRange(1,h1->GetNbinsX()+1);
    h2->GetXaxis()->SetRange(1,h2->GetNbinsX()+1);
    
-   h1->SetXTitle("Events");
-   h1->SetYTitle("Candidate LLH");
+   h1->SetYTitle("Events");
+   h1->SetXTitle("Posterior #sigma");
    h1->GetYaxis()->SetTitleOffset(1.4);
    h1->SetStats(kFALSE);
    double histoMax = std::max(h1->GetMaximum(), h2->GetMaximum());
-   h1->SetMaximum(1.2*histoMax);
+   h1->SetMaximum(1.4*histoMax);
    h1->Draw("");
    h2->Draw("same");
 
