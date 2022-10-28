@@ -39,6 +39,5 @@ set(CMAKE_INSTALL_RPATH_USE_LINK_PATH TRUE)
 MESSAGE("Installation prefix set to " ${CMAKE_INSTALL_PREFIX} )
 
 add_subdirectory(Core/src)
-add_subdirectory(HTauTau)
 add_subdirectory(OMTF)
 
