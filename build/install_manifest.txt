@@ -1,0 +1,5 @@
+/scratch/Magisterka/Current_work/RootAnalysis/build/lib/libFrameworkCore.so
+/scratch/Magisterka/Current_work/RootAnalysis/build/lib/libOMTFDataFormats.so
+/scratch/Magisterka/Current_work/RootAnalysis/build/lib/libOMTFAnalysis.so
+/scratch/Magisterka/Current_work/RootAnalysis/build/bin/omtfAnalysis
+/scratch/Magisterka/Current_work/RootAnalysis/build/config/omtf_emulator.ini
