@@ -1,6 +1,6 @@
 project(OMTF_Analysis LANGUAGES CXX)
 
-include_directories(${PROJECT_SOURCE_DIR}/../include ${CMAKE_SOURCE_DIR}/Core/include ${CMAKE_SOURCE_DIR}/OMTF/DataFormats/include)
+include_directories(${PROJECT_SOURCE_DIR}/../include ${CMAKE_SOURCE_DIR}/Core/include ${CMAKE_SOURCE_DIR}/GMT/DataFormats/include)
 include_directories(${ROOTINCDIR})
 
 add_library(OMTFAnalysis SHARED GMTAnalyzer.cc GMTHistograms.cc)
