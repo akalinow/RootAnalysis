@@ -30,7 +30,7 @@ std::vector<double> ptRanges = {0.,   1.,   2.,   3.,   4.,
 
 //////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////
-// double OMTFAnalyzer::calibratedPt(const std::string & sysType, const double & ptRaw){
+// double GMTAnalyzer::calibratedPt(const std::string & sysType, const double & ptRaw){
 
 //   if(sysType!="BMTF") return ptRaw;
 
@@ -48,7 +48,7 @@ std::vector<double> ptRanges = {0.,   1.,   2.,   3.,   4.,
 // }
 // //////////////////////////////////////////////////////////////////////////////
 // //////////////////////////////////////////////////////////////////////////////
-// OMTFAnalyzer::OMTFAnalyzer(const std::string & aName):Analyzer(aName){
+// GMTAnalyzer::GMTAnalyzer(const std::string & aName):Analyzer(aName){
 
 //   hGoldenPatterns = 0;
 //   hPtProfile = 0;
@@ -57,7 +57,7 @@ std::vector<double> ptRanges = {0.,   1.,   2.,   3.,   4.,
 // }
 // //////////////////////////////////////////////////////////////////////////////
 // //////////////////////////////////////////////////////////////////////////////
-// OMTFAnalyzer::~OMTFAnalyzer(){
+// GMTAnalyzer::~GMTAnalyzer(){
   
 //   delete myHistos_;
 //   delete hGoldenPatterns;
@@ -65,27 +65,27 @@ std::vector<double> ptRanges = {0.,   1.,   2.,   3.,   4.,
 // }
 // //////////////////////////////////////////////////////////////////////////////
 // //////////////////////////////////////////////////////////////////////////////
-// void OMTFAnalyzer::initialize(TDirectory* aDir,
+// void GMTAnalyzer::initialize(TDirectory* aDir,
 // 				       pat::strbitset *aSelections){
 
 //   mySelections_ = aSelections;
 //   ///The histograms for this analyzer will be saved into "TestHistos"
 //   ///directory of the ROOT file
-//   myHistos_ = new OMTFHistograms(aDir, selectionFlavours_);
+//   myHistos_ = new GMTHistograms(aDir, selectionFlavours_);
 
 // }
 // //////////////////////////////////////////////////////////////////////////////
 // //////////////////////////////////////////////////////////////////////////////
-// Analyzer* OMTFAnalyzer::clone() const{
+// Analyzer* GMTAnalyzer::clone() const{
 
-//   OMTFAnalyzer* clone = new OMTFAnalyzer(name());
+//   GMTAnalyzer* clone = new GMTAnalyzer(name());
 //   clone->setHistos(myHistos_);
 //   return clone;
 
 // };
 // //////////////////////////////////////////////////////////////////////////////
 // //////////////////////////////////////////////////////////////////////////////
-// void OMTFAnalyzer::finalize(){
+// void GMTAnalyzer::finalize(){
 
 
 //   fixQualityHistos();
@@ -94,7 +94,7 @@ std::vector<double> ptRanges = {0.,   1.,   2.,   3.,   4.,
 // }
 // //////////////////////////////////////////////////////////////////////////////
 // //////////////////////////////////////////////////////////////////////////////
-// void OMTFAnalyzer::fixQualityHistos(){
+// void GMTAnalyzer::fixQualityHistos(){
   
 //   if(omp_get_max_threads()==1){
 //     std::cout<<"quality_index_map.size(): "<<quality_index_map.size()<<std::endl;
@@ -128,7 +128,7 @@ std::vector<double> ptRanges = {0.,   1.,   2.,   3.,   4.,
 // }
 // //////////////////////////////////////////////////////////////////////////////
 // //////////////////////////////////////////////////////////////////////////////
-// bool OMTFAnalyzer::passQuality(const L1Obj & aL1Cand,
+// bool GMTAnalyzer::passQuality(const L1Obj & aL1Cand,
 // 			       const std::string & sysType,
 // 			       const std::string & selType){
   
@@ -151,12 +151,12 @@ std::vector<double> ptRanges = {0.,   1.,   2.,   3.,   4.,
 // }
 // //////////////////////////////////////////////////////////////////////////////
 // //////////////////////////////////////////////////////////////////////////////
-// void OMTFAnalyzer::fillTurnOnCurve(const int & iPtCut,
+// void GMTAnalyzer::fillTurnOnCurve(const int & iPtCut,
 // 				  const std::string & sysType,
 // 				  const std::string & selType){
 
 //   //int important for histo name construction
-//   int ptCut = OMTFHistograms::ptBins[iPtCut];
+//   int ptCut = GMTHistograms::ptBins[iPtCut];
 
 //   const std::vector<L1Obj> & myL1Coll = myL1ObjColl->getL1Objs();
 //   std::string hName = "h2DGmt"+selType;
@@ -239,7 +239,7 @@ std::vector<double> ptRanges = {0.,   1.,   2.,   3.,   4.,
 // }
 // //////////////////////////////////////////////////////////////////////////////
 // //////////////////////////////////////////////////////////////////////////////
-// void OMTFAnalyzer::fillRateHisto(const std::string & sysType,
+// void GMTAnalyzer::fillRateHisto(const std::string & sysType,
 // 				 const std::string & selType){
 
 //   if(name()=="NU_RATEAnalyzer" && myGenObj.pt()>0.0) return;
@@ -291,7 +291,7 @@ std::vector<double> ptRanges = {0.,   1.,   2.,   3.,   4.,
 //   int iCut = 18;
 //   bool pass = false;
 //   for(int iType=0;iType<=3;++iType){
-//     float ptCut = OMTFHistograms::ptBins[iCut];
+//     float ptCut = GMTHistograms::ptBins[iCut];
     
 //     if(iType==0) pass = myGenObj.pt()>ptCut + 20;
 //     else if(iType==1) pass = myGenObj.pt()>ptCut && myGenObj.pt()<(ptCut+5);
@@ -306,7 +306,7 @@ std::vector<double> ptRanges = {0.,   1.,   2.,   3.,   4.,
 // }
 // //////////////////////////////////////////////////////////////////////////////
 // //////////////////////////////////////////////////////////////////////////////
-// void OMTFAnalyzer::fillBendingHistos(const std::string & sysType){
+// void GMTAnalyzer::fillBendingHistos(const std::string & sysType){
 
 //    ///Find best matching L1 candidate
 //   float deltaR = 0.4, tmpR = 999;  
@@ -378,7 +378,7 @@ std::vector<double> ptRanges = {0.,   1.,   2.,   3.,   4.,
 // }
 // //////////////////////////////////////////////////////////////////////////////
 // //////////////////////////////////////////////////////////////////////////////
-// std::pair<double, double> OMTFAnalyzer::getPtProfile(){
+// std::pair<double, double> GMTAnalyzer::getPtProfile(){
 
 //   #pragma omp critical(GOLDENPATTERNS_INITIALIZATION)
 //   {
@@ -444,6 +444,7 @@ bool GMTAnalyzer::analyze(const EventProxyBase& iEvent){
   myEventId = myProxy.getEventId();
   myGenObjColl = myProxy.getGenObjColl();
   myL1ObjColl = myProxy.getL1ObjColl();
+  myL1PhaseIIObjColl = myProxy.getL1PhaseIIObjColl();
   myHits = myProxy.getHits();
   myGenObj = GenObj();
 

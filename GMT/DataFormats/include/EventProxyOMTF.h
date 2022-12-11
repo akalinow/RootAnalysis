@@ -10,6 +10,7 @@
 #include "EventObj.h"
 #include "GenObjColl.h"
 #include "L1ObjColl.h"
+#include "L1PhaseIIObjColl.h"
 
 #include "TBranch.h"
 
@@ -41,6 +42,8 @@ std::ostream& operator<< (std::ostream& stream, const OMTFHit& aHit);
 
      const L1ObjColl  *getL1ObjColl() const { return myL1ObjColl;};
 
+     const L1PhaseIIObjColl  *getL1PhaseIIObjColl() const { return myL1PhaseIIObjColl;};
+
      std::vector<OMTFHit> getHits() const;
      
    private:
@@ -49,6 +52,7 @@ std::ostream& operator<< (std::ostream& stream, const OMTFHit& aHit);
      EventObj       *myEvent;
      GenObjColl     *myGenObjColl;
      L1ObjColl      *myL1ObjColl;
+     L1PhaseIIObjColl *myL1PhaseIIObjColl;
      std::vector<int> *hits;
      std::vector<int> *hitsQuality;
      

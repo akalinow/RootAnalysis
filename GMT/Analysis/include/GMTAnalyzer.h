@@ -10,6 +10,9 @@
 #include "EventObj.h"
 #include "GenObjColl.h"
 #include "L1ObjColl.h"
+#include "L1PhaseIIObjColl.h"
+#include "L1PhaseIIObj.h"
+
 
 #include "TVector3.h"
 
@@ -61,11 +64,13 @@ class GMTAnalyzer:public Analyzer{
   TH1F *hCalibationHisto{0};
   TF1 *calibrationFunc{0};
   ///Histograms for this analysis
-  // OMTFHistograms *myHistos_;
+  GMTHistograms *myHistos_;
 
   const EventObj  *myEventId;
   const GenObjColl *myGenObjColl;
   const L1ObjColl  *myL1ObjColl;
+  const L1PhaseIIObjColl  *myL1PhaseIIObjColl;
+
   GenObj myGenObj;
   std::vector<OMTFHit> myHits;
 

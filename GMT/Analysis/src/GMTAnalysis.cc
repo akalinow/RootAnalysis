@@ -5,6 +5,8 @@
 #include "TFile.h"
 #include "TStopwatch.h"
 
+#include <typeinfo>
+
 #include "boost/functional/hash.hpp"
 #include "boost/property_tree/ptree.hpp"
 #include "boost/property_tree/ini_parser.hpp"
@@ -12,33 +14,36 @@
 
 int main(int argc, char ** argv) {
   
-  // std::string cfgFileName = "cfg.ini";
-  // if(argc<2){
-  //   std::cout<<"Usage: readEvents cfg.init"<<std::endl;
-  //   return 1;
-  // }
-  // else cfgFileName = argv[1];
+  std::string cfgFileName = "cfg.ini";
+  if(argc<2){
+    std::cout<<"Usage: readEvents cfg.init"<<std::endl;
+    return 1;
+  }
+  else cfgFileName = argv[1];
   
 
-  // std::cout<<"Start"<<std::endl;
-  // TStopwatch timer;
-  // timer.Start();
+  std::cout<<"Start"<<std::endl;
+  TStopwatch timer;
+  timer.Start();
 
-  // boost::property_tree::ptree pt;
-  // boost::property_tree::ini_parser::read_ini(cfgFileName, pt);
+  boost::property_tree::ptree pt;
+  boost::property_tree::ini_parser::read_ini(cfgFileName, pt);
   
-  // std::string processName = pt.get<std::string>("TreeAnalyzer.processName","Test");
+  std::string processName = pt.get<std::string>("TreeAnalyzer.processName","Test");
   
-  // //Tell Root we want to be multi-threaded
-  // ROOT::EnableThreadSafety();
-  // //When threading, also have to keep ROOT from logging all TObjects into a list
-  // TObject::SetObjectStat(false);
+  //Tell Root we want to be multi-threaded
+  ROOT::EnableThreadSafety();
+  //When threading, also have to keep ROOT from logging all TObjects into a list
+  TObject::SetObjectStat(false);
   
-  // //----------------------------------------------------------
-  // std::vector<Analyzer*> myAnalyzers;
+  //----------------------------------------------------------
+  std::vector<Analyzer*> myAnalyzers;
+
+  std::cout << typeid(myAnalyzers).name() << '\n';
+  
   // EventProxyOMTF *myEvent = new EventProxyOMTF();
   
-  // myAnalyzers.push_back(new OMTFAnalyzer(processName+"Analyzer"));
+  // myAnalyzers.push_back(new GMTAnalyzer(processName+"Analyzer"));
   
   // TreeAnalyzer *tree = new TreeAnalyzer("TreeAnalyzer",cfgFileName, myEvent);
   // tree->init(myAnalyzers);
@@ -57,7 +62,7 @@ int main(int argc, char ** argv) {
   // delete tree;
   // delete myEvent;
   
-  std::cout<<"Hi Kuba, it is working after refactoring"<<std::endl;
+  std::cout<<"Hi Kuba, it is working, GMT. Our new objects should be visible to the program"<<std::endl;
   return 0;
    
 }
