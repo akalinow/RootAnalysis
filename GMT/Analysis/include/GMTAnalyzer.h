@@ -57,24 +57,24 @@ class GMTAnalyzer:public Analyzer{
 
   // double calibratedPt(const std::string & sysType, const double & ptRaw);
 
-  // TFile *calibrationFile{0};
-  // TH1F *hCalibationHisto{0};
-  // TF1 *calibrationFunc{0};
-  // ///Histograms for this analysis
+  TFile *calibrationFile{0};
+  TH1F *hCalibationHisto{0};
+  TF1 *calibrationFunc{0};
+  ///Histograms for this analysis
   // OMTFHistograms *myHistos_;
 
-  // const EventObj  *myEventId;
-  // const GenObjColl *myGenObjColl;
-  // const L1ObjColl  *myL1ObjColl;
-  // GenObj myGenObj;
-  // std::vector<OMTFHit> myHits;
+  const EventObj  *myEventId;
+  const GenObjColl *myGenObjColl;
+  const L1ObjColl  *myL1ObjColl;
+  GenObj myGenObj;
+  std::vector<OMTFHit> myHits;
 
-  // TH3F *hGoldenPatterns;
-  // TH1D *hPtProfile;
+  TH3F *hGoldenPatterns;
+  TH1D *hPtProfile;
 
-  // TVector3 genMuMom;
+  TVector3 genMuMom;
 
-  // std::map<unsigned long, int> quality_index_map;
+  std::map<unsigned long, int> quality_index_map;
   
 };
 

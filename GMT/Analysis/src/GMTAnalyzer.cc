@@ -276,7 +276,7 @@ std::vector<double> ptRanges = {0.,   1.,   2.,   3.,   4.,
 // }
 // //////////////////////////////////////////////////////////////////////////////
 // //////////////////////////////////////////////////////////////////////////////
-// void OMTFAnalyzer::fillHistosForGenMuon(){
+// void GMTAnalyzer::fillHistosForGenMuon(){   // quick
 
 //   bool isOMTFAcceptance = fabs(myGenObj.eta())>0.83 && fabs(myGenObj.eta())<1.24;
 //   if(!isOMTFAcceptance) return;
@@ -439,13 +439,13 @@ bool GMTAnalyzer::analyze(const EventProxyBase& iEvent){
 
   clear();
 
-  // const EventProxyOMTF & myProxy = static_cast<const EventProxyOMTF&>(iEvent);
+  const EventProxyOMTF & myProxy = static_cast<const EventProxyOMTF&>(iEvent);
 
-  // myEventId = myProxy.getEventId();
-  // myGenObjColl = myProxy.getGenObjColl();
-  // myL1ObjColl = myProxy.getL1ObjColl();
-  // myHits = myProxy.getHits();
-  // myGenObj = GenObj();
+  myEventId = myProxy.getEventId();
+  myGenObjColl = myProxy.getGenObjColl();
+  myL1ObjColl = myProxy.getL1ObjColl();
+  myHits = myProxy.getHits();
+  myGenObj = GenObj();
 
   // const std::vector<GenObj> genObjVec = myGenObjColl->data();  
   // if(genObjVec.empty()) return false;
@@ -454,7 +454,7 @@ bool GMTAnalyzer::analyze(const EventProxyBase& iEvent){
   //   if(std::abs(aGenObj.pdgId())!=13) continue;
   //   if(std::abs(aGenObj.status())!=1) continue;
   //   myGenObj = aGenObj;
-  //   fillHistosForGenMuon();
+    // fillHistosForGenMuon();
   //   //fillBendingHistos("OMTF");
   // }
   // std::vector<int> ptCuts = {0, 10, 13, 15, 16, 18, 19, 20, 21, 22, 23};
