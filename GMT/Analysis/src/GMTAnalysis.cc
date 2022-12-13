@@ -41,26 +41,28 @@ int main(int argc, char ** argv) {
 
   std::cout << typeid(myAnalyzers).name() << '\n';
   
-  // EventProxyOMTF *myEvent = new EventProxyOMTF();
+  EventProxyOMTF *myEvent = new EventProxyOMTF();
+
+  std::cout << typeid(myEvent).name() << std::endl;
   
-  // myAnalyzers.push_back(new GMTAnalyzer(processName+"Analyzer"));
+  myAnalyzers.push_back(new GMTAnalyzer(processName+"Analyzer"));
   
-  // TreeAnalyzer *tree = new TreeAnalyzer("TreeAnalyzer",cfgFileName, myEvent);
-  // tree->init(myAnalyzers);
-  // int nEventsAnalysed = tree->loop();	  
-  // tree->finalize();
+  TreeAnalyzer *tree = new TreeAnalyzer("TreeAnalyzer",cfgFileName, myEvent);
+  tree->init(myAnalyzers);
+  int nEventsAnalysed = tree->loop();	  
+  tree->finalize();
   
-  // timer.Stop();
-  // Double_t rtime = timer.RealTime();
-  // Double_t ctime = timer.CpuTime();
-  // printf("Analysed events: %d \n",nEventsAnalysed);
-  // printf("RealTime=%f seconds, CpuTime=%f seconds\n",rtime,ctime);
-  // printf("%4.2f events / RealTime second .\n", nEventsAnalysed/rtime);
-  // printf("%4.2f events / CpuTime second .\n", nEventsAnalysed/ctime);
-  // tree->scaleHistograms();
-  // for(unsigned int i=0;i<myAnalyzers.size();++i) delete myAnalyzers[i];
-  // delete tree;
-  // delete myEvent;
+  timer.Stop();
+  Double_t rtime = timer.RealTime();
+  Double_t ctime = timer.CpuTime();
+  printf("Analysed events: %d \n",nEventsAnalysed);
+  printf("RealTime=%f seconds, CpuTime=%f seconds\n",rtime,ctime);
+  printf("%4.2f events / RealTime second .\n", nEventsAnalysed/rtime);
+  printf("%4.2f events / CpuTime second .\n", nEventsAnalysed/ctime);
+  tree->scaleHistograms();
+  for(unsigned int i=0;i<myAnalyzers.size();++i) delete myAnalyzers[i];
+  delete tree;
+  delete myEvent;
   
   std::cout<<"Hi Kuba, it is working, GMT. Our new objects should be visible to the program"<<std::endl;
   return 0;

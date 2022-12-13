@@ -51,7 +51,7 @@ void EventProxyOMTF::init(std::vector<std::string> const& iFileNames){
   myEvent = 0;
   myGenObjColl = 0;
   myL1ObjColl = 0;
-  // myL1PhaseIIObjColl = 0;
+  myL1PhaseIIObjColl = 0;
   hits = 0;
   hitsQuality = 0;
   
@@ -60,7 +60,7 @@ void EventProxyOMTF::init(std::vector<std::string> const& iFileNames){
   fChain->SetBranchAddress("event",&myEvent);
   fChain->SetBranchAddress("genColl",&myGenObjColl);
   fChain->SetBranchAddress("l1ObjColl",&myL1ObjColl);
-  // fChain->SetBranchAddress("l1PhaseIIObjColl",&myL1PhaseIIObjColl);
+  fChain->SetBranchAddress("l1PhaseIIObjColl",&myL1PhaseIIObjColl);
   fChain->SetBranchAddress("hits",&hits);
   fChain->SetBranchAddress("hitsQuality",&hitsQuality);
   

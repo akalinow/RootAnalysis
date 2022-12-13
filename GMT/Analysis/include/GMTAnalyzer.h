@@ -36,29 +36,29 @@ class GMTAnalyzer:public Analyzer{
 
   Analyzer* clone() const;
 
-  // void setHistos(GMTHistograms *histos) { myHistos_ = histos;};
+  void setHistos(GMTHistograms *histos) { myHistos_ = histos;};
 
  private:
 
-  // void fillHistosForGenMuon();
+  void fillHistosForGenMuon();
 
-  // void fillTurnOnCurve(const int & ptCut, const std::string & sysType,
-	// 	               const std::string & selType);
+  void fillTurnOnCurve(const int & ptCut, const std::string & sysType,
+		               const std::string & selType);
 
-  // void fillRateHisto(const std::string & sysType,
-	// 	     const std::string & selType);
+  void fillRateHisto(const std::string & sysType,
+		     const std::string & selType);
 
-  // bool passQuality(const L1Obj & aL1Cand,
-	// 	   const std::string & sysType,
-	// 	   const std::string & selType = "");
+  bool passQuality(const L1Obj & aL1Cand,
+		   const std::string & sysType,
+		   const std::string & selType = "");
 
-  // void fixQualityHistos();
+  void fixQualityHistos();
 
-  // void fillBendingHistos(const std::string & sysType);
+  void fillBendingHistos(const std::string & sysType);
 
-  // std::pair<double, double> getPtProfile();
+  std::pair<double, double> getPtProfile();
 
-  // double calibratedPt(const std::string & sysType, const double & ptRaw);
+  double calibratedPt(const std::string & sysType, const double & ptRaw);
 
   TFile *calibrationFile{0};
   TH1F *hCalibationHisto{0};
