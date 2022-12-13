@@ -48,7 +48,7 @@ class GMTAnalyzer:public Analyzer{
   void fillRateHisto(const std::string & sysType,
 		     const std::string & selType);
 
-  bool passQuality(const L1Obj & aL1Cand,
+  bool passQuality(const L1PhaseIIObj & aL1Cand,
 		   const std::string & sysType,
 		   const std::string & selType = "");
 

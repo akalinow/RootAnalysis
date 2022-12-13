@@ -128,21 +128,21 @@ void GMTAnalyzer::fixQualityHistos(){
 }
 // //////////////////////////////////////////////////////////////////////////////
 // //////////////////////////////////////////////////////////////////////////////
-bool GMTAnalyzer::passQuality(const L1Obj & aL1Cand,
+bool GMTAnalyzer::passQuality(const L1PhaseIIObj & aL1Cand,
 			       const std::string & sysType,
 			       const std::string & selType){
   
   bool lowPtVeto = false;
 
    if(sysType.find("BMTF")!=std::string::npos){
-     return aL1Cand.type==L1Obj::BMTF && aL1Cand.q>=12 && aL1Cand.bx==0 && !lowPtVeto;
+     return aL1Cand.type==L1PhaseIIObj::BMTF && aL1Cand.q>=12 && aL1Cand.bx==0 && !lowPtVeto;
    }
    else if(sysType.find("EMTF")!=std::string::npos){
      lowPtVeto = aL1Cand.disc/10>6;
-     return aL1Cand.type==L1Obj::EMTF && aL1Cand.q>=12 && aL1Cand.bx==0 && !lowPtVeto;
+     return aL1Cand.type==L1PhaseIIObj::EMTF && aL1Cand.q>=12 && aL1Cand.bx==0 && !lowPtVeto;
    }
    else if(sysType.find("OMTF")!=std::string::npos){    
-     return aL1Cand.type==L1Obj::OMTF_emu && aL1Cand.q>=12 && aL1Cand.bx==0 && !lowPtVeto;    
+     return aL1Cand.type==L1PhaseIIObj::OMTF_emu && aL1Cand.q>=12 && aL1Cand.bx==0 && !lowPtVeto;    
    }
    else if(sysType.find("Vx")!=std::string::npos){
      return true;
@@ -158,7 +158,7 @@ void GMTAnalyzer::fillTurnOnCurve(const int & iPtCut,
   //int important for histo name construction
   int ptCut = GMTHistograms::ptBins[iPtCut];
 
-  const std::vector<L1Obj> & myL1Coll = myL1ObjColl->getL1Objs();
+  const std::vector<L1PhaseIIObj> & myL1Coll = myL1PhaseIIObjColl->getL1PhaseIIObjs();
   std::string hName = "h2DGmt"+selType;
   if(sysType=="OMTF") {   
     hName = "h2DOMTF"+selType;
@@ -175,7 +175,7 @@ void GMTAnalyzer::fillTurnOnCurve(const int & iPtCut,
 
   ///Find best matching L1 candidate
   float deltaR = 0.4, tmpR = 999;
-  L1Obj selectedCand;
+  L1PhaseIIObj selectedCand;
 
   for(auto aCand: myL1Coll){
     bool pass = passQuality(aCand ,sysType, selType);
@@ -244,10 +244,10 @@ void GMTAnalyzer::fillTurnOnCurve(const int & iPtCut,
 
 //   if(name()=="NU_RATEAnalyzer" && myGenObj.pt()>0.0) return;
 
-//   const std::vector<L1Obj> & myL1Coll = myL1ObjColl->getL1Objs();
+//   const std::vector<L1PhaseIIObj> & myL1Coll = myL1PhaseIIObjColl->getL1PhaseIIObjs();
 //   std::string hName = "h2D"+sysType+"Rate"+selType;
 
-//   L1Obj selectedCand;
+//   L1PhaseIIObj selectedCand;
 //   for(auto aCand: myL1Coll){
 //     bool pass = passQuality(aCand ,sysType, selType);    
 //     if(pass && selectedCand.ptValue()<aCand.ptValue()) selectedCand = aCand;
@@ -480,41 +480,41 @@ void GMTAnalyzer::fillTurnOnCurve(const int & iPtCut,
 // }
 // //////////////////////////////////////////////////////////////////////////////
 // //////////////////////////////////////////////////////////////////////////////
-// void GMTAnalyzer::fillRateHisto(const std::string & sysType,
-// 				 const std::string & selType){
+void GMTAnalyzer::fillRateHisto(const std::string & sysType,
+				 const std::string & selType){
 
-//   if(name()=="NU_RATEAnalyzer" && myGenObj.pt()>0.0) return;
+  if(name()=="NU_RATEAnalyzer" && myGenObj.pt()>0.0) return;
 
-//   const std::vector<L1Obj> & myL1Coll = myL1ObjColl->getL1Objs();
-//   std::string hName = "h2D"+sysType+"Rate"+selType;
+  const std::vector<L1PhaseIIObj> & myL1Coll = myL1PhaseIIObjColl->getL1PhaseIIObjs();
+  std::string hName = "h2D"+sysType+"Rate"+selType;
 
-//   L1Obj selectedCand;
-//   for(auto aCand: myL1Coll){
-//     bool pass = passQuality(aCand ,sysType, selType);    
-//     if(pass && selectedCand.ptValue()<aCand.ptValue()) selectedCand = aCand;
-//   }
+  L1PhaseIIObj selectedCand;
+  for(auto aCand: myL1Coll){
+    bool pass = passQuality(aCand ,sysType, selType);    
+    if(pass && selectedCand.ptValue()<aCand.ptValue()) selectedCand = aCand;
+  }
 
-//   float val = calibratedPt(sysType, selectedCand.ptValue());
-//   bool pass = val>=20;
+  float val = calibratedPt(sysType, selectedCand.ptValue());
+  bool pass = val>=20;
 
-//   if(selType.find("Tot")!=std::string::npos) myHistos_->fill2DHistogram(hName,myGenObj.pt(),val);
-//   if(selType.find("VsEta")!=std::string::npos) myHistos_->fill2DHistogram(hName,myGenObj.pt(),pass*myGenObj.eta()+(!pass)*99);
-//   if(selType.find("VsPt")!=std::string::npos) myHistos_->fill2DHistogram(hName,myGenObj.pt(),pass*myGenObj.pt()+(!pass)*(-100));
+  if(selType.find("Tot")!=std::string::npos) myHistos_->fill2DHistogram(hName,myGenObj.pt(),val);
+  if(selType.find("VsEta")!=std::string::npos) myHistos_->fill2DHistogram(hName,myGenObj.pt(),pass*myGenObj.eta()+(!pass)*99);
+  if(selType.find("VsPt")!=std::string::npos) myHistos_->fill2DHistogram(hName,myGenObj.pt(),pass*myGenObj.pt()+(!pass)*(-100));
 
-//   if(sysType.find("EMTF")!=std::string::npos && selType=="VsQuality"){
-//     unsigned long hits = selectedCand.hits;
-//     if(quality_index_map.find(hits)==quality_index_map.end()) quality_index_map[hits] = quality_index_map.size();
-//     int val = quality_index_map[hits];
-//     if(myGenObj.pt()<10) myHistos_->fill2DHistogram(hName, myGenObj.pt(), pass*val+(!pass)*(-10));
-//     hName = "h2D"+sysType+"Quality20";    
-//     if(myGenObj.pt()>20) {
-//       myHistos_->fill2DHistogram(hName, val, pass);
-//     }
-//   }
-//   else if(selType=="VsQuality"){
-//      myHistos_->fill2DHistogram(hName, myGenObj.pt(), 0);
-//   }
-// }
+  if(sysType.find("EMTF")!=std::string::npos && selType=="VsQuality"){
+    unsigned long hits = selectedCand.hits;
+    if(quality_index_map.find(hits)==quality_index_map.end()) quality_index_map[hits] = quality_index_map.size();
+    int val = quality_index_map[hits];
+    if(myGenObj.pt()<10) myHistos_->fill2DHistogram(hName, myGenObj.pt(), pass*val+(!pass)*(-10));
+    hName = "h2D"+sysType+"Quality20";    
+    if(myGenObj.pt()>20) {
+      myHistos_->fill2DHistogram(hName, val, pass);
+    }
+  }
+  else if(selType=="VsQuality"){
+     myHistos_->fill2DHistogram(hName, myGenObj.pt(), 0);
+  }
+}
 // //////////////////////////////////////////////////////////////////////////////
 // //////////////////////////////////////////////////////////////////////////////
 void GMTAnalyzer::fillHistosForGenMuon(){   // quick
@@ -527,6 +527,7 @@ void GMTAnalyzer::fillHistosForGenMuon(){   // quick
       fillTurnOnCurve(iCut, "OMTF", selType);
       fillTurnOnCurve(iCut, "BMTF", selType);
       fillTurnOnCurve(iCut, "EMTF", selType);
+
   }
 
   int iCut = 18;
@@ -543,80 +544,81 @@ void GMTAnalyzer::fillHistosForGenMuon(){   // quick
     fillTurnOnCurve(iCut, "OMTF", selType);
     fillTurnOnCurve(iCut, "BMTF", selType);
     fillTurnOnCurve(iCut, "EMTF", selType);
+
   }
 }
 // //////////////////////////////////////////////////////////////////////////////
 // //////////////////////////////////////////////////////////////////////////////
-// void GMTAnalyzer::fillBendingHistos(const std::string & sysType){
+void GMTAnalyzer::fillBendingHistos(const std::string & sysType){
 
-//    ///Find best matching L1 candidate
-//   float deltaR = 0.4, tmpR = 999;  
-//   L1Obj selectedCand;
-//   const std::vector<L1Obj> & myL1Coll = myL1ObjColl->getL1Objs();
+   ///Find best matching L1 candidate
+  float deltaR = 0.4, tmpR = 999;  
+  L1PhaseIIObj selectedCand;
+  const std::vector<L1PhaseIIObj> & myL1Coll = myL1PhaseIIObjColl->getL1PhaseIIObjs();
  
-//   for(auto aCand: myL1Coll){
-//     bool pass = passQuality(aCand ,sysType);
-//     if(!pass) continue;    
-//     double deltaEta = std::abs(myGenObj.eta()-aCand.etaValue());    
-//     tmpR = deltaEta;
-//     if(tmpR<deltaR){
-//       deltaR = tmpR;
-//       selectedCand = aCand;
-//     }    
-//   }
+  for(auto aCand: myL1Coll){
+    bool pass = passQuality(aCand ,sysType);
+    if(!pass) continue;    
+    double deltaEta = std::abs(myGenObj.eta()-aCand.etaValue());    
+    tmpR = deltaEta;
+    if(tmpR<deltaR){
+      deltaR = tmpR;
+      selectedCand = aCand;
+    }    
+  }
   
-//   int refHit = 9999;
-//   for(auto aHit : myHits){
-//     if(aHit.iLayer==0) refHit = aHit.iPhi;
-//   };
-//   if(refHit>999) return;
+  int refHit = 9999;
+  for(auto aHit : myHits){
+    if(aHit.iLayer==0) refHit = aHit.iPhi;
+  };
+  if(refHit>999) return;
 
-//   bool badReco = false;
-//   bool goodReco = false;
-//   if(myGenObj.pt()<10 && calibratedPt(sysType, selectedCand.ptValue())>=20) badReco = true;
-//   else if(myGenObj.pt()>20 && calibratedPt(sysType, selectedCand.ptValue())>=20) goodReco = true;
+  bool badReco = false;
+  bool goodReco = false;
+  if(myGenObj.pt()<10 && calibratedPt(sysType, selectedCand.ptValue())>=20) badReco = true;
+  else if(myGenObj.pt()>20 && calibratedPt(sysType, selectedCand.ptValue())>=20) goodReco = true;
 
-//   std::bitset<18> hitsWord(selectedCand.hits);
+  std::bitset<18> hitsWord(selectedCand.hits);
 
-//   double phiB = 9999.0;
-//   double deltaMB2 = 9999.0;
-//   double deltaRB1In = 9999.0;
-//   double deltaRB1Out = 9999.0;
-//   double deltaRB2In = 9999.0;
-//   double deltaRB2Out = 9999.0;
-//   double deltaRE23 = 9999.0;
-//   double x1, y1;
+  double phiB = 9999.0;
+  double deltaMB2 = 9999.0;
+  double deltaRB1In = 9999.0;
+  double deltaRB1Out = 9999.0;
+  double deltaRB2In = 9999.0;
+  double deltaRB2Out = 9999.0;
+  double deltaRE23 = 9999.0;
+  double x1, y1;
 
-//  for(auto aHit : myHits){
-//    int deltaPhi = (aHit.iPhi-refHit)*myGenObj.charge();
-//    int iLayer = aHit.iLayer;
-//    if(iLayer==1) phiB = aHit.iPhi;
-//    if(iLayer==3) phiB = deltaPhi;
-//    if(iLayer==1 || iLayer==3 || iLayer==5) deltaPhi +=refHit*myGenObj.charge();
-//    if(iLayer==1 || iLayer==3 || iLayer==5) deltaPhi = (aHit.iPhi-phiB)*myGenObj.charge();
+ for(auto aHit : myHits){
+   int deltaPhi = (aHit.iPhi-refHit)*myGenObj.charge();
+   int iLayer = aHit.iLayer;
+   if(iLayer==1) phiB = aHit.iPhi;
+   if(iLayer==3) phiB = deltaPhi;
+   if(iLayer==1 || iLayer==3 || iLayer==5) deltaPhi +=refHit*myGenObj.charge();
+   if(iLayer==1 || iLayer==3 || iLayer==5) deltaPhi = (aHit.iPhi-phiB)*myGenObj.charge();
 
-//    myHistos_->fill3DHistogram("h3DBending", myGenObj.pt(), deltaPhi, iLayer);   
-//    if(iLayer==3) deltaMB2 = deltaPhi;
-//    if(iLayer==10) deltaRB1In = deltaPhi;
-//    if(iLayer==11) deltaRB1Out = deltaPhi;
-//    if(iLayer==12) deltaRB2In = deltaPhi;
-//    if(iLayer==13) deltaRB2Out = deltaPhi;
-//    if(iLayer==16) deltaRE23 = deltaPhi;
+   myHistos_->fill3DHistogram("h3DBending", myGenObj.pt(), deltaPhi, iLayer);   
+   if(iLayer==3) deltaMB2 = deltaPhi;
+   if(iLayer==10) deltaRB1In = deltaPhi;
+   if(iLayer==11) deltaRB1Out = deltaPhi;
+   if(iLayer==12) deltaRB2In = deltaPhi;
+   if(iLayer==13) deltaRB2Out = deltaPhi;
+   if(iLayer==16) deltaRE23 = deltaPhi;
 
-//    x1 = phiB;
-//    y1 = deltaMB2;
-//    if(iLayer==3 && goodReco) myHistos_->fill2DHistogram("h2DDeltaVsDelta_xy", x1, y1);
-//    if(iLayer==3 && badReco) myHistos_->fill2DHistogram("h2DDeltaVsDelta_xy_badReco", x1, y1);
+   x1 = phiB;
+   y1 = deltaMB2;
+   if(iLayer==3 && goodReco) myHistos_->fill2DHistogram("h2DDeltaVsDelta_xy", x1, y1);
+   if(iLayer==3 && badReco) myHistos_->fill2DHistogram("h2DDeltaVsDelta_xy_badReco", x1, y1);
    
-//   }
+  }
 
-//  myHistos_->fill2DHistogram("h2DDeltaVsDelta_MB2",phiB, deltaMB2);
-//  myHistos_->fill2DHistogram("h2DDeltaVsDelta_RB1In",phiB, deltaRB1In);
-//  myHistos_->fill2DHistogram("h2DDeltaVsDelta_RB1Out",phiB, deltaRB1Out);  
-//  myHistos_->fill2DHistogram("h2DDeltaVsDelta_RB2In",phiB, deltaRB2In);
-//  myHistos_->fill2DHistogram("h2DDeltaVsDelta_RB2Out",phiB, deltaRB2Out);
-//  myHistos_->fill2DHistogram("h2DDeltaVsDelta_RE23",phiB, deltaRE23);
-// }
+ myHistos_->fill2DHistogram("h2DDeltaVsDelta_MB2",phiB, deltaMB2);
+ myHistos_->fill2DHistogram("h2DDeltaVsDelta_RB1In",phiB, deltaRB1In);
+ myHistos_->fill2DHistogram("h2DDeltaVsDelta_RB1Out",phiB, deltaRB1Out);  
+ myHistos_->fill2DHistogram("h2DDeltaVsDelta_RB2In",phiB, deltaRB2In);
+ myHistos_->fill2DHistogram("h2DDeltaVsDelta_RB2Out",phiB, deltaRB2Out);
+ myHistos_->fill2DHistogram("h2DDeltaVsDelta_RE23",phiB, deltaRE23);
+}
 // //////////////////////////////////////////////////////////////////////////////
 // //////////////////////////////////////////////////////////////////////////////
 // std::pair<double, double> GMTAnalyzer::getPtProfile(){
@@ -712,8 +714,8 @@ void GMTAnalyzer::fillHistosForGenMuon(){   // quick
 
 //    ///Find best matching L1 candidate
 //   float deltaR = 0.4, tmpR = 999;  
-//   L1Obj selectedCand;
-//   const std::vector<L1Obj> & myL1Coll = myL1ObjColl->getL1Objs();
+//   L1PhaseIIObj selectedCand;
+//   const std::vector<L1PhaseIIObj> & myL1Coll = myL1PhaseIIObjColl->getL1PhaseIIObjs();
  
 //   for(auto aCand: myL1Coll){
 //     bool pass = passQuality(aCand ,sysType);
@@ -858,48 +860,50 @@ bool GMTAnalyzer::analyze(const EventProxyBase& iEvent){
     if(std::abs(aGenObj.status())!=1) continue;
     myGenObj = aGenObj;
     fillHistosForGenMuon();
-    //fillBendingHistos("OMTF");
+    // fillBendingHistos("OMTF");
   }
-  // std::vector<int> ptCuts = {0, 10, 13, 15, 16, 18, 19, 20, 21, 22, 23};
-  // for(int iQuality=0;iQuality<4;++iQuality){
-  //   std::string selType = std::string(TString::Format("quality%d",iQuality));
-  //   fillRateHisto("OMTF","Tot_"+selType);
-  //   fillRateHisto("BMTF","Tot_"+selType);
-  //   fillRateHisto("EMTF","Tot_"+selType);
+  std::vector<int> ptCuts = {0, 10, 13, 15, 16, 18, 19, 20, 21, 22, 23};
+  for(int iQuality=0;iQuality<4;++iQuality){
+    std::string selType = std::string(TString::Format("quality%d",iQuality));
+    fillRateHisto("GMT","Tot_"+selType);
+    fillRateHisto("BMTF","Tot_"+selType);
+    fillRateHisto("EMTF","Tot_"+selType);
+    fillRateHisto("EMTF","Tot_"+selType);
 
-  //   fillRateHisto("Vx","VsEta_"+selType);
-  //   fillRateHisto("OMTF","VsEta_"+selType);
-  //   fillRateHisto("BMTF","VsEta_"+selType);
-  //   fillRateHisto("EMTF","VsEta_"+selType);
 
-  //   for(auto iCut: ptCuts){
-  //     bool isOMTFAcceptance = fabs(myGenObj.eta())>0.83 && fabs(myGenObj.eta())<1.24;
-  //     if(!isOMTFAcceptance) continue;
-  //     fillTurnOnCurve(iCut, "OMTF", selType);
-  //     fillTurnOnCurve(iCut, "BMTF", selType);
-  //     fillTurnOnCurve(iCut, "EMTF", selType);
-  //   } 
-  // }
+    fillRateHisto("Vx","VsEta_"+selType);
+    fillRateHisto("OMTF","VsEta_"+selType);
+    fillRateHisto("BMTF","VsEta_"+selType);
+    fillRateHisto("EMTF","VsEta_"+selType);
 
-  // fillRateHisto("Vx","Tot");
-  // fillRateHisto("OMTF","Tot");
-  // fillRateHisto("BMTF","Tot");
-  // fillRateHisto("EMTF","Tot");
+    for(auto iCut: ptCuts){
+      bool isOMTFAcceptance = fabs(myGenObj.eta())>0.83 && fabs(myGenObj.eta())<1.24;
+      if(!isOMTFAcceptance) continue;
+      fillTurnOnCurve(iCut, "OMTF", selType);
+      fillTurnOnCurve(iCut, "BMTF", selType);
+      fillTurnOnCurve(iCut, "EMTF", selType);
+    } 
+  }
 
-  // fillRateHisto("Vx","VsPt");
-  // fillRateHisto("OMTF","VsPt");
-  // fillRateHisto("BMTF","VsPt");
-  // fillRateHisto("EMTF","VsPt");
+  fillRateHisto("Vx","Tot");
+  fillRateHisto("OMTF","Tot");
+  fillRateHisto("BMTF","Tot");
+  fillRateHisto("EMTF","Tot");
 
-  // fillRateHisto("Vx","VsEta");
-  // fillRateHisto("OMTF","VsEta");
-  // fillRateHisto("BMTF","VsEta");
-  // fillRateHisto("EMTF","VsEta");
+  fillRateHisto("Vx","VsPt");
+  fillRateHisto("OMTF","VsPt");
+  fillRateHisto("BMTF","VsPt");
+  fillRateHisto("EMTF","VsPt");
 
-  // fillRateHisto("Vx","VsQuality");
-  // fillRateHisto("OMTF","VsQuality");
-  // fillRateHisto("BMTF","VsQuality");
-  // fillRateHisto("EMTF","VsQuality");
+  fillRateHisto("Vx","VsEta");
+  fillRateHisto("OMTF","VsEta");
+  fillRateHisto("BMTF","VsEta");
+  fillRateHisto("EMTF","VsEta");
+
+  fillRateHisto("Vx","VsQuality");
+  fillRateHisto("OMTF","VsQuality");
+  fillRateHisto("BMTF","VsQuality");
+  fillRateHisto("EMTF","VsQuality");
   
   return true;
 }
