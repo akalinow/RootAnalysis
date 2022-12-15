@@ -859,7 +859,7 @@ bool GMTAnalyzer::analyze(const EventProxyBase& iEvent){
     if(std::abs(aGenObj.pdgId())!=13) continue;
     if(std::abs(aGenObj.status())!=1) continue;
     myGenObj = aGenObj;
-    fillHistosForGenMuon();
+    fillHistosForGenMuon();   // tworzy histogram 2d tylko, ze zrekonstruowane sa zawsze zerowe
     // fillBendingHistos("OMTF");
   }
   std::vector<int> ptCuts = {0, 10, 13, 15, 16, 18, 19, 20, 21, 22, 23};
