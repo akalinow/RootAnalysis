@@ -147,61 +147,85 @@ void GMTHistograms::finalizeHistograms(){
   finaliseGoldenPatterns("h3DBending");
   finaliseGoldenPatterns("h3DBendingRotated");
 
-  plotRate("Tot");
-  plotRate("VsEta");
-  plotRate("VsPt");
-  plotRate("VsQuality");
+  ///////////////////////////////////////////
+  plotEffPanel("uGMT_emu");     // important
+  plotEffVsEta("uGMT_emu");
+  plotEffVsVar("uGMT_emu","EtaVx");
+  plotEffVsVar("uGMT_emu","PhiVx");
 
-  std::vector<int> ptCuts = {10, 13, 15, 16, 18, 19, 20, 21, 22, 23};
-  for(auto iCut: ptCuts){
-    plotEffVsRate(iCut);
-  }
-  plotRate("VsEta_quality");
-  plotEffVsEtaVsQuality();
-
-  plotEffPanel("OMTF");
-  plotEffPanel("BMTF");
-  plotEffPanel("EMTF");
-    
   bool doHigh = true;
-  plotEffPanel("OMTF", doHigh);
-  plotEffPanel("BMTF", doHigh);
-  plotEffPanel("EMTF", doHigh);
-  plotEffVsEta("OMTF");
-  plotEffVsEta("EMTF");
-  plotEffVsEta("BMTF");
-  plotEffVsVar("OMTF","EtaVx");
-  plotEffVsVar("OMTF","PhiVx");
-  plotEffVsVar("EMTF","EtaVx");
-  plotEffVsVar("EMTF","PhiVx");
-  plotSingleHistogram("h2DOMTFPtRecVsPtGen");
-  plotSingleHistogram("h2DEMTFPtRecVsPtGen");
-  plotSingleHistogram("h2DBMTFPtRecVsPtGen");
+  plotEffPanel("uGMT_emu", doHigh);
+
+  plotSingleHistogram("h2DuGMT_emuPtRecVsPtGen");
+  plotQuantiles("h2DuGMT_emuPtRecVsPtGen");
+  
 
   for(int iPtCode=1;iPtCode<=30;++iPtCode){
-    plotOMTFVsOther(iPtCode,"BMTF");
-    plotOMTFVsOther(iPtCode,"EMTF");
+    plotOMTFVsOther(iPtCode,"uGMT_emu");
   }
-   
+
   plotSingleHistogram("h1DLLH_Low");
   plotSingleHistogram("h1DLLH_High");
   plotLLH();
 
-  plotSingleHistogram("h1DHitsPattern_Low_HitCount");
-  plotSingleHistogram("h1DHitsPattern_High_HitCount");
+  return;
 
-  plotSingleHistogram("h1DHitsPattern_Low_RefLayer");
-  plotSingleHistogram("h1DHitsPattern_High_RefLayer");
+  // plotRate("VsEta");
+  // plotRate("VsPt");
+  // plotRate("VsQuality");
 
-  plotSingleHistogram("h1DHitsPattern_Low_RefPhi");
-  plotSingleHistogram("h1DHitsPattern_High_RefPhi");
+  // std::vector<int> ptCuts = {10, 13, 15, 16, 18, 19, 20, 21, 22, 23};
+  // for(auto iCut: ptCuts){
+  //   plotEffVsRate(iCut);
+  // }
+  // plotRate("VsEta_quality");
+  // plotEffVsEtaVsQuality();
 
-  plotSingleHistogram("h1DDeltaEta_Low");
-  plotSingleHistogram("h1DDeltaEta_High");
+  // plotEffPanel("OMTF");
+  // plotEffPanel("BMTF");
+  // plotEffPanel("EMTF");
+    
+  // bool doHigh = true;
+  // plotEffPanel("OMTF", doHigh);
+  // plotEffPanel("BMTF", doHigh);
+  // plotEffPanel("EMTF", doHigh);
+  // plotEffVsEta("OMTF");
+  // plotEffVsEta("EMTF");
+  // plotEffVsEta("BMTF");
+  // plotEffVsVar("OMTF","EtaVx");
+  // plotEffVsVar("OMTF","PhiVx");
+  // plotEffVsVar("EMTF","EtaVx");
+  // plotEffVsVar("EMTF","PhiVx");
+  // plotSingleHistogram("h2DOMTFPtRecVsPtGen");
+  // plotSingleHistogram("h2DEMTFPtRecVsPtGen");
+  // plotSingleHistogram("h2DBMTFPtRecVsPtGen");
 
-  plotQuantiles("h2DOMTFPtRecVsPtGen");
-  plotQuantiles("h2DEMTFPtRecVsPtGen");
-  plotQuantiles("h2DBMTFPtRecVsPtGen");
+  // for(int iPtCode=1;iPtCode<=30;++iPtCode){
+  //   plotOMTFVsOther(iPtCode,"BMTF");
+  //   plotOMTFVsOther(iPtCode,"EMTF");
+  // }
+   
+  // plotSingleHistogram("h1DLLH_Low");
+  // plotSingleHistogram("h1DLLH_High");
+  // plotLLH();
+
+  ////////////////////////////// For GMT muons, those histograms are not created 
+  // plotSingleHistogram("h1DHitsPattern_Low_HitCount");  
+  // plotSingleHistogram("h1DHitsPattern_High_HitCount");
+
+  // plotSingleHistogram("h1DHitsPattern_Low_RefLayer");
+  // plotSingleHistogram("h1DHitsPattern_High_RefLayer");
+
+  // plotSingleHistogram("h1DHitsPattern_Low_RefPhi");
+  // plotSingleHistogram("h1DHitsPattern_High_RefPhi");
+
+  // plotSingleHistogram("h1DDeltaEta_Low");
+  // plotSingleHistogram("h1DDeltaEta_High");
+  //////////////////////////////////////////////////
+
+  // plotQuantiles("h2DOMTFPtRecVsPtGen");
+  // plotQuantiles("h2DEMTFPtRecVsPtGen");
+  // plotQuantiles("h2DBMTFPtRecVsPtGen");
   
 }
 /////////////////////////////////////////////////////////
