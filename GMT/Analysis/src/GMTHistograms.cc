@@ -147,85 +147,56 @@ void GMTHistograms::finalizeHistograms(){
   finaliseGoldenPatterns("h3DBending");
   finaliseGoldenPatterns("h3DBendingRotated");
 
-  ///////////////////////////////////////////
-  // plotEffPanel("uGMT_emu");     // important
-  // plotEffVsEta("uGMT_emu");
-  // plotEffVsVar("uGMT_emu","EtaVx");
-  // plotEffVsVar("uGMT_emu","PhiVx");
+    for(int iPtCode=1;iPtCode<=30;++iPtCode){
+    plotOMTFVsOther(iPtCode,"uGMT_emu");
+  }
 
-  // bool doHigh = true;
-  // plotEffPanel("uGMT_emu", doHigh);
+  std::vector<int> ptCuts = {10, 13, 15, 16, 18, 19, 20, 21, 22, 23};
+  for(auto iCut: ptCuts){
+    plotEffVsRate(iCut);
+  }
 
-  // plotSingleHistogram("h2DuGMT_emuPtRecVsPtGen");
-  // plotQuantiles("h2DuGMT_emuPtRecVsPtGen");
-  
-
-  // for(int iPtCode=1;iPtCode<=30;++iPtCode){
-  //   plotOMTFVsOther(iPtCode,"uGMT_emu");
-  // }
-
-  // plotSingleHistogram("h1DLLH_Low");
-  // plotSingleHistogram("h1DLLH_High");
-  // plotLLH();
+  plotRate("VsEta_quality");
+  plotEffVsEtaVsQuality();
 
   plotRate("VsEta");
-
   plotRate("VsPt");
   plotRate("VsQuality");
-  return;
-
-  // std::vector<int> ptCuts = {10, 13, 15, 16, 18, 19, 20, 21, 22, 23};
-  // for(auto iCut: ptCuts){
-  //   plotEffVsRate(iCut);
-  // }
-  // plotRate("VsEta_quality");
-  // plotEffVsEtaVsQuality();
-
-  // plotEffPanel("OMTF");
-  // plotEffPanel("BMTF");
-  // plotEffPanel("EMTF");
+  plotRate("VsEta_quality");
     
-  // bool doHigh = true;
-  // plotEffPanel("OMTF", doHigh);
-  // plotEffPanel("BMTF", doHigh);
-  // plotEffPanel("EMTF", doHigh);
-  // plotEffVsEta("OMTF");
-  // plotEffVsEta("EMTF");
-  // plotEffVsEta("BMTF");
-  // plotEffVsVar("OMTF","EtaVx");
-  // plotEffVsVar("OMTF","PhiVx");
-  // plotEffVsVar("EMTF","EtaVx");
-  // plotEffVsVar("EMTF","PhiVx");
-  // plotSingleHistogram("h2DOMTFPtRecVsPtGen");
-  // plotSingleHistogram("h2DEMTFPtRecVsPtGen");
-  // plotSingleHistogram("h2DBMTFPtRecVsPtGen");
+  bool doHigh = true;
+  plotEffPanel("uGMT_emu", doHigh);
+  plotEffPanel("uGMT_emu");
+  plotEffVsEta("uGMT_emu");
 
-  // for(int iPtCode=1;iPtCode<=30;++iPtCode){
-  //   plotOMTFVsOther(iPtCode,"BMTF");
-  //   plotOMTFVsOther(iPtCode,"EMTF");
-  // }
+  plotEffVsVar("uGMT_emu","EtaVx");
+  plotEffVsVar("uGMT_emu","PhiVx");
+
+  plotSingleHistogram("h2DuGMT_emuPtRecVsPtGen");
+
+  for(int iPtCode=1;iPtCode<=30;++iPtCode){
+      plotOMTFVsOther(iPtCode,"uGMT_emu");
+  }
    
-  // plotSingleHistogram("h1DLLH_Low");
-  // plotSingleHistogram("h1DLLH_High");
-  // plotLLH();
+  plotSingleHistogram("h1DLLH_Low");
+  plotSingleHistogram("h1DLLH_High");
+  plotLLH();
 
   ////////////////////////////// For GMT muons, those histograms are not created 
-  // plotSingleHistogram("h1DHitsPattern_Low_HitCount");  
-  // plotSingleHistogram("h1DHitsPattern_High_HitCount");
+  plotSingleHistogram("h1DHitsPattern_Low_HitCount");  
+  plotSingleHistogram("h1DHitsPattern_High_HitCount");
 
-  // plotSingleHistogram("h1DHitsPattern_Low_RefLayer");
-  // plotSingleHistogram("h1DHitsPattern_High_RefLayer");
+  plotSingleHistogram("h1DHitsPattern_Low_RefLayer");
+  plotSingleHistogram("h1DHitsPattern_High_RefLayer");
 
-  // plotSingleHistogram("h1DHitsPattern_Low_RefPhi");
-  // plotSingleHistogram("h1DHitsPattern_High_RefPhi");
+  plotSingleHistogram("h1DHitsPattern_Low_RefPhi");
+  plotSingleHistogram("h1DHitsPattern_High_RefPhi");
 
-  // plotSingleHistogram("h1DDeltaEta_Low");
-  // plotSingleHistogram("h1DDeltaEta_High");
+  plotSingleHistogram("h1DDeltaEta_Low");
+  plotSingleHistogram("h1DDeltaEta_High");
   //////////////////////////////////////////////////
 
-  // plotQuantiles("h2DOMTFPtRecVsPtGen");
-  // plotQuantiles("h2DEMTFPtRecVsPtGen");
-  // plotQuantiles("h2DBMTFPtRecVsPtGen");
+  plotQuantiles("h2DuGMT_emuPtRecVsPtGen");
   
 }
 /////////////////////////////////////////////////////////
@@ -614,7 +585,7 @@ void GMTHistograms::plotRate(std::string type){
   if(type.find("VsEta_quality")!=std::string::npos){
    hRateuGMT_emu = getRateHisto("uGMT_emu","VsEta_quality0");
    hRateVx = getRateHisto("uGMT_emu","VsEta_quality1");
-   hRateOMTF = getRateHisto("uGMT_emu","VsEta_quality2");
+   hRateOMTF = getRateHisto("OMTF","VsEta_quality2");
    hRateEMTF = getRateHisto("uGMT_emu","VsEta_quality3");    
   }
 
@@ -788,7 +759,7 @@ void GMTHistograms::plotEffVsRate(int iPtCut){
   TGraph *aGraph = new TGraph();
   aGraph->SetMarkerSize(1.3);
   std::map<std::string, TGraph*> sysGraphs;
-  std::vector<std::string >sysTypes = {"OMTF", "BMTF", "EMTF"};
+  std::vector<std::string >sysTypes = {"OMTF", "uGMT_emu", "EMTF"};
   for(auto && sysType: sysTypes){
     for(int iQuality=0;iQuality<4;++iQuality){
       std::string selType = std::string(TString::Format("quality%d",iQuality));      
@@ -816,7 +787,7 @@ void GMTHistograms::plotEffVsRate(int iPtCut){
       aGraph->SetMarkerColor(4);
       aGraph->SetMarkerStyle(22);
     }
-    if(sysType=="BMTF"){
+    if(sysType=="uGMT_emu"){
       aGraph->SetMarkerColor(2);
       aGraph->SetMarkerStyle(20);
     }
@@ -842,7 +813,7 @@ void GMTHistograms::plotEffVsRate(int iPtCut){
 
   hFrame->Draw();
   sysGraphs["OMTF"]->Draw("P");
-  sysGraphs["BMTF"]->Draw("P");
+  sysGraphs["uGMT_emu"]->Draw("P");
   sysGraphs["EMTF"]->Draw("P");
 
   TLegend *leg = new TLegend(0.2149123,0.6716102,0.4539474,0.8644068,NULL,"brNDC");
@@ -852,7 +823,7 @@ void GMTHistograms::plotEffVsRate(int iPtCut){
   leg->SetFillColor(10);
   leg->SetHeader(TString::Format("p_{T}^{REC} #geq %d GeV/c", (int)ptBins[iPtCut]));
   leg->AddEntry(sysGraphs["OMTF"],"Phase 1","p");
-  leg->AddEntry(sysGraphs["BMTF"],"LUT NN","p");
+  leg->AddEntry(sysGraphs["uGMT_emu"],"LUT NN","p");
   leg->AddEntry(sysGraphs["EMTF"],"TF NN","p");
   leg->Draw();
 
@@ -864,31 +835,31 @@ void GMTHistograms::plotEffVsRate(int iPtCut){
 ////////////////////////////////////////////////////////////////
 void GMTHistograms::plotEffVsEtaVsQuality(){
 
-  std::string hName = "h2DBMTF_quality1EtaVx25";
+  std::string hName = "h2DuGMT_emu_quality1EtaVx25";
   TH1D * hEffVx = getEfficiencyHisto(hName);
 
-  hName = "h2DBMTF_quality0EtaVx25";
-  TH1D * hEffBMTF = getEfficiencyHisto(hName);
+  hName = "h2DuGMT_emu_quality0EtaVx25";
+  TH1D * hEffuGMT_emu = getEfficiencyHisto(hName);
 
-  hName = "h2DBMTF_quality2EtaVx25";
+  hName = "h2DuGMT_emu_quality2EtaVx25";
   TH1D * hEffOMTF = getEfficiencyHisto(hName);
 
-  hName = "h2DBMTF_quality3EtaVx25";
+  hName = "h2DuGMT_emu_quality3EtaVx25";
   TH1D * hEffEMTF = getEfficiencyHisto(hName);
 
-  if(!hEffVx || !hEffBMTF || !hEffOMTF || !hEffEMTF) return;
+  if(!hEffVx || !hEffuGMT_emu || !hEffOMTF || !hEffEMTF) return;
 
   hEffVx->SetLineWidth(3);
-  hEffBMTF->SetLineWidth(3);
+  hEffuGMT_emu->SetLineWidth(3);
   hEffEMTF->SetLineWidth(3);
   hEffOMTF->SetLineWidth(3);
 
   hEffVx->SetLineColor(1);
-  hEffBMTF->SetLineColor(2);
+  hEffuGMT_emu->SetLineColor(2);
   hEffEMTF->SetLineColor(9);
   hEffOMTF->SetLineColor(4);
 
-  hEffBMTF->SetLineStyle(2);
+  hEffuGMT_emu->SetLineStyle(2);
   hEffEMTF->SetLineStyle(3);
 
   TCanvas* c = new TCanvas("EffVsEtaVsQuality","EffVsEtaVsQuality",460,500);
@@ -901,15 +872,15 @@ void GMTHistograms::plotEffVsEtaVsQuality(){
   l.SetFillColor(10);
 
 
-  hEffBMTF->SetXTitle("muon #eta");
-  hEffBMTF->SetYTitle("Efficiency for p_{T}^{cut}<p_{T}^{Gen}<p_{T}^{cut}+50 GeV");  
-  hEffBMTF->SetMaximum(1.0);
-  hEffBMTF->Draw();
+  hEffuGMT_emu->SetXTitle("muon #eta");
+  hEffuGMT_emu->SetYTitle("Efficiency for p_{T}^{cut}<p_{T}^{Gen}<p_{T}^{cut}+50 GeV");  
+  hEffuGMT_emu->SetMaximum(1.0);
+  hEffuGMT_emu->Draw();
   hEffVx->Draw("same");
   hEffOMTF->Draw("same");
   hEffEMTF->Draw("same");
 
-  l.AddEntry(hEffBMTF,"Q=0");
+  l.AddEntry(hEffuGMT_emu,"Q=0");
   l.AddEntry(hEffVx,"Q=1");
   l.AddEntry(hEffOMTF,"Q=2");
   l.AddEntry(hEffEMTF,"Q=3");  
