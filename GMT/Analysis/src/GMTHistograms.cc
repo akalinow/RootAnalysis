@@ -148,31 +148,31 @@ void GMTHistograms::finalizeHistograms(){
   finaliseGoldenPatterns("h3DBendingRotated");
 
   ///////////////////////////////////////////
-  plotEffPanel("uGMT_emu");     // important
-  plotEffVsEta("uGMT_emu");
-  plotEffVsVar("uGMT_emu","EtaVx");
-  plotEffVsVar("uGMT_emu","PhiVx");
+  // plotEffPanel("uGMT_emu");     // important
+  // plotEffVsEta("uGMT_emu");
+  // plotEffVsVar("uGMT_emu","EtaVx");
+  // plotEffVsVar("uGMT_emu","PhiVx");
 
-  bool doHigh = true;
-  plotEffPanel("uGMT_emu", doHigh);
+  // bool doHigh = true;
+  // plotEffPanel("uGMT_emu", doHigh);
 
-  plotSingleHistogram("h2DuGMT_emuPtRecVsPtGen");
-  plotQuantiles("h2DuGMT_emuPtRecVsPtGen");
+  // plotSingleHistogram("h2DuGMT_emuPtRecVsPtGen");
+  // plotQuantiles("h2DuGMT_emuPtRecVsPtGen");
   
 
-  for(int iPtCode=1;iPtCode<=30;++iPtCode){
-    plotOMTFVsOther(iPtCode,"uGMT_emu");
-  }
+  // for(int iPtCode=1;iPtCode<=30;++iPtCode){
+  //   plotOMTFVsOther(iPtCode,"uGMT_emu");
+  // }
 
-  plotSingleHistogram("h1DLLH_Low");
-  plotSingleHistogram("h1DLLH_High");
-  plotLLH();
+  // plotSingleHistogram("h1DLLH_Low");
+  // plotSingleHistogram("h1DLLH_High");
+  // plotLLH();
 
+  plotRate("VsEta");
+
+  plotRate("VsPt");
+  plotRate("VsQuality");
   return;
-
-  // plotRate("VsEta");
-  // plotRate("VsPt");
-  // plotRate("VsQuality");
 
   // std::vector<int> ptCuts = {10, 13, 15, 16, 18, 19, 20, 21, 22, 23};
   // for(auto iCut: ptCuts){
@@ -606,31 +606,31 @@ TH1* GMTHistograms::getRateHisto(std::string sysType,
 ////////////////////////////////////////////////////////////////
 void GMTHistograms::plotRate(std::string type){
   
-  TH1 *hRateBMTF = getRateHisto("BMTF",type);
+  TH1 *hRateuGMT_emu = getRateHisto("uGMT_emu",type);
   TH1 *hRateVx = getRateHisto("Vx",type);
   TH1 *hRateOMTF = getRateHisto("OMTF",type);
   TH1 *hRateEMTF = getRateHisto("EMTF",type);
 
   if(type.find("VsEta_quality")!=std::string::npos){
-   hRateBMTF = getRateHisto("BMTF","VsEta_quality0");
-   hRateVx = getRateHisto("BMTF","VsEta_quality1");
-   hRateOMTF = getRateHisto("BMTF","VsEta_quality2");
-   hRateEMTF = getRateHisto("BMTF","VsEta_quality3");    
+   hRateuGMT_emu = getRateHisto("uGMT_emu","VsEta_quality0");
+   hRateVx = getRateHisto("uGMT_emu","VsEta_quality1");
+   hRateOMTF = getRateHisto("uGMT_emu","VsEta_quality2");
+   hRateEMTF = getRateHisto("uGMT_emu","VsEta_quality3");    
   }
 
-  if(!hRateVx || !hRateBMTF || !hRateOMTF || !hRateEMTF) return;
+  if(!hRateVx || !hRateuGMT_emu || !hRateOMTF || !hRateEMTF) return;
 
   hRateVx->SetLineWidth(3);
-  hRateBMTF->SetLineWidth(3);
+  hRateuGMT_emu->SetLineWidth(3);
   hRateEMTF->SetLineWidth(3);
   hRateOMTF->SetLineWidth(3);
 
   hRateVx->SetLineColor(1);
-  hRateBMTF->SetLineColor(2);
+  hRateuGMT_emu->SetLineColor(2);
   hRateEMTF->SetLineColor(kGreen-2);
   hRateOMTF->SetLineColor(4);
 
-  hRateBMTF->SetLineStyle(2);
+  hRateuGMT_emu->SetLineStyle(2);
   hRateEMTF->SetLineStyle(1);
 
   TCanvas* c = new TCanvas("cRate","Rate",1.5*420,1.5*500);
@@ -645,7 +645,7 @@ void GMTHistograms::plotRate(std::string type){
 
   if(type.find("Tot")!=std::string::npos){
     hRateVx->SetAxisRange(2,50);
-    hRateBMTF->SetAxisRange(2,50);
+    hRateuGMT_emu->SetAxisRange(2,50);
     hRateEMTF->SetAxisRange(2,50);
     hRateOMTF->SetAxisRange(2,50);
     hRateVx->SetMinimum(1E1);
@@ -663,26 +663,26 @@ void GMTHistograms::plotRate(std::string type){
     pad1->SetLogy();
     pad1->SetGrid(1,0);
     hRateVx->Draw();
-    hRateBMTF->DrawCopy("same");
+    hRateuGMT_emu->DrawCopy("same");
     hRateEMTF->DrawCopy("same");
     hRateOMTF->DrawCopy("same");
 
     std::cout<<"Rate OMTF @ 20 GeV: "<< hRateOMTF->GetBinContent(hRateOMTF->FindBin(20-0.01))<<std::endl;
-    std::cout<<"Rate other @ 20 GeV: "<< hRateBMTF->GetBinContent(hRateBMTF->FindBin(20-0.01))<<std::endl;
+    std::cout<<"Rate other @ 20 GeV: "<< hRateuGMT_emu->GetBinContent(hRateuGMT_emu->FindBin(20-0.01))<<std::endl;
 
     c->cd();
     pad2->Draw();
     pad2->cd();
     
-    hRateBMTF->SetYTitle("new model/Phase1");
-    hRateBMTF->GetXaxis()->SetLabelSize(0.09);
-    hRateBMTF->GetYaxis()->SetLabelSize(0.09);
-    hRateBMTF->GetYaxis()->SetTitleSize(0.09);
-    hRateBMTF->GetYaxis()->SetTitleOffset(0.5);
-    hRateBMTF->Divide(hRateOMTF);
-    hRateBMTF->SetMaximum(1.5);
-    hRateBMTF->SetMinimum(0.2);
-    hRateBMTF->DrawCopy();
+    hRateuGMT_emu->SetYTitle("new model/Phase1");
+    hRateuGMT_emu->GetXaxis()->SetLabelSize(0.09);
+    hRateuGMT_emu->GetYaxis()->SetLabelSize(0.09);
+    hRateuGMT_emu->GetYaxis()->SetTitleSize(0.09);
+    hRateuGMT_emu->GetYaxis()->SetTitleOffset(0.5);
+    hRateuGMT_emu->Divide(hRateOMTF);
+    hRateuGMT_emu->SetMaximum(1.5);
+    hRateuGMT_emu->SetMinimum(0.2);
+    hRateuGMT_emu->DrawCopy();
 
     hRateEMTF->Divide(hRateOMTF);
     hRateEMTF->DrawCopy("same");
@@ -694,33 +694,33 @@ void GMTHistograms::plotRate(std::string type){
   }  
   if(type.find("VsEta_quality")!=std::string::npos){
     c->SetLogy(0);
-    hRateBMTF->SetXTitle("muon #eta");
-    double max = hRateBMTF->GetMaximum();
+    hRateuGMT_emu->SetXTitle("muon #eta");
+    double max = hRateuGMT_emu->GetMaximum();
     if(hRateOMTF->GetMaximum()>max) max = hRateOMTF->GetMaximum();
-    hRateBMTF->SetMaximum(1.5*max);
-    hRateBMTF->Draw();
+    hRateuGMT_emu->SetMaximum(1.5*max);
+    hRateuGMT_emu->Draw();
     hRateVx->Draw("same");
     hRateOMTF->Draw("same");
     hRateEMTF->Draw("same");
   }
   else if(type.find("VsEta")!=std::string::npos){
     c->SetLogy(0);
-    hRateBMTF->SetXTitle("muon #eta");
-    double max = hRateBMTF->GetMaximum();
+    hRateuGMT_emu->SetXTitle("muon #eta");
+    double max = hRateuGMT_emu->GetMaximum();
     if(hRateOMTF->GetMaximum()>max) max = hRateOMTF->GetMaximum();
-    hRateBMTF->SetMaximum(1.5*max);
-    hRateBMTF->Draw();
+    hRateuGMT_emu->SetMaximum(1.5*max);
+    hRateuGMT_emu->Draw();
     hRateOMTF->Draw("same");
     hRateEMTF->Draw("same");
   }
   if(type=="VsPt"){
     c->SetLogy(1);
-    hRateBMTF->SetXTitle("p_{T}^{gen} [GeV/c]");
-    hRateBMTF->SetAxisRange(2,100);
-    double max = hRateBMTF->GetMaximum();
+    hRateuGMT_emu->SetXTitle("p_{T}^{gen} [GeV/c]");
+    hRateuGMT_emu->SetAxisRange(2,100);
+    double max = hRateuGMT_emu->GetMaximum();
     if(hRateOMTF->GetMaximum()>max) max = hRateOMTF->GetMaximum();
-    hRateBMTF->SetMaximum(10*max);
-    hRateBMTF->Draw();
+    hRateuGMT_emu->SetMaximum(10*max);
+    hRateuGMT_emu->Draw();
     hRateOMTF->Draw("same");
     hRateEMTF->Draw("same");
   }
@@ -762,14 +762,14 @@ void GMTHistograms::plotRate(std::string type){
   }
 
   if(type=="VsEta_quality"){
-    leg->AddEntry(hRateBMTF,"Q=0");
+    leg->AddEntry(hRateuGMT_emu,"Q=0");
     leg->AddEntry(hRateVx,"Q=1");
     leg->AddEntry(hRateOMTF,"Q=2");
     leg->AddEntry(hRateEMTF,"Q=3");
   }
   else{
     leg->AddEntry(hRateOMTF,"Phase 1");
-    leg->AddEntry(hRateBMTF,"LUT NN");
+    leg->AddEntry(hRateuGMT_emu,"LUT NN");
     leg->AddEntry(hRateEMTF,"TF NN");
   }
   leg->Draw();
