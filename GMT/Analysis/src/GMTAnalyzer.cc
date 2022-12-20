@@ -20,13 +20,6 @@ std::vector<double> ptRanges = {0.,   1.,   2.,   3.,   4.,
                                   25.,  26.,  28.,  30.,  32.,  34.,
                                   36.,  38.,  40.,  50.,  60.,
                                   70.,  80.,  90.,  100., 200., 99999};
-/*
- std::vector<double> ptRanges ={0., 0.1,
-				 1.5, 2., 2.5, 3., 3.5, 4., 4.5, 5., 6., 7., 8.,
-				 10., 12., 14., 16., 18., 20., 25., 30., 35., 40., 45.,
-				 50., 60., 70., 80., 90., 100., 120., 140.,
-				 160. };
-*/
 
 //////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////
@@ -267,8 +260,8 @@ void GMTAnalyzer::fillRateHisto(const std::string & sysType,
 // //////////////////////////////////////////////////////////////////////////////
 void GMTAnalyzer::fillHistosForGenMuon(){   // quick
 
-  bool isOMTFAcceptance = fabs(myGenObj.eta())>0.83 && fabs(myGenObj.eta())<1.24;
-  if(!isOMTFAcceptance) return;
+  bool isGMTAcceptance = fabs(myGenObj.eta())<2.8;
+  if(!isGMTAcceptance) return;
 
   std::string selType = "";
   for(int iCut=0;iCut<31;++iCut){
@@ -405,9 +398,9 @@ bool GMTAnalyzer::analyze(const EventProxyBase& iEvent){
     fillRateHisto("uGMT_emu","VsEta_"+selType);
     fillRateHisto("EMTF","VsEta_"+selType);
 
-    for(auto iCut: ptCuts){
-      bool isOMTFAcceptance = fabs(myGenObj.eta())>0.83 && fabs(myGenObj.eta())<1.24;
-      if(!isOMTFAcceptance) continue;
+    for(auto iCut: ptCuts){      
+      bool isGMTAcceptance = fabs(myGenObj.eta())<2.8;
+      if(!isGMTAcceptance) continue;
       fillTurnOnCurve(iCut, "OMTF", selType);
       fillTurnOnCurve(iCut, "uGMT_emu", selType);
       fillTurnOnCurve(iCut, "EMTF", selType);

@@ -9,9 +9,11 @@
 
 #pragma link C++ class GenObj+;
 #pragma link C++ class L1Obj+;
+#pragma link C++ class L1PhaseIIObj+;
 
 #pragma link C++ class GenObjColl+;
 #pragma link C++ class L1ObjColl+;
+#pragma link C++ class L1PhaseIIObjColl+;
 
 #pragma link C++ class vector<TLorentzVector>;
 #pragma link C++ class vector<TVector2>;

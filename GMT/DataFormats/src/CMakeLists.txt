@@ -12,7 +12,7 @@ include_directories(${PROJECT_SOURCE_DIR}/../include )
 
 ROOT_GENERATE_DICTIONARY(G__OMTFObjects EventObj.h GenObj.h GenObjColl.h L1Obj.h L1ObjColl.h L1PhaseIIObj.h L1PhaseIIObjColl.h LINKDEF ${PROJECT_SOURCE_DIR}/../include/LinkDef.h)
 # 
-add_library(OMTFDataFormats SHARED EventObj.cc GenObj.cc L1Obj.cc L1ObjColl.cc L1PhaseIIObj.cc L1PhaseIIObjColl.cc  G__OMTFObjects.cxx EventProxyOMTF.cc)
+add_library(OMTFDataFormats SHARED EventObj.cc GenObj.cc L1Obj.cc L1PhaseIIObj.cc L1ObjColl.cc L1PhaseIIObj.cc L1PhaseIIObjColl.cc  G__OMTFObjects.cxx EventProxyOMTF.cc)
 # 
 # Define headers for this library. PUBLIC headers are used for
 # compiling the library, and will be added to consumers' build
@@ -28,3 +28,4 @@ if(EXISTS libOMTFObjects_rdict.pcm)
   install(FILES libOMTFObjects_rdict.pcm libOMTFObjects.rootmap DESTINATION lib)
 endif()
 
+ 

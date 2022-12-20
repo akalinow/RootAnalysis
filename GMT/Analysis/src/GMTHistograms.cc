@@ -107,14 +107,14 @@ void GMTHistograms::defineHistograms(){
  add2DHistogram("h2DEtaHitTemplate","",8*26,0.8,1.25,2,-0.5,1.5,file_);
  add2DHistogram("h2DPhiHitTemplate","",5*32,-M_PI,M_PI,2,-0.5,1.5,file_);
 
- add2DHistogram("h2DEtaVxTemplate","",10,0.8,1.3,2,-0.5,1.5,file_);
+ add2DHistogram("h2DEtaVxTemplate","",60,-3,3,2,-0.5,1.5,file_);
  add2DHistogram("h2DPhiVxTemplate","",4*32,-3.2,3.2,2,-0.5,1.5,file_);
 
  add2DHistogram("h2DQualityTemplate","",201,-0.5,200.5,2,-0.5,1.5,file_);
 
  //Rate histos
  add2DHistogram("h2DRateTotTemplate","",404,1,202,404,1,202,file_);
- add2DHistogram("h2DRateVsEtaTemplate","",404,1,202,10,0.8,1.3,file_);
+ add2DHistogram("h2DRateVsEtaTemplate","",404,1,202,60,-3,3,file_);
 
  add2DHistogram("h2DDeltaPhiTemplate","",30,-1,1,2,-0.5,1.5,file_);
  add2DHistogram("h2DDeltaPtTemplate","",21,-0.5,20.5,2,-0.5,1.5,file_);
@@ -143,6 +143,7 @@ void GMTHistograms::finalizeHistograms(){
 
   AnalysisHistograms::finalizeHistograms();
   utilsL1RpcStyle()->cd();
+  gErrorIgnoreLevel = kError;
 
   finaliseGoldenPatterns("h3DBending");
   finaliseGoldenPatterns("h3DBendingRotated");
