@@ -47,30 +47,19 @@ private:
 	       const std::string & varName);
 
 
-  void plotOMTFVsOther(int iPt, std::string sysType="BMTF");
+  void plotGMTVsOther(int iPt, std::string sysType="BMTF");
 
   void plotSingleHistogram(std::string hName);
-
-  void plotLLH();
 
   TH2F* makeRateWeights(TH2 *hOrig);
   TH1* getRateHisto(std::string sysType = "Vx",
 		    std::string type = "Tot");
   void plotRate(std::string type);
   void plotEffVsRate(int iPtCut);
-  void plotEffVsEtaVsQuality();
-  void plotGhostHistos(const std::string & sysType,
-		       const std::string & type);
   
   float getEfficiency(TH2F *h2D, float ptCut);
 
   TH1D *getEfficiencyHisto(const std::string & hName);
-
-  TH1F *sortRateHisto(TH1F *h1DRate, TH2F *h2DEff, std::string by);
-
-  void finaliseGoldenPatterns(std::string hName = "h3DBending");
-
-  void plotQuantiles(const std::string & hName);
  
   ///Types of the selection flow
   std::vector<std::string> selectionFlavours_;

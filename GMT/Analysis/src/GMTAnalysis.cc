@@ -37,14 +37,8 @@ int main(int argc, char ** argv) {
   TObject::SetObjectStat(false);
   
   //----------------------------------------------------------
-  std::vector<Analyzer*> myAnalyzers;
-
-  std::cout << typeid(myAnalyzers).name() << '\n';
-  
-  EventProxyOMTF *myEvent = new EventProxyOMTF();
-
-  std::cout << typeid(myEvent).name() << std::endl;
-  
+  std::vector<Analyzer*> myAnalyzers;  
+  EventProxyOMTF *myEvent = new EventProxyOMTF();  
   myAnalyzers.push_back(new GMTAnalyzer(processName+"Analyzer"));
   
   TreeAnalyzer *tree = new TreeAnalyzer("TreeAnalyzer",cfgFileName, myEvent);
@@ -63,8 +57,5 @@ int main(int argc, char ** argv) {
   for(unsigned int i=0;i<myAnalyzers.size();++i) delete myAnalyzers[i];
   delete tree;
   delete myEvent;
-  
-  std::cout<<"Hi Kuba, it is working, GMT. Our new objects should be visible to the program"<<std::endl;
   return 0;
-   
 }

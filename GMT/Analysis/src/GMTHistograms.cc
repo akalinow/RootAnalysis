@@ -23,7 +23,6 @@ const float GMTHistograms::ptBins[36]={0., 0.1,
 
 const int GMTHistograms::color[6] = {kBlack, kBlue, kRed, kMagenta, kTeal, kGreen};
 //Single mu
-const int GMTHistograms::ptCutsGmt[4] =     {0, 14, 19, 20};
 const int GMTHistograms::ptCutsOMTF[4] =     {0, 14, 19, 20};
 
 /////////////////////////////////////////////////////////
@@ -31,7 +30,6 @@ const int GMTHistograms::ptCutsOMTF[4] =     {0, 14, 19, 20};
 GMTHistograms::GMTHistograms(std::string fileName, int opt){
 
   AnalysisHistograms::init(fileName);
-
 
 }
 /////////////////////////////////////////////////////////
@@ -144,61 +142,39 @@ void GMTHistograms::finalizeHistograms(){
   AnalysisHistograms::finalizeHistograms();
   utilsL1RpcStyle()->cd();
   gErrorIgnoreLevel = kError;
-
-  finaliseGoldenPatterns("h3DBending");
-  finaliseGoldenPatterns("h3DBendingRotated");
-
-    for(int iPtCode=1;iPtCode<=30;++iPtCode){
-    plotOMTFVsOther(iPtCode,"uGMT_emu");
-  }
-
-  std::vector<int> ptCuts = {10, 13, 15, 16, 18, 19, 20, 21, 22, 23};
-  for(auto iCut: ptCuts){
-    plotEffVsRate(iCut);
-  }
-
-  plotRate("VsEta_quality");
-  plotEffVsEtaVsQuality();
-
-  plotRate("VsEta");
-  plotRate("VsPt");
-  plotRate("VsQuality");
-  plotRate("VsEta_quality");
-    
-  bool doHigh = true;
-  plotEffPanel("uGMT_emu", doHigh);
+  
+  //Panel with many turn-on curves
   plotEffPanel("uGMT_emu");
+  //Panel with many turn-on curves for high pT range
+  plotEffPanel("uGMT_emu", true);
+
+  
+  //Efficiency as a function of ete.
+  //Lines for selected points on the turn on curve shown
   plotEffVsEta("uGMT_emu");
 
+  //Efficiency vs given variable.
+  ///Lines for two pT cut values shown
   plotEffVsVar("uGMT_emu","EtaVx");
   plotEffVsVar("uGMT_emu","PhiVx");
 
+  //1D or 2D plot of given variable
   plotSingleHistogram("h2DuGMT_emuPtRecVsPtGen");
 
+  //Turn on curves for many pT thresholds.
+  ///Lines for reference - Phase2 uGMT, and other algorithm shown
   for(int iPtCode=1;iPtCode<=30;++iPtCode){
-      plotOMTFVsOther(iPtCode,"uGMT_emu");
+      plotGMTVsOther(iPtCode,"uGMT_emu");
   }
    
-  plotSingleHistogram("h1DLLH_Low");
-  plotSingleHistogram("h1DLLH_High");
-  plotLLH();
-
-  ////////////////////////////// For GMT muons, those histograms are not created 
-  plotSingleHistogram("h1DHitsPattern_Low_HitCount");  
-  plotSingleHistogram("h1DHitsPattern_High_HitCount");
-
-  plotSingleHistogram("h1DHitsPattern_Low_RefLayer");
-  plotSingleHistogram("h1DHitsPattern_High_RefLayer");
-
-  plotSingleHistogram("h1DHitsPattern_Low_RefPhi");
-  plotSingleHistogram("h1DHitsPattern_High_RefPhi");
-
-  plotSingleHistogram("h1DDeltaEta_Low");
-  plotSingleHistogram("h1DDeltaEta_High");
-  //////////////////////////////////////////////////
-
-  plotQuantiles("h2DuGMT_emuPtRecVsPtGen");
+  //1D or 2D plot of given variable
+  plotSingleHistogram("h2DuGMT_emuPtRecVsPtGen");
   
+  //Event rate plot for selected type
+  //Uses some old rate parametrisation for the single muons sample
+  ///Works also with neutrino sample
+  plotRate("Tot");
+   
 }
 /////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////
@@ -451,13 +427,13 @@ void GMTHistograms::plotEffVsEta(const std::string & sysType){
 }
 ////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////
-void GMTHistograms::plotOMTFVsOther(int iPtCut,
+void GMTHistograms::plotGMTVsOther(int iPtCut,
 				     const std::string sysType){
 
   float ptCut = ptBins[iPtCut];
 
-  TCanvas* c = new TCanvas(TString::Format("OMTFVsOther_%d",(int)ptCut).Data(),
-			   TString::Format("OMTFVsOther_%d",(int)ptCut).Data(),
+  TCanvas* c = new TCanvas(TString::Format("GMTVsOther_%d",(int)ptCut).Data(),
+			   TString::Format("GMTVsOther_%d",(int)ptCut).Data(),
 			   460,500);
 
   TLegend l(0.2,0.65,0.44,0.86,NULL,"brNDC");
@@ -478,21 +454,21 @@ void GMTHistograms::plotOMTFVsOther(int iPtCut,
   hEffOther->SetMarkerStyle(23);
   hEffOther->SetMarkerColor(2);
 
-  hName = "h2DOMTFPt"+std::to_string((int)ptCut);
+  hName = "h2DuGMT_emuPt"+std::to_string((int)ptCut);
   h2D = get2DHistogram(hName);
   hNum = h2D->ProjectionX("hNum",2,2);
   hDenom = h2D->ProjectionX("hDenom",1,1);    
   hDenom->Add(hNum);
 
-  TH1D* hEffOMTF =DivideErr(hNum,hDenom,"hEffOMTFTmp","B");
-  hEffOMTF->SetXTitle("gen. muon p_{T} [GeV/c]");
-  hEffOMTF->SetYTitle("Efficiency");
-  hEffOMTF->SetMaximum(1.04);
-  hEffOMTF->GetXaxis()->SetRange(2,100);
-  hEffOMTF->SetMarkerStyle(8);
-  hEffOMTF->SetMarkerColor(1);
-  hEffOMTF->SetStats(kFALSE);
-  hEffOMTF->DrawCopy();
+  TH1D* hEffGMT =DivideErr(hNum,hDenom,"hEffGMTTmp","B");
+  hEffGMT->SetXTitle("gen. muon p_{T} [GeV/c]");
+  hEffGMT->SetYTitle("Efficiency");
+  hEffGMT->SetMaximum(1.04);
+  hEffGMT->GetXaxis()->SetRange(2,100);
+  hEffGMT->SetMarkerStyle(8);
+  hEffGMT->SetMarkerColor(1);
+  hEffGMT->SetStats(kFALSE);
+  hEffGMT->DrawCopy();
   hEffOther->DrawCopy("same");
 
   std::string tmp = "p_{T} #geq ";
@@ -500,12 +476,9 @@ void GMTHistograms::plotOMTFVsOther(int iPtCut,
   else   tmp += "%1.0f GeV/c";
   l.AddEntry((TObject*)0, TString::Format(tmp.c_str(),ptCut).Data(), "");
   l.AddEntry((TObject*)0, "", "");
-  tmp = sysType;
-  if(sysType=="BMTF") tmp = "LUT NN";
-  if(sysType=="EMTF") tmp = "TF NN";
-  l.AddEntry(hEffOther, tmp.c_str());
+  l.AddEntry(hEffOther, sysType.c_str());
   l.AddEntry((TObject*)0, "", "");
-  l.AddEntry(hEffOMTF, "Phase1");
+  l.AddEntry(hEffGMT, "Phase2 GMT");
   l.DrawClone();
 
   TLine aLine(0,0,0,0);
@@ -513,12 +486,12 @@ void GMTHistograms::plotOMTFVsOther(int iPtCut,
   aLine.SetLineWidth(3);
   aLine.DrawLine(ptCut,0,ptCut,1.04);
 
-  c->Print(TString::Format("fig_eps/OMTFVs%s_%d.eps",sysType.c_str(),(int)ptCut).Data());
-  c->Print(TString::Format("fig_png/OMTFVs%s_%d.png",sysType.c_str(),(int)ptCut).Data());
+  c->Print(TString::Format("fig_eps/GMTVs%s_%d.eps",sysType.c_str(),(int)ptCut).Data());
+  c->Print(TString::Format("fig_png/GMTVs%s_%d.png",sysType.c_str(),(int)ptCut).Data());
 
   c->SetLogy();
-  c->Print(TString::Format("fig_eps/OMTFVs%s_%d_log.eps",sysType.c_str(),(int)ptCut).Data());
-  c->Print(TString::Format("fig_png/OMTFVs%s_%d_log.png",sysType.c_str(),(int)ptCut).Data());
+  c->Print(TString::Format("fig_eps/GMTVs%s_%d_log.eps",sysType.c_str(),(int)ptCut).Data());
+  c->Print(TString::Format("fig_png/GMTVs%s_%d_log.png",sysType.c_str(),(int)ptCut).Data());
 }
 ////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////
@@ -580,31 +553,16 @@ void GMTHistograms::plotRate(std::string type){
   
   TH1 *hRateuGMT_emu = getRateHisto("uGMT_emu",type);
   TH1 *hRateVx = getRateHisto("Vx",type);
-  TH1 *hRateOMTF = getRateHisto("OMTF",type);
-  TH1 *hRateEMTF = getRateHisto("EMTF",type);
 
-  if(type.find("VsEta_quality")!=std::string::npos){
-   hRateuGMT_emu = getRateHisto("uGMT_emu","VsEta_quality0");
-   hRateVx = getRateHisto("uGMT_emu","VsEta_quality1");
-   hRateOMTF = getRateHisto("OMTF","VsEta_quality2");
-   hRateEMTF = getRateHisto("uGMT_emu","VsEta_quality3");    
-  }
+  if(!hRateVx || !hRateuGMT_emu) return;
 
-  if(!hRateVx || !hRateuGMT_emu || !hRateOMTF || !hRateEMTF) return;
-
-  hRateVx->SetLineWidth(3);
-  hRateuGMT_emu->SetLineWidth(3);
-  hRateEMTF->SetLineWidth(3);
-  hRateOMTF->SetLineWidth(3);
-
+  hRateVx->SetLineWidth(3); 
   hRateVx->SetLineColor(1);
+  
+  hRateuGMT_emu->SetLineWidth(3);
   hRateuGMT_emu->SetLineColor(2);
-  hRateEMTF->SetLineColor(kGreen-2);
-  hRateOMTF->SetLineColor(4);
-
   hRateuGMT_emu->SetLineStyle(2);
-  hRateEMTF->SetLineStyle(1);
-
+ 
   TCanvas* c = new TCanvas("cRate","Rate",1.5*420,1.5*500);
   c->SetLogy(1);
   c->SetGrid(1,1);
@@ -618,304 +576,37 @@ void GMTHistograms::plotRate(std::string type){
   if(type.find("Tot")!=std::string::npos){
     hRateVx->SetAxisRange(2,50);
     hRateuGMT_emu->SetAxisRange(2,50);
-    hRateEMTF->SetAxisRange(2,50);
-    hRateOMTF->SetAxisRange(2,50);
     hRateVx->SetMinimum(1E1);
     hRateVx->SetMaximum(2E5);
     hRateVx->SetXTitle("p_{T}^{cut} [GeV/c]");
-
-    c->Divide(2);
-    TPad *pad1 = (TPad*)c->GetPad(1);
-    TPad *pad2 = (TPad*)c->GetPad(2);
-    pad1->SetPad(0.01,0.29,0.99,0.99);
-    pad2->SetPad(0.01,0.01,0.99,0.29);
-    
-    pad1->Draw();
-    pad1->cd();
-    pad1->SetLogy();
-    pad1->SetGrid(1,0);
+    c->SetLogy();
+    c->SetGrid(1,0);
     hRateVx->Draw();
     hRateuGMT_emu->DrawCopy("same");
-    hRateEMTF->DrawCopy("same");
-    hRateOMTF->DrawCopy("same");
-
-    std::cout<<"Rate OMTF @ 20 GeV: "<< hRateOMTF->GetBinContent(hRateOMTF->FindBin(20-0.01))<<std::endl;
-    std::cout<<"Rate other @ 20 GeV: "<< hRateuGMT_emu->GetBinContent(hRateuGMT_emu->FindBin(20-0.01))<<std::endl;
-
-    c->cd();
-    pad2->Draw();
-    pad2->cd();
-    
-    hRateuGMT_emu->SetYTitle("new model/Phase1");
-    hRateuGMT_emu->GetXaxis()->SetLabelSize(0.09);
-    hRateuGMT_emu->GetYaxis()->SetLabelSize(0.09);
-    hRateuGMT_emu->GetYaxis()->SetTitleSize(0.09);
-    hRateuGMT_emu->GetYaxis()->SetTitleOffset(0.5);
-    hRateuGMT_emu->Divide(hRateOMTF);
-    hRateuGMT_emu->SetMaximum(1.5);
-    hRateuGMT_emu->SetMinimum(0.2);
-    hRateuGMT_emu->DrawCopy();
-
-    hRateEMTF->Divide(hRateOMTF);
-    hRateEMTF->DrawCopy("same");
-    TLine *aLine = new TLine(0,0,0,0);
-    aLine->SetLineWidth(2);
-    aLine->SetLineColor(2);
-    aLine->DrawLine(5,1.0, 50,1.0);
-    c->cd();
+   
+    std::cout<<"Rate uGMT @ 20 GeV: "<< hRateuGMT_emu->GetBinContent(hRateuGMT_emu->FindBin(20-0.01))<<std::endl;
   }  
-  if(type.find("VsEta_quality")!=std::string::npos){
-    c->SetLogy(0);
-    hRateuGMT_emu->SetXTitle("muon #eta");
-    double max = hRateuGMT_emu->GetMaximum();
-    if(hRateOMTF->GetMaximum()>max) max = hRateOMTF->GetMaximum();
-    hRateuGMT_emu->SetMaximum(1.5*max);
-    hRateuGMT_emu->Draw();
-    hRateVx->Draw("same");
-    hRateOMTF->Draw("same");
-    hRateEMTF->Draw("same");
-  }
   else if(type.find("VsEta")!=std::string::npos){
     c->SetLogy(0);
     hRateuGMT_emu->SetXTitle("muon #eta");
     double max = hRateuGMT_emu->GetMaximum();
-    if(hRateOMTF->GetMaximum()>max) max = hRateOMTF->GetMaximum();
     hRateuGMT_emu->SetMaximum(1.5*max);
     hRateuGMT_emu->Draw();
-    hRateOMTF->Draw("same");
-    hRateEMTF->Draw("same");
   }
   if(type=="VsPt"){
     c->SetLogy(1);
     hRateuGMT_emu->SetXTitle("p_{T}^{gen} [GeV/c]");
     hRateuGMT_emu->SetAxisRange(2,100);
     double max = hRateuGMT_emu->GetMaximum();
-    if(hRateOMTF->GetMaximum()>max) max = hRateOMTF->GetMaximum();
     hRateuGMT_emu->SetMaximum(10*max);
     hRateuGMT_emu->Draw();
-    hRateOMTF->Draw("same");
-    hRateEMTF->Draw("same");
-  }
-  if(type=="VsQuality"){
-    c->SetLogy(0);
-    c->SetLeftMargin(0.2);
-    c->SetRightMargin(0.3);
-    c->SetBottomMargin(0.15);
-    
-    TH2F *hEff20 = get2DHistogram("h2DEMTFQuality20");    
-    if(!hEff20) return;
-    TH1F *hRateValues = sortRateHisto((TH1F*)hRateEMTF, hEff20, "rate");
-    TH1F *hEffValues = sortRateHisto((TH1F*)hRateEMTF, hEff20, "eff");
-    hRateValues->SetAxisRange(0,10);
-    hRateValues->GetYaxis()->SetTitleOffset(1.7);
-    hRateValues->GetYaxis()->SetTitle("Rate [arbitrary units]");
-    hRateValues->SetLineColor(kBlack);
-    hRateValues->Draw();
-    c->Update();
-    
-    Float_t rightmax = hEffValues->GetMaximum();
-    Float_t scale = gPad->GetUymax()/rightmax;
-    hEffValues->SetLineColor(kRed);
-    hEffValues->Scale(scale);
-    hEffValues->Draw("same hist");
-    //draw an axis on the right side
-    TGaxis *axis = new TGaxis(gPad->GetUxmax(),gPad->GetUymin(),
-			      gPad->GetUxmax(), gPad->GetUymax(),0,rightmax,510,"+L");
-    axis->SetTitle("Efficiency for p_{T}^{cut}=20 GeV/c @ p_{T}^{gen}>20 GeV/c");
-    axis->SetTitleOffset(2.0);
-    axis->SetTitleColor(kRed);
-    axis->SetLineColor(kRed);
-    axis->SetLabelColor(kRed);
-    axis->Draw();
-
-    c->Print(("fig_eps/Rate"+type+".eps").c_str());
-    c->Print(("fig_png/Rate"+type+".png").c_str());
-    return;
   }
 
-  if(type=="VsEta_quality"){
-    leg->AddEntry(hRateuGMT_emu,"Q=0");
-    leg->AddEntry(hRateVx,"Q=1");
-    leg->AddEntry(hRateOMTF,"Q=2");
-    leg->AddEntry(hRateEMTF,"Q=3");
-  }
-  else{
-    leg->AddEntry(hRateOMTF,"Phase 1");
-    leg->AddEntry(hRateuGMT_emu,"LUT NN");
-    leg->AddEntry(hRateEMTF,"TF NN");
-  }
+  leg->AddEntry(hRateuGMT_emu,"uGMT Phase 2");
   leg->Draw();
 
   c->Print(("fig_eps/Rate"+type+".eps").c_str());
   c->Print(("fig_png/Rate"+type+".png").c_str());
-}
-////////////////////////////////////////////////////////////////
-////////////////////////////////////////////////////////////////
-void GMTHistograms::plotEffVsRate(int iPtCut){
-
-  double ptCut = GMTHistograms::ptBins[iPtCut];
-  double xMin = 9999.0, xMax = -999.0;
-  double yMin = 1E8, yMax = -999.0;
-
-  TGraph *aGraph = new TGraph();
-  aGraph->SetMarkerSize(1.3);
-  std::map<std::string, TGraph*> sysGraphs;
-  std::vector<std::string >sysTypes = {"OMTF", "uGMT_emu", "EMTF"};
-  for(auto && sysType: sysTypes){
-    for(int iQuality=0;iQuality<4;++iQuality){
-      std::string selType = std::string(TString::Format("quality%d",iQuality));      
-      TH1 *hRate = getRateHisto(sysType,"Tot_"+selType);
-      if(!hRate) return;
-      std::string hName = "h2D"+sysType+selType+"Pt"+std::to_string((int)ptCut);
-      TH2F* hEff = this->get2DHistogram(hName);
-      if(!hEff) return;
-      float efficiency = getEfficiency(hEff, ptCut);
-      int iBin = hRate->FindBin(ptCut);
-      float rate = hRate->GetBinContent(iBin);
-      aGraph->SetPoint(iQuality, efficiency, rate);
-      if(efficiency<xMin) xMin = efficiency;
-      if(efficiency>xMax) xMax = efficiency;
-      if(rate<yMin) yMin = rate;
-      if(rate>yMax) yMax = rate;
-    }
-    std::cout<<sysType<<std::endl;
-    aGraph->Print();
-    if(sysType=="OMTF"){
-      aGraph->SetMarkerColor(1);
-      aGraph->SetMarkerStyle(21);
-    }
-    if(sysType=="EMTF"){
-      aGraph->SetMarkerColor(4);
-      aGraph->SetMarkerStyle(22);
-    }
-    if(sysType=="uGMT_emu"){
-      aGraph->SetMarkerColor(2);
-      aGraph->SetMarkerStyle(20);
-    }
-    sysGraphs[sysType] = (TGraph*)aGraph->Clone(sysType.c_str());
-  }
-  
-  xMin-=0.04;
-  xMax+=0.02;
-  yMin*=0.95;
-  yMax*=1.05;
-
-  TH1F *hFrame = new TH1F("hFrame",";Efficiency;Rate",2,xMin, xMax);
-  hFrame->SetMinimum(yMin);
-  hFrame->SetMaximum(yMax);
-  hFrame->GetYaxis()->SetTitleOffset(1.7);
-  hFrame->GetYaxis()->SetLabelSize(0.04);
-  hFrame->GetXaxis()->SetLabelSize(0.04);
-  hFrame->GetXaxis()->SetNdivisions(505);
-  hFrame->SetXTitle(TString::Format("Efficiency for %d < p_{T}^{gen} < 100",(int)ptBins[iPtCut]));
-
-  TCanvas* c = new TCanvas("cEffVsRate","EffVsRate",460,500);
-  c->SetGrid(1,1);
-
-  hFrame->Draw();
-  sysGraphs["OMTF"]->Draw("P");
-  sysGraphs["uGMT_emu"]->Draw("P");
-  sysGraphs["EMTF"]->Draw("P");
-
-  TLegend *leg = new TLegend(0.2149123,0.6716102,0.4539474,0.8644068,NULL,"brNDC");
-  leg->SetTextSize(0.05);
-  leg->SetFillStyle(4000);
-  leg->SetBorderSize(0);
-  leg->SetFillColor(10);
-  leg->SetHeader(TString::Format("p_{T}^{REC} #geq %d GeV/c", (int)ptBins[iPtCut]));
-  leg->AddEntry(sysGraphs["OMTF"],"Phase 1","p");
-  leg->AddEntry(sysGraphs["uGMT_emu"],"LUT NN","p");
-  leg->AddEntry(sysGraphs["EMTF"],"TF NN","p");
-  leg->Draw();
-
-  c->Print(TString::Format("fig_eps/RateVsEff_%d.eps",(int)ptBins[iPtCut]).Data());
-  c->Print(TString::Format("fig_png/RateVsEff_%d.png",(int)ptBins[iPtCut]).Data());
-  c->Print(TString::Format("fig_png/RateVsEff_%d.C",(int)ptBins[iPtCut]).Data());
-}
-////////////////////////////////////////////////////////////////
-////////////////////////////////////////////////////////////////
-void GMTHistograms::plotEffVsEtaVsQuality(){
-
-  std::string hName = "h2DuGMT_emu_quality1EtaVx25";
-  TH1D * hEffVx = getEfficiencyHisto(hName);
-
-  hName = "h2DuGMT_emu_quality0EtaVx25";
-  TH1D * hEffuGMT_emu = getEfficiencyHisto(hName);
-
-  hName = "h2DuGMT_emu_quality2EtaVx25";
-  TH1D * hEffOMTF = getEfficiencyHisto(hName);
-
-  hName = "h2DuGMT_emu_quality3EtaVx25";
-  TH1D * hEffEMTF = getEfficiencyHisto(hName);
-
-  if(!hEffVx || !hEffuGMT_emu || !hEffOMTF || !hEffEMTF) return;
-
-  hEffVx->SetLineWidth(3);
-  hEffuGMT_emu->SetLineWidth(3);
-  hEffEMTF->SetLineWidth(3);
-  hEffOMTF->SetLineWidth(3);
-
-  hEffVx->SetLineColor(1);
-  hEffuGMT_emu->SetLineColor(2);
-  hEffEMTF->SetLineColor(9);
-  hEffOMTF->SetLineColor(4);
-
-  hEffuGMT_emu->SetLineStyle(2);
-  hEffEMTF->SetLineStyle(3);
-
-  TCanvas* c = new TCanvas("EffVsEtaVsQuality","EffVsEtaVsQuality",460,500);
-  c->SetGrid(0,1);
-
-  TLegend l(0.6513158,0.1673729,0.8903509,0.470339,NULL,"brNDC");
-  l.SetTextSize(0.05);
-  l.SetFillStyle(4000);
-  l.SetBorderSize(0);
-  l.SetFillColor(10);
-
-
-  hEffuGMT_emu->SetXTitle("muon #eta");
-  hEffuGMT_emu->SetYTitle("Efficiency for p_{T}^{cut}<p_{T}^{Gen}<p_{T}^{cut}+50 GeV");  
-  hEffuGMT_emu->SetMaximum(1.0);
-  hEffuGMT_emu->Draw();
-  hEffVx->Draw("same");
-  hEffOMTF->Draw("same");
-  hEffEMTF->Draw("same");
-
-  l.AddEntry(hEffuGMT_emu,"Q=0");
-  l.AddEntry(hEffVx,"Q=1");
-  l.AddEntry(hEffOMTF,"Q=2");
-  l.AddEntry(hEffEMTF,"Q=3");  
-  l.DrawClone();
-
-  c->Print("fig_eps/EffVsEta.eps");
-  c->Print("fig_png/EffVsEta.png");
-}
-////////////////////////////////////////////////////////////////
-////////////////////////////////////////////////////////////////
-void GMTHistograms::plotGhostHistos(const std::string & sysType,
-				    const std::string & type){
-
-  TCanvas* c = new TCanvas("cGhostHistos","GhostHistos",460,500);
-  c->SetGrid(1,1);
-
-  TLegend *leg = new TLegend(0.2149123,0.6716102,0.4539474,0.8644068,NULL,"brNDC");
-  leg->SetTextSize(0.05);
-  leg->SetFillStyle(4000);
-  leg->SetBorderSize(0);
-  leg->SetFillColor(10);
-
-  std::string hName = "h2DGhostsVsProcessor"+sysType+type;
-  TH2F *h2DGhostsVsProcessor = (TH2F*)this->get2DHistogram(hName);
-
-  h2DGhostsVsProcessor->GetYaxis()->SetTitleOffset(1.7);
-  h2DGhostsVsProcessor->SetXTitle("Processor number");
-  h2DGhostsVsProcessor->SetYTitle("Number of candidates");
-  h2DGhostsVsProcessor->SetMarkerSize(2.8);
-  h2DGhostsVsProcessor->Draw("text");
-  h2DGhostsVsProcessor->GetYaxis()->SetRange(1,5);
-
-  c->Print(("fig_eps/GhostsVsProcessor"+sysType+type+".eps").c_str());
-  c->Print(("fig_png/GhostsVsProcessor"+sysType+type+".png").c_str());
 }
 ////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////
@@ -963,7 +654,6 @@ void GMTHistograms::plotSingleHistogram(std::string hName){
   l.SetFillColor(10);
 
   if(h2D) {
-    std::cout<<"myDirCopy: "<<myDirCopy<<std::endl;
     h2D->SetDirectory(myDirCopy);
     h2D->SetLineWidth(3);
     h2D->Scale(1.0/h2D->Integral());
@@ -971,7 +661,8 @@ void GMTHistograms::plotSingleHistogram(std::string hName){
     h2D->SetYTitle("p_{T}^{REC}");
     h2D->GetYaxis()->SetTitleOffset(1.4);
     h2D->SetStats(kFALSE);
-    h2D->Draw("candle2");
+    gStyle->SetPalette(kRainBow);
+    h2D->Draw("box colz");
     c->Print(TString::Format("fig_png/%s.png",hName.c_str()).Data());
   }
   if(h1D) {
@@ -988,188 +679,5 @@ void GMTHistograms::plotSingleHistogram(std::string hName){
     c->Print(TString::Format("fig_png/%s.png",hName.c_str()).Data());
   }
 }
-/////////////////////////////////////////////////////////
-/////////////////////////////////////////////////////////
-void GMTHistograms::plotLLH(){
-
-   TCanvas* c = new TCanvas("AnyHistogram","AnyHistogram",
-                                 460,500);
-
-   TH1F *h1 = get1DHistogram("h1DLLH_Low");
-   TH1F *h2 = get1DHistogram("h1DLLH_High");
-
-   if(!h1 || !h2) return;
-
-   TLegend l(0.18,0.75,0.35,0.87,NULL,"brNDC");
-   l.SetTextSize(0.05);
-   l.SetFillStyle(4000);
-   l.SetBorderSize(0);
-   l.SetFillColor(10);
-
-   h1->SetLineWidth(3);
-   h2->SetLineWidth(3);
-
-   h1->SetLineColor(2);
-   h2->SetLineColor(1);
-   
-   h1->Scale(1.0/h1->Integral(0,h1->GetNbinsX()+1));
-   h2->Scale(1.0/h2->Integral(0,h2->GetNbinsX()+1));
-
-   h1->GetXaxis()->SetRange(1,h1->GetNbinsX()+1);
-   h2->GetXaxis()->SetRange(1,h2->GetNbinsX()+1);
-   
-   h1->SetYTitle("Events");
-   h1->SetXTitle("Posterior #sigma");
-   h1->GetYaxis()->SetTitleOffset(1.4);
-   h1->SetStats(kFALSE);
-   double histoMax = std::max(h1->GetMaximum(), h2->GetMaximum());
-   h1->SetMaximum(1.4*histoMax);
-   h1->Draw("");
-   h2->Draw("same");
-
-   l.AddEntry(h1,"p_{T}^{GEN}<10 AND p_{T}^{REC} #geq 20 GeV/c");
-   l.AddEntry(h2,"p_{T}^{GEN}>20 AND p_{T}^{REC} #geq 20 GeV/c");
-   l.Draw();
-   
-   c->Print("fig_png/LLH_values.png");
-}
 ////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////
-TH1F * GMTHistograms::sortRateHisto(TH1F *h1DRate, TH2F *h2DEff, std::string by){
-
-  if(!h1DRate || !h2DEff) return 0;
-
-  TH1F *hRateSorted = (TH1F*)h1DRate->Clone("hRateSorted");    
-  hRateSorted->Reset();
-  ///Calculate efficiency
-  TH1D *hNum = h2DEff->ProjectionX("hNum",2,2);
-  TH1D *hDenom = h2DEff->ProjectionX("hDenom",1,1);
-  hDenom->Add(hNum);  
-  hNum->Scale(1.0/hDenom->Integral(0,hDenom->GetNbinsX()+1));
-  TH1D* hEff = hNum;
-  ////
-  std::map<float,std::string> rateMap;
-  std::map<float,int> rateMapBin;
-  ///Fill map with key = rate, value = bin label. The map will be sorted automatically by the rate value.
-  ///Second map has bin number as value. Needed to extract efficiency values.
-  TRandom3 aRndm;
-
-  for(int iBin=1;iBin<h1DRate->GetXaxis()->GetNbins();++iBin){
-    float rate = h1DRate->GetBinContent(iBin);
-    rate+=0.001*aRndm.Uniform();///Randomize rate values, to avoid having two same keys.
-    rateMap[rate] = h1DRate->GetXaxis()->GetBinLabel(iBin);
-    rateMapBin[rate] = iBin;
-  }
-  ///Fill histo copy with sorted values
-  unsigned int iBin = 1;
-  for (auto it = rateMap.rbegin(); it!= rateMap.rend(); ++it){
-    if(iBin<20){
-      std::cout<<"iBin: "<<iBin
-	       <<" Quality: "<<it->second
-	       <<" rate: "<<it->first
-	       <<" efficiency: "<<hEff->GetBinContent(rateMapBin[it->first])
-	       <<std::endl;
-    }
-    if(by=="rate") hRateSorted->SetBinContent(iBin, it->first);
-    if(by=="eff")  hRateSorted->SetBinContent(iBin, hEff->GetBinContent(rateMapBin[it->first]));
-    hRateSorted->GetXaxis()->SetBinLabel(iBin, it->second.c_str());
-    ++iBin;
-  }
-  
-  return hRateSorted;
-}
-////////////////////////////////////////////////////////////////
-////////////////////////////////////////////////////////////////
-void GMTHistograms::finaliseGoldenPatterns(std::string hName){
-
-  TH3F *hAllLayers = get3DHistogram(hName, true);
-  if(!hAllLayers) return;
-  hAllLayers->SetDirectory(myDirCopy);
-
-  TH2F *hLayer = 0;  
-  double threshold = 8E-13;
-  std::string hNameTmp = "";
-  for(int iLayer=0;iLayer<18;++iLayer){
-    hAllLayers->GetZaxis()->SetRangeUser(iLayer, iLayer);
-    hLayer = (TH2F*)hAllLayers->Project3D("yx");
-    hNameTmp = hName+"_iLayer_"+std::to_string(iLayer);
-    hLayer->SetName(hNameTmp.c_str());
-    hLayer->SetDirectory(myDirCopy);
-    double norm = 1.0;
-    double normalisedValue = 0.0;
-    int nBinsX = hLayer->GetNbinsX();
-    int nBinsY = hLayer->GetNbinsY();
-    ///Normalise each pT bin.
-    for(int iBinX=0;iBinX<=nBinsX;++iBinX){
-      norm = hLayer->Integral(iBinX, iBinX, 0, nBinsY);
-      for(int iBinY=0;iBinY<=nBinsY;++iBinY){
-	normalisedValue = hLayer->GetBinContent(iBinX, iBinY)/norm;
-	if(normalisedValue<threshold) normalisedValue = 0.0;
-	//else normalisedValue = log(normalisedValue) - log(threshold);
-	hLayer->SetBinContent(iBinX, iBinY, normalisedValue);
-	hLayer->SetBinError(iBinX, iBinY, 0);
-	int iBinZ = hAllLayers->GetZaxis()->FindBin(iLayer);
-	hAllLayers->SetBinContent(iBinX, iBinY, iBinZ, normalisedValue);
-	hAllLayers->SetBinError(iBinX, iBinY, iBinZ, 0);
-      }
-    }    
-  }
-
-  std::vector<std::string> names = {"h2DDeltaVsDelta_MB2", "h2DDeltaVsDelta_RB1In",
-				    "h2DDeltaVsDelta_RB1Out", "h2DDeltaVsDelta_RB2In",
-				    "h2DDeltaVsDelta_RB2Out", "h2DDeltaVsDelta_RE23",
-				    "h2DDeltaVsDelta_xy", "h2DDeltaVsDelta_xy_badReco"};
-  for(auto & hName: names){
-    TH2F *hDelta = get2DHistogram(hName, true);
-    if(hDelta)hDelta->SetDirectory(myDirCopy);
-  }
-  
-  return;
-}
-////////////////////////////////////////////////////////////////
-////////////////////////////////////////////////////////////////
-void GMTHistograms::plotQuantiles(const std::string & hName){
-
-  TH2F* h2D = get2DHistogram(hName);
-  if(!h2D) return;
-	
-  TCanvas* c = new TCanvas("AnyHistogram","AnyHistogram",
-			   460,500);
-
-  TLegend l(0.15,0.78,0.35,0.87,NULL,"brNDC");
-  l.SetTextSize(0.05);
-  l.SetFillStyle(4000);
-  l.SetBorderSize(0);
-  l.SetFillColor(10);
-
-  double xQ[1], yQ[1];
-  xQ[0] = 0.20;
-
-  TH1D *h1D = h2D->ProjectionX();
-  h1D->SetXTitle("p_{T}^{GEN}");
-  h1D->SetYTitle(TString::Format("p_{T}^{REC}@ CL %d",(int)(xQ[0]*100)));
-  h1D->Reset();
-
-  for(int iBinX=1;iBinX<h2D->GetNbinsX();++iBinX){
-    TH1D *hPtRec = h2D->ProjectionY("hPtRec",iBinX,iBinX);
-    if(hPtRec->Integral()<1) continue;	
-    hPtRec->GetQuantiles(1, yQ, xQ);
-    h1D->SetBinContent(iBinX, yQ[0]);
-  }
-
-  h1D->GetXaxis()->SetRangeUser(0,30);
-  h1D->Draw();
-  h1D->SetDirectory(myDirCopy);  
-  std::cout<<"Fit range: 0-10"<<std::endl;
-  h1D->Fit("pol1","W","",5, 10);
-  std::cout<<"Fit range: 10-20"<<std::endl;
-  h1D->Fit("pol1","W","",10, 10);
-  std::cout<<"Fit range: 20-50"<<std::endl;
-  h1D->Fit("pol1","W","",20, 50);
-  std::cout<<"Fit range: 5-40"<<std::endl;
-  h1D->Fit("pol2","W","",5, 40);
-
-  c->Print(TString::Format("fig_png/Quantile%d_%s.png",(int)(xQ[0]*100), hName.c_str()));
-}
-// ////////////////////////////////////////////////////////////////
-// ////////////////////////////////////////////////////////////////
