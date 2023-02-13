@@ -130,6 +130,18 @@ void GMTAnalyzer::fillTurnOnCurve(const GenObj & aGenObj,
   tmpName = hName+"PhiVx"+std::to_string(ptCut);
   myHistos_->fill2DHistogram(tmpName, aGenObj.phi(), passPtCut);
 
+  tmpName = hName+"BetaVx"+std::to_string(ptCut);
+  myHistos_->fill2DHistogram(tmpName, aGenObj.beta(), passPtCut);
+
+  tmpName = hName+"vzVx"+std::to_string(ptCut);
+  myHistos_->fill2DHistogram(tmpName, aGenObj.vz(), passPtCut);
+
+  tmpName = hName+"vxVx"+std::to_string(ptCut);
+  myHistos_->fill2DHistogram(tmpName, aGenObj.vx(), passPtCut);
+
+  tmpName = hName+"vyVx"+std::to_string(ptCut);
+  myHistos_->fill2DHistogram(tmpName, aGenObj.vy(), passPtCut);    
+
 }
 // //////////////////////////////////////////////////////////////////////////////
 // //////////////////////////////////////////////////////////////////////////////
@@ -209,7 +221,7 @@ bool GMTAnalyzer::analyze(const EventProxyBase& iEvent){
   
     fillRateHisto(aGenObj, "Vx","VsPt");
     fillRateHisto(aGenObj, "uGMT_emu","VsPt");
-  
+  // 
     fillRateHisto(aGenObj, "Vx","VsEta");
     fillRateHisto(aGenObj, "uGMT_emu","VsEta");
   }

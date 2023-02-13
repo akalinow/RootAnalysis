@@ -67,6 +67,11 @@ std::string GMTHistograms::getTemplateName(const std::string& name){
   if(name.find("PhiHit")!=std::string::npos) templateName = "h2DPhiHitTemplate";
   if(name.find("EtaVx")!=std::string::npos) templateName = "h2DEtaVxTemplate";
   if(name.find("PhiVx")!=std::string::npos) templateName = "h2DPhiVxTemplate";
+  if(name.find("BetaVx")!=std::string::npos) templateName = "h2DBetaVxTemplate";
+  if(name.find("vxVx")!=std::string::npos) templateName = "h2DvxVxTemplate";
+  if(name.find("vyVx")!=std::string::npos) templateName = "h2DvyVxTemplate";
+  if(name.find("vzVx")!=std::string::npos) templateName = "h2DvzVxTemplate";
+
   if(name.find("Quality")!=std::string::npos) templateName = "h2DQualityTemplate";
   if(name.find("RateTot")!=std::string::npos) templateName = "h2DRateTotTemplate";
   if(name.find("RateVsEta")!=std::string::npos) templateName = "h2DRateVsEtaTemplate";
@@ -107,6 +112,11 @@ void GMTHistograms::defineHistograms(){
 
  add2DHistogram("h2DEtaVxTemplate","",60,-3,3,2,-0.5,1.5,file_);
  add2DHistogram("h2DPhiVxTemplate","",4*32,-3.2,3.2,2,-0.5,1.5,file_);
+ add2DHistogram("h2DBetaVxTemplate","",4*32,-0.1,1.1,2,-0.5,1.5,file_);
+ add2DHistogram("h2DvzVxTemplate","",4*32,-0.1,6,2,-0.5,1.5,file_);
+ add2DHistogram("h2DvxVxTemplate","",4*32,-3,3,2,-0.5,1.5,file_);
+ add2DHistogram("h2DvyVxTemplate","",4*32,-0.1,6,2,-0.5,1.5,file_);
+
 
  add2DHistogram("h2DQualityTemplate","",201,-0.5,200.5,2,-0.5,1.5,file_);
 
@@ -157,6 +167,13 @@ void GMTHistograms::finalizeHistograms(){
   ///Lines for two pT cut values shown
   plotEffVsVar("uGMT_emu","EtaVx");
   plotEffVsVar("uGMT_emu","PhiVx");
+  plotEffVsVar("uGMT_emu","BetaVx");
+  plotEffVsVar("uGMT_emu","vzVx");
+  // plotEffVsVar("uGMT_emu","vxVx");
+  // plotEffVsVar("uGMT_emu","vyVx");
+
+
+
 
   //1D or 2D plot of given variable
   plotSingleHistogram("h2DuGMT_emuPtRecVsPtGen");
