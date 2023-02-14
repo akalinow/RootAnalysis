@@ -18,7 +18,6 @@ public:
   float mass() const { return _mass;}
   int pdgId() const { return _id;}
   int status() const { return _status;}
-  // int motherId() const { return _mid;}
   int charge() const { return _charge;}
   double vx() const { return _vx;}
   double vy() const { return _vy;}
