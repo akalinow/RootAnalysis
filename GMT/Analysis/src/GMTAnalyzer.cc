@@ -130,7 +130,7 @@ void GMTAnalyzer::fillTurnOnCurve(const GenObj & aGenObj,
   tmpName = hName+"PhiVx"+std::to_string(ptCut);
   myHistos_->fill2DHistogram(tmpName, aGenObj.phi(), passPtCut);
 
-  tmpName = hName+"BetaVx"+std::to_string(ptCut);
+  tmpName = hName+"Beta"+std::to_string(ptCut);
   myHistos_->fill2DHistogram(tmpName, aGenObj.beta(), passPtCut);
 
   tmpName = hName+"Vtx_x"+std::to_string(ptCut);
@@ -142,7 +142,7 @@ void GMTAnalyzer::fillTurnOnCurve(const GenObj & aGenObj,
   tmpName = hName+"Vtx_y"+std::to_string(ptCut);
   myHistos_->fill2DHistogram(tmpName, aGenObj.vy(), passPtCut);
 
-  float vertex_distance = sqrt(pow(aGenObj.vx(), 2) + pow(aGenObj.vy(), 2) + pow(aGenObj.vz(), 2));
+  float vertex_distance = sqrt(pow(aGenObj.vx(), 2) + pow(aGenObj.vy(), 2));
 
   tmpName = hName+"Vtx_d"+std::to_string(ptCut);
   myHistos_->fill2DHistogram(tmpName, vertex_distance, passPtCut);

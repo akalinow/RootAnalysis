@@ -67,7 +67,7 @@ std::string GMTHistograms::getTemplateName(const std::string& name){
   if(name.find("PhiHit")!=std::string::npos) templateName = "h2DPhiHitTemplate";
   if(name.find("EtaVx")!=std::string::npos) templateName = "h2DEtaVxTemplate";
   if(name.find("PhiVx")!=std::string::npos) templateName = "h2DPhiVxTemplate";
-  if(name.find("BetaVx")!=std::string::npos) templateName = "h2DBetaVxTemplate";
+  if(name.find("Beta")!=std::string::npos) templateName = "h2DBetaTemplate";
 
   if(name.find("Vtx_z")!=std::string::npos) templateName = "h2DVtx_zTemplate";
   if(name.find("Vtx_x")!=std::string::npos) templateName = "h2DVtx_xTemplate";
@@ -116,13 +116,13 @@ void GMTHistograms::defineHistograms(){
 
  add2DHistogram("h2DEtaVxTemplate","",60,-3,3,2,-0.5,1.5,file_);
  add2DHistogram("h2DPhiVxTemplate","",4*32,-3.2,3.2,2,-0.5,1.5,file_);
- add2DHistogram("h2DBetaVxTemplate","",4*32,-0.1,1.1,2,-0.5,1.5,file_);
+ add2DHistogram("h2DBetaTemplate","",4*32,-0.1,1.1,2,-0.5,1.5,file_);
 
- add2DHistogram("h2DVtx_xTemplate","",4*32,-3e-3,3e-3,2,-0.5,1.5,file_);
+ add2DHistogram("h2DVtx_xTemplate","",4*32,-4e-3,3e-3,2,-0.5,1.5,file_);
  add2DHistogram("h2DVtx_yTemplate","",4*32,-1.5e-3,1.5e-3,2,-0.5,1.5,file_);
- add2DHistogram("h2DVtx_zTemplate","",4*32,-0.1,6.2,2,-0.5,1.5,file_);
+ add2DHistogram("h2DVtx_zTemplate","",4*32,-10,10.2,2,-0.5,1.5,file_);
 
- add2DHistogram("h2DVtx_dTemplate","",4*32,-0,5,2,-0.5,1.5,file_);
+ add2DHistogram("h2DVtx_dTemplate","",4*32,0,0.0025,2,-0.5,1.5,file_);
 
 
  add2DHistogram("h2DQualityTemplate","",201,-0.5,200.5,2,-0.5,1.5,file_);
@@ -174,7 +174,7 @@ void GMTHistograms::finalizeHistograms(){
   ///Lines for two pT cut values shown
   plotEffVsVar("uGMT_emu","EtaVx");
   plotEffVsVar("uGMT_emu","PhiVx");
-  plotEffVsVar("uGMT_emu","BetaVx");
+  plotEffVsVar("uGMT_emu","Beta");
   plotEffVsVar("uGMT_emu","Vtx_z");
   plotEffVsVar("uGMT_emu","Vtx_x");
   plotEffVsVar("uGMT_emu","Vtx_y");
@@ -383,6 +383,7 @@ void GMTHistograms::plotEffVsVar(const std::string & sysType,
     std::string vtx_y = "Vtx_y";
     std::string vtx_z = "Vtx_z";
     std::string vtx_d = "Vtx_d";
+    std::string beta_name = "Beta";
 
     if (str_var_name == vtx_x){
       hEff->SetXTitle("Vtx_{x} [mm]");
@@ -395,6 +396,9 @@ void GMTHistograms::plotEffVsVar(const std::string & sysType,
     }
     else if (str_var_name == vtx_d){
       hEff->SetXTitle("Vtx_{d} [mm]");
+    }
+    else if (str_var_name == beta_name){
+      hEff->SetXTitle("#beta");
     }
 
     else {
