@@ -64,10 +64,11 @@ void GMTAnalyzer::finalize(){
 bool GMTAnalyzer::passQuality(const L1PhaseIIObj & aL1Cand,
 			       const std::string & sysType,
 			       const std::string & selType){
-  
+  std::cout << "wewnatrz pass Quality" << std::endl;
   bool lowPtVeto = false;
 
    if(sysType.find("uGMT_emu")!=std::string::npos){
+    std::cout << "znalazl nasze MIONY" << std::endl;
      return aL1Cand.type==L1PhaseIIObj::uGMT_emu && aL1Cand.q>=12 && aL1Cand.bx==0 && !lowPtVeto;
    }
    else if(sysType.find("Vx")!=std::string::npos){
@@ -85,12 +86,15 @@ void GMTAnalyzer::fillTurnOnCurve(const GenObj & aGenObj,
   //int is important for histo name construction
   int ptCut = GMTHistograms::ptBins[iPtCut];
 
+  std::cout << "wewnatrz fillTurnonCurve" << std::endl;
+
   const std::vector<L1PhaseIIObj> & myL1Coll = myL1PhaseIIObjColl->getL1PhaseIIObjs();
   std::string hName = "h2DGmt"+selType;
   if(sysType=="OMTF") {   
     hName = "h2DOMTF"+selType;
   }
-  if(sysType=="uGMT_emu") {   
+  if(sysType=="uGMT_emu") {
+    std::cout << "wewnatrz fillTurnonCurve - nasze miony" << std::endl;
     hName = "h2DuGMT_emu"+selType;
   }
   if(sysType=="EMTF") {   
@@ -175,11 +179,13 @@ void GMTAnalyzer::fillRateHisto(const GenObj & aGenObj,
 // //////////////////////////////////////////////////////////////////////////////
 void GMTAnalyzer::fillHistosForGenMuon(const GenObj & aGenObj){   
 
+  std::cout << "Czy wchodzi" << std::endl;
   bool isGMTAcceptance = fabs(aGenObj.eta())<2.4;
   if(!isGMTAcceptance) return;
 
   std::string selType = "";
   for(int iCut=0;iCut<31;++iCut){
+      std::cout << "Czy tu 1" << std::endl;
       fillTurnOnCurve(aGenObj, iCut, "OMTF", selType);
       fillTurnOnCurve(aGenObj, iCut, "uGMT_emu", selType);
   }
@@ -188,6 +194,7 @@ void GMTAnalyzer::fillHistosForGenMuon(const GenObj & aGenObj){
   bool pass = false;
   for(int iType=0;iType<=3;++iType){
     float ptCut = GMTHistograms::ptBins[iCut];
+    std::cout << "Czy tu 2" << std::endl;
     
     if(iType==0) pass = aGenObj.pt()>ptCut + 20;
     else if(iType==1) pass = aGenObj.pt()>ptCut && aGenObj.pt()<(ptCut+5);
@@ -197,6 +204,7 @@ void GMTAnalyzer::fillHistosForGenMuon(const GenObj & aGenObj){
     selType = std::string(TString::Format("Type%d",iType));
     fillTurnOnCurve(aGenObj, iCut, "OMTF", selType);
     fillTurnOnCurve(aGenObj, iCut, "uGMT_emu", selType);
+    std::cout << "Koniec" << std::endl;
   }
 }
 // //////////////////////////////////////////////////////////////////////////////

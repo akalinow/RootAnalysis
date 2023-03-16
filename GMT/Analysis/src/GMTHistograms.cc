@@ -160,42 +160,44 @@ void GMTHistograms::finalizeHistograms(){
   utilsL1RpcStyle()->cd();
   gErrorIgnoreLevel = kError;
   
-  //Panel with many turn-on curves
-  plotEffPanel("uGMT_emu");
-  //Panel with many turn-on curves for high pT range
-  plotEffPanel("uGMT_emu", true);
+  // //Panel with many turn-on curves
+  // plotEffPanel("uGMT_emu");
+  // //Panel with many turn-on curves for high pT range
+  // plotEffPanel("uGMT_emu", true);
 
-  
+  std::cout << "RYSOWANIE przed" << std::endl;  
   //Efficiency as a function of ete.
   //Lines for selected points on the turn on curve shown
   plotEffVsEta("uGMT_emu");
 
-  //Efficiency vs given variable.
-  ///Lines for two pT cut values shown
-  plotEffVsVar("uGMT_emu","EtaVx");
-  plotEffVsVar("uGMT_emu","PhiVx");
-  plotEffVsVar("uGMT_emu","Beta");
-  plotEffVsVar("uGMT_emu","Vtx_z");
-  plotEffVsVar("uGMT_emu","Vtx_x");
-  plotEffVsVar("uGMT_emu","Vtx_y");
-  plotEffVsVar("uGMT_emu","Vtx_d");
+  std::cout << "RYSOWANIE po" << std::endl;  
 
-  //1D or 2D plot of given variable
-  plotSingleHistogram("h2DuGMT_emuPtRecVsPtGen");
+  // //Efficiency vs given variable.
+  // ///Lines for two pT cut values shown
+  // plotEffVsVar("uGMT_emu","EtaVx");
+  // plotEffVsVar("uGMT_emu","PhiVx");
+  // plotEffVsVar("uGMT_emu","Beta");
+  // plotEffVsVar("uGMT_emu","Vtx_z");
+  // plotEffVsVar("uGMT_emu","Vtx_x");
+  // plotEffVsVar("uGMT_emu","Vtx_y");
+  // plotEffVsVar("uGMT_emu","Vtx_d");
 
-  //Turn on curves for many pT thresholds.
-  ///Lines for reference - Phase2 uGMT, and other algorithm shown
-  for(int iPtCode=1;iPtCode<=30;++iPtCode){
-      plotGMTVsOther(iPtCode,"uGMT_emu");
-  }
+  // //1D or 2D plot of given variable
+  // plotSingleHistogram("h2DuGMT_emuPtRecVsPtGen");
+
+  // //Turn on curves for many pT thresholds.
+  // ///Lines for reference - Phase2 uGMT, and other algorithm shown
+  // for(int iPtCode=1;iPtCode<=30;++iPtCode){
+  //     plotGMTVsOther(iPtCode,"uGMT_emu");
+  // }
    
-  //1D or 2D plot of given variable
-  plotSingleHistogram("h2DuGMT_emuPtRecVsPtGen");
+  // //1D or 2D plot of given variable
+  // plotSingleHistogram("h2DuGMT_emuPtRecVsPtGen");
   
-  //Event rate plot for selected type
-  //Uses some old rate parametrisation for the single muons sample
-  ///Works also with neutrino sample
-  plotRate("Tot");
+  // //Event rate plot for selected type
+  // //Uses some old rate parametrisation for the single muons sample
+  // ///Works also with neutrino sample
+  // plotRate("Tot");
    
 }
 /////////////////////////////////////////////////////////
@@ -421,6 +423,8 @@ void GMTHistograms::plotEffVsVar(const std::string & sysType,
 ////////////////////////////////////////////////////////////////
 void GMTHistograms::plotEffVsEta(const std::string & sysType){
 
+  std::cout << "wewnatrz plot EffVs Eta" << std::endl; 
+
   TCanvas* c = new TCanvas(TString::Format("EffVsEta_%s",sysType.c_str()),
 			   TString::Format("EffVsEta_%s",sysType.c_str()),
 			   800,500);
@@ -440,6 +444,7 @@ void GMTHistograms::plotEffVsEta(const std::string & sysType){
     float ptCut = GMTHistograms::ptBins[iCut];
     hName = "h2D"+sysType+"Type" + std::to_string(iType) + "EtaVx"+std::to_string((int)ptCut);
     TH2F* h2D = this->get2DHistogram(hName);
+    std::cout << h2D << std::endl;
     if(!h2D) return;
     TH1D *hNum = h2D->ProjectionX("hNum",2,2);
     TH1D *hDenom = h2D->ProjectionX("hDenom",1,1);
