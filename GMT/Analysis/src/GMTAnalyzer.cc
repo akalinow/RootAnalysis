@@ -86,15 +86,12 @@ void GMTAnalyzer::fillTurnOnCurve(const GenObj & aGenObj,
   //int is important for histo name construction
   int ptCut = GMTHistograms::ptBins[iPtCut];
 
-  std::cout << "wewnatrz fillTurnonCurve" << std::endl;
-
   const std::vector<L1PhaseIIObj> & myL1Coll = myL1PhaseIIObjColl->getL1PhaseIIObjs();
   std::string hName = "h2DGmt"+selType;
   if(sysType=="OMTF") {   
     hName = "h2DOMTF"+selType;
   }
-  if(sysType=="uGMT_emu") {
-    std::cout << "wewnatrz fillTurnonCurve - nasze miony" << std::endl;
+  if(sysType=="uGMT_emu") {    
     hName = "h2DuGMT_emu"+selType;
   }
   if(sysType=="EMTF") {   
@@ -126,10 +123,16 @@ void GMTAnalyzer::fillTurnOnCurve(const GenObj & aGenObj,
   tmpName = hName+"PtRecVsPtGen";
   myHistos_->fill2DHistogram(tmpName, aGenObj.pt(), selectedCand.ptValue());
   
+  std::cout<<"aGenObj.pt(): "<<aGenObj.pt()
+  <<" ptCut: "<<ptCut
+  <<" selType.size(): "<<selType.size()
+  <<std::endl;
   //Generic eff vs selected variable calculated for muons on plateau
   if(!selType.size() && aGenObj.pt()<ptCut+20) return;
   tmpName = hName+"EtaVx"+std::to_string(ptCut);
   myHistos_->fill2DHistogram(tmpName, aGenObj.eta(), passPtCut);
+  
+  std::cout<<"tmpName: "<<tmpName<<std::endl;
 
   tmpName = hName+"PhiVx"+std::to_string(ptCut);
   myHistos_->fill2DHistogram(tmpName, aGenObj.phi(), passPtCut);
@@ -178,14 +181,12 @@ void GMTAnalyzer::fillRateHisto(const GenObj & aGenObj,
 // //////////////////////////////////////////////////////////////////////////////
 // //////////////////////////////////////////////////////////////////////////////
 void GMTAnalyzer::fillHistosForGenMuon(const GenObj & aGenObj){   
-
-  std::cout << "Czy wchodzi" << std::endl;
+  
   bool isGMTAcceptance = fabs(aGenObj.eta())<2.4;
   if(!isGMTAcceptance) return;
 
   std::string selType = "";
   for(int iCut=0;iCut<31;++iCut){
-      std::cout << "Czy tu 1" << std::endl;
       fillTurnOnCurve(aGenObj, iCut, "OMTF", selType);
       fillTurnOnCurve(aGenObj, iCut, "uGMT_emu", selType);
   }
@@ -193,8 +194,7 @@ void GMTAnalyzer::fillHistosForGenMuon(const GenObj & aGenObj){
   int iCut = 18;
   bool pass = false;
   for(int iType=0;iType<=3;++iType){
-    float ptCut = GMTHistograms::ptBins[iCut];
-    std::cout << "Czy tu 2" << std::endl;
+    float ptCut = GMTHistograms::ptBins[iCut];    
     
     if(iType==0) pass = aGenObj.pt()>ptCut + 20;
     else if(iType==1) pass = aGenObj.pt()>ptCut && aGenObj.pt()<(ptCut+5);
@@ -203,8 +203,7 @@ void GMTAnalyzer::fillHistosForGenMuon(const GenObj & aGenObj){
     
     selType = std::string(TString::Format("Type%d",iType));
     fillTurnOnCurve(aGenObj, iCut, "OMTF", selType);
-    fillTurnOnCurve(aGenObj, iCut, "uGMT_emu", selType);
-    std::cout << "Koniec" << std::endl;
+    fillTurnOnCurve(aGenObj, iCut, "uGMT_emu", selType);    
   }
 }
 // //////////////////////////////////////////////////////////////////////////////

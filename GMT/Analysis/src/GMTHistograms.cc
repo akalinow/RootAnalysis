@@ -161,16 +161,13 @@ void GMTHistograms::finalizeHistograms(){
   gErrorIgnoreLevel = kError;
   
   // //Panel with many turn-on curves
-  // plotEffPanel("uGMT_emu");
+  plotEffPanel("uGMT_emu");
   // //Panel with many turn-on curves for high pT range
-  // plotEffPanel("uGMT_emu", true);
+  plotEffPanel("uGMT_emu", true);
 
-  std::cout << "RYSOWANIE przed" << std::endl;  
   //Efficiency as a function of ete.
   //Lines for selected points on the turn on curve shown
   plotEffVsEta("uGMT_emu");
-
-  std::cout << "RYSOWANIE po" << std::endl;  
 
   // //Efficiency vs given variable.
   // ///Lines for two pT cut values shown
@@ -187,9 +184,9 @@ void GMTHistograms::finalizeHistograms(){
 
   // //Turn on curves for many pT thresholds.
   // ///Lines for reference - Phase2 uGMT, and other algorithm shown
-  // for(int iPtCode=1;iPtCode<=30;++iPtCode){
-  //     plotGMTVsOther(iPtCode,"uGMT_emu");
-  // }
+  for(int iPtCode=1;iPtCode<=30;++iPtCode){
+       plotGMTVsOther(iPtCode,"uGMT_emu");
+   }
    
   // //1D or 2D plot of given variable
   // plotSingleHistogram("h2DuGMT_emuPtRecVsPtGen");
