@@ -122,7 +122,7 @@ void GMTHistograms::defineHistograms(){
  add2DHistogram("h2DVtx_yTemplate","",4*32,-1.5e-3,1.5e-3,2,-0.5,1.5,file_);
  add2DHistogram("h2DVtx_zTemplate","",4*32,-10,10.2,2,-0.5,1.5,file_);
 
- add2DHistogram("h2DVtx_dTemplate","",4*32,0,0.0025,2,-0.5,1.5,file_);
+ add2DHistogram("h2DVtx_dTemplate","",4*32,0,0.003,2,-0.5,1.5,file_);
 
 
  add2DHistogram("h2DQualityTemplate","",201,-0.5,200.5,2,-0.5,1.5,file_);
@@ -171,16 +171,16 @@ void GMTHistograms::finalizeHistograms(){
 
   // //Efficiency vs given variable.
   // ///Lines for two pT cut values shown
-  // plotEffVsVar("uGMT_emu","EtaVx");
-  // plotEffVsVar("uGMT_emu","PhiVx");
-  // plotEffVsVar("uGMT_emu","Beta");
-  // plotEffVsVar("uGMT_emu","Vtx_z");
-  // plotEffVsVar("uGMT_emu","Vtx_x");
-  // plotEffVsVar("uGMT_emu","Vtx_y");
-  // plotEffVsVar("uGMT_emu","Vtx_d");
+  plotEffVsVar("uGMT_emu","EtaVx");
+  plotEffVsVar("uGMT_emu","PhiVx");
+  plotEffVsVar("uGMT_emu","Beta");
+  plotEffVsVar("uGMT_emu","Vtx_z");
+  plotEffVsVar("uGMT_emu","Vtx_x");
+  plotEffVsVar("uGMT_emu","Vtx_y");
+  plotEffVsVar("uGMT_emu","Vtx_d");
 
   // //1D or 2D plot of given variable
-  // plotSingleHistogram("h2DuGMT_emuPtRecVsPtGen");
+  plotSingleHistogram("h2DuGMT_emuPtRecVsPtGen");
 
   // //Turn on curves for many pT thresholds.
   // ///Lines for reference - Phase2 uGMT, and other algorithm shown
@@ -189,12 +189,12 @@ void GMTHistograms::finalizeHistograms(){
    }
    
   // //1D or 2D plot of given variable
-  // plotSingleHistogram("h2DuGMT_emuPtRecVsPtGen");
+  plotSingleHistogram("h2DuGMT_emuPtRecVsPtGen");
   
   // //Event rate plot for selected type
-  // //Uses some old rate parametrisation for the single muons sample
+  // //Uses some old rate parametrisation for the single particles sample
   // ///Works also with neutrino sample
-  // plotRate("Tot");
+  plotRate("Tot");
    
 }
 /////////////////////////////////////////////////////////
@@ -299,7 +299,7 @@ void GMTHistograms::plotEffPanel(const std::string & sysType, bool doHigh){
     hEff->GetXaxis()->SetRange(1,50);
     hEff->SetMarkerStyle(21+icut);
     hEff->SetMarkerColor(color[icut]);
-    hEff->SetXTitle("gen. muon p_{T} [GeV/c]");
+    hEff->SetXTitle("gen. particle p_{T} [GeV/c]");
     hEff->SetYTitle("Efficiency");
     if (icut==0)hEff->DrawCopy();
     else hEff->DrawCopy("same");
@@ -420,8 +420,6 @@ void GMTHistograms::plotEffVsVar(const std::string & sysType,
 ////////////////////////////////////////////////////////////////
 void GMTHistograms::plotEffVsEta(const std::string & sysType){
 
-  std::cout << "wewnatrz plot EffVs Eta" << std::endl; 
-
   TCanvas* c = new TCanvas(TString::Format("EffVsEta_%s",sysType.c_str()),
 			   TString::Format("EffVsEta_%s",sysType.c_str()),
 			   800,500);
@@ -441,7 +439,6 @@ void GMTHistograms::plotEffVsEta(const std::string & sysType){
     float ptCut = GMTHistograms::ptBins[iCut];
     hName = "h2D"+sysType+"Type" + std::to_string(iType) + "EtaVx"+std::to_string((int)ptCut);
     TH2F* h2D = this->get2DHistogram(hName);
-    std::cout << h2D << std::endl;
     if(!h2D) return;
     TH1D *hNum = h2D->ProjectionX("hNum",2,2);
     TH1D *hDenom = h2D->ProjectionX("hDenom",1,1);
@@ -454,7 +451,7 @@ void GMTHistograms::plotEffVsEta(const std::string & sysType){
     hEff->SetMarkerStyle(21+iType);
     hEff->SetMarkerColor(color[iType]);
     hEff->GetYaxis()->SetTitleOffset(1.0);
-    hEff->SetXTitle("generated muon #eta");
+    hEff->SetXTitle("generated particle #eta");
     hEff->SetYTitle("Efficiency");
     if (iType==0)hEff->DrawCopy();
     else hEff->DrawCopy("same");
@@ -468,10 +465,10 @@ void GMTHistograms::plotEffVsEta(const std::string & sysType){
   TLine *aLine = new TLine(0,0,0,0);
   aLine->SetLineWidth(2);
   aLine->SetLineColor(2);
-  aLine->DrawLine(0.83,0,0.83,1.0);
-  aLine->DrawLine(-0.83,0,-0.83,1.0);
-  aLine->DrawLine(1.24,0,1.24,1.0);
-  aLine->DrawLine(-1.24,0,-1.24,1.0);
+  // aLine->DrawLine(0.83,0,0.83,1.0);
+  // aLine->DrawLine(-0.83,0,-0.83,1.0);
+  // aLine->DrawLine(1.24,0,1.24,1.0);
+  // aLine->DrawLine(-1.24,0,-1.24,1.0);
 
   l.SetHeader(TString::Format("p_{T} = %d  GeV/c",(int)GMTHistograms::ptBins[iCut]).Data());
   l.DrawClone();
@@ -514,7 +511,7 @@ void GMTHistograms::plotGMTVsOther(int iPtCut,
   hDenom->Add(hNum);
 
   TH1D* hEffGMT =DivideErr(hNum,hDenom,"hEffGMTTmp","B");
-  hEffGMT->SetXTitle("gen. muon p_{T} [GeV/c]");
+  hEffGMT->SetXTitle("gen. particle p_{T} [GeV/c]");
   hEffGMT->SetYTitle("Efficiency");
   hEffGMT->SetMaximum(1.04);
   hEffGMT->GetXaxis()->SetRange(2,100);
@@ -641,7 +638,7 @@ void GMTHistograms::plotRate(std::string type){
   }  
   else if(type.find("VsEta")!=std::string::npos){
     c->SetLogy(0);
-    hRateuGMT_emu->SetXTitle("muon #eta");
+    hRateuGMT_emu->SetXTitle("particle #eta");
     double max = hRateuGMT_emu->GetMaximum();
     hRateuGMT_emu->SetMaximum(1.5*max);
     hRateuGMT_emu->Draw();
@@ -715,7 +712,9 @@ void GMTHistograms::plotSingleHistogram(std::string hName){
     h2D->GetYaxis()->SetTitleOffset(1.4);
     h2D->SetStats(kFALSE);
     gStyle->SetPalette(kRainBow);
-    h2D->Draw("box colz");
+    // h2D->Draw("box colz");
+    h2D->Draw("COLZ1");
+
     c->Print(TString::Format("fig_png/%s.png",hName.c_str()).Data());
   }
   if(h1D) {

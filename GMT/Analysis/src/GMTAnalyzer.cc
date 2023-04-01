@@ -64,11 +64,9 @@ void GMTAnalyzer::finalize(){
 bool GMTAnalyzer::passQuality(const L1PhaseIIObj & aL1Cand,
 			       const std::string & sysType,
 			       const std::string & selType){
-  std::cout << "wewnatrz pass Quality" << std::endl;
   bool lowPtVeto = false;
 
    if(sysType.find("uGMT_emu")!=std::string::npos){
-    std::cout << "znalazl nasze MIONY" << std::endl;
      return aL1Cand.type==L1PhaseIIObj::uGMT_emu && aL1Cand.q>=12 && aL1Cand.bx==0 && !lowPtVeto;
    }
    else if(sysType.find("Vx")!=std::string::npos){
@@ -113,6 +111,8 @@ void GMTAnalyzer::fillTurnOnCurve(const GenObj & aGenObj,
   }
 
   bool passPtCut = selectedCand.ptValue()>=ptCut && selectedCand.ptValue()>0;
+  // bool passPtCut = true;
+
 
   std::string tmpName = hName+"Pt"+std::to_string(ptCut);
   myHistos_->fill2DHistogram(tmpName, aGenObj.pt(), passPtCut);
@@ -123,17 +123,11 @@ void GMTAnalyzer::fillTurnOnCurve(const GenObj & aGenObj,
   tmpName = hName+"PtRecVsPtGen";
   myHistos_->fill2DHistogram(tmpName, aGenObj.pt(), selectedCand.ptValue());
   
-  std::cout<<"aGenObj.pt(): "<<aGenObj.pt()
-  <<" ptCut: "<<ptCut
-  <<" selType.size(): "<<selType.size()
-  <<std::endl;
   //Generic eff vs selected variable calculated for muons on plateau
   if(!selType.size() && aGenObj.pt()<ptCut+20) return;
   tmpName = hName+"EtaVx"+std::to_string(ptCut);
   myHistos_->fill2DHistogram(tmpName, aGenObj.eta(), passPtCut);
   
-  std::cout<<"tmpName: "<<tmpName<<std::endl;
-
   tmpName = hName+"PhiVx"+std::to_string(ptCut);
   myHistos_->fill2DHistogram(tmpName, aGenObj.phi(), passPtCut);
 
@@ -182,7 +176,7 @@ void GMTAnalyzer::fillRateHisto(const GenObj & aGenObj,
 // //////////////////////////////////////////////////////////////////////////////
 void GMTAnalyzer::fillHistosForGenMuon(const GenObj & aGenObj){   
   
-  bool isGMTAcceptance = fabs(aGenObj.eta())<2.4;
+  bool isGMTAcceptance = fabs(aGenObj.eta())<2.2;
   if(!isGMTAcceptance) return;
 
   std::string selType = "";
@@ -194,12 +188,21 @@ void GMTAnalyzer::fillHistosForGenMuon(const GenObj & aGenObj){
   int iCut = 18;
   bool pass = false;
   for(int iType=0;iType<=3;++iType){
-    float ptCut = GMTHistograms::ptBins[iCut];    
-    
-    if(iType==0) pass = aGenObj.pt()>ptCut + 20;
-    else if(iType==1) pass = aGenObj.pt()>ptCut && aGenObj.pt()<(ptCut+5);
-    else if(iType==2) pass = aGenObj.pt()<10;
+    // float ptCut = GMTHistograms::ptBins[iCut];    
+    // 
+    // warunki tworzenia dopasowac
+    if(iType==0) pass = true; //aGenObj.pt()>ptCut + 20;
+    else if(iType==1) pass = true; //aGenObj.pt()>ptCut && aGenObj.pt()<(ptCut+5);
+    else if(iType==2) pass = true; //aGenObj.pt()<10;
     if(!pass) continue;
+
+    //     float ptCut = GMTHistograms::ptBins[iCut];    
+    
+    // // warunki tworzenia dopasowac
+    // if(iType==0) pass = aGenObj.pt()>ptCut + 20;
+    // else if(iType==1) pass = aGenObj.pt()>ptCut && aGenObj.pt()<(ptCut+5);
+    // else if(iType==2) pass = aGenObj.pt()<10;
+    // if(!pass) continue;
     
     selType = std::string(TString::Format("Type%d",iType));
     fillTurnOnCurve(aGenObj, iCut, "OMTF", selType);
@@ -224,8 +227,10 @@ bool GMTAnalyzer::analyze(const EventProxyBase& iEvent){
   if(genObjVec.empty()) return false;
 
   for(auto aGenObj: genObjVec){
-    if(std::abs(aGenObj.pdgId())!=13) continue;
-    if(std::abs(aGenObj.status())!=1) continue;    
+    // if(std::abs(aGenObj.pdgId())!=13) continue;
+    if(std::abs(aGenObj.pdgId())!=1000015) continue; // do czastek HSCP to ich numer, do stau takze ten numer
+
+    // if(std::abs(aGenObj.status())!=1) continue;    
     fillHistosForGenMuon(aGenObj); 
   
     fillRateHisto(aGenObj, "Vx","Tot");
