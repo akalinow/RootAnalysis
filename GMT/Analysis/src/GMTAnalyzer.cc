@@ -168,6 +168,7 @@ void GMTAnalyzer::fillRateHisto(const GenObj & aGenObj,
   }
 
   bool pass = selectedCand.ptValue()>=20;
+
   if(selType.find("Tot")!=std::string::npos) myHistos_->fill2DHistogram(hName,aGenObj.pt(),selectedCand.ptValue());
   if(selType.find("VsEta")!=std::string::npos) myHistos_->fill2DHistogram(hName,aGenObj.pt(),pass*aGenObj.eta()+(!pass)*99);
   if(selType.find("VsPt")!=std::string::npos) myHistos_->fill2DHistogram(hName,aGenObj.pt(),pass*aGenObj.pt()+(!pass)*(-100));
@@ -181,7 +182,7 @@ void GMTAnalyzer::fillHistosForGenMuon(const GenObj & aGenObj){
 
   std::string selType = "";
   for(int iCut=0;iCut<31;++iCut){
-      fillTurnOnCurve(aGenObj, iCut, "OMTF", selType);
+      // fillTurnOnCurve(aGenObj, iCut, "OMTF", selType);
       fillTurnOnCurve(aGenObj, iCut, "uGMT_emu", selType);
   }
 
@@ -191,21 +192,21 @@ void GMTAnalyzer::fillHistosForGenMuon(const GenObj & aGenObj){
     // float ptCut = GMTHistograms::ptBins[iCut];    
     // 
     // warunki tworzenia dopasowac
-    if(iType==0) pass = true; //aGenObj.pt()>ptCut + 20;
-    else if(iType==1) pass = true; //aGenObj.pt()>ptCut && aGenObj.pt()<(ptCut+5);
-    else if(iType==2) pass = true; //aGenObj.pt()<10;
-    if(!pass) continue;
-
-    //     float ptCut = GMTHistograms::ptBins[iCut];    
-    
-    // // warunki tworzenia dopasowac
-    // if(iType==0) pass = aGenObj.pt()>ptCut + 20;
-    // else if(iType==1) pass = aGenObj.pt()>ptCut && aGenObj.pt()<(ptCut+5);
-    // else if(iType==2) pass = aGenObj.pt()<10;
+    // if(iType==0) pass = true; //aGenObj.pt()>ptCut + 20;
+    // else if(iType==1) pass = true; //aGenObj.pt()>ptCut && aGenObj.pt()<(ptCut+5);
+    // else if(iType==2) pass = true; //aGenObj.pt()<10;
     // if(!pass) continue;
+
+        float ptCut = GMTHistograms::ptBins[iCut];    
+    // // 
+    // // warunki tworzenia dopasowac
+    if(iType==0) pass = aGenObj.pt()>ptCut + 20;
+    else if(iType==1) pass = aGenObj.pt()>ptCut && aGenObj.pt()<(ptCut+5);
+    else if(iType==2) pass = aGenObj.pt()<10;
+    if(!pass) continue;
     
     selType = std::string(TString::Format("Type%d",iType));
-    fillTurnOnCurve(aGenObj, iCut, "OMTF", selType);
+    // fillTurnOnCurve(aGenObj, iCut, "OMTF", selType);
     fillTurnOnCurve(aGenObj, iCut, "uGMT_emu", selType);    
   }
 }
@@ -227,10 +228,11 @@ bool GMTAnalyzer::analyze(const EventProxyBase& iEvent){
   if(genObjVec.empty()) return false;
 
   for(auto aGenObj: genObjVec){
-    // if(std::abs(aGenObj.pdgId())!=13) continue;
-    if(std::abs(aGenObj.pdgId())!=1000015) continue; // do czastek HSCP to ich numer, do stau takze ten numer
+    if(std::abs(aGenObj.pdgId())!=13) continue;
 
-    // if(std::abs(aGenObj.status())!=1) continue;    
+    // if(std::abs(aGenObj.pdgId())!=1000015) continue; // do czastek HSCP to ich numer, do stau takze ten numer
+
+    if(std::abs(aGenObj.status())!=1) continue;    
     fillHistosForGenMuon(aGenObj); 
   
     fillRateHisto(aGenObj, "Vx","Tot");

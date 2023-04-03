@@ -185,7 +185,7 @@ void GMTHistograms::finalizeHistograms(){
   // //Turn on curves for many pT thresholds.
   // ///Lines for reference - Phase2 uGMT, and other algorithm shown
   for(int iPtCode=1;iPtCode<=30;++iPtCode){
-       plotGMTVsOther(iPtCode,"uGMT_emu");
+      //  plotGMTVsOther(iPtCode,"uGMT_emu");
    }
    
   // //1D or 2D plot of given variable
@@ -362,12 +362,14 @@ void GMTHistograms::plotEffVsVar(const std::string & sysType,
  
   for (int icut=0; icut<2;++icut){
     float ptCut = GMTHistograms::ptBins[ptCuts[icut]];
+
     hName = "h2D"+sysType+varName+std::to_string((int)ptCut);
     TH2F* h2D = this->get2DHistogram(hName.Data());
     if(!h2D) return;
     TH1D *hNum = h2D->ProjectionX("hNum",2,2);
     TH1D *hDenom = h2D->ProjectionX("hDenom",1,1);
     hDenom->Add(hNum);
+    
     TH1D* hEff =DivideErr(hNum,hDenom,"Pt_Int","B");
     hEff->SetStats(kFALSE);
     hEff->SetMinimum(0.0);
@@ -465,10 +467,6 @@ void GMTHistograms::plotEffVsEta(const std::string & sysType){
   TLine *aLine = new TLine(0,0,0,0);
   aLine->SetLineWidth(2);
   aLine->SetLineColor(2);
-  // aLine->DrawLine(0.83,0,0.83,1.0);
-  // aLine->DrawLine(-0.83,0,-0.83,1.0);
-  // aLine->DrawLine(1.24,0,1.24,1.0);
-  // aLine->DrawLine(-1.24,0,-1.24,1.0);
 
   l.SetHeader(TString::Format("p_{T} = %d  GeV/c",(int)GMTHistograms::ptBins[iCut]).Data());
   l.DrawClone();
@@ -695,7 +693,7 @@ void GMTHistograms::plotSingleHistogram(std::string hName){
   if(!h2D && !h1D) return;
 	
   TCanvas* c = new TCanvas("AnyHistogram","AnyHistogram",
-			   460,500);
+			   600,400);
 
   TLegend l(0.15,0.78,0.35,0.87,NULL,"brNDC");
   l.SetTextSize(0.05);
@@ -710,10 +708,10 @@ void GMTHistograms::plotSingleHistogram(std::string hName){
     h2D->SetXTitle("p_{T}^{GEN}");
     h2D->SetYTitle("p_{T}^{REC}");
     h2D->GetYaxis()->SetTitleOffset(1.4);
-    h2D->SetStats(kFALSE);
-    gStyle->SetPalette(kRainBow);
-    // h2D->Draw("box colz");
-    h2D->Draw("COLZ1");
+    h2D->SetStats(kTRUE);
+    gStyle->SetPalette(kBird);
+    h2D->Draw("COLZ");
+
 
     c->Print(TString::Format("fig_png/%s.png",hName.c_str()).Data());
   }
