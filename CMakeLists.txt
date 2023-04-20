@@ -13,6 +13,8 @@ MESSAGE("Boost directory: " ${Boost_LIBRARY_DIRS})
 
 ##https://root.cern.ch/how/integrate-root-my-project-cmake
 list(APPEND CMAKE_PREFIX_PATH $ENV{ROOTSYS})
+#list(APPEND CMAKE_PREFIX_PATH /snap/root-framework/current/usr/local/)
+
 find_package(ROOT REQUIRED COMPONENTS RIO GenVector Physics RooFitCore RooFit)
 include(${ROOT_USE_FILE})
 
@@ -37,5 +39,5 @@ set(CMAKE_INSTALL_RPATH_USE_LINK_PATH TRUE)
 MESSAGE("Installation prefix set to " ${CMAKE_INSTALL_PREFIX} )
 
 add_subdirectory(Core/src)
-add_subdirectory(HTauTau)
+add_subdirectory(GMT)
 
