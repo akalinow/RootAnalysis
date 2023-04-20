@@ -10,8 +10,8 @@ GMT/DataFormats/src/G__GMTObjects.cxx
  /eos/user/a/almuhamm/02.TriggerEff/RootAnalysis/GMT/DataFormats/include/L1PhaseIIObj.h
  /eos/user/a/almuhamm/02.TriggerEff/RootAnalysis/GMT/DataFormats/include/L1PhaseIIObjColl.h
  /eos/user/a/almuhamm/02.TriggerEff/RootAnalysis/GMT/DataFormats/include/LinkDef.h
- /eos/user/a/almuhamm/02.TriggerEff/RootAnalysis/GMT/DataFormats/include/RecoMuon.h
- /eos/user/a/almuhamm/02.TriggerEff/RootAnalysis/GMT/DataFormats/include/RecoMuonObj.h
+ /eos/user/a/almuhamm/02.TriggerEff/RootAnalysis/GMT/DataFormats/include/MuonObj.h
+ /eos/user/a/almuhamm/02.TriggerEff/RootAnalysis/GMT/DataFormats/include/MuonObjColl.h
  /usr/include/root/DllImport.h
  /usr/include/root/RConfigure.h
  /usr/include/root/ROOT/RConfig.hxx

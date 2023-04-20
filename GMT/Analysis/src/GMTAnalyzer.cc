@@ -77,7 +77,7 @@ bool GMTAnalyzer::passQuality(const L1Obj & aL1Cand,
 }
 // //////////////////////////////////////////////////////////////////////////////
 // //////////////////////////////////////////////////////////////////////////////
-void GMTAnalyzer::fillTurnOnCurve(const RecoMuonObj & aRecoMuon,
+void GMTAnalyzer::fillTurnOnCurve(const MuonObj & aRecoMuon,
                                   const int & iPtCut,
 				                          const std::string & sysType,
 				                          const std::string & selType){
@@ -151,7 +151,7 @@ void GMTAnalyzer::fillTurnOnCurve(const RecoMuonObj & aRecoMuon,
 // //////////////////////////////////////////////////////////////////////////////
 // //////////////////////////////////////////////////////////////////////////////
 
-void GMTAnalyzer::fillRateHisto(const RecoMuonObj & aRecoMuon,
+void GMTAnalyzer::fillRateHisto(const MuonObj & aRecoMuon,
                                 const std::string & sysType,
 				                        const std::string & selType){
 
@@ -174,7 +174,7 @@ void GMTAnalyzer::fillRateHisto(const RecoMuonObj & aRecoMuon,
 }
 // //////////////////////////////////////////////////////////////////////////////
 // //////////////////////////////////////////////////////////////////////////////
-void GMTAnalyzer::fillHistosForRecoMuon(const RecoMuonObj & aRecoMuon){   
+void GMTAnalyzer::fillHistosForRecoMuon(const MuonObj & aRecoMuon){   
 
   bool isGMTAcceptance = fabs(aRecoMuon.eta())<2.4;
   if(!isGMTAcceptance) return;
@@ -210,11 +210,11 @@ bool GMTAnalyzer::analyze(const EventProxyBase& iEvent){
   const EventProxyOMTF & myProxy = static_cast<const EventProxyOMTF&>(iEvent);
 
   myEventId = myProxy.getEventId();
-  mymuonColl = myProxy.getRecoMuonObjColl();
+  myMuonObjColl = myProxy.getRecoMuonObjColl();
   myL1ObjColl = myProxy.getL1ObjColl();
   myL1PhaseIIObjColl = myProxy.getL1PhaseIIObjColl();
 
-  const std::vector<RecoMuonObj> RecoMuonVec = mymuonColl->data();  
+  const std::vector<MuonObj> RecoMuonVec = myMuonObjColl->data();  
   if(RecoMuonVec.empty()) return false;
 
   for(auto aRecoMuonObj: RecoMuonVec){

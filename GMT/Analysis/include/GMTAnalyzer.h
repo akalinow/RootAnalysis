@@ -12,7 +12,7 @@
 #include "L1ObjColl.h"
 #include "L1PhaseIIObjColl.h"
 #include "L1PhaseIIObj.h"
-#include "RecoMuon.h"
+#include "MuonObjColl.h"
 
 #include "TVector3.h"
 
@@ -39,13 +39,13 @@ class GMTAnalyzer:public Analyzer{
 
  private:
 
-  void fillHistosForRecoMuon(const RecoMuonObj & aRecoMuon);
+  void fillHistosForRecoMuon(const MuonObj & aRecoMuon);
 
-  void fillTurnOnCurve(const RecoMuonObj & aRecoMuon,
+  void fillTurnOnCurve(const MuonObj & aRecoMuon,
                       const int & ptCut, const std::string & sysType,
 		                  const std::string & selType);
 
-  void fillRateHisto(const RecoMuonObj & aRecoMuon,
+  void fillRateHisto(const MuonObj & aRecoMuon,
                     const std::string & sysType,
 		                const std::string & selType);
 
@@ -57,7 +57,7 @@ class GMTAnalyzer:public Analyzer{
   GMTHistograms *myHistos_;
 
   const EventObj  *myEventId;
-  const RecoMuon  *mymuonColl;
+  const MuonObjColl  *myMuonObjColl;
   const L1ObjColl  *myL1ObjColl;
   const L1PhaseIIObjColl  *myL1PhaseIIObjColl; 
 };

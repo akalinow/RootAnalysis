@@ -80,8 +80,8 @@ GMT/DataFormats/src/G__GMTObjects.cxx: ../GMT/DataFormats/include/L1Obj.h
 GMT/DataFormats/src/G__GMTObjects.cxx: ../GMT/DataFormats/include/L1ObjColl.h
 GMT/DataFormats/src/G__GMTObjects.cxx: ../GMT/DataFormats/include/L1PhaseIIObj.h
 GMT/DataFormats/src/G__GMTObjects.cxx: ../GMT/DataFormats/include/L1PhaseIIObjColl.h
-GMT/DataFormats/src/G__GMTObjects.cxx: ../GMT/DataFormats/include/RecoMuon.h
-GMT/DataFormats/src/G__GMTObjects.cxx: ../GMT/DataFormats/include/RecoMuonObj.h
+GMT/DataFormats/src/G__GMTObjects.cxx: ../GMT/DataFormats/include/MuonObjColl.h
+GMT/DataFormats/src/G__GMTObjects.cxx: ../GMT/DataFormats/include/MuonObj.h
 GMT/DataFormats/src/G__GMTObjects.cxx: ../GMT/DataFormats/include/EventObj.h
 GMT/DataFormats/src/G__GMTObjects.cxx: ../GMT/DataFormats/include/GenObj.h
 GMT/DataFormats/src/G__GMTObjects.cxx: ../GMT/DataFormats/include/GenObjColl.h
@@ -89,11 +89,11 @@ GMT/DataFormats/src/G__GMTObjects.cxx: ../GMT/DataFormats/include/L1Obj.h
 GMT/DataFormats/src/G__GMTObjects.cxx: ../GMT/DataFormats/include/L1ObjColl.h
 GMT/DataFormats/src/G__GMTObjects.cxx: ../GMT/DataFormats/include/L1PhaseIIObj.h
 GMT/DataFormats/src/G__GMTObjects.cxx: ../GMT/DataFormats/include/L1PhaseIIObjColl.h
-GMT/DataFormats/src/G__GMTObjects.cxx: ../GMT/DataFormats/include/RecoMuon.h
-GMT/DataFormats/src/G__GMTObjects.cxx: ../GMT/DataFormats/include/RecoMuonObj.h
+GMT/DataFormats/src/G__GMTObjects.cxx: ../GMT/DataFormats/include/MuonObjColl.h
+GMT/DataFormats/src/G__GMTObjects.cxx: ../GMT/DataFormats/include/MuonObj.h
 GMT/DataFormats/src/G__GMTObjects.cxx: ../GMT/DataFormats/include/LinkDef.h
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --blue --bold --progress-dir=/eos/user/a/almuhamm/02.TriggerEff/RootAnalysis/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_1) "Generating G__GMTObjects.cxx, libGMTObjects_rdict.pcm, libGMTObjects.rootmap"
-	cd /eos/user/a/almuhamm/02.TriggerEff/RootAnalysis/build/GMT/DataFormats/src && /afs/cern.ch/user/a/almuhamm/conda/bin/cmake -E env LD_LIBRARY_PATH=/usr/lib64/root: /usr/bin/rootcling -v2 -f G__GMTObjects.cxx -s /eos/user/a/almuhamm/02.TriggerEff/RootAnalysis/build/GMT/DataFormats/src/libGMTObjects.so -rml libGMTObjects.so -rmf /eos/user/a/almuhamm/02.TriggerEff/RootAnalysis/build/GMT/DataFormats/src/libGMTObjects.rootmap -I/usr/include/root -I/eos/user/a/almuhamm/02.TriggerEff/RootAnalysis/GMT/DataFormats/src/../include -I/eos/user/a/almuhamm/02.TriggerEff/RootAnalysis/GMT/DataFormats/src EventObj.h GenObj.h GenObjColl.h L1Obj.h L1ObjColl.h L1PhaseIIObj.h L1PhaseIIObjColl.h RecoMuon.h RecoMuonObj.h /eos/user/a/almuhamm/02.TriggerEff/RootAnalysis/GMT/DataFormats/src/../include/LinkDef.h
+	cd /eos/user/a/almuhamm/02.TriggerEff/RootAnalysis/build/GMT/DataFormats/src && /afs/cern.ch/user/a/almuhamm/conda/bin/cmake -E env LD_LIBRARY_PATH=/usr/lib64/root: /usr/bin/rootcling -v2 -f G__GMTObjects.cxx -s /eos/user/a/almuhamm/02.TriggerEff/RootAnalysis/build/GMT/DataFormats/src/libGMTObjects.so -rml libGMTObjects.so -rmf /eos/user/a/almuhamm/02.TriggerEff/RootAnalysis/build/GMT/DataFormats/src/libGMTObjects.rootmap -I/usr/include/root -I/eos/user/a/almuhamm/02.TriggerEff/RootAnalysis/GMT/DataFormats/src/../include -I/eos/user/a/almuhamm/02.TriggerEff/RootAnalysis/GMT/DataFormats/src EventObj.h GenObj.h GenObjColl.h L1Obj.h L1ObjColl.h L1PhaseIIObj.h L1PhaseIIObjColl.h MuonObjColl.h MuonObj.h /eos/user/a/almuhamm/02.TriggerEff/RootAnalysis/GMT/DataFormats/src/../include/LinkDef.h
 
 GMT/DataFormats/src/libGMTObjects_rdict.pcm: GMT/DataFormats/src/G__GMTObjects.cxx
 	@$(CMAKE_COMMAND) -E touch_nocreate GMT/DataFormats/src/libGMTObjects_rdict.pcm
@@ -213,19 +213,19 @@ GMT/DataFormats/src/CMakeFiles/GMTDataFormats.dir/EventProxyOMTF.cc.s: cmake_for
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling CXX source to assembly CMakeFiles/GMTDataFormats.dir/EventProxyOMTF.cc.s"
 	cd /eos/user/a/almuhamm/02.TriggerEff/RootAnalysis/build/GMT/DataFormats/src && /usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /eos/user/a/almuhamm/02.TriggerEff/RootAnalysis/GMT/DataFormats/src/EventProxyOMTF.cc -o CMakeFiles/GMTDataFormats.dir/EventProxyOMTF.cc.s
 
-GMT/DataFormats/src/CMakeFiles/GMTDataFormats.dir/RecoMuonObj.cc.o: GMT/DataFormats/src/CMakeFiles/GMTDataFormats.dir/flags.make
-GMT/DataFormats/src/CMakeFiles/GMTDataFormats.dir/RecoMuonObj.cc.o: ../GMT/DataFormats/src/RecoMuonObj.cc
-GMT/DataFormats/src/CMakeFiles/GMTDataFormats.dir/RecoMuonObj.cc.o: GMT/DataFormats/src/CMakeFiles/GMTDataFormats.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/eos/user/a/almuhamm/02.TriggerEff/RootAnalysis/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_10) "Building CXX object GMT/DataFormats/src/CMakeFiles/GMTDataFormats.dir/RecoMuonObj.cc.o"
-	cd /eos/user/a/almuhamm/02.TriggerEff/RootAnalysis/build/GMT/DataFormats/src && /usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT GMT/DataFormats/src/CMakeFiles/GMTDataFormats.dir/RecoMuonObj.cc.o -MF CMakeFiles/GMTDataFormats.dir/RecoMuonObj.cc.o.d -o CMakeFiles/GMTDataFormats.dir/RecoMuonObj.cc.o -c /eos/user/a/almuhamm/02.TriggerEff/RootAnalysis/GMT/DataFormats/src/RecoMuonObj.cc
+GMT/DataFormats/src/CMakeFiles/GMTDataFormats.dir/MuonObj.cc.o: GMT/DataFormats/src/CMakeFiles/GMTDataFormats.dir/flags.make
+GMT/DataFormats/src/CMakeFiles/GMTDataFormats.dir/MuonObj.cc.o: ../GMT/DataFormats/src/MuonObj.cc
+GMT/DataFormats/src/CMakeFiles/GMTDataFormats.dir/MuonObj.cc.o: GMT/DataFormats/src/CMakeFiles/GMTDataFormats.dir/compiler_depend.ts
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/eos/user/a/almuhamm/02.TriggerEff/RootAnalysis/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_10) "Building CXX object GMT/DataFormats/src/CMakeFiles/GMTDataFormats.dir/MuonObj.cc.o"
+	cd /eos/user/a/almuhamm/02.TriggerEff/RootAnalysis/build/GMT/DataFormats/src && /usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT GMT/DataFormats/src/CMakeFiles/GMTDataFormats.dir/MuonObj.cc.o -MF CMakeFiles/GMTDataFormats.dir/MuonObj.cc.o.d -o CMakeFiles/GMTDataFormats.dir/MuonObj.cc.o -c /eos/user/a/almuhamm/02.TriggerEff/RootAnalysis/GMT/DataFormats/src/MuonObj.cc
 
-GMT/DataFormats/src/CMakeFiles/GMTDataFormats.dir/RecoMuonObj.cc.i: cmake_force
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Preprocessing CXX source to CMakeFiles/GMTDataFormats.dir/RecoMuonObj.cc.i"
-	cd /eos/user/a/almuhamm/02.TriggerEff/RootAnalysis/build/GMT/DataFormats/src && /usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /eos/user/a/almuhamm/02.TriggerEff/RootAnalysis/GMT/DataFormats/src/RecoMuonObj.cc > CMakeFiles/GMTDataFormats.dir/RecoMuonObj.cc.i
+GMT/DataFormats/src/CMakeFiles/GMTDataFormats.dir/MuonObj.cc.i: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Preprocessing CXX source to CMakeFiles/GMTDataFormats.dir/MuonObj.cc.i"
+	cd /eos/user/a/almuhamm/02.TriggerEff/RootAnalysis/build/GMT/DataFormats/src && /usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /eos/user/a/almuhamm/02.TriggerEff/RootAnalysis/GMT/DataFormats/src/MuonObj.cc > CMakeFiles/GMTDataFormats.dir/MuonObj.cc.i
 
-GMT/DataFormats/src/CMakeFiles/GMTDataFormats.dir/RecoMuonObj.cc.s: cmake_force
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling CXX source to assembly CMakeFiles/GMTDataFormats.dir/RecoMuonObj.cc.s"
-	cd /eos/user/a/almuhamm/02.TriggerEff/RootAnalysis/build/GMT/DataFormats/src && /usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /eos/user/a/almuhamm/02.TriggerEff/RootAnalysis/GMT/DataFormats/src/RecoMuonObj.cc -o CMakeFiles/GMTDataFormats.dir/RecoMuonObj.cc.s
+GMT/DataFormats/src/CMakeFiles/GMTDataFormats.dir/MuonObj.cc.s: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling CXX source to assembly CMakeFiles/GMTDataFormats.dir/MuonObj.cc.s"
+	cd /eos/user/a/almuhamm/02.TriggerEff/RootAnalysis/build/GMT/DataFormats/src && /usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /eos/user/a/almuhamm/02.TriggerEff/RootAnalysis/GMT/DataFormats/src/MuonObj.cc -o CMakeFiles/GMTDataFormats.dir/MuonObj.cc.s
 
 # Object files for target GMTDataFormats
 GMTDataFormats_OBJECTS = \
@@ -237,7 +237,7 @@ GMTDataFormats_OBJECTS = \
 "CMakeFiles/GMTDataFormats.dir/L1PhaseIIObjColl.cc.o" \
 "CMakeFiles/GMTDataFormats.dir/G__GMTObjects.cxx.o" \
 "CMakeFiles/GMTDataFormats.dir/EventProxyOMTF.cc.o" \
-"CMakeFiles/GMTDataFormats.dir/RecoMuonObj.cc.o"
+"CMakeFiles/GMTDataFormats.dir/MuonObj.cc.o"
 
 # External object files for target GMTDataFormats
 GMTDataFormats_EXTERNAL_OBJECTS =
@@ -250,7 +250,7 @@ GMT/DataFormats/src/libGMTDataFormats.so: GMT/DataFormats/src/CMakeFiles/GMTData
 GMT/DataFormats/src/libGMTDataFormats.so: GMT/DataFormats/src/CMakeFiles/GMTDataFormats.dir/L1PhaseIIObjColl.cc.o
 GMT/DataFormats/src/libGMTDataFormats.so: GMT/DataFormats/src/CMakeFiles/GMTDataFormats.dir/G__GMTObjects.cxx.o
 GMT/DataFormats/src/libGMTDataFormats.so: GMT/DataFormats/src/CMakeFiles/GMTDataFormats.dir/EventProxyOMTF.cc.o
-GMT/DataFormats/src/libGMTDataFormats.so: GMT/DataFormats/src/CMakeFiles/GMTDataFormats.dir/RecoMuonObj.cc.o
+GMT/DataFormats/src/libGMTDataFormats.so: GMT/DataFormats/src/CMakeFiles/GMTDataFormats.dir/MuonObj.cc.o
 GMT/DataFormats/src/libGMTDataFormats.so: GMT/DataFormats/src/CMakeFiles/GMTDataFormats.dir/build.make
 GMT/DataFormats/src/libGMTDataFormats.so: GMT/DataFormats/src/CMakeFiles/GMTDataFormats.dir/link.txt
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --bold --progress-dir=/eos/user/a/almuhamm/02.TriggerEff/RootAnalysis/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_11) "Linking CXX shared library libGMTDataFormats.so"

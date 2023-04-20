@@ -10,8 +10,8 @@ GMT/DataFormats/src/G__GMTObjects.cxx: \
  ../GMT/DataFormats/include/L1PhaseIIObj.h \
  ../GMT/DataFormats/include/L1PhaseIIObjColl.h \
  ../GMT/DataFormats/include/LinkDef.h \
- ../GMT/DataFormats/include/RecoMuon.h \
- ../GMT/DataFormats/include/RecoMuonObj.h \
+ ../GMT/DataFormats/include/MuonObj.h \
+ ../GMT/DataFormats/include/MuonObjColl.h \
  /usr/include/root/DllImport.h \
  /usr/include/root/RConfigure.h \
  /usr/include/root/ROOT/RConfig.hxx \

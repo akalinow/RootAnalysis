@@ -10,9 +10,9 @@ include_directories(${PROJECT_SOURCE_DIR}/../include )
 # # 
 # With new objects
 
-ROOT_GENERATE_DICTIONARY(G__GMTObjects EventObj.h GenObj.h GenObjColl.h L1Obj.h L1ObjColl.h L1PhaseIIObj.h L1PhaseIIObjColl.h RecoMuon.h RecoMuonObj.h LINKDEF ${PROJECT_SOURCE_DIR}/../include/LinkDef.h)
+ROOT_GENERATE_DICTIONARY(G__GMTObjects EventObj.h GenObj.h GenObjColl.h L1Obj.h L1ObjColl.h L1PhaseIIObj.h L1PhaseIIObjColl.h MuonObjColl.h MuonObj.h LINKDEF ${PROJECT_SOURCE_DIR}/../include/LinkDef.h)
 # 
-add_library(GMTDataFormats SHARED EventObj.cc GenObj.cc L1Obj.cc L1PhaseIIObj.cc L1ObjColl.cc L1PhaseIIObj.cc L1PhaseIIObjColl.cc  G__GMTObjects.cxx EventProxyOMTF.cc RecoMuonObj.cc)
+add_library(GMTDataFormats SHARED EventObj.cc GenObj.cc L1Obj.cc L1PhaseIIObj.cc L1ObjColl.cc L1PhaseIIObj.cc L1PhaseIIObjColl.cc  G__GMTObjects.cxx EventProxyOMTF.cc MuonObj.cc)
 # 
 # Define headers for this library. PUBLIC headers are used for
 # compiling the library, and will be added to consumers' build

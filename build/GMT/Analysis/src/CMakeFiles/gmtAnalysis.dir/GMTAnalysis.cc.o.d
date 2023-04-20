@@ -492,8 +492,8 @@ GMT/Analysis/src/CMakeFiles/gmtAnalysis.dir/GMTAnalysis.cc.o: \
  /eos/user/a/almuhamm/02.TriggerEff/RootAnalysis/GMT/DataFormats/include/L1PhaseIIObjColl.h \
  /eos/user/a/almuhamm/02.TriggerEff/RootAnalysis/GMT/DataFormats/include/L1PhaseIIObj.h \
  /eos/user/a/almuhamm/02.TriggerEff/RootAnalysis/GMT/DataFormats/include/L1PhaseIIObj.h \
- /eos/user/a/almuhamm/02.TriggerEff/RootAnalysis/GMT/DataFormats/include/RecoMuon.h \
- /eos/user/a/almuhamm/02.TriggerEff/RootAnalysis/GMT/DataFormats/include/RecoMuonObj.h \
+ /eos/user/a/almuhamm/02.TriggerEff/RootAnalysis/GMT/DataFormats/include/MuonObjColl.h \
+ /eos/user/a/almuhamm/02.TriggerEff/RootAnalysis/GMT/DataFormats/include/MuonObj.h \
  /usr/include/root/TVector3.h /usr/include/root/TError.h \
  /usr/include/root/DllImport.h /usr/include/root/TVector2.h \
  /usr/include/root/TMatrix.h /usr/include/root/TMatrixF.h \
@@ -507,7 +507,7 @@ GMT/Analysis/src/CMakeFiles/gmtAnalysis.dir/GMTAnalysis.cc.o: \
  /eos/user/a/almuhamm/02.TriggerEff/RootAnalysis/GMT/DataFormats/include/GenObjColl.h \
  /eos/user/a/almuhamm/02.TriggerEff/RootAnalysis/GMT/DataFormats/include/L1ObjColl.h \
  /eos/user/a/almuhamm/02.TriggerEff/RootAnalysis/GMT/DataFormats/include/L1PhaseIIObjColl.h \
- /eos/user/a/almuhamm/02.TriggerEff/RootAnalysis/GMT/DataFormats/include/RecoMuon.h \
+ /eos/user/a/almuhamm/02.TriggerEff/RootAnalysis/GMT/DataFormats/include/MuonObjColl.h \
  /usr/include/root/TBranch.h /usr/include/root/TStopwatch.h \
  /usr/include/boost/property_tree/ptree.hpp \
  /usr/include/boost/property_tree/ptree_fwd.hpp \

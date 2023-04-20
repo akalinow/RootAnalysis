@@ -11,7 +11,7 @@
 #include "GenObjColl.h"
 #include "L1ObjColl.h"
 #include "L1PhaseIIObjColl.h"
-#include "RecoMuon.h"
+#include "MuonObjColl.h"
 #include "TBranch.h"
 
 struct OMTFHit{
@@ -44,7 +44,7 @@ std::ostream& operator<< (std::ostream& stream, const OMTFHit& aHit);
 
      const L1PhaseIIObjColl  *getL1PhaseIIObjColl() const { return myL1PhaseIIObjColl;};
 
-     const RecoMuon *getRecoMuonObjColl() const { return mymuonColl;}; 
+     const MuonObjColl *getRecoMuonObjColl() const { return mymuonColl;}; 
      std::vector<OMTFHit> getHits() const;
      
    private:
@@ -54,7 +54,7 @@ std::ostream& operator<< (std::ostream& stream, const OMTFHit& aHit);
      GenObjColl     *myGenObjColl;
      L1ObjColl      *myL1ObjColl;
      L1PhaseIIObjColl *myL1PhaseIIObjColl;
-     RecoMuon *mymuonColl;
+     MuonObjColl *mymuonColl;
      std::vector<int> *hits;
      std::vector<int> *hitsQuality;
      

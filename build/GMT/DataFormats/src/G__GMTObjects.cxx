@@ -42,8 +42,8 @@
 #include "L1ObjColl.h"
 #include "L1PhaseIIObj.h"
 #include "L1PhaseIIObjColl.h"
-#include "RecoMuon.h"
-#include "RecoMuonObj.h"
+#include "MuonObjColl.h"
+#include "MuonObj.h"
 
 // Header files passed via #pragma extra_include
 
@@ -288,67 +288,67 @@ namespace ROOT {
 } // end of namespace ROOT
 
 namespace ROOT {
-   static void *new_RecoMuonObj(void *p = 0);
-   static void *newArray_RecoMuonObj(Long_t size, void *p);
-   static void delete_RecoMuonObj(void *p);
-   static void deleteArray_RecoMuonObj(void *p);
-   static void destruct_RecoMuonObj(void *p);
+   static void *new_MuonObj(void *p = 0);
+   static void *newArray_MuonObj(Long_t size, void *p);
+   static void delete_MuonObj(void *p);
+   static void deleteArray_MuonObj(void *p);
+   static void destruct_MuonObj(void *p);
 
    // Function generating the singleton type initializer
-   static TGenericClassInfo *GenerateInitInstanceLocal(const ::RecoMuonObj*)
+   static TGenericClassInfo *GenerateInitInstanceLocal(const ::MuonObj*)
    {
-      ::RecoMuonObj *ptr = 0;
-      static ::TVirtualIsAProxy* isa_proxy = new ::TInstrumentedIsAProxy< ::RecoMuonObj >(0);
+      ::MuonObj *ptr = 0;
+      static ::TVirtualIsAProxy* isa_proxy = new ::TInstrumentedIsAProxy< ::MuonObj >(0);
       static ::ROOT::TGenericClassInfo 
-         instance("RecoMuonObj", ::RecoMuonObj::Class_Version(), "RecoMuonObj.h", 7,
-                  typeid(::RecoMuonObj), ::ROOT::Internal::DefineBehavior(ptr, ptr),
-                  &::RecoMuonObj::Dictionary, isa_proxy, 4,
-                  sizeof(::RecoMuonObj) );
-      instance.SetNew(&new_RecoMuonObj);
-      instance.SetNewArray(&newArray_RecoMuonObj);
-      instance.SetDelete(&delete_RecoMuonObj);
-      instance.SetDeleteArray(&deleteArray_RecoMuonObj);
-      instance.SetDestructor(&destruct_RecoMuonObj);
+         instance("MuonObj", ::MuonObj::Class_Version(), "MuonObj.h", 7,
+                  typeid(::MuonObj), ::ROOT::Internal::DefineBehavior(ptr, ptr),
+                  &::MuonObj::Dictionary, isa_proxy, 4,
+                  sizeof(::MuonObj) );
+      instance.SetNew(&new_MuonObj);
+      instance.SetNewArray(&newArray_MuonObj);
+      instance.SetDelete(&delete_MuonObj);
+      instance.SetDeleteArray(&deleteArray_MuonObj);
+      instance.SetDestructor(&destruct_MuonObj);
       return &instance;
    }
-   TGenericClassInfo *GenerateInitInstance(const ::RecoMuonObj*)
+   TGenericClassInfo *GenerateInitInstance(const ::MuonObj*)
    {
-      return GenerateInitInstanceLocal((::RecoMuonObj*)0);
+      return GenerateInitInstanceLocal((::MuonObj*)0);
    }
    // Static variable to force the class initialization
-   static ::ROOT::TGenericClassInfo *_R__UNIQUE_DICT_(Init) = GenerateInitInstanceLocal((const ::RecoMuonObj*)0x0); R__UseDummy(_R__UNIQUE_DICT_(Init));
+   static ::ROOT::TGenericClassInfo *_R__UNIQUE_DICT_(Init) = GenerateInitInstanceLocal((const ::MuonObj*)0x0); R__UseDummy(_R__UNIQUE_DICT_(Init));
 } // end of namespace ROOT
 
 namespace ROOT {
-   static void *new_RecoMuon(void *p = 0);
-   static void *newArray_RecoMuon(Long_t size, void *p);
-   static void delete_RecoMuon(void *p);
-   static void deleteArray_RecoMuon(void *p);
-   static void destruct_RecoMuon(void *p);
+   static void *new_MuonObjColl(void *p = 0);
+   static void *newArray_MuonObjColl(Long_t size, void *p);
+   static void delete_MuonObjColl(void *p);
+   static void deleteArray_MuonObjColl(void *p);
+   static void destruct_MuonObjColl(void *p);
 
    // Function generating the singleton type initializer
-   static TGenericClassInfo *GenerateInitInstanceLocal(const ::RecoMuon*)
+   static TGenericClassInfo *GenerateInitInstanceLocal(const ::MuonObjColl*)
    {
-      ::RecoMuon *ptr = 0;
-      static ::TVirtualIsAProxy* isa_proxy = new ::TInstrumentedIsAProxy< ::RecoMuon >(0);
+      ::MuonObjColl *ptr = 0;
+      static ::TVirtualIsAProxy* isa_proxy = new ::TInstrumentedIsAProxy< ::MuonObjColl >(0);
       static ::ROOT::TGenericClassInfo 
-         instance("RecoMuon", ::RecoMuon::Class_Version(), "RecoMuon.h", 10,
-                  typeid(::RecoMuon), ::ROOT::Internal::DefineBehavior(ptr, ptr),
-                  &::RecoMuon::Dictionary, isa_proxy, 4,
-                  sizeof(::RecoMuon) );
-      instance.SetNew(&new_RecoMuon);
-      instance.SetNewArray(&newArray_RecoMuon);
-      instance.SetDelete(&delete_RecoMuon);
-      instance.SetDeleteArray(&deleteArray_RecoMuon);
-      instance.SetDestructor(&destruct_RecoMuon);
+         instance("MuonObjColl", ::MuonObjColl::Class_Version(), "MuonObjColl.h", 10,
+                  typeid(::MuonObjColl), ::ROOT::Internal::DefineBehavior(ptr, ptr),
+                  &::MuonObjColl::Dictionary, isa_proxy, 4,
+                  sizeof(::MuonObjColl) );
+      instance.SetNew(&new_MuonObjColl);
+      instance.SetNewArray(&newArray_MuonObjColl);
+      instance.SetDelete(&delete_MuonObjColl);
+      instance.SetDeleteArray(&deleteArray_MuonObjColl);
+      instance.SetDestructor(&destruct_MuonObjColl);
       return &instance;
    }
-   TGenericClassInfo *GenerateInitInstance(const ::RecoMuon*)
+   TGenericClassInfo *GenerateInitInstance(const ::MuonObjColl*)
    {
-      return GenerateInitInstanceLocal((::RecoMuon*)0);
+      return GenerateInitInstanceLocal((::MuonObjColl*)0);
    }
    // Static variable to force the class initialization
-   static ::ROOT::TGenericClassInfo *_R__UNIQUE_DICT_(Init) = GenerateInitInstanceLocal((const ::RecoMuon*)0x0); R__UseDummy(_R__UNIQUE_DICT_(Init));
+   static ::ROOT::TGenericClassInfo *_R__UNIQUE_DICT_(Init) = GenerateInitInstanceLocal((const ::MuonObjColl*)0x0); R__UseDummy(_R__UNIQUE_DICT_(Init));
 } // end of namespace ROOT
 
 //______________________________________________________________________________
@@ -562,72 +562,72 @@ TClass *L1PhaseIIObj::Class()
 }
 
 //______________________________________________________________________________
-atomic_TClass_ptr RecoMuonObj::fgIsA(0);  // static to hold class pointer
+atomic_TClass_ptr MuonObj::fgIsA(0);  // static to hold class pointer
 
 //______________________________________________________________________________
-const char *RecoMuonObj::Class_Name()
+const char *MuonObj::Class_Name()
 {
-   return "RecoMuonObj";
+   return "MuonObj";
 }
 
 //______________________________________________________________________________
-const char *RecoMuonObj::ImplFileName()
+const char *MuonObj::ImplFileName()
 {
-   return ::ROOT::GenerateInitInstanceLocal((const ::RecoMuonObj*)0x0)->GetImplFileName();
+   return ::ROOT::GenerateInitInstanceLocal((const ::MuonObj*)0x0)->GetImplFileName();
 }
 
 //______________________________________________________________________________
-int RecoMuonObj::ImplFileLine()
+int MuonObj::ImplFileLine()
 {
-   return ::ROOT::GenerateInitInstanceLocal((const ::RecoMuonObj*)0x0)->GetImplFileLine();
+   return ::ROOT::GenerateInitInstanceLocal((const ::MuonObj*)0x0)->GetImplFileLine();
 }
 
 //______________________________________________________________________________
-TClass *RecoMuonObj::Dictionary()
+TClass *MuonObj::Dictionary()
 {
-   fgIsA = ::ROOT::GenerateInitInstanceLocal((const ::RecoMuonObj*)0x0)->GetClass();
+   fgIsA = ::ROOT::GenerateInitInstanceLocal((const ::MuonObj*)0x0)->GetClass();
    return fgIsA;
 }
 
 //______________________________________________________________________________
-TClass *RecoMuonObj::Class()
+TClass *MuonObj::Class()
 {
-   if (!fgIsA.load()) { R__LOCKGUARD(gInterpreterMutex); fgIsA = ::ROOT::GenerateInitInstanceLocal((const ::RecoMuonObj*)0x0)->GetClass(); }
+   if (!fgIsA.load()) { R__LOCKGUARD(gInterpreterMutex); fgIsA = ::ROOT::GenerateInitInstanceLocal((const ::MuonObj*)0x0)->GetClass(); }
    return fgIsA;
 }
 
 //______________________________________________________________________________
-atomic_TClass_ptr RecoMuon::fgIsA(0);  // static to hold class pointer
+atomic_TClass_ptr MuonObjColl::fgIsA(0);  // static to hold class pointer
 
 //______________________________________________________________________________
-const char *RecoMuon::Class_Name()
+const char *MuonObjColl::Class_Name()
 {
-   return "RecoMuon";
+   return "MuonObjColl";
 }
 
 //______________________________________________________________________________
-const char *RecoMuon::ImplFileName()
+const char *MuonObjColl::ImplFileName()
 {
-   return ::ROOT::GenerateInitInstanceLocal((const ::RecoMuon*)0x0)->GetImplFileName();
+   return ::ROOT::GenerateInitInstanceLocal((const ::MuonObjColl*)0x0)->GetImplFileName();
 }
 
 //______________________________________________________________________________
-int RecoMuon::ImplFileLine()
+int MuonObjColl::ImplFileLine()
 {
-   return ::ROOT::GenerateInitInstanceLocal((const ::RecoMuon*)0x0)->GetImplFileLine();
+   return ::ROOT::GenerateInitInstanceLocal((const ::MuonObjColl*)0x0)->GetImplFileLine();
 }
 
 //______________________________________________________________________________
-TClass *RecoMuon::Dictionary()
+TClass *MuonObjColl::Dictionary()
 {
-   fgIsA = ::ROOT::GenerateInitInstanceLocal((const ::RecoMuon*)0x0)->GetClass();
+   fgIsA = ::ROOT::GenerateInitInstanceLocal((const ::MuonObjColl*)0x0)->GetClass();
    return fgIsA;
 }
 
 //______________________________________________________________________________
-TClass *RecoMuon::Class()
+TClass *MuonObjColl::Class()
 {
-   if (!fgIsA.load()) { R__LOCKGUARD(gInterpreterMutex); fgIsA = ::ROOT::GenerateInitInstanceLocal((const ::RecoMuon*)0x0)->GetClass(); }
+   if (!fgIsA.load()) { R__LOCKGUARD(gInterpreterMutex); fgIsA = ::ROOT::GenerateInitInstanceLocal((const ::MuonObjColl*)0x0)->GetClass(); }
    return fgIsA;
 }
 
@@ -851,70 +851,70 @@ namespace ROOT {
 } // end of namespace ROOT for class ::L1PhaseIIObjColl
 
 //______________________________________________________________________________
-void RecoMuonObj::Streamer(TBuffer &R__b)
+void MuonObj::Streamer(TBuffer &R__b)
 {
-   // Stream an object of class RecoMuonObj.
+   // Stream an object of class MuonObj.
 
    if (R__b.IsReading()) {
-      R__b.ReadClassBuffer(RecoMuonObj::Class(),this);
+      R__b.ReadClassBuffer(MuonObj::Class(),this);
    } else {
-      R__b.WriteClassBuffer(RecoMuonObj::Class(),this);
+      R__b.WriteClassBuffer(MuonObj::Class(),this);
    }
 }
 
 namespace ROOT {
    // Wrappers around operator new
-   static void *new_RecoMuonObj(void *p) {
-      return  p ? new(p) ::RecoMuonObj : new ::RecoMuonObj;
+   static void *new_MuonObj(void *p) {
+      return  p ? new(p) ::MuonObj : new ::MuonObj;
    }
-   static void *newArray_RecoMuonObj(Long_t nElements, void *p) {
-      return p ? new(p) ::RecoMuonObj[nElements] : new ::RecoMuonObj[nElements];
+   static void *newArray_MuonObj(Long_t nElements, void *p) {
+      return p ? new(p) ::MuonObj[nElements] : new ::MuonObj[nElements];
    }
    // Wrapper around operator delete
-   static void delete_RecoMuonObj(void *p) {
-      delete ((::RecoMuonObj*)p);
+   static void delete_MuonObj(void *p) {
+      delete ((::MuonObj*)p);
    }
-   static void deleteArray_RecoMuonObj(void *p) {
-      delete [] ((::RecoMuonObj*)p);
+   static void deleteArray_MuonObj(void *p) {
+      delete [] ((::MuonObj*)p);
    }
-   static void destruct_RecoMuonObj(void *p) {
-      typedef ::RecoMuonObj current_t;
+   static void destruct_MuonObj(void *p) {
+      typedef ::MuonObj current_t;
       ((current_t*)p)->~current_t();
    }
-} // end of namespace ROOT for class ::RecoMuonObj
+} // end of namespace ROOT for class ::MuonObj
 
 //______________________________________________________________________________
-void RecoMuon::Streamer(TBuffer &R__b)
+void MuonObjColl::Streamer(TBuffer &R__b)
 {
-   // Stream an object of class RecoMuon.
+   // Stream an object of class MuonObjColl.
 
    if (R__b.IsReading()) {
-      R__b.ReadClassBuffer(RecoMuon::Class(),this);
+      R__b.ReadClassBuffer(MuonObjColl::Class(),this);
    } else {
-      R__b.WriteClassBuffer(RecoMuon::Class(),this);
+      R__b.WriteClassBuffer(MuonObjColl::Class(),this);
    }
 }
 
 namespace ROOT {
    // Wrappers around operator new
-   static void *new_RecoMuon(void *p) {
-      return  p ? new(p) ::RecoMuon : new ::RecoMuon;
+   static void *new_MuonObjColl(void *p) {
+      return  p ? new(p) ::MuonObjColl : new ::MuonObjColl;
    }
-   static void *newArray_RecoMuon(Long_t nElements, void *p) {
-      return p ? new(p) ::RecoMuon[nElements] : new ::RecoMuon[nElements];
+   static void *newArray_MuonObjColl(Long_t nElements, void *p) {
+      return p ? new(p) ::MuonObjColl[nElements] : new ::MuonObjColl[nElements];
    }
    // Wrapper around operator delete
-   static void delete_RecoMuon(void *p) {
-      delete ((::RecoMuon*)p);
+   static void delete_MuonObjColl(void *p) {
+      delete ((::MuonObjColl*)p);
    }
-   static void deleteArray_RecoMuon(void *p) {
-      delete [] ((::RecoMuon*)p);
+   static void deleteArray_MuonObjColl(void *p) {
+      delete [] ((::MuonObjColl*)p);
    }
-   static void destruct_RecoMuon(void *p) {
-      typedef ::RecoMuon current_t;
+   static void destruct_MuonObjColl(void *p) {
+      typedef ::MuonObjColl current_t;
       ((current_t*)p)->~current_t();
    }
-} // end of namespace ROOT for class ::RecoMuon
+} // end of namespace ROOT for class ::MuonObjColl
 
 namespace ROOT {
    static TClass *vectorlElongsPdoublegR_Dictionary();
@@ -1112,69 +1112,69 @@ namespace ROOT {
 } // end of namespace ROOT for class vector<bool>
 
 namespace ROOT {
-   static TClass *vectorlERecoMuonObjgR_Dictionary();
-   static void vectorlERecoMuonObjgR_TClassManip(TClass*);
-   static void *new_vectorlERecoMuonObjgR(void *p = 0);
-   static void *newArray_vectorlERecoMuonObjgR(Long_t size, void *p);
-   static void delete_vectorlERecoMuonObjgR(void *p);
-   static void deleteArray_vectorlERecoMuonObjgR(void *p);
-   static void destruct_vectorlERecoMuonObjgR(void *p);
+   static TClass *vectorlEMuonObjgR_Dictionary();
+   static void vectorlEMuonObjgR_TClassManip(TClass*);
+   static void *new_vectorlEMuonObjgR(void *p = 0);
+   static void *newArray_vectorlEMuonObjgR(Long_t size, void *p);
+   static void delete_vectorlEMuonObjgR(void *p);
+   static void deleteArray_vectorlEMuonObjgR(void *p);
+   static void destruct_vectorlEMuonObjgR(void *p);
 
    // Function generating the singleton type initializer
-   static TGenericClassInfo *GenerateInitInstanceLocal(const vector<RecoMuonObj>*)
+   static TGenericClassInfo *GenerateInitInstanceLocal(const vector<MuonObj>*)
    {
-      vector<RecoMuonObj> *ptr = 0;
-      static ::TVirtualIsAProxy* isa_proxy = new ::TIsAProxy(typeid(vector<RecoMuonObj>));
+      vector<MuonObj> *ptr = 0;
+      static ::TVirtualIsAProxy* isa_proxy = new ::TIsAProxy(typeid(vector<MuonObj>));
       static ::ROOT::TGenericClassInfo 
-         instance("vector<RecoMuonObj>", -2, "vector", 210,
-                  typeid(vector<RecoMuonObj>), ::ROOT::Internal::DefineBehavior(ptr, ptr),
-                  &vectorlERecoMuonObjgR_Dictionary, isa_proxy, 0,
-                  sizeof(vector<RecoMuonObj>) );
-      instance.SetNew(&new_vectorlERecoMuonObjgR);
-      instance.SetNewArray(&newArray_vectorlERecoMuonObjgR);
-      instance.SetDelete(&delete_vectorlERecoMuonObjgR);
-      instance.SetDeleteArray(&deleteArray_vectorlERecoMuonObjgR);
-      instance.SetDestructor(&destruct_vectorlERecoMuonObjgR);
-      instance.AdoptCollectionProxyInfo(TCollectionProxyInfo::Generate(TCollectionProxyInfo::Pushback< vector<RecoMuonObj> >()));
+         instance("vector<MuonObj>", -2, "vector", 210,
+                  typeid(vector<MuonObj>), ::ROOT::Internal::DefineBehavior(ptr, ptr),
+                  &vectorlEMuonObjgR_Dictionary, isa_proxy, 0,
+                  sizeof(vector<MuonObj>) );
+      instance.SetNew(&new_vectorlEMuonObjgR);
+      instance.SetNewArray(&newArray_vectorlEMuonObjgR);
+      instance.SetDelete(&delete_vectorlEMuonObjgR);
+      instance.SetDeleteArray(&deleteArray_vectorlEMuonObjgR);
+      instance.SetDestructor(&destruct_vectorlEMuonObjgR);
+      instance.AdoptCollectionProxyInfo(TCollectionProxyInfo::Generate(TCollectionProxyInfo::Pushback< vector<MuonObj> >()));
 
-      ::ROOT::AddClassAlternate("vector<RecoMuonObj>","std::vector<RecoMuonObj, std::allocator<RecoMuonObj> >");
+      ::ROOT::AddClassAlternate("vector<MuonObj>","std::vector<MuonObj, std::allocator<MuonObj> >");
       return &instance;
    }
    // Static variable to force the class initialization
-   static ::ROOT::TGenericClassInfo *_R__UNIQUE_DICT_(Init) = GenerateInitInstanceLocal((const vector<RecoMuonObj>*)0x0); R__UseDummy(_R__UNIQUE_DICT_(Init));
+   static ::ROOT::TGenericClassInfo *_R__UNIQUE_DICT_(Init) = GenerateInitInstanceLocal((const vector<MuonObj>*)0x0); R__UseDummy(_R__UNIQUE_DICT_(Init));
 
    // Dictionary for non-ClassDef classes
-   static TClass *vectorlERecoMuonObjgR_Dictionary() {
-      TClass* theClass =::ROOT::GenerateInitInstanceLocal((const vector<RecoMuonObj>*)0x0)->GetClass();
-      vectorlERecoMuonObjgR_TClassManip(theClass);
+   static TClass *vectorlEMuonObjgR_Dictionary() {
+      TClass* theClass =::ROOT::GenerateInitInstanceLocal((const vector<MuonObj>*)0x0)->GetClass();
+      vectorlEMuonObjgR_TClassManip(theClass);
    return theClass;
    }
 
-   static void vectorlERecoMuonObjgR_TClassManip(TClass* ){
+   static void vectorlEMuonObjgR_TClassManip(TClass* ){
    }
 
 } // end of namespace ROOT
 
 namespace ROOT {
    // Wrappers around operator new
-   static void *new_vectorlERecoMuonObjgR(void *p) {
-      return  p ? ::new((::ROOT::Internal::TOperatorNewHelper*)p) vector<RecoMuonObj> : new vector<RecoMuonObj>;
+   static void *new_vectorlEMuonObjgR(void *p) {
+      return  p ? ::new((::ROOT::Internal::TOperatorNewHelper*)p) vector<MuonObj> : new vector<MuonObj>;
    }
-   static void *newArray_vectorlERecoMuonObjgR(Long_t nElements, void *p) {
-      return p ? ::new((::ROOT::Internal::TOperatorNewHelper*)p) vector<RecoMuonObj>[nElements] : new vector<RecoMuonObj>[nElements];
+   static void *newArray_vectorlEMuonObjgR(Long_t nElements, void *p) {
+      return p ? ::new((::ROOT::Internal::TOperatorNewHelper*)p) vector<MuonObj>[nElements] : new vector<MuonObj>[nElements];
    }
    // Wrapper around operator delete
-   static void delete_vectorlERecoMuonObjgR(void *p) {
-      delete ((vector<RecoMuonObj>*)p);
+   static void delete_vectorlEMuonObjgR(void *p) {
+      delete ((vector<MuonObj>*)p);
    }
-   static void deleteArray_vectorlERecoMuonObjgR(void *p) {
-      delete [] ((vector<RecoMuonObj>*)p);
+   static void deleteArray_vectorlEMuonObjgR(void *p) {
+      delete [] ((vector<MuonObj>*)p);
    }
-   static void destruct_vectorlERecoMuonObjgR(void *p) {
-      typedef vector<RecoMuonObj> current_t;
+   static void destruct_vectorlEMuonObjgR(void *p) {
+      typedef vector<MuonObj> current_t;
       ((current_t*)p)->~current_t();
    }
-} // end of namespace ROOT for class vector<RecoMuonObj>
+} // end of namespace ROOT for class vector<MuonObj>
 
 namespace ROOT {
    static TClass *vectorlEL1PhaseIIObjgR_Dictionary();
@@ -1381,8 +1381,8 @@ namespace {
 "L1ObjColl.h",
 "L1PhaseIIObj.h",
 "L1PhaseIIObjColl.h",
-"RecoMuon.h",
-"RecoMuonObj.h",
+"MuonObjColl.h",
+"MuonObj.h",
 0
     };
     static const char* includePaths[] = {
@@ -1408,8 +1408,8 @@ class __attribute__((annotate("$clingAutoload$L1Obj.h")))  L1Obj;
 class __attribute__((annotate("$clingAutoload$L1ObjColl.h")))  L1ObjColl;
 class __attribute__((annotate("$clingAutoload$L1PhaseIIObj.h")))  L1PhaseIIObj;
 class __attribute__((annotate("$clingAutoload$L1PhaseIIObjColl.h")))  L1PhaseIIObjColl;
-class __attribute__((annotate("$clingAutoload$RecoMuonObj.h")))  __attribute__((annotate("$clingAutoload$RecoMuon.h")))  RecoMuonObj;
-class __attribute__((annotate("$clingAutoload$RecoMuon.h")))  RecoMuon;
+class __attribute__((annotate("$clingAutoload$MuonObj.h")))  __attribute__((annotate("$clingAutoload$MuonObjColl.h")))  MuonObj;
+class __attribute__((annotate("$clingAutoload$MuonObjColl.h")))  MuonObjColl;
 )DICTFWDDCLS";
     static const char* payloadCode = R"DICTPAYLOAD(
 #line 1 "libGMTObjects dictionary payload"
@@ -1424,8 +1424,8 @@ class __attribute__((annotate("$clingAutoload$RecoMuon.h")))  RecoMuon;
 #include "L1ObjColl.h"
 #include "L1PhaseIIObj.h"
 #include "L1PhaseIIObjColl.h"
-#include "RecoMuon.h"
-#include "RecoMuonObj.h"
+#include "MuonObjColl.h"
+#include "MuonObj.h"
 
 #undef  _BACKWARD_BACKWARD_WARNING_H
 )DICTPAYLOAD";
@@ -1437,8 +1437,8 @@ class __attribute__((annotate("$clingAutoload$RecoMuon.h")))  RecoMuon;
 "L1ObjColl", payloadCode, "@",
 "L1PhaseIIObj", payloadCode, "@",
 "L1PhaseIIObjColl", payloadCode, "@",
-"RecoMuon", payloadCode, "@",
-"RecoMuonObj", payloadCode, "@",
+"MuonObj", payloadCode, "@",
+"MuonObjColl", payloadCode, "@",
 nullptr
 };
     static bool isInitialized = false;

@@ -14,8 +14,8 @@
 #pragma link C++ class GenObjColl+;
 #pragma link C++ class L1ObjColl+;
 #pragma link C++ class L1PhaseIIObjColl+;
-#pragma link C++ class RecoMuon+;
-#pragma link C++ class RecoMuonObj+;
+#pragma link C++ class MuonObjColl+;
+#pragma link C++ class MuonObj+;
 #pragma link C++ class vector<TLorentzVector>;
 #pragma link C++ class vector<TVector2>;
 #pragma link C++ class vector<LongDouble_t>;

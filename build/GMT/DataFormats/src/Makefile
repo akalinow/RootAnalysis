@@ -384,29 +384,29 @@ L1PhaseIIObjColl.cc.s:
 	cd /eos/user/a/almuhamm/02.TriggerEff/RootAnalysis/build && $(MAKE) $(MAKESILENT) -f GMT/DataFormats/src/CMakeFiles/GMTDataFormats.dir/build.make GMT/DataFormats/src/CMakeFiles/GMTDataFormats.dir/L1PhaseIIObjColl.cc.s
 .PHONY : L1PhaseIIObjColl.cc.s
 
-RecoMuonObj.o: RecoMuonObj.cc.o
-.PHONY : RecoMuonObj.o
+MuonObj.o: MuonObj.cc.o
+.PHONY : MuonObj.o
 
 # target to build an object file
-RecoMuonObj.cc.o:
-	cd /eos/user/a/almuhamm/02.TriggerEff/RootAnalysis/build && $(MAKE) $(MAKESILENT) -f GMT/DataFormats/src/CMakeFiles/GMTDataFormats.dir/build.make GMT/DataFormats/src/CMakeFiles/GMTDataFormats.dir/RecoMuonObj.cc.o
-.PHONY : RecoMuonObj.cc.o
+MuonObj.cc.o:
+	cd /eos/user/a/almuhamm/02.TriggerEff/RootAnalysis/build && $(MAKE) $(MAKESILENT) -f GMT/DataFormats/src/CMakeFiles/GMTDataFormats.dir/build.make GMT/DataFormats/src/CMakeFiles/GMTDataFormats.dir/MuonObj.cc.o
+.PHONY : MuonObj.cc.o
 
-RecoMuonObj.i: RecoMuonObj.cc.i
-.PHONY : RecoMuonObj.i
+MuonObj.i: MuonObj.cc.i
+.PHONY : MuonObj.i
 
 # target to preprocess a source file
-RecoMuonObj.cc.i:
-	cd /eos/user/a/almuhamm/02.TriggerEff/RootAnalysis/build && $(MAKE) $(MAKESILENT) -f GMT/DataFormats/src/CMakeFiles/GMTDataFormats.dir/build.make GMT/DataFormats/src/CMakeFiles/GMTDataFormats.dir/RecoMuonObj.cc.i
-.PHONY : RecoMuonObj.cc.i
+MuonObj.cc.i:
+	cd /eos/user/a/almuhamm/02.TriggerEff/RootAnalysis/build && $(MAKE) $(MAKESILENT) -f GMT/DataFormats/src/CMakeFiles/GMTDataFormats.dir/build.make GMT/DataFormats/src/CMakeFiles/GMTDataFormats.dir/MuonObj.cc.i
+.PHONY : MuonObj.cc.i
 
-RecoMuonObj.s: RecoMuonObj.cc.s
-.PHONY : RecoMuonObj.s
+MuonObj.s: MuonObj.cc.s
+.PHONY : MuonObj.s
 
 # target to generate assembly for a file
-RecoMuonObj.cc.s:
-	cd /eos/user/a/almuhamm/02.TriggerEff/RootAnalysis/build && $(MAKE) $(MAKESILENT) -f GMT/DataFormats/src/CMakeFiles/GMTDataFormats.dir/build.make GMT/DataFormats/src/CMakeFiles/GMTDataFormats.dir/RecoMuonObj.cc.s
-.PHONY : RecoMuonObj.cc.s
+MuonObj.cc.s:
+	cd /eos/user/a/almuhamm/02.TriggerEff/RootAnalysis/build && $(MAKE) $(MAKESILENT) -f GMT/DataFormats/src/CMakeFiles/GMTDataFormats.dir/build.make GMT/DataFormats/src/CMakeFiles/GMTDataFormats.dir/MuonObj.cc.s
+.PHONY : MuonObj.cc.s
 
 # Help Target
 help:
@@ -446,9 +446,9 @@ help:
 	@echo "... L1PhaseIIObjColl.o"
 	@echo "... L1PhaseIIObjColl.i"
 	@echo "... L1PhaseIIObjColl.s"
-	@echo "... RecoMuonObj.o"
-	@echo "... RecoMuonObj.i"
-	@echo "... RecoMuonObj.s"
+	@echo "... MuonObj.o"
+	@echo "... MuonObj.i"
+	@echo "... MuonObj.s"
 .PHONY : help
 
 
