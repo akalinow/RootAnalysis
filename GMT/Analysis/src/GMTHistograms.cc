@@ -109,7 +109,7 @@ void GMTHistograms::defineHistograms(){
  add2DHistogram("h2DPtTemplate","",150,0,150,2,-0.5,1.5,file_);
  add2DHistogram("h2DHighPtTemplate","",50,50,550,2,-0.5,1.5,file_);
 
- add2DHistogram("h2DPtVsPtTemplate","",404,0,202,404,0,202,file_);
+ add2DHistogram("h2DPtVsPtTemplate","",404,0,100,404,0,130,file_);
 
  add2DHistogram("h2DEtaHitTemplate","",8*26,0.8,1.25,2,-0.5,1.5,file_);
  add2DHistogram("h2DPhiHitTemplate","",5*32,-M_PI,M_PI,2,-0.5,1.5,file_);
@@ -118,11 +118,11 @@ void GMTHistograms::defineHistograms(){
  add2DHistogram("h2DPhiVxTemplate","",4*32,-3.2,3.2,2,-0.5,1.5,file_);
  add2DHistogram("h2DBetaTemplate","",4*32,-0.1,1.1,2,-0.5,1.5,file_);
 
- add2DHistogram("h2DVtx_xTemplate","",4*32,-4e-3,3e-3,2,-0.5,1.5,file_);
- add2DHistogram("h2DVtx_yTemplate","",4*32,-1.5e-3,1.5e-3,2,-0.5,1.5,file_);
- add2DHistogram("h2DVtx_zTemplate","",4*32,-10,10.2,2,-0.5,1.5,file_);
+ add2DHistogram("h2DVtx_xTemplate","",4*32,-0.005,0.005,2,-0.5,1.5,file_);
+ add2DHistogram("h2DVtx_yTemplate","",4*32,-0.003,0.003,2,-0.5,1.5,file_);
+ add2DHistogram("h2DVtx_zTemplate","",4*32,-15,15.2,2,-0.5,1.5,file_);
 
- add2DHistogram("h2DVtx_dTemplate","",4*32,0,0.003,2,-0.5,1.5,file_);
+ add2DHistogram("h2DVtx_dTemplate","",4*32,0,0.0035,2,-0.5,1.5,file_);
 
 
  add2DHistogram("h2DQualityTemplate","",201,-0.5,200.5,2,-0.5,1.5,file_);
@@ -282,8 +282,10 @@ void GMTHistograms::plotEffPanel(const std::string & sysType, bool doHigh){
 
   TString hName("");
   const int *ptCuts = ptCutsOMTF;
+
+    std::string names[3] = {"#beta <0.5", "#beta <0.7", "#beta <1"};
  
-  for (int icut=0; icut <=3;++icut){
+  for (int icut=0; icut <=2;++icut){
     float ptCut = GMTHistograms::ptBins[ptCuts[icut]];
     hName = "h2D"+sysType+"Pt"+std::to_string((int)ptCut);
     if(doHigh) hName = "h2D"+sysType+"HighPt"+std::to_string((int)ptCut);
@@ -304,8 +306,8 @@ void GMTHistograms::plotEffPanel(const std::string & sysType, bool doHigh){
     if (icut==0)hEff->DrawCopy();
     else hEff->DrawCopy("same");
     TString nameCut = TString::Format("%d", (int)GMTHistograms::ptBins[ptCuts[icut]])+" GeV/c";
-    if (icut==0) nameCut = "no p_{T} cut";
-    l.AddEntry(hEff,nameCut.Data());
+    // if (icut==0) nameCut = "no p_{T} cut";
+    l.AddEntry(hEff, names[icut].c_str());
   }
   l.DrawClone();
   if(!doHigh) c->Print(TString::Format("fig_png/PanelVsPt_%s.png",sysType.c_str()).Data());
@@ -410,9 +412,6 @@ void GMTHistograms::plotEffVsVar(const std::string & sysType,
 
     if (icut==0)hEff->DrawCopy("E0");
     else hEff->DrawCopy("same E0");
-    std::string nameCut = std::to_string((int)ptCut)+" GeV/c";
-    if (icut==0) nameCut = "no p_{T} cut";
-    l.AddEntry(hEff,nameCut.c_str());
   }
   l.DrawClone();
   c->Print(TString::Format("fig_eps/EffVs%s_%s.eps",varName.c_str(), sysType.c_str()).Data());
@@ -457,10 +456,11 @@ void GMTHistograms::plotEffVsEta(const std::string & sysType){
     hEff->SetYTitle("Efficiency");
     if (iType==0)hEff->DrawCopy();
     else hEff->DrawCopy("same");
-    std::string nameCut = std::to_string((int)GMTHistograms::ptBins[iCut])+" GeV/c";
-    if (iType==0) nameCut = "p_{T}^{#mu}>p_{T}^{cut} + 20 GeV/c";
-    if (iType==1) nameCut = "p_{T}^{cut}<p_{T}^{#mu}<#dot p_{T}^{cut} + 5 GeV/c";
-    if (iType==2) nameCut = "p_{T}^{#mu}<10 GeV/c (#epsilon #times 50)";
+    std::string nameCut;
+    // std::string nameCut = std::to_string((int)GMTHistograms::ptBins[iCut])+" GeV/c";
+    if (iType==0) nameCut = "#beta < 0.5";
+    if (iType==1) nameCut = "#beta < 0.7";
+    if (iType==2) nameCut = "#beta < 1";
     l.AddEntry(hEff,nameCut.c_str());
   }
   ///OMTF eta range used for generating patterns.
@@ -468,7 +468,7 @@ void GMTHistograms::plotEffVsEta(const std::string & sysType){
   aLine->SetLineWidth(2);
   aLine->SetLineColor(2);
 
-  l.SetHeader(TString::Format("p_{T} = %d  GeV/c",(int)GMTHistograms::ptBins[iCut]).Data());
+  // l.SetHeader(TString::Format("p_{T} = %d  GeV/c",(int)GMTHistograms::ptBins[iCut]).Data());
   l.DrawClone();
   c->Print(TString::Format("fig_png/EffVsEta_%s.png",sysType.c_str()).Data());
   c->Print(TString::Format("fig_png/EffVsEta_%s.C",sysType.c_str()).Data());
@@ -693,7 +693,8 @@ void GMTHistograms::plotSingleHistogram(std::string hName){
   if(!h2D && !h1D) return;
 	
   TCanvas* c = new TCanvas("AnyHistogram","AnyHistogram",
-			   600,400);
+			   800,600);
+  c->SetRightMargin(0.18);
 
   TLegend l(0.15,0.78,0.35,0.87,NULL,"brNDC");
   l.SetTextSize(0.05);
@@ -704,7 +705,10 @@ void GMTHistograms::plotSingleHistogram(std::string hName){
   if(h2D) {
     h2D->SetDirectory(myDirCopy);
     h2D->SetLineWidth(3);
-    h2D->Scale(1.0/h2D->Integral());
+    h2D->GetYaxis()->SetRangeUser(0, 1000); // <-- ustawienie zakresu osi x
+
+
+    // h2D->Scale(1.0/h2D->Integral());
     h2D->SetXTitle("p_{T}^{GEN}");
     h2D->SetYTitle("p_{T}^{REC}");
     h2D->GetYaxis()->SetTitleOffset(1.4);

@@ -177,7 +177,7 @@ void GMTAnalyzer::fillRateHisto(const GenObj & aGenObj,
 // //////////////////////////////////////////////////////////////////////////////
 void GMTAnalyzer::fillHistosForGenMuon(const GenObj & aGenObj){   
   
-  bool isGMTAcceptance = fabs(aGenObj.eta())<2.2;
+  bool isGMTAcceptance = fabs(aGenObj.eta())<2;
   if(!isGMTAcceptance) return;
 
   std::string selType = "";
@@ -192,18 +192,18 @@ void GMTAnalyzer::fillHistosForGenMuon(const GenObj & aGenObj){
     // float ptCut = GMTHistograms::ptBins[iCut];    
     // 
     // warunki tworzenia dopasowac
-    // if(iType==0) pass = true; //aGenObj.pt()>ptCut + 20;
-    // else if(iType==1) pass = true; //aGenObj.pt()>ptCut && aGenObj.pt()<(ptCut+5);
-    // else if(iType==2) pass = true; //aGenObj.pt()<10;
-    // if(!pass) continue;
+    if(iType==0) pass = true; //aGenObj.pt()>ptCut + 20;
+    else if(iType==1) pass = true; //aGenObj.pt()>ptCut && aGenObj.pt()<(ptCut+5);
+    else if(iType==2) pass = true; //aGenObj.pt()<10;
+    if(!pass) continue;
 
-        float ptCut = GMTHistograms::ptBins[iCut];    
+        // float ptCut = GMTHistograms::ptBins[iCut];    
     // // 
     // // warunki tworzenia dopasowac
-    if(iType==0) pass = aGenObj.pt()>ptCut + 20;
-    else if(iType==1) pass = aGenObj.pt()>ptCut && aGenObj.pt()<(ptCut+5);
-    else if(iType==2) pass = aGenObj.pt()<10;
-    if(!pass) continue;
+    // if(iType==0) pass = aGenObj.beta()<0.5;
+    // else if(iType==1) pass = aGenObj.beta()<0.7 && aGenObj.beta()>0.5;
+    // else if(iType==2) pass = aGenObj.beta()<1 && aGenObj.beta()>0.5;
+    // if(!pass) continue;
     
     selType = std::string(TString::Format("Type%d",iType));
     // fillTurnOnCurve(aGenObj, iCut, "OMTF", selType);
@@ -228,11 +228,10 @@ bool GMTAnalyzer::analyze(const EventProxyBase& iEvent){
   if(genObjVec.empty()) return false;
 
   for(auto aGenObj: genObjVec){
-    if(std::abs(aGenObj.pdgId())!=13) continue;
+    // if(std::abs(aGenObj.pdgId())!=13) continue;
 
-    // if(std::abs(aGenObj.pdgId())!=1000015) continue; // do czastek HSCP to ich numer, do stau takze ten numer
+    if(std::abs(aGenObj.pdgId())!=1000015) continue; // do czastek HSCP to ich numer, do stau takze ten numer
 
-    if(std::abs(aGenObj.status())!=1) continue;    
     fillHistosForGenMuon(aGenObj); 
   
     fillRateHisto(aGenObj, "Vx","Tot");
