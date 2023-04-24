@@ -58,6 +58,7 @@ std::string GMTHistograms::getTemplateName(const std::string& name){
 
   if(name.find("DeltaEta")!=std::string::npos) templateName = "h1DDeltaEtaTemplate";
   if(name.find("DeltaPhi")!=std::string::npos) templateName = "h1DDeltaPhiTemplate";
+  if(name.find("DiMuonMass")!=std::string::npos) templateName = "h1DDiMuonMassTemplate";
 
   if(name.find("Pt")!=std::string::npos) templateName = "h2DPtTemplate";
   if(name.find("HighPt")!=std::string::npos) templateName = "h2DHighPtTemplate";
@@ -102,8 +103,8 @@ void GMTHistograms::defineHistograms(){
 
  //Make template histos
  add1DHistogram("h1DDeltaEtaTemplate","",11,-0.83,0.83,file_);
-
  add1DHistogram("h1DDeltaPhiTemplate","",5*32,-M_PI,M_PI,file_);
+ add1DHistogram("h1DDiMuonMassTemplate", "", 80, 70, 110, file_);
 
  ///Efficiency histos
  add2DHistogram("h2DPtTemplate","",150,0,150,2,-0.5,1.5,file_);

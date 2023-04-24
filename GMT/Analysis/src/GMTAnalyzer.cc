@@ -103,8 +103,12 @@ void GMTAnalyzer::fillTurnOnCurve(const MuonObj & aRecoMuon,
   
   for(auto aCand: myL1Coll){
     bool pass = passQuality(aCand ,sysType, selType);
+    std::cout<< " pt and eta of the reco ::  before the pass: pt :   " << aRecoMuon.pt()<< "   eta :   "<<aRecoMuon.eta() <<"\n"; 
+    double check_delta = std::abs(aRecoMuon.eta()-aCand.etaValue());
+    std::cout<< " the delta before pass : " << check_delta << "\n";
     if(!pass) continue;    
-    double delta = std::abs(aRecoMuon.eta()-aCand.etaValue());    
+    double delta = std::abs(aRecoMuon.eta()-aCand.etaValue());
+    std::cout<< " delta eta between the reco muon and the l1 candidate " << delta <<"\n";    
     if(delta<deltaEta){
       deltaEta = delta;
       selectedCand = aCand;      
