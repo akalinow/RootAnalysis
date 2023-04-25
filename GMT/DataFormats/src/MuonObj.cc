@@ -7,13 +7,11 @@ std::ostream & operator<< (std::ostream &out, const MuonObj &o)
 {
   out<<"RecoMuonObj: ";
   out<<" charge: "<<o.charge();
-  out<<"pt: "<<o.pt()<<" eta: "<<o.eta()<<" phi: "<<o.phi();
+  out<<" pt:     "<<o.pt() <<"  eta:  "<<o.eta() <<" phi: "<<o.phi();
   out<<" RPC Hits : "<<o.nrpchits();
   out<<" DT  Hits : "<<o.ndthits();
   out<<" Medium ID : "<<o.mediumID();
-
-
-
+  out<<" l1Eta     : "<<o.l1eta();
 
   out<<std::endl;
 

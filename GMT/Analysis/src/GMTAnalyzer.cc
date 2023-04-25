@@ -82,7 +82,9 @@ void GMTAnalyzer::fillTurnOnCurve(const MuonObj & aRecoMuon,
 				                          const std::string & sysType,
 				                          const std::string & selType){
 
-  //int is important for histo name construction
+ 
+
+ //int is important for histo name construction
   int ptCut = GMTHistograms::ptBins[iPtCut];
 
   const std::vector<L1Obj> & myL1Coll = myL1ObjColl->getL1Objs();
@@ -90,25 +92,21 @@ void GMTAnalyzer::fillTurnOnCurve(const MuonObj & aRecoMuon,
   if(sysType=="OMTF") {   
     hName = "h2DOMTF"+selType;
   }
-  if(sysType=="uGMT_emu") {   
+  /*if(sysType=="uGMT_emu") {   
     hName = "h2DuGMT_emu"+selType;
   }
   if(sysType=="EMTF") {   
     hName = "h2DEMTF"+selType;
   }
-
+*/
   ///Find the best matching L1 candidate
   float deltaEta = 0.4;
   L1Obj selectedCand;
   
   for(auto aCand: myL1Coll){
     bool pass = passQuality(aCand ,sysType, selType);
-    std::cout<< " pt and eta of the reco ::  before the pass: pt :   " << aRecoMuon.pt()<< "   eta :   "<<aRecoMuon.eta() <<"\n"; 
-    double check_delta = std::abs(aRecoMuon.eta()-aCand.etaValue());
-    std::cout<< " the delta before pass : " << check_delta << "\n";
     if(!pass) continue;    
     double delta = std::abs(aRecoMuon.eta()-aCand.etaValue());
-    std::cout<< " delta eta between the reco muon and the l1 candidate " << delta <<"\n";    
     if(delta<deltaEta){
       deltaEta = delta;
       selectedCand = aCand;      
@@ -167,8 +165,10 @@ void GMTAnalyzer::fillRateHisto(const MuonObj & aRecoMuon,
 
   L1Obj selectedCand;
   for(auto aCand: myL1Coll){
+
     bool pass = passQuality(aCand ,sysType, selType);    
     if(pass && selectedCand.ptValue()<aCand.ptValue()) selectedCand = aCand;
+
   }
 
   bool pass = selectedCand.ptValue()>=20;
