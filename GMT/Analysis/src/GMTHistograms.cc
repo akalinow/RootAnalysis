@@ -116,7 +116,7 @@ void GMTHistograms::defineHistograms(){
 
  add2DHistogram("h2DEtaVxTemplate","",60,-3,3,2,-0.5,1.5,file_);
  add2DHistogram("h2DPhiVxTemplate","",4*32,-3.2,3.2,2,-0.5,1.5,file_);
- add2DHistogram("h2DBetaTemplate","",4*32,-0.1,1.1,2,-0.5,1.5,file_);
+ add2DHistogram("h2DBetaTemplate","",4*32,-0.1,1,2,-0.5,1.5,file_);
 
  add2DHistogram("h2DVtx_xTemplate","",4*32,-0.005,0.005,2,-0.5,1.5,file_);
  add2DHistogram("h2DVtx_yTemplate","",4*32,-0.003,0.003,2,-0.5,1.5,file_);
@@ -389,16 +389,16 @@ void GMTHistograms::plotEffVsVar(const std::string & sysType,
     std::string beta_name = "Beta";
 
     if (str_var_name == vtx_x){
-      hEff->SetXTitle("Vtx_{x} [mm]");
+      hEff->SetXTitle("Vtx_{x} [cm]");
     }
     else if (str_var_name == vtx_y){
-      hEff->SetXTitle("Vtx_{y} [mm]");
+      hEff->SetXTitle("Vtx_{y} [cm]");
     }
     else if (str_var_name == vtx_z){
-      hEff->SetXTitle("Vtx_{z} [mm]");
+      hEff->SetXTitle("Vtx_{z} [cm]");
     }
     else if (str_var_name == vtx_d){
-      hEff->SetXTitle("Vtx_{d} [mm]");
+      hEff->SetXTitle("Vtx_{d} [cm]");
     }
     else if (str_var_name == beta_name){
       hEff->SetXTitle("#beta");
@@ -445,6 +445,7 @@ void GMTHistograms::plotEffVsEta(const std::string & sysType){
     TH1D *hDenom = h2D->ProjectionX("hDenom",1,1);
     if(iType==2) hNum->Scale(50.0);
     hDenom->Add(hNum);
+
     TH1D* hEff =DivideErr(hNum,hDenom,"Pt_Int","B");
     hEff->SetStats(kFALSE);
     hEff->SetMinimum(0.0001);
@@ -459,8 +460,8 @@ void GMTHistograms::plotEffVsEta(const std::string & sysType){
     std::string nameCut;
     // std::string nameCut = std::to_string((int)GMTHistograms::ptBins[iCut])+" GeV/c";
     if (iType==0) nameCut = "#beta < 0.5";
-    if (iType==1) nameCut = "#beta < 0.7";
-    if (iType==2) nameCut = "#beta < 1";
+    if (iType==1) nameCut = "0.5 < #beta < 0.7";
+    if (iType==2) nameCut = "0.7 < #beta < 1";
     l.AddEntry(hEff,nameCut.c_str());
   }
   ///OMTF eta range used for generating patterns.

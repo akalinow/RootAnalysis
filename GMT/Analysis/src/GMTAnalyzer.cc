@@ -124,6 +124,7 @@ void GMTAnalyzer::fillTurnOnCurve(const GenObj & aGenObj,
   myHistos_->fill2DHistogram(tmpName, aGenObj.pt(), selectedCand.ptValue());
   
   //Generic eff vs selected variable calculated for muons on plateau
+  std::cout << selType.size() << std::endl;
   if(!selType.size() && aGenObj.pt()<ptCut+20) return;
   tmpName = hName+"EtaVx"+std::to_string(ptCut);
   myHistos_->fill2DHistogram(tmpName, aGenObj.eta(), passPtCut);
