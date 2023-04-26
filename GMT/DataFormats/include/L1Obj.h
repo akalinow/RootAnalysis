@@ -31,7 +31,7 @@ public:
   double ptValue() const { return (pt-1.)/2.; }
   double etaValue() const { return eta/240.*2.61; }
   double phiValue() const {
-    if (type==OMTF || type==OMTF_emu || type==EMTF) 
+    if (type==OMTF || type==OMTF_emu)// || type==EMTF) 
     return modulo2PI( ( (15.+iProcessor*60.)/360. + phi/576. ) *2*M_PI) ;  
     else if (type==BMTF) return modulo2PI( ( (-15.+iProcessor*30.)/360. + phi/576. ) *2*M_PI);
     else if (type==uGMT || type==uGMT_emu) return modulo2PI((phi/576.)*2*M_PI);

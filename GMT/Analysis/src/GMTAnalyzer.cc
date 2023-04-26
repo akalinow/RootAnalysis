@@ -68,7 +68,9 @@ bool GMTAnalyzer::passQuality(const L1Obj & aL1Cand,
   bool lowPtVeto = false;
 
    if(sysType.find("uGMT_emu")!=std::string::npos){
-     return aL1Cand.type==L1Obj::uGMT_emu && aL1Cand.q>=12 && aL1Cand.bx==0 && !lowPtVeto;
+     
+     //std::cout<< aL1Cand.type << aL1Cand.q << aL1Cand.bx << " : quality and bx for L1 cand "<< "\n";
+     return aL1Cand.type==L1Obj::OMTF && aL1Cand.q>=12 && aL1Cand.bx==0 && !lowPtVeto;
    }
    else if(sysType.find("Vx")!=std::string::npos){
      return true;
@@ -86,7 +88,7 @@ void GMTAnalyzer::fillTurnOnCurve(const MuonObj & aRecoMuon,
 
  //int is important for histo name construction
   int ptCut = GMTHistograms::ptBins[iPtCut];
-
+  std::cout<<" the pt and eta distribution : "<< aRecoMuon.eta() <<"\t" << aRecoMuon.pt()<<"\n";
   const std::vector<L1Obj> & myL1Coll = myL1ObjColl->getL1Objs();
   std::string hName = "h2DGmt"+selType;
   if(sysType=="OMTF") {   
@@ -218,22 +220,23 @@ bool GMTAnalyzer::analyze(const EventProxyBase& iEvent){
   myL1ObjColl = myProxy.getL1ObjColl();
   myL1PhaseIIObjColl = myProxy.getL1PhaseIIObjColl();
 
-  const std::vector<MuonObj> RecoMuonVec = myMuonObjColl->data();  
-  if(RecoMuonVec.empty()) return false;
+  const std::vector<MuonObj> MuonObjVec = myMuonObjColl->data();  
+  if(MuonObjVec.empty()) return false;
 
-  for(auto aRecoMuonObj: RecoMuonVec){
+  for(auto aMuonObj: MuonObjVec){
+     std::cout<<"output of the muon object "<<  aMuonObj <<"\n"; 
    // if(std::abs(aGenObj.pdgId())!=13) continue;
    // if(std::abs(aGenObj.status())!=1) continue;    
-    fillHistosForRecoMuon(aRecoMuonObj); 
+    fillHistosForRecoMuon(aMuonObj); 
   
-    fillRateHisto(aRecoMuonObj, "Vx","Tot");
-    fillRateHisto(aRecoMuonObj, "uGMT_emu","Tot");
+    fillRateHisto(aMuonObj, "Vx","Tot");
+    fillRateHisto(aMuonObj, "uGMT_emu","Tot");
   
-    fillRateHisto(aRecoMuonObj, "Vx","VsPt");
-    fillRateHisto(aRecoMuonObj, "uGMT_emu","VsPt");
+    fillRateHisto(aMuonObj, "Vx","VsPt");
+    fillRateHisto(aMuonObj, "uGMT_emu","VsPt");
    
-    fillRateHisto(aRecoMuonObj, "Vx","VsEta");
-    fillRateHisto(aRecoMuonObj, "uGMT_emu","VsEta");
+    fillRateHisto(aMuonObj, "Vx","VsEta");
+    fillRateHisto(aMuonObj, "uGMT_emu","VsEta");
   }
   
   return true;
