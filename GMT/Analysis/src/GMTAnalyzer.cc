@@ -67,9 +67,10 @@ bool GMTAnalyzer::passQuality(const L1Obj & aL1Cand,
   
   bool lowPtVeto = false;
 
-   if(sysType.find("uGMT_emu")!=std::string::npos){
+   if(sysType.find("OMTF")!=std::string::npos){
      
-     //std::cout<< aL1Cand.type << aL1Cand.q << aL1Cand.bx << " : quality and bx for L1 cand "<< "\n";
+     std::cout<<"---------info regarding the L1 candidate ----------\n"
+	      <<aL1Cand<<"\n";
      return aL1Cand.type==L1Obj::OMTF && aL1Cand.q>=12 && aL1Cand.bx==0 && !lowPtVeto;
    }
    else if(sysType.find("Vx")!=std::string::npos){
@@ -94,13 +95,13 @@ void GMTAnalyzer::fillTurnOnCurve(const MuonObj & aRecoMuon,
   if(sysType=="OMTF") {   
     hName = "h2DOMTF"+selType;
   }
-  /*if(sysType=="uGMT_emu") {   
+  if(sysType=="uGMT_emu") {   
     hName = "h2DuGMT_emu"+selType;
   }
   if(sysType=="EMTF") {   
     hName = "h2DEMTF"+selType;
   }
-*/
+
   ///Find the best matching L1 candidate
   float deltaEta = 0.4;
   L1Obj selectedCand;
@@ -109,12 +110,13 @@ void GMTAnalyzer::fillTurnOnCurve(const MuonObj & aRecoMuon,
     bool pass = passQuality(aCand ,sysType, selType);
     if(!pass) continue;    
     double delta = std::abs(aRecoMuon.eta()-aCand.etaValue());
+    std::cout<< " this delta eta should be different than that of the (deltaEta=0.4)  :"<<delta<< "\n"; 
     if(delta<deltaEta){
       deltaEta = delta;
       selectedCand = aCand;      
     }    
   }
-
+ // std::cout<< " lets check for 1000 events (the set one should be chnaged by the calculated one) : "<<deltaEta << "\n"; 
   bool passPtCut = selectedCand.ptValue()>=ptCut && selectedCand.ptValue()>0;
 
   std::string tmpName = hName+"Pt"+std::to_string(ptCut);
@@ -133,24 +135,7 @@ void GMTAnalyzer::fillTurnOnCurve(const MuonObj & aRecoMuon,
 
   tmpName = hName+"PhiVx"+std::to_string(ptCut);
   myHistos_->fill2DHistogram(tmpName, aRecoMuon.phi(), passPtCut);
-/*
-  tmpName = hName+"BetaVx"+std::to_string(ptCut);
-  myHistos_->fill2DHistogram(tmpName, aRecoMuon.beta(), passPtCut);
 
-  tmpName = hName+"vxVx"+std::to_string(ptCut);
-  myHistos_->fill2DHistogram(tmpName, aRecoMuon.vx(), passPtCut);
-
-  tmpName = hName+"vzVx"+std::to_string(ptCut);
-  myHistos_->fill2DHistogram(tmpName, aRecoMuon.vz(), passPtCut);
-
-  tmpName = hName+"vyVx"+std::to_string(ptCut);
-  myHistos_->fill2DHistogram(tmpName, aRecoMuon.vy(), passPtCut);
-
-  float vertex_distance = sqrt(pow(aRecoMuon.vx(), 2) + pow(aRecoMuon.vy(), 2) + pow(aRecoMuon.vz(), 2));
-
-  tmpName = hName+"vert_dist"+std::to_string(ptCut);
-  myHistos_->fill2DHistogram(tmpName, vertex_distance, passPtCut);
-*/
 }
 // //////////////////////////////////////////////////////////////////////////////
 // //////////////////////////////////////////////////////////////////////////////
@@ -168,7 +153,8 @@ void GMTAnalyzer::fillRateHisto(const MuonObj & aRecoMuon,
   L1Obj selectedCand;
   for(auto aCand: myL1Coll){
 
-    bool pass = passQuality(aCand ,sysType, selType);    
+    bool pass = passQuality(aCand ,sysType, selType); 
+    std::cout << " rate histograms : "<<pass<< "\n";   
     if(pass && selectedCand.ptValue()<aCand.ptValue()) selectedCand = aCand;
 
   }
@@ -225,8 +211,6 @@ bool GMTAnalyzer::analyze(const EventProxyBase& iEvent){
 
   for(auto aMuonObj: MuonObjVec){
      std::cout<<"output of the muon object "<<  aMuonObj <<"\n"; 
-   // if(std::abs(aGenObj.pdgId())!=13) continue;
-   // if(std::abs(aGenObj.status())!=1) continue;    
     fillHistosForRecoMuon(aMuonObj); 
   
     fillRateHisto(aMuonObj, "Vx","Tot");
