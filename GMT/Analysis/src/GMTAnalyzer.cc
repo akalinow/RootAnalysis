@@ -82,21 +82,6 @@ void GMTAnalyzer::fillTurnOnCurve(const MuonObj & aRecoMuon,
                                   const int & iPtCut,
 				                          const std::string & sysType,
 				                          const std::string & selType){
-  //double px = aRecoMuon.pt() * aRecoMuon.pt() *cos(aRecoMuon.phi());
-  //double py = aRecoMuon.pt() * aRecoMuon.pt() *sin(aRecoMuon.phi());
-  double pz = aRecoMuon.pt() * aRecoMuon.pt() *sinh(aRecoMuon.eta());
-  //double absp = sqrt(px*px+py*py+pz*pz);
-  double energy = pz* (exp(2*aRecoMuon.eta() +1)/exp(2*aRecoMuon.eta() -1));
-  TLorentzVector TheZResonance;;
-  TLorentzVector TheMuonLegPositive;
-  TLorentzVector TheMuonLegNegative;
-  
-  if(aRecoMuon.charge() > 0){ TheMuonLegPositive.SetPtEtaPhiE (aRecoMuon.pt(), aRecoMuon.eta(), aRecoMuon.phi(), energy);}
-  if(aRecoMuon.charge() < 0){ TheMuonLegNegative.SetPtEtaPhiE (aRecoMuon.pt(), aRecoMuon.eta(), aRecoMuon.phi(), energy);}
-  
-  TheZResonance = TheMuonLegPositive + TheMuonLegNegative;
-  if(TheZResonance.M()<110 || TheZResonance.M()>70){ std::cout<< " the mass of the particle : "<<  TheZResonance.M()<< "\n"; } 
-
 
    
  //int is important for histo name construction
@@ -206,17 +191,32 @@ void GMTAnalyzer::fillHistosForRecoMuon(const MuonObj & aRecoMuon){
 bool GMTAnalyzer::analyze(const EventProxyBase& iEvent){
 
   clear();
-
+   double nominalMuonMass = 0.1056583;
+   std::cout<< " nominal mass : "<< nominalMuonMass<< "\n";
+   TLorentzVector TheZResonance;;
+   TLorentzVector TheMuonLegPositive;
+   TLorentzVector TheMuonLegNegative;
   const EventProxyOMTF & myProxy = static_cast<const EventProxyOMTF&>(iEvent);
 
   myEventId = myProxy.getEventId();
   myMuonObjColl = myProxy.getRecoMuonObjColl();
   myL1ObjColl = myProxy.getL1ObjColl();
   myL1PhaseIIObjColl = myProxy.getL1PhaseIIObjColl();
+  const std::vector<MuonObj> & myMuonColl = myMuonObjColl->getMuonObjs();
+  for ( auto aMuonCand: myMuonColl){
+    double pz =  aMuonCand.pt() *sinh(aMuonCand.eta());
+    double energy = pz* (exp(2*aMuonCand.eta() +1)/exp(2*aMuonCand.eta() -1));
+    std::cout<<" the pz and and the energy : " << pz << "\t E :"<< energy <<"\n";
+    if(aMuonCand.charge() > 0){ TheMuonLegPositive.SetPtEtaPhiM(aMuonCand.pt(), aMuonCand.eta(), aMuonCand.phi(),energy /*nominalMuonMass*/);}
+    if(aMuonCand.charge() < 0){ TheMuonLegNegative.SetPtEtaPhiM(aMuonCand.pt(), aMuonCand.eta(), aMuonCand.phi(),energy /*nominalMuonMas*/);}
+    TheZResonance = TheMuonLegPositive + TheMuonLegNegative;
+    std::cout<<" print the mass value : "<< TheZResonance.M()<<"\n";
+    //if(TheZResonance.M()<110 || TheZResonance.M()>70){ std::cout<< " the mass of the particle : "<<  TheZResonance.M()<< "\n"; 
+   }
+  
 
   const std::vector<MuonObj> MuonObjVec = myMuonObjColl->data();  
   if(MuonObjVec.empty()) return false;
-
   for(auto aMuonObj: MuonObjVec){
     fillHistosForRecoMuon(aMuonObj); 
   
