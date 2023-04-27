@@ -12,6 +12,7 @@ public:
 	MuonObjColl(const std::vector<MuonObj> & coll = std::vector<MuonObj>()) : theColl(coll) {}
 	operator const std::vector<MuonObj> & () const { return theColl;}
 	operator bool() const {return !theColl.empty(); }
+        const std::vector<MuonObj> & getMuonObjs() const { return theColl; }
         const std::vector<MuonObj> & data() const { return theColl;}
 private:
 	std::vector<MuonObj> theColl;

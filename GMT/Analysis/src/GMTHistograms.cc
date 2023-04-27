@@ -66,15 +66,8 @@ std::string GMTHistograms::getTemplateName(const std::string& name){
   
   if(name.find("EtaHit")!=std::string::npos) templateName = "h2DEtaHitTemplate";
   if(name.find("PhiHit")!=std::string::npos) templateName = "h2DPhiHitTemplate";
-  if(name.find("EtaVx")!=std::string::npos) templateName = "h2DEtaVxTemplate";
-  if(name.find("PhiVx")!=std::string::npos) templateName = "h2DPhiVxTemplate";
-  if(name.find("BetaVx")!=std::string::npos) templateName = "h2DBetaVxTemplate";
-
-  if(name.find("vzVx")!=std::string::npos) templateName = "h2DvzVxTemplate";
-  if(name.find("vxVx")!=std::string::npos) templateName = "h2DvxVxTemplate";
-  if(name.find("vyVx")!=std::string::npos) templateName = "h2DvyVxTemplate";
-
-  if(name.find("vert_dist")!=std::string::npos) templateName = "h2DVertDistTemplate";
+  if(name.find("EtauGMT")!=std::string::npos) templateName = "h2DEtauGMTTemplate";
+  if(name.find("PhiuGMT")!=std::string::npos) templateName = "h2DPhiuGMTTemplate";
 
 
   if(name.find("Quality")!=std::string::npos) templateName = "h2DQualityTemplate";
@@ -115,16 +108,8 @@ void GMTHistograms::defineHistograms(){
  add2DHistogram("h2DEtaHitTemplate","",8*26,0.8,1.25,2,-0.5,1.5,file_);
  add2DHistogram("h2DPhiHitTemplate","",5*32,-M_PI,M_PI,2,-0.5,1.5,file_);
 
- add2DHistogram("h2DEtaVxTemplate","",60,-3,3,2,-0.5,1.5,file_);
- add2DHistogram("h2DPhiVxTemplate","",4*32,-3.2,3.2,2,-0.5,1.5,file_);
- add2DHistogram("h2DBetaVxTemplate","",4*32,-0.1,1.1,2,-0.5,1.5,file_);
-
- add2DHistogram("h2DvzVxTemplate","",4*32,-0.1,6.2,2,-0.5,1.5,file_);
- add2DHistogram("h2DvxVxTemplate","",4*32,-3,3,2,-0.5,1.5,file_);
- add2DHistogram("h2DvyVxTemplate","",4*32,-2,2,2,-0.5,1.5,file_);
-
- add2DHistogram("h2DVertDistTemplate","",4*32,-2,2,2,-0.5,1.5,file_);
-
+ add2DHistogram("h2DEtauGMTTemplate","",60,-3,3,2,-0.5,1.5,file_);
+ add2DHistogram("h2DPhiuGMTTemplate","",4*32,-3.2,3.2,2,-0.5,1.5,file_);
 
  add2DHistogram("h2DQualityTemplate","",201,-0.5,200.5,2,-0.5,1.5,file_);
 
@@ -162,39 +147,34 @@ void GMTHistograms::finalizeHistograms(){
   gErrorIgnoreLevel = kError;
   
   //Panel with many turn-on curves
-  plotEffPanel("uGMT_emu");
+  plotEffPanel("uGMT");
   //Panel with many turn-on curves for high pT range
-  plotEffPanel("uGMT_emu", true);
+  plotEffPanel("uGMT", true);
 
   
   //Efficiency as a function of ete.
   //Lines for selected points on the turn on curve shown
-  plotEffVsEta("uGMT_emu");
+  plotEffVsEta("uGMT");
 
   //Efficiency vs given variable.
   ///Lines for two pT cut values shown
-  plotEffVsVar("uGMT_emu","EtaVx");
-  plotEffVsVar("uGMT_emu","PhiVx");
-  plotEffVsVar("uGMT_emu","BetaVx");
-  plotEffVsVar("uGMT_emu","vzVx");
-  plotEffVsVar("uGMT_emu","vxVx");
-  plotEffVsVar("uGMT_emu","vyVx");
-  plotEffVsVar("uGMT_emu","vert_dist");
+  plotEffVsVar("uGMT","EtaVx");
+  plotEffVsVar("uGMT","PhiVx");
 
 
 
 
   //1D or 2D plot of given variable
-  plotSingleHistogram("h2DuGMT_emuPtRecVsPtGen");
+  plotSingleHistogram("h2DuGMTPtRecVsPtGen");
 
   //Turn on curves for many pT thresholds.
   ///Lines for reference - Phase2 uGMT, and other algorithm shown
   for(int iPtCode=1;iPtCode<=30;++iPtCode){
-      plotGMTVsOther(iPtCode,"uGMT_emu");
+      plotGMTVsOther(iPtCode,"uGMT");
   }
    
   //1D or 2D plot of given variable
-  plotSingleHistogram("h2DuGMT_emuPtRecVsPtGen");
+  plotSingleHistogram("h2DuGMTPtRecVsPtGen");
   
   //Event rate plot for selected type
   //Uses some old rate parametrisation for the single muons sample
@@ -304,7 +284,7 @@ void GMTHistograms::plotEffPanel(const std::string & sysType, bool doHigh){
     hEff->GetXaxis()->SetRange(1,50);
     hEff->SetMarkerStyle(21+icut);
     hEff->SetMarkerColor(color[icut]);
-    hEff->SetXTitle("gen. muon p_{T} [GeV/c]");
+    hEff->SetXTitle("reco. muon p_{T} [GeV/c]");
     hEff->SetYTitle("Efficiency");
     if (icut==0)hEff->DrawCopy();
     else hEff->DrawCopy("same");
@@ -413,7 +393,7 @@ void GMTHistograms::plotEffVsEta(const std::string & sysType){
   std::string hName = "";
   for (int iType=0; iType<3;++iType){
     float ptCut = GMTHistograms::ptBins[iCut];
-    hName = "h2D"+sysType+"Type" + std::to_string(iType) + "EtaVx"+std::to_string((int)ptCut);
+    hName = "h2D"+sysType+"Type" + std::to_string(iType) + "EtauGMT"+std::to_string((int)ptCut);
     TH2F* h2D = this->get2DHistogram(hName);
     if(!h2D) return;
     TH1D *hNum = h2D->ProjectionX("hNum",2,2);
@@ -427,7 +407,7 @@ void GMTHistograms::plotEffVsEta(const std::string & sysType){
     hEff->SetMarkerStyle(21+iType);
     hEff->SetMarkerColor(color[iType]);
     hEff->GetYaxis()->SetTitleOffset(1.0);
-    hEff->SetXTitle("generated muon #eta");
+    hEff->SetXTitle("reco muon #eta");
     hEff->SetYTitle("Efficiency");
     if (iType==0)hEff->DrawCopy();
     else hEff->DrawCopy("same");
@@ -480,14 +460,14 @@ void GMTHistograms::plotGMTVsOther(int iPtCut,
   hEffOther->SetMarkerStyle(23);
   hEffOther->SetMarkerColor(2);
 
-  hName = "h2DuGMT_emuPt"+std::to_string((int)ptCut);
+  hName = "h2DuGMTPt"+std::to_string((int)ptCut);
   h2D = get2DHistogram(hName);
   hNum = h2D->ProjectionX("hNum",2,2);
   hDenom = h2D->ProjectionX("hDenom",1,1);    
   hDenom->Add(hNum);
 
   TH1D* hEffGMT =DivideErr(hNum,hDenom,"hEffGMTTmp","B");
-  hEffGMT->SetXTitle("gen. muon p_{T} [GeV/c]");
+  hEffGMT->SetXTitle("reco. muon p_{T} [GeV/c]");
   hEffGMT->SetYTitle("Efficiency");
   hEffGMT->SetMaximum(1.04);
   hEffGMT->GetXaxis()->SetRange(2,100);

@@ -3,13 +3,13 @@
 #include <omp.h>
 #include <bitset>
 #include <sstream>
-
+#include <cmath> 
 #include <iostream>
 
 #include "TreeAnalyzer.h"
 #include "GMTAnalyzer.h"
 #include "EventProxyOMTF.h"
-
+#include "TLorentzVector.h"
 #include "TF1.h"
 
 std::vector<double> ptRanges = {0.,   1.,   2.,   3.,   4.,   
@@ -67,13 +67,11 @@ bool GMTAnalyzer::passQuality(const L1Obj & aL1Cand,
   
   bool lowPtVeto = false;
 
-   if(sysType.find("OMTF")!=std::string::npos){
+   if(sysType.find("uGMT")!=std::string::npos){
      
-     std::cout<<"---------info regarding the L1 candidate ----------\n"
-	      <<aL1Cand<<"\n";
-     return aL1Cand.type==L1Obj::OMTF && aL1Cand.q>=12 && aL1Cand.bx==0 && !lowPtVeto;
+     return aL1Cand.type==L1Obj::uGMT && aL1Cand.q>=12 && aL1Cand.bx==0 && !lowPtVeto;
    }
-   else if(sysType.find("Vx")!=std::string::npos){
+   else if(sysType.find("OMTF")!=std::string::npos){
      return true;
    }   
    return false;
@@ -84,19 +82,32 @@ void GMTAnalyzer::fillTurnOnCurve(const MuonObj & aRecoMuon,
                                   const int & iPtCut,
 				                          const std::string & sysType,
 				                          const std::string & selType){
+  //double px = aRecoMuon.pt() * aRecoMuon.pt() *cos(aRecoMuon.phi());
+  //double py = aRecoMuon.pt() * aRecoMuon.pt() *sin(aRecoMuon.phi());
+  double pz = aRecoMuon.pt() * aRecoMuon.pt() *sinh(aRecoMuon.eta());
+  //double absp = sqrt(px*px+py*py+pz*pz);
+  double energy = pz* (exp(2*aRecoMuon.eta() +1)/exp(2*aRecoMuon.eta() -1));
+  TLorentzVector TheZResonance;;
+  TLorentzVector TheMuonLegPositive;
+  TLorentzVector TheMuonLegNegative;
+  
+  if(aRecoMuon.charge() > 0){ TheMuonLegPositive.SetPtEtaPhiE (aRecoMuon.pt(), aRecoMuon.eta(), aRecoMuon.phi(), energy);}
+  if(aRecoMuon.charge() < 0){ TheMuonLegNegative.SetPtEtaPhiE (aRecoMuon.pt(), aRecoMuon.eta(), aRecoMuon.phi(), energy);}
+  
+  TheZResonance = TheMuonLegPositive + TheMuonLegNegative;
+  if(TheZResonance.M()<110 || TheZResonance.M()>70){ std::cout<< " the mass of the particle : "<<  TheZResonance.M()<< "\n"; } 
 
- 
 
+   
  //int is important for histo name construction
   int ptCut = GMTHistograms::ptBins[iPtCut];
-  std::cout<<" the pt and eta distribution : "<< aRecoMuon.eta() <<"\t" << aRecoMuon.pt()<<"\n";
   const std::vector<L1Obj> & myL1Coll = myL1ObjColl->getL1Objs();
   std::string hName = "h2DGmt"+selType;
   if(sysType=="OMTF") {   
     hName = "h2DOMTF"+selType;
   }
-  if(sysType=="uGMT_emu") {   
-    hName = "h2DuGMT_emu"+selType;
+  if(sysType=="uGMT") {   
+    hName = "h2DuGMT"+selType;
   }
   if(sysType=="EMTF") {   
     hName = "h2DEMTF"+selType;
@@ -110,13 +121,11 @@ void GMTAnalyzer::fillTurnOnCurve(const MuonObj & aRecoMuon,
     bool pass = passQuality(aCand ,sysType, selType);
     if(!pass) continue;    
     double delta = std::abs(aRecoMuon.eta()-aCand.etaValue());
-    std::cout<< " this delta eta should be different than that of the (deltaEta=0.4)  :"<<delta<< "\n"; 
     if(delta<deltaEta){
       deltaEta = delta;
       selectedCand = aCand;      
     }    
   }
- // std::cout<< " lets check for 1000 events (the set one should be chnaged by the calculated one) : "<<deltaEta << "\n"; 
   bool passPtCut = selectedCand.ptValue()>=ptCut && selectedCand.ptValue()>0;
 
   std::string tmpName = hName+"Pt"+std::to_string(ptCut);
@@ -130,10 +139,10 @@ void GMTAnalyzer::fillTurnOnCurve(const MuonObj & aRecoMuon,
   
   //Generic eff vs selected variable calculated for muons on plateau
   if(!selType.size() && aRecoMuon.pt()<ptCut+20) return;
-  tmpName = hName+"EtaVx"+std::to_string(ptCut);
+  tmpName = hName+"EtauGMT"+std::to_string(ptCut);
   myHistos_->fill2DHistogram(tmpName, aRecoMuon.eta(), passPtCut);
 
-  tmpName = hName+"PhiVx"+std::to_string(ptCut);
+  tmpName = hName+"PhiuGMT"+std::to_string(ptCut);
   myHistos_->fill2DHistogram(tmpName, aRecoMuon.phi(), passPtCut);
 
 }
@@ -153,8 +162,7 @@ void GMTAnalyzer::fillRateHisto(const MuonObj & aRecoMuon,
   L1Obj selectedCand;
   for(auto aCand: myL1Coll){
 
-    bool pass = passQuality(aCand ,sysType, selType); 
-    std::cout << " rate histograms : "<<pass<< "\n";   
+    bool pass = passQuality(aCand ,sysType, selType);    
     if(pass && selectedCand.ptValue()<aCand.ptValue()) selectedCand = aCand;
 
   }
@@ -174,7 +182,7 @@ void GMTAnalyzer::fillHistosForRecoMuon(const MuonObj & aRecoMuon){
   std::string selType = "";
   for(int iCut=0;iCut<31;++iCut){
       fillTurnOnCurve(aRecoMuon, iCut, "OMTF", selType);
-      fillTurnOnCurve(aRecoMuon, iCut, "uGMT_emu", selType);
+      fillTurnOnCurve(aRecoMuon, iCut, "uGMT", selType);
   }
 
   int iCut = 18;
@@ -189,7 +197,7 @@ void GMTAnalyzer::fillHistosForRecoMuon(const MuonObj & aRecoMuon){
     
     selType = std::string(TString::Format("Type%d",iType));
     fillTurnOnCurve(aRecoMuon, iCut, "OMTF", selType);
-    fillTurnOnCurve(aRecoMuon, iCut, "uGMT_emu", selType);
+    fillTurnOnCurve(aRecoMuon, iCut, "uGMT", selType);
   }
 }
 // //////////////////////////////////////////////////////////////////////////////
@@ -210,17 +218,12 @@ bool GMTAnalyzer::analyze(const EventProxyBase& iEvent){
   if(MuonObjVec.empty()) return false;
 
   for(auto aMuonObj: MuonObjVec){
-     std::cout<<"output of the muon object "<<  aMuonObj <<"\n"; 
     fillHistosForRecoMuon(aMuonObj); 
   
-    fillRateHisto(aMuonObj, "Vx","Tot");
-    fillRateHisto(aMuonObj, "uGMT_emu","Tot");
-  
-    fillRateHisto(aMuonObj, "Vx","VsPt");
-    fillRateHisto(aMuonObj, "uGMT_emu","VsPt");
-   
-    fillRateHisto(aMuonObj, "Vx","VsEta");
-    fillRateHisto(aMuonObj, "uGMT_emu","VsEta");
+    
+    fillRateHisto(aMuonObj, "uGMT","Tot");
+    fillRateHisto(aMuonObj, "uGMT","VsPt");
+    fillRateHisto(aMuonObj, "uGMT","VsEta");
   }
   
   return true;
