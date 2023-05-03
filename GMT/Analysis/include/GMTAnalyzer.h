@@ -34,7 +34,7 @@ class GMTAnalyzer:public Analyzer{
   void finalize();
 
   Analyzer* clone() const;
-
+  double zmass ;
   void setHistos(GMTHistograms *histos) { myHistos_ = histos;};
 
  private:

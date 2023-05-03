@@ -5,12 +5,13 @@
 #include <sstream>
 #include <cmath> 
 #include <iostream>
-
+#include "TCanvas.h"
 #include "TreeAnalyzer.h"
 #include "GMTAnalyzer.h"
 #include "EventProxyOMTF.h"
 #include "TLorentzVector.h"
 #include "TF1.h"
+#include "TH1D.h"
 
 std::vector<double> ptRanges = {0.,   1.,   2.,   3.,   4.,   
                                   5.,   6.,   7.,   8.,   9., 
@@ -82,8 +83,7 @@ void GMTAnalyzer::fillTurnOnCurve(const MuonObj & aRecoMuon,
                                   const int & iPtCut,
 				                          const std::string & sysType,
 				                          const std::string & selType){
-
-   
+  
  //int is important for histo name construction
   int ptCut = GMTHistograms::ptBins[iPtCut];
   const std::vector<L1Obj> & myL1Coll = myL1ObjColl->getL1Objs();
@@ -129,6 +129,7 @@ void GMTAnalyzer::fillTurnOnCurve(const MuonObj & aRecoMuon,
 
   tmpName = hName+"PhiuGMT"+std::to_string(ptCut);
   myHistos_->fill2DHistogram(tmpName, aRecoMuon.phi(), passPtCut);
+
 
 }
 // //////////////////////////////////////////////////////////////////////////////
@@ -189,10 +190,9 @@ void GMTAnalyzer::fillHistosForRecoMuon(const MuonObj & aRecoMuon){
 // //////////////////////////////////////////////////////////////////////////////
 // //////////////////////////////////////////////////////////////////////////////
 bool GMTAnalyzer::analyze(const EventProxyBase& iEvent){
-
+   
    clear();
    double nominalMuonMass = 0.1056583;
-   std::cout<< " nominal mass : "<< nominalMuonMass<< "\n";
    TLorentzVector TheZResonance;;
    TLorentzVector TheMuonLegPositive;
    TLorentzVector TheMuonLegNegative;
@@ -203,27 +203,22 @@ bool GMTAnalyzer::analyze(const EventProxyBase& iEvent){
   myL1ObjColl = myProxy.getL1ObjColl();
   myL1PhaseIIObjColl = myProxy.getL1PhaseIIObjColl();
   const std::vector<MuonObj> & myMuonColl = myMuonObjColl->getMuonObjs();
-  
+  if(myMuonColl.empty())return false;
   for ( auto aMuonCand: myMuonColl){
+    fillHistosForRecoMuon(aMuonCand);
+    fillRateHisto(aMuonCand, "uGMT","Tot");
+    fillRateHisto(aMuonCand, "uGMT","VsPt");
+    fillRateHisto(aMuonCand, "uGMT","VsEta");
+
     if(aMuonCand.charge() > 0){ TheMuonLegPositive.SetPtEtaPhiM(aMuonCand.pt(), aMuonCand.eta(), aMuonCand.phi(),nominalMuonMass);}
     if(aMuonCand.charge() < 0){ TheMuonLegNegative.SetPtEtaPhiM(aMuonCand.pt(), aMuonCand.eta(), aMuonCand.phi(),nominalMuonMass);}
     TheZResonance = TheMuonLegPositive + TheMuonLegNegative;
     if(TheZResonance.M() < 70 || TheZResonance.M()>110)continue;
-    std::cout<<" print the mass value : "<< TheZResonance.M()<<"\n";
-   
+    std::string tmpName = "h1DDiMuonMass";
+    myHistos_->fill1DHistogram(tmpName, TheZResonance.M(), 1);
    }
-  
+   
 
-  const std::vector<MuonObj> MuonObjVec = myMuonObjColl->data();  
-  if(MuonObjVec.empty()) return false;
-  for(auto aMuonObj: MuonObjVec){
-
-    fillHistosForRecoMuon(aMuonObj); 
-    fillRateHisto(aMuonObj, "uGMT","Tot");
-    fillRateHisto(aMuonObj, "uGMT","VsPt");
-    fillRateHisto(aMuonObj, "uGMT","VsEta");
-
-  }
   
   return true;
 }

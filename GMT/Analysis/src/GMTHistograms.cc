@@ -11,6 +11,20 @@
 #include "TMarker.h"
 #include "TRandom3.h"
 #include "TGaxis.h"
+#include "RooRealVar.h"
+#include "RooDataSet.h"
+#include "RooGaussian.h"
+#include "RooChebychev.h"
+#include "RooAddPdf.h"
+#include "RooExtendPdf.h"
+#include "RooFitResult.h"
+#include "TAxis.h"
+#include "RooPlot.h"
+#include "RooDataHist.h"
+#include "RooExponential.h"
+#include "RooJohnson.h"
+using namespace RooFit ;
+
 
 #include "utilsL1RpcStyle.h"
 
@@ -68,7 +82,7 @@ std::string GMTHistograms::getTemplateName(const std::string& name){
   if(name.find("PhiHit")!=std::string::npos) templateName = "h2DPhiHitTemplate";
   if(name.find("EtauGMT")!=std::string::npos) templateName = "h2DEtauGMTTemplate";
   if(name.find("PhiuGMT")!=std::string::npos) templateName = "h2DPhiuGMTTemplate";
-
+  if(name.find("uGMTPtRecVsPtOMTF")!=std::string::npos) templateName = "uGMTPtRecVsPtOMTF";
 
   if(name.find("Quality")!=std::string::npos) templateName = "h2DQualityTemplate";
   if(name.find("RateTot")!=std::string::npos) templateName = "h2DRateTotTemplate";
@@ -102,7 +116,7 @@ void GMTHistograms::defineHistograms(){
  ///Efficiency histos
  add2DHistogram("h2DPtTemplate","",150,0,150,2,-0.5,1.5,file_);
  add2DHistogram("h2DHighPtTemplate","",50,50,550,2,-0.5,1.5,file_);
-
+ add2DHistogram("h2DuGMTPtRecVsPtOMTFTemplate", "", 50, 0, 300, 50, 0, 300, file_);
  add2DHistogram("h2DPtVsPtTemplate","",404,0,202,404,0,202,file_);
 
  add2DHistogram("h2DEtaHitTemplate","",8*26,0.8,1.25,2,-0.5,1.5,file_);
@@ -155,26 +169,17 @@ void GMTHistograms::finalizeHistograms(){
   //Efficiency as a function of ete.
   //Lines for selected points on the turn on curve shown
   plotEffVsEta("uGMT");
-
-  //Efficiency vs given variable.
-  ///Lines for two pT cut values shown
-  plotEffVsVar("uGMT","EtaVx");
-  plotEffVsVar("uGMT","PhiVx");
-
-
-
-
-  //1D or 2D plot of given variable
-  plotSingleHistogram("h2DuGMTPtRecVsPtGen");
-
+  plotEffVsVar("uGMT", "Eta");
+  plotEffVsVar("uGMT", "Phi");
+  plotSingleHistogram("h2DuGMTPtRecVsPtOMTF");
+  plotSingleHistogram("h1DDiMuonMass");
   //Turn on curves for many pT thresholds.
   ///Lines for reference - Phase2 uGMT, and other algorithm shown
   for(int iPtCode=1;iPtCode<=30;++iPtCode){
       plotGMTVsOther(iPtCode,"uGMT");
   }
    
-  //1D or 2D plot of given variable
-  plotSingleHistogram("h2DuGMTPtRecVsPtGen");
+  
   
   //Event rate plot for selected type
   //Uses some old rate parametrisation for the single muons sample
@@ -664,7 +669,7 @@ void GMTHistograms::plotSingleHistogram(std::string hName){
     h2D->SetLineWidth(3);
     h2D->Scale(1.0/h2D->Integral());
     h2D->SetXTitle("p_{T}^{GEN}");
-    h2D->SetYTitle("p_{T}^{REC}");
+    h2D->SetYTitle("p_{T}^{OMTF}");
     h2D->GetYaxis()->SetTitleOffset(1.4);
     h2D->SetStats(kFALSE);
     gStyle->SetPalette(kRainBow);
@@ -676,12 +681,39 @@ void GMTHistograms::plotSingleHistogram(std::string hName){
     h1D->SetLineWidth(3);
     h1D->Scale(1.0/h1D->Integral(0,h1D->GetNbinsX()+1));    
     h1D->GetXaxis()->SetRange(1,h1D->GetNbinsX()+1);
-    h1D->SetXTitle("X");
-    h1D->SetYTitle("Y");
+    h1D->SetXTitle("Z(#mu^{+}#mu^{-}) [GeV]");
+    h1D->SetYTitle("Events");
     h1D->GetYaxis()->SetTitleOffset(1.4);
     h1D->SetStats(kFALSE);
-    h1D->Draw("");
-    h1D->Print();
+    gStyle->SetOptStat(0) ;
+    gStyle->SetPalette(1) ;
+    RooRealVar mass("mass", "Z(#mu^{+}#mu^{-}) (GeV/c^{2})", 70, 110);
+    RooDataHist dh("dh", "dh", mass, Import(*h1D));
+    RooRealVar mu("mu", "mu", 91.18, 90, 93);
+    RooRealVar lambda ("lambda", "lambda",  0.5, 0, 10);
+    RooRealVar gamma ("gamma", "gamma",  0., -4, 4);
+    RooRealVar delta ("delta", "delta", 1., 0, 20);
+    RooJohnson john ("john", "john", mass, mu, lambda, gamma, delta);    
+    RooRealVar conts ("conts","conts", -10.0, 0.0);
+    RooExponential expoBg ("expoBg","expoBG",mass,conts);
+    RooRealVar nSig("nSig", "nSig",5e+03,(int)h1D->GetEntries());
+    RooRealVar nBkg("nBkg", "nBkg", 500 ,(int)h1D->GetEntries());
+    RooAddPdf zpdf("zpdf","zpdf",RooArgList(john,expoBg), RooArgList(nSig,nBkg));
+    RooFitResult* fitRes = zpdf.fitTo(dh,Save(),NumCPU(8));
+    fitRes->Print("v");
+    RooPlot* zmassf = mass.frame(Title("Z(#mu^{+}#mu^{-}) (GeV/c^{2})"));
+    dh.plotOn(zmassf,DataError(RooAbsData::SumW2));
+    zpdf.plotOn(zmassf) ;
+    zpdf.plotOn(zmassf, RooFit::LineColor(kGreen),RooFit::Components("john"), RooFit::Name("signal"), LineWidth(2), LineStyle(4));
+    zpdf.plotOn(zmassf,RooFit::LineColor(kRed),RooFit::Components("expoBg"), RooFit::Name("combinatorial"), LineWidth(2), LineStyle(6));
+    TLegend *leg = new TLegend(0.3,0.7,0.5,0.9);
+    leg->AddEntry(zmassf->findObject("signal"),"Z^{0}#rightarrow #mu^{+}#mu^{-}","l");
+    leg->AddEntry(zmassf->findObject("combinatorial"),"Combi","l");
+    zmassf->SetStats(0);
+    zmassf->Draw();
+    leg->Draw("same");
+    //h1D->Draw("");
+    //h1D->Print();
     c->Print(TString::Format("fig_png/%s.png",hName.c_str()).Data());
   }
 }
