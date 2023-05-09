@@ -12,7 +12,9 @@ std::ostream & operator<< (std::ostream &out, const MuonObj &o)
   out<<" DT  Hits : "<<o.ndthits();
   out<<" Medium ID : "<<o.mediumID();
   out<<" l1Eta     : "<<o.l1eta();
-
+  out<<" Hlt  matching  : "<<o.matchedhlt();
+  out<<" Hlt Iso matching  : "<<o.matchedisohlt();
+  
   out<<std::endl;
 
   return out;

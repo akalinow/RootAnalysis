@@ -15,7 +15,9 @@
 #include "MuonObjColl.h"
 #include "TLorentzVector.h"
 #include "TVector3.h"
-
+#include "TMath.h"
+using namespace TMath;
+using namespace std;
 class TriggerHistograms;
 class OMTFHit;
 
@@ -35,6 +37,15 @@ class GMTAnalyzer:public Analyzer{
 
   Analyzer* clone() const;
   double zmass ;
+  double nominalMuonMass = 0.1056583;
+  TLorentzVector TheZResonance;;
+  TLorentzVector TheMuonLegPositive;
+  TLorentzVector TheMuonLegNegative;
+  TLorentzVector TagFourVector;;
+  TLorentzVector ProbeFourVector;
+  TVector3 tagVector;
+  TVector3 probeVector;
+
   void setHistos(GMTHistograms *histos) { myHistos_ = histos;};
 
  private:

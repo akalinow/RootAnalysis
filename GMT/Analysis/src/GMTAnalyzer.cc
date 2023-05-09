@@ -12,7 +12,11 @@
 #include "TLorentzVector.h"
 #include "TF1.h"
 #include "TH1D.h"
-
+#include "TVector3.h"
+#include "TMath.h"
+#include "TROOT.h"
+using namespace TMath;
+using namespace std;
 std::vector<double> ptRanges = {0.,   1.,   2.,   3.,   4.,   
                                   5.,   6.,   7.,   8.,   9., 
                                   10.,  11.,  12.,  13.,  14.,
@@ -87,6 +91,7 @@ void GMTAnalyzer::fillTurnOnCurve(const MuonObj & aRecoMuon,
  //int is important for histo name construction
   int ptCut = GMTHistograms::ptBins[iPtCut];
   const std::vector<L1Obj> & myL1Coll = myL1ObjColl->getL1Objs();
+  const std::vector<MuonObj> & myMuonColl = myMuonObjColl->getMuonObjs();
   std::string hName = "h2DGmt"+selType;
   if(sysType=="OMTF") {   
     hName = "h2DOMTF"+selType;
@@ -99,27 +104,51 @@ void GMTAnalyzer::fillTurnOnCurve(const MuonObj & aRecoMuon,
   }
 
   ///Find the best matching L1 candidate
-  float deltaEta = 0.4;
+  double deltaEta = 0.4;
+  double tpdeltaR = 0.6;
   L1Obj selectedCand;
-  
+  MuonObj passCand;
+  for(auto biMuon : myMuonColl){
+     if(biMuon.charge() > 0 && biMuon.matchedisohlt() ==1 && biMuon.mediumID() == 1 && biMuon.pt() > 0){
+        TagFourVector.SetPtEtaPhiM(biMuon.pt(), biMuon.eta(), biMuon.phi(),nominalMuonMass);
+        tagVector.SetPtEtaPhi(biMuon.pt(), biMuon.eta(), biMuon.phi());
+     }
+     if(biMuon.charge() < 0 && biMuon.matchedisohlt() == 1){
+        ProbeFourVector.SetPtEtaPhiM(biMuon.pt(), biMuon.eta(), biMuon.phi(),nominalMuonMass);
+        probeVector.SetPtEtaPhi(biMuon.pt(), biMuon.eta(), biMuon.phi());
+     }
+       //double delTP = ROOT::Math::VectorUtil::DeltaR(tagVector, probeVector);
+        double deta = TagFourVector.Eta() - ProbeFourVector.Eta();
+        double dphi = TagFourVector.Phi() - ProbeFourVector.Phi();
+        if(dphi > TMath::Pi()) dphi = 2.0*TMath::Pi() - dphi;
+        if(dphi < 0) dphi = -1.0*dphi;
+        double delTP =  TMath::Sqrt( TMath::Power(deta,2) + TMath::Power(dphi,2) );
+        if(delTP < tpdeltaR){ 
+            passCand = biMuon ; 
+            tpdeltaR = delTP;
+        } 
+     
+    }
+ 
+  //std::cout << " the pt of the pass candidate : "<<passCand.pt()<<"\n"; 
   for(auto aCand: myL1Coll){
     bool pass = passQuality(aCand ,sysType, selType);
     if(!pass) continue;    
-    double delta = std::abs(aRecoMuon.eta()-aCand.etaValue());
+    double delta = std::abs(passCand.eta()-aCand.etaValue());
     if(delta<deltaEta){
       deltaEta = delta;
       selectedCand = aCand;      
     }    
   }
   bool passPtCut = selectedCand.ptValue()>=ptCut && selectedCand.ptValue()>0;
-
+  
   std::string tmpName = hName+"Pt"+std::to_string(ptCut);
   myHistos_->fill2DHistogram(tmpName, aRecoMuon.pt(), passPtCut);
 
   tmpName = hName+"HighPt"+std::to_string(ptCut);
   myHistos_->fill2DHistogram(tmpName, aRecoMuon.pt(), passPtCut);
 
-  tmpName = hName+"PtRecVsPtGen";
+  tmpName = hName+"PtRecVsPtOMTF";
   myHistos_->fill2DHistogram(tmpName, aRecoMuon.pt(), selectedCand.ptValue());
   
   //Generic eff vs selected variable calculated for muons on plateau
@@ -134,7 +163,7 @@ void GMTAnalyzer::fillTurnOnCurve(const MuonObj & aRecoMuon,
 }
 // //////////////////////////////////////////////////////////////////////////////
 // //////////////////////////////////////////////////////////////////////////////
-
+ 
 void GMTAnalyzer::fillRateHisto(const MuonObj & aRecoMuon,
                                 const std::string & sysType,
 				                        const std::string & selType){
@@ -192,10 +221,7 @@ void GMTAnalyzer::fillHistosForRecoMuon(const MuonObj & aRecoMuon){
 bool GMTAnalyzer::analyze(const EventProxyBase& iEvent){
    
    clear();
-   double nominalMuonMass = 0.1056583;
-   TLorentzVector TheZResonance;;
-   TLorentzVector TheMuonLegPositive;
-   TLorentzVector TheMuonLegNegative;
+   
    const EventProxyOMTF & myProxy = static_cast<const EventProxyOMTF&>(iEvent);
 
   myEventId = myProxy.getEventId();
@@ -205,6 +231,8 @@ bool GMTAnalyzer::analyze(const EventProxyBase& iEvent){
   const std::vector<MuonObj> & myMuonColl = myMuonObjColl->getMuonObjs();
   if(myMuonColl.empty())return false;
   for ( auto aMuonCand: myMuonColl){
+    //std::cout<< "the hlt : "<< aMuonCand.matchedisohlt()<<"\n"; 
+
     fillHistosForRecoMuon(aMuonCand);
     fillRateHisto(aMuonCand, "uGMT","Tot");
     fillRateHisto(aMuonCand, "uGMT","VsPt");
