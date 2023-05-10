@@ -79,6 +79,9 @@ std::string GMTHistograms::getTemplateName(const std::string& name){
   if(name.find("Pt")!=std::string::npos) templateName = "h2DPtTemplate";
   if(name.find("HighPt")!=std::string::npos) templateName = "h2DHighPtTemplate";
   if(name.find("PtRecVsPtGen")!=std::string::npos) templateName = "h2DPtVsPtTemplate";
+  if(name.find("passPVsallP")!=std::string::npos) templateName = "h2DpassPVsallPTemplate";
+
+
   
   if(name.find("EtaHit")!=std::string::npos) templateName = "h2DEtaHitTemplate";
   if(name.find("PhiHit")!=std::string::npos) templateName = "h2DPhiHitTemplate";
@@ -117,6 +120,8 @@ void GMTHistograms::defineHistograms(){
  add1DHistogram("h1DDiMuonProbeAllTemplate", "", 80, 70,110, file_);
  add1DHistogram("h1DDiMuonProbePassTemplate", "", 80, 70,110, file_);
  add1DHistogram("h1DDiMuonProbeFailTemplate", "", 80, 70,110, file_);
+ 
+
 
  ///Efficiency histos
  add2DHistogram("h2DPtTemplate","",150,0,150,2,-0.5,1.5,file_);
@@ -131,6 +136,7 @@ void GMTHistograms::defineHistograms(){
  add2DHistogram("h2DPhiuGMTTemplate","",4*32,-3.2,3.2,2,-0.5,1.5,file_);
 
  add2DHistogram("h2DQualityTemplate","",201,-0.5,200.5,2,-0.5,1.5,file_);
+ add2DHistogram("h2passPVsallPTemplate","",100,0,100,100,0,100,file_);
 
  //Rate histos
  add2DHistogram("h2DRateTotTemplate","",404,1,202,404,1,202,file_);
@@ -178,7 +184,7 @@ void GMTHistograms::finalizeHistograms(){
   plotEffVsVar("uGMT", "Phi");
   plotSingleHistogram("h2DuGMTPtRecVsPtOMTF");
   plotSingleHistogram("h1DDiMuonMass");
-   
+  plotSingleHistogram("h2DuGMTpassVsallP"); 
   //Turn on curves for many pT thresholds.
   ///Lines for reference - Phase2 uGMT, and other algorithm shown
   for(int iPtCode=1;iPtCode<=30;++iPtCode){
@@ -652,6 +658,26 @@ TH1D * GMTHistograms::getEfficiencyHisto(const std::string & hName){
   hDenom->Add(hNum);
   TH1D* hEffTmp =DivideErr(hNum,hDenom,"hEffTmp","B");
   return hEffTmp;
+}
+////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////
+void GMTHistograms::plotTandPEfficiency(  std::string hName){
+    TCanvas* c = new TCanvas("TandP","TandP",800,800);
+    std::string sysType = "uGMT";
+    TString  hlName = "h2D"+sysType+hName;
+    TH2F* h2D = this->get2DHistogram(hlName.Data());
+    TH1D *hNum = h2D->ProjectionY("hNum",1,1);
+    TH1D *hDenom = h2D->ProjectionX("hDenom",1,1);
+    TH1D* hEff =DivideErr(hNum,hDenom,"Pt_Int","B");
+    hEff->SetStats(kFALSE);
+    hEff->SetMinimum(0.0);
+    hEff->SetMaximum(1.04);
+    hEff->SetMarkerStyle(21);
+    hEff->SetMarkerColor(4);
+    hEff->SetXTitle("reco muon p_{T} (GeV/c)");
+    hEff->SetYTitle("Efficiency");
+    hEff->DrawCopy("E0");
+    c->Print(TString::Format("fig_png/%s.png",hName.c_str()).Data());
 }
 ////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////

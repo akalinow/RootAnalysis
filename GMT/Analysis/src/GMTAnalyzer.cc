@@ -107,7 +107,8 @@ void GMTAnalyzer::fillTurnOnCurve(const MuonObj & aRecoMuon,
   double deltaEta = 0.4;
   double tpdeltaR = 0.6;
   L1Obj selectedCand;
-  MuonObj passCand;
+  MuonObj passProbeCand;
+  MuonObj allProbeCand;
   for(auto biMuon : myMuonColl){
      if(biMuon.charge() > 0 && biMuon.matchedisohlt() ==1 && biMuon.mediumID() == 1 && biMuon.pt() > 0){
         TagFourVector.SetPtEtaPhiM(biMuon.pt(), biMuon.eta(), biMuon.phi(),nominalMuonMass);
@@ -116,6 +117,7 @@ void GMTAnalyzer::fillTurnOnCurve(const MuonObj & aRecoMuon,
      if(biMuon.charge() < 0 && biMuon.matchedisohlt() == 1){
         ProbeFourVector.SetPtEtaPhiM(biMuon.pt(), biMuon.eta(), biMuon.phi(),nominalMuonMass);
         probeVector.SetPtEtaPhi(biMuon.pt(), biMuon.eta(), biMuon.phi());
+        allProbeCand = biMuon;
      }
        //double delTP = ROOT::Math::VectorUtil::DeltaR(tagVector, probeVector);
         double deta = TagFourVector.Eta() - ProbeFourVector.Eta();
@@ -123,8 +125,9 @@ void GMTAnalyzer::fillTurnOnCurve(const MuonObj & aRecoMuon,
         if(dphi > TMath::Pi()) dphi = 2.0*TMath::Pi() - dphi;
         if(dphi < 0) dphi = -1.0*dphi;
         double delTP =  TMath::Sqrt( TMath::Power(deta,2) + TMath::Power(dphi,2) );
+        
         if(delTP < tpdeltaR){ 
-            passCand = biMuon ; 
+            passProbeCand = allProbeCand ; 
             tpdeltaR = delTP;
         } 
      
@@ -134,15 +137,18 @@ void GMTAnalyzer::fillTurnOnCurve(const MuonObj & aRecoMuon,
   for(auto aCand: myL1Coll){
     bool pass = passQuality(aCand ,sysType, selType);
     if(!pass) continue;    
-    double delta = std::abs(passCand.eta()-aCand.etaValue());
+    double delta = std::abs(passProbeCand.eta()-aCand.etaValue());
     if(delta<deltaEta){
       deltaEta = delta;
       selectedCand = aCand;      
     }    
   }
   bool passPtCut = selectedCand.ptValue()>=ptCut && selectedCand.ptValue()>0;
+   
+  std::string tmpName = hName + "passPVsallP";
+  myHistos_->fill2DHistogram(tmpName, allProbeCand.pt(), passProbeCand.pt());
   
-  std::string tmpName = hName+"Pt"+std::to_string(ptCut);
+  tmpName = hName+"Pt"+std::to_string(ptCut);
   myHistos_->fill2DHistogram(tmpName, aRecoMuon.pt(), passPtCut);
 
   tmpName = hName+"HighPt"+std::to_string(ptCut);
