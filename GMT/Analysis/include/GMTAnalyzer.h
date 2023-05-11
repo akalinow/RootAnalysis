@@ -38,6 +38,7 @@ class GMTAnalyzer:public Analyzer{
   Analyzer* clone() const;
   double zmass ;
   double nominalMuonMass = 0.1056583;
+  double tpdeltaR = 0.4;
   TLorentzVector TheZResonance;;
   TLorentzVector TheMuonLegPositive;
   TLorentzVector TheMuonLegNegative;

@@ -79,7 +79,6 @@ std::string GMTHistograms::getTemplateName(const std::string& name){
   if(name.find("Pt")!=std::string::npos) templateName = "h2DPtTemplate";
   if(name.find("HighPt")!=std::string::npos) templateName = "h2DHighPtTemplate";
   if(name.find("PtRecVsPtGen")!=std::string::npos) templateName = "h2DPtVsPtTemplate";
-  if(name.find("passPVsallP")!=std::string::npos) templateName = "h2DpassPVsallPTemplate";
 
 
   
@@ -136,7 +135,6 @@ void GMTHistograms::defineHistograms(){
  add2DHistogram("h2DPhiuGMTTemplate","",4*32,-3.2,3.2,2,-0.5,1.5,file_);
 
  add2DHistogram("h2DQualityTemplate","",201,-0.5,200.5,2,-0.5,1.5,file_);
- add2DHistogram("h2passPVsallPTemplate","",100,0,100,100,0,100,file_);
 
  //Rate histos
  add2DHistogram("h2DRateTotTemplate","",404,1,202,404,1,202,file_);
@@ -661,26 +659,6 @@ TH1D * GMTHistograms::getEfficiencyHisto(const std::string & hName){
 }
 ////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////
-void GMTHistograms::plotTandPEfficiency(  std::string hName){
-    TCanvas* c = new TCanvas("TandP","TandP",800,800);
-    std::string sysType = "uGMT";
-    TString  hlName = "h2D"+sysType+hName;
-    TH2F* h2D = this->get2DHistogram(hlName.Data());
-    TH1D *hNum = h2D->ProjectionY("hNum",1,1);
-    TH1D *hDenom = h2D->ProjectionX("hDenom",1,1);
-    TH1D* hEff =DivideErr(hNum,hDenom,"Pt_Int","B");
-    hEff->SetStats(kFALSE);
-    hEff->SetMinimum(0.0);
-    hEff->SetMaximum(1.04);
-    hEff->SetMarkerStyle(21);
-    hEff->SetMarkerColor(4);
-    hEff->SetXTitle("reco muon p_{T} (GeV/c)");
-    hEff->SetYTitle("Efficiency");
-    hEff->DrawCopy("E0");
-    c->Print(TString::Format("fig_png/%s.png",hName.c_str()).Data());
-}
-////////////////////////////////////////////////////////////////
-////////////////////////////////////////////////////////////////
 void GMTHistograms::plotSingleHistogram(std::string hName){
 
   TH2F* h2D = get2DHistogram(hName);
