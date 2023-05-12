@@ -39,11 +39,11 @@ class GMTAnalyzer:public Analyzer{
   double zmass ;
   double nominalMuonMass = 0.1056583;
   double tpdeltaR = 0.4;
-  TLorentzVector TheZResonance;;
-  TLorentzVector TheMuonLegPositive;
-  TLorentzVector TheMuonLegNegative;
-  TLorentzVector TagFourVector;;
-  TLorentzVector ProbeFourVector;
+  TLorentzVector theMuonLegPositive;
+  TLorentzVector theMuonLegNegative;
+  TLorentzVector theZResonance;
+  TLorentzVector tagFourVector;
+  TLorentzVector probeFourVector;
   TVector3 tagVector;
   TVector3 probeVector;
 

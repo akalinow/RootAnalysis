@@ -207,33 +207,37 @@ bool GMTAnalyzer::analyze(const EventProxyBase& iEvent){
   myL1ObjColl = myProxy.getL1ObjColl();
   myL1PhaseIIObjColl = myProxy.getL1PhaseIIObjColl();
   const std::vector<MuonObj> & myMuonColl = myMuonObjColl->getMuonObjs();
-  MuonObj aAllCand;
-  MuonObj aPassCand;
+  MuonObj aTagCand; MuonObj aProbeCand; MuonObj aPassCand;
   if(myMuonColl.empty())return false;
   for ( auto aMuonCand: myMuonColl){
 
     {
-    if(aMuonCand.charge() > 0){ TheMuonLegPositive.SetPtEtaPhiM(aMuonCand.pt(), aMuonCand.eta(), aMuonCand.phi(),nominalMuonMass);}
-    if(aMuonCand.charge() < 0){ TheMuonLegNegative.SetPtEtaPhiM(aMuonCand.pt(), aMuonCand.eta(), aMuonCand.phi(),nominalMuonMass);}
-    TheZResonance = TheMuonLegPositive + TheMuonLegNegative;
-    if(TheZResonance.M() < 70 || TheZResonance.M()>110)continue;
+    if(aMuonCand.charge() > 0){ theMuonLegPositive.SetPtEtaPhiM(aMuonCand.pt(), aMuonCand.eta(), aMuonCand.phi(),nominalMuonMass);}
+    if(aMuonCand.charge() < 0){ theMuonLegNegative.SetPtEtaPhiM(aMuonCand.pt(), aMuonCand.eta(), aMuonCand.phi(),nominalMuonMass);}
+    theZResonance = theMuonLegPositive + theMuonLegNegative;
+    if(theZResonance.M() < 70 || theZResonance.M()>110)continue;
     std::string tmpName = "h1DDiMuonMass";
-    myHistos_->fill1DHistogram(tmpName, TheZResonance.M(), 1);
+    myHistos_->fill1DHistogram(tmpName, theZResonance.M(), 1);
    }
-    if(aMuonCand.charge() > 0 && aMuonCand.matchedisohlt() ==1 && fabs(aMuonCand.eta()) < 1.0 && aMuonCand.pt() > 0){
-        TagFourVector.SetPtEtaPhiM(aMuonCand.pt(), aMuonCand.eta(), aMuonCand.phi(),nominalMuonMass);      
+    if( aMuonCand.matchedisohlt() ==1 && fabs(aMuonCand.eta()) < 0.75){
+        tagFourVector.SetPtEtaPhiM(aMuonCand.pt(), aMuonCand.eta(), aMuonCand.phi(),nominalMuonMass);      
      }
-     if(aMuonCand.charge() < 0 && fabs(aMuonCand.eta()) > 1){
-        ProbeFourVector.SetPtEtaPhiM(aMuonCand.pt(), aMuonCand.eta(), aMuonCand.phi(),nominalMuonMass);
-        aAllCand = aMuonCand;
+     if( fabs(aMuonCand.eta()) > 0.83){
+        probeFourVector.SetPtEtaPhiM(aMuonCand.pt(), aMuonCand.eta(), aMuonCand.phi(),nominalMuonMass);
+        aProbeCand = aMuonCand;
      }
-        double deta = TagFourVector.Eta() - ProbeFourVector.Eta();
-        double dphi = TagFourVector.Phi() - ProbeFourVector.Phi();
+        
+        
+        double deta = tagFourVector.Eta() - probeFourVector.Eta();
+        /*
+        double dphi = pagFourVector.Phi() - probeFourVector.Phi();
         if(dphi > TMath::Pi()) dphi = 2.0*TMath::Pi() - dphi;
         if(dphi < 0) dphi = -1.0*dphi;
         double delTP =  TMath::Sqrt( TMath::Power(deta,2) + TMath::Power(dphi,2) );
+        */
 
-        if(delTP < tpdeltaR) aPassCand = aAllCand ;
+
+        if(deta >  0.5) aPassCand = aProbeCand ;
         fillHistosForRecoMuon(aPassCand);
         fillRateHisto(aPassCand, "uGMT","Tot");
         fillRateHisto(aPassCand, "uGMT","VsPt");
