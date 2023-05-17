@@ -73,9 +73,6 @@ std::string GMTHistograms::getTemplateName(const std::string& name){
   if(name.find("DeltaEta")!=std::string::npos) templateName = "h1DDeltaEtaTemplate";
   if(name.find("DeltaPhi")!=std::string::npos) templateName = "h1DDeltaPhiTemplate";
   if(name.find("DiMuonMass")!=std::string::npos) templateName = "h1DDiMuonMassTemplate";
-  if(name.find("DiMuonProbeAll")!=std::string::npos) templateName = "h1DDiMuonProbeAllTemplate";
-  if(name.find("DiMuonProbePass")!=std::string::npos) templateName = "h1DDiMuonProbePassTemplate";
-  if(name.find("DiMuonProbeFail")!=std::string::npos) templateName = "h1DDiMuonProbeFailTemplate";
   if(name.find("Pt")!=std::string::npos) templateName = "h2DPtTemplate";
   if(name.find("HighPt")!=std::string::npos) templateName = "h2DHighPtTemplate";
   if(name.find("PtRecVsPtGen")!=std::string::npos) templateName = "h2DPtVsPtTemplate";
@@ -116,16 +113,13 @@ void GMTHistograms::defineHistograms(){
  add1DHistogram("h1DDeltaEtaTemplate","",11,-0.83,0.83,file_);
  add1DHistogram("h1DDeltaPhiTemplate","",5*32,-M_PI,M_PI,file_);
  add1DHistogram("h1DDiMuonMassTemplate", "", 80, 70, 110, file_);
- add1DHistogram("h1DDiMuonProbeAllTemplate", "", 80, 70,110, file_);
- add1DHistogram("h1DDiMuonProbePassTemplate", "", 80, 70,110, file_);
- add1DHistogram("h1DDiMuonProbeFailTemplate", "", 80, 70,110, file_);
  
 
 
  ///Efficiency histos
  add2DHistogram("h2DPtTemplate","",150,0,150,2,-0.5,1.5,file_);
  add2DHistogram("h2DHighPtTemplate","",50,50,550,2,-0.5,1.5,file_);
- add2DHistogram("h2DPtRecVsPtOMTFTemplate", "", 50, 0, 300, 50, 0, 300, file_);
+ add2DHistogram("h2DPtRecVsPtOMTFTemplate", "", 100, 0, 200, 100, 0, 200, file_);
  add2DHistogram("h2DPtVsPtTemplate","",404,0,202,404,0,202,file_);
 
  add2DHistogram("h2DEtaHitTemplate","",8*26,0.8,1.25,2,-0.5,1.5,file_);
@@ -181,8 +175,7 @@ void GMTHistograms::finalizeHistograms(){
   plotEffVsVar("uGMT", "Eta");
   plotEffVsVar("uGMT", "Phi");
   plotSingleHistogram("h2DuGMTPtRecVsPtOMTF");
-  plotSingleHistogram("h1DDiMuonMass");
-  plotSingleHistogram("h2DuGMTpassVsallP"); 
+  plotSingleHistogram("h1DDiMuonMass"); 
   //Turn on curves for many pT thresholds.
   ///Lines for reference - Phase2 uGMT, and other algorithm shown
   for(int iPtCode=1;iPtCode<=30;++iPtCode){
@@ -701,7 +694,7 @@ void GMTHistograms::plotSingleHistogram(std::string hName){
     RooDataHist dh("dh", "dh", mass, Import(*h1D));
     RooRealVar mu("mu", "mu", 91.18, 90, 93);
     RooRealVar lambda ("lambda", "lambda",  0.5, 0, 10);
-    RooRealVar gamma ("gamma", "gamma",  0., -4, 4);
+    RooRealVar gamma ("gamma", "gamma",  0., 0.00, 0.1);
     RooRealVar delta ("delta", "delta", 1., 0, 20);
     RooJohnson john ("john", "john", mass, mu, lambda, gamma, delta);    
     RooRealVar conts ("conts","conts", -10.0, 0.0);
@@ -714,6 +707,8 @@ void GMTHistograms::plotSingleHistogram(std::string hName){
     RooPlot* zmassf = mass.frame(Title("Z(#mu^{+}#mu^{-}) (GeV/c^{2})"));
     dh.plotOn(zmassf,DataError(RooAbsData::SumW2));
     zpdf.plotOn(zmassf) ;
+    double chisquare_mass = zmassf->chiSquare();
+    std::cout<<"Chi square of mass fit is :   "<< chisquare_mass<<"\n";
     zpdf.plotOn(zmassf, RooFit::LineColor(kGreen),RooFit::Components("john"), RooFit::Name("signal"), LineWidth(2), LineStyle(4));
     zpdf.plotOn(zmassf,RooFit::LineColor(kRed),RooFit::Components("expoBg"), RooFit::Name("combinatorial"), LineWidth(2), LineStyle(6));
     TLegend *leg = new TLegend(0.25,0.7,0.45,0.9);

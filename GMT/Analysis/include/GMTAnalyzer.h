@@ -64,7 +64,8 @@ class GMTAnalyzer:public Analyzer{
   bool passQuality(const L1Obj & aL1Cand,
 		              const std::string & sysType,
 		              const std::string & selType = "");
- 
+  double zResonance(const MuonObj  aRecoMuon);
+  double detaTagAndProbe(const MuonObj  aRecoMuon); 
   ///Histograms for this analysis
   GMTHistograms *myHistos_;
 
