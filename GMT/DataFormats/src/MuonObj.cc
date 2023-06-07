@@ -6,17 +6,14 @@
 std::ostream & operator<< (std::ostream &out, const MuonObj &o)
 {
   out<<"RecoMuonObj: ";
-  out<<" charge: "<<o.charge();
-  out<<" pt:     "<<o.pt() <<"  eta:  "<<o.eta() <<" phi: "<<o.phi();
-  out<<" RPC Hits : "<<o.nrpchits();
-  out<<" DT  Hits : "<<o.ndthits();
-  out<<" Medium ID : "<<o.mediumID();
-  out<<" l1Eta     : "<<o.l1eta();
-  out<<" Hlt  matching  : "<<o.matchedhlt();
-  out<<" Hlt Iso matching  : "<<o.matchedisohlt();
+  out<<" ch: "<<o.charge();
+  out<<" pt,eta,phi: ("<<o.pt() <<", "<<o.eta() <<", "<<o.phi()<<")";
+  out<<" Hits: RPC|DT:"<<o.nrpchits()<<"|"<<o.ndthits();
+  out<<" ID medium/tight: "<<o.mediumID()<<"|"<<o.tightID();
+  out<<" l1 eta,phi: "<<o.l1eta()<<", "<<o.l1phi();
+  out<<" match HLT|IsoHLT: "<<o.matchedhlt()<<"|"<<o.matchedisohlt();
   
   out<<std::endl;
-
   return out;
 }
 

@@ -77,8 +77,6 @@ std::string GMTHistograms::getTemplateName(const std::string& name){
   if(name.find("HighPt")!=std::string::npos) templateName = "h2DHighPtTemplate";
   if(name.find("PtRecVsPtGen")!=std::string::npos) templateName = "h2DPtVsPtTemplate";
 
-
-  
   if(name.find("EtaHit")!=std::string::npos) templateName = "h2DEtaHitTemplate";
   if(name.find("PhiHit")!=std::string::npos) templateName = "h2DPhiHitTemplate";
   if(name.find("EtauGMT")!=std::string::npos) templateName = "h2DEtauGMTTemplate";
@@ -92,13 +90,14 @@ std::string GMTHistograms::getTemplateName(const std::string& name){
   if(name.find("RateVsQuality")!=std::string::npos) templateName = "h2DRateVsQualityTemplate";
   if(name.find("DeltaPhi")!=std::string::npos) templateName = "h2DDeltaPhiTemplate";
   if(name.find("DeltaPt")!=std::string::npos) templateName = "h2DDeltaPtTemplate";
-  if(name.find("GhostsVsProcessor")!=std::string::npos) templateName = "h2DGhostsVsProcessorTemplate";
-  if(name.find("3DBending")!=std::string::npos) templateName = "h3DBendingTemplate";
+
+  if(name.find("PtProbe")!=std::string::npos) templateName = "h1DPtTemplate";  
+  if(name.find("PtTag")!=std::string::npos) templateName = "h1DPtTemplate";  
+  if(name.find("AbsEta")!=std::string::npos) templateName = "h1DAbsEtaTemplate";  
+  if(name.find("AbsEtaProbe")!=std::string::npos) templateName = "h1DAbsEtaProbeTemplate";  
   
-  if(name.find("LLH")!=std::string::npos) templateName = "h1DLLHTemplate";
-  if(name.find("HitsPattern")!=std::string::npos) templateName = "h1DHitsPatternTemplate";
-  if(name.find("h2DDeltaVsDelta")!=std::string::npos) templateName = "h2DDeltaVsDeltaTemplate";
   
+  if(!templateName.size()) std::cout<<name<<std::endl;
   return templateName;
 }
 /////////////////////////////////////////////////////////
@@ -114,7 +113,10 @@ void GMTHistograms::defineHistograms(){
  add1DHistogram("h1DDeltaPhiTemplate","",5*32,-M_PI,M_PI,file_);
  add1DHistogram("h1DDiMuonMassTemplate", "", 80, 70, 110, file_);
  
-
+ add1DHistogram("h1DPtTemplate","",50,0,100,file_);
+ add1DHistogram("h1DAbsEtaTemplate","",60,0.0,2.4,file_);
+ add1DHistogram("h1DAbsEtaProbeTemplate","",60,0.8,1.4,file_);
+ 
 
  ///Efficiency histos
  add2DHistogram("h2DPtTemplate","",150,0,150,2,-0.5,1.5,file_);
@@ -145,12 +147,6 @@ void GMTHistograms::defineHistograms(){
  //Likelihood histos
  add1DHistogram("h1DLLHTemplate","",40,0,20,file_);
  add1DHistogram("h1DHitsPatternTemplate","",101,-0.5,100.5,file_);
-
- //Pattern histos
- add3DHistogram("h3DBendingTemplate","",50, 0, 100, 296,-250.5,45.5, 18, -0.5, 17.5, file_);
-
- 
- add2DHistogram("h2DDeltaVsDeltaTemplate","",176,-150.5,25.5, 176,-150.5,25.5, file_);
  
  histosInitialized_ = true;
  }
@@ -162,11 +158,19 @@ void GMTHistograms::finalizeHistograms(){
   AnalysisHistograms::finalizeHistograms();
   utilsL1RpcStyle()->cd();
   gErrorIgnoreLevel = kError;
-  
+    
   //Panel with many turn-on curves
-  plotEffPanel("uGMT");
+  plotEffPanel("OMTF");
   //Panel with many turn-on curves for high pT range
-  plotEffPanel("uGMT", true);
+  plotEffPanel("OMTF", true);
+  plotSingleHistogram("h1DPtProbe"); 
+  plotSingleHistogram("h1DAbsEtaProbe"); 
+  
+  plotSingleHistogram("h1DPtTag"); 
+  plotSingleHistogram("h1DAbsEtaTag"); 
+  
+  plotSingleHistogram("h1DDiMuonMassTagProbe"); 
+  return;
 
   
   //Efficiency as a function of ete.
@@ -182,8 +186,6 @@ void GMTHistograms::finalizeHistograms(){
       plotGMTVsOther(iPtCode,"uGMT");
   }
    
-  
-  
   //Event rate plot for selected type
   //Uses some old rate parametrisation for the single muons sample
   ///Works also with neutrino sample
@@ -684,41 +686,11 @@ void GMTHistograms::plotSingleHistogram(std::string hName){
     h1D->SetLineWidth(3);
     h1D->Scale(1.0/h1D->Integral(0,h1D->GetNbinsX()+1));    
     h1D->GetXaxis()->SetRange(1,h1D->GetNbinsX()+1);
-    h1D->SetXTitle("Z(#mu^{+}#mu^{-}) [GeV]");
-    h1D->SetYTitle("Events");
+    h1D->SetXTitle("X");
+    h1D->SetYTitle("Y");
     h1D->GetYaxis()->SetTitleOffset(1.4);
     h1D->SetStats(kFALSE);
-    gStyle->SetOptStat(0) ;
-    gStyle->SetPalette(1) ;
-    RooRealVar mass("mass", "Z(#mu^{+}#mu^{-}) (GeV/c^{2})", 70, 110);
-    RooDataHist dh("dh", "dh", mass, Import(*h1D));
-    RooRealVar mu("mu", "mu", 91.18, 90, 93);
-    RooRealVar lambda ("lambda", "lambda",  0.5, 0, 10);
-    RooRealVar gamma ("gamma", "gamma",  0., 0.00, 0.1);
-    RooRealVar delta ("delta", "delta", 1., 0, 20);
-    RooJohnson john ("john", "john", mass, mu, lambda, gamma, delta);    
-    RooRealVar conts ("conts","conts", -10.0, 0.0);
-    RooExponential expoBg ("expoBg","expoBG",mass,conts);
-    RooRealVar nSig("nSig", "nSig",500,0,(int)h1D->GetEntries());
-    RooRealVar nBkg("nBkg", "nBkg", 500,0,(int)h1D->GetEntries());
-    RooAddPdf zpdf("zpdf","zpdf",RooArgList(john,expoBg), RooArgList(nSig,nBkg));
-    RooFitResult* fitRes = zpdf.fitTo(dh,Save(true),NumCPU(8), RooFit::Minimizer("Minuit2", "Migrad"));
-    fitRes->Print("v");
-    RooPlot* zmassf = mass.frame(Title("Z(#mu^{+}#mu^{-}) (GeV/c^{2})"));
-    dh.plotOn(zmassf,DataError(RooAbsData::SumW2));
-    zpdf.plotOn(zmassf) ;
-    double chisquare_mass = zmassf->chiSquare();
-    std::cout<<"Chi square of mass fit is :   "<< chisquare_mass<<"\n";
-    zpdf.plotOn(zmassf, RooFit::LineColor(kGreen),RooFit::Components("john"), RooFit::Name("signal"), LineWidth(2), LineStyle(4));
-    zpdf.plotOn(zmassf,RooFit::LineColor(kRed),RooFit::Components("expoBg"), RooFit::Name("combinatorial"), LineWidth(2), LineStyle(6));
-    TLegend *leg = new TLegend(0.25,0.7,0.45,0.9);
-    leg->AddEntry(zmassf->findObject("signal"),"Z^{0}#rightarrow #mu^{+}#mu^{-}","l");
-    leg->AddEntry(zmassf->findObject("combinatorial"),"Combi","l");
-    zmassf->SetStats(0);
-    zmassf->Draw();
-    leg->Draw("same");
-    //h1D->Draw("");
-    //h1D->Print();
+    h1D->Draw("");
     c->Print(TString::Format("fig_png/%s.png",hName.c_str()).Data());
   }
 }

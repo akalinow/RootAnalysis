@@ -31,19 +31,22 @@ std::ostream & operator<< (std::ostream &out, const L1Obj &o)
     case L1Obj::NONE     : { out <<"NONE    "; break; }
     default: out <<"Unknown";
   };
+  out<<"pt,eta,phi value: "<<o.ptValue()<<", "<<o.etaValue();
+  double phiValue = o.phiValue();
+  if(std::abs(phiValue)>M_PI) phiValue -=2*M_PI;
+  out<<", "<<phiValue;
   out << "  pt: "; 
     if (o.chargeValue()==1) out <<"+"; 
     else if (o.chargeValue()==-1) out <<"-";
     else out <<"?";
-  out <<o.pt<<", eta: "<<o.eta;
-  out <<", phi: ";  
+  out <<o.pt<<", eta: "<<o.eta<<", phi: ";  
   if (o.iProcessor >= 0){ out<<std::setw(2)<<o.iProcessor<<"_";} else { out<<std::setw(5); }
   out <<o.phi <<" (V: "<<std::setprecision(4)<<o.phiValue()<<std::setprecision(6)<<")";
   out <<", q: "<<o.q<<", bx: "<<o.bx;
   if (true || o.type ==  L1Obj::OMTF || o. type== L1Obj::OMTF_emu) {//AK true
       out <<" track: "<< std::bitset<29>(o.hits) 
           <<" disc: "<< std::bitset<12>(o.disc)
-	  <<" ref layer: "<<o.refLayer
+	        <<" ref layer: "<<o.refLayer
           <<", ";//AK << OmtfName(o.iProcessor, o.position);
   }
   return out;

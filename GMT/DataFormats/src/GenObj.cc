@@ -10,9 +10,7 @@ std::ostream & operator<< (std::ostream &out, const GenObj &o)
   out<<" charge: "<<o.charge();
   out<<"pt: "<<o.pt()<<" eta: "<<o.eta()<<" phi: "<<o.phi();
   out<<" status: "<<o.status();
-  out<<" x coordinate of vertex position: "<<o.vx();
-  out<<" y coordinate of vertex position: "<<o.vy();
-  out<<" z coordinate of vertex position: "<<o.vz();
+  out<<" vertex: ("<<o.vx()<<", "<<o.vy()<<", "<<o.vz()<<")";
   out<<" beta: "<<o.beta();
 
 
