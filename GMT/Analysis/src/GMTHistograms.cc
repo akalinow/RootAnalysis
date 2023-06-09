@@ -116,7 +116,7 @@ void GMTHistograms::defineHistograms(){
 
  add2DHistogram("h2DEtaVxTemplate","",60,-3,3,2,-0.5,1.5,file_);
  add2DHistogram("h2DPhiVxTemplate","",4*32,-3.2,3.2,2,-0.5,1.5,file_);
- add2DHistogram("h2DBetaTemplate","",4*32,-0.1,1,2,-0.5,1.5,file_);
+ add2DHistogram("h2DBetaTemplate","",4*32,0.1,1,2,-0.5,1.5,file_);
 
  add2DHistogram("h2DVtx_xTemplate","",4*32,-0.005,0.005,2,-0.5,1.5,file_);
  add2DHistogram("h2DVtx_yTemplate","",4*32,-0.003,0.003,2,-0.5,1.5,file_);
@@ -362,8 +362,11 @@ void GMTHistograms::plotEffVsVar(const std::string & sysType,
   TString hName("");
   const int *ptCuts = ptCutsOMTF;
  
-  for (int icut=0; icut<2;++icut){
+  for (int icut=0; icut<1;++icut){
+    std::cout << icut << std::endl;
     float ptCut = GMTHistograms::ptBins[ptCuts[icut]];
+
+    std::cout << ptCut << std::endl;
 
     hName = "h2D"+sysType+varName+std::to_string((int)ptCut);
     TH2F* h2D = this->get2DHistogram(hName.Data());
