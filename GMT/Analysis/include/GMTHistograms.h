@@ -2,6 +2,8 @@
 #define GMTHistograms_H
 
 #include "AnalysisHistograms.h"
+#include "TEfficiency.h"
+#include "TGraphAsymmErrors.h"
 
 class GMTHistograms: public AnalysisHistograms {
 public:
@@ -32,11 +34,13 @@ private:
 
   TH1* Integrate(TH1 * histoD);
 
-  TH1D * DivideErr(TH1D * h1, TH1D * h2,
+  TEfficiency * DivideErr(TH1D * h1, TH1D * h2,
                    const char * name="DivideErr",
                    const char * optErr ="");
 
   void plotEffPanel(const std::string & sysType, bool doHigh=false);
+
+   void plotEffPanelGen(const std::string & sysType, bool doHigh=false);
 
   void plotEffVsEta(const std::string & sysType);
 
@@ -59,7 +63,7 @@ private:
   
   float getEfficiency(TH2F *h2D, float ptCut);
 
-  TH1D *getEfficiencyHisto(const std::string & hName);
+  TEfficiency *getEfficiencyHisto(const std::string & hName);
  
   ///Types of the selection flow
   std::vector<std::string> selectionFlavours_;

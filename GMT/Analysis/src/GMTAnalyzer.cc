@@ -83,6 +83,60 @@ bool GMTAnalyzer::passQuality(const L1Obj & aL1Cand,
 }
 // //////////////////////////////////////////////////////////////////////////////
 // //////////////////////////////////////////////////////////////////////////////
+void GMTAnalyzer::fillTurnOnCurveGen(const GenObj & aGenObj,
+                                  const int & iPtCut,
+				                          const std::string & sysType,
+				                          const std::string & selType){
+
+  //int is important for histo name construction
+  int ptCut = GMTHistograms::ptBins[iPtCut];
+
+  /*const std::vector<L1PhaseIIObj> & myL1Coll = myL1PhaseIIObjColl->getL1PhaseIIObjs();*/
+  const std::vector<L1Obj> & myL1Coll = myL1ObjColl->getL1Objs();
+  std::string hName = "h2DGmt"+selType;
+  if(sysType=="OMTF") {   
+    hName = "h2DOMTF"+selType;
+  }
+  if(sysType=="uGMT_emu") {   
+    hName = "h2DuGMT_emu"+selType;
+  }
+  if(sysType=="uGMT") {   
+    hName = "h2DuGMT"+selType;
+  }
+  if(sysType=="EMTF") {   
+    hName = "h2DEMTF"+selType;
+  }
+
+  ///Find the best matching L1 candidate
+  float deltaEta = 0.4;
+  L1Obj selectedCand; /*L1PhaseIIObj selectedCand;*/
+  
+  for(auto aCand: myL1Coll){
+    bool pass = passQuality(aCand ,sysType, selType);
+    if(!pass) continue;    
+    /*std::cout<<aCand<<std::endl;*/
+    double delta = std::abs(aGenObj.eta()-aCand.etaValue());    
+    if(delta<deltaEta){
+      deltaEta = delta;
+      selectedCand = aCand;      
+    }    
+  }
+
+  bool passPtCut = selectedCand.ptValue()>=ptCut && selectedCand.ptValue()>0;
+
+  std::string tmpName = hName+"Pt_Gen"+std::to_string(ptCut);
+  myHistos_->fill2DHistogram(tmpName, aGenObj.pt(), passPtCut);
+
+  tmpName = hName+"HighPt_Gen"+std::to_string(ptCut);
+  myHistos_->fill2DHistogram(tmpName, aGenObj.pt(), passPtCut);
+
+  tmpName = hName+"PtRecVsPtGen";
+  myHistos_->fill2DHistogram(tmpName, aGenObj.pt(), selectedCand.ptValue());
+  
+
+}
+// //////////////////////////////////////////////////////////////////////////////
+// //////////////////////////////////////////////////////////////////////////////
 void GMTAnalyzer::fillTurnOnCurve(const MuonObj & aMuonCand,
                                   const int & iPtCut,
 				                          const std::string & sysType,
@@ -124,10 +178,10 @@ void GMTAnalyzer::fillTurnOnCurve(const MuonObj & aMuonCand,
   }
   bool passPtCut = selectedCand.ptValue()>=ptCut && selectedCand.ptValue()>0;
    
-  std::string tmpName = hName+"Pt"+std::to_string(ptCut);
+  std::string tmpName = hName+"Pt_Reco"+std::to_string(ptCut);
   myHistos_->fill2DHistogram(tmpName, aMuonCand.pt(), passPtCut);
 
-  tmpName = hName+"HighPt"+std::to_string(ptCut);
+  tmpName = hName+"HighPt_Reco"+std::to_string(ptCut);
   myHistos_->fill2DHistogram(tmpName, aMuonCand.pt(), passPtCut);
 
   tmpName = hName+"PtRecVsPtOMTF";
@@ -166,11 +220,36 @@ void GMTAnalyzer::fillRateHisto(const MuonObj & aRecoMuon,
 }
 // //////////////////////////////////////////////////////////////////////////////
 // //////////////////////////////////////////////////////////////////////////////
-void GMTAnalyzer::fillHistosForRecoMuon(const MuonObj & aRecoMuon){   
+void GMTAnalyzer::fillHistosForGenMuon(const GenObj & aGenObj){   
 
-  bool isGMTAcceptance = fabs(aRecoMuon.eta())<2.4;
-  if(!isGMTAcceptance) return;
-  
+  bool isOMTFAcceptance = fabs(aGenObj.eta())>0.83 && fabs(aGenObj.eta())<1.24;
+  if(!isOMTFAcceptance) return;
+
+  std::string selType = "";
+  for(int iCut=0;iCut<31;++iCut){
+      fillTurnOnCurveGen(aGenObj, iCut, "OMTF", selType);
+      
+  }
+
+  int iCut = 18;
+  bool pass = false;
+  for(int iType=0;iType<=3;++iType){
+    float ptCut = GMTHistograms::ptBins[iCut];
+    
+    if(iType==0) pass = aGenObj.pt()>ptCut + 20;
+    else if(iType==1) pass = aGenObj.pt()>ptCut && aGenObj.pt()<(ptCut+5);
+    else if(iType==2) pass = aGenObj.pt()<10;
+    if(!pass) continue;
+    
+    selType = std::string(TString::Format("Type%d",iType));
+    fillTurnOnCurveGen(aGenObj, iCut, "OMTF", selType);
+    
+  }
+}
+// //////////////////////////////////////////////////////////////////////////////
+// //////////////////////////////////////////////////////////////////////////////
+// //////////////////////////////////////////////////////////////////////////////
+void GMTAnalyzer::fillHistosForRecoMuon(const MuonObj & aRecoMuon){     
   bool isOMTFAcceptance = fabs(aRecoMuon.eta())>0.83 && fabs(aRecoMuon.eta())<1.24;
   if(!isOMTFAcceptance) return;
   
@@ -208,6 +287,11 @@ bool GMTAnalyzer::analyze(const EventProxyBase& iEvent){
   myMuonObjColl = myProxy.getRecoMuonObjColl();
   myL1ObjColl = myProxy.getL1ObjColl();
   myL1PhaseIIObjColl = myProxy.getL1PhaseIIObjColl();
+  myGenObjColl = myProxy.getGenObjColl();
+
+  //////////////////////////////////////////////////////////////////////
+   /////////For  muonColl as Reference with L1////////////////////////////////
+   /////////////////////////////////////////////////////////////////////
   const std::vector<MuonObj> & myMuonColl = myMuonObjColl->getMuonObjs();
   if(myMuonColl.size()<2) return false;
   
@@ -248,6 +332,20 @@ bool GMTAnalyzer::analyze(const EventProxyBase& iEvent){
         fillHistosForRecoMuon(aMuonCand);
       }
     }
+
+
+  //////////////////////////////////////////////////////////////////////
+   /////////For Gen muon as Reference with L1////////////////////////////////
+   /////////////////////////////////////////////////////////////////////
+
+  const std::vector<GenObj> genObjVec = myGenObjColl->data();  
+  if(genObjVec.empty()) return false;
+
+  for(auto aGenObj: genObjVec){
+    if(std::abs(aGenObj.pdgId())!=13) continue;
+    if(std::abs(aGenObj.status())!=1) continue;   
+    fillHistosForGenMuon(aGenObj); ////////////ONLY this
+  }  
     
   return true;
 }

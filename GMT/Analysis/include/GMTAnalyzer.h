@@ -53,9 +53,15 @@ class GMTAnalyzer:public Analyzer{
 
   void fillHistosForRecoMuon(const MuonObj & aRecoMuon);
 
+  void fillHistosForGenMuon(const GenObj & aGenObj);
+
   void fillTurnOnCurve(const MuonObj & aRecoMuon,
                       const int & ptCut, const std::string & sysType,
 		                  const std::string & selType);
+
+  void fillTurnOnCurveGen(const GenObj & aGenObj,
+                      const int & ptCut, const std::string & sysType,
+		                  const std::string & selType);                     
 
   void fillRateHisto(const MuonObj & aRecoMuon,
                     const std::string & sysType,
@@ -73,6 +79,7 @@ class GMTAnalyzer:public Analyzer{
   const MuonObjColl  *myMuonObjColl;
   const L1ObjColl  *myL1ObjColl;
   const L1PhaseIIObjColl  *myL1PhaseIIObjColl; 
+  const GenObjColl *myGenObjColl;
 };
 
 #endif
