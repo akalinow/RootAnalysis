@@ -109,7 +109,7 @@ void GMTHistograms::defineHistograms(){
  add2DHistogram("h2DPtTemplate","",150,0,150,2,-0.5,1.5,file_);
  add2DHistogram("h2DHighPtTemplate","",50,50,550,2,-0.5,1.5,file_);
 
- add2DHistogram("h2DPtVsPtTemplate","",404,0,100,404,0,130,file_);
+ add2DHistogram("h2DPtVsPtTemplate","",404,10,100,404,0,260,file_);
 
  add2DHistogram("h2DEtaHitTemplate","",8*26,0.8,1.25,2,-0.5,1.5,file_);
  add2DHistogram("h2DPhiHitTemplate","",5*32,-M_PI,M_PI,2,-0.5,1.5,file_);
@@ -288,6 +288,7 @@ void GMTHistograms::plotEffPanel(const std::string & sysType, bool doHigh){
   for (int icut=0; icut <=2;++icut){
     float ptCut = GMTHistograms::ptBins[ptCuts[icut]];
     hName = "h2D"+sysType+"Pt"+std::to_string((int)ptCut);
+
     if(doHigh) hName = "h2D"+sysType+"HighPt"+std::to_string((int)ptCut);
     TH2F* h2D = this->get2DHistogram(hName.Data());
     if(!h2D) return;
@@ -363,10 +364,7 @@ void GMTHistograms::plotEffVsVar(const std::string & sysType,
   const int *ptCuts = ptCutsOMTF;
  
   for (int icut=0; icut<1;++icut){
-    std::cout << icut << std::endl;
     float ptCut = GMTHistograms::ptBins[ptCuts[icut]];
-
-    std::cout << ptCut << std::endl;
 
     hName = "h2D"+sysType+varName+std::to_string((int)ptCut);
     TH2F* h2D = this->get2DHistogram(hName.Data());
@@ -380,7 +378,7 @@ void GMTHistograms::plotEffVsVar(const std::string & sysType,
     hEff->SetMinimum(0.0);
     hEff->SetMaximum(1.04);
     hEff->SetMarkerStyle(21+icut);
-    hEff->SetMarkerColor(color[icut]);
+    hEff->SetMarkerColor(color[1]);
 
     const char * str_var_name = varName.c_str();
     std::string str(str_var_name);
@@ -390,6 +388,9 @@ void GMTHistograms::plotEffVsVar(const std::string & sysType,
     std::string vtx_z = "Vtx_z";
     std::string vtx_d = "Vtx_d";
     std::string beta_name = "Beta";
+    std::string phi_name = "PhiVx";
+    std::string eta_name = "EtaVx";
+
 
     if (str_var_name == vtx_x){
       hEff->SetXTitle("Vtx_{x} [cm]");
@@ -405,6 +406,12 @@ void GMTHistograms::plotEffVsVar(const std::string & sysType,
     }
     else if (str_var_name == beta_name){
       hEff->SetXTitle("#beta");
+    }
+    else if (str_var_name == eta_name){
+      hEff->SetXTitle("#eta");
+    }
+    else if (str_var_name == phi_name){
+      hEff->SetXTitle("#phi");
     }
 
     else {

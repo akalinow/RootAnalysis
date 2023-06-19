@@ -124,7 +124,6 @@ void GMTAnalyzer::fillTurnOnCurve(const GenObj & aGenObj,
   myHistos_->fill2DHistogram(tmpName, aGenObj.pt(), selectedCand.ptValue());
   
   //Generic eff vs selected variable calculated for muons on plateau
-  std::cout << selType.size() << std::endl;
   if(!selType.size() && aGenObj.pt()<ptCut+20) return;
   tmpName = hName+"EtaVx"+std::to_string(ptCut);
   myHistos_->fill2DHistogram(tmpName, aGenObj.eta(), passPtCut);
@@ -178,7 +177,7 @@ void GMTAnalyzer::fillRateHisto(const GenObj & aGenObj,
 // //////////////////////////////////////////////////////////////////////////////
 void GMTAnalyzer::fillHistosForGenMuon(const GenObj & aGenObj){   
   
-  bool isGMTAcceptance = fabs(aGenObj.eta())<2;
+  bool isGMTAcceptance = fabs(aGenObj.eta())<2.4;
   if(!isGMTAcceptance) return;
 
   std::string selType = "";
@@ -229,9 +228,9 @@ bool GMTAnalyzer::analyze(const EventProxyBase& iEvent){
   if(genObjVec.empty()) return false;
 
   for(auto aGenObj: genObjVec){
-    // if(std::abs(aGenObj.pdgId())!=13) continue;
+    if(std::abs(aGenObj.pdgId())!=13) continue;
 
-    if(std::abs(aGenObj.pdgId())!=1000015) continue; // do czastek HSCP to ich numer, do stau takze ten numer
+    // if(std::abs(aGenObj.pdgId())!=1000015) continue; // do czastek HSCP to ich numer, do stau takze ten numer
 
     fillHistosForGenMuon(aGenObj); 
   
