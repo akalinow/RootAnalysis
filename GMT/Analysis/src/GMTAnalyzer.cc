@@ -106,24 +106,35 @@ void GMTAnalyzer::fillTurnOnCurveGen(const GenObj & aGenObj,
   if(sysType=="EMTF") {   
     hName = "h2DEMTF"+selType;
   }
+ 
+  //if(std::abs(aGenObj.pt())>5) return;
 
   ///Find the best matching L1 candidate
-  float deltaEta = 0.4;
+  float deltaEta = 0.3;
   L1Obj selectedCand; /*L1PhaseIIObj selectedCand;*/
   
   for(auto aCand: myL1Coll){
     bool pass = passQuality(aCand ,sysType, selType);
     if(!pass) continue;    
-    /*std::cout<<aCand<<std::endl;*/
     double delta = std::abs(aGenObj.eta()-aCand.etaValue());    
     if(delta<deltaEta){
       deltaEta = delta;
-      selectedCand = aCand;      
+      selectedCand = aCand;  
     }    
   }
-
-  bool passPtCut = selectedCand.ptValue()>=ptCut && selectedCand.ptValue()>0;
-
+    bool passPtCut = selectedCand.ptValue()>=ptCut && selectedCand.ptValue()>0;  
+    /*std::cout<<"**----------------------------**"<<std::endl;
+    std::cout<<"L1 muon matched"<<std::endl;
+    std::cout<<selectedCand<<std::endl; 
+    std::cout<<"Value of passPtCut: "<<passPtCut<<std::endl;  
+    std::cout<<"**----------------------------**"<<std::endl;
+  
+   
+   
+    std::cout<<"gen muon"<<std::endl;
+    std::cout<<aGenObj<<std::endl; 
+    std::cout<<"**----------------------------**"<<std::endl;*/
+  
   std::string tmpName = hName+"Pt_Gen"+std::to_string(ptCut);
   myHistos_->fill2DHistogram(tmpName, aGenObj.pt(), passPtCut);
 
@@ -222,12 +233,13 @@ void GMTAnalyzer::fillRateHisto(const MuonObj & aRecoMuon,
 // //////////////////////////////////////////////////////////////////////////////
 void GMTAnalyzer::fillHistosForGenMuon(const GenObj & aGenObj){   
 
-  bool isOMTFAcceptance = fabs(aGenObj.eta())>0.83 && fabs(aGenObj.eta())<1.24;
-  if(!isOMTFAcceptance) return;
+  
 
   std::string selType = "";
   for(int iCut=0;iCut<31;++iCut){
+      //std::cout<<"//////////////This events is for the cut://///////////// "<<iCut<<std::endl;
       fillTurnOnCurveGen(aGenObj, iCut, "OMTF", selType);
+     //std::cout<<"/////////////This is the end of event for the cut://///////////////// "<<iCut<<std::endl;
       
   }
 
@@ -250,8 +262,6 @@ void GMTAnalyzer::fillHistosForGenMuon(const GenObj & aGenObj){
 // //////////////////////////////////////////////////////////////////////////////
 // //////////////////////////////////////////////////////////////////////////////
 void GMTAnalyzer::fillHistosForRecoMuon(const MuonObj & aRecoMuon){     
-  bool isOMTFAcceptance = fabs(aRecoMuon.eta())>0.83 && fabs(aRecoMuon.eta())<1.24;
-  if(!isOMTFAcceptance) return;
   
   myHistos_->fill1DHistogram("h1DPtProbe", aRecoMuon.pt());
   myHistos_->fill1DHistogram("h1DAbsEtaProbe", std::abs(aRecoMuon.eta()));
@@ -293,7 +303,7 @@ bool GMTAnalyzer::analyze(const EventProxyBase& iEvent){
    /////////For  muonColl as Reference with L1////////////////////////////////
    /////////////////////////////////////////////////////////////////////
   const std::vector<MuonObj> & myMuonColl = myMuonObjColl->getMuonObjs();
-  if(myMuonColl.size()<2) return false;
+  if(myMuonColl.size()!=2) return false;
   
   MuonObj aTag =  myMuonColl.at(0);
   bool tagPass = aTag.pt()>20 && aTag.matchedisohlt();
@@ -316,7 +326,10 @@ bool GMTAnalyzer::analyze(const EventProxyBase& iEvent){
       aProbe = aMuonCand;   
     }
   }
-  if(aProbe.pt()<1) return true;
+
+  bool isOMTFAcceptanceP = fabs(aProbe.eta())>0.83 && fabs(aProbe.eta())<1.24;
+  if(!isOMTFAcceptanceP) return false;
+  if(aProbe.pt()<1) return false;//avoid adding PU at low pt 
   
   ROOT::Math::PtEtaPhiMVector p4Probe(aProbe.pt(), aProbe.eta(), aProbe.phi(), m_muon);
   myHistos_->fill1DHistogram("h1DDiMuonMassTagProbe",(p4Probe+p4Tag).mass());   
@@ -339,13 +352,89 @@ bool GMTAnalyzer::analyze(const EventProxyBase& iEvent){
    /////////////////////////////////////////////////////////////////////
 
   const std::vector<GenObj> genObjVec = myGenObjColl->data();  
-  if(genObjVec.empty()) return false;
+  if(genObjVec.size()!=2) return false; //
+  //if(genObjVec.empty()) return false;
+  //if(myMuonColl.size() < 2 )return false;
 
-  for(auto aGenObj: genObjVec){
+  /*for (auto aMuonCandG: genObjVec){  
+    //if (aMuonCandG.charge() !=1 || aMuonCandG.charge()!=-1) continue;
+    if(std::abs(aMuonCandG.pdgId())!=13) continue;
+    bool isOMTFAcceptance = fabs(aMuonCandG.eta())>0.83 && fabs(aMuonCandG.eta())<1.24;
+    if(!isOMTFAcceptance) continue;
+    
+    //if (aMuonCandG.pt()>5) continue;
+    std::cout<<aMuonCandG<<std::endl; 
+  
+     }*/
+   
+//////////////////////////////////////////////////////////////////////
+  /*for(auto aGenObj: genObjVec){
+     bool isOMTFAcceptance = fabs(aGenObj.eta())>0.83 && fabs(aGenObj.eta())<1.24;
+    if(!isOMTFAcceptance) continue;
     if(std::abs(aGenObj.pdgId())!=13) continue;
-    if(std::abs(aGenObj.status())!=1) continue;   
-    fillHistosForGenMuon(aGenObj); ////////////ONLY this
-  }  
+    //if(std::abs(aGenObj.status())!=1) continue;   
+    if (aGenObj.pt()>5) continue;
+    std::cout<<aGenObj<<std::endl; 
+    //fillHistosForGenMuon(aGenObj); ////////////ONLY this
+   // break;
+  } */
+////////////////////////////////////////////
+  GenObj aTagG =  genObjVec.at(0);
+  bool tagPassG = aTagG.pt()>10 ;//&& aTagG.matchedisohlt() && std::abs(aTagG.status())==1
+  if(!tagPassG) return true;
+  
+  ROOT::Math::PtEtaPhiMVector p4TagG(aTagG.pt(), aTagG.eta(), aTagG.phi(), m_muon);
+  myHistos_->fill1DHistogram("h1DPtTagGen", aTagG.pt());
+  myHistos_->fill1DHistogram("h1DAbsEtaTagGen", std::abs(aTagG.eta()));
+  
+  GenObj aProbeG;
+  //double m_Z = 90;
+  double deltaM_ZG = 20;
+  double tmpDeltaG = 2*deltaM_ZG;
+  for (auto aMuonCandG: genObjVec){  
+   // if(std::abs(aMuonCandG.pdgId())!=13) continue;
+   // if(std::abs(aMuonCandG.status())!=1) continue; 
+      ROOT::Math::PtEtaPhiMVector p4MuonCand(aMuonCandG.pt(), aMuonCandG.eta(), aMuonCandG.phi(), m_muon);
+      tmpDeltaG= std::abs((p4MuonCand+p4TagG).mass()-m_Z);
+      if(tmpDeltaG<deltaM_ZG){ //aMuonCandG.tightID() && 
+      deltaM_ZG = tmpDeltaG;
+      aProbeG = aMuonCandG;   
+    }
+  }
+  //if(aProbeG.pt()<1) return false;////////here was the  pt<1;
+
+  bool isOMTFAcceptance = fabs(aProbeG.eta())>0.83 && fabs(aProbeG.eta())<1.24;
+  if(!isOMTFAcceptance) return false;
+
+  if(aProbeG.pt()<1) return false;
+
+  ROOT::Math::PtEtaPhiMVector p4ProbeG(aProbeG.pt(), aProbeG.eta(), aProbeG.phi(), m_muon);
+  myHistos_->fill1DHistogram("h1DDiMuonMassTagProbeGen",(p4ProbeG+p4TagG).mass());   
+  //std::cout<<"/////////////////////////***BEGIN EVENT***//////////////////////////"<<std::endl; 
+  /*std::cout<<"$$$$$$---BEGIN tag an probe muon---$$$$$$$$$$:"<<std::endl;  
+  std::cout<<"aprobe muon in first:  "<<aProbeG<<std::endl;*/
+  fillHistosForGenMuon(aProbeG);
+  //std::cout<<"$$$$$$---END  tag  an  probe muon---$$$$$$$$$$:"<<std::endl;
+  
+  
+  ///Add PU muons to analysis
+  /*double deltaRCutG = 0.6;
+  for (auto aMuonCandG: genObjVec){      
+   // if(std::abs(aMuonCandG.pdgId())!=13) continue;
+   // if(std::abs(aMuonCandG.status())!=1) continue;   
+    //std::cout<<aMuonCandG<<std::endl; 
+      ROOT::Math::PtEtaPhiMVector p4MuonCandG(aMuonCandG.pt(), aMuonCandG.eta(), aMuonCandG.phi(), m_muon);
+      if(
+         ROOT::Math::VectorUtil::DeltaR(p4MuonCandG, p4TagG)>deltaRCutG && 
+         ROOT::Math::VectorUtil::DeltaR(p4MuonCandG, p4ProbeG)>deltaRCutG){
+         std::cout<<"***********************BEGIN PU**************************************"<<std::endl; 
+         std::cout<<"This PU muon:"<<std::endl;
+         fillHistosForGenMuon(aMuonCandG);
+         //std::cout<<"************************END PU*************************************"<<std::endl;
+      }
+  }*/
+    
+ // std::cout<<"///////////////////////////***END EVENT***///////////////////////////"<<std::endl;
     
   return true;
 }

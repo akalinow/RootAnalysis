@@ -166,7 +166,7 @@ void GMTHistograms::finalizeHistograms(){
   plotEffPanel("OMTF");
   plotEffPanelGen("OMTF");
   //Panel with many turn-on curves for high pT range
-  plotEffPanel("OMTF", true);
+  //plotEffPanel("OMTF", true);
 
   plotSingleHistogram("h1DPtProbe"); 
   plotSingleHistogram("h1DAbsEtaProbe"); 
@@ -274,8 +274,8 @@ TCanvas* c = new TCanvas(TString::Format("EffVsPt_%s",sysType.c_str()),
  
   for (int icut=0; icut <=3;++icut){
     float ptCut = GMTHistograms::ptBins[ptCuts[icut]];
-    hName = "h2D"+sysType+"Pt_reco"+std::to_string((int)ptCut);
-    if(doHigh) hName = "h2D"+sysType+"HighPt_reco"+std::to_string((int)ptCut);
+    hName = "h2D"+sysType+"Pt_Reco"+std::to_string((int)ptCut);
+    if(doHigh) hName = "h2D"+sysType+"HighPt_Reco"+std::to_string((int)ptCut);
     TH2F* h2D = this->get2DHistogram(hName.Data());
     if(!h2D) return;
     TH1D *hNum = h2D->ProjectionX("hNum",2,2);
@@ -284,16 +284,16 @@ TCanvas* c = new TCanvas(TString::Format("EffVsPt_%s",sysType.c_str()),
     TEfficiency* hEff =DivideErr(hNum,hDenom,"Pt_Int","B"); //TH1D
     hEff->SetMarkerStyle(21+icut);
     hEff->SetMarkerColor(color[icut]);
-    hEff->SetTitle("different options;Muon p_{T} [GeV/c];Efficiency");
+    hEff->SetTitle("different options;reco Muon p_{T} [GeV/c];Efficiency");
     if (icut==0)hEff->Draw();
-    else hEff->Draw("PSAME");
+    else hEff->Draw("same");
     TString nameCut = TString::Format("%d", (int)GMTHistograms::ptBins[ptCuts[icut]])+" GeV/c";
     if (icut==0) nameCut = "no p_{T} cut";
     l.AddEntry(hEff,nameCut.Data());
 
     c->Update();
     auto graph = hEff->GetPaintedGraph();
-    graph->GetXaxis()->SetRangeUser(0.0,50.0);
+    graph->GetXaxis()->SetRangeUser(0.0,100.0);
     graph->GetYaxis()->SetRangeUser(0.0,1.0);
     c->Update();
   }
@@ -331,15 +331,15 @@ void GMTHistograms::plotEffPanelGen(const std::string & sysType, bool doHigh){
     TEfficiency* hEff =DivideErr(hNum,hDenom,"Pt_Int","B"); 
     hEff->SetMarkerStyle(21+icut);
     hEff->SetMarkerColor(color[icut]);
-    hEff->SetTitle("different options;Muon p_{T} [GeV/c];Efficiency");
+    hEff->SetTitle("different options;gen Muon p_{T} [GeV/c];Efficiency");
     if (icut==0)hEff->Draw();
-    else hEff->Draw("PSAME");
+    else hEff->Draw("same");
     TString nameCut = TString::Format("%d", (int)GMTHistograms::ptBins[ptCuts[icut]])+" GeV/c";
     if (icut==0) nameCut = "no p_{T} cut";
     l.AddEntry(hEff,nameCut.Data());
     c->Update();
     auto graph = hEff->GetPaintedGraph();
-    graph->GetXaxis()->SetRangeUser(0.0,50.0);
+    graph->GetXaxis()->SetRangeUser(0.0,100.0);
     graph->GetYaxis()->SetRangeUser(0.0,1.0);
     c->Update();
   }

@@ -1,15 +1,16 @@
 #ifndef GenObj_H
 #define GenObj_H
 #include <ostream>
-
 #include "TObject.h"
+//#include <cmath>
+
 // #include "DataFormats/Math/interface/LorentzVector.h"
 
 class GenObj : public TObject {
 public:
  GenObj(float pt=0., float eta=0., float phi=0.,float mass=0., 
 	int charge=0, int pdgid=0, int st=0, double vx=0., double vy=0., double vz=0., double beta=0):
-  _pt(pt),_eta(eta),_phi(phi),_mass(mass),_charge(charge),_id(pdgid),_status(st),_vx(vx),_vy(vy),_vz(vz),_beta(beta){}
+  _pt(pt),_eta(eta),_phi(phi),_mass(mass),_charge(charge),_id(pdgid),_status(st),_vx(vx),_vy(vy),_vz(vz),_beta(beta)  {}
   virtual ~GenObj() {}
 public:
   float pt() const { return _pt;}
