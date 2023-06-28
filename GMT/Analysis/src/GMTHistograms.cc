@@ -12,6 +12,7 @@
 #include "TRandom3.h"
 #include "TGaxis.h"
 #include "TEfficiency.h"
+#include "TGraphAsymmErrors.h"
 
 #include "utilsL1RpcStyle.h"
 
@@ -125,7 +126,7 @@ void GMTHistograms::defineHistograms(){
 
  add2DHistogram("h2DEtaVxTemplate","",60,-2.5,2.5,2,-0.5,1.5,file_);
  add2DHistogram("h2DPhiVxTemplate","",4*32,-3.2,3.2,2,-0.5,1.5,file_);
- add2DHistogram("h2DBetaTemplate","",4*32,0.1,1,2,-0.5,1.5,file_);
+ add2DHistogram("h2DBetaTemplate","",4*32,0.9999,1,2,-0.5,1.5,file_);
 
  add2DHistogram("h2DVtx_xTemplate","",4*32,-0.005,0.005,2,-0.5,1.5,file_);
  add2DHistogram("h2DVtx_yTemplate","",4*32,-0.003,0.003,2,-0.5,1.5,file_);
@@ -133,8 +134,8 @@ void GMTHistograms::defineHistograms(){
  add2DHistogram("h2DVtx_dTemplate","",4*32,0,0.0035,2,-0.5,1.5,file_);
 
  add2DHistogram("h2DPTemplate","",4*32,80,3400,2,-0.5,1.5,file_);
- add2DHistogram("h2DLorGammaTemplate","",4*32,0,12,2,-0.5,1.5,file_);
- add2DHistogram("h2DGamBetaTemplate","",4*32,0,12,2,-0.5,1.5,file_);
+ add2DHistogram("h2DLorGammaTemplate","",4*32,0,12000,2,-0.5,1.5,file_);
+ add2DHistogram("h2DGamBetaTemplate","",4*32,0,12000,2,-0.5,1.5,file_);
  add2DHistogram("h2DdxyTemplate","",4*32,0,2,2,-0.5,1.5,file_);
 
 
@@ -180,16 +181,16 @@ void GMTHistograms::finalizeHistograms(){
 
   //Efficiency as a function of ete.
   //Lines for selected points on the turn on curve shown
-  // plotEffVsEta("uGMT_emu");
+  plotEffVsEta("uGMT_emu");
 
   // //Efficiency vs given variable.
   // ///Lines for two pT cut values shown
-  // plotEffVsVar("uGMT_emu","EtaVx");
+  plotEffVsVar("uGMT_emu","EtaVx");
   // plotEffVsVar("uGMT_emu","PhiVx");
-  // plotEffVsVar("uGMT_emu","Beta");
-  // plotEffVsVar("uGMT_emu","Vtx_z");
-  // plotEffVsVar("uGMT_emu","Vtx_x");
-  // plotEffVsVar("uGMT_emu","Vtx_y");
+  plotEffVsVar("uGMT_emu","Beta");
+  plotEffVsVar("uGMT_emu","Vtx_z");
+  plotEffVsVar("uGMT_emu","Vtx_x");
+  plotEffVsVar("uGMT_emu","Vtx_y");
   // plotEffVsVar("uGMT_emu","Vtx_d");
   plotEffVsVar("uGMT_emu","dxy");
 
@@ -248,7 +249,7 @@ TH1* GMTHistograms::Integrate(TH1 * histoD) {
 }
 /////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////
-TH1D * GMTHistograms::DivideErr(TH1D * h1,
+TEfficiency * GMTHistograms::DivideErr(TH1D * h1,
                  TH1D * h2,
                  const char * name,
                  const char * optErr)
@@ -256,62 +257,15 @@ TH1D * GMTHistograms::DivideErr(TH1D * h1,
 //
 // return h1/h2 with recalculated errors for "B"
 //
-///////////////////////////////////////////////////////////
-//     TEfficiency* pEff = nullptr;
-//     std::cout << pEff << std::endl;
-
-//     if (TEfficiency::CheckConsistency(*h1, *h2))
-//     {
-//         pEff = new TEfficiency(*h1, *h2);
-//         std::cout << "OK" << std::endl;
-//     }
-
-//     // Rest of your code...
-
-//     TH2* h2out = pEff->CreateHistogram();  // Convert TEfficiency to TH2
-
-//     // Create a TH1D projection along the desired axis
-//     TH1D* hout = nullptr;
-//     if (h2out)
-//     {
-//         hout = h2out->ProjectionY();
-//         delete h2out;  // Clean up the TH2 histogram
-//     }
-
-//     // Don't forget to clean up the memory
-//     delete pEff;
-
-//     return hout;  // Return the TH1D* histogram
-// }
-
-/////////////////////////////////////////////////////////
-
-  if (!h1) std::cout <<"DivideErr called, but histogram (h1) pointer is:"<<h1<<std::endl;
+ if (!h1) std::cout <<"DivideErr called, but histogram (h1) pointer is:"<<h1<<std::endl;
   if (!h2) std::cout <<"DivideErr called, but histogram (h2) pointer is:"<<h1<<std::endl;
   if (!h1 || !h2) return 0;
-  TH1D * hout = new TH1D( *h1);
-  hout->Reset();
+  TEfficiency * hout = 0;
+  if(TEfficiency::CheckConsistency(*h1,*h2)){
+    hout = new TEfficiency(*h1,*h2);
+  //hout->Reset();
   hout->SetName(name);
-//  hout->SetTitleOffset(gStyle->GetTitleXOffset(),"x");
-//  hout->SetTitleOffset(gStyle->GetTitleYOffset(),"y");
-  hout->Divide(h1,h2,1.,1.,optErr);
-
-  if (strcmp(optErr,"B")==0  || strcmp(optErr,"b")==0) {
-    for (int i = 0; i<=hout->GetNbinsX()+1;i++) {
-      Float_t tot   = h2->GetBinContent(i) ;
-      Float_t tot_e = h2->GetBinError(i);
-      Float_t eff = hout->GetBinContent(i) ;
-      Float_t Err = 0.;
-      if (tot > 0) {
-        if (eff == 1.) eff = (tot-1)/tot; //modify efficiency as one even in numerator not fired
-        Err = tot_e / tot * sqrt( eff* (1-eff) );
-      }
-      hout->SetBinError(i, Err);
-    }
-  } else {
-    std::cout << "** Fig--DivideErr ** unknown option ---"<<optErr<<"---"<<std::endl;
   }
-
   return hout;
 }
 /////////////////////////////////////////////////////////
@@ -344,20 +298,25 @@ void GMTHistograms::plotEffPanel(const std::string & sysType, bool doHigh){
     TH1D *hNum = h2D->ProjectionX("hNum",2,2);
     TH1D *hDenom = h2D->ProjectionX("hDenom",1,1);    
     hDenom->Add(hNum);
-    TH1D* hEff =DivideErr(hNum,hDenom,"Pt_Int","B");
-    hEff->SetStats(kFALSE);
-    hEff->SetMinimum(0.0001);
-    hEff->SetMaximum(1.04);
-    hEff->GetXaxis()->SetRange(1,50);
+    TEfficiency* hEff =DivideErr(hNum,hDenom,"Pt_Int","B");
+    // hEff->SetStats(kFALSE);
+    // hEff->SetMinimum(0.0001);
+    // hEff->SetMaximum(1.04);
+    // hEff->GetXaxis()->SetRange(1,50);
     hEff->SetMarkerStyle(21+icut);
     hEff->SetMarkerColor(color[icut]);
-    hEff->SetXTitle("gen. particle p_{T} [GeV/c]");
-    hEff->SetYTitle("Efficiency");
-    if (icut==0)hEff->DrawCopy();
-    else hEff->DrawCopy("same");
+    // hEff->SetXTitle("gen. particle p_{T} [GeV/c]");
+    // hEff->SetYTitle("Efficiency");
+    if (icut==0)hEff->Draw();
+    else hEff->Draw("PPSAME");
     TString nameCut = TString::Format("%d", (int)GMTHistograms::ptBins[ptCuts[icut]])+" GeV/c";
     // if (icut==0) nameCut = "no p_{T} cut";
     l.AddEntry(hEff, names[icut].c_str());
+    c->Update();
+    auto graph = hEff->GetPaintedGraph();
+    graph->GetXaxis()->SetRangeUser(0.0,50.0);
+    graph->GetYaxis()->SetRangeUser(0.0,1.0);
+    c->Update();
   }
   l.DrawClone();
   if(!doHigh) c->Print(TString::Format("fig_png/PanelVsPt_%s.png",sysType.c_str()).Data());
@@ -420,14 +379,22 @@ void GMTHistograms::plotEffVsVar(const std::string & sysType,
     if(!h2D) return;
     TH1D *hNum = h2D->ProjectionX("hNum",2,2);
     TH1D *hDenom = h2D->ProjectionX("hDenom",1,1);
+
+    // std::cout << hNum->GetEntries() << std::endl;
+
+
+
     hDenom->Add(hNum);
+    // std::cout << hDenom->GetEntries() << std::endl;
     
-    TH1D* hEff =DivideErr(hNum,hDenom,"Pt_Int","B");
-    hEff->SetStats(kFALSE);
-    hEff->SetMinimum(0.0);
-    hEff->SetMaximum(1.04);
-    hEff->SetMarkerStyle(21+icut);
-    hEff->SetMarkerColor(color[1]);
+    TEfficiency* hEff =DivideErr(hNum,hDenom,"Pt_Int","B");
+
+    auto htest = hEff->CreateGraph();
+    // hEff->SetStats(kFALSE);
+    // htest->SetMinimum(0.0);
+    // hEff->SetMaximum(1.04);
+    htest->SetMarkerStyle(21+icut);
+    htest->SetMarkerColor(color[1]);
 
     const char * str_var_name = varName.c_str();
     std::string str(str_var_name);
@@ -444,51 +411,103 @@ void GMTHistograms::plotEffVsVar(const std::string & sysType,
     std::string gambeta_name = "GamBeta";
     std::string dxy_name = "dxy";
 
-
-
     if (str_var_name == vtx_x){
-      hEff->SetXTitle("Vtx_{x} [cm]");
+      // hEff->SetTitle("Vtx_{x} [cm]");
+      htest->SetTitle("; Vtx_{x} [cm] ; Efficiency");
+      // htest->GetXaxis()->SetNdivisions(6);
+      // htest->GetXaxis()->SetRangeUser(0, 1);
+      // htest->GetYaxis()->SetRangeUser(0, 1);
+      c->Update();
     }
     else if (str_var_name == vtx_y){
-      hEff->SetXTitle("Vtx_{y} [cm]");
+      // hEff->SetTitle("Vtx_{y} [cm]");
+      htest->SetTitle("; Vtx_{y} [cm] ; Efficiency");
+      // htest->GetXaxis()->SetNdivisions(6);
+      // htest->GetXaxis()->SetRangeUser(0, 1);
+      // htest->GetYaxis()->SetRangeUser(0, 1);
+      c->Update();
     }
     else if (str_var_name == vtx_z){
-      hEff->SetXTitle("Vtx_{z} [cm]");
+      // hEff->SetTitle("Vtx_{z} [cm]");
+      htest->SetTitle("; Vtx_{z} [cm] ; Efficiency");
+      // htest->GetXaxis()->SetNdivisions(6);
+      // htest->GetXaxis()->SetRangeUser(0, 1);
+      // htest->GetYaxis()->SetRangeUser(0, 1);
+      c->Update();
     }
     else if (str_var_name == vtx_d){
-      hEff->SetXTitle("Vtx_{d} [cm]");
+      // hEff->SetTitle("Vtx_{d} [cm]");
+      htest->SetTitle("; Vtx_{d} [cm] ; Efficiency");
+      // htest->GetXaxis()->SetNdivisions(6);
+      // htest->GetXaxis()->SetRangeUser(0, 1);
+      // htest->GetYaxis()->SetRangeUser(0, 1);
+      c->Update();
     }
     else if (str_var_name == beta_name){
-      hEff->SetXTitle("#beta");
+      htest->SetTitle("; #beta ; Efficiency");
+      htest->GetXaxis()->SetNdivisions(6);
+      htest->GetXaxis()->SetRangeUser(0, 1);
+      htest->GetYaxis()->SetRangeUser(0, 1);
+      c->Update();
     }
     else if (str_var_name == eta_name){
-      hEff->SetXTitle("#eta");
+      // hEff->SetTitle("#eta");
+      htest->SetTitle("; #eta; Efficiency");
+      // htest->GetXaxis()->SetNdivisions(6);
+      // htest->GetXaxis()->SetRangeUser(0, 1);
+      // htest->GetYaxis()->SetRangeUser(0, 1);
+      c->Update();
     }
     else if (str_var_name == p_name){
-      hEff->SetXTitle("p [GeV]");
+      hEff->SetTitle("p [GeV]");
+      htest->SetTitle("; p [GeV] ; Efficiency");
+      // htest->GetXaxis()->SetNdivisions(6);
+      // htest->GetXaxis()->SetRangeUser(0, 1);
+      // htest->GetYaxis()->SetRangeUser(0, 1);
+      c->Update();
     }
     else if (str_var_name == phi_name){
-      hEff->SetXTitle("#phi");
+      // hEff->SetTitle("#phi");
+      htest->SetTitle("; #phi ; Efficiency");
+      // htest->GetXaxis()->SetNdivisions(6);
+      // htest->GetXaxis()->SetRangeUser(0, 1);
+      // htest->GetYaxis()->SetRangeUser(0, 1);
+      c->Update();
     }
     else if (str_var_name == lorgamma_name){
-      hEff->SetXTitle("#gamma");
+      
+      // hEff->SetTitle("#gamma");
+      htest->SetTitle("; #gamma ; Efficiency");
+      // htest->GetXaxis()->SetNdivisions(6);
+      // htest->GetXaxis()->SetRangeUser(0, 1);
+      // htest->GetYaxis()->SetRangeUser(0, 1);
+      c->Update();
     }
     else if (str_var_name == gambeta_name){
-      hEff->SetXTitle("#gamma#beta");
+      hEff->SetTitle("#gamma#beta");
+      htest->SetTitle("; #beta#gamma ; Efficiency");
+      // htest->GetXaxis()->SetNdivisions(6);
+      // htest->GetXaxis()->SetRangeUser(0, 1);
+      // htest->GetYaxis()->SetRangeUser(0, 1);
+      c->Update();
     }
     else if (str_var_name == dxy_name){
-      // c->SetLogx();
-      hEff->SetXTitle("d_{xy} [cm]");
+      // hEff->SetTitle("d_{xy} [cm]");
+      htest->SetTitle("; d_{xy} [cm] ; Efficiency");
+      // htest->GetXaxis()->SetNdivisions(6);
+      // htest->GetXaxis()->SetRangeUser(0, 1);
+      // htest->GetYaxis()->SetRangeUser(0, 1);
+      c->Update();
     }
 
     else {
-    hEff->SetXTitle(varName.c_str());
+    hEff->SetTitle(varName.c_str());
     }
 
-    hEff->SetYTitle("Efficiency");
+    hEff->SetTitle("Efficiency");
 
-    if (icut==0)hEff->DrawCopy("E0");
-    else hEff->DrawCopy("same E0");
+    if (icut==0)htest->Draw("AP");
+    else htest->Draw("AP");
   }
   l.DrawClone();
   c->Print(TString::Format("fig_eps/EffVs%s_%s.eps",varName.c_str(), sysType.c_str()).Data());
@@ -523,17 +542,17 @@ void GMTHistograms::plotEffVsEta(const std::string & sysType){
     if(iType==2) hNum->Scale(50.0);
     hDenom->Add(hNum);
 
-    TH1D* hEff =DivideErr(hNum,hDenom,"Pt_Int","B");
-    hEff->SetStats(kFALSE);
-    hEff->SetMinimum(0.0001);
-    hEff->SetMaximum(1.04);
+    TEfficiency* hEff =DivideErr(hNum,hDenom,"Pt_Int","B");
+    // hEff->SetStats(kFALSE);
+    // hEff->SetMinimum(0.0001);
+    // hEff->SetMaximum(1.04);
     hEff->SetMarkerStyle(21+iType);
     hEff->SetMarkerColor(color[iType]);
-    hEff->GetYaxis()->SetTitleOffset(1.0);
-    hEff->SetXTitle("generated particle #eta");
-    hEff->SetYTitle("Efficiency");
-    if (iType==0)hEff->DrawCopy();
-    else hEff->DrawCopy("same");
+    // hEff->GetYaxis()->SetTitleOffset(1.0);
+    hEff->SetTitle("generated particle #eta");
+    // hEff->SetYTitle("Efficiency");
+    if (iType==0)hEff->Draw();
+    else hEff->Draw("PSAME");
     std::string nameCut;
     // std::string nameCut = std::to_string((int)GMTHistograms::ptBins[iCut])+" GeV/c";
     if (iType==0) nameCut = "#beta < 0.5";
@@ -576,7 +595,7 @@ void GMTHistograms::plotGMTVsOther(int iPtCut,
   TH1D *hNum = h2D->ProjectionX("hNum",2,2);
   TH1D *hDenom = h2D->ProjectionX("hDenom",1,1);
   hDenom->Add(hNum);
-  TH1D* hEffOther =DivideErr(hNum,hDenom,"hEffOther","B");
+  TEfficiency* hEffOther =DivideErr(hNum,hDenom,"hEffOther","B");
   hEffOther->SetMarkerStyle(23);
   hEffOther->SetMarkerColor(2);
 
@@ -586,16 +605,16 @@ void GMTHistograms::plotGMTVsOther(int iPtCut,
   hDenom = h2D->ProjectionX("hDenom",1,1);    
   hDenom->Add(hNum);
 
-  TH1D* hEffGMT =DivideErr(hNum,hDenom,"hEffGMTTmp","B");
-  hEffGMT->SetXTitle("gen. particle p_{T} [GeV/c]");
-  hEffGMT->SetYTitle("Efficiency");
-  hEffGMT->SetMaximum(1.04);
-  hEffGMT->GetXaxis()->SetRange(2,100);
+  TEfficiency* hEffGMT =DivideErr(hNum,hDenom,"hEffGMTTmp","B");
+  hEffGMT->SetTitle("gen. particle p_{T} [GeV/c]");
+  // hEffGMT->SetYTitle("Efficiency");
+  // hEffGMT->SetMaximum(1.04);
+  // hEffGMT->GetXaxis()->SetRange(2,100);
   hEffGMT->SetMarkerStyle(8);
   hEffGMT->SetMarkerColor(1);
-  hEffGMT->SetStats(kFALSE);
-  hEffGMT->DrawCopy();
-  hEffOther->DrawCopy("same");
+  // hEffGMT->SetStats(kFALSE);
+  hEffGMT->Draw();
+  hEffOther->Draw("PSAME");
 
   std::string tmp = "p_{T} #geq ";
   if(int(ptCut*10)%10==5) tmp += "%1.1f GeV/c";
@@ -708,7 +727,7 @@ void GMTHistograms::plotRate(std::string type){
     c->SetLogy();
     c->SetGrid(1,0);
     hRateVx->Draw();
-    hRateuGMT_emu->DrawCopy("same");
+    hRateuGMT_emu->DrawCopy("PSAME");
    
     std::cout<<"Rate uGMT @ 20 GeV: "<< hRateuGMT_emu->GetBinContent(hRateuGMT_emu->FindBin(20-0.01))<<std::endl;
   }  
@@ -736,22 +755,22 @@ void GMTHistograms::plotRate(std::string type){
 }
 ////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////
-float  GMTHistograms::getEfficiency(TH2F *h2D, float ptCut){
+// float  GMTHistograms::getEfficiency(TH2F *h2D, float ptCut){
 
-  TH1D *hNum = h2D->ProjectionX("hNum",2,2);
-  TH1D *hDenom = h2D->ProjectionX("hDenom",1,1);
-  hDenom->Add(hNum);
-  TH1D* hEffTmp =DivideErr(hNum,hDenom,"hEffTmp","B");
-  //Mean eff above pt cut
-  int binLow = hEffTmp->FindBin(ptCut);
-  int binHigh = hEffTmp->FindBin(100);
-  float range = hEffTmp->GetBinLowEdge(binHigh+1) - hEffTmp->GetBinLowEdge(binLow);
-  float eff = hEffTmp->Integral(binLow,binHigh,"width")/range;
-  return eff;
-}
+//   TH1D *hNum = h2D->ProjectionX("hNum",2,2);
+//   TH1D *hDenom = h2D->ProjectionX("hDenom",1,1);
+//   hDenom->Add(hNum);
+//   TH1D* hEffTmp =DivideErr(hNum,hDenom,"hEffTmp","B");
+//   //Mean eff above pt cut
+//   int binLow = hEffTmp->FindBin(ptCut);
+//   int binHigh = hEffTmp->FindBin(100);
+//   float range = hEffTmp->GetBinLowEdge(binHigh+1) - hEffTmp->GetBinLowEdge(binLow);
+//   float eff = hEffTmp->Integral(binLow,binHigh,"width")/range;
+//   return eff;
+// }
 ////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////
-TH1D * GMTHistograms::getEfficiencyHisto(const std::string & hName){
+TEfficiency* GMTHistograms::getEfficiencyHisto(const std::string & hName){
 
   TH2F* h2D = this->get2DHistogram(hName);
   if(!h2D) return 0;
@@ -759,7 +778,7 @@ TH1D * GMTHistograms::getEfficiencyHisto(const std::string & hName){
   TH1D *hNum = h2D->ProjectionX("hNum",2,2);
   TH1D *hDenom = h2D->ProjectionX("hDenom",1,1);  
   hDenom->Add(hNum);
-  TH1D* hEffTmp =DivideErr(hNum,hDenom,"hEffTmp","B");
+  TEfficiency* hEffTmp =DivideErr(hNum,hDenom,"hEffTmp","B");
   return hEffTmp;
 }
 ////////////////////////////////////////////////////////////////
