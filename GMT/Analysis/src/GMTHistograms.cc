@@ -193,9 +193,9 @@ void GMTHistograms::finalizeHistograms(){
   // plotEffVsVar("uGMT_emu","Vtx_d");
   plotEffVsVar("uGMT_emu","dxy");
 
-  // plotEffVsVar("uGMT_emu","P");
-  // plotEffVsVar("uGMT_emu","LorGamma");
-  // plotEffVsVar("uGMT_emu","GamBeta");
+  plotEffVsVar("uGMT_emu","P");
+  plotEffVsVar("uGMT_emu","LorGamma");
+  plotEffVsVar("uGMT_emu","GamBeta");
 
   // //1D or 2D plot of given variable
   // plotSingleHistogram("h2DuGMT_emuPtRecVsPtGen");
