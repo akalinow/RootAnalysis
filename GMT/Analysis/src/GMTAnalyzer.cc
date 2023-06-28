@@ -3,6 +3,7 @@
 #include <omp.h>
 #include <bitset>
 #include <sstream>
+// #include <Vector3D.h>
 
 #include <iostream>
 
@@ -11,6 +12,8 @@
 #include "EventProxyOMTF.h"
 
 #include "TF1.h"
+
+std::set<const GenObj*> processedObjects;
 
 std::vector<double> ptRanges = {0.,   1.,   2.,   3.,   4.,   
                                   5.,   6.,   7.,   8.,   9., 
@@ -147,6 +150,32 @@ void GMTAnalyzer::fillTurnOnCurve(const GenObj & aGenObj,
 
   tmpName = hName+"Vtx_d"+std::to_string(ptCut);
   myHistos_->fill2DHistogram(tmpName, vertex_distance, passPtCut);
+
+  float momentum = aGenObj.pt() * cosh(aGenObj.eta());
+  tmpName = hName+"P"+std::to_string(ptCut);
+  myHistos_->fill2DHistogram(tmpName, momentum, passPtCut);
+
+  float lorentzgamma = 1 / (sqrt(1 - pow(aGenObj.beta(), 2)));
+  tmpName = hName+"LorGamma"+std::to_string(ptCut);
+  myHistos_->fill2DHistogram(tmpName, lorentzgamma, passPtCut);
+
+  float gammabeta = lorentzgamma * aGenObj.beta();
+  tmpName = hName+"GamBeta"+std::to_string(ptCut);
+  myHistos_->fill2DHistogram(tmpName, gammabeta, passPtCut);
+
+  TVector2 sv(aGenObj.vx(), aGenObj.vy());
+  float px = aGenObj.pt() * cos(aGenObj.phi());
+  float py = aGenObj.pt() * sin(aGenObj.phi());
+  // float pz = aGenObj.pt() * sinh(aGenObj.eta());
+  TVector2 mom(px, py);
+  TVector2 mom_u = mom.Unit();
+
+  Double_t dot_val = sv.X()*mom_u.X() + sv.Y()*mom_u.Y();
+
+  float dxy = sqrt(sv.Mod2() - std::pow(dot_val, 2));
+  tmpName = hName+"dxy"+std::to_string(ptCut);
+  // std::cout << dxy << std::endl;
+  myHistos_->fill2DHistogram(tmpName, dxy, passPtCut);
 
 }
 // //////////////////////////////////////////////////////////////////////////////

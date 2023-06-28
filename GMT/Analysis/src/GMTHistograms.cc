@@ -11,6 +11,7 @@
 #include "TMarker.h"
 #include "TRandom3.h"
 #include "TGaxis.h"
+#include "TEfficiency.h"
 
 #include "utilsL1RpcStyle.h"
 
@@ -62,6 +63,8 @@ std::string GMTHistograms::getTemplateName(const std::string& name){
   if(name.find("Pt")!=std::string::npos) templateName = "h2DPtTemplate";
   if(name.find("HighPt")!=std::string::npos) templateName = "h2DHighPtTemplate";
   if(name.find("PtRecVsPtGen")!=std::string::npos) templateName = "h2DPtVsPtTemplate";
+
+
   
   if(name.find("EtaHit")!=std::string::npos) templateName = "h2DEtaHitTemplate";
   if(name.find("PhiHit")!=std::string::npos) templateName = "h2DPhiHitTemplate";
@@ -72,9 +75,14 @@ std::string GMTHistograms::getTemplateName(const std::string& name){
   if(name.find("Vtx_z")!=std::string::npos) templateName = "h2DVtx_zTemplate";
   if(name.find("Vtx_x")!=std::string::npos) templateName = "h2DVtx_xTemplate";
   if(name.find("Vtx_y")!=std::string::npos) templateName = "h2DVtx_yTemplate";
+  if(name.find("Vtx_d")!=std::string::npos) templateName = "h2DVtx_yTemplate";
 
-  if(name.find("Vtx_d")!=std::string::npos) templateName = "h2DVtx_dTemplate";
 
+  if(name.find("P")!=std::string::npos) templateName = "h2DPTemplate";
+  if(name.find("LorGamma")!=std::string::npos) templateName = "h2DLorGammaTemplate";
+  if(name.find("GamBeta")!=std::string::npos) templateName = "h2DGamBetaTemplate";
+
+    if(name.find("dxy")!=std::string::npos) templateName = "h2DdxyTemplate";
 
   if(name.find("Quality")!=std::string::npos) templateName = "h2DQualityTemplate";
   if(name.find("RateTot")!=std::string::npos) templateName = "h2DRateTotTemplate";
@@ -111,18 +119,23 @@ void GMTHistograms::defineHistograms(){
 
  add2DHistogram("h2DPtVsPtTemplate","",404,10,100,404,0,260,file_);
 
+
  add2DHistogram("h2DEtaHitTemplate","",8*26,0.8,1.25,2,-0.5,1.5,file_);
  add2DHistogram("h2DPhiHitTemplate","",5*32,-M_PI,M_PI,2,-0.5,1.5,file_);
 
- add2DHistogram("h2DEtaVxTemplate","",60,-3,3,2,-0.5,1.5,file_);
+ add2DHistogram("h2DEtaVxTemplate","",60,-2.5,2.5,2,-0.5,1.5,file_);
  add2DHistogram("h2DPhiVxTemplate","",4*32,-3.2,3.2,2,-0.5,1.5,file_);
  add2DHistogram("h2DBetaTemplate","",4*32,0.1,1,2,-0.5,1.5,file_);
 
  add2DHistogram("h2DVtx_xTemplate","",4*32,-0.005,0.005,2,-0.5,1.5,file_);
  add2DHistogram("h2DVtx_yTemplate","",4*32,-0.003,0.003,2,-0.5,1.5,file_);
- add2DHistogram("h2DVtx_zTemplate","",4*32,-15,15.2,2,-0.5,1.5,file_);
-
+ add2DHistogram("h2DVtx_zTemplate","",4*32,-20,20.2,2,-0.5,1.5,file_);
  add2DHistogram("h2DVtx_dTemplate","",4*32,0,0.0035,2,-0.5,1.5,file_);
+
+ add2DHistogram("h2DPTemplate","",4*32,80,3400,2,-0.5,1.5,file_);
+ add2DHistogram("h2DLorGammaTemplate","",4*32,0,12,2,-0.5,1.5,file_);
+ add2DHistogram("h2DGamBetaTemplate","",4*32,0,12,2,-0.5,1.5,file_);
+ add2DHistogram("h2DdxyTemplate","",4*32,0,2,2,-0.5,1.5,file_);
 
 
  add2DHistogram("h2DQualityTemplate","",201,-0.5,200.5,2,-0.5,1.5,file_);
@@ -161,40 +174,46 @@ void GMTHistograms::finalizeHistograms(){
   gErrorIgnoreLevel = kError;
   
   // //Panel with many turn-on curves
-  plotEffPanel("uGMT_emu");
+  // plotEffPanel("uGMT_emu");
   // //Panel with many turn-on curves for high pT range
-  plotEffPanel("uGMT_emu", true);
+  // plotEffPanel("uGMT_emu", true);
 
   //Efficiency as a function of ete.
   //Lines for selected points on the turn on curve shown
-  plotEffVsEta("uGMT_emu");
+  // plotEffVsEta("uGMT_emu");
 
   // //Efficiency vs given variable.
   // ///Lines for two pT cut values shown
-  plotEffVsVar("uGMT_emu","EtaVx");
-  plotEffVsVar("uGMT_emu","PhiVx");
-  plotEffVsVar("uGMT_emu","Beta");
-  plotEffVsVar("uGMT_emu","Vtx_z");
-  plotEffVsVar("uGMT_emu","Vtx_x");
-  plotEffVsVar("uGMT_emu","Vtx_y");
-  plotEffVsVar("uGMT_emu","Vtx_d");
+  // plotEffVsVar("uGMT_emu","EtaVx");
+  // plotEffVsVar("uGMT_emu","PhiVx");
+  // plotEffVsVar("uGMT_emu","Beta");
+  // plotEffVsVar("uGMT_emu","Vtx_z");
+  // plotEffVsVar("uGMT_emu","Vtx_x");
+  // plotEffVsVar("uGMT_emu","Vtx_y");
+  // plotEffVsVar("uGMT_emu","Vtx_d");
+  plotEffVsVar("uGMT_emu","dxy");
+
+  // plotEffVsVar("uGMT_emu","P");
+  // plotEffVsVar("uGMT_emu","LorGamma");
+  // plotEffVsVar("uGMT_emu","GamBeta");
 
   // //1D or 2D plot of given variable
-  plotSingleHistogram("h2DuGMT_emuPtRecVsPtGen");
+  // plotSingleHistogram("h2DuGMT_emuPtRecVsPtGen");
+
 
   // //Turn on curves for many pT thresholds.
   // ///Lines for reference - Phase2 uGMT, and other algorithm shown
-  for(int iPtCode=1;iPtCode<=30;++iPtCode){
-      //  plotGMTVsOther(iPtCode,"uGMT_emu");
-   }
+  // for(int iPtCode=1;iPtCode<=30;++iPtCode){
+  //     //  plotGMTVsOther(iPtCode,"uGMT_emu");
+  //  }
    
   // //1D or 2D plot of given variable
-  plotSingleHistogram("h2DuGMT_emuPtRecVsPtGen");
+  // plotSingleHistogram("h2DuGMT_emuPtRecVsPtGen");
   
   // //Event rate plot for selected type
   // //Uses some old rate parametrisation for the single particles sample
   // ///Works also with neutrino sample
-  plotRate("Tot");
+  // plotRate("Tot");
    
 }
 /////////////////////////////////////////////////////////
@@ -237,6 +256,36 @@ TH1D * GMTHistograms::DivideErr(TH1D * h1,
 //
 // return h1/h2 with recalculated errors for "B"
 //
+///////////////////////////////////////////////////////////
+//     TEfficiency* pEff = nullptr;
+//     std::cout << pEff << std::endl;
+
+//     if (TEfficiency::CheckConsistency(*h1, *h2))
+//     {
+//         pEff = new TEfficiency(*h1, *h2);
+//         std::cout << "OK" << std::endl;
+//     }
+
+//     // Rest of your code...
+
+//     TH2* h2out = pEff->CreateHistogram();  // Convert TEfficiency to TH2
+
+//     // Create a TH1D projection along the desired axis
+//     TH1D* hout = nullptr;
+//     if (h2out)
+//     {
+//         hout = h2out->ProjectionY();
+//         delete h2out;  // Clean up the TH2 histogram
+//     }
+
+//     // Don't forget to clean up the memory
+//     delete pEff;
+
+//     return hout;  // Return the TH1D* histogram
+// }
+
+/////////////////////////////////////////////////////////
+
   if (!h1) std::cout <<"DivideErr called, but histogram (h1) pointer is:"<<h1<<std::endl;
   if (!h2) std::cout <<"DivideErr called, but histogram (h2) pointer is:"<<h1<<std::endl;
   if (!h1 || !h2) return 0;
@@ -390,6 +439,11 @@ void GMTHistograms::plotEffVsVar(const std::string & sysType,
     std::string beta_name = "Beta";
     std::string phi_name = "PhiVx";
     std::string eta_name = "EtaVx";
+    std::string p_name = "P";
+    std::string lorgamma_name = "LorGamma";
+    std::string gambeta_name = "GamBeta";
+    std::string dxy_name = "dxy";
+
 
 
     if (str_var_name == vtx_x){
@@ -410,8 +464,21 @@ void GMTHistograms::plotEffVsVar(const std::string & sysType,
     else if (str_var_name == eta_name){
       hEff->SetXTitle("#eta");
     }
+    else if (str_var_name == p_name){
+      hEff->SetXTitle("p [GeV]");
+    }
     else if (str_var_name == phi_name){
       hEff->SetXTitle("#phi");
+    }
+    else if (str_var_name == lorgamma_name){
+      hEff->SetXTitle("#gamma");
+    }
+    else if (str_var_name == gambeta_name){
+      hEff->SetXTitle("#gamma#beta");
+    }
+    else if (str_var_name == dxy_name){
+      // c->SetLogx();
+      hEff->SetXTitle("d_{xy} [cm]");
     }
 
     else {
