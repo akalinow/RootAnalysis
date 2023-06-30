@@ -303,7 +303,9 @@ bool GMTAnalyzer::analyze(const EventProxyBase& iEvent){
    /////////For  muonColl as Reference with L1////////////////////////////////
    /////////////////////////////////////////////////////////////////////
   const std::vector<MuonObj> & myMuonColl = myMuonObjColl->getMuonObjs();
+
   if(myMuonColl.size()!=2) return false;
+  //if(myMuonColl.empty()) return false;
   
   MuonObj aTag =  myMuonColl.at(0);
   bool tagPass = aTag.pt()>20 && aTag.matchedisohlt();
@@ -388,7 +390,6 @@ bool GMTAnalyzer::analyze(const EventProxyBase& iEvent){
   myHistos_->fill1DHistogram("h1DAbsEtaTagGen", std::abs(aTagG.eta()));
   
   GenObj aProbeG;
-  //double m_Z = 90;
   double deltaM_ZG = 20;
   double tmpDeltaG = 2*deltaM_ZG;
   for (auto aMuonCandG: genObjVec){  
@@ -401,7 +402,6 @@ bool GMTAnalyzer::analyze(const EventProxyBase& iEvent){
       aProbeG = aMuonCandG;   
     }
   }
-  //if(aProbeG.pt()<1) return false;////////here was the  pt<1;
 
   bool isOMTFAcceptance = fabs(aProbeG.eta())>0.83 && fabs(aProbeG.eta())<1.24;
   if(!isOMTFAcceptance) return false;

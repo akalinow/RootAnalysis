@@ -168,13 +168,13 @@ void GMTHistograms::finalizeHistograms(){
   //Panel with many turn-on curves for high pT range
   //plotEffPanel("OMTF", true);
 
-  plotSingleHistogram("h1DPtProbe"); 
-  plotSingleHistogram("h1DAbsEtaProbe"); 
+  plotPt("h1DPtProbe"); 
+  plotEta("h1DAbsEtaProbe"); 
   
-  plotSingleHistogram("h1DPtTag"); 
-  plotSingleHistogram("h1DAbsEtaTag"); 
+  plotPt("h1DPtTag"); 
+  plotEta("h1DAbsEtaTag"); 
   
-  plotSingleHistogram("h1DDiMuonMassTagProbe"); 
+  plotMassMuon("h1DDiMuonMassTagProbe"); 
  //// Plotting Gen vs Reco muon turn on curves
  for(int iPtCode=1;iPtCode<=30;++iPtCode){
       plotGMTVsOther(iPtCode,"OMTF");
@@ -727,6 +727,139 @@ void GMTHistograms::plotSingleHistogram(std::string hName){
     h1D->SetXTitle("X");
     h1D->SetYTitle("Y");
     h1D->GetYaxis()->SetTitleOffset(1.4);
+    h1D->SetStats(kFALSE);
+    h1D->Draw("");
+    c->Print(TString::Format("fig_png/%s.png",hName.c_str()).Data());
+  }
+}
+////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////
+
+void GMTHistograms::plotMassMuon(std::string hName){
+
+  TH2F* h2D = get2DHistogram(hName);
+  TH1F* h1D = get1DHistogram(hName);
+  if(!h2D && !h1D) return;
+	
+  TCanvas* c = new TCanvas("AnyHistogram","AnyHistogram",
+			   800,800);
+
+  TLegend l(0.15,0.78,0.35,0.87,NULL,"brNDC");
+  l.SetTextSize(0.05);
+  l.SetFillStyle(4000);
+  l.SetBorderSize(0);
+  l.SetFillColor(10);
+
+  if(h2D) {
+    h2D->SetDirectory(myDirCopy);
+    h2D->SetLineWidth(3);
+    h2D->Scale(1.0/h2D->Integral());
+    h2D->SetXTitle("p_{T}^{Reco}");
+    h2D->SetYTitle("p_{T}^{OMTF}");
+    h2D->GetYaxis()->SetTitleOffset(1.4);
+    h2D->SetStats(kFALSE);
+    gStyle->SetPalette(kRainBow);
+    h2D->Draw("box colz");
+    c->Print(TString::Format("fig_png/%s.png",hName.c_str()).Data());
+  }
+  if(h1D) {
+    h1D->SetDirectory(myDirCopy);
+    h1D->SetLineWidth(3);
+    h1D->Scale(1.0/h1D->Integral(0,h1D->GetNbinsX()+1));    
+    h1D->GetXaxis()->SetRange(1,h1D->GetNbinsX()+1);
+    h1D->SetXTitle("Z(#mu^{+}#mu^{-}) [GeV/c^{2}]");
+    h1D->SetMarkerStyle(kFullCircle);
+    h1D->SetYTitle("Events");
+    h1D->GetYaxis()->SetTitleOffset(1.4);
+    h1D->SetMarkerColor(2);
+    h1D->SetStats(kFALSE);
+    h1D->Draw("");
+    c->Print(TString::Format("fig_png/%s.png",hName.c_str()).Data());
+  }
+}
+////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////
+void GMTHistograms::plotPt(std::string hName){
+
+  TH2F* h2D = get2DHistogram(hName);
+  TH1F* h1D = get1DHistogram(hName);
+  if(!h2D && !h1D) return;
+	
+  TCanvas* c = new TCanvas("AnyHistogram","AnyHistogram",
+			   800,800);
+
+  TLegend l(0.15,0.78,0.35,0.87,NULL,"brNDC");
+  l.SetTextSize(0.05);
+  l.SetFillStyle(4000);
+  l.SetBorderSize(0);
+  l.SetFillColor(10);
+
+  if(h2D) {
+    h2D->SetDirectory(myDirCopy);
+    h2D->SetLineWidth(3);
+    h2D->Scale(1.0/h2D->Integral());
+    h2D->SetXTitle("p_{T}^{Reco}");
+    h2D->SetYTitle("p_{T}^{OMTF}");
+    h2D->GetYaxis()->SetTitleOffset(1.4);
+    h2D->SetStats(kFALSE);
+    gStyle->SetPalette(kRainBow);
+    h2D->Draw("box colz");
+    c->Print(TString::Format("fig_png/%s.png",hName.c_str()).Data());
+  }
+  if(h1D) {
+    h1D->SetDirectory(myDirCopy);
+    h1D->SetLineWidth(3);
+    h1D->Scale(1.0/h1D->Integral(0,h1D->GetNbinsX()+1));    
+    h1D->GetXaxis()->SetRange(1,h1D->GetNbinsX()+1);
+    h1D->SetXTitle(" P_{T} Muon [GeV/c]");
+    h1D->SetYTitle("Events");
+     h1D->SetMarkerStyle(kFullCircle);
+    h1D->GetYaxis()->SetTitleOffset(1.4);
+    h1D->SetMarkerColor(2);
+    h1D->SetStats(kFALSE);
+    h1D->Draw("");
+    c->Print(TString::Format("fig_png/%s.png",hName.c_str()).Data());
+  }
+}
+////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////
+void GMTHistograms::plotEta(std::string hName){
+
+  TH2F* h2D = get2DHistogram(hName);
+  TH1F* h1D = get1DHistogram(hName);
+  if(!h2D && !h1D) return;
+	
+  TCanvas* c = new TCanvas("AnyHistogram","AnyHistogram",
+			   800,800);
+
+  TLegend l(0.15,0.78,0.35,0.87,NULL,"brNDC");
+  l.SetTextSize(0.05);
+  l.SetFillStyle(4000);
+  l.SetBorderSize(0);
+  l.SetFillColor(10);
+
+  if(h2D) {
+    h2D->SetDirectory(myDirCopy);
+    h2D->SetLineWidth(3);
+    h2D->Scale(1.0/h2D->Integral());
+    h2D->SetXTitle("p_{T}^{Reco}");
+    h2D->SetYTitle("p_{T}^{OMTF}");
+    h2D->GetYaxis()->SetTitleOffset(1.4);
+    h2D->SetStats(kFALSE);
+    gStyle->SetPalette(kRainBow);
+    h2D->Draw("box colz");
+    c->Print(TString::Format("fig_png/%s.png",hName.c_str()).Data());
+  }
+  if(h1D) {
+    h1D->SetDirectory(myDirCopy);
+    h1D->SetLineWidth(3);
+    h1D->Scale(1.0/h1D->Integral(0,h1D->GetNbinsX()+1));    
+    h1D->GetXaxis()->SetRange(1,h1D->GetNbinsX()+1);
+    h1D->SetXTitle("#lbar#eta#lbar");
+    h1D->SetYTitle("Events");
+    h1D->GetYaxis()->SetTitleOffset(1.8);
+    h1D->SetMarkerStyle(kFullCircle);
+    h1D->SetMarkerColor(2);
     h1D->SetStats(kFALSE);
     h1D->Draw("");
     c->Print(TString::Format("fig_png/%s.png",hName.c_str()).Data());

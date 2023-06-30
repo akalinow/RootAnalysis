@@ -53,7 +53,10 @@ private:
 
   void plotGMTVsOther(int iPt, std::string sysType="BMTF");
   void plotTandPEfficiency(const std::string & sysType,  std::string hName);
-  void plotSingleHistogram(std::string hName);
+  void plotSingleHistogram(std::string hName); 
+  void plotMassMuon(std::string hName); 
+  void plotPt(std::string hName); 
+  void plotEta(std::string hName);
 
   TH2F* makeRateWeights(TH2 *hOrig);
   TH1* getRateHisto(std::string sysType = "Vx",
