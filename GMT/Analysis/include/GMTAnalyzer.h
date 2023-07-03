@@ -16,7 +16,10 @@
 #include "TLorentzVector.h"
 #include "TVector3.h"
 #include "TMath.h"
-using namespace TMath;
+
+#include <Math/Vector4D.h>
+#include <Math/VectorUtil.h>
+//using namespace TMath;
 using namespace std;
 class TriggerHistograms;
 class OMTFHit;
@@ -51,17 +54,12 @@ class GMTAnalyzer:public Analyzer{
 
  private:
 
-  void fillHistosForRecoMuon(const MuonObj & aRecoMuon);
+  void fillHistosForMuon(const ROOT::Math::LorentzVector<ROOT::Math::PtEtaPhiM4D<double> > & p4vector,const std::string & typeGenReco);
 
-  void fillHistosForGenMuon(const GenObj & aGenObj);
-
-  void fillTurnOnCurve(const MuonObj & aRecoMuon,
+  void fillTurnOnCurve(const ROOT::Math::LorentzVector<ROOT::Math::PtEtaPhiM4D<double> > & p4vector,
                       const int & ptCut, const std::string & sysType,
-		                  const std::string & selType);
-
-  void fillTurnOnCurveGen(const GenObj & aGenObj,
-                      const int & ptCut, const std::string & sysType,
-		                  const std::string & selType);                     
+		                  const std::string & selType,
+                      const std::string & typeGenReco);                   
 
   void fillRateHisto(const MuonObj & aRecoMuon,
                     const std::string & sysType,
