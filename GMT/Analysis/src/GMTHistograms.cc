@@ -136,7 +136,7 @@ void GMTHistograms::defineHistograms(){
  add2DHistogram("h2DPTemplate","",4*32,80,3400,2,-0.5,1.5,file_);
  add2DHistogram("h2DLorGammaTemplate","",4*32,0,12000,2,-0.5,1.5,file_);
  add2DHistogram("h2DGamBetaTemplate","",4*32,0,12000,2,-0.5,1.5,file_);
- add2DHistogram("h2DdxyTemplate","",4*32,0,2,2,-0.5,1.5,file_);
+ add2DHistogram("h2DdxyTemplate","",4*32,0,6,2,-0.5,1.5,file_);
 
 
  add2DHistogram("h2DQualityTemplate","",201,-0.5,200.5,2,-0.5,1.5,file_);
@@ -195,8 +195,8 @@ void GMTHistograms::finalizeHistograms(){
   plotEffVsVar("uGMT_emu","dxy");
 
   plotEffVsVar("uGMT_emu","P");
-  plotEffVsVar("uGMT_emu","LorGamma");
-  plotEffVsVar("uGMT_emu","GamBeta");
+  // plotEffVsVar("uGMT_emu","LorGamma");
+  // plotEffVsVar("uGMT_emu","GamBeta");
 
   // //1D or 2D plot of given variable
   // plotSingleHistogram("h2DuGMT_emuPtRecVsPtGen");
@@ -380,12 +380,8 @@ void GMTHistograms::plotEffVsVar(const std::string & sysType,
     TH1D *hNum = h2D->ProjectionX("hNum",2,2);
     TH1D *hDenom = h2D->ProjectionX("hDenom",1,1);
 
-    // std::cout << hNum->GetEntries() << std::endl;
-
-
-
+    const char * str_var_name = varName.c_str();
     hDenom->Add(hNum);
-    // std::cout << hDenom->GetEntries() << std::endl;
     
     TEfficiency* hEff =DivideErr(hNum,hDenom,"Pt_Int","B");
 
@@ -396,7 +392,6 @@ void GMTHistograms::plotEffVsVar(const std::string & sysType,
     htest->SetMarkerStyle(21+icut);
     htest->SetMarkerColor(color[1]);
 
-    const char * str_var_name = varName.c_str();
     std::string str(str_var_name);
 
     std::string vtx_x = "Vtx_x";
@@ -416,7 +411,7 @@ void GMTHistograms::plotEffVsVar(const std::string & sysType,
       htest->SetTitle("; Vtx_{x} [cm] ; Efficiency");
       // htest->GetXaxis()->SetNdivisions(6);
       // htest->GetXaxis()->SetRangeUser(0, 1);
-      // htest->GetYaxis()->SetRangeUser(0, 1);
+      htest->GetYaxis()->SetRangeUser(0, 1);
       c->Update();
     }
     else if (str_var_name == vtx_y){
@@ -424,7 +419,7 @@ void GMTHistograms::plotEffVsVar(const std::string & sysType,
       htest->SetTitle("; Vtx_{y} [cm] ; Efficiency");
       // htest->GetXaxis()->SetNdivisions(6);
       // htest->GetXaxis()->SetRangeUser(0, 1);
-      // htest->GetYaxis()->SetRangeUser(0, 1);
+      htest->GetYaxis()->SetRangeUser(0, 1);
       c->Update();
     }
     else if (str_var_name == vtx_z){
@@ -432,7 +427,7 @@ void GMTHistograms::plotEffVsVar(const std::string & sysType,
       htest->SetTitle("; Vtx_{z} [cm] ; Efficiency");
       // htest->GetXaxis()->SetNdivisions(6);
       // htest->GetXaxis()->SetRangeUser(0, 1);
-      // htest->GetYaxis()->SetRangeUser(0, 1);
+      htest->GetYaxis()->SetRangeUser(0, 1);
       c->Update();
     }
     else if (str_var_name == vtx_d){
@@ -440,7 +435,7 @@ void GMTHistograms::plotEffVsVar(const std::string & sysType,
       htest->SetTitle("; Vtx_{d} [cm] ; Efficiency");
       // htest->GetXaxis()->SetNdivisions(6);
       // htest->GetXaxis()->SetRangeUser(0, 1);
-      // htest->GetYaxis()->SetRangeUser(0, 1);
+      htest->GetYaxis()->SetRangeUser(0, 1);
       c->Update();
     }
     else if (str_var_name == beta_name){
@@ -455,7 +450,7 @@ void GMTHistograms::plotEffVsVar(const std::string & sysType,
       htest->SetTitle("; #eta; Efficiency");
       // htest->GetXaxis()->SetNdivisions(6);
       // htest->GetXaxis()->SetRangeUser(0, 1);
-      // htest->GetYaxis()->SetRangeUser(0, 1);
+      htest->GetYaxis()->SetRangeUser(0, 1);
       c->Update();
     }
     else if (str_var_name == p_name){
@@ -463,7 +458,7 @@ void GMTHistograms::plotEffVsVar(const std::string & sysType,
       htest->SetTitle("; p [GeV] ; Efficiency");
       // htest->GetXaxis()->SetNdivisions(6);
       // htest->GetXaxis()->SetRangeUser(0, 1);
-      // htest->GetYaxis()->SetRangeUser(0, 1);
+      htest->GetYaxis()->SetRangeUser(0, 1);
       c->Update();
     }
     else if (str_var_name == phi_name){
@@ -471,24 +466,24 @@ void GMTHistograms::plotEffVsVar(const std::string & sysType,
       htest->SetTitle("; #phi ; Efficiency");
       // htest->GetXaxis()->SetNdivisions(6);
       // htest->GetXaxis()->SetRangeUser(0, 1);
-      // htest->GetYaxis()->SetRangeUser(0, 1);
+      htest->GetYaxis()->SetRangeUser(0, 1);
       c->Update();
     }
     else if (str_var_name == lorgamma_name){
       
       // hEff->SetTitle("#gamma");
       htest->SetTitle("; #gamma ; Efficiency");
-      // htest->GetXaxis()->SetNdivisions(6);
+      htest->GetXaxis()->SetNdivisions(4);
       // htest->GetXaxis()->SetRangeUser(0, 1);
-      // htest->GetYaxis()->SetRangeUser(0, 1);
+      htest->GetYaxis()->SetRangeUser(0, 1);
       c->Update();
     }
     else if (str_var_name == gambeta_name){
       hEff->SetTitle("#gamma#beta");
       htest->SetTitle("; #beta#gamma ; Efficiency");
-      // htest->GetXaxis()->SetNdivisions(6);
+      htest->GetXaxis()->SetNdivisions(4);
       // htest->GetXaxis()->SetRangeUser(0, 1);
-      // htest->GetYaxis()->SetRangeUser(0, 1);
+      htest->GetYaxis()->SetRangeUser(0, 1);
       c->Update();
     }
     else if (str_var_name == dxy_name){
@@ -496,7 +491,7 @@ void GMTHistograms::plotEffVsVar(const std::string & sysType,
       htest->SetTitle("; d_{xy} [cm] ; Efficiency");
       // htest->GetXaxis()->SetNdivisions(6);
       // htest->GetXaxis()->SetRangeUser(0, 1);
-      // htest->GetYaxis()->SetRangeUser(0, 1);
+      htest->GetYaxis()->SetRangeUser(0, 1);
       c->Update();
     }
 

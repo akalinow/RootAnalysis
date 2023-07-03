@@ -166,11 +166,11 @@ void GMTAnalyzer::fillTurnOnCurve(const GenObj & aGenObj,
   TVector2 sv(aGenObj.vx(), aGenObj.vy());
   float px = aGenObj.pt() * cos(aGenObj.phi());
   float py = aGenObj.pt() * sin(aGenObj.phi());
-  // float pz = aGenObj.pt() * sinh(aGenObj.eta());
+
   TVector2 mom(px, py);
   TVector2 mom_u = mom.Unit();
 
-  Double_t dot_val = sv.X()*mom_u.X() + sv.Y()*mom_u.Y();
+  auto dot_val = sv.X()*mom_u.X() + sv.Y()*mom_u.Y();
 
   float dxy = sqrt(sv.Mod2() - std::pow(dot_val, 2));
   tmpName = hName+"dxy"+std::to_string(ptCut);
