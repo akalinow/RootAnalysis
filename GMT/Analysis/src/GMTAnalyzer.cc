@@ -254,7 +254,7 @@ bool GMTAnalyzer::analyze(const EventProxyBase& iEvent){
   fillHistosForMuon(p4Probe,"Reco");
   
   ///Add PU muons to analysis
-  double deltaRCut = 0.6;
+  double deltaRCut = 0.4;
   for (auto aMuonCand: myMuonColl){   
     
       ROOT::Math::PtEtaPhiMVector p4MuonCand(aMuonCand.pt(), aMuonCand.eta(), aMuonCand.phi(), m_muon);
@@ -274,7 +274,7 @@ bool GMTAnalyzer::analyze(const EventProxyBase& iEvent){
   if(genObjVec.size()!=2) return false; //
   
   GenObj aTagG =  genObjVec.at(0);
-  bool tagPassG = aTagG.pt()>10 ;//&& aTagG.matchedisohlt() && std::abs(aTagG.status())==1
+  bool tagPassG = aTagG.pt()>10 ;//std::abs(aTagG.status())==1
   if(!tagPassG) return true;
   
   ROOT::Math::PtEtaPhiMVector p4TagG(aTagG.pt(), aTagG.eta(), aTagG.phi(), m_muon);

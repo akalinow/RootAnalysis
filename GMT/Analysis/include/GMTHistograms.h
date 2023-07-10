@@ -38,9 +38,7 @@ private:
                    const char * name="DivideErr",
                    const char * optErr ="");
 
-  void plotEffPanel(const std::string & sysType, bool doHigh=false);
-
-   void plotEffPanelGen(const std::string & sysType, bool doHigh=false);
+  void plotEffPanel(const std::string & sysType, std::string htype , bool doHigh=false);
 
   void plotEffVsEta(const std::string & sysType);
 
@@ -53,10 +51,8 @@ private:
 
   void plotGMTVsOther(int iPt, std::string sysType="BMTF");
   void plotTandPEfficiency(const std::string & sysType,  std::string hName);
-  void plotSingleHistogram(std::string hName); 
-  void plotMassMuon(std::string hName); 
-  void plotPt(std::string hName); 
-  void plotEta(std::string hName);
+  void plotSingleHistogram(std::string hName,  const char * xlabel= "Xlabel"); 
+
 
   TH2F* makeRateWeights(TH2 *hOrig);
   TH1* getRateHisto(std::string sysType = "Vx",

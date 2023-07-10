@@ -163,18 +163,20 @@ void GMTHistograms::finalizeHistograms(){
   gErrorIgnoreLevel = kError;
     
   //Panel with many turn-on curves
-  plotEffPanel("OMTF");
-  plotEffPanelGen("OMTF");
+  plotEffPanel("OMTF","Reco");
+  plotEffPanel("OMTF","Gen");
+
+  //plotEffPanelGen("OMTF");
   //Panel with many turn-on curves for high pT range
   //plotEffPanel("OMTF", true);
 
-  plotPt("h1DPtProbe"); 
-  plotEta("h1DAbsEtaProbe"); 
   
-  plotPt("h1DPtTag"); 
-  plotEta("h1DAbsEtaTag"); 
-  
-  plotMassMuon("h1DDiMuonMassTagProbe"); 
+  plotSingleHistogram("h1DPtProbe"," P_{T} Muon [GeV/c]");
+  plotSingleHistogram("h1DAbsEtaProbe","#lbar#eta#lbar");
+  plotSingleHistogram("h1DPtTag"," P_{T} Muon [GeV/c]");
+  plotSingleHistogram("h1DAbsEtaTag","#lbar#eta#lbar");
+  plotSingleHistogram("h1DDiMuonMassTagProbe", "Z(#mu^{+}#mu^{-}) [GeV/c^{2}]");
+
  //// Plotting Gen vs Reco muon turn on curves
  for(int iPtCode=1;iPtCode<=30;++iPtCode){
       plotGMTVsOther(iPtCode,"OMTF");
@@ -256,7 +258,7 @@ TEfficiency * GMTHistograms::DivideErr(TH1D * h1,
 }
 /////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////
-void GMTHistograms::plotEffPanel(const std::string & sysType, bool doHigh){
+void GMTHistograms::plotEffPanel(const std::string & sysType, std::string htype, bool doHigh){
 
 TCanvas* c = new TCanvas(TString::Format("EffVsPt_%s",sysType.c_str()),
 			   TString::Format("EffVsPt_%s",sysType.c_str()),
@@ -274,8 +276,8 @@ TCanvas* c = new TCanvas(TString::Format("EffVsPt_%s",sysType.c_str()),
  
   for (int icut=0; icut <=3;++icut){
     float ptCut = GMTHistograms::ptBins[ptCuts[icut]];
-    hName = "h2D"+sysType+"Pt_Reco"+std::to_string((int)ptCut);
-    if(doHigh) hName = "h2D"+sysType+"HighPt_Reco"+std::to_string((int)ptCut);
+    hName = "h2D"+sysType+"Pt_"+htype+std::to_string((int)ptCut);
+    if(doHigh) hName = "h2D"+sysType+"HighPt_"+htype+std::to_string((int)ptCut);
     TH2F* h2D = this->get2DHistogram(hName.Data());
     if(!h2D) return;
     TH1D *hNum = h2D->ProjectionX("hNum",2,2);
@@ -284,7 +286,8 @@ TCanvas* c = new TCanvas(TString::Format("EffVsPt_%s",sysType.c_str()),
     TEfficiency* hEff =DivideErr(hNum,hDenom,"Pt_Int","B"); //TH1D
     hEff->SetMarkerStyle(21+icut);
     hEff->SetMarkerColor(color[icut]);
-    hEff->SetTitle("different options;reco Muon p_{T} [GeV/c];Efficiency");
+    TString titl= "different options;" + htype + "Muon p_{T} [GeV/c];Efficiency";
+    hEff->SetTitle(titl);
     if (icut==0)hEff->Draw();
     else hEff->Draw("same");
     TString nameCut = TString::Format("%d", (int)GMTHistograms::ptBins[ptCuts[icut]])+" GeV/c";
@@ -298,8 +301,12 @@ TCanvas* c = new TCanvas(TString::Format("EffVsPt_%s",sysType.c_str()),
     c->Update();
   }
   l.DrawClone();
-  if(!doHigh) c->Print(TString::Format("fig_png/PanelVsPt_RECO_%s.png",sysType.c_str()).Data());
-  else  c->Print(TString::Format("fig_png/PanelVsHighPt_RECO_%s.png",sysType.c_str()).Data());
+  TString sent = "fig_png/PanelVsPt_"+htype+"_%s.png";
+  if(!doHigh) c->Print(TString::Format(sent,sysType.c_str()).Data());
+  else  {
+    TString sent = "fig_png/PanelVsHighPt_"+htype+"_%s.png";
+    c->Print(TString::Format(sent,sysType.c_str()).Data());
+  }
 }
 ////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////
@@ -692,7 +699,7 @@ TEfficiency * GMTHistograms::getEfficiencyHisto(const std::string & hName){
 }
 ////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////
-void GMTHistograms::plotSingleHistogram(std::string hName){
+void GMTHistograms::plotSingleHistogram(std::string hName, const char * xlabel){
 
   TH2F* h2D = get2DHistogram(hName);
   TH1F* h1D = get1DHistogram(hName);
@@ -724,97 +731,10 @@ void GMTHistograms::plotSingleHistogram(std::string hName){
     h1D->SetLineWidth(3);
     h1D->Scale(1.0/h1D->Integral(0,h1D->GetNbinsX()+1));    
     h1D->GetXaxis()->SetRange(1,h1D->GetNbinsX()+1);
-    h1D->SetXTitle("X");
-    h1D->SetYTitle("Y");
-    h1D->GetYaxis()->SetTitleOffset(1.4);
-    h1D->SetStats(kFALSE);
-    h1D->Draw("");
-    c->Print(TString::Format("fig_png/%s.png",hName.c_str()).Data());
-  }
-}
-////////////////////////////////////////////////////////////////
-////////////////////////////////////////////////////////////////
-
-void GMTHistograms::plotMassMuon(std::string hName){
-
-  TH2F* h2D = get2DHistogram(hName);
-  TH1F* h1D = get1DHistogram(hName);
-  if(!h2D && !h1D) return;
-	
-  TCanvas* c = new TCanvas("AnyHistogram","AnyHistogram",
-			   800,800);
-
-  TLegend l(0.15,0.78,0.35,0.87,NULL,"brNDC");
-  l.SetTextSize(0.05);
-  l.SetFillStyle(4000);
-  l.SetBorderSize(0);
-  l.SetFillColor(10);
-
-  if(h2D) {
-    h2D->SetDirectory(myDirCopy);
-    h2D->SetLineWidth(3);
-    h2D->Scale(1.0/h2D->Integral());
-    h2D->SetXTitle("p_{T}^{Reco}");
-    h2D->SetYTitle("p_{T}^{OMTF}");
-    h2D->GetYaxis()->SetTitleOffset(1.4);
-    h2D->SetStats(kFALSE);
-    gStyle->SetPalette(kRainBow);
-    h2D->Draw("box colz");
-    c->Print(TString::Format("fig_png/%s.png",hName.c_str()).Data());
-  }
-  if(h1D) {
-    h1D->SetDirectory(myDirCopy);
-    h1D->SetLineWidth(3);
-    h1D->Scale(1.0/h1D->Integral(0,h1D->GetNbinsX()+1));    
-    h1D->GetXaxis()->SetRange(1,h1D->GetNbinsX()+1);
-    h1D->SetXTitle("Z(#mu^{+}#mu^{-}) [GeV/c^{2}]");
-    h1D->SetMarkerStyle(kFullCircle);
-    h1D->SetYTitle("Events");
-    h1D->GetYaxis()->SetTitleOffset(1.4);
-    h1D->SetMarkerColor(2);
-    h1D->SetStats(kFALSE);
-    h1D->Draw("");
-    c->Print(TString::Format("fig_png/%s.png",hName.c_str()).Data());
-  }
-}
-////////////////////////////////////////////////////////////////
-////////////////////////////////////////////////////////////////
-void GMTHistograms::plotPt(std::string hName){
-
-  TH2F* h2D = get2DHistogram(hName);
-  TH1F* h1D = get1DHistogram(hName);
-  if(!h2D && !h1D) return;
-	
-  TCanvas* c = new TCanvas("AnyHistogram","AnyHistogram",
-			   800,800);
-
-  TLegend l(0.15,0.78,0.35,0.87,NULL,"brNDC");
-  l.SetTextSize(0.05);
-  l.SetFillStyle(4000);
-  l.SetBorderSize(0);
-  l.SetFillColor(10);
-
-  if(h2D) {
-    h2D->SetDirectory(myDirCopy);
-    h2D->SetLineWidth(3);
-    h2D->Scale(1.0/h2D->Integral());
-    h2D->SetXTitle("p_{T}^{Reco}");
-    h2D->SetYTitle("p_{T}^{OMTF}");
-    h2D->GetYaxis()->SetTitleOffset(1.4);
-    h2D->SetStats(kFALSE);
-    gStyle->SetPalette(kRainBow);
-    h2D->Draw("box colz");
-    c->Print(TString::Format("fig_png/%s.png",hName.c_str()).Data());
-  }
-  if(h1D) {
-    h1D->SetDirectory(myDirCopy);
-    h1D->SetLineWidth(3);
-    h1D->Scale(1.0/h1D->Integral(0,h1D->GetNbinsX()+1));    
-    h1D->GetXaxis()->SetRange(1,h1D->GetNbinsX()+1);
-    h1D->SetXTitle(" P_{T} Muon [GeV/c]");
-    h1D->SetYTitle("Events");
+    h1D->SetXTitle(xlabel);
+    h1D->SetYTitle("Density");
+    h1D->GetYaxis()->SetTitleOffset(1.7);
      h1D->SetMarkerStyle(kFullCircle);
-    h1D->GetYaxis()->SetTitleOffset(1.4);
     h1D->SetMarkerColor(2);
     h1D->SetStats(kFALSE);
     h1D->Draw("");
@@ -823,47 +743,6 @@ void GMTHistograms::plotPt(std::string hName){
 }
 ////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////
-void GMTHistograms::plotEta(std::string hName){
 
-  TH2F* h2D = get2DHistogram(hName);
-  TH1F* h1D = get1DHistogram(hName);
-  if(!h2D && !h1D) return;
-	
-  TCanvas* c = new TCanvas("AnyHistogram","AnyHistogram",
-			   800,800);
 
-  TLegend l(0.15,0.78,0.35,0.87,NULL,"brNDC");
-  l.SetTextSize(0.05);
-  l.SetFillStyle(4000);
-  l.SetBorderSize(0);
-  l.SetFillColor(10);
 
-  if(h2D) {
-    h2D->SetDirectory(myDirCopy);
-    h2D->SetLineWidth(3);
-    h2D->Scale(1.0/h2D->Integral());
-    h2D->SetXTitle("p_{T}^{Reco}");
-    h2D->SetYTitle("p_{T}^{OMTF}");
-    h2D->GetYaxis()->SetTitleOffset(1.4);
-    h2D->SetStats(kFALSE);
-    gStyle->SetPalette(kRainBow);
-    h2D->Draw("box colz");
-    c->Print(TString::Format("fig_png/%s.png",hName.c_str()).Data());
-  }
-  if(h1D) {
-    h1D->SetDirectory(myDirCopy);
-    h1D->SetLineWidth(3);
-    h1D->Scale(1.0/h1D->Integral(0,h1D->GetNbinsX()+1));    
-    h1D->GetXaxis()->SetRange(1,h1D->GetNbinsX()+1);
-    h1D->SetXTitle("#lbar#eta#lbar");
-    h1D->SetYTitle("Events");
-    h1D->GetYaxis()->SetTitleOffset(1.8);
-    h1D->SetMarkerStyle(kFullCircle);
-    h1D->SetMarkerColor(2);
-    h1D->SetStats(kFALSE);
-    h1D->Draw("");
-    c->Print(TString::Format("fig_png/%s.png",hName.c_str()).Data());
-  }
-}
-////////////////////////////////////////////////////////////////
-////////////////////////////////////////////////////////////////
