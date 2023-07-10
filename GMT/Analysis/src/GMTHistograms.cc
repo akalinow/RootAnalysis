@@ -283,10 +283,10 @@ TCanvas* c = new TCanvas(TString::Format("EffVsPt_%s",sysType.c_str()),
     TH1D *hNum = h2D->ProjectionX("hNum",2,2);
     TH1D *hDenom = h2D->ProjectionX("hDenom",1,1);    
     hDenom->Add(hNum);
-    TEfficiency* hEff =DivideErr(hNum,hDenom,"Pt_Int","B"); //TH1D
+    TEfficiency* hEff =DivideErr(hNum,hDenom,"Pt_Int","B"); 
     hEff->SetMarkerStyle(21+icut);
     hEff->SetMarkerColor(color[icut]);
-    TString titl= "different options;" + htype + "Muon p_{T} [GeV/c];Efficiency";
+    TString titl= "different options;" + htype + " Muon p_{T} [GeV/c]; Efficiency";
     hEff->SetTitle(titl);
     if (icut==0)hEff->Draw();
     else hEff->Draw("same");
@@ -310,53 +310,7 @@ TCanvas* c = new TCanvas(TString::Format("EffVsPt_%s",sysType.c_str()),
 }
 ////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////
-void GMTHistograms::plotEffPanelGen(const std::string & sysType, bool doHigh){
 
-  TCanvas* c = new TCanvas(TString::Format("EffVsPt_Gen%s",sysType.c_str()),
-			   TString::Format("EffVsPt_Gen%s",sysType.c_str()),
-			   460,500);
- 
-  TLegend l(0.6513158,0.1673729,0.8903509,0.470339,NULL,"brNDC");
-  l.SetTextSize(0.05);
-  l.SetFillStyle(4000);
-  l.SetBorderSize(0);
-  l.SetFillColor(10);
-  c->SetGrid(0,1);
- 
-  TString hName("");
-  const int *ptCuts = ptCutsOMTF;
- 
-  for (int icut=0; icut <=3;++icut){
-    float ptCut = GMTHistograms::ptBins[ptCuts[icut]];
-    hName = "h2D"+sysType+"Pt_Gen"+std::to_string((int)ptCut);
-    if(doHigh) hName = "h2D"+sysType+"HighPt_Gen"+std::to_string((int)ptCut);
-    TH2F* h2D = this->get2DHistogram(hName.Data());
-    if(!h2D) return;
-    TH1D *hNum = h2D->ProjectionX("hNum",2,2);
-    TH1D *hDenom = h2D->ProjectionX("hDenom",1,1);    
-    hDenom->Add(hNum);
-    TEfficiency* hEff =DivideErr(hNum,hDenom,"Pt_Int","B"); 
-    hEff->SetMarkerStyle(21+icut);
-    hEff->SetMarkerColor(color[icut]);
-    hEff->SetTitle("different options;gen Muon p_{T} [GeV/c];Efficiency");
-    if (icut==0)hEff->Draw();
-    else hEff->Draw("same");
-    TString nameCut = TString::Format("%d", (int)GMTHistograms::ptBins[ptCuts[icut]])+" GeV/c";
-    if (icut==0) nameCut = "no p_{T} cut";
-    l.AddEntry(hEff,nameCut.Data());
-    c->Update();
-    auto graph = hEff->GetPaintedGraph();
-    graph->GetXaxis()->SetRangeUser(0.0,100.0);
-    graph->GetYaxis()->SetRangeUser(0.0,1.0);
-    c->Update();
-  }
-  l.DrawClone();
-  if(!doHigh) c->Print(TString::Format("fig_png/PanelVsPt_Gen_%s.png",sysType.c_str()).Data());
-  else  c->Print(TString::Format("fig_png/PanelVsHighPt_Gen_%s.png",sysType.c_str()).Data());
-}
-//////////////////////////////////////////////////////////////////////////////////////////////
-///////////////////////////////////////////////////////////////////////////////////////////
-////////////////////////////////////////////////////////////////////////////////////////////
 void GMTHistograms::plotVar(const std::string & sysType,
 			    const std::string & varName){
 
@@ -699,7 +653,7 @@ TEfficiency * GMTHistograms::getEfficiencyHisto(const std::string & hName){
 }
 ////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////
-void GMTHistograms::plotSingleHistogram(std::string hName, const char * xlabel){
+void GMTHistograms::plotSingleHistogram(std::string hName,TString xlabel ){ //const char * xlabel
 
   TH2F* h2D = get2DHistogram(hName);
   TH1F* h1D = get1DHistogram(hName);
@@ -731,6 +685,7 @@ void GMTHistograms::plotSingleHistogram(std::string hName, const char * xlabel){
     h1D->SetLineWidth(3);
     h1D->Scale(1.0/h1D->Integral(0,h1D->GetNbinsX()+1));    
     h1D->GetXaxis()->SetRange(1,h1D->GetNbinsX()+1);
+    //TString xlabel = xlabel;
     h1D->SetXTitle(xlabel);
     h1D->SetYTitle("Density");
     h1D->GetYaxis()->SetTitleOffset(1.7);
