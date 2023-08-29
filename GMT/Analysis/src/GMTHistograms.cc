@@ -23,6 +23,9 @@
 #include "RooDataHist.h"
 #include "RooExponential.h"
 #include "RooJohnson.h"
+
+#include "TEfficiency.h"
+#include "TGraphAsymmErrors.h"
 using namespace RooFit ;
 
 
@@ -160,16 +163,24 @@ void GMTHistograms::finalizeHistograms(){
   gErrorIgnoreLevel = kError;
     
   //Panel with many turn-on curves
-  plotEffPanel("OMTF");
+  plotEffPanel("OMTF","Reco");
+  plotEffPanel("OMTF","Gen");
+
+  //plotEffPanelGen("OMTF");
   //Panel with many turn-on curves for high pT range
-  plotEffPanel("OMTF", true);
-  plotSingleHistogram("h1DPtProbe"); 
-  plotSingleHistogram("h1DAbsEtaProbe"); 
+  //plotEffPanel("OMTF", true);
+
   
-  plotSingleHistogram("h1DPtTag"); 
-  plotSingleHistogram("h1DAbsEtaTag"); 
-  
-  plotSingleHistogram("h1DDiMuonMassTagProbe"); 
+  plotSingleHistogram("h1DPtProbe"," P_{T} Muon [GeV/c]");
+  plotSingleHistogram("h1DAbsEtaProbe","#lbar#eta#lbar");
+  plotSingleHistogram("h1DPtTag"," P_{T} Muon [GeV/c]");
+  plotSingleHistogram("h1DAbsEtaTag","#lbar#eta#lbar");
+  plotSingleHistogram("h1DDiMuonMassTagProbe", "Z(#mu^{+}#mu^{-}) [GeV/c^{2}]");
+
+ //// Plotting Gen vs Reco muon turn on curves
+ for(int iPtCode=1;iPtCode<=30;++iPtCode){
+      plotGMTVsOther(iPtCode,"OMTF");
+  }
   return;
 
   
@@ -224,7 +235,7 @@ TH1* GMTHistograms::Integrate(TH1 * histoD) {
 }
 /////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////
-TH1D * GMTHistograms::DivideErr(TH1D * h1,
+TEfficiency * GMTHistograms::DivideErr(TH1D * h1,
                  TH1D * h2,
                  const char * name,
                  const char * optErr)
@@ -232,82 +243,74 @@ TH1D * GMTHistograms::DivideErr(TH1D * h1,
 //
 // return h1/h2 with recalculated errors for "B"
 //
-  if (!h1) std::cout <<"DivideErr called, but histogram (h1) pointer is:"<<h1<<std::endl;
+ if (!h1) std::cout <<"DivideErr called, but histogram (h1) pointer is:"<<h1<<std::endl;
   if (!h2) std::cout <<"DivideErr called, but histogram (h2) pointer is:"<<h1<<std::endl;
   if (!h1 || !h2) return 0;
-  TH1D * hout = new TH1D( *h1);
-  hout->Reset();
-  hout->SetName(name);
-//  hout->SetTitleOffset(gStyle->GetTitleXOffset(),"x");
-//  hout->SetTitleOffset(gStyle->GetTitleYOffset(),"y");
-  hout->Divide(h1,h2,1.,1.,optErr);
-
-  if (strcmp(optErr,"B")==0  || strcmp(optErr,"b")==0) {
-    for (int i = 0; i<=hout->GetNbinsX()+1;i++) {
-      Float_t tot   = h2->GetBinContent(i) ;
-      Float_t tot_e = h2->GetBinError(i);
-      Float_t eff = hout->GetBinContent(i) ;
-      Float_t Err = 0.;
-      if (tot > 0) {
-        if (eff == 1.) eff = (tot-1)/tot; //modify efficiency as one even in numerator not fired
-        Err = tot_e / tot * sqrt( eff* (1-eff) );
-      }
-      hout->SetBinError(i, Err);
+  TEfficiency * hout = 0;
+  if(TEfficiency::CheckConsistency(*h1,*h2)){
+    std::cout<<"works"<<std::endl;
+    hout = new TEfficiency(*h1,*h2);
     }
-  } else {
-    std::cout << "** Fig--DivideErr ** unknown option ---"<<optErr<<"---"<<std::endl;
-  }
+  //hout->Reset();
+  hout->SetName(name);
 
   return hout;
 }
 /////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////
-void GMTHistograms::plotEffPanel(const std::string & sysType, bool doHigh){
+void GMTHistograms::plotEffPanel(const std::string & sysType, std::string htype, bool doHigh){
 
-  TCanvas* c = new TCanvas(TString::Format("EffVsPt_%s",sysType.c_str()),
+TCanvas* c = new TCanvas(TString::Format("EffVsPt_%s",sysType.c_str()),
 			   TString::Format("EffVsPt_%s",sysType.c_str()),
 			   460,500);
-
+  
   TLegend l(0.6513158,0.1673729,0.8903509,0.470339,NULL,"brNDC");
   l.SetTextSize(0.05);
   l.SetFillStyle(4000);
   l.SetBorderSize(0);
   l.SetFillColor(10);
   c->SetGrid(0,1);
-
+ 
   TString hName("");
   const int *ptCuts = ptCutsOMTF;
  
   for (int icut=0; icut <=3;++icut){
     float ptCut = GMTHistograms::ptBins[ptCuts[icut]];
-    hName = "h2D"+sysType+"Pt"+std::to_string((int)ptCut);
-    if(doHigh) hName = "h2D"+sysType+"HighPt"+std::to_string((int)ptCut);
+    hName = "h2D"+sysType+"Pt_"+htype+std::to_string((int)ptCut);
+    if(doHigh) hName = "h2D"+sysType+"HighPt_"+htype+std::to_string((int)ptCut);
     TH2F* h2D = this->get2DHistogram(hName.Data());
     if(!h2D) return;
     TH1D *hNum = h2D->ProjectionX("hNum",2,2);
     TH1D *hDenom = h2D->ProjectionX("hDenom",1,1);    
     hDenom->Add(hNum);
-    TH1D* hEff =DivideErr(hNum,hDenom,"Pt_Int","B");
-    hEff->SetStats(kFALSE);
-    hEff->SetMinimum(0.0001);
-    hEff->SetMaximum(1.04);
-    hEff->GetXaxis()->SetRange(1,50);
+    TEfficiency* hEff =DivideErr(hNum,hDenom,"Pt_Int","B"); 
     hEff->SetMarkerStyle(21+icut);
     hEff->SetMarkerColor(color[icut]);
-    hEff->SetXTitle("reco. muon p_{T} [GeV/c]");
-    hEff->SetYTitle("Efficiency");
-    if (icut==0)hEff->DrawCopy();
-    else hEff->DrawCopy("same");
+    TString titl= "different options;" + htype + " Muon p_{T} [GeV/c]; Efficiency";
+    hEff->SetTitle(titl);
+    if (icut==0)hEff->Draw();
+    else hEff->Draw("same");
     TString nameCut = TString::Format("%d", (int)GMTHistograms::ptBins[ptCuts[icut]])+" GeV/c";
     if (icut==0) nameCut = "no p_{T} cut";
     l.AddEntry(hEff,nameCut.Data());
+
+    c->Update();
+    auto graph = hEff->GetPaintedGraph();
+    graph->GetXaxis()->SetRangeUser(0.0,100.0);
+    graph->GetYaxis()->SetRangeUser(0.0,1.0);
+    c->Update();
   }
   l.DrawClone();
-  if(!doHigh) c->Print(TString::Format("fig_png/PanelVsPt_%s.png",sysType.c_str()).Data());
-  else  c->Print(TString::Format("fig_png/PanelVsHighPt_%s.png",sysType.c_str()).Data());
+  TString sent = "fig_png/PanelVsPt_"+htype+"_%s.png";
+  if(!doHigh) c->Print(TString::Format(sent,sysType.c_str()).Data());
+  else  {
+    TString sent = "fig_png/PanelVsHighPt_"+htype+"_%s.png";
+    c->Print(TString::Format(sent,sysType.c_str()).Data());
+  }
 }
 ////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////
+
 void GMTHistograms::plotVar(const std::string & sysType,
 			    const std::string & varName){
 
@@ -338,7 +341,7 @@ void GMTHistograms::plotVar(const std::string & sysType,
 }
 ////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////
-void GMTHistograms::plotEffVsVar(const std::string & sysType,
+/*void GMTHistograms::plotEffVsVar(const std::string & sysType,
 		const std::string & varName){
 
   TCanvas* c = new TCanvas(TString::Format("EffVs%s_%s",varName.c_str(),sysType.c_str()),
@@ -440,16 +443,17 @@ void GMTHistograms::plotEffVsEta(const std::string & sysType){
   l.DrawClone();
   c->Print(TString::Format("fig_png/EffVsEta_%s.png",sysType.c_str()).Data());
   c->Print(TString::Format("fig_png/EffVsEta_%s.C",sysType.c_str()).Data());
-}
+}*/
 ////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////
 void GMTHistograms::plotGMTVsOther(int iPtCut,
 				     const std::string sysType){
 
+
   float ptCut = ptBins[iPtCut];
 
-  TCanvas* c = new TCanvas(TString::Format("uGMTVsOther_%d",(int)ptCut).Data(),
-			   TString::Format("uGMTVsOther_%d",(int)ptCut).Data(),
+  TCanvas* c = new TCanvas(TString::Format("GenVsOther_%d",(int)ptCut).Data(),
+			   TString::Format("GenVsOther_%d",(int)ptCut).Data(),
 			   460,500);
 
   TLegend l(0.2,0.65,0.44,0.86,NULL,"brNDC");
@@ -460,41 +464,49 @@ void GMTHistograms::plotGMTVsOther(int iPtCut,
   c->SetLogx(1);
   c->SetGrid(0,1);
 
-  std::string hName = "h2D"+sysType+"Pt"+std::to_string((int)ptCut);
+  std::string hName = "h2D"+sysType+"Pt_Reco"+std::to_string((int)ptCut);
   TH2F* h2D = get2DHistogram(hName);
   if(!h2D) return;
   TH1D *hNum = h2D->ProjectionX("hNum",2,2);
   TH1D *hDenom = h2D->ProjectionX("hDenom",1,1);
   hDenom->Add(hNum);
-  TH1D* hEffOther =DivideErr(hNum,hDenom,"hEffOther","B");
+  TEfficiency* hEffOther =DivideErr(hNum,hDenom,"hEffOther","B");
   hEffOther->SetMarkerStyle(23);
   hEffOther->SetMarkerColor(2);
 
-  hName = "h2DuGMTPt"+std::to_string((int)ptCut);
+  hName = "h2DOMTFPt_Gen"+std::to_string((int)ptCut);
   h2D = get2DHistogram(hName);
   hNum = h2D->ProjectionX("hNum",2,2);
   hDenom = h2D->ProjectionX("hDenom",1,1);    
   hDenom->Add(hNum);
 
-  TH1D* hEffGMT =DivideErr(hNum,hDenom,"hEffuGMTTmp","B");
-  hEffGMT->SetXTitle("reco. muon p_{T} [GeV/c]");
-  hEffGMT->SetYTitle("Efficiency");
-  hEffGMT->SetMaximum(1.04);
-  hEffGMT->GetXaxis()->SetRange(2,100);
+  TEfficiency* hEffGMT =DivideErr(hNum,hDenom,"hEffGMTTmp","B");
   hEffGMT->SetMarkerStyle(8);
   hEffGMT->SetMarkerColor(1);
-  hEffGMT->SetStats(kFALSE);
-  hEffGMT->DrawCopy();
-  hEffOther->DrawCopy("same");
+  hEffGMT->SetTitle("different options;Muon p_{T} [GeV/c];Efficiency");
+  hEffGMT->Draw(); 
+  hEffOther->Draw("same");
+
+  c->Update();
+  auto graph = hEffGMT->GetPaintedGraph();
+  graph->GetXaxis()->SetRangeUser(0.0,100.0);
+  graph->GetYaxis()->SetRangeUser(0.0,1.0);
+  c->Update();
+
+    c->Update();
+  auto graph2 = hEffOther->GetPaintedGraph();
+  graph2->GetXaxis()->SetRangeUser(0.0,100.0);
+  graph2->GetYaxis()->SetRangeUser(0.0,1.0);
+  c->Update();
 
   std::string tmp = "p_{T} #geq ";
   if(int(ptCut*10)%10==5) tmp += "%1.1f GeV/c";
   else   tmp += "%1.0f GeV/c";
   l.AddEntry((TObject*)0, TString::Format(tmp.c_str(),ptCut).Data(), "");
   l.AddEntry((TObject*)0, "", "");
-  l.AddEntry(hEffOther, sysType.c_str());
   l.AddEntry((TObject*)0, "", "");
-  l.AddEntry(hEffGMT, "Phase2 GMT");
+  l.AddEntry(hEffGMT, "Gen Muon");
+  l.AddEntry(hEffOther, "Reco Muon");
   l.DrawClone();
 
   TLine aLine(0,0,0,0);
@@ -502,13 +514,14 @@ void GMTHistograms::plotGMTVsOther(int iPtCut,
   aLine.SetLineWidth(3);
   aLine.DrawLine(ptCut,0,ptCut,1.04);
 
-  c->Print(TString::Format("fig_eps/uGMTVs%s_%d.eps",sysType.c_str(),(int)ptCut).Data());
-  c->Print(TString::Format("fig_png/uGMTVs%s_%d.png",sysType.c_str(),(int)ptCut).Data());
+  c->Print(TString::Format("fig_eps/GenVsReco_%s_%d.eps",sysType.c_str(),(int)ptCut).Data());
+  c->Print(TString::Format("fig_png/GenVsReco_%s_%d.png",sysType.c_str(),(int)ptCut).Data());
 
   c->SetLogy();
-  c->Print(TString::Format("fig_eps/uGMTVs%s_%d_log.eps",sysType.c_str(),(int)ptCut).Data());
-  c->Print(TString::Format("fig_png/uGMTVs%s_%d_log.png",sysType.c_str(),(int)ptCut).Data());
+  c->Print(TString::Format("fig_eps/GenVsReco_%s_%d_log.eps",sysType.c_str(),(int)ptCut).Data());
+  c->Print(TString::Format("fig_png/GenVsReco_%s_%d_log.png",sysType.c_str(),(int)ptCut).Data());
 }
+
 ////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////
 TH2F* GMTHistograms::makeRateWeights(TH2 *hOrig){
@@ -626,22 +639,8 @@ void GMTHistograms::plotRate(std::string type){
 }
 ////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////
-float  GMTHistograms::getEfficiency(TH2F *h2D, float ptCut){
 
-  TH1D *hNum = h2D->ProjectionX("hNum",2,2);
-  TH1D *hDenom = h2D->ProjectionX("hDenom",1,1);
-  hDenom->Add(hNum);
-  TH1D* hEffTmp =DivideErr(hNum,hDenom,"hEffTmp","B");
-  //Mean eff above pt cut
-  int binLow = hEffTmp->FindBin(ptCut);
-  int binHigh = hEffTmp->FindBin(100);
-  float range = hEffTmp->GetBinLowEdge(binHigh+1) - hEffTmp->GetBinLowEdge(binLow);
-  float eff = hEffTmp->Integral(binLow,binHigh,"width")/range;
-  return eff;
-}
-////////////////////////////////////////////////////////////////
-////////////////////////////////////////////////////////////////
-TH1D * GMTHistograms::getEfficiencyHisto(const std::string & hName){
+TEfficiency * GMTHistograms::getEfficiencyHisto(const std::string & hName){
 
   TH2F* h2D = this->get2DHistogram(hName);
   if(!h2D) return 0;
@@ -649,12 +648,12 @@ TH1D * GMTHistograms::getEfficiencyHisto(const std::string & hName){
   TH1D *hNum = h2D->ProjectionX("hNum",2,2);
   TH1D *hDenom = h2D->ProjectionX("hDenom",1,1);  
   hDenom->Add(hNum);
-  TH1D* hEffTmp =DivideErr(hNum,hDenom,"hEffTmp","B");
+  TEfficiency* hEffTmp =DivideErr(hNum,hDenom,"hEffTmp","B");
   return hEffTmp;
 }
 ////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////
-void GMTHistograms::plotSingleHistogram(std::string hName){
+void GMTHistograms::plotSingleHistogram(std::string hName,TString xlabel ){ //const char * xlabel
 
   TH2F* h2D = get2DHistogram(hName);
   TH1F* h1D = get1DHistogram(hName);
@@ -686,9 +685,12 @@ void GMTHistograms::plotSingleHistogram(std::string hName){
     h1D->SetLineWidth(3);
     h1D->Scale(1.0/h1D->Integral(0,h1D->GetNbinsX()+1));    
     h1D->GetXaxis()->SetRange(1,h1D->GetNbinsX()+1);
-    h1D->SetXTitle("X");
-    h1D->SetYTitle("Y");
-    h1D->GetYaxis()->SetTitleOffset(1.4);
+    //TString xlabel = xlabel;
+    h1D->SetXTitle(xlabel);
+    h1D->SetYTitle("Density");
+    h1D->GetYaxis()->SetTitleOffset(1.7);
+     h1D->SetMarkerStyle(kFullCircle);
+    h1D->SetMarkerColor(2);
     h1D->SetStats(kFALSE);
     h1D->Draw("");
     c->Print(TString::Format("fig_png/%s.png",hName.c_str()).Data());
@@ -696,3 +698,6 @@ void GMTHistograms::plotSingleHistogram(std::string hName){
 }
 ////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////
+
+
+
