@@ -1,5 +1,5 @@
-/eos/user/a/almuhamm/02.TriggerEff/RootAnalysis/build/lib/libFrameworkCore.so
-/eos/user/a/almuhamm/02.TriggerEff/RootAnalysis/build/lib/libGMTDataFormats.so
-/eos/user/a/almuhamm/02.TriggerEff/RootAnalysis/build/lib/libGMTAnalysis.so
-/eos/user/a/almuhamm/02.TriggerEff/RootAnalysis/build/bin/gmtAnalysis
-/eos/user/a/almuhamm/02.TriggerEff/RootAnalysis/build/config/gmt_emulator.ini
+/home/akalinow/scratch/CMS/OMTF/Run3/RootAnalysis/build/lib/libFrameworkCore.so
+/home/akalinow/scratch/CMS/OMTF/Run3/RootAnalysis/build/lib/libOMTFDataFormats.so
+/home/akalinow/scratch/CMS/OMTF/Run3/RootAnalysis/build/lib/libOMTFAnalysis.so
+/home/akalinow/scratch/CMS/OMTF/Run3/RootAnalysis/build/bin/omtfAnalysis
+/home/akalinow/scratch/CMS/OMTF/Run3/RootAnalysis/build/config/omtf_emulator.ini

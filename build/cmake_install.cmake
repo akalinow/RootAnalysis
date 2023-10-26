@@ -1,8 +1,8 @@
-# Install script for directory: /eos/user/a/almuhamm/02.TriggerEff/RootAnalysis
+# Install script for directory: /home/akalinow/scratch/CMS/OMTF/Run3/RootAnalysis
 
 # Set the install prefix
 if(NOT DEFINED CMAKE_INSTALL_PREFIX)
-  set(CMAKE_INSTALL_PREFIX "/eos/user/a/almuhamm/02.TriggerEff/RootAnalysis/build")
+  set(CMAKE_INSTALL_PREFIX "/home/akalinow/scratch/CMS/OMTF/Run3/RootAnalysis/build")
 endif()
 string(REGEX REPLACE "/$" "" CMAKE_INSTALL_PREFIX "${CMAKE_INSTALL_PREFIX}")
 
@@ -39,13 +39,13 @@ endif()
 
 # Set default install directory permissions.
 if(NOT DEFINED CMAKE_OBJDUMP)
-  set(CMAKE_OBJDUMP "/usr/bin/objdump")
+  set(CMAKE_OBJDUMP "/cvmfs/sft.cern.ch/lcg/releases/binutils/2.37-355ed/x86_64-centos8/bin/objdump")
 endif()
 
 if(NOT CMAKE_INSTALL_LOCAL_ONLY)
   # Include the install script for each subdirectory.
-  include("/eos/user/a/almuhamm/02.TriggerEff/RootAnalysis/build/Core/src/cmake_install.cmake")
-  include("/eos/user/a/almuhamm/02.TriggerEff/RootAnalysis/build/GMT/cmake_install.cmake")
+  include("/home/akalinow/scratch/CMS/OMTF/Run3/RootAnalysis/build/Core/src/cmake_install.cmake")
+  include("/home/akalinow/scratch/CMS/OMTF/Run3/RootAnalysis/build/OMTF/cmake_install.cmake")
 
 endif()
 
@@ -57,5 +57,5 @@ endif()
 
 string(REPLACE ";" "\n" CMAKE_INSTALL_MANIFEST_CONTENT
        "${CMAKE_INSTALL_MANIFEST_FILES}")
-file(WRITE "/eos/user/a/almuhamm/02.TriggerEff/RootAnalysis/build/${CMAKE_INSTALL_MANIFEST}"
+file(WRITE "/home/akalinow/scratch/CMS/OMTF/Run3/RootAnalysis/build/${CMAKE_INSTALL_MANIFEST}"
      "${CMAKE_INSTALL_MANIFEST_CONTENT}")
