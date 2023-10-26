@@ -1,10 +1,9 @@
-cmake_minimum_required (VERSION 2.6)
+cmake_minimum_required (VERSION 3.2)
 project (RootAnalysis)
 set( CMAKE_VERBOSE_MAKEFILE on )
 
 # Include Boost as an imported target
 #On lxplus one needs a newer boost version thant available by default
-#set(BOOST_ROOT /cvmfs/cms.cern.ch/slc7_amd64_gcc630/external/boost/1.63.0)
 find_package(Boost REQUIRED COMPONENTS regex)
 add_library(boost INTERFACE IMPORTED)
 set_property(TARGET boost PROPERTY
@@ -13,7 +12,6 @@ MESSAGE("Boost directory: " ${Boost_LIBRARY_DIRS})
 
 ##https://root.cern.ch/how/integrate-root-my-project-cmake
 list(APPEND CMAKE_PREFIX_PATH $ENV{ROOTSYS})
-#list(APPEND CMAKE_PREFIX_PATH /snap/root-framework/current/usr/local/)
 
 find_package(ROOT REQUIRED COMPONENTS RIO GenVector Physics RooFitCore RooFit)
 include(${ROOT_USE_FILE})
@@ -39,5 +37,5 @@ set(CMAKE_INSTALL_RPATH_USE_LINK_PATH TRUE)
 MESSAGE("Installation prefix set to " ${CMAKE_INSTALL_PREFIX} )
 
 add_subdirectory(Core/src)
-add_subdirectory(GMT)
+add_subdirectory(OMTF)
 

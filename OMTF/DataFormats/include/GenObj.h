@@ -3,13 +3,18 @@
 #include <ostream>
 
 #include "TObject.h"
+
 class GenObj : public TObject {
 public:
- GenObj(float pt=0., float eta=0., float phi=0.,float mass=0., 
-	int charge=0, int pdgid=0, int st=0, int mother=0):
-  _pt(pt),_eta(eta),_phi(phi),_mass(mass),_charge(charge),_id(pdgid),_status(st),_mid(mother) {}
+
+GenObj(int charge=0, int pdgid=0, int st=0, int mother=0):_charge(charge),_id(pdgid),_status(st),_mid(mother){}
+
   virtual ~GenObj() {}
 public:
+
+  void setVertexXYZ(double x, double y, double z);
+  void setPtEtaPhiM(double pt, double eta, double phi, double m);
+
   float pt() const { return _pt;}
   float eta() const { return _eta;}
   float phi() const { return _phi;}
@@ -18,13 +23,19 @@ public:
   int status() const { return _status;}
   int motherId() const { return _mid;}
   int charge() const { return _charge;}
+  double vx() const { return _vx;}
+  double vy() const { return _vy;}
+  double vz() const { return _vz;}
+  double beta() const { return _beta;}
+
 
 private:  
   float _pt,_eta,_phi,_mass; 
   int _charge,_id,_status,_mid; 
+  double _vx, _vy, _vz, _beta;
 
 public:
-  ClassDef(GenObj,1);
+  ClassDef(GenObj,4);
 };
 
 std::ostream & operator<< (std::ostream &out, const GenObj &o);

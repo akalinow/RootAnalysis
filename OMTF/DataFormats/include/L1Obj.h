@@ -4,42 +4,34 @@
 #include <iostream>
 #include <math.h>
 
-namespace { 
-  double modulo2PI (double phi) { 
-    while (phi > 2*M_PI) phi -= 2*M_PI;
-    while (phi < 0.) phi += 2*M_PI;
-    return phi;
-  }
-}
-
 class L1Obj : public TObject {
 
 public:
   
-  enum TYPE { NONE, RPCb, RPCf, DT, CSC, GMT, RPCb_emu, RPCf_emu, GMT_emu, OMTF, OMTF_emu, BMTF, EMTF, uGMT, uGMT_emu };
+  enum TYPE { NONE, RPCb, RPCf, DT, CSC, GMT, RPCb_emu, RPCf_emu, GMT_emu, OMTF, OMTF_emu, BMTF, EMTF, uGMT, uGMT_emu, uGMTPhase2_emu};
 
-  int pt, eta, phi;
-  int disc;
-  int   bx, q, hits, charge, refLayer;
-  TYPE  type;
-  int   iProcessor, position;
+  double pt{-999}, eta{-999}, phi{-999};
+  double ptUnconstrained{-999};
+  double z0{-999}, d0{-999};
+  int disc{-999};
+  int   bx{-999}, q{-999}, hits{-999}, charge{-999}, refLayer{-999};
+  TYPE  type{NONE};
+  int   iProcessor{-999}, position{-999};
 
   L1Obj();
 
   bool isValid() const { return type!=NONE && pt>0;}
 
-  double ptValue() const { return (pt-1.)/2.; }
-  double etaValue() const { return eta/240.*2.61; }
-  double phiValue() const {
-    if (type==OMTF || type==OMTF_emu || type==EMTF) 
-    return modulo2PI( ( (15.+iProcessor*60.)/360. + phi/576. ) *2*M_PI) ;  
-    else if (type==BMTF) return modulo2PI( ( (-15.+iProcessor*30.)/360. + phi/576. ) *2*M_PI);
-    else if (type==uGMT || type==uGMT_emu) return modulo2PI((phi/576.)*2*M_PI);
-    else return 9999.;
-  }
-  int chargeValue() const { return pow(-1,charge); }
+  double ptValue() const;   
+  double etaValue() const; 
+  double phiValue() const; 
+  int chargeValue() const;
+  
+  double ptUnconstrainedValue() const; 
+  double z0Value() const;
+  double d0Value() const;
 
-  ClassDef(L1Obj,4)
+  ClassDef(L1Obj,6)
 };
 
 
