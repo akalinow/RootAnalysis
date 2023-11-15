@@ -20,16 +20,18 @@ public:
 
   virtual std::string getTemplateName(const std::string& name);
 
+  static const std::vector<std::string> algos;
   static const std::vector<double> color;
   static const std::vector<double> iPtCuts;
   static const std::vector<double> ptBins;
+  
 private:
 
   virtual void defineHistograms();
 
   TH1* Integrate(TH1 * histoD);
 
-  void plotEffPanel(const std::string & sysType, bool doHigh=false);
+  void plotEffPanel(const std::string & sysType, const std::string & varName);
 
   void plotEffVsEta(const std::string & sysType);
 

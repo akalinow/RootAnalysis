@@ -9,13 +9,6 @@ namespace {
     return phi;
   }
 }
-
-
-L1Obj::L1Obj() : pt(0),eta(0),phi(0),
-                 disc(0), 
-                 bx(0),q(0), hits(0), charge(0), refLayer(0), 
-                 type(NONE), 
-                 iProcessor(-1), position(0) {};
                  
 double L1Obj::ptValue() const { return type==uGMTPhase2_emu ?  pt : (pt-1.)/2.; }
 double L1Obj::etaValue() const { return type==uGMTPhase2_emu ? eta : eta/240.*2.61; }

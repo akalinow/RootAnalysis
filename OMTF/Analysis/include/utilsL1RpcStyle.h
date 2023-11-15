@@ -37,7 +37,7 @@ TStyle* utilsL1RpcStyle()
   l1RpcStyle->SetOptStat(0);
   l1RpcStyle->SetOptTitle(0);
   l1RpcStyle->SetMarkerSize(1.0);
-  l1RpcStyle->SetPalette(14);
+  //l1RpcStyle->SetPalette(14);
 
 // stat options
   l1RpcStyle->SetStatBorderSize(1);

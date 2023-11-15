@@ -22,6 +22,16 @@ void GenObj::setPtEtaPhiM(double pt, double eta, double phi, double m){
   _beta = p/sqrt(p*p + _mass*_mass);
 }
 
+double GenObj::dxy() const{
+
+  return -(_vx*sin(_phi) - _vy*cos(_phi));
+}
+
+double GenObj::dz() const{
+
+  return _vz;
+}
+
 std::ostream & operator<< (std::ostream &out, const GenObj &o)
 {
   out<<"GenObj: ";

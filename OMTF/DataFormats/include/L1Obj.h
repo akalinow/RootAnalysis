@@ -10,15 +10,15 @@ public:
   
   enum TYPE { NONE, RPCb, RPCf, DT, CSC, GMT, RPCb_emu, RPCf_emu, GMT_emu, OMTF, OMTF_emu, BMTF, EMTF, uGMT, uGMT_emu, uGMTPhase2_emu};
 
-  double pt{-999}, eta{-999}, phi{-999};
-  double ptUnconstrained{-999};
-  double z0{-999}, d0{-999};
-  int disc{-999};
-  int   bx{-999}, q{-999}, hits{-999}, charge{-999}, refLayer{-999};
+  double pt{0}, eta{0}, phi{0};
+  double ptUnconstrained{0};
+  double z0{0}, d0{0};
+  int disc{0};
+  int   bx{0}, q{0}, hits{0}, charge{0}, refLayer{0};
   TYPE  type{NONE};
-  int   iProcessor{-999}, position{-999};
+  int   iProcessor{-1}, position{0};
 
-  L1Obj();
+  L1Obj(){};
 
   bool isValid() const { return type!=NONE && pt>0;}
 

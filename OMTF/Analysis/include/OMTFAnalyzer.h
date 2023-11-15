@@ -37,6 +37,8 @@ class OMTFAnalyzer:public Analyzer{
  private:
 
   void fillHistosForGenMuon();
+  
+  void fillRateHistos();
 
   void fillTurnOnCurve(const int & ptCut, const std::string & sysType,
 		               const std::string & selType);
@@ -48,9 +50,10 @@ class OMTFAnalyzer:public Analyzer{
 		   const std::string & sysType,
 		   const std::string & selType = "");
 
-  double calibratedPt(const std::string & sysType, const double & ptRaw);
-  
-  bool isInEtaAcceptance(const double & eta);
+  double calibratedPt(const std::string & sysType, const L1Obj & aCand);
+  bool isPtGeq(const double &pt1, const double &pt2);
+
+  bool isInEtaAcceptance(const GenObj & aGenObj);
 
   ///Histograms for this analysis
   OMTFHistograms *myHistos_;
