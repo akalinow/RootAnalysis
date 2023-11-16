@@ -94,6 +94,7 @@ void OMTFHistograms::finalizeHistograms(){
   AnalysisHistograms::finalizeHistograms();
   utilsL1RpcStyle()->cd();
 
+  plotOMTFVsOther(OMTFHistograms::iPtCuts.at(3),"OMTFDisp");
   plotOMTFVsOther(OMTFHistograms::iPtCuts.at(3),"OMTFDispU");
   plotOMTFVsOther(OMTFHistograms::iPtCuts.at(3),"OMTFDispC");
   plotOMTFVsOther(OMTFHistograms::iPtCuts.at(3),"GMT");
@@ -111,10 +112,12 @@ void OMTFHistograms::finalizeHistograms(){
   }
    
   plotSingleHistogram("h2DOMTFPtRecVsPtGen");
+  plotSingleHistogram("h2DOMTFDispPtRecVsPtGen");
   plotSingleHistogram("h2DOMTFDispUPtRecVsPtGen");
   plotSingleHistogram("h2DOMTFDispCPtRecVsPtGen");
 
   plotSingleHistogram("h2DOMTFdxyVsPhiB");
+  plotSingleHistogram("h2DOMTFDispdxyVsPhiB");
   plotSingleHistogram("h2DOMTFDispUdxyVsPhiB");
   plotSingleHistogram("h2DOMTFDispUdxyVsPhiBRefLayer0");
   plotSingleHistogram("h2DOMTFDispUdxyVsPhiBRefLayer2");
@@ -486,7 +489,7 @@ void OMTFHistograms::plotRate(std::string type){
     hRateOMTFdispC->Divide(hRateOMTF);
     hRateOMTFdisp->Divide(hRateOMTF);
     hRateOMTFdispC->SetMaximum(2.6);
-    hRateOMTFdispC->SetMinimum(0.7);
+    hRateOMTFdispC->SetMinimum(0.3);
     hRateOMTFdispC->DrawCopy();
     hRateOMTFdisp->DrawCopy("same");
 
@@ -562,7 +565,7 @@ void OMTFHistograms::plotSingleHistogram(std::string hName){
     h2D->SetLineWidth(3);
     h2D->Scale(1.0/h2D->Integral());
     h2D->SetXTitle("p_{T}^{GEN}");
-    h2D->SetYTitle("AA p_{T}^{REC}");
+    h2D->SetYTitle("p_{T}^{REC}");
     h2D->GetYaxis()->SetTitleOffset(1.4);
     h2D->SetStats(kFALSE);
     h2D->GetYaxis()->SetRangeUser(0,150);
@@ -571,7 +574,7 @@ void OMTFHistograms::plotSingleHistogram(std::string hName){
     TF1 fDiag("fDiag","x",0,100);
     fDiag.DrawCopy("same");
   }
-  else if(h2D){
+  else if(h2D && hName.find("dxyVsPhiB")!=std::string::npos){
     h2D->SetXTitle("d_{xy} [cm]");
     h2D->SetYTitle("#varphi bending");
     h2D->SetZTitle("entries");
