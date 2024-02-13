@@ -1,5 +1,0 @@
-/home/akalinow/scratch/CMS/OMTF/Run3/RootAnalysis/build/lib/libFrameworkCore.so
-/home/akalinow/scratch/CMS/OMTF/Run3/RootAnalysis/build/lib/libOMTFDataFormats.so
-/home/akalinow/scratch/CMS/OMTF/Run3/RootAnalysis/build/lib/libOMTFAnalysis.so
-/home/akalinow/scratch/CMS/OMTF/Run3/RootAnalysis/build/bin/omtfAnalysis
-/home/akalinow/scratch/CMS/OMTF/Run3/RootAnalysis/build/config/omtf_emulator.ini
