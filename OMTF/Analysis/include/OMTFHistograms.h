@@ -24,6 +24,10 @@ public:
   static const std::vector<double> color;
   static const std::vector<double> iPtCuts;
   static const std::vector<double> ptBins;
+
+  static constexpr int lhcNumberOfBunches = 2760;
+  static constexpr int lhcRevolutionFreq = 11264;
+  static constexpr double lhcRate = lhcNumberOfBunches * lhcRevolutionFreq;
   
 private:
 
@@ -41,13 +45,13 @@ private:
   void plotVar(const std::string & sysType,
 	       const std::string & varName);
 
-  void plotOMTFVsOther(int iPt, std::string sysType="BMTF");
+  void plotEffType1VsType2(int iPt, std::string sysType1="OMTF", std::string sysType2="BMTF");
 
   void plotSingleHistogram(std::string hName);
 
-  TH2F* makeRateWeights(TH2 *hOrig);
-  TH1* getRateHisto(std::string sysType = "Vx",
-		    std::string type = "Tot");
+  double vxMuRate(double pt_GeV) const;
+  TH2F* makeRateWeights(TH2 *hOrig, const std::string & flavour);
+  TH1* getRateHisto(std::string sysType = "Vx", std::string type = "Tot");
   void plotRate(std::string type);
     
   TEfficiency * getEfficiency(const std::string & hName);

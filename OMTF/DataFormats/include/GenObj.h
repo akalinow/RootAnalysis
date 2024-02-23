@@ -32,9 +32,9 @@ public:
   double dz() const;
 
 private:  
-  float _pt,_eta,_phi,_mass; 
-  int _charge,_id,_status,_mid; 
-  double _vx, _vy, _vz, _beta;
+  float _pt{0},_eta{-99},_phi{-99},_mass{0}; 
+  int _charge{0},_id{0},_status{0},_mid{0}; 
+  double _vx{-99}, _vy{-99}, _vz{-99}, _beta{0};
 
 public:
   ClassDef(GenObj,4);

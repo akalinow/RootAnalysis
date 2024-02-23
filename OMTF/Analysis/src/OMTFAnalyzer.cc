@@ -19,6 +19,7 @@ double OMTFAnalyzer::calibratedPt(const std::string & sysType, const L1Obj & aCa
   double value = aCand.ptValue();
   if(sysType=="OMTFDispU") value = aCand.ptUnconstrainedValue();  
   else if(sysType=="OMTFDisp") value = std::max(aCand.ptUnconstrainedValue(), aCand.ptValue());  
+  else if(sysType=="NN") value = aCand.ptValue();
   
   return value;
 }
@@ -90,13 +91,15 @@ bool OMTFAnalyzer::passQuality(const L1Obj & aL1Cand,
 			       const std::string & sysType,
 			       const std::string & selType){
 			       
-  bool qualitySelection = aL1Cand.q>=12 && aL1Cand.bx==0;      
+  bool qualitySelection = aL1Cand.q>=12 && aL1Cand.bx==0;     
   
   if(sysType=="OMTF") qualitySelection &= (aL1Cand.type==L1Obj::OMTF_emu);
-  else if(sysType.find("OMTFDispU")!=std::string::npos || sysType.find("OMTFDispC")!=std::string::npos) qualitySelection &= (aL1Cand.type==L1Obj::BMTF);
-  else if(sysType=="OMTFDisp") qualitySelection &=  (aL1Cand.type==L1Obj::BMTF) && aL1Cand.ptUnconstrainedValue()>aL1Cand.ptValue()+10 && (std::abs(aL1Cand.d0Value())>75);
+  else if(sysType=="NN")  qualitySelection &= aL1Cand.type==L1Obj::EMTF;
+  else if(sysType=="LUT") qualitySelection = aL1Cand.q>=8 && aL1Cand.bx==0 && aL1Cand.type==L1Obj::BMTF;
   else if(sysType=="GMT") qualitySelection &= aL1Cand.type==L1Obj::uGMT_emu;
+  else if(sysType=="GMTPhase2") qualitySelection &= aL1Cand.type==L1Obj::uGMTPhase2_emu;
   else if(sysType.find("Vx")!=std::string::npos) qualitySelection = true;
+
   return qualitySelection;
 }
 //////////////////////////////////////////////////////////////////////////////
@@ -149,7 +152,7 @@ void OMTFAnalyzer::fillTurnOnCurve(const int & iPtCut,
   }
 
   tmpName = hName+"EtaVx"+std::to_string(ptCut);
-  myHistos_->fill2DHistogram(tmpName, myGenObj.eta(), passPtCut);
+  myHistos_->fill2DHistogram(tmpName, std::abs(myGenObj.eta()), passPtCut);
 
   tmpName = hName+"PhiVx"+std::to_string(ptCut);
   myHistos_->fill2DHistogram(tmpName, myGenObj.phi(), passPtCut);
@@ -181,7 +184,7 @@ void OMTFAnalyzer::fillRateHisto(const std::string & sysType,
   bool passPtCut = isPtGeq(candPt, ptCut);
 
   if(selType.find("Tot")!=std::string::npos) myHistos_->fill2DHistogram(hName,myGenObj.pt(), candPt);
-  if(selType.find("VsEta")!=std::string::npos) myHistos_->fill2DHistogram(hName,myGenObj.pt(), passPtCut*myGenObj.eta()+(!passPtCut)*99);
+  if(selType.find("VsEta")!=std::string::npos) myHistos_->fill2DHistogram(hName,myGenObj.pt(), passPtCut*std::abs(myGenObj.eta())+(!passPtCut)*99);
   if(selType.find("VsPt")!=std::string::npos) myHistos_->fill2DHistogram(hName,myGenObj.pt(),  passPtCut*myGenObj.pt()+(!passPtCut)*(-100));
 }
 /////////////////////////////////////////////////////////////////////////////
@@ -203,7 +206,6 @@ void OMTFAnalyzer::fillRateHistos(){
 //////////////////////////////////////////////////////////////////////////////
 void OMTFAnalyzer::fillHistosForGenMuon(){
   
-
   myHistos_->fill1DHistogram("h1DGenEtaAll", myGenObj.eta());
   myHistos_->fill1DHistogram("h1DGenDxyAll", myGenObj.dxy());
   myHistos_->fill1DHistogram("h1DGenDzAll", myGenObj.dz());
@@ -253,9 +255,9 @@ bool OMTFAnalyzer::analyze(const EventProxyBase& iEvent){
   myGenObjColl = myProxy.getGenObjColl();
   myL1ObjColl = myProxy.getL1ObjColl();
   myGenObj = GenObj();
-  
-  const std::vector<GenObj> genObjVec = myGenObjColl->data();  
-  if(genObjVec.empty()) return false;
+
+  const std::vector<GenObj> genObjVec = myGenObjColl->data(); 
+  if(genObjVec.empty() && name().find("NU_RATE")==std::string::npos) return false;
   
   // Filter out non-muon particles and particles with non-final state
 for (auto & aGenObj : genObjVec) {
@@ -264,7 +266,9 @@ for (auto & aGenObj : genObjVec) {
         fillHistosForGenMuon();
     }
   }
+
   fillRateHistos();
+
   return true;
 }
 //////////////////////////////////////////////////////////////////////////////
