@@ -94,7 +94,10 @@ bool OMTFAnalyzer::passQuality(const L1Obj & aL1Cand,
   bool qualitySelection = aL1Cand.q>=12 && aL1Cand.bx==0;     
   
   if(sysType=="OMTF") qualitySelection &= (aL1Cand.type==L1Obj::OMTF_emu);
-  else if(sysType=="Masked")  qualitySelection &= aL1Cand.type==L1Obj::BMTF;
+  else if(sysType=="NN")  qualitySelection &= aL1Cand.type==L1Obj::EMTF;
+  else if(sysType=="LUT") qualitySelection = aL1Cand.q>=8 && aL1Cand.bx==0 && aL1Cand.type==L1Obj::BMTF;
+  else if(sysType=="GMT") qualitySelection &= aL1Cand.type==L1Obj::uGMT_emu;
+  else if(sysType=="GMTPhase2") qualitySelection &= aL1Cand.type==L1Obj::uGMTPhase2_emu;
   else if(sysType.find("Vx")!=std::string::npos) qualitySelection = true;
 
   return qualitySelection;
@@ -173,7 +176,6 @@ void OMTFAnalyzer::fillRateHisto(const std::string & sysType,
   for(auto & aCand: myL1Coll){
     bool pass = passQuality(aCand ,sysType, selType);  
     if (pass && aCand>selectedCand) selectedCand = aCand;
-    //if(pass && selectedCand.ptValue()<aCand.ptValue()) selectedCand = aCand;
   }
 
   float candPt = calibratedPt(sysType, selectedCand);

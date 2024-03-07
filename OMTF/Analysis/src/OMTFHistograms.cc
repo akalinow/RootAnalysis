@@ -15,7 +15,7 @@
 
 #include "utilsL1RpcStyle.h"
 
-const std::vector<std::string> OMTFHistograms::algos = {"OMTF", "Masked"};  
+const std::vector<std::string> OMTFHistograms::algos = {"OMTF", "LUT", "NN", "GMT", "GMTPhase2"};  
 const std::vector<double> OMTFHistograms::ptBins = {1., 4, 4.5, 5, 5.5, 6, 6.5, 7, 8.5, 10, 
                                                     12, 14, 16, 18.5, 20, 21, 22, 26, 28, 30, 32, 
                                                     36, 40, 48, 54, 60, 70, 82, 96, 114, 200, 99999};
@@ -112,11 +112,8 @@ void OMTFHistograms::finalizeHistograms(){
 
   AnalysisHistograms::finalizeHistograms();
   utilsL1RpcStyle()->cd();
-
-  plotRate("Tot");
-  return; //TEST
   
-  //plotEffType1VsType2(OMTFHistograms::iPtCuts.at(3),"LUT","NN");
+  plotEffType1VsType2(OMTFHistograms::iPtCuts.at(3),"LUT","NN");
   for(auto & anAlgo : algos){    
 
     if (anAlgo!="OMTF"){
@@ -138,9 +135,9 @@ void OMTFHistograms::finalizeHistograms(){
   plotRate("VsEta");
   plotRate("VsPt");
    
-  //plotSingleHistogram("h2DOMTFPtRecVsPtGen");
-  //plotSingleHistogram("h2DLUTPtRecVsPtGen");
-  //plotSingleHistogram("h2DNNPtRecVsPtGen");
+  plotSingleHistogram("h2DOMTFPtRecVsPtGen");
+  plotSingleHistogram("h2DLUTPtRecVsPtGen");
+  plotSingleHistogram("h2DNNPtRecVsPtGen");
   return;
  
   plotSingleHistogram("h2DOMTFdxyVsPhiB");
@@ -392,13 +389,12 @@ TH2F* OMTFHistograms::makeRateWeights(TH2 *hOrig, const std::string & selFlavour
   float ptLow, ptHigh, weight;
 
   //Taken from https://cmssdt.cern.ch/lxr/source/Validation/MuonRPCGeometry/test/RPCHistos.cc line 139
-  //Scaling factor, par[0] set to reproduce OMTF rate @22 GeV with PU200 sample 
+  //Scaling factor, par[0] set to reproduce OMTF rate with the 367833 run
+  //this run had 2345 bunches, so the rate is scaled to 2760 bunches
   TF1 *fIntVxMuRate = new TF1("fIntVxMuRate","[0]*TMath::Power(x,[1]*TMath::Log(x))*TMath::Power(x,[2])*TMath::Exp([3])",1,1000);
-  fIntVxMuRate->SetParameters(1.0, -0.235801, -2.82346, 17.162);
+  fIntVxMuRate->SetParameters(2.080479/2621.82*(2760/2345), -0.235801, -2.82346, 17.162);
   ///Function parameters set to get a constant weight corresponding to the LHC rate
   if (selFlavour.find("NU_RATE")!=std::string::npos) fIntVxMuRate->SetParameters(-1.0, 0.0, 1.0, log(lhcRate/binWidth/nEvTotal/1E3));
-
-  //Rate [kHz] OMTF CMSSW default @ 22 GeV 8.55882
 
   for (int iBin = 0; iBin <= hPtGen->GetNbinsX()+1; ++iBin){
     ptLow = hPtGen->GetXaxis()->GetBinLowEdge(iBin);
@@ -431,7 +427,7 @@ TH1* OMTFHistograms::getRateHisto(std::string sysType,
   TH1D *hRate = h2D->ProjectionY(("hRate"+sysType).c_str());
   if(sysType=="Vx") hRate = h2D->ProjectionX("hRate");
 
-  hRate->SetYTitle("[kHz] for 2760 bunches");
+  hRate->SetYTitle(TString::Format("[kHz] for %d bunches", lhcNumberOfBunches));
   hRate->SetLineWidth(3);
 
   if(type.find("VsEta")!=std::string::npos) return (TH1*)hRate->Clone("hRateClone");
@@ -444,8 +440,8 @@ void OMTFHistograms::plotRate(std::string type){
   
   TH1 *hRateVx = getRateHisto("Vx",type);
   TH1 *hRateOMTF = getRateHisto("OMTF",type);
-  TH1 *hRateNN = getRateHisto("Masked",type);
-  TH1 *hRateLUT = getRateHisto("Masked",type);
+  TH1 *hRateNN = getRateHisto("NN",type);
+  TH1 *hRateLUT = getRateHisto("LUT",type);
   
   if(!hRateVx || !hRateOMTF || !hRateNN || !hRateLUT) return;
 
@@ -500,17 +496,18 @@ void OMTFHistograms::plotRate(std::string type){
     hRateVx->Draw();
     hRateOMTF->DrawCopy("same");
     hRateNN->DrawCopy("same");
-    //hRateLUT->DrawCopy("same");
+    hRateLUT->DrawCopy("same");
     
     std::cout<<"Rate [kHz] OMTF CMSSW default @ "<<ptCut<<" GeV "<< hRateOMTF->GetBinContent(hRateOMTF->FindBin(ptCut))<<std::endl;
-    std::cout<<"Rate [kHz] Masked @ "<<ptCut<<" GeV "<< hRateNN->GetBinContent(hRateNN->FindBin(ptCut))<<std::endl;
+    std::cout<<"Rate [kHz] LUT @ "<<ptCut<<" GeV "<< hRateNN->GetBinContent(hRateLUT->FindBin(ptCut))<<std::endl;
+    std::cout<<"Rate [kHz] NN @ "<<ptCut<<" GeV "<< hRateNN->GetBinContent(hRateNN->FindBin(ptCut))<<std::endl;
    
     c->cd();
     pad2->Draw();
     pad2->cd();
 
     hRateNN->SetXTitle("p_{T}^{cut} [GeV/c]");
-    hRateNN->SetYTitle("masked/default");
+    hRateNN->SetYTitle("new/default");
     hRateNN->GetXaxis()->SetLabelSize(0.1);
     hRateNN->GetXaxis()->SetTitleSize(0.1);
     hRateNN->GetYaxis()->SetLabelSize(0.1);
@@ -536,7 +533,7 @@ void OMTFHistograms::plotRate(std::string type){
     max = std::max(max, hRateLUT->GetMaximum());
     hRateNN->SetMaximum(1.5*max);
     hRateNN->Draw();
-    //hRateLUT->Draw("same");
+    hRateLUT->Draw("same");
     hRateOMTF->Draw("same");
     leg->SetHeader(TString::Format("p_{T}^{cut} = %d  GeV/c", int(ptCut)).Data());
   }
@@ -548,14 +545,14 @@ void OMTFHistograms::plotRate(std::string type){
     max = std::max(max, hRateLUT->GetMaximum());
     hRateNN->SetMaximum(1.2*max);
     hRateNN->Draw();
-    //hRateLUT->Draw("same");
+    hRateLUT->Draw("same");
     hRateOMTF->Draw("same");
     leg->SetHeader(TString::Format("p_{T}^{cut} = %d  GeV/c",int(ptCut)).Data());
   }
  
   leg->AddEntry(hRateOMTF,"OMTF");
-  leg->AddEntry(hRateNN,"Masked DT's");
-  //leg->AddEntry(hRateLUT,"LUT NN");
+  leg->AddEntry(hRateNN,"TF NN");
+  leg->AddEntry(hRateLUT,"LUT NN");
   leg->Draw();
 
   c->Print(("fig_eps/Rate"+type+".eps").c_str());
