@@ -94,10 +94,7 @@ bool OMTFAnalyzer::passQuality(const L1Obj & aL1Cand,
   bool qualitySelection = aL1Cand.q>=12 && aL1Cand.bx==0;     
   
   if(sysType=="OMTF") qualitySelection &= (aL1Cand.type==L1Obj::OMTF_emu);
-  else if(sysType=="NN")  qualitySelection &= aL1Cand.type==L1Obj::EMTF;
-  else if(sysType=="LUT") qualitySelection = aL1Cand.q>=8 && aL1Cand.bx==0 && aL1Cand.type==L1Obj::BMTF;
-  else if(sysType=="GMT") qualitySelection &= aL1Cand.type==L1Obj::uGMT_emu;
-  else if(sysType=="GMTPhase2") qualitySelection &= aL1Cand.type==L1Obj::uGMTPhase2_emu;
+  else if(sysType=="Masked")  qualitySelection &= aL1Cand.type==L1Obj::BMTF;
   else if(sysType.find("Vx")!=std::string::npos) qualitySelection = true;
 
   return qualitySelection;
@@ -174,8 +171,9 @@ void OMTFAnalyzer::fillRateHisto(const std::string & sysType,
 
   L1Obj selectedCand;
   for(auto & aCand: myL1Coll){
-    bool pass = passQuality(aCand ,sysType, selType);    
-    if(pass && selectedCand.ptValue()<aCand.ptValue()) selectedCand = aCand;
+    bool pass = passQuality(aCand ,sysType, selType);  
+    if (pass && aCand>selectedCand) selectedCand = aCand;
+    //if(pass && selectedCand.ptValue()<aCand.ptValue()) selectedCand = aCand;
   }
 
   float candPt = calibratedPt(sysType, selectedCand);
@@ -225,22 +223,23 @@ void OMTFAnalyzer::fillHistosForGenMuon(){
     }
   }
     
-  ///Efficiency vs eta and phi for three selected point on
+  ///Efficiency vs eta and phi for three selected points on
   ///a turn on curve
   bool pass = false;
-  for(int iType=0;iType<=3;++iType){
-    int iPtCut = OMTFHistograms::iPtCuts.at(3);
-    float ptCut = OMTFHistograms::ptBins.at(iPtCut);
-    
-    if(iType==0) pass = myGenObj.pt()>ptCut + 20;
-    else if(iType==1) pass = myGenObj.pt()>ptCut && myGenObj.pt()<(ptCut+5);
-    else if(iType==2) pass = myGenObj.pt()<10;
-    if(!pass) continue;
-    
-    selType = std::string(TString::Format("Type%d",iType));
-    for(auto & anAlgo : OMTFHistograms::algos){    
-      fillTurnOnCurve(iPtCut, anAlgo, selType);      
-    }   
+  for(auto iPtCut: OMTFHistograms::iPtCuts){
+    for(int iType=0;iType<=3;++iType){
+      float ptCut = OMTFHistograms::ptBins.at(iPtCut);
+      
+      if(iType==0) pass = myGenObj.pt()>ptCut + 20;
+      else if(iType==1) pass = myGenObj.pt()>ptCut && myGenObj.pt()<(ptCut+5);
+      else if(iType==2) pass = myGenObj.pt()<10;
+      if(!pass) continue;
+      
+      selType = std::string(TString::Format("Type%d",iType));
+      for(auto & anAlgo : OMTFHistograms::algos){    
+        fillTurnOnCurve(iPtCut, anAlgo, selType);      
+      }   
+    }
   }
 }
 //////////////////////////////////////////////////////////////////////////////

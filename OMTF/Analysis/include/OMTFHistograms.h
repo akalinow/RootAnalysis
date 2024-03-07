@@ -25,7 +25,7 @@ public:
   static const std::vector<double> iPtCuts;
   static const std::vector<double> ptBins;
 
-  static constexpr int lhcNumberOfBunches = 2760;
+  static constexpr int lhcNumberOfBunches = 2345; //TEST 2760;
   static constexpr int lhcRevolutionFreq = 11264;
   static constexpr double lhcRate = lhcNumberOfBunches * lhcRevolutionFreq;
   

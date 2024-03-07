@@ -34,7 +34,12 @@ public:
   ClassDef(L1Obj,6)
 };
 
+bool operator< (const L1Obj &a, const L1Obj &b);
+bool operator> (const L1Obj &a, const L1Obj &b);
 
 std::ostream & operator<< (std::ostream &out, const L1Obj &o);
+
+bool operator< (const L1Obj &a, const L1Obj &b);
+bool operator> (const L1Obj &a, const L1Obj &b);
 
 #endif

@@ -26,8 +26,22 @@ double L1Obj::ptUnconstrainedValue() const { return ptUnconstrained - 1;}
 double L1Obj::z0Value() const { return z0;}
 double L1Obj::d0Value() const { return d0;}
 
-               
+bool operator< (const L1Obj &a, const L1Obj &b){
 
+  auto hitCount_a = std::bitset<29>(a.hits).count();
+  auto hitCount_b = std::bitset<29>(b.hits).count();
+
+  auto result = a.q < b.q                           //quality has priority
+       || (a.q == b.q && hitCount_a < hitCount_b)   //later number of hits
+       || (a.q == b.q && hitCount_a == hitCount_b && a.pt < b.pt); //later pt
+
+  return result;
+}
+
+bool operator > (const L1Obj &a, const L1Obj &b){
+  return !(a<b);
+}
+              
 std::ostream & operator<< (std::ostream &out, const L1Obj &o)
 {
   out<<"L1Obj: ";
