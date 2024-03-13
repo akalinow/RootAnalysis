@@ -392,7 +392,7 @@ TH2F* OMTFHistograms::makeRateWeights(TH2 *hOrig, const std::string & selFlavour
   //Scaling factor, par[0] set to reproduce OMTF rate with the 367833 run
   //this run had 2345 bunches, so the rate is scaled to 2760 bunches
   TF1 *fIntVxMuRate = new TF1("fIntVxMuRate","[0]*TMath::Power(x,[1]*TMath::Log(x))*TMath::Power(x,[2])*TMath::Exp([3])",1,1000);
-  fIntVxMuRate->SetParameters(2.080479/2621.82*(2760/2345), -0.235801, -2.82346, 17.162);
+  fIntVxMuRate->SetParameters(2.080479*(2760/2345)/2165.46, -0.235801, -2.82346, 17.162);
   ///Function parameters set to get a constant weight corresponding to the LHC rate
   if (selFlavour.find("NU_RATE")!=std::string::npos) fIntVxMuRate->SetParameters(-1.0, 0.0, 1.0, log(lhcRate/binWidth/nEvTotal/1E3));
 
