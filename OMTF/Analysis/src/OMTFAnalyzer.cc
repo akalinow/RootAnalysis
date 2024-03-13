@@ -41,7 +41,7 @@ bool OMTFAnalyzer::isInEtaAcceptance(const GenObj & aGenObj){
   double eta_max = 1.24;
 
   bool decision = false;
-  if(true) { //use eta extrapolation for all muons
+  if(false) { //use eta extrapolation for all muons
     double rMB1 = 420.0; //cm
     double tan_theta_min = tan(2*atan(exp(-eta_max)));
     double tan_theta_max = tan(2*atan(exp(-eta_min)));
@@ -173,7 +173,6 @@ void OMTFAnalyzer::fillRateHisto(const std::string & sysType,
   for(auto & aCand: myL1Coll){
     bool pass = passQuality(aCand ,sysType, selType);  
     if (pass && aCand>selectedCand) selectedCand = aCand;
-    //if(pass && selectedCand.ptValue()<aCand.ptValue()) selectedCand = aCand;
   }
 
   float candPt = calibratedPt(sysType, selectedCand);

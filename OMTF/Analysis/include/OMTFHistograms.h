@@ -25,7 +25,7 @@ public:
   static const std::vector<double> iPtCuts;
   static const std::vector<double> ptBins;
 
-  static constexpr int lhcNumberOfBunches = 2345; //TEST 2760;
+  static constexpr int lhcNumberOfBunches = 2760; //TEST 2760 2345;
   static constexpr int lhcRevolutionFreq = 11264;
   static constexpr double lhcRate = lhcNumberOfBunches * lhcRevolutionFreq;
   
@@ -45,7 +45,10 @@ private:
   void plotVar(const std::string & sysType,
 	       const std::string & varName);
 
-  void plotEffType1VsType2(int iPt, std::string sysType1="OMTF", std::string sysType2="BMTF");
+  void plotEffType1VsType2(int iPt, 
+                           std::string varName="Pt",
+                           std::string sysType1="OMTF", 
+                           std::string sysType2="BMTF");
 
   void plotSingleHistogram(std::string hName);
 
