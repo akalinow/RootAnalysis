@@ -19,7 +19,7 @@ double OMTFAnalyzer::calibratedPt(const std::string & sysType, const L1Obj & aCa
   double value = aCand.ptValue();
   if(sysType=="OMTFDispU") value = aCand.ptUnconstrainedValue();  
   else if(sysType=="OMTFDisp") value = std::max(aCand.ptUnconstrainedValue(), aCand.ptValue());  
-  else if(sysType=="NN") value = 1.15*aCand.ptValue();
+  else if(sysType=="NN") value = aCand.ptValue();
 
   
   return value;

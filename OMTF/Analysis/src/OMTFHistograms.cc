@@ -222,7 +222,7 @@ void OMTFHistograms::plotEffVsVar(const std::string & sysType,
   
   TH1F hFrame("hFrame","",1,0,1);    
   hFrame.SetStats(kFALSE);
-  hFrame.SetMinimum(0.0);
+  hFrame.SetMinimum(0.8);
   hFrame.SetMaximum(1.04);
   hFrame.SetXTitle(varName.c_str());
   hFrame.SetYTitle("Efficiency");
@@ -499,7 +499,7 @@ void OMTFHistograms::plotRate(std::string type){
     hRateLUT->DrawCopy("same");
     
     std::cout<<"Rate [kHz] OMTF CMSSW default @ "<<ptCut<<" GeV "<< hRateOMTF->GetBinContent(hRateOMTF->FindBin(ptCut))<<std::endl;
-    std::cout<<"Rate [kHz] LUT @ "<<ptCut<<" GeV "<< hRateNN->GetBinContent(hRateLUT->FindBin(ptCut))<<std::endl;
+    std::cout<<"Rate [kHz] LUT @ "<<ptCut<<" GeV "<< hRateLUT->GetBinContent(hRateLUT->FindBin(ptCut))<<std::endl;
     std::cout<<"Rate [kHz] NN @ "<<ptCut<<" GeV "<< hRateNN->GetBinContent(hRateNN->FindBin(ptCut))<<std::endl;
    
     c->cd();
