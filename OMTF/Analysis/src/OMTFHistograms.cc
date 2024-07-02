@@ -27,14 +27,14 @@ double OMTFHistograms::vxMuRate(double pt_GeV) const{
 
   if (pt_GeV<1E-3) return 0.0;
 
-  constexpr double lum = 2.0e34;
-  constexpr double dabseta = 1.0;
-  constexpr double dpt = 1.0;
-  constexpr double afactor = 1.0e-34*lum*dabseta*dpt;
-  constexpr double a  = 2*1.3084E6;
-  constexpr double mu=-0.725;
-  constexpr double sigma=0.4333;
-  constexpr double s2=2*sigma*sigma;
+  constexpr double lum = 2.0e34; // cm^-2 s^-1
+  constexpr double dabseta = 1.24 - 0.83; //OMTF acceptance
+  constexpr double dpt = 1.0; // GeV
+  constexpr double afactor = 1.0e-34*lum*dabseta*dpt*1.0e-3; // kHz
+  constexpr double a = 2*1.3084E6;
+  constexpr double mu = -0.725;
+  constexpr double sigma = 0.4333;
+  constexpr double s2 = 2*sigma*sigma;
   double ptlog10 = log10(pt_GeV);
   double ex = (ptlog10-mu)*(ptlog10-mu)/s2;
   double rate = (a * exp(-ex) * afactor);
@@ -393,16 +393,24 @@ TH2F* OMTFHistograms::makeRateWeights(TH2 *hOrig, const std::string & selFlavour
   //this run had 2345 bunches, so the rate is scaled to 2760 bunches
   TF1 *fIntVxMuRate = new TF1("fIntVxMuRate","[0]*TMath::Power(x,[1]*TMath::Log(x))*TMath::Power(x,[2])*TMath::Exp([3])",1,1000);
   fIntVxMuRate->SetParameters(2.080479*(2760/2345)/2165.46, -0.235801, -2.82346, 17.162);
-  ///Function parameters set to get a constant weight corresponding to the LHC rate
-  if (selFlavour.find("NU_RATE")!=std::string::npos) fIntVxMuRate->SetParameters(-1.0, 0.0, 1.0, log(lhcRate/binWidth/nEvTotal/1E3));
+
+  //Differential vxmurate as used by Karol.
+  //TF1 *fDiffVxMuRate = new TF1("fDiffVxMuRate",this->vxMuRate,1,1000);
+
 
   for (int iBin = 0; iBin <= hPtGen->GetNbinsX()+1; ++iBin){
     ptLow = hPtGen->GetXaxis()->GetBinLowEdge(iBin);
     ptHigh = hPtGen->GetXaxis()->GetBinUpEdge(iBin);
     nEvInBin = hPtGen->GetBinContent(iBin);
     if(nEvInBin<1) nEvInBin = 1;
-    if(selFlavour.find("NU_RATE")!=std::string::npos) nEvInBin = 1; 
-    weight = (fIntVxMuRate->Eval(ptLow) - fIntVxMuRate->Eval(ptHigh))/nEvInBin;
+    if(selFlavour.find("NU_RATE")!=std::string::npos){
+      weight = lhcRate/binWidth/nEvTotal/1E3; //rate in kHz
+    }
+    else{
+     //weight = (fIntVxMuRate->Eval(ptLow) - fIntVxMuRate->Eval(ptHigh))/nEvInBin;
+      //weight = fDiffVxMuRate->Integral(ptLow, ptHigh)/nEvInBin;
+      weight = (ptHigh-ptLow)*(vxMuRate(ptLow) + vxMuRate(ptHigh))/2.0/nEvInBin;
+      }
     for (int iBinY = 0; iBinY<=hOrig->GetNbinsY()+1;++iBinY) hWeights->SetBinContent(iBin,iBinY,weight);
   }
 
