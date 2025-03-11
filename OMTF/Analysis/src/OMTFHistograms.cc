@@ -15,12 +15,13 @@
 
 #include "utilsL1RpcStyle.h"
 
-const std::vector<std::string> OMTFHistograms::algos = {"OMTF", "LUT", "NN", "GMT", "GMTPhase2"};  
+const std::vector<std::string> OMTFHistograms::algos = {"OMTF", "OMTFDispU", "LUT", "NN", "GMT", "GMTPhase2"};
+//const std::vector<std::string> OMTFHistograms::algos = {"GMTPhase2"};
 const std::vector<double> OMTFHistograms::ptBins = {1., 4, 4.5, 5, 5.5, 6, 6.5, 7, 8.5, 10, 
                                                     12, 14, 16, 18.5, 20, 21, 22, 26, 28, 30, 32, 
                                                     36, 40, 48, 54, 60, 70, 82, 96, 114, 200, 99999};
 const std::vector<double> OMTFHistograms::color = {kBlack, kBlue, kRed, kMagenta, kTeal, kGreen};
-const std::vector<double> OMTFHistograms::iPtCuts = {0, 3, 10, 16, 17};
+const std::vector<double> OMTFHistograms::iPtCuts = {0, 3, 10, 14, 17};
 /////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////
 double OMTFHistograms::vxMuRate(double pt_GeV) const{
@@ -123,12 +124,12 @@ void OMTFHistograms::finalizeHistograms(){
 
     plotEffPanel(anAlgo,"Pt");
     plotEffPanel(anAlgo,"HighPt");
-    //plotEffPanel(anAlgo,"dxy");
-    //plotEffPanel(anAlgo,"dz");
+    plotEffPanel(anAlgo,"dxy");
+    plotEffPanel(anAlgo,"dz");
     plotEffVsVar(anAlgo,"EtaVx");
     plotEffVsVar(anAlgo,"PhiVx");
-    //plotEffVsVar(anAlgo,"dxy");
-    //plotEffVsVar(anAlgo,"dz");
+    plotEffVsVar(anAlgo,"dxy");
+    plotEffVsVar(anAlgo,"dz");
     plotEffVsEta(anAlgo);
   }
   plotRate("Tot");
@@ -138,7 +139,6 @@ void OMTFHistograms::finalizeHistograms(){
   plotSingleHistogram("h2DOMTFPtRecVsPtGen");
   plotSingleHistogram("h2DLUTPtRecVsPtGen");
   plotSingleHistogram("h2DNNPtRecVsPtGen");
-  return;
  
   plotSingleHistogram("h2DOMTFdxyVsPhiB");
   plotSingleHistogram("h2DOMTFDispdxyVsPhiB");
@@ -482,8 +482,8 @@ void OMTFHistograms::plotRate(std::string type){
   if(type.find("Tot")!=std::string::npos){
     hRateVx->GetXaxis()->SetRangeUser(-1,60);
     hRateNN->GetXaxis()->SetRangeUser(-1,60);
-    hRateVx->SetMinimum(8E-1);
-    hRateVx->SetMaximum(1.5E3);
+    hRateVx->SetMinimum(9E-2);
+    hRateVx->SetMaximum(1E2);
     
     c->Divide(2);
     TPad *pad1 = (TPad*)c->GetPad(1);

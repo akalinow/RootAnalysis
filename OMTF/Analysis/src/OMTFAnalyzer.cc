@@ -18,10 +18,7 @@ double OMTFAnalyzer::calibratedPt(const std::string & sysType, const L1Obj & aCa
 
   double value = aCand.ptValue();
   if(sysType=="OMTFDispU") value = aCand.ptUnconstrainedValue();  
-  else if(sysType=="OMTFDisp") value = std::max(aCand.ptUnconstrainedValue(), aCand.ptValue());  
-  else if(sysType=="NN") value = 1.15*aCand.ptValue();
-
-  
+  else if(sysType=="NN") value = 1.15*aCand.ptValue();  
   return value;
 }
 //////////////////////////////////////////////////////////////////////////////
@@ -94,7 +91,7 @@ bool OMTFAnalyzer::passQuality(const L1Obj & aL1Cand,
 			       
   bool qualitySelection = aL1Cand.q>=12 && aL1Cand.bx==0;     
   
-  if(sysType=="OMTF") qualitySelection &= (aL1Cand.type==L1Obj::OMTF_emu);
+  if(sysType=="OMTF" || sysType=="OMTFDispU") qualitySelection &= (aL1Cand.type==L1Obj::OMTF_emu);
   else if(sysType=="NN")  qualitySelection &= aL1Cand.type==L1Obj::EMTF;
   else if(sysType=="LUT") qualitySelection = aL1Cand.q>=8 && aL1Cand.bx==0 && aL1Cand.type==L1Obj::BMTF;
   else if(sysType=="GMT") qualitySelection &= aL1Cand.type==L1Obj::uGMT_emu;
@@ -211,12 +208,12 @@ void OMTFAnalyzer::fillHistosForGenMuon(){
   myHistos_->fill1DHistogram("h1DGenDxyAll", myGenObj.dxy());
   myHistos_->fill1DHistogram("h1DGenDzAll", myGenObj.dz());
 
-  if(!isInEtaAcceptance(myGenObj)) return;
-
   myHistos_->fill1DHistogram("h1DGenPt", myGenObj.pt());
   myHistos_->fill1DHistogram("h1DGenEta", myGenObj.eta());
   myHistos_->fill1DHistogram("h1DGenDxy", myGenObj.dxy());
   myHistos_->fill1DHistogram("h1DGenDz", myGenObj.dz());
+
+  if(!isInEtaAcceptance(myGenObj)) return;
 
   ///Generic turn on curves
   std::string selType = "";
