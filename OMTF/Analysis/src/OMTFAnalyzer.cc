@@ -93,7 +93,7 @@ bool OMTFAnalyzer::passQuality(const L1Obj & aL1Cand,
   
   if(sysType=="OMTF" || sysType=="OMTFDispU") qualitySelection &= (aL1Cand.type==L1Obj::OMTF_emu);
   else if(sysType=="NN")  qualitySelection &= aL1Cand.type==L1Obj::EMTF;
-  else if(sysType=="LUT") qualitySelection = aL1Cand.q>=8 && aL1Cand.bx==0 && aL1Cand.type==L1Obj::BMTF;
+  else if(sysType=="LUT") qualitySelection = aL1Cand.q>=2 && aL1Cand.bx==0 && aL1Cand.type==L1Obj::BMTF;
   else if(sysType=="GMT") qualitySelection &= aL1Cand.type==L1Obj::uGMT_emu;
   else if(sysType=="GMTPhase2") qualitySelection &= aL1Cand.type==L1Obj::uGMTPhase2_emu;
   else if(sysType.find("Vx")!=std::string::npos) qualitySelection = true;
@@ -257,15 +257,15 @@ bool OMTFAnalyzer::analyze(const EventProxyBase& iEvent){
 
   const std::vector<GenObj> genObjVec = myGenObjColl->data(); 
   if(genObjVec.empty() && name().find("NU_RATE")==std::string::npos) return false;
-  
+
   // Filter out non-muon particles and particles with non-final state
-for (auto & aGenObj : genObjVec) {
+  for (auto & aGenObj : genObjVec) {
     if (std::abs(aGenObj.pdgId()) == 13 && std::abs(aGenObj.status()) == 1) {
         myGenObj = aGenObj;
         fillHistosForGenMuon();
     }
   }
-
+  if(!isInEtaAcceptance(myGenObj)) return true;
   fillRateHistos();
 
   return true;

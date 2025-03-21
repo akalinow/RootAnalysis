@@ -523,8 +523,8 @@ void OMTFHistograms::plotRate(std::string type){
     hRateNN->GetYaxis()->SetTitleOffset(0.5);
     hRateNN->Divide(hRateOMTF);
     hRateLUT->Divide(hRateOMTF);
-    hRateNN->SetMaximum(2.0);
-    hRateNN->SetMinimum(0.3);
+    hRateNN->SetMaximum(1.1);
+    hRateNN->SetMinimum(0.9);
     hRateNN->DrawCopy();
     hRateLUT->DrawCopy("same");
 

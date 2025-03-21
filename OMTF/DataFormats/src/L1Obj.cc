@@ -10,7 +10,22 @@ namespace {
   }
 }
                  
-double L1Obj::ptValue() const { return type==uGMTPhase2_emu ?  pt : (pt-1.)/2.; }
+double L1Obj::ptValue() const { 
+
+  double returnValue = 0.0;
+  if (type==OMTF || type==OMTF_emu) {
+    returnValue = (pt-1)*0.5;
+  } else if (type==BMTF || type==EMTF) {
+    //use Phase2L1GMT::LSBpt for BMTF and EMTF holding NN output from OMTF
+    returnValue = pt*0.03125;
+  } else if (type==uGMT || type==uGMT_emu) {
+    returnValue = (pt-1)*0.5;
+  } else if (type==uGMTPhase2_emu) {
+    returnValue = pt;
+  }
+  return returnValue;
+}
+
 double L1Obj::etaValue() const { return type==uGMTPhase2_emu ? eta : eta/240.*2.61; }
 double L1Obj::phiValue() const {
     if (type==OMTF || type==OMTF_emu || type==EMTF) 
