@@ -38,6 +38,9 @@ bool OMTFAnalyzer::isInEtaAcceptance(const GenObj & aGenObj){
   double eta_min = 0.83;
   double eta_max = 1.24;
 
+  eta_min = -3.0; //TEST
+  eta_max = 3.0; //TEST 
+
   bool decision = false;
   if(true) { //use eta extrapolation for all muons
     double rMB1 = 420.0; //cm
@@ -150,7 +153,8 @@ void OMTFAnalyzer::fillTurnOnCurve(const int & iPtCut,
   }
 
   tmpName = hName+"EtaVx"+std::to_string(ptCut);
-  myHistos_->fill2DHistogram(tmpName, std::abs(myGenObj.eta()), passPtCut);
+  //myHistos_->fill2DHistogram(tmpName, std::abs(myGenObj.eta()), passPtCut);
+  myHistos_->fill2DHistogram(tmpName, myGenObj.eta(), passPtCut);
 
   tmpName = hName+"PhiVx"+std::to_string(ptCut);
   myHistos_->fill2DHistogram(tmpName, myGenObj.phi(), passPtCut);

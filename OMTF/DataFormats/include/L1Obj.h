@@ -8,7 +8,7 @@ class L1Obj : public TObject {
 
 public:
   
-  enum TYPE { NONE, RPCb, RPCf, DT, CSC, GMT, RPCb_emu, RPCf_emu, GMT_emu, OMTF, OMTF_emu, BMTF, EMTF, uGMT, uGMT_emu, uGMTPhase2_emu};
+  enum TYPE { NONE, RPCb, RPCf, DT, CSC, GMT, RPCb_emu, RPCf_emu, GMT_emu, OMTF, OMTF_emu, BMTF, EMTF, uGMT, uGMT_emu, uGMTPhase2_emu, SAMuon};
 
   double pt{0}, eta{0}, phi{0};
   double ptUnconstrained{0};
@@ -17,6 +17,12 @@ public:
   int   bx{0}, q{0}, hits{0}, charge{0}, refLayer{0};
   TYPE  type{NONE};
   int   iProcessor{-1}, position{0};
+  int hwBeta{0};
+  int commonStubCount{0};
+  int totalStubQuality{0};
+  int totalStubCount{0};
+  int commonStubQuality{0};
+
 
   L1Obj(){};
 
@@ -31,7 +37,7 @@ public:
   double z0Value() const;
   double d0Value() const;
 
-  ClassDef(L1Obj,6)
+  ClassDef(L1Obj, 7)
 };
 
 bool operator< (const L1Obj &a, const L1Obj &b);

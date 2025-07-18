@@ -10,32 +10,17 @@ namespace {
   }
 }
                  
-double L1Obj::ptValue() const { 
-
-  double returnValue = 0.0;
-  if (type==OMTF || type==OMTF_emu) {
-    returnValue = (pt-1)*0.5;
-  } else if (type==BMTF || type==EMTF) {
-    //use Phase2L1GMT::LSBpt for BMTF and EMTF holding NN output from OMTF
-    returnValue = pt*0.03125;
-  } else if (type==uGMT || type==uGMT_emu) {
-    returnValue = (pt-1)*0.5;
-  } else if (type==uGMTPhase2_emu) {
-    returnValue = pt;
-  }
-  return returnValue;
-}
-
-double L1Obj::etaValue() const { return type==uGMTPhase2_emu ? eta : eta/240.*2.61; }
+double L1Obj::ptValue() const { return (type==uGMTPhase2_emu) ?  pt : (pt-1.)/2.; }
+double L1Obj::etaValue() const { return (type==uGMTPhase2_emu ) ? eta : eta/240.*2.61; }
 double L1Obj::phiValue() const {
     if (type==OMTF || type==OMTF_emu || type==EMTF) 
     return modulo2PI( ( (15.+iProcessor*60.)/360. + phi/576. ) *2*M_PI) ;  
     else if (type==BMTF) return modulo2PI( ( (-15.+iProcessor*30.)/360. + phi/576. ) *2*M_PI);
     else if (type==uGMT || type==uGMT_emu) return modulo2PI((phi/576.)*2*M_PI);
-    else if (type==uGMTPhase2_emu) return modulo2PI(phi);
+    else if (type==uGMTPhase2_emu ) return modulo2PI(phi);
     else return 9999.;
   }
-int L1Obj::chargeValue() const { return type==uGMTPhase2_emu ? charge : pow(-1,charge); }
+int L1Obj::chargeValue() const { return (type==uGMTPhase2_emu || type==SAMuon) ? charge : pow(-1,charge); }
 
 double L1Obj::ptUnconstrainedValue() const { return ptUnconstrained - 1;}
 double L1Obj::z0Value() const { return z0;}
@@ -55,8 +40,8 @@ bool operator< (const L1Obj &a, const L1Obj &b){
 
 bool operator > (const L1Obj &a, const L1Obj &b){
   return !(a<b);
-}
-              
+}               
+
 std::ostream & operator<< (std::ostream &out, const L1Obj &o)
 {
   out<<"L1Obj: ";
@@ -76,6 +61,7 @@ std::ostream & operator<< (std::ostream &out, const L1Obj &o)
     case L1Obj::uGMT     : { out <<"uGMT    "; break; }
     case L1Obj::uGMT_emu : { out <<"uGMT_emu"; break; }
     case L1Obj::uGMTPhase2_emu : { out <<"uGMTPhase2_emu"; break; }
+    case L1Obj::SAMuon   : { out <<"SAMuon  "; break; }
     case L1Obj::NONE     : { out <<"NONE    "; break; }
     default: out <<"Unknown";
   };
@@ -90,7 +76,7 @@ std::ostream & operator<< (std::ostream &out, const L1Obj &o)
   out <<", q: "<<o.q<<", bx: "<<o.bx;
   if (o.type ==  L1Obj::OMTF || o. type== L1Obj::OMTF_emu) {
       out <<" track: "<< std::bitset<29>(o.hits) 
-          <<" disc: "<< std::bitset<12>(o.disc);          
+          <<" disc: "<< std::bitset<12>(o.disc);
   }
   return out;
 }

@@ -16,7 +16,6 @@
 #include "utilsL1RpcStyle.h"
 
 const std::vector<std::string> OMTFHistograms::algos = {"OMTF", "OMTFDispU", "LUT", "NN", "GMT", "GMTPhase2"};
-//const std::vector<std::string> OMTFHistograms::algos = {"GMTPhase2"};
 const std::vector<double> OMTFHistograms::ptBins = {1., 4, 4.5, 5, 5.5, 6, 6.5, 7, 8.5, 10, 
                                                     12, 14, 16, 18.5, 20, 21, 22, 26, 28, 30, 32, 
                                                     36, 40, 48, 54, 60, 70, 82, 96, 114, 200, 99999};
@@ -85,10 +84,15 @@ void OMTFHistograms::defineHistograms(){
 
  if(!histosInitialized_){
  ///Efficiency histos
- add2DHistogram("h2DPtTemplate",";gen. muon p_{T} [GeV/c];Efficiency",60,0,60,2,-0.5,1.5,file_);
+ //add2DHistogram("h2DPtTemplate",";gen. muon p_{T} [GeV/c];Efficiency",60,0,60,2,-0.5,1.5,file_);
+ add2DHistogram("h2DPtTemplate",";gen. muon p_{T} [GeV/c];Efficiency",30,0,20,2,-0.5,1.5,file_);
+
  add2DHistogram("h2DHighPtTemplate",";gen. muon p_{T} [GeV/c];Efficiency",50,50,550,2,-0.5,1.5,file_);
  add2DHistogram("h2DPtVsPtTemplate","",41,0,205,41,0,205,file_);
- add2DHistogram("h2DEtaVxTemplate",";gen. muon #eta;Efficiency",10,0.83,1.24,2,-0.5,1.5,file_);
+ //add2DHistogram("h2DEtaVxTemplate",";gen. muon #eta;Efficiency",10,0.83,1.24,2,-0.5,1.5,file_);
+ add2DHistogram("h2DEtaVxTemplate",";gen. muon #eta;Efficiency",40,-3,3, 2,-0.5,1.5,file_);
+
+
  add2DHistogram("h2DPhiVxTemplate",";gen. muon #varphi;Efficiency",128,-3.2,3.2,2,-0.5,1.5,file_);
  add2DHistogram("h2DdxyTemplate",";d_{xy} [cm];Efficiency",50,0,500,2,-0.5,1.5,file_);
  add2DHistogram("h2DdzTemplate",";d_{z} [cm];Efficiency",70,0,700,2,-0.5,1.5,file_);
@@ -102,7 +106,6 @@ void OMTFHistograms::defineHistograms(){
  add1DHistogram("h1DGenEtaTemplate",";#eta;",300,-3.0,3.0,file_);
  add1DHistogram("h1DGenDxyTemplate",";d_{xy} [cm];",50,0,500,file_);
  add1DHistogram("h1DGenDzTemplate",";d_{z} [cm];",140,-700,700,file_);
-
  ///////////////////
  histosInitialized_ = true;
  }
@@ -114,7 +117,11 @@ void OMTFHistograms::finalizeHistograms(){
   AnalysisHistograms::finalizeHistograms();
   utilsL1RpcStyle()->cd();
   
-  plotEffType1VsType2(OMTFHistograms::iPtCuts.at(3),"LUT","NN");
+  plotEffType1VsType2(OMTFHistograms::iPtCuts.at(0),"GMT","GMTPhase2");
+  plotEffVsVar("GMT","EtaVx");
+  plotEffVsVar("GMTPhase2","EtaVx");
+  return; //TEST
+
   for(auto & anAlgo : algos){    
 
     if (anAlgo!="OMTF"){
@@ -323,12 +330,13 @@ void OMTFHistograms::plotEffType1VsType2(int iPtCut,
 			   TString::Format("OMTFVsOther_%d",(int)ptCut).Data(),
 			   460,500);
 
-  TLegend l(0.2,0.65,0.44,0.86,NULL,"brNDC");
+  //TEST TLegend l(0.2,0.65,0.44,0.86,NULL,"brNDC");
+  TLegend l(0.6,0.2,0.85,0.4,NULL,"brNDC");
   l.SetTextSize(0.05);
   l.SetFillStyle(4000);
   l.SetBorderSize(0);
   l.SetFillColor(10);
-  c->SetLogx(1);
+  //TEST c->SetLogx(1);
   c->SetGrid(0,1);
 
   std::string hName = "h2D"+sysType1+"Pt"+std::to_string((int)ptCut);
@@ -343,7 +351,7 @@ void OMTFHistograms::plotEffType1VsType2(int iPtCut,
   hEffType2->SetMarkerColor(1);
   if(!hEffType2) return;
   
-  TH1F hFrame("hFrame","",1,1,50);    
+  TH1F hFrame("hFrame","",1,1,hEffType1->GetPassedHistogram()->GetXaxis()->GetXmax());    
   hFrame.SetStats(kFALSE);
   hFrame.SetMinimum(0.0001);
   hFrame.SetMaximum(1.04);
